@@ -4,6 +4,7 @@
 **模块说明**：AI对话会话管理、消息发送接收、流式响应、附件处理、提示词应用等功能
 
 ## 目录
+
 - [获取会话列表](#获取会话列表)
 - [获取会话详情](#获取会话详情)
 - [创建会话](#创建会话)
@@ -46,6 +47,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - `keyword` → 侧边栏搜索框
 - 会话列表（左侧边栏）
 
@@ -64,18 +66,18 @@ Authorization: Bearer <JWT_TOKEN>
         appName: string;         // 应用名称
         modelId: number;         // 使用的模型ID
         modelName: string;       // 模型名称
-        
+
         // 最后一条消息
         lastMessage?: {
           role: 'user' | 'assistant';
           content: string;       // 消息摘要
           timestamp: number;
         };
-        
+
         messageCount: number;    // 消息总数
         isArchived: boolean;     // 是否归档
         isPinned: boolean;       // 是否置顶
-        
+
         createdAt: number;
         updatedAt: number;
         createdBy: number;
@@ -93,6 +95,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 左侧会话列表
 - 每个会话显示：标题、最后消息、时间
 
@@ -113,7 +116,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 会话ID
+  id: number; // 会话ID
 }
 ```
 
@@ -130,7 +133,7 @@ Authorization: Bearer <JWT_TOKEN>
     appName: string;
     modelId: number;
     modelName: string;
-    
+
     // 会话配置
     config: {
       temperature?: number;
@@ -138,11 +141,11 @@ Authorization: Bearer <JWT_TOKEN>
       topP?: number;
       systemPrompt?: string;  // 系统提示词
     };
-    
+
     messageCount: number;
     isArchived: boolean;
     isPinned: boolean;
-    
+
     createdAt: number;
     updatedAt: number;
     createdBy: number;
@@ -171,7 +174,7 @@ Authorization: Bearer <JWT_TOKEN>
   title?: string;            // 可选|会话标题，默认"新对话"
   appId: number;             // 必填|应用ID
   modelId: number;           // 必填|模型ID
-  
+
   // 可选：会话配置
   config?: {
     temperature?: number;    // 温度参数 0-2
@@ -183,6 +186,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 新建对话按钮
 - 应用选择器
 - 模型选择器
@@ -227,7 +231,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 会话ID
+  id: number; // 会话ID
 }
 ```
 
@@ -250,6 +254,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 重命名会话
 - 切换应用/模型
 - 置顶/归档操作
@@ -284,7 +289,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 会话ID
+  id: number; // 会话ID
 }
 ```
 
@@ -321,7 +326,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  sessionId: number;         // 会话ID
+  sessionId: number; // 会话ID
 }
 ```
 
@@ -337,20 +342,21 @@ Authorization: Bearer <JWT_TOKEN>
     size: number;
     url: string;
   }>;
-  
+
   // 可选：覆盖会话配置
   overrideConfig?: {
     temperature?: number;
     maxTokens?: number;
     topP?: number;
   };
-  
+
   // 可选：应用提示词
   promptId?: number;         // 提示词库ID
 }
 ```
 
 **Figma对应**：
+
 - 消息输入框
 - 附件预览
 - 发送按钮
@@ -371,7 +377,7 @@ Authorization: Bearer <JWT_TOKEN>
       attachments?: Attachment[];
       timestamp: number;
     },
-    
+
     // AI响应消息
     assistantMessage: {
       id: number;
@@ -379,7 +385,7 @@ Authorization: Bearer <JWT_TOKEN>
       role: 'assistant';
       content: string;         // 完整响应内容
       timestamp: number;
-      
+
       // 使用统计
       usage?: {
         promptTokens: number;
@@ -458,18 +464,19 @@ data: {"code": 500, "message": "生成失败"}
 ```
 
 **Figma对应**：
+
 - 消息实时显示
 - 打字机效果
 - 流式响应动画
 
 ### 事件类型
 
-| 事件类型 | 说明 | 数据结构 |
-|---------|------|---------|
-| start | 开始生成 | `{type: "start", messageId: number}` |
-| content | 内容增量 | `{type: "content", delta: string}` |
-| end | 生成完成 | `{type: "end", usage: {...}}` |
-| error | 错误 | `{type: "error", code: number, message: string}` |
+| 事件类型 | 说明     | 数据结构                                         |
+| -------- | -------- | ------------------------------------------------ |
+| start    | 开始生成 | `{type: "start", messageId: number}`             |
+| content  | 内容增量 | `{type: "content", delta: string}`               |
+| end      | 生成完成 | `{type: "end", usage: {...}}`                    |
+| error    | 错误     | `{type: "error", code: number, message: string}` |
 
 ---
 
@@ -516,7 +523,7 @@ Authorization: Bearer <JWT_TOKEN>
         sessionId: number;
         role: 'user' | 'assistant';
         content: string;
-        
+
         // 附件（仅用户消息）
         attachments?: Array<{
           id: number;
@@ -525,7 +532,7 @@ Authorization: Bearer <JWT_TOKEN>
           size: number;
           url: string;
         }>;
-        
+
         // 使用统计（仅AI消息）
         usage?: {
           promptTokens: number;
@@ -533,7 +540,7 @@ Authorization: Bearer <JWT_TOKEN>
           totalTokens: number;
           cost: number;
         };
-        
+
         timestamp: number;
         isStreaming?: boolean;   // 是否正在流式生成
       }
@@ -551,6 +558,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 消息列表
 - 滚动加载更多
 - 消息气泡（用户/AI）
@@ -579,6 +587,7 @@ Content-Type: multipart/form-data
 ```
 
 **Figma对应**：
+
 - 附件上传按钮
 - 附件预览
 
@@ -626,7 +635,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 附件ID
+  id: number; // 附件ID
 }
 ```
 
@@ -671,6 +680,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 提示词库弹窗
 - 提示词选择
 - 变量填充表单
@@ -721,11 +731,12 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  appId: number;             // 必填|新应用ID
+  appId: number; // 必填|新应用ID
 }
 ```
 
 **Figma对应**：
+
 - 应用切换器下拉框
 
 ### 响应数据
@@ -768,11 +779,12 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  modelId: number;           // 必填|新模型ID
+  modelId: number; // 必填|新模型ID
 }
 ```
 
 **Figma对应**：
+
 - 模型切换器下拉框
 
 ### 响应数据
@@ -827,6 +839,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 停止生成按钮（流式响应时显示）
 
 ---
@@ -847,7 +860,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   sessionId: number;
-  messageId: number;         // 用户消息ID
+  messageId: number; // 用户消息ID
 }
 ```
 
@@ -865,6 +878,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 消息右键菜单
 - 重新生成选项
 
@@ -933,7 +947,7 @@ Authorization: Bearer <JWT_TOKEN>
     totalMessages: number;
     totalTokens: number;
     totalCost: number;
-    
+
     // 今日统计
     todayStats: {
       sessions: number;
@@ -941,7 +955,7 @@ Authorization: Bearer <JWT_TOKEN>
       tokens: number;
       cost: number;
     };
-    
+
     // 使用趋势
     usageTrend: Array<{
       date: string;
@@ -949,7 +963,7 @@ Authorization: Bearer <JWT_TOKEN>
       messages: number;
       tokens: number;
     }>;
-    
+
     // Top应用
     topApps: Array<{
       appId: number;
@@ -957,7 +971,7 @@ Authorization: Bearer <JWT_TOKEN>
       messageCount: number;
       percentage: number;
     }>;
-    
+
     // Top模型
     topModels: Array<{
       modelId: number;
@@ -1028,6 +1042,7 @@ Content-Type: multipart/form-data
 ```
 
 **Figma对应**：
+
 - 语音输入按钮
 - 录音界面
 
@@ -1089,17 +1104,17 @@ Content-Type: multipart/form-data
 
 ## 错误码
 
-| 错误码 | 说明 |
-|--------|------|
-| 40301 | 会话不存在 |
-| 40302 | 消息内容为空 |
-| 40303 | 附件上传失败 |
-| 40304 | 附件格式不支持 |
-| 40305 | 附件大小超限 |
-| 40306 | Token余额不足 |
-| 40307 | 模型不可用 |
-| 40308 | 生成超时 |
-| 40309 | 内容违规 |
+| 错误码 | 说明           |
+| ------ | -------------- |
+| 40301  | 会话不存在     |
+| 40302  | 消息内容为空   |
+| 40303  | 附件上传失败   |
+| 40304  | 附件格式不支持 |
+| 40305  | 附件大小超限   |
+| 40306  | Token余额不足  |
+| 40307  | 模型不可用     |
+| 40308  | 生成超时       |
+| 40309  | 内容违规       |
 
 ---
 

@@ -4,6 +4,7 @@
 **模块说明**：应用的创建、编辑、删除、配置、发布等功能
 
 ## 目录
+
 - [获取应用列表](#获取应用列表)
 - [获取应用详情](#获取应用详情)
 - [创建应用](#创建应用)
@@ -42,6 +43,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - `keyword` → 搜索框输入
 - `category` → 分类筛选下拉框
 - `status` → 状态筛选（已发布/草稿）
@@ -67,7 +69,7 @@ Authorization: Bearer <JWT_TOKEN>
         lastModified: string;    // "2小时前"
         apiCalls: number;
         createdBy: number;
-        
+
         // 配置信息（简略）
         model?: string;          // 使用的模型
         knowledgeBaseCount?: number;  // 关联知识库数
@@ -86,6 +88,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 应用列表页的卡片网格
 - 每个卡片显示：图标、名称、描述、状态、调用次数、最后修改时间
 
@@ -106,7 +109,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 应用ID
+  id: number; // 应用ID
 }
 ```
 
@@ -126,7 +129,7 @@ Authorization: Bearer <JWT_TOKEN>
     createdAt: number;
     updatedAt: number;
     createdBy: number;
-    
+
     // 详细配置
     config: {
       // 模型配置
@@ -139,7 +142,7 @@ Authorization: Bearer <JWT_TOKEN>
         frequencyPenalty: number;
         presencePenalty: number;
       },
-      
+
       // 关联资源
       resources: {
         knowledgeBase?: {
@@ -156,20 +159,20 @@ Authorization: Bearer <JWT_TOKEN>
           enabled: boolean;
         }>;
       },
-      
+
       // 提示词配置
       prompts: {
         system: string;
         context?: string;
       },
-      
+
       // 对话设置
       conversation: {
         welcomeMessage: string;
         openingQuestions: string[];
         maxHistoryLength: number;
       },
-      
+
       // 功能设置
       features: {
         enableFileUpload: boolean;
@@ -178,7 +181,7 @@ Authorization: Bearer <JWT_TOKEN>
         enableSuggestions: boolean;
         enableHistory: boolean;
       },
-      
+
       // 安全设置
       security: {
         enableContentFilter: boolean;
@@ -186,7 +189,7 @@ Authorization: Bearer <JWT_TOKEN>
         dataRetentionDays: number;
         enableAnonymization: boolean;
       },
-      
+
       // 发布设置
       publish: {
         publicAccess: boolean;
@@ -194,7 +197,7 @@ Authorization: Bearer <JWT_TOKEN>
         apiEnabled: boolean;
       }
     },
-    
+
     // 统计数据
     stats: {
       totalApiCalls: number;
@@ -208,6 +211,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 应用设置页面的所有Tab内容
 - 基本信息、模型配置、关联资源、提示词等各个配置项
 
@@ -233,13 +237,14 @@ Authorization: Bearer <JWT_TOKEN>
   description: string;       // 必填|应用描述|maxLength:500
   category: ApplicationCategory;  // 必填|应用分类
   language?: Language;       // 可选|默认语言，默认zh-CN
-  
+
   // 可选：从模板创建
   templateId?: number;       // 模板ID
 }
 ```
 
 **Figma对应**：
+
 - 创建应用对话框的表单字段
 - 名称输入框、图标选择器、描述输入框、分类选择器
 
@@ -286,7 +291,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 应用ID
+  id: number; // 应用ID
 }
 ```
 
@@ -303,6 +308,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 应用设置页 → 基本信息Tab
 - 编辑应用对话框
 
@@ -336,7 +342,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 应用ID
+  id: number; // 应用ID
 }
 ```
 
@@ -353,24 +359,24 @@ Authorization: Bearer <JWT_TOKEN>
     frequencyPenalty?: number;
     presencePenalty?: number;
   },
-  
+
   resources?: {
     knowledgeBaseId?: number | null;  // 关联的知识库ID，null表示取消关联
     datasetId?: number | null;        // 关联的数据集ID
     workflowIds?: number[];           // 关联的工作流ID列表
   },
-  
+
   prompts?: {
     system?: string;
     context?: string;
   },
-  
+
   conversation?: {
     welcomeMessage?: string;
     openingQuestions?: string[];
     maxHistoryLength?: number;
   },
-  
+
   features?: {
     enableFileUpload?: boolean;
     enableVoiceInput?: boolean;
@@ -378,14 +384,14 @@ Authorization: Bearer <JWT_TOKEN>
     enableSuggestions?: boolean;
     enableHistory?: boolean;
   },
-  
+
   security?: {
     enableContentFilter?: boolean;
     enableDataEncryption?: boolean;
     dataRetentionDays?: number;
     enableAnonymization?: boolean;
   },
-  
+
   publish?: {
     publicAccess?: boolean;
     embedEnabled?: boolean;
@@ -395,6 +401,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 应用设置页的各个Tab配置项
 - 模型配置、关联资源、提示词、对话设置、功能、安全、发布设置
 
@@ -428,7 +435,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 应用ID
+  id: number; // 应用ID
 }
 ```
 
@@ -466,7 +473,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 应用ID
+  id: number; // 应用ID
 }
 ```
 
@@ -508,7 +515,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 应用ID
+  id: number; // 应用ID
 }
 ```
 
@@ -543,7 +550,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 源应用ID
+  id: number; // 源应用ID
 }
 ```
 
@@ -585,7 +592,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 应用ID
+  id: number; // 应用ID
 }
 ```
 
@@ -600,6 +607,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 分享应用对话框
 - 分享方式选择、权限设置、有效期设置
 
@@ -638,7 +646,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 应用ID
+  id: number; // 应用ID
 }
 ```
 
@@ -707,7 +715,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 应用ID
+  id: number; // 应用ID
 }
 ```
 
@@ -760,7 +768,7 @@ Content-Type: multipart/form-data
 ```
 创建 → 草稿 → 发布 → 已发布
               ↑______|
-              
+
 已发布 → 取消发布 → 草稿
 ```
 

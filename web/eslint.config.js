@@ -10,6 +10,7 @@ const prettierConfig = require('eslint-config-prettier');
 
 module.exports = [
   js.configs.recommended,
+  prettierConfig,
   {
     files: ['**/*.{ts,tsx,js,jsx}'],
     languageOptions: {
@@ -35,10 +36,11 @@ module.exports = [
     },
     plugins: {
       '@typescript-eslint': typescript,
-      'react': react,
+      react: react,
       'react-hooks': reactHooks,
       'jsx-a11y': jsxA11y,
-      'import': importPlugin,
+      import: importPlugin,
+      prettier: prettier,
     },
     rules: {
       // React相关规则
@@ -52,20 +54,23 @@ module.exports = [
       'react/no-array-index-key': 'warn',
       'react/no-unescaped-entities': 'off',
       'react/display-name': 'off',
-      
+
       // React Hooks规则
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
-      
+
       // TypeScript规则
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_' },
+      ],
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-empty-function': 'warn',
       '@typescript-eslint/no-non-null-assertion': 'warn',
       '@typescript-eslint/no-var-requires': 'error',
-      
+
       // 通用规则
       'no-console': 'warn',
       'no-debugger': 'error',
@@ -75,11 +80,14 @@ module.exports = [
       'no-var': 'error',
       'object-shorthand': 'error',
       'prefer-arrow-callback': 'error',
-      
+
       // 可访问性规则
       'jsx-a11y/anchor-is-valid': 'off',
       'jsx-a11y/click-events-have-key-events': 'warn',
       'jsx-a11y/no-static-element-interactions': 'warn',
+
+      // Prettier规则
+      'prettier/prettier': 'error',
     },
     settings: {
       react: {

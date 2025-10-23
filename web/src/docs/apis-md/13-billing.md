@@ -4,6 +4,7 @@
 **模块说明**：订阅计划、支付处理、发票管理、使用量查询等功能
 
 ## 目录
+
 - [获取订阅计划](#获取订阅计划)
 - [获取当前订阅](#获取当前订阅)
 - [创建订阅](#创建订阅)
@@ -35,6 +36,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 计费周期切换（月付/季付/年付）
 - 订阅计划卡片
 
@@ -51,7 +53,7 @@ Authorization: Bearer <JWT_TOKEN>
         name: string;          // "免费版", "专业版", "企业版"
         nameEn: string;
         icon: string;          // 图标名称
-        
+
         // 定价
         price: number;         // 月价格
         originalPrice?: number; // 原价（优惠时）
@@ -59,13 +61,13 @@ Authorization: Bearer <JWT_TOKEN>
         discount?: string;     // "节省20%"
         currency: string;      // "CNY"
         period: string;        // "/月"
-        
+
         description: string;
         popular?: boolean;     // 是否热门
-        
+
         // 功能特性
         features: string[];
-        
+
         // 限制额度
         limits: {
           apiCalls: string;    // "10,000次/月"
@@ -80,7 +82,7 @@ Authorization: Bearer <JWT_TOKEN>
           membersRaw: number;
           support: string;     // "邮件支持"
         };
-        
+
         // 附加功能
         addons?: Array<{
           id: string;
@@ -95,6 +97,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 订阅计划卡片网格
 - 每个卡片显示：名称、价格、功能列表、限制、订阅按钮
 
@@ -123,12 +126,12 @@ Authorization: Bearer <JWT_TOKEN>
     planName: string;
     status: 'active' | 'canceled' | 'expired' | 'trialing';
     statusColor: string;
-    
+
     // 计费信息
     billingCycle: 'monthly' | 'quarterly' | 'yearly';
     price: number;
     currency: string;
-    
+
     // 时间
     startDate: string;
     startedAt: number;
@@ -136,10 +139,10 @@ Authorization: Bearer <JWT_TOKEN>
     currentPeriodEnd: number;
     nextBillingDate: string;  // "2024-02-15"
     nextBillingAt: number;
-    
+
     canceledAt?: number;
     cancelAtPeriodEnd?: boolean;  // 是否在周期结束时取消
-    
+
     // 限制和使用
     limits: {
       apiCalls: number;
@@ -148,7 +151,7 @@ Authorization: Bearer <JWT_TOKEN>
       storage: number;
       members: number;
     };
-    
+
     usage: {
       apiCalls: number;
       apiCallsPercentage: number;
@@ -158,7 +161,7 @@ Authorization: Bearer <JWT_TOKEN>
       storagePercentage: number;
       members: number;
     };
-    
+
     // 附加服务
     addons?: Array<{
       id: string;
@@ -171,6 +174,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 当前订阅卡片
 - 使用量进度条
 - 下次续费时间
@@ -195,16 +199,17 @@ Authorization: Bearer <JWT_TOKEN>
   planId: string;            // 必填|计划ID
   billingCycle: 'monthly' | 'quarterly' | 'yearly';
   paymentMethodId: string;   // 必填|支付方式ID
-  
+
   // 可选：附加服务
   addonIds?: string[];
-  
+
   // 可选：优惠券
   couponCode?: string;
 }
 ```
 
 **Figma对应**：
+
 - 订阅计划选择
 - 计费周期选择
 - 支付方式选择
@@ -219,7 +224,7 @@ Authorization: Bearer <JWT_TOKEN>
     subscriptionId: number;
     planId: string;
     status: 'active' | 'pending_payment';
-    
+
     // 支付信息（如需要支付）
     payment?: {
       orderId: string;
@@ -229,7 +234,7 @@ Authorization: Bearer <JWT_TOKEN>
       qrCode?: string;       // 二维码（微信/支付宝）
       expiresAt: number;     // 支付过期时间
     };
-    
+
     createdAt: number;
   },
   timestamp: 1706889600000
@@ -267,6 +272,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 升级/降级按钮
 - 确认对话框
 
@@ -281,14 +287,14 @@ Authorization: Bearer <JWT_TOKEN>
     oldPlanId: string;
     newPlanId: string;
     effectiveAt: number;
-    
+
     // 费用调整
     proration?: {
       creditAmount: number;  // 退款金额
       chargeAmount: number;  // 补差金额
       description: string;
     };
-    
+
     // 如需补差
     payment?: {
       orderId: string;
@@ -331,6 +337,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 取消订阅按钮
 - 确认对话框
 - 反馈表单
@@ -411,15 +418,15 @@ Authorization: Bearer <JWT_TOKEN>
         id: string;
         type: 'credit_card' | 'alipay' | 'wechat' | 'bank_transfer';
         typeLabel: string;     // "信用卡", "支付宝"
-        
+
         // 卡片信息（信用卡）
         brand?: string;        // "Visa", "MasterCard"
         lastFour?: string;     // "4242"
         expiry?: string;       // "12/25"
-        
+
         // 账户信息（支付宝/微信）
         account?: string;      // 部分显示
-        
+
         isDefault: boolean;
         createdAt: number;
       }
@@ -430,6 +437,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 支付方式列表
 - 每个支付方式显示：类型图标、卡号/账号、默认标记
 
@@ -451,7 +459,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   type: 'credit_card' | 'alipay' | 'wechat';
-  
+
   // 信用卡
   creditCard?: {
     number: string;          // 卡号
@@ -460,15 +468,16 @@ Authorization: Bearer <JWT_TOKEN>
     cvc: string;             // 安全码
     holderName: string;      // 持卡人姓名
   };
-  
+
   // 支付宝/微信（需要授权）
   authCode?: string;         // 授权码
-  
+
   setAsDefault?: boolean;    // 是否设为默认
 }
 ```
 
 **Figma对应**：
+
 - 添加支付方式对话框
 - 信用卡表单
 - 第三方支付授权
@@ -507,7 +516,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: string;                // 支付方式ID
+  id: string; // 支付方式ID
 }
 ```
 
@@ -543,7 +552,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: string;                // 支付方式ID
+  id: string; // 支付方式ID
 }
 ```
 
@@ -599,16 +608,16 @@ Authorization: Bearer <JWT_TOKEN>
         invoiceNumber: string;  // "INV-2024-001"
         date: string;           // "2024-01-15"
         dateTimestamp: number;
-        
+
         amount: number;
         currency: string;
         amountDisplay: string;  // "¥299.00"
-        
+
         status: 'paid' | 'pending' | 'failed' | 'refunded';
         statusColor: string;
-        
+
         description: string;    // "专业版订阅 - 月付"
-        
+
         // 详细项
         items: Array<{
           description: string;
@@ -616,11 +625,11 @@ Authorization: Bearer <JWT_TOKEN>
           unitPrice: number;
           amount: number;
         }>;
-        
+
         // 下载链接
         pdfUrl: string;
         downloadUrl: string;
-        
+
         paidAt?: number;
       }
     ],
@@ -631,6 +640,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 发票列表表格
 - 每行显示：发票号、日期、金额、状态、下载按钮
 
@@ -651,7 +661,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: string;                // 发票ID
+  id: string; // 发票ID
 }
 ```
 
@@ -692,7 +702,7 @@ Authorization: Bearer <JWT_TOKEN>
       start: number;
       end: number;
     },
-    
+
     // 当前使用量
     current: {
       apiCalls: {
@@ -718,7 +728,7 @@ Authorization: Bearer <JWT_TOKEN>
         limit: number;
       }
     },
-    
+
     // 使用趋势
     trends: {
       apiCalls: Array<{
@@ -734,7 +744,7 @@ Authorization: Bearer <JWT_TOKEN>
         size: number;
       }>;
     },
-    
+
     // 按资源类型分组
     byResource: {
       applications: number;
@@ -742,7 +752,7 @@ Authorization: Bearer <JWT_TOKEN>
       datasets: number;
       models: number;
     },
-    
+
     // 预估费用
     estimatedCost: {
       current: number;
@@ -755,6 +765,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 使用量详情页面
 - 使用量趋势图表
 - 资源使用分布
@@ -777,7 +788,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  couponCode: string;        // 优惠券码
+  couponCode: string; // 优惠券码
 }
 ```
 
@@ -801,6 +812,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 优惠券输入框
 - 应用按钮
 
@@ -842,14 +854,14 @@ Authorization: Bearer <JWT_TOKEN>
         currency: string;
         status: string;
         statusColor: string;
-        
+
         paymentMethod: string;
         description: string;
-        
+
         createdAt: number;
         paidAt?: number;
         refundedAt?: number;
-        
+
         invoiceId?: string;
       }
     ],
@@ -915,11 +927,13 @@ trial（试用） → active（激活） → past_due（逾期） → canceled�
 ### 升级/降级规则
 
 **升级（Upgrade）**
+
 - 立即生效
 - 按比例计算剩余时间
 - 补差价
 
 **降级（Downgrade）**
+
 - 下个周期生效
 - 当前周期继续享受原计划
 - 无需退款
@@ -934,16 +948,16 @@ trial（试用） → active（激活） → past_due（逾期） → canceled�
 
 ## 错误码
 
-| 错误码 | 说明 |
-|--------|------|
-| 41301 | 订阅不存在 |
-| 41302 | 计划不存在 |
-| 41303 | 支付方式无效 |
-| 41304 | 支付失败 |
-| 41305 | 优惠券无效或已过期 |
-| 41306 | 超过使用限额 |
-| 41307 | 发票不存在 |
-| 41308 | 不能删除默认支付方式 |
+| 错误码 | 说明                 |
+| ------ | -------------------- |
+| 41301  | 订阅不存在           |
+| 41302  | 计划不存在           |
+| 41303  | 支付方式无效         |
+| 41304  | 支付失败             |
+| 41305  | 优惠券无效或已过期   |
+| 41306  | 超过使用限额         |
+| 41307  | 发票不存在           |
+| 41308  | 不能删除默认支付方式 |
 
 ---
 

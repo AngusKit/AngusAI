@@ -1,9 +1,21 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '../ui/dialog';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
 import { Label } from '../ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../ui/select';
 import { Badge } from '../ui/badge';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
@@ -58,7 +70,11 @@ const iconOptions = [
   { emoji: '🌺', bg: 'bg-pink-100 dark:bg-pink-900/30', label: '花朵' },
 ];
 
-export function EditKnowledgeBaseDialog({ open, onOpenChange, knowledgeBase }: EditKnowledgeBaseDialogProps) {
+export function EditKnowledgeBaseDialog({
+  open,
+  onOpenChange,
+  knowledgeBase,
+}: EditKnowledgeBaseDialogProps) {
   const [kbName, setKbName] = useState('');
   const [description, setDescription] = useState('');
   const [visibility, setVisibility] = useState('private');
@@ -78,8 +94,10 @@ export function EditKnowledgeBaseDialog({ open, onOpenChange, knowledgeBase }: E
       'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400',
       'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
     ];
-    
-    const index = tag.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
+
+    const index =
+      tag.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) %
+      colors.length;
     return colors[index];
   };
 
@@ -87,24 +105,24 @@ export function EditKnowledgeBaseDialog({ open, onOpenChange, knowledgeBase }: E
     if (e.key === 'Enter' || e.key === ',') {
       e.preventDefault();
       const newTag = tagInput.trim();
-      
+
       if (!newTag) return;
-      
+
       if (newTag.length > 10) {
         toast.error('标签长度不能超过10个字符');
         return;
       }
-      
+
       if (tags.length >= 5) {
         toast.error('最多只能添加5个标签');
         return;
       }
-      
+
       if (tags.includes(newTag)) {
         toast.error('标签已存在');
         return;
       }
-      
+
       setTags([...tags, newTag]);
       setTagInput('');
     }
@@ -121,10 +139,12 @@ export function EditKnowledgeBaseDialog({ open, onOpenChange, knowledgeBase }: E
       setDescription(knowledgeBase.description);
       setVisibility(knowledgeBase.visibility || 'private');
       setTags(knowledgeBase.tags || []);
-      
+
       // 根据icon找到对应的索引
       if (knowledgeBase.icon) {
-        const iconIndex = iconOptions.findIndex(opt => opt.emoji === knowledgeBase.icon);
+        const iconIndex = iconOptions.findIndex(
+          opt => opt.emoji === knowledgeBase.icon
+        );
         if (iconIndex !== -1) {
           setSelectedIcon(iconIndex);
         }
@@ -149,37 +169,47 @@ export function EditKnowledgeBaseDialog({ open, onOpenChange, knowledgeBase }: E
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl dark:bg-gray-900 dark:border-gray-700">
+      <DialogContent className='max-w-2xl dark:bg-gray-900 dark:border-gray-700'>
         <DialogHeader>
-          <DialogTitle className="dark:text-white">编辑知识库</DialogTitle>
-          <DialogDescription className="text-gray-500 dark:text-gray-400">
+          <DialogTitle className='dark:text-white'>编辑知识库</DialogTitle>
+          <DialogDescription className='text-gray-500 dark:text-gray-400'>
             修改知识库的基本信息
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-5 py-4">
+        <div className='space-y-5 py-4'>
           {/* 名称和可见性在同一行 */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className='grid grid-cols-2 gap-4'>
             <div>
-              <Label className="text-sm mb-2 block dark:text-gray-300">知识库名称</Label>
+              <Label className='text-sm mb-2 block dark:text-gray-300'>
+                知识库名称
+              </Label>
               <Input
                 value={kbName}
-                onChange={(e) => setKbName(e.target.value)}
-                placeholder="请输入知识库名称"
-                className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                onChange={e => setKbName(e.target.value)}
+                placeholder='请输入知识库名称'
+                className='dark:bg-gray-800 dark:border-gray-700 dark:text-white'
               />
             </div>
 
             <div>
-              <Label className="text-sm mb-2 block dark:text-gray-300">可见性</Label>
+              <Label className='text-sm mb-2 block dark:text-gray-300'>
+                可见性
+              </Label>
               <Select value={visibility} onValueChange={setVisibility}>
-                <SelectTrigger className="dark:bg-gray-800 dark:border-gray-700 dark:text-white">
+                <SelectTrigger className='dark:bg-gray-800 dark:border-gray-700 dark:text-white'>
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                  <SelectItem value="private" className="dark:text-white">私有</SelectItem>
-                  <SelectItem value="team" className="dark:text-white">团队可见</SelectItem>
-                  <SelectItem value="public" className="dark:text-white">公开</SelectItem>
+                <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
+                  <SelectItem value='private' className='dark:text-white'>
+                    私有
+                  </SelectItem>
+                  <SelectItem value='team' className='dark:text-white'>
+                    团队可见
+                  </SelectItem>
+                  <SelectItem value='public' className='dark:text-white'>
+                    公开
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -187,41 +217,40 @@ export function EditKnowledgeBaseDialog({ open, onOpenChange, knowledgeBase }: E
 
           {/* 描述 */}
           <div>
-            <Label className="text-sm mb-2 block dark:text-gray-300">描述</Label>
+            <Label className='text-sm mb-2 block dark:text-gray-300'>
+              描述
+            </Label>
             <Textarea
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="请输入知识库描述"
+              onChange={e => setDescription(e.target.value)}
+              placeholder='请输入知识库描述'
               rows={3}
-              className="dark:bg-gray-800 dark:border-gray-700 dark:text-white resize-none"
+              className='dark:bg-gray-800 dark:border-gray-700 dark:text-white resize-none'
             />
           </div>
 
           {/* 标签 */}
           <div>
-            <Label className="text-sm mb-2 block dark:text-gray-300">
-              标签 <span className="text-gray-400">({tags.length}/5)</span>
+            <Label className='text-sm mb-2 block dark:text-gray-300'>
+              标签 <span className='text-gray-400'>({tags.length}/5)</span>
             </Label>
             <Input
               value={tagInput}
-              onChange={(e) => setTagInput(e.target.value)}
+              onChange={e => setTagInput(e.target.value)}
               onKeyDown={handleAddTag}
-              placeholder="输入标签后按回车，最多5个，每个不超过10字符"
-              className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+              placeholder='输入标签后按回车，最多5个，每个不超过10字符'
+              className='dark:bg-gray-800 dark:border-gray-700 dark:text-white'
               disabled={tags.length >= 5}
               maxLength={10}
             />
             {tags.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-2">
-                {tags.map((tag) => (
-                  <Badge
-                    key={tag}
-                    className={`border-0 ${getTagColor(tag)}`}
-                  >
+              <div className='flex flex-wrap gap-2 mt-2'>
+                {tags.map(tag => (
+                  <Badge key={tag} className={`border-0 ${getTagColor(tag)}`}>
                     {tag}
                     <button
                       onClick={() => handleRemoveTag(tag)}
-                      className="ml-1 hover:opacity-70 transition-opacity"
+                      className='ml-1 hover:opacity-70 transition-opacity'
                     >
                       ×
                     </button>
@@ -233,16 +262,18 @@ export function EditKnowledgeBaseDialog({ open, onOpenChange, knowledgeBase }: E
 
           {/* 图标 - 超过两排时可滚动 */}
           <div>
-            <Label className="text-sm mb-2 block dark:text-gray-300">图标</Label>
-            <div className="max-h-[140px] overflow-y-auto pr-2 border border-gray-200 dark:border-gray-700 rounded-lg p-2">
-              <div className="grid grid-cols-8 gap-2">
+            <Label className='text-sm mb-2 block dark:text-gray-300'>
+              图标
+            </Label>
+            <div className='max-h-[140px] overflow-y-auto pr-2 border border-gray-200 dark:border-gray-700 rounded-lg p-2'>
+              <div className='grid grid-cols-8 gap-2'>
                 {iconOptions.map((option, index) => (
                   <button
                     key={index}
                     onClick={() => setSelectedIcon(index)}
                     className={`${option.bg} w-12 h-12 rounded-lg flex items-center justify-center text-xl transition-all ${
-                      selectedIcon === index 
-                        ? 'ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-gray-900' 
+                      selectedIcon === index
+                        ? 'ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-gray-900'
                         : 'hover:scale-105'
                     }`}
                     title={option.label}
@@ -255,17 +286,17 @@ export function EditKnowledgeBaseDialog({ open, onOpenChange, knowledgeBase }: E
           </div>
         </div>
 
-        <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <div className='flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700'>
           <Button
-            variant="outline"
+            variant='outline'
             onClick={() => onOpenChange(false)}
-            className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+            className='dark:bg-gray-800 dark:border-gray-700 dark:text-white'
           >
             取消
           </Button>
           <Button
             onClick={handleSave}
-            className="bg-blue-500 hover:bg-blue-600 text-white"
+            className='bg-blue-500 hover:bg-blue-600 text-white'
           >
             保存
           </Button>

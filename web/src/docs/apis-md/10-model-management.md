@@ -4,6 +4,7 @@
 **模块说明**：模型的添加、配置、启动、停止、监控等功能
 
 ## 目录
+
 - [获取模型列表](#获取模型列表)
 - [获取模型详情](#获取模型详情)
 - [添加模型](#添加模型)
@@ -44,6 +45,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - `keyword` → 搜索框
 - `type` → 类型筛选下拉框
 - `status` → 状态筛选（运行中/已停止/部署中）
@@ -69,28 +71,28 @@ Authorization: Bearer <JWT_TOKEN>
         version: string;
         status: ModelStatus;   // running | stopped | deploying
         statusColor: string;
-        
+
         // 性能指标
         performance: {
           latency: string;       // "128ms"
           throughput: string;    // "1.2K req/min"
           accuracy: string;      // "98.5%"
         };
-        
+
         // 资源使用
         resources: {
           cpu: string;           // "45%"
           memory: string;        // "2.1GB"
           gpu: string;           // "60%"
         };
-        
+
         // 统计
         calls: string;           // "45.2K"
         callsCount: number;
         cost: string;            // "¥1,234"
         deployed: string;        // "2023-10-15"
         deployedAt: number;
-        
+
         createdAt: number;
         updatedAt: number;
       }
@@ -107,6 +109,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 模型列表网格卡片或列表
 - 每个卡片显示：图标、名称、类型、状态、性能、资源、调用统计
 
@@ -127,7 +130,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 模型ID
+  id: number; // 模型ID
 }
 ```
 
@@ -149,14 +152,14 @@ Authorization: Bearer <JWT_TOKEN>
     version: string;
     status: ModelStatus;
     statusColor: string;
-    
+
     // 配置信息
     config: {
       // API配置
       apiEndpoint?: string;
       apiKey?: string;         // 部分隐藏
       apiKeyMasked?: string;   // "sk-***abc"
-      
+
       // 模型参数
       parameters: {
         maxTokens?: number;
@@ -167,7 +170,7 @@ Authorization: Bearer <JWT_TOKEN>
         presencePenalty?: number;
         stopSequences?: string[];
       };
-      
+
       // 部署配置
       deployment?: {
         region?: string;
@@ -177,7 +180,7 @@ Authorization: Bearer <JWT_TOKEN>
         minReplicas?: number;
         maxReplicas?: number;
       };
-      
+
       // 限制配置
       limits?: {
         rateLimit?: number;      // 每分钟请求数
@@ -185,7 +188,7 @@ Authorization: Bearer <JWT_TOKEN>
         maxConcurrent?: number;  // 最大并发数
       };
     };
-    
+
     // 性能指标
     performance: {
       latency: string;
@@ -195,7 +198,7 @@ Authorization: Bearer <JWT_TOKEN>
       accuracy: string;
       accuracyPercent: number;
     };
-    
+
     // 资源使用
     resources: {
       cpu: string;
@@ -205,7 +208,7 @@ Authorization: Bearer <JWT_TOKEN>
       gpu: string;
       gpuPercent: number;
     };
-    
+
     // 统计数据
     stats: {
       totalCalls: number;
@@ -217,7 +220,7 @@ Authorization: Bearer <JWT_TOKEN>
       successRate: number;
       last24HoursCalls: number;
     };
-    
+
     // 时间信息
     deployed: string;
     deployedAt: number;
@@ -230,6 +233,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 模型详情对话框
 - 显示完整配置、性能指标、资源使用、统计数据
 
@@ -255,11 +259,11 @@ Authorization: Bearer <JWT_TOKEN>
   type: ModelType;           // 必填|模型类型
   provider: ModelProvider;   // 必填|提供商
   version?: string;          // 可选|版本号
-  
+
   // API配置
   apiEndpoint?: string;      // API端点
   apiKey?: string;           // API密钥（加密传输）
-  
+
   // 模型参数
   parameters?: {
     maxTokens?: number;
@@ -269,7 +273,7 @@ Authorization: Bearer <JWT_TOKEN>
     frequencyPenalty?: number;
     presencePenalty?: number;
   };
-  
+
   // 部署配置
   deployment?: {
     region?: string;
@@ -279,20 +283,21 @@ Authorization: Bearer <JWT_TOKEN>
     minReplicas?: number;
     maxReplicas?: number;
   };
-  
+
   // 限制配置
   limits?: {
     rateLimit?: number;
     dailyLimit?: number;
     maxConcurrent?: number;
   };
-  
+
   // 是否立即部署
   autoDeploy?: boolean;      // 默认false
 }
 ```
 
 **Figma对应**：
+
 - 添加模型对话框
 - 多步骤表单：基本信息、API配置、参数设置、部署设置
 
@@ -338,7 +343,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 模型ID
+  id: number; // 模型ID
 }
 ```
 
@@ -358,6 +363,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 编辑模型对话框
 
 ### 响应数据
@@ -396,7 +402,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 模型ID
+  id: number; // 模型ID
 }
 ```
 
@@ -433,7 +439,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 模型ID
+  id: number; // 模型ID
 }
 ```
 
@@ -453,6 +459,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 模型卡片上的启动按钮
 - 详情页的启动按钮
 
@@ -480,7 +487,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 模型ID
+  id: number; // 模型ID
 }
 ```
 
@@ -507,6 +514,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 模型卡片上的停止按钮
 
 ---
@@ -526,7 +534,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 模型ID
+  id: number; // 模型ID
 }
 ```
 
@@ -571,7 +579,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 模型ID
+  id: number; // 模型ID
 }
 ```
 
@@ -598,7 +606,7 @@ Authorization: Bearer <JWT_TOKEN>
       end: number;
       granularity: string;   // 数据粒度
     },
-    
+
     // 性能指标时序数据
     latency: Array<{
       timestamp: number;
@@ -607,33 +615,33 @@ Authorization: Bearer <JWT_TOKEN>
       p95?: number;
       p99?: number;
     }>;
-    
+
     throughput: Array<{
       timestamp: number;
       value: number;         // 请求数/分钟
     }>;
-    
+
     successRate: Array<{
       timestamp: number;
       value: number;         // 百分比
     }>;
-    
+
     // 资源使用时序数据
     cpu: Array<{
       timestamp: number;
       value: number;         // 百分比
     }>;
-    
+
     memory: Array<{
       timestamp: number;
       value: number;         // MB
     }>;
-    
+
     gpu: Array<{
       timestamp: number;
       value: number;         // 百分比
     }>;
-    
+
     // 成本数据
     cost: Array<{
       timestamp: number;
@@ -646,6 +654,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 模型详情页的监控Tab
 - 性能趋势图表
 
@@ -666,7 +675,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 模型ID
+  id: number; // 模型ID
 }
 ```
 
@@ -695,7 +704,7 @@ Authorization: Bearer <JWT_TOKEN>
       avgResponseTime: number;
       successRate: number;
     },
-    
+
     // 调用趋势
     callsTrend: Array<{
       timestamp: number;
@@ -703,7 +712,7 @@ Authorization: Bearer <JWT_TOKEN>
       successful: number;
       failed: number;
     }>;
-    
+
     // Token使用
     tokenUsage: Array<{
       timestamp: number;
@@ -711,13 +720,13 @@ Authorization: Bearer <JWT_TOKEN>
       outputTokens: number;
       totalTokens: number;
     }>;
-    
+
     // 成本趋势
     costTrend: Array<{
       timestamp: number;
       cost: number;
     }>;
-    
+
     // Top调用应用
     topApplications: Array<{
       applicationId: number;
@@ -725,7 +734,7 @@ Authorization: Bearer <JWT_TOKEN>
       calls: number;
       percentage: number;
     }>;
-    
+
     // 错误分析
     errorAnalysis?: {
       total: number;
@@ -789,6 +798,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 模型管理页面顶部的4个统计卡片
 
 ---
@@ -818,7 +828,7 @@ Authorization: Bearer <JWT_TOKEN>
         description: string;
         logo: string;
         supportedTypes: ModelType[];
-        
+
         // 可用模型
         models: Array<{
           id: string;
@@ -830,7 +840,7 @@ Authorization: Bearer <JWT_TOKEN>
             outputPerToken: number;
           };
         }>;
-        
+
         // 配置要求
         configRequirements: {
           apiKey: boolean;
@@ -860,7 +870,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 模型ID
+  id: number; // 模型ID
 }
 ```
 
@@ -936,7 +946,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 模型ID
+  id: number; // 模型ID
 }
 ```
 
@@ -991,7 +1001,7 @@ Content-Type: multipart/form-data
 添加 → stopped（已停止） → deploying（部署中） → running（运行中）
                                                     ↓
                                                   stopped
-                                                  
+
 running → error（错误） → 可重启恢复
 ```
 
@@ -1019,16 +1029,16 @@ running → error（错误） → 可重启恢复
 
 ## 错误码
 
-| 错误码 | 说明 |
-|--------|------|
-| 41001 | 模型不存在 |
-| 41002 | 模型正在运行，无法删除 |
-| 41003 | API密钥无效 |
-| 41004 | 模型配置不完整 |
-| 41005 | 模型部署失败 |
-| 41006 | 超过并发限制 |
-| 41007 | 超过每日限额 |
-| 41008 | 不支持的模型类型 |
+| 错误码 | 说明                   |
+| ------ | ---------------------- |
+| 41001  | 模型不存在             |
+| 41002  | 模型正在运行，无法删除 |
+| 41003  | API密钥无效            |
+| 41004  | 模型配置不完整         |
+| 41005  | 模型部署失败           |
+| 41006  | 超过并发限制           |
+| 41007  | 超过每日限额           |
+| 41008  | 不支持的模型类型       |
 
 ---
 

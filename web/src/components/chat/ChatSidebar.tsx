@@ -1,4 +1,13 @@
-import { MessageSquare, Plus, Trash2, MoreVertical, ChevronLeft, Search, Clock, Star } from 'lucide-react';
+import {
+  MessageSquare,
+  Plus,
+  Trash2,
+  MoreVertical,
+  ChevronLeft,
+  Search,
+  Clock,
+  Star,
+} from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { ScrollArea } from '../ui/scroll-area';
@@ -57,7 +66,12 @@ export function ChatSidebar({
     today: filteredSessions.filter(s => isToday(s.updatedAt)),
     yesterday: filteredSessions.filter(s => isYesterday(s.updatedAt)),
     lastWeek: filteredSessions.filter(s => isLastWeek(s.updatedAt)),
-    older: filteredSessions.filter(s => !isToday(s.updatedAt) && !isYesterday(s.updatedAt) && !isLastWeek(s.updatedAt)),
+    older: filteredSessions.filter(
+      s =>
+        !isToday(s.updatedAt) &&
+        !isYesterday(s.updatedAt) &&
+        !isLastWeek(s.updatedAt)
+    ),
   };
 
   function isToday(date: Date) {
@@ -103,12 +117,12 @@ export function ChatSidebar({
       )}
     >
       {session.isStarred && (
-        <Star className="w-4 h-4 flex-shrink-0 fill-yellow-400 text-yellow-400" />
+        <Star className='w-4 h-4 flex-shrink-0 fill-yellow-400 text-yellow-400' />
       )}
       {!session.isStarred && (
-        <MessageSquare className="w-4 h-4 flex-shrink-0" />
+        <MessageSquare className='w-4 h-4 flex-shrink-0' />
       )}
-      <div className="flex-1 min-w-0">
+      <div className='flex-1 min-w-0'>
         {renamingId === session.id ? (
           <Input
             value={renameValue}
@@ -121,14 +135,14 @@ export function ChatSidebar({
               }
             }}
             onBlur={() => submitRename(session.id)}
-            className="h-7 text-sm"
+            className='h-7 text-sm'
             autoFocus
             onClick={e => e.stopPropagation()}
           />
         ) : (
           <>
-            <p className="text-sm truncate">{session.title}</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
+            <p className='text-sm truncate'>{session.title}</p>
+            <p className='text-xs text-gray-500 dark:text-gray-400'>
               {session.messages.length} 条消息
             </p>
           </>
@@ -137,22 +151,27 @@ export function ChatSidebar({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 opacity-0 group-hover:opacity-100"
+            variant='ghost'
+            size='icon'
+            className='h-8 w-8 opacity-0 group-hover:opacity-100'
             onClick={e => e.stopPropagation()}
           >
-            <MoreVertical className="w-4 h-4" />
+            <MoreVertical className='w-4 h-4' />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
+        <DropdownMenuContent align='end'>
           <DropdownMenuItem
             onClick={e => {
               e.stopPropagation();
               onToggleStar(session.id);
             }}
           >
-            <Star className={cn("w-4 h-4 mr-2", session.isStarred && "fill-yellow-400 text-yellow-400")} />
+            <Star
+              className={cn(
+                'w-4 h-4 mr-2',
+                session.isStarred && 'fill-yellow-400 text-yellow-400'
+              )}
+            />
             {session.isStarred ? '取消收藏' : '收藏'}
           </DropdownMenuItem>
           <DropdownMenuItem
@@ -161,17 +180,17 @@ export function ChatSidebar({
               handleRename(session.id, session.title);
             }}
           >
-            <MessageSquare className="w-4 h-4 mr-2" />
+            <MessageSquare className='w-4 h-4 mr-2' />
             重命名
           </DropdownMenuItem>
           <DropdownMenuItem
-            className="text-red-600 dark:text-red-400"
+            className='text-red-600 dark:text-red-400'
             onClick={e => {
               e.stopPropagation();
               onDeleteSession(session.id);
             }}
           >
-            <Trash2 className="w-4 h-4 mr-2" />
+            <Trash2 className='w-4 h-4 mr-2' />
             删除
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -179,15 +198,21 @@ export function ChatSidebar({
     </div>
   );
 
-  const SessionGroup = ({ title, sessions }: { title: string; sessions: Session[] }) => {
+  const SessionGroup = ({
+    title,
+    sessions,
+  }: {
+    title: string;
+    sessions: Session[];
+  }) => {
     if (sessions.length === 0) return null;
     return (
-      <div className="mb-4">
-        <h3 className="text-xs text-gray-500 dark:text-gray-400 px-3 mb-2 flex items-center gap-2">
-          <Clock className="w-3 h-3" />
+      <div className='mb-4'>
+        <h3 className='text-xs text-gray-500 dark:text-gray-400 px-3 mb-2 flex items-center gap-2'>
+          <Clock className='w-3 h-3' />
           {title}
         </h3>
-        <div className="space-y-1">
+        <div className='space-y-1'>
           {sessions.map(session => (
             <SessionItem key={session.id} session={session} />
           ))}
@@ -198,72 +223,59 @@ export function ChatSidebar({
 
   if (!isOpen) {
     return (
-      <div className="w-12 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col items-center py-4">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onToggle}
-          className="mb-4"
-        >
-          <MessageSquare className="w-5 h-5" />
+      <div className='w-12 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col items-center py-4'>
+        <Button variant='ghost' size='icon' onClick={onToggle} className='mb-4'>
+          <MessageSquare className='w-5 h-5' />
         </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onNewSession}
-        >
-          <Plus className="w-5 h-5" />
+        <Button variant='ghost' size='icon' onClick={onNewSession}>
+          <Plus className='w-5 h-5' />
         </Button>
       </div>
     );
   }
 
   return (
-    <div className="w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
+    <div className='w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col'>
       {/* Header */}
-      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg dark:text-white flex items-center gap-2">
-            <MessageSquare className="w-5 h-5" />
+      <div className='p-4 border-b border-gray-200 dark:border-gray-700'>
+        <div className='flex items-center justify-between mb-4'>
+          <h2 className='text-lg dark:text-white flex items-center gap-2'>
+            <MessageSquare className='w-5 h-5' />
             对话列表
           </h2>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onToggle}
-          >
-            <ChevronLeft className="w-5 h-5" />
+          <Button variant='ghost' size='icon' onClick={onToggle}>
+            <ChevronLeft className='w-5 h-5' />
           </Button>
         </div>
 
-        <div className="flex gap-2">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <div className='flex gap-2'>
+          <div className='flex-1 relative'>
+            <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
             <Input
-              placeholder="搜索对话..."
+              placeholder='搜索对话...'
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="pl-10 dark:bg-gray-750 dark:border-gray-600"
+              className='pl-10 dark:bg-gray-750 dark:border-gray-600'
             />
           </div>
-          <Button onClick={onNewSession} size="icon">
-            <Plus className="w-4 h-4" />
+          <Button onClick={onNewSession} size='icon'>
+            <Plus className='w-4 h-4' />
           </Button>
         </div>
       </div>
 
       {/* Sessions List */}
-      <ScrollArea className="flex-1">
-        <div className="p-4">
-          <SessionGroup title="今天" sessions={groupedSessions.today} />
-          <SessionGroup title="昨天" sessions={groupedSessions.yesterday} />
-          <SessionGroup title="最近7天" sessions={groupedSessions.lastWeek} />
-          <SessionGroup title="更早" sessions={groupedSessions.older} />
+      <ScrollArea className='flex-1'>
+        <div className='p-4'>
+          <SessionGroup title='今天' sessions={groupedSessions.today} />
+          <SessionGroup title='昨天' sessions={groupedSessions.yesterday} />
+          <SessionGroup title='最近7天' sessions={groupedSessions.lastWeek} />
+          <SessionGroup title='更早' sessions={groupedSessions.older} />
 
           {filteredSessions.length === 0 && (
-            <div className="text-center py-12">
-              <MessageSquare className="w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" />
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+            <div className='text-center py-12'>
+              <MessageSquare className='w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600' />
+              <p className='text-sm text-gray-500 dark:text-gray-400'>
                 {searchQuery ? '未找到相关对话' : '暂无对话'}
               </p>
             </div>
@@ -272,8 +284,8 @@ export function ChatSidebar({
       </ScrollArea>
 
       {/* Footer */}
-      <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-        <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
+      <div className='p-4 border-t border-gray-200 dark:border-gray-700'>
+        <div className='text-xs text-gray-500 dark:text-gray-400 text-center'>
           共 {sessions.length} 个对话
         </div>
       </div>

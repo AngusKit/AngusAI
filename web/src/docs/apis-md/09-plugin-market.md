@@ -4,6 +4,7 @@
 **模块说明**：插件的浏览、安装、卸载、配置、评价等功能
 
 ## 目录
+
 - [获取插件列表](#获取插件列表)
 - [获取插件详情](#获取插件详情)
 - [安装插件](#安装插件)
@@ -44,6 +45,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - `keyword` → 搜索框
 - `category` → 分类筛选下拉框
 - `sortBy` → 排序方式选择器
@@ -77,12 +79,12 @@ Authorization: Bearer <JWT_TOKEN>
         author: string;
         authorId: number;
         tags: string[];
-        
+
         // 简要信息
         uploadDate: string;    // "2023-10-15"
         uploadedAt: number;
         lastUpdate?: number;
-        
+
         // 健康状态
         healthStatus?: {
           status: 'healthy' | 'warning' | 'error';
@@ -103,6 +105,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 插件市场网格卡片或列表
 - 每个卡片显示：图标、名称、描述、评分、下载量、价格、安装状态
 
@@ -123,7 +126,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 插件ID
+  id: number; // 插件ID
 }
 ```
 
@@ -153,7 +156,7 @@ Authorization: Bearer <JWT_TOKEN>
     author: string;
     authorId: number;
     tags: string[];
-    
+
     // 详细信息
     features: string[];      // 功能特性列表
     changelog: string;       // 更新日志
@@ -161,17 +164,17 @@ Authorization: Bearer <JWT_TOKEN>
       minVersion?: string;   // 最小系统版本
       dependencies?: string[]; // 依赖的其他插件
     };
-    
+
     // 文件信息
     pluginFiles?: {
       executable: string;    // 可执行文件路径
       yaml: string;          // 配置文件路径
       size: string;          // 文件大小
     };
-    
+
     // 权限要求
     permissions?: string[];  // 需要的权限列表
-    
+
     // 配置选项
     configOptions?: Array<{
       key: string;
@@ -182,7 +185,7 @@ Authorization: Bearer <JWT_TOKEN>
       options?: any[];       // select类型的选项
       description?: string;
     }>;
-    
+
     // 健康状态
     healthStatus?: {
       status: 'healthy' | 'warning' | 'error';
@@ -190,7 +193,7 @@ Authorization: Bearer <JWT_TOKEN>
       message: string;
       details?: any;
     };
-    
+
     // API统计（已安装时）
     apiStats?: {
       totalCalls: number;
@@ -198,7 +201,7 @@ Authorization: Bearer <JWT_TOKEN>
       avgResponseTime: number;
       last24Hours: number;
     };
-    
+
     // 时间信息
     uploadDate: string;
     uploadedAt: number;
@@ -210,6 +213,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 插件详情对话框
 - 显示完整描述、功能、评价、更新日志等
 
@@ -230,7 +234,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 插件ID
+  id: number; // 插件ID
 }
 ```
 
@@ -262,6 +266,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 插件卡片上的"安装"按钮
 - 详情页的"安装"按钮
 
@@ -290,7 +295,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 插件ID
+  id: number; // 插件ID
 }
 ```
 
@@ -317,6 +322,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 已安装插件的"卸载"按钮
 
 ### 业务规则
@@ -342,7 +348,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 插件ID
+  id: number; // 插件ID
 }
 ```
 
@@ -350,7 +356,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  enabled: boolean;          // true启用，false禁用
+  enabled: boolean; // true启用，false禁用
 }
 ```
 
@@ -369,6 +375,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 已安装插件列表的启用/禁用开关
 
 ---
@@ -388,7 +395,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 插件ID
+  id: number; // 插件ID
 }
 ```
 
@@ -396,11 +403,12 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  config: Record<string, any>;  // 配置键值对
+  config: Record<string, any>; // 配置键值对
 }
 ```
 
 **Figma对应**：
+
 - 插件配置对话框
 - 根据configOptions动态生成表单
 
@@ -435,7 +443,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 插件ID
+  id: number; // 插件ID
 }
 ```
 
@@ -486,11 +494,11 @@ Content-Type: multipart/form-data
   category: PluginCategory;  // 必填|分类
   version: string;           // 必填|版本号
   tags?: string[];           // 可选|标签
-  
+
   // 文件
   pluginFile: File;          // 必填|插件文件（zip）
   icon?: File;               // 可选|图标文件
-  
+
   // 详细信息
   features?: string[];       // 功能列表
   changelog?: string;        // 更新日志
@@ -499,16 +507,17 @@ Content-Type: multipart/form-data
     dependencies?: string[];
   };
   permissions?: string[];    // 权限要求
-  
+
   // 定价
   price?: number;            // 价格，0表示免费
-  
+
   // 配置定义
   configSchema?: string;     // JSON字符串，配置项定义
 }
 ```
 
 **Figma对应**：
+
 - 上传插件对话框
 - 多步骤表单
 
@@ -554,7 +563,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 插件ID
+  id: number; // 插件ID
 }
 ```
 
@@ -568,7 +577,7 @@ Authorization: Bearer <JWT_TOKEN>
   changelog?: string;
   tags?: string[];
   icon?: File;
-  
+
   // 如果上传新版本
   newVersion?: string;
   pluginFile?: File;
@@ -605,7 +614,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 插件ID
+  id: number; // 插件ID
 }
 ```
 
@@ -643,7 +652,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 插件ID
+  id: number; // 插件ID
 }
 ```
 
@@ -697,6 +706,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 插件详情页的评价Tab
 - 评分分布图
 - 评价列表
@@ -718,7 +728,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 插件ID
+  id: number; // 插件ID
 }
 ```
 
@@ -726,12 +736,13 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  rating: number;            // 必填|评分 1-5
-  content: string;           // 必填|评价内容|maxLength:500
+  rating: number; // 必填|评分 1-5
+  content: string; // 必填|评价内容|maxLength:500
 }
 ```
 
 **Figma对应**：
+
 - 插件详情页的评价表单
 - 星级评分 + 文本输入
 
@@ -860,7 +871,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  helpful: boolean;          // true有帮助，false取消
+  helpful: boolean; // true有帮助，false取消
 }
 ```
 
@@ -896,7 +907,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 插件ID
+  id: number; // 插件ID
 }
 ```
 
@@ -904,7 +915,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  paymentMethod: PaymentMethod;  // 支付方式
+  paymentMethod: PaymentMethod; // 支付方式
 }
 ```
 
@@ -960,6 +971,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - "已安装"Tab的插件列表
 
 ---
@@ -1005,6 +1017,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 插件市场页面顶部统计卡片
 
 ---
@@ -1024,7 +1037,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 插件ID
+  id: number; // 插件ID
 }
 ```
 
@@ -1058,7 +1071,7 @@ Authorization: Bearer <JWT_TOKEN>
 上传 → pending（待审核） → approved（已批准） → published（已发布）
                          ↓
                       rejected（拒绝） → 可修改重新提交
-                      
+
 published → deprecated（已弃用）
 ```
 
@@ -1073,6 +1086,7 @@ published → deprecated（已弃用）
 ### 权限系统
 
 插件可能需要以下权限：
+
 - 读取文件
 - 写入文件
 - 网络访问
@@ -1084,16 +1098,16 @@ published → deprecated（已弃用）
 
 ## 错误码
 
-| 错误码 | 说明 |
-|--------|------|
-| 40901 | 插件不存在 |
-| 40902 | 插件未安装 |
-| 40903 | 版本不兼容 |
-| 40904 | 缺少依赖插件 |
-| 40905 | 权限不足 |
-| 40906 | 配置无效 |
-| 40907 | 已安装相同插件 |
-| 40908 | 需要先购买 |
+| 错误码 | 说明           |
+| ------ | -------------- |
+| 40901  | 插件不存在     |
+| 40902  | 插件未安装     |
+| 40903  | 版本不兼容     |
+| 40904  | 缺少依赖插件   |
+| 40905  | 权限不足       |
+| 40906  | 配置无效       |
+| 40907  | 已安装相同插件 |
+| 40908  | 需要先购买     |
 
 ---
 

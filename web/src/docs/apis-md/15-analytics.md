@@ -4,6 +4,7 @@
 **模块说明**：详细的API使用统计、性能分析、趋势图表等功能
 
 ## 目录
+
 - [获取分析概览](#获取分析概览)
 - [获取API调用趋势](#获取api调用趋势)
 - [获取Token使用趋势](#获取token使用趋势)
@@ -37,6 +38,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - `timeRange` → 时间范围选择器
 - `appId` → 应用筛选下拉框
 
@@ -52,7 +54,7 @@ Authorization: Bearer <JWT_TOKEN>
       start: number;
       end: number;
     };
-    
+
     // 核心指标
     stats: {
       totalApiCalls: {
@@ -62,21 +64,21 @@ Authorization: Bearer <JWT_TOKEN>
         trend: 'up' | 'down';
         comparedTo: string;       // "与上周期相比"
       };
-      
+
       activeUsers: {
         value: number;
         valueDisplay: string;
         change: string;
         trend: 'up' | 'down';
       };
-      
+
       tokenConsumption: {
         value: number;
         valueDisplay: string;     // "1.2M"
         change: string;
         trend: 'up' | 'down';
       };
-      
+
       avgResponseTime: {
         value: number;            // 秒
         valueDisplay: string;     // "1.2s"
@@ -84,7 +86,7 @@ Authorization: Bearer <JWT_TOKEN>
         trend: 'up' | 'down';
       };
     };
-    
+
     // 成功率
     successRate: {
       value: number;              // 98.5
@@ -98,6 +100,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 统计卡片（4个关键指标）
 - 趋势箭头和百分比变化
 
@@ -141,7 +144,7 @@ Authorization: Bearer <JWT_TOKEN>
         successRate: number;    // 百分比
       }
     ],
-    
+
     summary: {
       totalCalls: number;
       avgCallsPerPeriod: number;
@@ -154,6 +157,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - API调用趋势折线图
 - 成功/失败堆叠柱状图
 - 图表数据源
@@ -198,7 +202,7 @@ Authorization: Bearer <JWT_TOKEN>
         cost: number;           // 费用
       }
     ],
-    
+
     summary: {
       totalInput: number;
       totalOutput: number;
@@ -212,6 +216,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - Token使用趋势面积图
 - 输入/输出Token堆叠图
 
@@ -257,7 +262,7 @@ Authorization: Bearer <JWT_TOKEN>
         maxTime: number;
       }
     ],
-    
+
     summary: {
       overallAvg: number;
       overallP95: number;
@@ -273,6 +278,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 响应时间折线图
 - P95/P99性能指标
 
@@ -316,7 +322,7 @@ Authorization: Bearer <JWT_TOKEN>
         avgResponseTime: number;
       }
     ],
-    
+
     total: {
       apps: number;
       calls: number;
@@ -328,6 +334,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 应用使用分布饼图
 - 应用使用排名列表
 
@@ -371,7 +378,7 @@ Authorization: Bearer <JWT_TOKEN>
         color: string;          // 图表颜色
       }
     ],
-    
+
     total: {
       models: number;
       calls: number;
@@ -384,6 +391,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 模型使用分布饼图
 - 不同颜色区分不同模型
 
@@ -436,6 +444,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - Top接口列表表格
 - 调用次数、响应时间、成功率列
 
@@ -480,7 +489,7 @@ Authorization: Bearer <JWT_TOKEN>
         change: string;         // "+12%"
       }
     ],
-    
+
     // 按接口统计错误
     byEndpoint: [
       {
@@ -490,7 +499,7 @@ Authorization: Bearer <JWT_TOKEN>
         topErrorCode: number;
       }
     ],
-    
+
     // 错误趋势
     errorTrend: Array<{
       timestamp: number;
@@ -499,7 +508,7 @@ Authorization: Bearer <JWT_TOKEN>
       code4xx: number;
       code5xx: number;
     }>;
-    
+
     summary: {
       totalErrors: number;
       errorRate: number;        // 总体错误率
@@ -515,6 +524,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 错误分析柱状图
 - 错误分布饼图
 - 错误趋势折线图
@@ -554,7 +564,7 @@ Authorization: Bearer <JWT_TOKEN>
       wau: number;            // 周活跃用户
       mau: number;            // 月活跃用户
     }>;
-    
+
     // 用户行为分布
     userBehavior: {
       newUsers: number;
@@ -562,7 +572,7 @@ Authorization: Bearer <JWT_TOKEN>
       avgSessionDuration: number;  // 秒
       avgCallsPerUser: number;
     };
-    
+
     // Top用户
     topUsers: Array<{
       userId: number;
@@ -612,7 +622,7 @@ Authorization: Bearer <JWT_TOKEN>
       calls: number;
       tokens: number;
     }>;
-    
+
     // 按应用分组
     byApp: Array<{
       appId: number;
@@ -620,7 +630,7 @@ Authorization: Bearer <JWT_TOKEN>
       cost: number;
       percentage: number;
     }>;
-    
+
     // 按模型分组
     byModel: Array<{
       modelId: number;
@@ -628,7 +638,7 @@ Authorization: Bearer <JWT_TOKEN>
       cost: number;
       percentage: number;
     }>;
-    
+
     summary: {
       totalCost: number;
       avgCostPerCall: number;
@@ -641,6 +651,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 成本趋势图
 - 成本分布
 - 预算预警
@@ -700,7 +711,7 @@ Authorization: Bearer <JWT_TOKEN>
       avgResponseTime: number;
       errorRate: number;
     };
-    
+
     // 最近调用（最新10条）
     recentCalls: Array<{
       timestamp: number;
@@ -711,7 +722,7 @@ Authorization: Bearer <JWT_TOKEN>
       userId?: number;
       appId?: number;
     }>;
-    
+
     // 分钟级趋势（最近60分钟）
     minuteTrend: Array<{
       minute: string;         // "14:30"
@@ -725,6 +736,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 实时监控仪表板
 - 实时调用流
 
@@ -754,14 +766,14 @@ Authorization: Bearer <JWT_TOKEN>
       average: number;
       percentile: number;     // 你的排名（百分位）
     };
-    
+
     // 成功率对比
     successRate: {
       yours: number;
       average: number;
       percentile: number;
     };
-    
+
     // 成本效率对比
     costEfficiency: {
       costPerThousandCalls: number;
@@ -806,12 +818,12 @@ Authorization: Bearer <JWT_TOKEN>
 
 ## 错误码
 
-| 错误码 | 说明 |
-|--------|------|
-| 41501 | 时间范围无效 |
-| 41502 | 应用不存在 |
-| 41503 | 数据导出失败 |
-| 41504 | 没有分析数据 |
+| 错误码 | 说明         |
+| ------ | ------------ |
+| 41501  | 时间范围无效 |
+| 41502  | 应用不存在   |
+| 41503  | 数据导出失败 |
+| 41504  | 没有分析数据 |
 
 ---
 

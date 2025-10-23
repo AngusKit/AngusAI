@@ -4,6 +4,7 @@
 **模块说明**：API密钥的创建、管理、权限控制、使用统计等功能
 
 ## 目录
+
 - [获取API密钥列表](#获取api密钥列表)
 - [获取API密钥详情](#获取api密钥详情)
 - [创建API密钥](#创建api密钥)
@@ -41,6 +42,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - `keyword` → 搜索框
 - `status` → 状态筛选
 - 密钥列表表格
@@ -60,27 +62,27 @@ Authorization: Bearer <JWT_TOKEN>
         keyVisible: string;      // 部分可见："sk-abc123***********"
         status: 'active' | 'inactive' | 'expired';
         statusColor: string;
-        
+
         // 权限
         permissions: Array<'read' | 'write' | 'delete'>;
-        
+
         // 授权资源
         authorizedResources: Array<{
           type: ResourceType;    // application | workflow | dataset | knowledge | plugin | model
           ids: number[];         // 空数组表示全部
           names?: string[];      // 资源名称列表
         }>;
-        
+
         // 限制配置
         rateLimit: string;       // "1000次/分钟"
         rateLimitRaw: number;
         dailyLimit?: number;     // 每日限额
-        
+
         // 统计
         usageCount: number;      // 总使用次数
         lastUsed: string;        // "2分钟前"
         lastUsedAt?: number;
-        
+
         // 时间
         createdAt: number;
         created: string;         // "2024-01-15"
@@ -100,6 +102,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - API密钥列表表格
 - 每行显示：名称、密钥（部分可见）、权限、状态、创建时间、最后使用
 
@@ -120,7 +123,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 密钥ID
+  id: number; // 密钥ID
 }
 ```
 
@@ -135,10 +138,10 @@ Authorization: Bearer <JWT_TOKEN>
     name: string;
     keyVisible: string;      // 不返回完整密钥
     status: string;
-    
+
     // 权限详情
     permissions: string[];
-    
+
     // 授权资源详情
     authorizedResources: Array<{
       type: ResourceType;
@@ -149,15 +152,15 @@ Authorization: Bearer <JWT_TOKEN>
         type: string;
       }>;
     }>;
-    
+
     // 限制配置
     rateLimit: string;
     rateLimitRaw: number;
     dailyLimit?: number;
-    
+
     // IP白名单
     ipWhitelist?: string[];
-    
+
     // 使用统计
     usage: {
       total: number;
@@ -165,7 +168,7 @@ Authorization: Bearer <JWT_TOKEN>
       thisWeek: number;
       thisMonth: number;
     };
-    
+
     // 最近调用记录
     recentCalls?: Array<{
       timestamp: number;
@@ -175,7 +178,7 @@ Authorization: Bearer <JWT_TOKEN>
       responseTime: number;
       ip: string;
     }>;
-    
+
     createdAt: number;
     lastUsedAt?: number;
     expiresAt?: number;
@@ -185,6 +188,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 密钥详情弹窗
 - 使用统计图表
 - 最近调用记录
@@ -208,23 +212,23 @@ Authorization: Bearer <JWT_TOKEN>
 {
   name: string;              // 必填|密钥名称|maxLength:50
   description?: string;      // 可选|描述|maxLength:200
-  
+
   // 权限设置
   permissions: Array<'read' | 'write' | 'delete'>;  // 必填
-  
+
   // 授权资源
   authorizedResources?: Array<{
     type: ResourceType;
     ids: number[];           // 空数组表示该类型的全部资源
   }>;
-  
+
   // 限制配置
   rateLimit?: number;        // 可选|速率限制（次/分钟），默认1000
   dailyLimit?: number;       // 可选|每日限额
-  
+
   // IP白名单
   ipWhitelist?: string[];    // 可选|IP地址列表
-  
+
   // 过期设置
   expiresIn?: number;        // 可选|有效期（天数），默认365天
   neverExpires?: boolean;    // 可选|永不过期
@@ -232,6 +236,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 创建API密钥对话框
 - 权限勾选框
 - 资源选择器
@@ -250,7 +255,7 @@ Authorization: Bearer <JWT_TOKEN>
     permissions: string[];
     createdAt: number;
     expiresAt?: number;
-    
+
     // 警告信息
     warning: "请立即保存此密钥，它只会显示一次！"
   },
@@ -259,6 +264,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 创建成功后的密钥展示弹窗
 - 复制按钮
 - 警告提示
@@ -288,7 +294,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 密钥ID
+  id: number; // 密钥ID
 }
 ```
 
@@ -311,6 +317,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 编辑密钥对话框
 
 ### 响应数据
@@ -349,7 +356,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 密钥ID
+  id: number; // 密钥ID
 }
 ```
 
@@ -386,7 +393,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 密钥ID
+  id: number; // 密钥ID
 }
 ```
 
@@ -399,6 +406,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 启用/禁用开关
 
 ### 响应数据
@@ -432,7 +440,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 密钥ID
+  id: number; // 密钥ID
 }
 ```
 
@@ -454,6 +462,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 刷新密钥按钮
 - 确认对话框
 
@@ -480,7 +489,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 密钥ID
+  id: number; // 密钥ID
 }
 ```
 
@@ -507,7 +516,7 @@ Authorization: Bearer <JWT_TOKEN>
       avgResponseTime: number;
       successRate: number;
     },
-    
+
     // 调用趋势
     callsTrend: Array<{
       timestamp: number;
@@ -515,7 +524,7 @@ Authorization: Bearer <JWT_TOKEN>
       successful: number;
       failed: number;
     }>;
-    
+
     // 按接口统计
     byEndpoint: Array<{
       endpoint: string;
@@ -523,17 +532,17 @@ Authorization: Bearer <JWT_TOKEN>
       calls: number;
       percentage: number;
     }>;
-    
+
     // 按状态码统计
     byStatusCode: Record<number, number>;
-    
+
     // 按IP统计
     byIp: Array<{
       ip: string;
       calls: number;
       location?: string;
     }>;
-    
+
     // 错误分析
     topErrors: Array<{
       error: string;
@@ -546,6 +555,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 使用统计Tab
 - 趋势图表
 - 接口调用分布
@@ -568,7 +578,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 密钥ID
+  id: number; // 密钥ID
 }
 ```
 
@@ -601,14 +611,14 @@ Authorization: Bearer <JWT_TOKEN>
         endpoint: string;      // /api/v1/applications
         statusCode: number;
         responseTime: number;  // 毫秒
-        
+
         // 请求信息
         request: {
           ip: string;
           userAgent?: string;
           params?: any;
         };
-        
+
         // 响应信息
         response: {
           size: number;        // 字节
@@ -623,6 +633,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 调用日志Tab
 - 日志列表表格
 
@@ -700,6 +711,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 创建密钥时的模板选择
 
 ### 预设模板
@@ -768,13 +780,13 @@ Authorization: Bearer <JWT_TOKEN>
     activeKeys: number;
     inactiveKeys: number;
     expiredKeys: number;
-    
+
     // 今日统计
     todayStats: {
       calls: number;
       successRate: number;
     };
-    
+
     // 使用排名
     topKeys: Array<{
       keyId: number;
@@ -842,16 +854,16 @@ X-RateLimit-Reset: 1706889660
 
 ## 错误码
 
-| 错误码 | 说明 |
-|--------|------|
-| 40101 | API密钥不存在 |
-| 40102 | API密钥已失效 |
-| 40103 | API密钥已过期 |
-| 40104 | 权限不足 |
-| 40105 | IP不在白名单 |
-| 40106 | 超过速率限制 |
-| 40107 | 超过每日限额 |
-| 40108 | 密钥数量超过限制 |
+| 错误码 | 说明             |
+| ------ | ---------------- |
+| 40101  | API密钥不存在    |
+| 40102  | API密钥已失效    |
+| 40103  | API密钥已过期    |
+| 40104  | 权限不足         |
+| 40105  | IP不在白名单     |
+| 40106  | 超过速率限制     |
+| 40107  | 超过每日限额     |
+| 40108  | 密钥数量超过限制 |
 
 ---
 

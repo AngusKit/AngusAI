@@ -4,6 +4,7 @@
 **模块说明**：提供工作台统计数据、快速访问、推荐工具等功能
 
 ## 目录
+
 - [获取工作台概览](#获取工作台概览)
 - [获取统计卡片数据](#获取统计卡片数据)
 - [获取最近应用](#获取最近应用)
@@ -36,7 +37,7 @@ Authorization: Bearer <JWT_TOKEN>
       greeting: string;      // 根据时间段返回："早上好"、"下午好"、"晚上好"
       lastLoginTime: number;
     },
-    
+
     // 统计卡片
     stats: {
       totalApplications: {
@@ -60,10 +61,10 @@ Authorization: Bearer <JWT_TOKEN>
         trend: 'up' | 'down';
       }
     },
-    
+
     // 最近应用（前4个）
     recentApplications: Application[],
-    
+
     // 推荐工具（前3个）
     recommendedTools: RecommendedTool[]
   },
@@ -72,6 +73,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - `welcome` → 欢迎横幅内容
 - `stats.totalApplications` → "应用总数"统计卡片
 - `stats.apiCalls` → "API调用"统计卡片
@@ -150,6 +152,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 四个统计卡片的数值、趋势、图表数据
 - 卡片上的小型趋势图
 
@@ -199,6 +202,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - "最近使用"部分的应用卡片
 - 卡片显示应用图标、名称、描述、状态
 
@@ -250,6 +254,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - "推荐工具"部分的卡片
 - 显示工具图标、标题、描述、使用次数
 
@@ -339,6 +344,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 使用分析页面的各种图表数据
 - 趋势图、柱状图、饼图的数据源
 
@@ -378,6 +384,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 如果Figma中有快速操作按钮区域
 
 ---
@@ -435,6 +442,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - Header右上角的通知图标和下拉列表
 
 ---
@@ -454,7 +462,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;            // 通知ID
+  id: number; // 通知ID
 }
 ```
 

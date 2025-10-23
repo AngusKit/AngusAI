@@ -23,13 +23,7 @@ module.exports = {
     sourceType: 'module',
     project: './tsconfig.json',
   },
-  plugins: [
-    'react',
-    'react-hooks',
-    '@typescript-eslint',
-    'jsx-a11y',
-    'import',
-  ],
+  plugins: ['react', 'react-hooks', '@typescript-eslint', 'jsx-a11y', 'import'],
   rules: {
     // React相关规则
     'react/react-in-jsx-scope': 'off', // React 17+ 不需要导入React
@@ -42,11 +36,11 @@ module.exports = {
     'react/no-array-index-key': 'warn',
     'react/no-unescaped-entities': 'off',
     'react/display-name': 'off',
-    
+
     // React Hooks规则
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'warn',
-    
+
     // TypeScript规则
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     '@typescript-eslint/no-explicit-any': 'warn',
@@ -56,7 +50,7 @@ module.exports = {
     '@typescript-eslint/no-non-null-assertion': 'warn',
     '@typescript-eslint/prefer-const': 'error',
     '@typescript-eslint/no-var-requires': 'error',
-    
+
     // 通用规则
     'no-console': 'warn',
     'no-debugger': 'error',
@@ -66,7 +60,7 @@ module.exports = {
     'no-var': 'error',
     'object-shorthand': 'error',
     'prefer-arrow-callback': 'error',
-    
+
     // Import规则
     'import/order': [
       'error',
@@ -89,7 +83,7 @@ module.exports = {
     'import/no-unresolved': 'off', // TypeScript会处理这个
     'import/extensions': 'off',
     'import/no-extraneous-dependencies': 'off',
-    
+
     // 可访问性规则
     'jsx-a11y/anchor-is-valid': 'off', // 与Next.js Link冲突
     'jsx-a11y/click-events-have-key-events': 'warn',

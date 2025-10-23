@@ -118,7 +118,8 @@ export const zhCN = {
     cannotEditSystem: '系统模板不可编辑，可以复制后修改',
     cannotDeleteSystem: '系统模板不可删除',
     deleteCategory: '删除分类',
-    confirmDeleteCategory: '确定要删除此分类吗？该分类下的提示词将被移动到"编程开发"分类。此操作无法撤销。',
+    confirmDeleteCategory:
+      '确定要删除此分类吗？该分类下的提示词将被移动到"编程开发"分类。此操作无法撤销。',
     cannotDeleteSystemCategory: '系统分类不可删除',
     categoryDeleted: '分类已删除',
   },

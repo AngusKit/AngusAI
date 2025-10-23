@@ -4,6 +4,7 @@
 **模块说明**：用户偏好、通知配置、安全设置、集成设置等功能
 
 ## 目录
+
 - [获取用户设置](#获取用户设置)
 - [更新用户设置](#更新用户设置)
 - [获取通知设置](#获取通知设置)
@@ -34,7 +35,7 @@ Authorization: Bearer <JWT_TOKEN>
   message: "success",
   data: {
     userId: number;
-    
+
     // 基本信息
     profile: {
       name: string;
@@ -46,7 +47,7 @@ Authorization: Bearer <JWT_TOKEN>
       timezone: string;        // "Asia/Shanghai"
       language: 'zh-CN' | 'en-US';
     };
-    
+
     // 偏好设置
     preferences: {
       theme: 'light' | 'dark' | 'auto';
@@ -55,7 +56,7 @@ Authorization: Bearer <JWT_TOKEN>
       timeFormat: '12h' | '24h';
       defaultView: 'grid' | 'list';
     };
-    
+
     // 隐私设置
     privacy: {
       profileVisibility: 'public' | 'team' | 'private';
@@ -68,6 +69,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 个人设置页面
 - 基本信息表单
 - 偏好设置选项
@@ -97,7 +99,7 @@ Authorization: Bearer <JWT_TOKEN>
     timezone?: string;
     language?: string;
   };
-  
+
   preferences?: {
     theme?: string;
     locale?: string;
@@ -105,7 +107,7 @@ Authorization: Bearer <JWT_TOKEN>
     timeFormat?: string;
     defaultView?: string;
   };
-  
+
   privacy?: {
     profileVisibility?: string;
     showEmail?: boolean;
@@ -115,6 +117,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 个人设置编辑表单
 - 保存按钮
 
@@ -149,7 +152,7 @@ Content-Type: multipart/form-data
 
 ```typescript
 {
-  avatar: File;              // 图片文件
+  avatar: File; // 图片文件
 }
 ```
 
@@ -221,7 +224,7 @@ Authorization: Bearer <JWT_TOKEN>
     email: {
       enabled: boolean;
       frequency: 'immediately' | 'daily' | 'weekly';
-      
+
       // 具体通知类型
       notifications: {
         systemUpdates: boolean;       // 系统更新
@@ -234,7 +237,7 @@ Authorization: Bearer <JWT_TOKEN>
         apiErrors: boolean;           // API错误
       };
     };
-    
+
     // 浏览器通知
     browser: {
       enabled: boolean;
@@ -244,7 +247,7 @@ Authorization: Bearer <JWT_TOKEN>
         errorAlerts: boolean;         // 错误警告
       };
     };
-    
+
     // 应用内通知
     inApp: {
       enabled: boolean;
@@ -254,7 +257,7 @@ Authorization: Bearer <JWT_TOKEN>
         all: boolean;
       };
     };
-    
+
     // 移动推送
     mobile: {
       enabled: boolean;
@@ -270,6 +273,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 通知设置页面
 - 各类通知开关
 - 频率选择器
@@ -296,18 +300,18 @@ Authorization: Bearer <JWT_TOKEN>
     frequency?: string;
     notifications?: Record<string, boolean>;
   };
-  
+
   browser?: {
     enabled?: boolean;
     notifications?: Record<string, boolean>;
   };
-  
+
   inApp?: {
     enabled?: boolean;
     showBadge?: boolean;
     playSound?: boolean;
   };
-  
+
   mobile?: {
     enabled?: boolean;
     quietHours?: {
@@ -358,13 +362,13 @@ Authorization: Bearer <JWT_TOKEN>
       method: 'totp' | 'sms' | 'email';
       setupAt?: number;
     };
-    
+
     // 会话管理
     sessions: {
       maxActiveSessions: number;
       currentSessions: number;
       sessionTimeout: number;  // 分钟
-      
+
       // 活跃会话列表
       activeSessions: Array<{
         id: string;
@@ -377,7 +381,7 @@ Authorization: Bearer <JWT_TOKEN>
         createdAt: number;
       }>;
     };
-    
+
     // 登录历史
     loginHistory: Array<{
       id: number;
@@ -388,7 +392,7 @@ Authorization: Bearer <JWT_TOKEN>
       browser: string;
       status: 'success' | 'failed';
     }>;
-    
+
     // 密码策略
     passwordPolicy: {
       minLength: number;
@@ -399,7 +403,7 @@ Authorization: Bearer <JWT_TOKEN>
       lastChangedAt?: number;
       expiresIn?: number;      // 天数
     };
-    
+
     // IP白名单
     ipWhitelist: {
       enabled: boolean;
@@ -411,6 +415,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 安全设置页面
 - 双因素认证设置
 - 活跃会话列表
@@ -450,7 +455,7 @@ Authorization: Bearer <JWT_TOKEN>
       qrCode: string;        // 二维码URL
       backupCodes: string[]; // 备用码
     };
-    
+
     // SMS/Email方式
     verificationCodeSent?: boolean;
   },
@@ -459,6 +464,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 双因素认证设置向导
 - 二维码扫描
 - 验证码输入
@@ -480,7 +486,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  code: string;              // 验证码
+  code: string; // 验证码
 }
 ```
 
@@ -548,13 +554,14 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  currentPassword: string;   // 必填|当前密码
-  newPassword: string;       // 必填|新密码|minLength:8
-  confirmPassword: string;   // 必填|确认密码
+  currentPassword: string; // 必填|当前密码
+  newPassword: string; // 必填|新密码|minLength:8
+  confirmPassword: string; // 必填|确认密码
 }
 ```
 
 **Figma对应**：
+
 - 修改密码表单
 
 ### 响应数据
@@ -595,7 +602,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  sessionId: string;         // 会话ID
+  sessionId: string; // 会话ID
 }
 ```
 
@@ -610,6 +617,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 活跃会话列表
 - 终止会话按钮
 
@@ -667,7 +675,7 @@ Authorization: Bearer <JWT_TOKEN>
         description: string;
         category: string;      // "开发工具", "通讯"
         status: 'connected' | 'disconnected';
-        
+
         // 连接信息
         connection?: {
           account: string;
@@ -675,10 +683,10 @@ Authorization: Bearer <JWT_TOKEN>
           expiresAt?: number;
           scopes: string[];
         };
-        
+
         // 配置
         config?: Record<string, any>;
-        
+
         // 统计
         stats?: {
           lastSync?: number;
@@ -692,6 +700,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 集成设置页面
 - 集成卡片列表
 
@@ -712,7 +721,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  integrationId: string;     // 集成ID
+  integrationId: string; // 集成ID
 }
 ```
 
@@ -722,13 +731,13 @@ Authorization: Bearer <JWT_TOKEN>
 {
   // OAuth方式
   authCode?: string;
-  
+
   // API密钥方式
   apiKey?: string;
-  
+
   // Webhook方式
   webhookUrl?: string;
-  
+
   // 其他配置
   config?: Record<string, any>;
 }
@@ -744,7 +753,7 @@ Authorization: Bearer <JWT_TOKEN>
     integrationId: string;
     status: 'connected';
     connectedAt: number;
-    
+
     // OAuth需要重定向
     authUrl?: string;
   },
@@ -809,7 +818,7 @@ Authorization: Bearer <JWT_TOKEN>
         type: 'full' | 'partial';
         format: 'json' | 'csv' | 'zip';
         status: 'processing' | 'completed' | 'failed';
-        
+
         // 导出范围
         scope: {
           applications: boolean;
@@ -818,11 +827,11 @@ Authorization: Bearer <JWT_TOKEN>
           knowledge: boolean;
           conversations: boolean;
         };
-        
+
         fileSize?: number;
         downloadUrl?: string;
         expiresAt?: number;
-        
+
         requestedAt: number;
         completedAt?: number;
       }
@@ -833,6 +842,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 数据导出页面
 - 导出记录列表
 
@@ -855,7 +865,7 @@ Authorization: Bearer <JWT_TOKEN>
 {
   type: 'full' | 'partial';
   format: 'json' | 'csv' | 'zip';
-  
+
   // 部分导出时指定范围
   scope?: {
     applications?: boolean;
@@ -913,6 +923,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 账户删除确认对话框
 - 密码验证
 
@@ -978,7 +989,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  key: string;               // 偏好设置键名
+  key: string; // 偏好设置键名
 }
 ```
 
@@ -1022,7 +1033,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  value: any;                // 偏好设置值
+  value: any; // 偏好设置值
 }
 ```
 
@@ -1078,15 +1089,15 @@ Authorization: Bearer <JWT_TOKEN>
 
 ## 错误码
 
-| 错误码 | 说明 |
-|--------|------|
-| 41401 | 设置项不存在 |
-| 41402 | 当前密码错误 |
-| 41403 | 新密码不符合要求 |
-| 41404 | 验证码错误或已过期 |
-| 41405 | 会话不存在 |
-| 41406 | 集成连接失败 |
-| 41407 | 导出请求过于频繁 |
+| 错误码 | 说明               |
+| ------ | ------------------ |
+| 41401  | 设置项不存在       |
+| 41402  | 当前密码错误       |
+| 41403  | 新密码不符合要求   |
+| 41404  | 验证码错误或已过期 |
+| 41405  | 会话不存在         |
+| 41406  | 集成连接失败       |
+| 41407  | 导出请求过于频繁   |
 
 ---
 

@@ -4,6 +4,7 @@
 **模块说明**：数据集的创建、管理、数据导入、数据源连接等功能
 
 ## 目录
+
 - [获取数据集列表](#获取数据集列表)
 - [获取数据集详情](#获取数据集详情)
 - [创建数据集](#创建数据集)
@@ -44,6 +45,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - `keyword` → 搜索框
 - `type` → 数据类型筛选（文本/表格/数据源）
 - `status` → 状态筛选
@@ -75,7 +77,7 @@ Authorization: Bearer <JWT_TOKEN>
         creator: string;
         createdBy: number;
         tags: string[];
-        
+
         // 统计信息
         stats?: {
           totalRecords: number;
@@ -96,6 +98,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 数据集列表表格
 - 每行显示：图标、名称、类型、数据量、大小、状态、更新时间
 
@@ -116,7 +119,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 数据集ID
+  id: number; // 数据集ID
 }
 ```
 
@@ -143,7 +146,7 @@ Authorization: Bearer <JWT_TOKEN>
     creator: string;
     createdBy: number;
     tags: string[];
-    
+
     // 配置信息
     config: {
       // 文本数据配置
@@ -152,7 +155,7 @@ Authorization: Bearer <JWT_TOKEN>
         delimiter?: string;      // 分隔符
         hasHeader: boolean;      // 是否有表头
       };
-      
+
       // 表格数据配置
       tableConfig?: {
         columns: Array<{
@@ -163,7 +166,7 @@ Authorization: Bearer <JWT_TOKEN>
         primaryKey?: string;
         indexes?: string[];
       };
-      
+
       // 数据源配置
       dataSourceConfig?: {
         type: 'mysql' | 'postgresql' | 'mongodb' | 'api' | 'file';
@@ -177,14 +180,14 @@ Authorization: Bearer <JWT_TOKEN>
         syncSchedule?: string;   // cron表达式
         lastSyncTime?: number;
       };
-      
+
       // 数据处理配置
       processing?: {
         cleaningRules?: string[];
         transformRules?: string[];
       };
     };
-    
+
     // 统计信息
     stats: {
       totalRecords: number;
@@ -199,6 +202,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 选中数据集后展开的详情面板
 - 不同类型数据集显示不同的配置项
 
@@ -226,7 +230,7 @@ Authorization: Bearer <JWT_TOKEN>
   type: DataType;            // 必填|数据类型：text | table | datasource
   visibility: Visibility;    // 必填|可见性
   tags?: string[];           // 可选|标签，最多5个
-  
+
   // 配置（根据type不同而不同）
   config?: {
     textConfig?: {
@@ -251,6 +255,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 创建数据集对话框
 - 名称、描述、类型选择、可见性、标签
 
@@ -295,7 +300,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 数据集ID
+  id: number; // 数据集ID
 }
 ```
 
@@ -313,6 +318,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 编辑数据集对话框
 
 ### 响应数据
@@ -345,7 +351,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 数据集ID
+  id: number; // 数据集ID
 }
 ```
 
@@ -383,7 +389,7 @@ Content-Type: multipart/form-data
 
 ```typescript
 {
-  id: number;                // 数据集ID
+  id: number; // 数据集ID
 }
 ```
 
@@ -398,6 +404,7 @@ Content-Type: multipart/form-data
 ```
 
 **Figma对应**：
+
 - 选中文本/表格数据集后的上传区域
 - 支持文件上传和直接粘贴
 
@@ -442,7 +449,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 数据集ID（必须是datasource类型）
+  id: number; // 数据集ID（必须是datasource类型）
 }
 ```
 
@@ -452,7 +459,7 @@ Authorization: Bearer <JWT_TOKEN>
 {
   name: string;              // 必填|数据源名称
   sourceType: 'file' | 'api' | 'database' | 'web' | 'cloud';
-  
+
   // 数据库连接
   database?: {
     type: 'mysql' | 'postgresql' | 'mongodb' | 'redis';
@@ -463,7 +470,7 @@ Authorization: Bearer <JWT_TOKEN>
     password: string;        // 加密传输
     tables?: string[];       // 要同步的表
   };
-  
+
   // API连接
   api?: {
     url: string;
@@ -474,14 +481,14 @@ Authorization: Bearer <JWT_TOKEN>
       credentials: any;
     };
   };
-  
+
   // 文件连接
   file?: {
     path: string;
     type: 'csv' | 'json' | 'xml' | 'excel';
     encoding?: string;
   };
-  
+
   // 同步配置
   syncConfig?: {
     schedule?: string;       // cron表达式
@@ -491,6 +498,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 添加数据源对话框
 - 不同类型显示不同的表单
 
@@ -529,7 +537,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 数据集ID
+  id: number; // 数据集ID
 }
 ```
 
@@ -565,7 +573,7 @@ Authorization: Bearer <JWT_TOKEN>
         addedTime: string;
         recordCount: string;
         lastSync?: string;
-        
+
         // 连接信息（敏感信息隐藏）
         connection?: {
           host?: string;
@@ -586,6 +594,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 数据源类型数据集的数据源列表
 - 左侧列表显示
 
@@ -606,8 +615,8 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  datasetId: number;         // 数据集ID
-  sourceId: number;          // 数据源ID
+  datasetId: number; // 数据集ID
+  sourceId: number; // 数据源ID
 }
 ```
 
@@ -675,7 +684,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 数据集ID
+  id: number; // 数据集ID
 }
 ```
 
@@ -701,7 +710,7 @@ Authorization: Bearer <JWT_TOKEN>
       content: string[];     // 文本行数组
       total: number;
     };
-    
+
     // 表格数据
     tableData?: {
       columns: Array<{
@@ -711,7 +720,7 @@ Authorization: Bearer <JWT_TOKEN>
       rows: any[][];         // 行数据
       total: number;
     };
-    
+
     // 数据源数据（数据库表）
     dataSourceData?: {
       tableName?: string;
@@ -722,7 +731,7 @@ Authorization: Bearer <JWT_TOKEN>
       rows: any[][];
       total: number;
     };
-    
+
     pagination: {
       page: number;
       pageSize: number;
@@ -735,6 +744,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 选中数据源时右侧的记录预览表格
 
 ---
@@ -754,7 +764,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 数据集ID
+  id: number; // 数据集ID
 }
 ```
 
@@ -821,6 +831,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 数据集页面顶部的4个统计卡片
 
 ---
@@ -841,7 +852,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   sourceType: 'database' | 'api' | 'file';
-  connection: any;           // 连接配置，同添加数据源的参数
+  connection: any; // 连接配置，同添加数据源的参数
 }
 ```
 
@@ -880,7 +891,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 数据集ID
+  id: number; // 数据集ID
 }
 ```
 
@@ -941,7 +952,7 @@ Authorization: Bearer <JWT_TOKEN>
 preparing → processing → active
                       ↓
                     failed → 可重试
-                    
+
 active → inactive（停用）
 ```
 
@@ -955,14 +966,14 @@ active → inactive（停用）
 
 ## 错误码
 
-| 错误码 | 说明 |
-|--------|------|
-| 40301 | 数据集不存在 |
-| 40302 | 数据格式不支持 |
-| 40303 | 数据集类型不匹配 |
-| 40304 | 数据源连接失败 |
-| 40305 | 存储空间不足 |
-| 40306 | 数据量超过限制 |
+| 错误码 | 说明             |
+| ------ | ---------------- |
+| 40301  | 数据集不存在     |
+| 40302  | 数据格式不支持   |
+| 40303  | 数据集类型不匹配 |
+| 40304  | 数据源连接失败   |
+| 40305  | 存储空间不足     |
+| 40306  | 数据量超过限制   |
 
 ---
 

@@ -4,6 +4,7 @@
 **模块说明**：知识库的创建、文档上传、检索、管理等功能
 
 ## 目录
+
 - [获取知识库列表](#获取知识库列表)
 - [获取知识库详情](#获取知识库详情)
 - [创建知识库](#创建知识库)
@@ -42,6 +43,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 知识库列表页的搜索框、筛选器、排序选择器
 
 ### 响应数据
@@ -79,6 +81,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 知识库列表的卡片
 - 显示图标、名称、文档数、大小、启用状态
 
@@ -99,7 +102,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 知识库ID
+  id: number; // 知识库ID
 }
 ```
 
@@ -122,7 +125,7 @@ Authorization: Bearer <JWT_TOKEN>
     updatedAt: number;
     tags: string[];
     visibility: Visibility;
-    
+
     // 统计信息
     stats: {
       totalDocuments: number;
@@ -130,7 +133,7 @@ Authorization: Bearer <JWT_TOKEN>
       totalChunks: number;        // 总分段数
       avgChunkSize: number;       // 平均分段大小
     },
-    
+
     // 配置信息
     config: {
       chunkSize: number;          // 分段大小
@@ -143,6 +146,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 选中知识库后右侧展示的详情面板
 
 ---
@@ -168,7 +172,7 @@ Authorization: Bearer <JWT_TOKEN>
   description: string;       // 必填|描述|maxLength:500
   visibility: Visibility;    // 必填|可见性
   tags?: string[];           // 可选|标签，最多5个
-  
+
   // 配置（可选，使用默认值）
   config?: {
     chunkSize?: number;      // 分段大小，默认512
@@ -179,6 +183,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 创建知识库对话框的所有表单字段
 - 名称、图标选择器、描述、可见性、标签输入
 
@@ -225,7 +230,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 知识库ID
+  id: number; // 知识库ID
 }
 ```
 
@@ -248,6 +253,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 编辑知识库对话框
 
 ### 响应数据
@@ -280,7 +286,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 知识库ID
+  id: number; // 知识库ID
 }
 ```
 
@@ -318,7 +324,7 @@ Content-Type: multipart/form-data
 
 ```typescript
 {
-  id: number;                // 知识库ID
+  id: number; // 知识库ID
 }
 ```
 
@@ -331,6 +337,7 @@ Content-Type: multipart/form-data
 ```
 
 **Figma对应**：
+
 - 选中知识库后的上传区域
 - 支持点击上传和拖拽上传
 
@@ -381,7 +388,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 知识库ID
+  id: number; // 知识库ID
 }
 ```
 
@@ -401,6 +408,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 选中知识库后下方的文档列表
 - 搜索、筛选、排序功能
 
@@ -437,6 +445,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 文档列表表格
 - 显示文件名、类型、大小、上传时间、状态、启用开关
 
@@ -457,8 +466,8 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  knowledgeBaseId: number;   // 知识库ID
-  documentId: number;        // 文档ID
+  knowledgeBaseId: number; // 知识库ID
+  documentId: number; // 文档ID
 }
 ```
 
@@ -473,6 +482,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 文档列表中的删除按钮
 
 ---
@@ -501,7 +511,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  enabled: boolean;          // true启用，false禁用
+  enabled: boolean; // true启用，false禁用
 }
 ```
 
@@ -520,6 +530,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 文档列表中每行的启用/禁用开关
 
 ---
@@ -562,6 +573,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 文档列表中显示的处理进度条
 
 ---
@@ -581,7 +593,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 知识库ID
+  id: number; // 知识库ID
 }
 ```
 
@@ -624,7 +636,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 知识库ID
+  id: number; // 知识库ID
 }
 ```
 

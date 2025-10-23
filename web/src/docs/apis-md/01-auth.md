@@ -4,6 +4,7 @@
 **模块说明**：处理用户认证、授权、会话管理等功能
 
 ## 目录
+
 - [用户登录](#用户登录)
 - [用户注册](#用户注册)
 - [退出登录](#退出登录)
@@ -32,6 +33,7 @@
 ```
 
 **Figma对应**：
+
 - `username` → 登录页"用户名/邮箱"输入框
 - `password` → 登录页"密码"输入框
 - `captcha` → 登录页"验证码"输入框（超过3次失败后显示）
@@ -119,6 +121,7 @@
 ```
 
 **Figma对应**：
+
 - `username` → 注册页"用户名"输入框
 - `email` → 注册页"邮箱"输入框
 - `password` → 注册页"密码"输入框
@@ -190,8 +193,8 @@
 
 ```typescript
 {
-  email: string;         // 必填|邮箱地址
-  type: 'register' | 'reset_password';  // 必填|验证码类型
+  email: string; // 必填|邮箱地址
+  type: 'register' | 'reset_password'; // 必填|验证码类型
 }
 ```
 
@@ -248,7 +251,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  refreshToken: string;  // 必填|刷新Token
+  refreshToken: string; // 必填|刷新Token
 }
 ```
 
@@ -309,6 +312,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - `avatar` → Header右上角头像
 - `username` → 用户中心页面显示
 - `role` → 控制侧边栏菜单权限
@@ -374,8 +378,8 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  oldPassword: string;   // 必填|当前密码
-  newPassword: string;   // 必填|新密码|minLength:8
+  oldPassword: string; // 必填|当前密码
+  newPassword: string; // 必填|新密码|minLength:8
   confirmPassword: string; // 必填|确认新密码
 }
 ```
@@ -423,7 +427,7 @@ Content-Type: multipart/form-data
 
 ```typescript
 {
-  avatar: File;          // 必填|图片文件|支持jpg,png,gif|最大5MB
+  avatar: File; // 必填|图片文件|支持jpg,png,gif|最大5MB
 }
 ```
 
@@ -458,9 +462,9 @@ Content-Type: multipart/form-data
 
 ```typescript
 {
-  email: string;         // 必填|邮箱地址
-  emailCode: string;     // 必填|邮箱验证码
-  newPassword: string;   // 必填|新密码
+  email: string; // 必填|邮箱地址
+  emailCode: string; // 必填|邮箱验证码
+  newPassword: string; // 必填|新密码
   confirmPassword: string; // 必填|确认密码
 }
 ```

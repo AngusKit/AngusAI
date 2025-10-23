@@ -4,6 +4,7 @@
 **模块说明**：提示词的创建、管理、分类、搜索、收藏等功能
 
 ## 目录
+
 - [获取提示词列表](#获取提示词列表)
 - [获取提示词详情](#获取提示词详情)
 - [创建提示词](#创建提示词)
@@ -44,6 +45,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - `keyword` → 顶部搜索框
 - `category` → 左侧分类列表选择
 - `isFavorite` → "收藏"分类
@@ -89,6 +91,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 提示词卡片网格
 - 每个卡片显示：标题、标签、使用次数、收藏状态
 
@@ -109,7 +112,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 提示词ID
+  id: number; // 提示词ID
 }
 ```
 
@@ -134,26 +137,26 @@ Authorization: Bearer <JWT_TOKEN>
     usageCount: number;
     isSystem: boolean;
     isPublic: boolean;
-    
+
     // 变量定义（从content中提取）
     variables?: Array<{
       name: string;          // 变量名
       placeholder?: string;  // 占位符
       required: boolean;
     }>;
-    
+
     // 使用示例
     examples?: Array<{
       input: Record<string, any>;  // 变量值
       output: string;              // 预期输出
     }>;
-    
+
     // 创建者信息
     createdAt: number;
     updatedAt: number;
     createdBy: number;
     createdByName: string;
-    
+
     // 统计信息
     stats: {
       totalUses: number;
@@ -166,6 +169,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 点击提示词卡片后的详情弹窗
 - 显示完整内容、标签、使用次数
 
@@ -195,14 +199,14 @@ Authorization: Bearer <JWT_TOKEN>
     color: string;           // 标签颜色
   }>;                        // 可选|标签，最多10个
   isPublic?: boolean;        // 可选|是否公开，默认false
-  
+
   // 可选：变量定义
   variables?: Array<{
     name: string;
     placeholder?: string;
     required?: boolean;
   }>;
-  
+
   // 可选：使用示例
   examples?: Array<{
     input: Record<string, any>;
@@ -212,6 +216,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 创建提示词对话框
 - 标题、内容、分类、标签输入
 
@@ -256,7 +261,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 提示词ID
+  id: number; // 提示词ID
 }
 ```
 
@@ -279,6 +284,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 编辑提示词对话框
 
 ### 响应数据
@@ -317,7 +323,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 提示词ID
+  id: number; // 提示词ID
 }
 ```
 
@@ -354,7 +360,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 提示词ID
+  id: number; // 提示词ID
 }
 ```
 
@@ -362,7 +368,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  isFavorite: boolean;       // true收藏，false取消收藏
+  isFavorite: boolean; // true收藏，false取消收藏
 }
 ```
 
@@ -381,6 +387,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 提示词卡片上的星标图标
 - 点击切换收藏状态
 
@@ -401,7 +408,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 源提示词ID
+  id: number; // 源提示词ID
 }
 ```
 
@@ -427,6 +434,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 提示词卡片的复制按钮
 
 ---
@@ -446,7 +454,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 提示词ID
+  id: number; // 提示词ID
 }
 ```
 
@@ -465,6 +473,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 点击"复制"按钮时调用
 - 使用次数+1
 
@@ -506,6 +515,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 左侧分类列表
 - 全部、收藏、编程开发、写作、营销等
 
@@ -534,6 +544,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 添加分类对话框
 
 ### 响应数据
@@ -577,7 +588,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: string;                // 分类ID
+  id: string; // 分类ID
 }
 ```
 
@@ -623,7 +634,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: string;                // 分类ID
+  id: string; // 分类ID
 }
 ```
 
@@ -827,14 +838,14 @@ Authorization: Bearer <JWT_TOKEN>
     publicPrompts: number;
     totalUsages: number;
     categoriesCount: number;
-    
+
     // 分类统计
     categoryStats: Array<{
       categoryId: string;
       categoryName: string;
       count: number;
     }>;
-    
+
     // 使用趋势
     usageTrend: Array<{
       date: string;
@@ -852,6 +863,7 @@ Authorization: Bearer <JWT_TOKEN>
 ### 提示词变量
 
 支持在内容中使用变量占位符：
+
 ```
 {变量名} 或 [变量名] 或 {{变量名}}
 ```
@@ -878,14 +890,14 @@ Authorization: Bearer <JWT_TOKEN>
 
 ## 错误码
 
-| 错误码 | 说明 |
-|--------|------|
-| 40801 | 提示词不存在 |
-| 40802 | 提示词标题重复 |
-| 40803 | 无权限操作该提示词 |
-| 40804 | 分类不存在 |
-| 40805 | 系统分类不可删除 |
-| 40806 | 标签数量超过限制 |
+| 错误码 | 说明               |
+| ------ | ------------------ |
+| 40801  | 提示词不存在       |
+| 40802  | 提示词标题重复     |
+| 40803  | 无权限操作该提示词 |
+| 40804  | 分类不存在         |
+| 40805  | 系统分类不可删除   |
+| 40806  | 标签数量超过限制   |
 
 ---
 

@@ -4,6 +4,7 @@
 **模块说明**：工作流的创建、编辑、执行、监控等功能
 
 ## 目录
+
 - [获取工作流列表](#获取工作流列表)
 - [获取工作流详情](#获取工作流详情)
 - [创建工作流](#创建工作流)
@@ -45,6 +46,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - `keyword` → 工作流页面顶部搜索框
 - `type` → 类型筛选下拉框
 - `status` → 状态筛选（运行中/已停止）
@@ -72,7 +74,7 @@ Authorization: Bearer <JWT_TOKEN>
         version: string;         // 版本号
         createdAt: number;
         updatedAt: number;
-        
+
         // 统计信息
         stats: {
           todayCalls: number;      // 今日调用次数
@@ -94,6 +96,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 工作流列表页的网格卡片或表格行
 - 每个卡片显示：图标、名称、状态、今日运行次数、成功率
 - 操作按钮：运行、编辑、查看、复制、删除
@@ -115,7 +118,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 工作流ID
+  id: number; // 工作流ID
 }
 ```
 
@@ -139,24 +142,24 @@ Authorization: Bearer <JWT_TOKEN>
     createdAt: number;
     updatedAt: number;
     createdBy: number;
-    
+
     // 工作流配置
     config: {
       // 流程定义
       nodes: WorkflowNode[];
       edges: WorkflowEdge[];
-      
+
       // 运行配置
       maxExecutionTime: number;  // 最大执行时间（秒）
       retryOnError: boolean;     // 错误时重试
       maxRetries: number;        // 最大重试次数
-      
+
       // 触发配置
       triggers: {
         type: 'manual' | 'schedule' | 'webhook' | 'event';
         config?: any;  // 具体触发配置
       }[];
-      
+
       // 变量定义
       variables: Array<{
         name: string;
@@ -166,7 +169,7 @@ Authorization: Bearer <JWT_TOKEN>
         description?: string;
       }>;
     },
-    
+
     // 统计数据
     stats: {
       totalExecutions: number;
@@ -182,6 +185,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 工作流编辑器的画布内容
 - 节点和连线数据
 - 工作流配置面板
@@ -209,10 +213,10 @@ Authorization: Bearer <JWT_TOKEN>
   iconBg?: string;           // 可选|背景色
   iconColor?: string;        // 可选|图标颜色
   type: WorkflowType;        // 必填|工作流类型
-  
+
   // 可选：从模板创建
   templateId?: number;       // 模板ID
-  
+
   // 可选：初始配置
   config?: {
     nodes?: WorkflowNode[];
@@ -223,6 +227,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 创建工作流对话框
 - 名称、描述、类型选择器
 
@@ -269,7 +274,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 工作流ID
+  id: number; // 工作流ID
 }
 ```
 
@@ -287,6 +292,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 编辑工作流信息对话框
 
 ### 响应数据
@@ -319,7 +325,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 工作流ID
+  id: number; // 工作流ID
 }
 ```
 
@@ -344,6 +350,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 工作流编辑器的保存按钮
 - 拖拽添加节点
 - 连线操作
@@ -388,7 +395,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 工作流ID
+  id: number; // 工作流ID
 }
 ```
 
@@ -425,7 +432,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 源工作流ID
+  id: number; // 源工作流ID
 }
 ```
 
@@ -504,6 +511,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 工作流页面顶部的4个统计卡片
 - 工作流总数、运行中、今日调用、成功率
 
@@ -524,7 +532,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 工作流ID
+  id: number; // 工作流ID
 }
 ```
 
@@ -538,6 +546,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 工作流卡片上的运行按钮
 - 表格视图中的运行图标
 
@@ -589,7 +598,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 工作流ID
+  id: number; // 工作流ID
 }
 ```
 
@@ -643,6 +652,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 工作流页面下方的"最近操作"表格
 - 搜索框、工作流筛选下拉框
 - 分页组件
@@ -667,7 +677,7 @@ Authorization: Bearer <JWT_TOKEN>
         executionTime?: number;  // 执行时间（毫秒）
         createdTime: string;     // "2023-10-15 14:30:25"
         createdAt: number;       // 时间戳
-        
+
         // 详细信息
         inputs?: any;
         outputs?: any;
@@ -692,6 +702,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 操作日志表格的每一行
 - 显示：工作流名称、活动、状态、操作人、时间
 
@@ -712,7 +723,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  executionId: string;       // 执行ID
+  executionId: string; // 执行ID
 }
 ```
 
@@ -730,11 +741,11 @@ Authorization: Bearer <JWT_TOKEN>
     startedAt: number;
     completedAt?: number;
     executionTime?: number;
-    
+
     // 输入输出
     inputs: any;
     outputs?: any;
-    
+
     // 节点执行详情
     nodeExecutions: Array<{
       nodeId: string;
@@ -749,7 +760,7 @@ Authorization: Bearer <JWT_TOKEN>
       error?: string;
       logs?: string[];
     }>;
-    
+
     // 错误信息
     error?: {
       message: string;
@@ -778,7 +789,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 工作流ID
+  id: number; // 工作流ID
 }
 ```
 
@@ -807,7 +818,7 @@ Authorization: Bearer <JWT_TOKEN>
         createdBy: number;
         createdByName: string;
         isCurrent: boolean;    // 是否为当前版本
-        
+
         // 变更摘要
         changes: {
           nodesAdded: number;
@@ -844,8 +855,8 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 工作流ID
-  versionId: number;         // 版本ID
+  id: number; // 工作流ID
+  versionId: number; // 版本ID
 }
 ```
 
@@ -887,8 +898,8 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 工作流ID
-  versionId: number;         // 版本ID
+  id: number; // 工作流ID
+  versionId: number; // 版本ID
 }
 ```
 
@@ -923,7 +934,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 工作流ID
+  id: number; // 工作流ID
 }
 ```
 
@@ -931,7 +942,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  enabled: boolean;          // true启用，false禁用
+  enabled: boolean; // true启用，false禁用
 }
 ```
 
@@ -958,17 +969,18 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 interface WorkflowNode {
-  id: string;                // 节点唯一ID
-  type: NodeType;            // 节点类型
+  id: string; // 节点唯一ID
+  type: NodeType; // 节点类型
   position: {
     x: number;
     y: number;
   };
   data: {
-    label: string;           // 节点标签
-    config?: any;            // 节点特定配置
+    label: string; // 节点标签
+    config?: any; // 节点特定配置
   };
-  style?: {                  // 节点样式
+  style?: {
+    // 节点样式
     background?: string;
     color?: string;
     border?: string;
@@ -982,14 +994,14 @@ interface WorkflowNode {
 
 ```typescript
 interface WorkflowEdge {
-  id: string;                // 连线唯一ID
-  source: string;            // 源节点ID
-  target: string;            // 目标节点ID
-  sourceHandle?: string;     // 源节点句柄
-  targetHandle?: string;     // 目标节点句柄
+  id: string; // 连线唯一ID
+  source: string; // 源节点ID
+  target: string; // 目标节点ID
+  sourceHandle?: string; // 源节点句柄
+  targetHandle?: string; // 目标节点句柄
   type?: 'default' | 'straight' | 'step' | 'smoothstep';
-  animated?: boolean;        // 是否动画
-  label?: string;            // 连线标签
+  animated?: boolean; // 是否动画
+  label?: string; // 连线标签
   style?: {
     stroke?: string;
     strokeWidth?: number;
@@ -1041,15 +1053,15 @@ interface WorkflowEdge {
 
 ## 错误码
 
-| 错误码 | 说明 |
-|--------|------|
-| 40001 | 工作流不存在 |
-| 40002 | 工作流正在运行，无法删除 |
-| 40003 | 节点配置无效 |
-| 40004 | 检测到循环依赖 |
-| 40005 | 缺少开始或结束节点 |
-| 40006 | 执行超时 |
-| 40007 | 版本不存在 |
+| 错误码 | 说明                     |
+| ------ | ------------------------ |
+| 40001  | 工作流不存在             |
+| 40002  | 工作流正在运行，无法删除 |
+| 40003  | 节点配置无效             |
+| 40004  | 检测到循环依赖           |
+| 40005  | 缺少开始或结束节点       |
+| 40006  | 执行超时                 |
+| 40007  | 版本不存在               |
 
 ---
 

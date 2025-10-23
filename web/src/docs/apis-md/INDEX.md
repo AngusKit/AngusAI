@@ -166,35 +166,35 @@
 
 ### 页面 → API模块映射
 
-| Figma页面 | API模块 | 状态 |
-|----------|---------|------|
-| 登录页面 | 01-auth.md | ✅ |
-| 工作台 | 02-dashboard.md | ✅ |
-| AI Chat | 03-chat.md | ⏳ |
-| 我的应用 | 04-applications.md | ✅ |
-| 应用设置 | 04-applications.md | ✅ |
-| 知识库 | 05-knowledge-base.md | ✅ |
-| 数据集 | 06-dataset.md | ⏳ |
-| 工作流 | 07-workflow.md | ✅ |
-| 提示词库 | 08-prompt-library.md | ⏳ |
-| 插件市场 | 09-plugin-market.md | ⏳ |
-| 模型管理 | 10-model-management.md | ⏳ |
-| API密钥 | 11-api-keys.md | ⏳ |
-| 团队设置 | 12-team.md | ⏳ |
-| 计费订阅 | 13-billing.md | ⏳ |
-| 系统设置 | 14-settings.md | ⏳ |
+| Figma页面 | API模块                | 状态 |
+| --------- | ---------------------- | ---- |
+| 登录页面  | 01-auth.md             | ✅   |
+| 工作台    | 02-dashboard.md        | ✅   |
+| AI Chat   | 03-chat.md             | ⏳   |
+| 我的应用  | 04-applications.md     | ✅   |
+| 应用设置  | 04-applications.md     | ✅   |
+| 知识库    | 05-knowledge-base.md   | ✅   |
+| 数据集    | 06-dataset.md          | ⏳   |
+| 工作流    | 07-workflow.md         | ✅   |
+| 提示词库  | 08-prompt-library.md   | ⏳   |
+| 插件市场  | 09-plugin-market.md    | ⏳   |
+| 模型管理  | 10-model-management.md | ⏳   |
+| API密钥   | 11-api-keys.md         | ⏳   |
+| 团队设置  | 12-team.md             | ⏳   |
+| 计费订阅  | 13-billing.md          | ⏳   |
+| 系统设置  | 14-settings.md         | ⏳   |
 
 ### UI组件 → API映射
 
-| UI组件 | 对应API | Figma位置 |
-|--------|---------|-----------|
-| 应用列表卡片 | GET /api/v1/applications | 我的应用页 |
-| 创建应用对话框 | POST /api/v1/applications | 顶部+按钮 |
-| 知识库卡片 | GET /api/v1/knowledge-bases | 知识库页 |
-| 文档上传区 | POST /api/v1/knowledge-bases/:id/documents | 选中知识库后 |
-| 统计卡片 | GET /api/v1/dashboard/stats | 工作台页 |
-| 聊天消息 | POST /api/v1/chat/messages | Chat页 |
-| 工作流画布 | GET/PUT /api/v1/workflows/:id | 工作流编辑器 |
+| UI组件         | 对应API                                    | Figma位置    |
+| -------------- | ------------------------------------------ | ------------ |
+| 应用列表卡片   | GET /api/v1/applications                   | 我的应用页   |
+| 创建应用对话框 | POST /api/v1/applications                  | 顶部+按钮    |
+| 知识库卡片     | GET /api/v1/knowledge-bases                | 知识库页     |
+| 文档上传区     | POST /api/v1/knowledge-bases/:id/documents | 选中知识库后 |
+| 统计卡片       | GET /api/v1/dashboard/stats                | 工作台页     |
+| 聊天消息       | POST /api/v1/chat/messages                 | Chat页       |
+| 工作流画布     | GET/PUT /api/v1/workflows/:id              | 工作流编辑器 |
 
 ---
 
@@ -203,24 +203,29 @@
 ### 按功能分类
 
 #### 用户相关
+
 - [用户认证](01-auth.md)
 - [用户设置](14-settings.md)
 - [团队管理](12-team.md)
 
 #### 应用开发
+
 - [应用管理](04-applications.md)
 - [工作流](07-workflow.md)
 - [提示词库](08-prompt-library.md)
 
 #### 数据管理
+
 - [知识库](05-knowledge-base.md)
 - [数据集](06-dataset.md)
 
 #### AI功能
+
 - [对话](03-chat.md)
 - [模型管理](10-model-management.md)
 
 #### 系统功能
+
 - [工作台](02-dashboard.md)
 - [API密钥](11-api-keys.md)
 - [插件市场](09-plugin-market.md)
@@ -231,7 +236,9 @@
 ## 📖 使用指南
 
 ### 1. 查看接口规范
+
 每个模块文档包含：
+
 - 接口路径和方法
 - 请求参数详细说明
 - 响应数据结构
@@ -240,15 +247,18 @@
 - Figma对应关系
 
 ### 2. 参数命名规则
+
 - 所有参数使用小驼峰命名：`pageSize`, `createdAt`
 - 路径使用连字符：`/api/v1/knowledge-bases`
 - 枚举值使用下划线：`CUSTOMER_SERVICE`
 
 ### 3. 时间格式
+
 - 统一使用Unix时间戳（毫秒）
 - 示例：`1706889600000`
 
 ### 4. 分页规范
+
 ```typescript
 {
   page: 1,
@@ -259,6 +269,7 @@
 ```
 
 ### 5. 响应格式
+
 ```typescript
 {
   code: 200,
@@ -275,6 +286,7 @@
 ### API开发优先级
 
 #### 第一阶段（MVP）
+
 1. ✅ 认证授权
 2. ✅ 工作台
 3. ⏳ AI对话
@@ -282,12 +294,14 @@
 5. ✅ 知识库
 
 #### 第二阶段（完善）
+
 6. ⏳ 数据集
 7. ⏳ 工作流
 8. ⏳ 提示词库
 9. ⏳ API密钥
 
 #### 第三阶段（增强）
+
 10. ⏳ 插件市场
 11. ⏳ 模型管理
 12. ⏳ 团队管理
@@ -314,12 +328,12 @@
 
 ## 🔄 更新记录
 
-| 日期 | 版本 | 更新内容 |
-|------|------|----------|
+| 日期       | 版本   | 更新内容                                                                                  |
+| ---------- | ------ | ----------------------------------------------------------------------------------------- |
 | 2024-02-02 | v2.0.0 | 🎉 完成所有14个模块！新增AI对话、API密钥、团队管理、计费订阅、系统设置5个模块（88个接口） |
-| 2024-02-02 | v1.2.0 | 新增数据集、提示词库、插件市场、模型管理4个模块（71个接口） |
-| 2024-02-02 | v1.1.0 | 新增工作流模块API文档（15个接口） |
-| 2024-02-02 | v1.0.0 | 初始版本，完成核心模块（47个接口） |
+| 2024-02-02 | v1.2.0 | 新增数据集、提示词库、插件市场、模型管理4个模块（71个接口）                               |
+| 2024-02-02 | v1.1.0 | 新增工作流模块API文档（15个接口）                                                         |
+| 2024-02-02 | v1.0.0 | 初始版本，完成核心模块（47个接口）                                                        |
 
 ---
 

@@ -4,6 +4,7 @@
 **模块说明**：团队资源共享管理、权限控制、访问统计等功能
 
 ## 目录
+
 - [获取共享资源列表](#获取共享资源列表)
 - [获取共享详情](#获取共享详情)
 - [创建资源共享](#创建资源共享)
@@ -32,20 +33,21 @@ Authorization: Bearer <JWT_TOKEN>
   page?: number;
   pageSize?: number;
   keyword?: string;           // 搜索资源名称
-  
+
   // 筛选
   type?: 'application' | 'workflow' | 'dataset' | 'knowledge' | 'model';
   permission?: 'view' | 'edit' | 'manage';
   sharedWith?: 'all' | 'specific';  // 共享范围
   ownedByMe?: boolean;        // 我创建的
   sharedToMe?: boolean;       // 共享给我的
-  
+
   sortBy?: 'name' | 'lastShared' | 'views' | 'edits';
   sortOrder?: 'asc' | 'desc';
 }
 ```
 
 **Figma对应**：
+
 - `keyword` → 搜索框
 - `type` → 类型筛选下拉框
 - `permission` → 权限筛选
@@ -65,12 +67,12 @@ Authorization: Bearer <JWT_TOKEN>
         resourceName: string;
         resourceType: 'application' | 'workflow' | 'dataset' | 'knowledge' | 'model';
         resourceTypeLabel: string;  // "应用", "工作流"
-        
+
         // 资源图标配置
         icon: string;           // 图标名称
         iconBg: string;         // "bg-blue-100"
         iconColor: string;      // "text-blue-600"
-        
+
         // 所有者信息
         owner: {
           userId: number;
@@ -78,35 +80,35 @@ Authorization: Bearer <JWT_TOKEN>
           email: string;
           avatar?: string;
         };
-        
+
         // 共享信息
         sharedWith: 'all' | 'specific';
         sharedWithLabel: string;  // "全体成员", "部分成员"
         memberCount: number;    // 共享给几个成员
-        
+
         // 权限
         permission: 'view' | 'edit' | 'manage';
         permissionLabel: string;  // "查看", "编辑", "管理"
-        
+
         // 统计
         views: number;          // 访问次数
         edits: number;          // 编辑次数
         lastShared: string;     // "2小时前"
         lastSharedAt: number;
-        
+
         // 时间
         createdAt: number;
         createdDate: string;    // "2024-03-15"
       }
     ],
-    
+
     pagination: {
       page: number;
       pageSize: number;
       total: number;
       totalPages: number;
     },
-    
+
     // 统计摘要
     summary: {
       totalResources: number;
@@ -129,6 +131,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 共享资源列表卡片
 - 每个卡片显示：图标、名称、类型、所有者、共享范围、权限、统计
 
@@ -149,7 +152,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 共享ID
+  id: number; // 共享ID
 }
 ```
 
@@ -164,18 +167,18 @@ Authorization: Bearer <JWT_TOKEN>
     resourceId: number;
     resourceName: string;
     resourceType: string;
-    
+
     owner: {
       userId: number;
       userName: string;
       email: string;
       avatar?: string;
     };
-    
+
     // 共享配置
     sharedWith: 'all' | 'specific';
     permission: 'view' | 'edit' | 'manage';
-    
+
     // 共享成员列表（specific时）
     members?: Array<{
       userId: number;
@@ -187,14 +190,14 @@ Authorization: Bearer <JWT_TOKEN>
       lastAccessed?: number;
       accessCount: number;
     }>;
-    
+
     // 访问统计
     statistics: {
       totalViews: number;
       totalEdits: number;
       uniqueVisitors: number;
       avgAccessesPerUser: number;
-      
+
       // 访问趋势（最近7天）
       viewTrend: Array<{
         date: string;
@@ -202,7 +205,7 @@ Authorization: Bearer <JWT_TOKEN>
         users: number;
       }>;
     };
-    
+
     // 最近活动
     recentActivities: Array<{
       userId: number;
@@ -211,7 +214,7 @@ Authorization: Bearer <JWT_TOKEN>
       actionLabel: string;
       timestamp: number;
     }>;
-    
+
     createdAt: number;
     updatedAt: number;
   },
@@ -220,6 +223,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 共享详情对话框
 - 成员列表
 - 访问统计图表
@@ -244,16 +248,16 @@ Authorization: Bearer <JWT_TOKEN>
 {
   resourceId: number;        // 必填|资源ID
   resourceType: 'application' | 'workflow' | 'dataset' | 'knowledge' | 'model';
-  
+
   // 共享范围
   sharedWith: 'all' | 'specific';  // 必填
-  
+
   // 权限设置
   permission: 'view' | 'edit' | 'manage';  // 必填
-  
+
   // 指定成员（sharedWith为specific时必填）
   memberIds?: number[];
-  
+
   // 可选：通知设置
   notifyMembers?: boolean;   // 是否发送通知，默认true
   message?: string;          // 通知消息
@@ -261,6 +265,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 共享资源对话框
 - 共享范围单选框（全体成员/指定成员）
 - 权限选择
@@ -309,7 +314,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 共享ID
+  id: number; // 共享ID
 }
 ```
 
@@ -319,21 +324,22 @@ Authorization: Bearer <JWT_TOKEN>
 {
   sharedWith?: 'all' | 'specific';
   permission?: 'view' | 'edit' | 'manage';
-  
+
   // 更新成员列表（sharedWith为specific时）
   memberIds?: number[];
-  
+
   // 可选：单独设置某个成员的权限
   memberPermissions?: Array<{
     userId: number;
     permission: 'view' | 'edit' | 'manage';
   }>;
-  
+
   notifyMembers?: boolean;
 }
 ```
 
 **Figma对应**：
+
 - 编辑共享设置对话框
 - 权限变更
 - 成员添加/移除
@@ -370,7 +376,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 共享ID
+  id: number; // 共享ID
 }
 ```
 
@@ -383,6 +389,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 取消共享按钮
 - 确认对话框
 
@@ -419,8 +426,8 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 共享ID
-  userId: number;            // 成员用户ID
+  id: number; // 共享ID
+  userId: number; // 成员用户ID
 }
 ```
 
@@ -451,7 +458,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 共享ID
+  id: number; // 共享ID
 }
 ```
 
@@ -530,6 +537,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 成员选择列表
 - 成员搜索
 - 已选成员标记
@@ -551,7 +559,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 共享ID
+  id: number; // 共享ID
 }
 ```
 
@@ -576,7 +584,7 @@ Authorization: Bearer <JWT_TOKEN>
       totalDownloads: number;
       uniqueVisitors: number;
     },
-    
+
     // 访问趋势
     viewTrend: Array<{
       date: string;
@@ -584,7 +592,7 @@ Authorization: Bearer <JWT_TOKEN>
       edits: number;
       uniqueUsers: number;
     }>;
-    
+
     // Top访问者
     topVisitors: Array<{
       userId: number;
@@ -593,7 +601,7 @@ Authorization: Bearer <JWT_TOKEN>
       edits: number;
       lastAccessed: number;
     }>;
-    
+
     // 按操作类型统计
     byAction: {
       view: number;
@@ -601,7 +609,7 @@ Authorization: Bearer <JWT_TOKEN>
       download: number;
       copy: number;
     };
-    
+
     // 按时段统计
     byHour: Array<{
       hour: number;           // 0-23
@@ -613,6 +621,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 访问统计图表
 - Top访问者列表
 - 操作分布
@@ -650,14 +659,14 @@ Authorization: Bearer <JWT_TOKEN>
       totalViews: number;
       totalMembers: number;
     };
-    
+
     // 共享给我的
     sharedToMe: {
       total: number;
       byType: Record<string, number>;
       recentlyAccessed: number;
     };
-    
+
     // 最近活动
     recentActivities: Array<{
       resourceId: number;
@@ -732,7 +741,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 共享ID
+  id: number; // 共享ID
 }
 ```
 
@@ -765,10 +774,10 @@ Authorization: Bearer <JWT_TOKEN>
 manage（管理） > edit（编辑） > view（查看）
 ```
 
-| 权限 | 可执行操作 |
-|------|----------|
-| **view** | 查看资源内容、导出、复制 |
-| **edit** | view权限 + 编辑资源、保存修改 |
+| 权限       | 可执行操作                    |
+| ---------- | ----------------------------- |
+| **view**   | 查看资源内容、导出、复制      |
+| **edit**   | view权限 + 编辑资源、保存修改 |
 | **manage** | edit权限 + 共享管理、删除资源 |
 
 ### 共享范围
@@ -793,15 +802,15 @@ manage（管理） > edit（编辑） > view（查看）
 
 ## 错误码
 
-| 错误码 | 说明 |
-|--------|------|
-| 41601 | 共享不存在 |
-| 41602 | 资源不存在 |
-| 41603 | 权限不足（仅所有者可操作） |
-| 41604 | 成员不存在 |
-| 41605 | 资源已共享 |
-| 41606 | 不能共享给自己 |
-| 41607 | 成员不在团队中 |
+| 错误码 | 说明                       |
+| ------ | -------------------------- |
+| 41601  | 共享不存在                 |
+| 41602  | 资源不存在                 |
+| 41603  | 权限不足（仅所有者可操作） |
+| 41604  | 成员不存在                 |
+| 41605  | 资源已共享                 |
+| 41606  | 不能共享给自己             |
+| 41607  | 成员不在团队中             |
 
 ---
 

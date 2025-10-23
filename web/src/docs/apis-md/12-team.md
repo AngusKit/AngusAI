@@ -4,6 +4,7 @@
 **模块说明**：团队成员管理、邀请、角色权限、操作日志等功能
 
 ## 目录
+
 - [获取团队成员列表](#获取团队成员列表)
 - [获取成员详情](#获取成员详情)
 - [邀请成员](#邀请成员)
@@ -41,6 +42,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - `keyword` → 搜索框
 - `role` → 角色筛选下拉框
 - `status` → 状态筛选
@@ -61,18 +63,18 @@ Authorization: Bearer <JWT_TOKEN>
         email: string;
         avatar?: string;
         avatarFallback: string;  // "ZW"（姓名首字母）
-        
+
         // 角色和状态
         role: 'owner' | 'admin' | 'member' | 'viewer';
         roleLabel: string;       // "所有者"
         roleColor: string;       // 角色标签颜色
         status: 'active' | 'inactive' | 'pending';
         statusColor: string;
-        
+
         // 统计
         resourcesShared: number;    // 共享的资源数
         resourcesAccessed: number;  // 访问的资源数
-        
+
         // 时间
         joinedDate: string;      // "2024-01-15"
         joinedAt: number;
@@ -92,6 +94,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 团队成员列表表格
 - 每行显示：头像、姓名、邮箱、角色、状态、加入时间、最后活跃
 
@@ -112,7 +115,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 成员ID
+  id: number; // 成员ID
 }
 ```
 
@@ -130,13 +133,13 @@ Authorization: Bearer <JWT_TOKEN>
     avatar?: string;
     role: string;
     status: string;
-    
+
     // 权限详情
     permissions: Array<{
       resource: string;      // 'applications' | 'workflows' | 'datasets' 等
       actions: Array<'read' | 'write' | 'delete'>;
     }>;
-    
+
     // 活动统计
     activity: {
       totalLogins: number;
@@ -145,7 +148,7 @@ Authorization: Bearer <JWT_TOKEN>
       resourcesShared: number;
       resourcesAccessed: number;
     };
-    
+
     // 共享资源列表
     sharedResources: Array<{
       type: ResourceType;
@@ -153,7 +156,7 @@ Authorization: Bearer <JWT_TOKEN>
       name: string;
       sharedAt: number;
     }>;
-    
+
     // 最近活动
     recentActivities: Array<{
       id: number;
@@ -162,7 +165,7 @@ Authorization: Bearer <JWT_TOKEN>
       timestamp: number;
       details?: string;
     }>;
-    
+
     joinedAt: number;
     lastActiveAt: number;
     invitedBy?: number;
@@ -173,6 +176,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 成员详情弹窗
 - 活动统计卡片
 - 共享资源列表
@@ -198,24 +202,25 @@ Authorization: Bearer <JWT_TOKEN>
   email: string;             // 必填|邮箱|email格式
   role: 'admin' | 'member' | 'viewer';  // 必填|角色
   message?: string;          // 可选|邀请消息|maxLength:500
-  
+
   // 可选：自定义权限（覆盖角色默认权限）
   customPermissions?: Array<{
     resource: string;
     actions: string[];
   }>;
-  
+
   // 可选：指定可访问的资源
   accessibleResources?: Array<{
     type: ResourceType;
     ids: number[];
   }>;
-  
+
   expiresIn?: number;        // 可选|邀请有效期（天数），默认7天
 }
 ```
 
 **Figma对应**：
+
 - 邀请成员对话框
 - 邮箱输入
 - 角色选择
@@ -240,6 +245,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 邀请成功提示
 - 复制邀请链接按钮
 
@@ -268,7 +274,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 成员ID
+  id: number; // 成员ID
 }
 ```
 
@@ -276,11 +282,12 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  role: 'admin' | 'member' | 'viewer';  // 新角色
+  role: 'admin' | 'member' | 'viewer'; // 新角色
 }
 ```
 
 **Figma对应**：
+
 - 成员列表的角色下拉选择器
 - 确认对话框
 
@@ -323,7 +330,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 成员ID
+  id: number; // 成员ID
 }
 ```
 
@@ -335,7 +342,7 @@ Authorization: Bearer <JWT_TOKEN>
     resource: string;        // 资源类型
     actions: Array<'read' | 'write' | 'delete'>;
   }>;
-  
+
   accessibleResources?: Array<{
     type: ResourceType;
     ids: number[];
@@ -375,7 +382,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 成员ID
+  id: number; // 成员ID
 }
 ```
 
@@ -389,6 +396,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 移除成员按钮
 - 确认对话框
 - 资源转移选项
@@ -448,15 +456,15 @@ Authorization: Bearer <JWT_TOKEN>
         role: string;
         status: 'pending' | 'accepted' | 'declined' | 'expired';
         statusColor: string;
-        
+
         invitedBy: number;
         invitedByName: string;
         invitedDate: string;
         invitedAt: number;
-        
+
         expiresDate: string;
         expiresAt: number;
-        
+
         // 操作
         canResend: boolean;
         canRevoke: boolean;
@@ -469,6 +477,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 待处理邀请Tab
 - 邀请列表表格
 - 每行显示：邮箱、角色、邀请人、邀请时间、过期时间、状态
@@ -490,7 +499,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 邀请ID
+  id: number; // 邀请ID
 }
 ```
 
@@ -509,6 +518,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 重发邀请按钮
 
 ---
@@ -528,7 +538,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  id: number;                // 邀请ID
+  id: number; // 邀请ID
 }
 ```
 
@@ -543,6 +553,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 撤销邀请按钮
 
 ---
@@ -562,7 +573,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  token: string;             // 邀请令牌（邮件链接中）
+  token: string; // 邀请令牌（邮件链接中）
 }
 ```
 
@@ -600,7 +611,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  token: string;             // 邀请令牌
+  token: string; // 邀请令牌
 }
 ```
 
@@ -654,17 +665,17 @@ Authorization: Bearer <JWT_TOKEN>
         memberId: number;
         memberName: string;
         memberEmail: string;
-        
+
         action: string;        // 操作类型
         actionLabel: string;   // "创建应用"
         resource: string;      // 资源类型
         resourceId?: number;
         resourceName?: string;
-        
+
         details?: string;      // 详细描述
         ipAddress: string;
         userAgent?: string;
-        
+
         timestamp: number;
         createdAt: string;
       }
@@ -676,6 +687,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 操作日志Tab
 - 日志列表
 - 筛选器
@@ -709,7 +721,7 @@ Authorization: Bearer <JWT_TOKEN>
   data: {
     teamId: number;
     teamName: string;
-    
+
     // 成员设置
     memberSettings: {
       maxMembers: number;    // 最大成员数
@@ -717,14 +729,14 @@ Authorization: Bearer <JWT_TOKEN>
       allowInvite: boolean;  // 是否允许成员邀请
       requireApproval: boolean;  // 邀请是否需要批准
     };
-    
+
     // 资源设置
     resourceSettings: {
       defaultVisibility: Visibility;
       allowSharing: boolean;
       requireApprovalForShare: boolean;
     };
-    
+
     // 安全设置
     securitySettings: {
       enableIPWhitelist: boolean;
@@ -732,7 +744,7 @@ Authorization: Bearer <JWT_TOKEN>
       enableTwoFactor: boolean;
       sessionTimeout: number;  // 分钟
     };
-    
+
     // 通知设置
     notificationSettings: {
       emailNotifications: boolean;
@@ -744,6 +756,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Figma对应**：
+
 - 团队设置页面
 
 ---
@@ -817,7 +830,7 @@ Authorization: Bearer <JWT_TOKEN>
     totalMembers: number;
     activeMembers: number;
     pendingInvitations: number;
-    
+
     // 角色分布
     roleDistribution: {
       owner: number;
@@ -825,14 +838,14 @@ Authorization: Bearer <JWT_TOKEN>
       member: number;
       viewer: number;
     };
-    
+
     // 活跃度
     activityStats: {
       dailyActiveUsers: number;
       weeklyActiveUsers: number;
       monthlyActiveUsers: number;
     };
-    
+
     // 资源统计
     resourceStats: {
       sharedResources: number;
@@ -849,12 +862,12 @@ Authorization: Bearer <JWT_TOKEN>
 
 ### 角色权限
 
-| 角色 | 权限 |
-|------|------|
-| **Owner** | 所有权限，包括删除团队 |
-| **Admin** | 管理成员、资源、设置 |
-| **Member** | 创建和管理自己的资源 |
-| **Viewer** | 只读访问 |
+| 角色       | 权限                   |
+| ---------- | ---------------------- |
+| **Owner**  | 所有权限，包括删除团队 |
+| **Admin**  | 管理成员、资源、设置   |
+| **Member** | 创建和管理自己的资源   |
+| **Viewer** | 只读访问               |
 
 ### 角色层级
 
@@ -880,16 +893,16 @@ Owner > Admin > Member > Viewer
 
 ## 错误码
 
-| 错误码 | 说明 |
-|--------|------|
-| 41201 | 成员不存在 |
-| 41202 | 邀请不存在或已过期 |
-| 41203 | 权限不足 |
-| 41204 | 不能移除owner |
-| 41205 | 不能更改自己的角色 |
-| 41206 | 邮箱已被邀请 |
-| 41207 | 成员数量已达上限 |
-| 41208 | 邀请令牌无效 |
+| 错误码 | 说明               |
+| ------ | ------------------ |
+| 41201  | 成员不存在         |
+| 41202  | 邀请不存在或已过期 |
+| 41203  | 权限不足           |
+| 41204  | 不能移除owner      |
+| 41205  | 不能更改自己的角色 |
+| 41206  | 邮箱已被邀请       |
+| 41207  | 成员数量已达上限   |
+| 41208  | 邀请令牌无效       |
 
 ---
 

@@ -14,7 +14,7 @@ export const defaultLanguage: Language = 'zh-CN';
 export function getNestedTranslation(obj: any, path: string): string {
   const keys = path.split('.');
   let result = obj;
-  
+
   for (const key of keys) {
     if (result && typeof result === 'object' && key in result) {
       result = result[key];
@@ -22,6 +22,6 @@ export function getNestedTranslation(obj: any, path: string): string {
       return path; // Return the key if not found
     }
   }
-  
+
   return typeof result === 'string' ? result : path;
 }
