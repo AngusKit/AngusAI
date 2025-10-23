@@ -1,0 +1,4 @@
+/web/pnpm-lock.yaml
+/web/build/
+/web/node_modules/
+/.idea/
