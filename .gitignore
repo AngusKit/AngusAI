@@ -1,4 +1,4 @@
-/web/pnpm-lock.yaml
 /web/build/
 /web/node_modules/
 /.idea/
+/web/package-lock.json
