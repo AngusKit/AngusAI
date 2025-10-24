@@ -1,0 +1,19 @@
+# mkdir -p /opt/AngusAI && cd /opt/AngusAI
+# mkdir /opt/AngusAI/{conf,data,logs,plugins,tmp}
+# docker compose -f ai.yml up -d
+services:
+  angusai:
+    image: xcancloud/angusai-enterprise:1.0.0
+    container_name: angusai
+    restart: unless-stopped
+    volumes:
+      - ./conf:/opt/AngusAI/conf
+      - ./data:/opt/AngusAI/data
+      - ./logs:/opt/AngusAI/logs
+      - ./plugins:/opt/AngusAI/plugins
+      - ./tmp:/opt/AngusAI/tmp
+    ports:
+      - "8901:8901"
+      - "6806:6806"
+    environment:
+      TZ: ${TIMEZONE:-UTC}
