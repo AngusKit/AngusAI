@@ -15,6 +15,7 @@
   <name>AngusAI :: Parent</name>
   <version>1.0.0</version>
   <packaging>pom</packaging>
+  <description>AngusAI is an open-source development platform for large language models (LLM) built with Java and React. It allows developers to swiftly create production-level generative AI applications.</description>
 
   <modules>
     <module>service</module>
