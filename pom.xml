@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>cloud.xcan.angus</groupId>
+    <artifactId>AngusInfra</artifactId>
+    <version>1.0.0</version>
+  </parent>
+
+  <artifactId>AngusAI</artifactId>
+  <name>AngusAI :: Parent</name>
+  <version>1.0.0</version>
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>service</module>
+    <module>web</module>
+    <module>assembly</module> <!--Note: Must be packaged last-->
+  </modules>
+
+  <organization>
+    <name>XCan Company</name>
+    <url>http://www.xcan.company</url>
+  </organization>
+
+  <licenses>
+    <license>
+      <name>XCan Business License, Version 1.0</name>
+      <url>http://www.xcan.company/licenses/XCBL-1.0</url>
+    </license>
+  </licenses>
+
+  <properties>
+    <archive.name>tester</archive.name>
+    <hump.name>AngusAI</hump.name>
+  </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-specific-files</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.basedir}/dist</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>docker</directory>
+                  <includes>
+                    <include>docker-cicd.sh</include>
+                    <include>Dockerfile</include>
+                  </includes>
+                  <filtering>true</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
