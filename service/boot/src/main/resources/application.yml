@@ -259,13 +259,13 @@ springdoc:
         ### 2. API Service Endpoints
           | Deployment Type   | Service Endpoint                     |
           |-------------------|--------------------------------------|
-          | SaaS Cloud Edition| `https://bj-c1-prod-apis.xcan.cloud/tester` |
+          | SaaS Cloud Edition| `https://bj-c1-prod-apis.xcan.cloud/ai` |
           | Private Deployment| `http://AI_HOST:AI_PORT` (default)   |
           |                   | Or configured via `AI_APIS_URL_PREFIX` |
 
         ### 3. API Call Example
           ```bash
-          curl -i 'https://bj-c1-prod-apis.xcan.cloud/tester/api/v1/task/search?pageNo=1&pageSize=10' \
+          curl -i 'https://bj-c1-prod-apis.xcan.cloud/ai/api/v1/task/search?pageNo=1&pageSize=10' \
             -H 'Accept: application/json'
             -H 'Authorization: Bearer 7RProMAjgCr40gMgrsnRROvMXHrXrDrzwqo7ti1V2ZXc6bjoWvVEOTkjbQnLAxMTi5fJrnET' 
           ```
@@ -294,7 +294,7 @@ springdoc:
           }
           ```
     servers:
-      - url: "https://bj-c1-prod-apis.xcan.cloud/tester"
+      - url: "https://bj-c1-prod-apis.xcan.cloud/ai"
         description: "AngusAI Cloud Service API Endpoint"
 
 logging:
