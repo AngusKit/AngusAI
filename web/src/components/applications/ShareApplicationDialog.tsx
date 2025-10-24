@@ -291,7 +291,7 @@ export function ShareApplicationDialog({
                 <div className='flex-1'>
                   <Label className='text-sm dark:text-white'>匿名访问</Label>
                   <p className='text-xs text-gray-500 dark:text-gray-400 mt-1'>
-                    允许未登录用户使用应用
+                    允许未登录用户访问应用
                   </p>
                 </div>
                 <Switch
@@ -305,7 +305,7 @@ export function ShareApplicationDialog({
                 <div className='flex-1'>
                   <Label className='text-sm dark:text-white'>需要授权</Label>
                   <p className='text-xs text-gray-500 dark:text-gray-400 mt-1'>
-                    访问前需要通过您的授权
+                    只有授权用户才可访问
                   </p>
                 </div>
                 <Switch

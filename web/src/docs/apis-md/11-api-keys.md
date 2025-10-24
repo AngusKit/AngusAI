@@ -32,7 +32,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  page?: number;
+  pageNo?: number;
   pageSize?: number;
   keyword?: string;           // 搜索密钥名称
   status?: 'active' | 'inactive' | 'expired';
@@ -91,7 +91,7 @@ Authorization: Bearer <JWT_TOKEN>
       }
     ],
     pagination: {
-      page: number;
+      pageNo: number;
       pageSize: number;
       total: number;
       totalPages: number;
@@ -586,7 +586,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  page?: number;
+  pageNo?: number;
   pageSize?: number;
   startTime?: number;        // 开始时间
   endTime?: number;          // 结束时间

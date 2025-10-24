@@ -35,7 +35,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  page?: number;
+  pageNo?: number;
   pageSize?: number;
   keyword?: string;           // 搜索关键词（名称、描述）
   type?: WorkflowType;        // 工作流类型筛选
@@ -85,7 +85,7 @@ Authorization: Bearer <JWT_TOKEN>
       }
     ],
     pagination: {
-      page: number;
+      pageNo: number;
       pageSize: number;
       total: number;
       totalPages: number;
@@ -640,7 +640,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  page?: number;
+  pageNo?: number;
   pageSize?: number;
   workflowId?: number;       // 筛选特定工作流
   workflowName?: string;     // 按工作流名称筛选
@@ -690,7 +690,7 @@ Authorization: Bearer <JWT_TOKEN>
       }
     ],
     pagination: {
-      page: number;
+      pageNo: number;
       pageSize: number;
       total: number;
       totalPages: number;
@@ -796,7 +796,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  page?: number;
+  pageNo?: number;
   pageSize?: number;
 }
 ```
@@ -827,7 +827,7 @@ Authorization: Bearer <JWT_TOKEN>
       }
     ],
     pagination: {
-      page: number;
+      pageNo: number;
       pageSize: number;
       total: number;
       totalPages: number;

@@ -33,7 +33,7 @@ enum UserRole {
 
 ```typescript
 interface Pagination {
-  page: number;
+  pageNo: number;
   pageSize: number;
   total: number;
   totalPages: number;

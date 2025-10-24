@@ -35,7 +35,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  page?: number;
+  pageNo?: number;
   pageSize?: number;
   keyword?: string;           // 搜索会话标题或内容
   appId?: number;             // 筛选指定应用
@@ -84,7 +84,7 @@ Authorization: Bearer <JWT_TOKEN>
       }
     ],
     pagination: {
-      page: number;
+      pageNo: number;
       pageSize: number;
       total: number;
       totalPages: number;
@@ -503,7 +503,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  page?: number;
+  pageNo?: number;
   pageSize?: number;         // 默认20，最大100
   beforeId?: number;         // 获取指定消息之前的消息
   afterId?: number;          // 获取指定消息之后的消息
@@ -546,7 +546,7 @@ Authorization: Bearer <JWT_TOKEN>
       }
     ],
     pagination: {
-      page: number;
+      pageNo: number;
       pageSize: number;
       total: number;
       totalPages: number;

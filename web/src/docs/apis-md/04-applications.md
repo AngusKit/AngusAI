@@ -32,7 +32,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  page?: number;              // 页码，默认1
+  pageNo?: number;              // 页码，默认1
   pageSize?: number;          // 每页数量，默认20
   keyword?: string;           // 关键词搜索（名称、描述）
   category?: ApplicationCategory;  // 分类筛选
@@ -77,7 +77,7 @@ Authorization: Bearer <JWT_TOKEN>
       }
     ],
     pagination: {
-      page: number;
+      pageNo: number;
       pageSize: number;
       total: number;
       totalPages: number;

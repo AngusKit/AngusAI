@@ -31,7 +31,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  page?: number;
+  pageNo?: number;
   pageSize?: number;
   keyword?: string;           // 搜索姓名、邮箱
   role?: 'owner' | 'admin' | 'member' | 'viewer';
@@ -83,7 +83,7 @@ Authorization: Bearer <JWT_TOKEN>
       }
     ],
     pagination: {
-      page: number;
+      pageNo: number;
       pageSize: number;
       total: number;
       totalPages: number;
@@ -436,7 +436,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  page?: number;
+  pageNo?: number;
   pageSize?: number;
   status?: 'pending' | 'accepted' | 'declined' | 'expired';
 }
@@ -642,7 +642,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  page?: number;
+  pageNo?: number;
   pageSize?: number;
   memberId?: number;         // 筛选特定成员
   action?: string;           // 筛选操作类型

@@ -33,7 +33,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  page?: number;
+  pageNo?: number;
   pageSize?: number;
   keyword?: string;           // 搜索关键词
   category?: PluginCategory;  // 分类筛选
@@ -94,7 +94,7 @@ Authorization: Bearer <JWT_TOKEN>
       }
     ],
     pagination: {
-      page: number;
+      pageNo: number;
       pageSize: number;
       total: number;
       totalPages: number;
@@ -660,7 +660,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  page?: number;
+  pageNo?: number;
   pageSize?: number;
   orderBy?: 'latest' | 'helpful' | 'rating';
   rating?: number;           // 筛选评分

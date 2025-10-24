@@ -587,7 +587,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  page?: number;
+  pageNo?: number;
   pageSize?: number;
   status?: 'paid' | 'pending' | 'failed' | 'refunded';
   startDate?: number;
@@ -833,7 +833,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  page?: number;
+  pageNo?: number;
   pageSize?: number;
   status?: 'success' | 'failed' | 'pending' | 'refunded';
 }

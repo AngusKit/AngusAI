@@ -78,7 +78,7 @@ apis-md/
   "data": {
     "items": [],
     "pagination": {
-      "page": 1,
+      "pageNo": 1,
       "pageSize": 20,
       "total": 100,
       "totalPages": 5
@@ -118,7 +118,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  page?: number;        // 页码，默认1
+  pageNo?: number;        // 页码，默认1
   pageSize?: number;    // 每页数量，默认20
   orderBy?: string;      // 排序字段
   orderSort?: 'asc' | 'desc';  // 排序方向，默认desc

@@ -1,10 +1,10 @@
 package cloud.xcan.angus.core.ai.interfaces.activity.facade.internal.assembler;
 
-import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
-import cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder;
 import cloud.xcan.angus.core.ai.domain.activity.Activity;
 import cloud.xcan.angus.core.ai.interfaces.activity.facade.dto.ActivityFindDto;
 import cloud.xcan.angus.core.ai.interfaces.activity.facade.vo.ActivityDetailVo;
+import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
+import cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder;
 import cloud.xcan.angus.remote.search.SearchCriteria;
 import java.util.Set;
 

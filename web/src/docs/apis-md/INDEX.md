@@ -261,7 +261,7 @@
 
 ```typescript
 {
-  page: 1,
+  pageNo: 1,
   pageSize: 20,
   orderBy: 'createdDate',
   orderSort: 'desc'

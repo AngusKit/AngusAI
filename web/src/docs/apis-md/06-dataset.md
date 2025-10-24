@@ -32,7 +32,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  page?: number;
+  pageNo?: number;
   pageSize?: number;
   keyword?: string;           // 搜索关键词（名称、描述）
   type?: DataType;            // 数据类型筛选：text | table | datasource
@@ -87,7 +87,7 @@ Authorization: Bearer <JWT_TOKEN>
       }
     ],
     pagination: {
-      page: number;
+      pageNo: number;
       pageSize: number;
       total: number;
       totalPages: number;
@@ -545,7 +545,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  page?: number;
+  pageNo?: number;
   pageSize?: number;
   sourceType?: string;       // 数据源类型筛选
   status?: string;           // 状态筛选
@@ -583,7 +583,7 @@ Authorization: Bearer <JWT_TOKEN>
       }
     ],
     pagination: {
-      page: number;
+      pageNo: number;
       pageSize: number;
       total: number;
       totalPages: number;
@@ -692,7 +692,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  page?: number;             // 页码，默认1
+  pageNo?: number;             // 页码，默认1
   pageSize?: number;         // 每页数量，默认20，最大100
   sourceId?: number;         // 数据源ID（数据源类型）
 }
@@ -733,7 +733,7 @@ Authorization: Bearer <JWT_TOKEN>
     };
 
     pagination: {
-      page: number;
+      pageNo: number;
       pageSize: number;
       total: number;
       totalPages: number;

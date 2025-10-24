@@ -30,7 +30,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  page?: number;
+  pageNo?: number;
   pageSize?: number;
   keyword?: string;           // 搜索资源名称
 
@@ -103,7 +103,7 @@ Authorization: Bearer <JWT_TOKEN>
     ],
 
     pagination: {
-      page: number;
+      pageNo: number;
       pageSize: number;
       total: number;
       totalPages: number;

@@ -1,7 +1,7 @@
 package cloud.xcan.angus.core.ai.interfaces.activity.facade.internal;
 
-import static cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder.getMatchSearchFields;
 import static cloud.xcan.angus.core.ai.interfaces.activity.facade.internal.assembler.ActivityAssembler.getSpecification;
+import static cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder.getMatchSearchFields;
 import static cloud.xcan.angus.core.utils.CoreUtils.buildVoPageResult;
 
 import cloud.xcan.angus.core.ai.application.query.activity.ActivityQuery;

@@ -33,7 +33,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  page?: number;
+  pageNo?: number;
   pageSize?: number;
   keyword?: string;          // 搜索关键词
   orderBy?: 'createdDate' | 'lastModifiedDate' | 'documentsCount' | 'name';
@@ -70,7 +70,7 @@ Authorization: Bearer <JWT_TOKEN>
       }
     ],
     pagination: {
-      page: number;
+      pageNo: number;
       pageSize: number;
       total: number;
       totalPages: number;
@@ -396,7 +396,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  page?: number;
+  pageNo?: number;
   pageSize?: number;
   keyword?: string;
   type?: DocumentType;       // 文件类型筛选
@@ -434,7 +434,7 @@ Authorization: Bearer <JWT_TOKEN>
       }
     ],
     pagination: {
-      page: number;
+      pageNo: number;
       pageSize: number;
       total: number;
       totalPages: number;
@@ -665,7 +665,7 @@ Authorization: Bearer <JWT_TOKEN>
         content: string;       // 分段内容
         score: number;         // 相似度分数 0-1
         metadata: {
-          page?: number;       // 页码（PDF）
+          pageNo?: number;       // 页码（PDF）
           position?: string;   // 位置信息
         }
       }

@@ -10,7 +10,7 @@ public enum CombinedTargetType implements EnumMessage<String> {
     return this.name();
   }
 
-  public boolean isParent(){
+  public boolean isParent() {
     return false;
   }
 }

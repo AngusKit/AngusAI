@@ -32,7 +32,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```typescript
 {
-  page?: number;
+  pageNo?: number;
   pageSize?: number;
   keyword?: string;           // 搜索关键词（标题、内容）
   category?: string;          // 分类ID筛选
@@ -80,7 +80,7 @@ Authorization: Bearer <JWT_TOKEN>
       }
     ],
     pagination: {
-      page: number;
+      pageNo: number;
       pageSize: number;
       total: number;
       totalPages: number;
@@ -747,7 +747,7 @@ Authorization: Bearer <JWT_TOKEN>
   maxUsage?: number;         // 最大使用次数
   createdAfter?: number;     // 创建时间筛选
   createdBefore?: number;
-  page?: number;
+  pageNo?: number;
   pageSize?: number;
 }
 ```
