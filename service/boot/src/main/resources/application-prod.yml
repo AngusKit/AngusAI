@@ -1,0 +1,119 @@
+xcan:
+  trace:
+    enabled: false
+  cloud:
+    gmApiUrlPrefix: ${GM_CLOUD_APIS_URL_PREFIX}
+  mockService:
+    aiApisUrlPrefix: ${AI_APIS_SERVER_URL}
+  datasource:
+    extra:
+      dbType: '@databaseType@'
+      entityPackages:
+        - cloud.xcan.angus.idgen.entity
+        - cloud.xcan.angus.api.commonlink
+        - cloud.xcan.angus.core.ai.domain
+    hikari:
+      readOnly: false
+      connectionTestQuery: SELECT 1 FROM DUAL
+      poolName: xcanHikariCP
+      idleTimeout: 600000
+      maxLifetime: 1800000
+      maximumPoolSize: 30
+      minimumIdle: 10
+    mysql:
+      driverClassName: com.mysql.cj.jdbc.Driver
+      type: com.zaxxer.hikari.HikariDataSource
+      url: jdbc:mysql://${AI_MYSQL_HOST}:${AI_MYSQL_PORT}/${AI_MYSQL_DB}?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&autoReconnect=true&useSSL=false&zeroDateTimeBehavior=convertToNull&serverTimezone=${info.app.timezone}&rewriteBatchedStatements=true
+      username: ${AI_MYSQL_USER}
+      password: ${AI_MYSQL_PASSWORD}
+      schema:
+        - mysql/idgen-schema.sql
+    postgresql:
+      driverClassName: org.postgresql.Driver
+      type: com.zaxxer.hikari.HikariDataSource
+      url: jdbc:postgresql://${AI_POSTGRES_HOST}:${AI_POSTGRES_PORT}/${AI_POSTGRES_DB}?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&autoReconnect=true&useSSL=false&zeroDateTimeBehavior=convertToNull&serverTimezone=${info.app.timezone}&rewriteBatchedStatements=true
+      username: ${AI_POSTGRES_USER}
+      password: ${AI_POSTGRES_PASSWORD}
+      schema:
+        - postgres/idgen-schema.sql
+    commonlink:
+      mysql:
+        driverClassName: com.mysql.cj.jdbc.Driver
+        type: com.zaxxer.hikari.HikariDataSource
+        url: jdbc:mysql://${COMMON_MYSQL_HOST}:${COMMON_MYSQL_PORT}/${COMMON_MYSQL_DB}?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&autoReconnect=true&useSSL=false&zeroDateTimeBehavior=convertToNull&serverTimezone=${info.app.timezone}&rewriteBatchedStatements=true
+        username: ${COMMON_MYSQL_USER}
+        password: ${COMMON_MYSQL_PASSWORD}
+      postgresql:
+        driverClassName: org.postgresql.Driver
+        type: com.zaxxer.hikari.HikariDataSource
+        url: jdbc:postgresql://${COMMON_POSTGRES_HOST}:${COMMON_POSTGRES_PORT}/${COMMON_POSTGRES_DB}?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&autoReconnect=true&useSSL=false&zeroDateTimeBehavior=convertToNull&serverTimezone=${info.app.timezone}&rewriteBatchedStatements=true
+        username: ${COMMON_POSTGRES_USER}
+        password: ${COMMON_POSTGRES_PASSWORD}
+  redis:
+    enabled: true
+    deployment: ${AI_REDIS_DEPLOY_MODE:SINGLE}
+    host: ${AI_REDIS_HOST}
+    port: ${AI_REDIS_PORT}
+    password: ${AI_REDIS_PASSWORD}
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 5
+
+eureka:
+  client:
+    healthcheck:
+      enabled: true
+    register-with-eureka: true
+    fetch-registry: true
+    registry-fetch-interval-seconds: 30
+    eureka-connection-idle-timeout-seconds: 30
+    initial-instance-info-replication-interval-seconds: 40
+    serviceUrl:
+      defaultZone: http://${EUREKA_USER_NAME}:${EUREKA_USER_PASSWORD}@${GM_HOST}:${GM_PORT}/eureka/
+  instance:
+    app-name: '@artifactId@'
+    instance-id: ${spring.cloud.client.ip-address}:${server.port}
+    lease-expiration-duration-in-seconds: 90
+    lease-renewal-interval-in-seconds: 30
+    prefer-ip-address: true
+    status-page-url: http://${spring.cloud.client.ip-address}:${server.port}/swagger-ui/
+    health-check-url-path: /actuator/health
+
+spring:
+  security:
+    oauth2:
+      resource-server:
+        opaque-token:
+          client-id: ${OAUTH2_INTROSPECT_CLIENT_ID}
+          client-secret: ${OAUTH2_INTROSPECT_CLIENT_SECRET}
+          introspection-uri: ${GM_APIS_URL_PREFIX}/oauth2/introspect
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        generate_statistics: false
+        use_sql_comments: false
+        type: trace
+        jdbc:
+          batch_size: 200
+          time_zone: ${info.app.timezone}
+        order_inserts: true
+        order_updates: true
+        enable_lazy_load_no_trans: true
+        session_factory:
+          statement_inspector: cloud.xcan.angus.core.jpa.interceptor.TenantInterceptor
+    database: '@databaseType@'
+    database-platform: '@databaseDialect@'
+    open-in-view: false
+
+logging:
+  level:
+    org: WARN
+    com: WARN
+    org.springdoc: error
+

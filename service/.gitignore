@@ -1,0 +1,39 @@
+.DS_Store
+target/
+!.mvn/wrapper/maven-wrapper.jar
+logs
+work
+tmp
+.env
+conf/.*env
+extension/dist
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+.gitlab-ci.yml
+CATALINA_BASE_IS_UNDEFINED
+
+### NetBeans ###
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+# Eclipse
+.settings/
+#.classpath
+#.project
+/.metadata/

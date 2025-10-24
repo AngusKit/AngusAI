@@ -1,0 +1,325 @@
+server:
+  port: ${AI_PORT:1530}
+  servlet:
+    context-path: /
+
+xcan:
+  core:
+    enabled: true
+  global:
+    cors:
+      enabled: true
+  opt-log:
+    enabled: true
+    clearBeforeDay: 360
+  api-log:
+    enabled: true
+    userRequest:
+      enabled: true
+      printLevel: FULL
+    systemRequest:
+      enabled: true
+      printLevel: FULL
+  id-gen:
+    enabled: true
+  datasource:
+    enabled: true
+    commonlink:
+      enabled: true
+  redis:
+    enabled: true
+  l2cache:
+    enabled: true
+    allowNullValues: true
+    composite:
+      l1AllOpen: true
+      l1Manual: false
+    # L1 cache
+    caffeine:
+      expireAfterWrite: 1800
+      expireAfterAccess: 600
+      initialCapacity: 50000
+      maximumSize: 500000
+    # L2 cache
+    redis:
+      defaultExpiration: 1800000
+      defaultPenetrationExpiration: 300000
+      expires: { setting: 7200000, settingTenant: 7200000, servicesSchema: 7200000, servicesComps: 7200000 }
+      topic: j2cache:angus
+
+info:
+  app:
+    name: '@hump.name@'
+    editionType: '@editionType@'
+    version: '@project.version@'
+    artifactId: '@artifactId@'
+    instanceId: ${spring.cloud.client.ip-address}:${server.port}
+    description: '@project.description@'
+    timezone: ${TIMEZONE:Asia/Shanghai}
+    profile: '@profile.active@'
+    runtime: ${RUNTIME:HOST}
+    license: XCan Business License, Version 1.0
+    licenseUrl: http://www.xcan.cloud/licenses/XCBL-1.0
+    organization: '@organization.name@'
+    organizationUrl: '@organization.url@'
+
+spring:
+  application:
+    name: '@artifactId@'
+  profiles:
+    active: '@profile.active@'
+  messages:
+    basename: i18n/messages-infra-spec,i18n/messages-infra-remote,i18n/messages-ai-api,i18n/messages-ai-core,i18n/messages-ai-commercial,i18n/messages-gm-api,i18n/messages-ess-api,i18n/messages-storage-api
+  jackson:
+    defaultPropertyInclusion: always
+    dateFormat: ${JACKSON_DATE_FORMAT:yyyy-MM-dd HH:mm:ss}
+    localeDateFormat: ${JACKSON_LOCALE_DATE_FORMAT:yyyy-MM-dd}
+    localeTimeFormat: ${JACKSON_LOCALE_TIME_FORMAT:HH:mm:ss}
+    timeZone: ${TIMEZONE:Asia/Shanghai}
+    generator:
+      write_numbers_as_strings: true
+  main:
+    allow-circular-references: true
+    allow-bean-definition-overriding: true
+    banner-mode: OFF
+  data:
+    ldap:
+      repositories:
+        enabled: false
+  web:
+    resources:
+      add-mappings: false
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 100MB
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    operations-sorter: alpha
+    tags-sorter: alpha
+  open-api:
+    info:
+      title: AngusAI RESTful APIs Documentation
+      version: 1.0
+      contact:
+        url: https://www.xcan.cloud
+        email: technical_support@xcan.cloud
+      license:
+        name: GPL-3.0
+        url: https://github.com/xcancloud/AngusAI/blob/main/LICENSE
+      description: >
+        ## API Specification
+        
+        AngusAI is built on **RESTful design principles** and strictly adheres to the [OpenAPI 3.0](https://swagger.io/specification/v3/) specification format.
+
+        ### 1. Protocol Specification
+        
+        - **Mandatory HTTPS Usage**  
+          APIs are always served over HTTPS to ensure secure data transmission.  
+          > **Note**: Private deployment customers may not have security certificates configured and require separate handling.
+
+        - **API Version Management**  
+          Version numbers are embedded in URL paths:  
+          ```
+          /api/v1/resource
+          /api/v2/resource
+          ```
+
+        ### 2. Resource Naming Convention
+        
+        - Uniformly use **lowercase letters** or **lower camel case naming**  
+        - Examples:  
+          ```
+          /user
+          /productCategories
+          /orderItems
+          ```
+
+        ### 3. HTTP Method Specification
+          | Method      | Description                              | Success Code | Example                   |
+          |-------------|------------------------------------------|--------------|---------------------------|
+          | **GET**     | Retrieve resources                       | 200          | `GET /users`              |
+          | **POST**    | Create resources                         | 201          | `POST /users`             |
+          | **PUT**     | Replace entire resource (create if absent)| 200          | `PUT /users/{id}`         |
+          | **PATCH**   | Partial resource update                  | 200          | `PATCH /users/{id}`       |
+          | **DELETE**  | Delete resources                         | 204          | `DELETE /users/{id}`      |
+        
+        **Special Operation Patterns** - Use verbs/adjectives for granular operations:  
+          ```
+          PATCH /users/{id}/enabled   # Enable user
+          POST /orders/{id}/cancel    # Cancel order
+          ```
+
+        ### 4. Security Authentication
+        
+        **OAuth 2.0 Authentication** - Protected resources require authentication header:  
+        
+        ```
+        Authorization: Bearer <access_token>
+        ```
+
+        ### 5. Request Parameter Specification
+        
+        #### Request Headers
+          ```
+          Content-Type: application/json
+          Accept: application/json
+          Authorization: Bearer xxxxxxxxxxxx
+          ```
+
+        #### Query Parameters
+          | Parameter Type | Format Example                      | Description          |
+          |----------------|-------------------------------------|----------------------|
+          | Pagination     | `?pageNo=2&pageSize=20`             | Page number and size |
+          | Sorting        | `?orderBy=createdDate&orderSort=DESC` | Sort field and direction |
+          | Filtering      | `?status=active&role=admin`         | Field filters        |
+        
+        #### Request Body (JSON)
+          ```json
+          {
+            "name": "John Doe",
+            "email": "john@example.com",
+            "role": "member",
+            "preferences": {
+              "notifications": true,
+              "theme": "dark"
+            }
+          }
+          ```
+
+        ### 6. Response Specification
+        
+        #### Status Codes
+          | Code | Meaning                          |
+          |------|----------------------------------|
+          | 200  | OK - Request succeeded           |
+          | 201  | Created - Resource created       |
+          | 204  | No Content - Success, no content |
+          | 400  | Bad Request - Client error       |
+          | 401  | Unauthorized - Not authenticated |
+          | 403  | Forbidden - Access denied        |
+          | 404  | Not Found - Resource not exist   |
+          | 429  | Too Many Requests - Rate limited |
+          | 500  | Internal Server Error - Server failure |
+        
+        #### Response Body Structure
+          ```json
+          {
+            "code": "S",
+            "msg": "Operation succeeded",
+            "data": {
+              "total": 42,
+              "list": [
+                {
+                  "id": "301222970049691648",
+                  "username": "U20250628001287",
+                  "email": "user@example.com"
+                }
+              ]
+            },
+            "datetime": "2025-06-15 14:49:56",
+            "ext": {}
+          }
+          ```
+
+        ## Quick Start Guide
+
+        ### 1. Obtaining Access Tokens
+        
+        #### System Access Token
+          **Use Case**: System-to-system integration  
+          **Acquisition Process**:
+          1. Log in to AngusGM application
+          2. Navigate to: **System** → **System Tokens**
+          3. Create new token:
+             - Enter token name
+             - Set permission scope
+             - Configure expiration time
+          4. Click **Create Token** to generate new credentials
+        
+          > **Note**: System tokens have full API permissions without data restrictions.
+
+        #### User Access Token
+          **Use Case**: User-level API operations  
+          **Acquisition Process**:
+          1. Log in to AngusGM application
+          2. Access: **User Profile** → **Access Tokens**
+          3. Create new token:
+             - Verify user password
+             - Set token name
+             - Configure validity period
+          4. Click **Create Token** to generate credentials
+        
+          > **Note**: User tokens inherit the user's API permissions and data access rights.
+
+        ### 2. API Service Endpoints
+          | Deployment Type   | Service Endpoint                     |
+          |-------------------|--------------------------------------|
+          | SaaS Cloud Edition| `https://bj-c1-prod-apis.xcan.cloud/tester` |
+          | Private Deployment| `http://AI_HOST:AI_PORT` (default)   |
+          |                   | Or configured via `AI_APIS_URL_PREFIX` |
+
+        ### 3. API Call Example
+          ```bash
+          curl -i 'https://bj-c1-prod-apis.xcan.cloud/tester/api/v1/task/search?pageNo=1&pageSize=10' \
+            -H 'Accept: application/json'
+            -H 'Authorization: Bearer 7RProMAjgCr40gMgrsnRROvMXHrXrDrzwqo7ti1V2ZXc6bjoWvVEOTkjbQnLAxMTi5fJrnET' 
+          ```
+
+        **Response Example**:
+          ```http
+          HTTP/1.1 200 OK
+          Date: Sun, 15 Jun 2025 06:49:56 GMT
+          Content-Type: application/json
+          XC-Request-Id: 34acb65c2c484188a2f9f3a3f4ca3d1f
+        
+          {
+            "code": "S",
+            "msg": "Success",
+            "data": {
+              "total": "1",
+              "list": [
+                {
+                  "id": "301222970049691648",
+                  "code": "AT00000016",
+                  "name": "A Task"
+                }
+              ]
+            },
+            "datetime": "2025-06-15 14:49:56"
+          }
+          ```
+    servers:
+      - url: "https://bj-c1-prod-apis.xcan.cloud/tester"
+        description: "AngusAI Cloud Service API Endpoint"
+
+logging:
+  config: classpath:spring-logback.xml
+  level:
+    org.springframework.web: WARN
+    org.springframework.security: WARN
+    org.springframework.cloud: WARN
+  file:
+    path: ${log.dir:logs}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - enums
+          - messages
+          - systemlog
+          - appworkspace
+          - health
+          - info
+          - metrics
+          - serviceregistry
+  endpoint:
+    health:
+      show-details: always
+      access: read_only

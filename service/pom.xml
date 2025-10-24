@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>cloud.xcan.angus</groupId>
+    <artifactId>AngusAI</artifactId>
+    <version>1.0.0</version>
+  </parent>
+
+  <artifactId>xcan-angusai.service</artifactId>
+  <name>AngusAI :: Service</name>
+  <version>1.0.0</version>
+  <packaging>pom</packaging>
+  <description>AngusAI (referred to as AT) helps software development teams conduct software
+    development and testing activities efficiently and sustainably, while meeting the requirements
+    of agile development and agile testing for clients.
+  </description>
+
+  <modules>
+    <module>api</module>
+    <module>core</module>
+    <module>boot</module>
+  </modules>
+
+  <organization>
+    <name>XCan Cloud</name>
+    <url>http://www.xcan.cloud</url>
+  </organization>
+
+  <licenses>
+    <license>
+      <name>GPL-3.0 License</name>
+      <url>https://www.gnu.org/licenses/gpl-3.0.html</url>
+    </license>
+    <license>
+      <name>XCan Business License, Version 1.0</name>
+      <url>http://www.xcan.cloud/licenses/XCBL-1.0</url>
+    </license>
+  </licenses>
+
+  <scm>
+    <url>scm:git:http://github.com/xcancloud/AngusAI</url>
+    <connection>scm:git:git@github.com/xcancloud/AngusAI.git</connection>
+    <developerConnection>scm:git:http://github.com/xcancloud/AngusAI.git
+    </developerConnection>
+    <tag>${project.version}</tag>
+  </scm>
+
+  <issueManagement>
+    <system>github</system>
+    <url>http://github.com/xcancloud/angusai/-/issues</url>
+  </issueManagement>
+
+  <developers>
+    <developer>
+      <name>XiaoLong Liu</name>
+      <roles>
+        <role>Developer</role>
+        <role>Project Manager</role>
+        <role>Architect</role>
+      </roles>
+    </developer>
+
+    <developer>
+      <name>Qin Hu</name>
+      <roles>
+        <role>Developer</role>
+        <role>Project Manager</role>
+        <role>Architect</role>
+      </roles>
+    </developer>
+
+    <developer>
+      <name>Coder Boy</name>
+      <roles>
+        <role>Developer</role>
+        <role>Architect</role>
+      </roles>
+    </developer>
+
+    <developer>
+      <name>Ninja</name>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </developer>
+
+    <developer>
+      <name>Ghost</name>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </developer>
+  </developers>
+
+  <mailingLists>
+    <mailingList>
+      <name>Dev Mailing List</name>
+      <post>technical_support@xcan.cloud</post>
+      <subscribe>dev-subscribe@xcan.cloud</subscribe>
+      <unsubscribe>dev-unsubscribe@xcan.cloud</unsubscribe>
+    </mailingList>
+  </mailingLists>
+
+  <contributors/>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+    <java.version>17</java.version>
+    <maven.compiler.source>${java.version}</maven.compiler.source>
+    <maven.compiler.target>${java.version}</maven.compiler.target>
+
+    <xcan-infra.bom.version>1.0.0</xcan-infra.bom.version>
+    <xcan-plugin.bom.version>1.0.0</xcan-plugin.bom.version>
+
+    <xcan-angusgm.api.version>1.0.0</xcan-angusgm.api.version>
+    <xcan-angusstorage.api.version>1.0.0</xcan-angusstorage.api.version>
+    <xcan-angusess.api.version>1.0.0</xcan-angusess.api.version>
+    <xcan-angusexpense.api.version>1.0.0</xcan-angusexpense.api.version>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>cloud.xcan.angus</groupId>
+        <artifactId>xcan-infra.bom</artifactId>
+        <version>${xcan-infra.bom.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>cloud.xcan.angus</groupId>
+        <artifactId>xcan-plugin.bom</artifactId>
+        <version>${xcan-plugin.bom.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>cloud.xcan.angus</groupId>
+        <artifactId>xcan-angusai.api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>cloud.xcan.angus</groupId>
+        <artifactId>xcan-angusai.core</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>cloud.xcan.angus</groupId>
+        <artifactId>xcan-angusgm.api</artifactId>
+        <version>${xcan-angusgm.api.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>cloud.xcan.angus</groupId>
+        <artifactId>xcan-angusstorage.api</artifactId>
+        <version>${xcan-angusstorage.api.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>cloud.xcan.angus</groupId>
+        <artifactId>xcan-angusess.api</artifactId>
+        <version>${xcan-angusess.api.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>cloud.xcan.angus</groupId>
+        <artifactId>xcan-angusexpense.api</artifactId>
+        <version>${xcan-angusexpense.api.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+</project>
