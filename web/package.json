@@ -2,17 +2,21 @@
   "name": "AngusAI",
   "version": "0.1.0",
   "private": true,
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
-    "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
-    "lint:check": "eslint . --ext .ts,.tsx,.js,.jsx --max-warnings 0",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "format:staged": "prettier --write --ignore-unknown",
-    "format:lint": "npm run lint:fix && npm run format"
-  },
+      "scripts": {
+          "dev": "vite",
+          "build": "vite build",
+          "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
+          "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
+          "lint:check": "eslint . --ext .ts,.tsx,.js,.jsx --max-warnings 0",
+          "format": "prettier --write .",
+          "format:check": "prettier --check .",
+          "format:staged": "prettier --write --ignore-unknown",
+          "format:lint": "npm run lint:fix && npm run format",
+          "test": "jest",
+          "test:watch": "jest --watch",
+          "test:coverage": "jest --coverage",
+          "test:ci": "jest --ci --coverage --watchAll=false"
+      },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.3",
     "@radix-ui/react-alert-dialog": "^1.1.6",
@@ -59,6 +63,10 @@
     "vaul": "^1.1.2"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/jest": "^30.0.0",
     "@types/node": "^20.10.0",
     "@typescript-eslint/eslint-plugin": "^8.46.2",
     "@typescript-eslint/parser": "^8.46.2",
@@ -70,7 +78,10 @@
     "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.0",
+    "jest": "^30.2.0",
+    "jest-environment-jsdom": "^30.2.0",
     "prettier": "^3.6.2",
+    "ts-jest": "^29.4.5",
     "vite": "6.3.5"
   }
 }

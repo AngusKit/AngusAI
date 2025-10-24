@@ -111,11 +111,6 @@ export const enUS: TranslationKeys = {
     viewAll: 'View All',
   },
 
-  // Recent Apps
-  recentApps: {
-    title: 'Recent Applications',
-    viewAll: 'View All',
-  },
 
   // Quick Actions
   quickActions: {
@@ -387,21 +382,12 @@ export const enUS: TranslationKeys = {
     featured: 'Featured',
     allCategories: 'All Categories',
     downloads: 'Downloads',
-    rating: 'Rating',
+    score: 'Rating',
     install: 'Install',
     installed: 'Installed',
     viewDetails: 'View Details',
   },
 
-  // Analytics
-  analytics: {
-    title: 'Usage Analytics',
-    overview: 'Overview',
-    apiCalls: 'API Calls',
-    performance: 'Performance',
-    costs: 'Cost Analysis',
-    trends: 'Trend Analysis',
-  },
 
   // Knowledge Base File Upload
   knowledgeUpload: {

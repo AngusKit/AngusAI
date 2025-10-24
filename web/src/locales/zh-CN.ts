@@ -472,7 +472,7 @@ export const zhCN = {
     featured: '精选',
     allCategories: '所有分类',
     downloads: '下载量',
-    rating: '评分',
+    score: '评分',
     install: '安装',
     installed: '已安装',
     viewDetails: '查看详情',
