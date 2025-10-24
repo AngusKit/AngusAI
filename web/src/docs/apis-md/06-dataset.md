@@ -38,8 +38,8 @@ Authorization: Bearer <JWT_TOKEN>
   type?: DataType;            // 数据类型筛选：text | table | datasource
   status?: 'active' | 'inactive' | 'preparing';
   visibility?: Visibility;    // 可见性筛选
-  sortBy?: 'createdAt' | 'updatedAt' | 'dataCount' | 'name';
-  sortOrder?: 'asc' | 'desc';
+  orderBy?: 'createdDate' | 'lastModifiedDate' | 'dataCount' | 'name';
+  orderSort?: 'asc' | 'desc';
   tags?: string[];            // 标签筛选
 }
 ```
@@ -56,7 +56,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: [
       {
@@ -71,10 +71,10 @@ Authorization: Bearer <JWT_TOKEN>
         status: 'active' | 'inactive' | 'preparing';
         statusColor: string;     // 状态颜色类名
         visibility: Visibility;
-        createdAt: number;
-        updatedAt: number;
+        createdDate: Date
+        lastModifiedDate: Date;
         updateTime: string;      // "2023-10-12"
-        creator: string;
+        createdByName: string;
         createdBy: number;
         tags: string[];
 
@@ -93,7 +93,7 @@ Authorization: Bearer <JWT_TOKEN>
       totalPages: number;
     }
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -128,7 +128,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     id: number;
     name: string;
@@ -141,9 +141,9 @@ Authorization: Bearer <JWT_TOKEN>
     status: string;
     statusColor: string;
     visibility: Visibility;
-    createdAt: number;
-    updatedAt: number;
-    creator: string;
+    createdDate: Date
+    lastModifiedDate: Date;
+    createdByName: string;
     createdBy: number;
     tags: string[];
 
@@ -197,7 +197,7 @@ Authorization: Bearer <JWT_TOKEN>
       lastUpdateTime: number;
     };
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -264,15 +264,15 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 201,
-  message: "数据集创建成功",
+  msg: "数据集创建成功",
   data: {
     id: number;
     name: string;
     type: DataType;
     status: 'preparing';     // 新创建默认为准备中
-    createdAt: number;
+    createdDate: Date
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -326,11 +326,11 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "更新成功",
+  msg: "更新成功",
   data: {
     // 返回更新后的数据集信息
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -360,8 +360,8 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 204,
-  message: "删除成功",
-  timestamp: 1706889600000
+  msg: "删除成功",
+  datetime: 1706889600000
 }
 ```
 
@@ -413,14 +413,14 @@ Content-Type: multipart/form-data
 ```typescript
 {
   code: 201,
-  message: "上传成功，开始处理",
+  msg: "上传成功，开始处理",
   data: {
     uploadId: string;
     recordsCount: number;    // 预估记录数
     status: 'processing';
     estimatedTime: number;   // 预计处理时间（秒）
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -507,7 +507,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 201,
-  message: "数据源添加成功",
+  msg: "数据源添加成功",
   data: {
     id: number;
     name: string;
@@ -516,7 +516,7 @@ Authorization: Bearer <JWT_TOKEN>
     recordCount?: number;
     lastSyncTime?: number;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -557,7 +557,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: [
       {
@@ -589,7 +589,7 @@ Authorization: Bearer <JWT_TOKEN>
       totalPages: number;
     }
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -625,13 +625,13 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "同步已启动",
+  msg: "同步已启动",
   data: {
     syncId: string;
     status: 'syncing';
     startedAt: number;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -662,8 +662,8 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 204,
-  message: "删除成功",
-  timestamp: 1706889600000
+  msg: "删除成功",
+  datetime: 1706889600000
 }
 ```
 
@@ -703,7 +703,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     // 文本数据
     textData?: {
@@ -739,7 +739,7 @@ Authorization: Bearer <JWT_TOKEN>
       totalPages: number;
     }
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -799,7 +799,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     totalDatasets: {
       value: number;
@@ -826,7 +826,7 @@ Authorization: Bearer <JWT_TOKEN>
       change: string;
     }
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -861,7 +861,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "连接成功",
+  msg: "连接成功",
   data: {
     status: 'success' | 'failed';
     message?: string;
@@ -870,7 +870,7 @@ Authorization: Bearer <JWT_TOKEN>
       recordCount?: number;  // 可访问的记录数
     };
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -911,11 +911,11 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "批量删除成功",
+  msg: "批量删除成功",
   data: {
     deletedCount: number;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 

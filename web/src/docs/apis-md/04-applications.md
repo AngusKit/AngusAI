@@ -37,8 +37,8 @@ Authorization: Bearer <JWT_TOKEN>
   keyword?: string;           // 关键词搜索（名称、描述）
   category?: ApplicationCategory;  // 分类筛选
   status?: ApplicationStatus;      // 状态筛选
-  sortBy?: 'createdAt' | 'updatedAt' | 'apiCalls' | 'name';
-  sortOrder?: 'asc' | 'desc';
+  orderBy?: 'createdDate' | 'lastModifiedDate' | 'apiCalls' | 'name';
+  orderSort?: 'asc' | 'desc';
 }
 ```
 
@@ -47,14 +47,14 @@ Authorization: Bearer <JWT_TOKEN>
 - `keyword` → 搜索框输入
 - `category` → 分类筛选下拉框
 - `status` → 状态筛选（已发布/草稿）
-- `sortBy` → 排序方式选择器
+- `orderBy` → 排序方式选择器
 
 ### 响应数据
 
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: [
       {
@@ -64,8 +64,8 @@ Authorization: Bearer <JWT_TOKEN>
         description: string;
         category: ApplicationCategory;
         status: ApplicationStatus;
-        createdAt: number;
-        updatedAt: number;
+        createdDate: Date
+        lastModifiedDate: Date;
         lastModified: string;    // "2小时前"
         apiCalls: number;
         createdBy: number;
@@ -83,7 +83,7 @@ Authorization: Bearer <JWT_TOKEN>
       totalPages: number;
     }
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -118,7 +118,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     id: number;
     name: string;
@@ -126,8 +126,8 @@ Authorization: Bearer <JWT_TOKEN>
     description: string;
     category: ApplicationCategory;
     status: ApplicationStatus;
-    createdAt: number;
-    updatedAt: number;
+    createdDate: Date
+    lastModifiedDate: Date;
     createdBy: number;
 
     // 详细配置
@@ -168,7 +168,7 @@ Authorization: Bearer <JWT_TOKEN>
 
       // 对话设置
       conversation: {
-        welcomeMessage: string;
+        welcomemsg: string;
         openingQuestions: string[];
         maxHistoryLength: number;
       },
@@ -206,7 +206,7 @@ Authorization: Bearer <JWT_TOKEN>
       successRate: number;
     }
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -253,7 +253,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 201,
-  message: "应用创建成功",
+  msg: "应用创建成功",
   data: {
     id: number;
     name: string;
@@ -261,9 +261,9 @@ Authorization: Bearer <JWT_TOKEN>
     description: string;
     category: ApplicationCategory;
     status: 'draft';         // 新创建默认为草稿
-    createdAt: number;
+    createdDate: Date
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -317,11 +317,11 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "更新成功",
+  msg: "更新成功",
   data: {
     // 返回更新后的应用信息
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -410,11 +410,11 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "配置更新成功",
+  msg: "配置更新成功",
   data: {
     // 返回更新后的完整配置
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -444,8 +444,8 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 204,
-  message: "删除成功",
-  timestamp: 1706889600000
+  msg: "删除成功",
+  datetime: 1706889600000
 }
 ```
 
@@ -482,13 +482,13 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "应用已发布",
+  msg: "应用已发布",
   data: {
     id: number;
     status: 'published';
     publishedAt: number;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -524,12 +524,12 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "已取消发布",
+  msg: "已取消发布",
   data: {
     id: number;
     status: 'draft';
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -567,11 +567,11 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 201,
-  message: "复制成功",
+  msg: "复制成功",
   data: {
     // 返回新应用的完整信息
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -616,7 +616,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "分享链接已生成",
+  msg: "分享链接已生成",
   data: {
     shareId: string;
     shareType: 'link' | 'invite_code';
@@ -625,7 +625,7 @@ Authorization: Bearer <JWT_TOKEN>
     qrCode?: string;          // 二维码图片URL
     expiresAt?: number;       // 过期时间
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -665,7 +665,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     overview: {
       totalCalls: number;
@@ -676,15 +676,15 @@ Authorization: Bearer <JWT_TOKEN>
     },
     trends: {
       calls: Array<{
-        timestamp: number;
+        datetime: number;
         value: number;
       }>;
       tokens: Array<{
-        timestamp: number;
+        datetime: number;
         value: number;
       }>;
       responseTime: Array<{
-        timestamp: number;
+        datetime: number;
         value: number;
       }>;
     },
@@ -694,7 +694,7 @@ Authorization: Bearer <JWT_TOKEN>
       callCount: number;
     }>;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -751,11 +751,11 @@ Content-Type: multipart/form-data
 ```typescript
 {
   code: 201,
-  message: "导入成功",
+  msg: "导入成功",
   data: {
     // 返回创建的应用信息
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 

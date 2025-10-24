@@ -38,8 +38,8 @@ Authorization: Bearer <JWT_TOKEN>
   category?: string;          // 分类ID筛选
   isFavorite?: boolean;       // 仅收藏
   tags?: string[];            // 标签筛选
-  sortBy?: 'createdAt' | 'updatedAt' | 'usageCount' | 'title';
-  sortOrder?: 'asc' | 'desc';
+  orderBy?: 'createdDate' | 'lastModifiedDate' | 'usageCount' | 'title';
+  orderSort?: 'asc' | 'desc';
   isPublic?: boolean;         // 是否公开
 }
 ```
@@ -56,7 +56,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: [
       {
@@ -73,8 +73,8 @@ Authorization: Bearer <JWT_TOKEN>
         usageCount: number;    // 使用次数
         isSystem: boolean;     // 是否为系统模板
         isPublic: boolean;     // 是否公开
-        createdAt: number;
-        updatedAt: number;
+        createdDate: Date
+        lastModifiedDate: Date;
         createdBy: number;
         createdByName: string;
       }
@@ -86,7 +86,7 @@ Authorization: Bearer <JWT_TOKEN>
       totalPages: number;
     }
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -121,7 +121,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     id: number;
     title: string;
@@ -152,8 +152,8 @@ Authorization: Bearer <JWT_TOKEN>
     }>;
 
     // 创建者信息
-    createdAt: number;
-    updatedAt: number;
+    createdDate: Date
+    lastModifiedDate: Date;
     createdBy: number;
     createdByName: string;
 
@@ -164,7 +164,7 @@ Authorization: Bearer <JWT_TOKEN>
       shares: number;
     };
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -225,14 +225,14 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 201,
-  message: "提示词创建成功",
+  msg: "提示词创建成功",
   data: {
     id: number;
     title: string;
     category: string;
-    createdAt: number;
+    createdDate: Date
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -292,11 +292,11 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "更新成功",
+  msg: "更新成功",
   data: {
     // 返回更新后的提示词信息
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -332,8 +332,8 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 204,
-  message: "删除成功",
-  timestamp: 1706889600000
+  msg: "删除成功",
+  datetime: 1706889600000
 }
 ```
 
@@ -377,12 +377,12 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "操作成功",
+  msg: "操作成功",
   data: {
     id: number;
     isFavorite: boolean;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -425,11 +425,11 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 201,
-  message: "复制成功",
+  msg: "复制成功",
   data: {
     // 返回新提示词的完整信息
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -463,12 +463,12 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     id: number;
     usageCount: number;      // 更新后的使用次数
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -495,7 +495,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: [
       {
@@ -510,7 +510,7 @@ Authorization: Bearer <JWT_TOKEN>
       }
     ]
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -552,7 +552,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 201,
-  message: "分类创建成功",
+  msg: "分类创建成功",
   data: {
     id: string;
     name: string;
@@ -561,7 +561,7 @@ Authorization: Bearer <JWT_TOKEN>
     color: string;
     isSystem: false;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -609,11 +609,11 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "更新成功",
+  msg: "更新成功",
   data: {
     // 返回更新后的分类信息
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -643,8 +643,8 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 204,
-  message: "删除成功",
-  timestamp: 1706889600000
+  msg: "删除成功",
+  datetime: 1706889600000
 }
 ```
 
@@ -683,7 +683,7 @@ Content-Type: multipart/form-data
 ```typescript
 {
   code: 201,
-  message: "导入成功",
+  msg: "导入成功",
   data: {
     importedCount: number;
     skippedCount: number;
@@ -692,7 +692,7 @@ Content-Type: multipart/form-data
       error: string;
     }>;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -757,7 +757,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: Prompt[];
     pagination: Pagination;
@@ -773,7 +773,7 @@ Authorization: Bearer <JWT_TOKEN>
       }>;
     };
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -804,11 +804,11 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: Prompt[];
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -830,7 +830,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     totalPrompts: number;
     myPrompts: number;
@@ -852,7 +852,7 @@ Authorization: Bearer <JWT_TOKEN>
       count: number;
     }>;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 

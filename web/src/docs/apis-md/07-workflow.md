@@ -40,8 +40,8 @@ Authorization: Bearer <JWT_TOKEN>
   keyword?: string;           // 搜索关键词（名称、描述）
   type?: WorkflowType;        // 工作流类型筛选
   status?: WorkflowStatus;    // 状态筛选
-  sortBy?: 'createdAt' | 'updatedAt' | 'calls' | 'name';
-  sortOrder?: 'asc' | 'desc';
+  orderBy?: 'createdDate' | 'lastModifiedDate' | 'calls' | 'name';
+  orderSort?: 'asc' | 'desc';
 }
 ```
 
@@ -57,7 +57,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: [
       {
@@ -72,8 +72,8 @@ Authorization: Bearer <JWT_TOKEN>
         enabled: boolean;        // 是否启用
         nodesCount: number;      // 节点数量
         version: string;         // 版本号
-        createdAt: number;
-        updatedAt: number;
+        createdDate: Date
+        lastModifiedDate: Date;
 
         // 统计信息
         stats: {
@@ -91,7 +91,7 @@ Authorization: Bearer <JWT_TOKEN>
       totalPages: number;
     }
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -127,7 +127,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     id: number;
     name: string;
@@ -139,8 +139,8 @@ Authorization: Bearer <JWT_TOKEN>
     status: WorkflowStatus;
     enabled: boolean;
     version: string;
-    createdAt: number;
-    updatedAt: number;
+    createdDate: Date
+    lastModifiedDate: Date;
     createdBy: number;
 
     // 工作流配置
@@ -180,7 +180,7 @@ Authorization: Bearer <JWT_TOKEN>
       lastExecutionStatus?: 'success' | 'failed' | 'running';
     }
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -236,7 +236,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 201,
-  message: "工作流创建成功",
+  msg: "工作流创建成功",
   data: {
     id: number;
     name: string;
@@ -244,9 +244,9 @@ Authorization: Bearer <JWT_TOKEN>
     type: WorkflowType;
     status: 'draft';         // 新创建默认为草稿
     version: '1.0.0';
-    createdAt: number;
+    createdDate: Date
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -300,11 +300,11 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "更新成功",
+  msg: "更新成功",
   data: {
     // 返回更新后的工作流信息
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -361,13 +361,13 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "配置保存成功",
+  msg: "配置保存成功",
   data: {
     id: number;
     version: string;        // 版本号自动递增
-    updatedAt: number;
+    lastModifiedDate: Date;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -404,8 +404,8 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 204,
-  message: "删除成功",
-  timestamp: 1706889600000
+  msg: "删除成功",
+  datetime: 1706889600000
 }
 ```
 
@@ -449,11 +449,11 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 201,
-  message: "复制成功",
+  msg: "复制成功",
   data: {
     // 返回新工作流的完整信息
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -483,7 +483,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     totalWorkflows: {
       value: number;
@@ -506,7 +506,7 @@ Authorization: Bearer <JWT_TOKEN>
       trend: 'up' | 'down';
     }
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -556,7 +556,7 @@ Authorization: Bearer <JWT_TOKEN>
 // 同步模式
 {
   code: 200,
-  message: "执行成功",
+  msg: "执行成功",
   data: {
     executionId: string;
     status: 'success' | 'failed';
@@ -565,19 +565,19 @@ Authorization: Bearer <JWT_TOKEN>
     startedAt: number;
     completedAt: number;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 
 // 异步模式
 {
   code: 202,
-  message: "执行已启动",
+  msg: "执行已启动",
   data: {
     executionId: string;
     status: 'running';
     startedAt: number;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -615,11 +615,11 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "已停止",
+  msg: "已停止",
   data: {
     stoppedExecutions: string[];  // 已停止的执行ID列表
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -662,7 +662,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: [
       {
@@ -675,8 +675,7 @@ Authorization: Bearer <JWT_TOKEN>
         statusColor: string;     // 状态颜色类名
         operator: string;        // 操作人
         executionTime?: number;  // 执行时间（毫秒）
-        createdTime: string;     // "2023-10-15 14:30:25"
-        createdAt: number;       // 时间戳
+        createdDate: Date
 
         // 详细信息
         inputs?: any;
@@ -697,7 +696,7 @@ Authorization: Bearer <JWT_TOKEN>
       totalPages: number;
     }
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -732,7 +731,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     executionId: string;
     workflowId: number;
@@ -763,12 +762,12 @@ Authorization: Bearer <JWT_TOKEN>
 
     // 错误信息
     error?: {
-      message: string;
+      msg: string;
       nodeId?: string;
       stack?: string;
     };
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -807,14 +806,14 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: [
       {
         versionId: number;
         version: string;       // "1.0.0"
         description?: string;  // 版本描述
-        createdAt: number;
+        createdDate: Date
         createdBy: number;
         createdByName: string;
         isCurrent: boolean;    // 是否为当前版本
@@ -834,7 +833,7 @@ Authorization: Bearer <JWT_TOKEN>
       totalPages: number;
     }
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -865,7 +864,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     versionId: number;
     version: string;
@@ -874,10 +873,10 @@ Authorization: Bearer <JWT_TOKEN>
       edges: WorkflowEdge[];
       variables: any[];
     },
-    createdAt: number;
+    createdDate: Date
     createdBy: number;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -908,12 +907,12 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "已恢复到版本 1.2.0",
+  msg: "已恢复到版本 1.2.0",
   data: {
     newVersionId: number;
     newVersion: string;      // 恢复后创建的新版本号
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -951,13 +950,13 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "状态已更新",
+  msg: "状态已更新",
   data: {
     id: number;
     enabled: boolean;
     status: WorkflowStatus;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 

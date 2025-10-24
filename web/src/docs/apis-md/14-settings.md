@@ -32,7 +32,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     userId: number;
 
@@ -64,7 +64,7 @@ Authorization: Bearer <JWT_TOKEN>
       showActivity: boolean;
     };
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -126,11 +126,11 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "设置已更新",
+  msg: "设置已更新",
   data: {
     // 返回更新后的设置
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -161,12 +161,12 @@ Content-Type: multipart/form-data
 ```typescript
 {
   code: 200,
-  message: "头像上传成功",
+  msg: "头像上传成功",
   data: {
     avatarUrl: string;
     uploadedAt: number;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -195,8 +195,8 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 204,
-  message: "头像已删除",
-  timestamp: 1706889600000
+  msg: "头像已删除",
+  datetime: 1706889600000
 }
 ```
 
@@ -218,7 +218,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     // 邮件通知
     email: {
@@ -268,7 +268,7 @@ Authorization: Bearer <JWT_TOKEN>
       };
     };
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -328,11 +328,11 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "通知设置已更新",
+  msg: "通知设置已更新",
   data: {
     // 返回更新后的设置
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -354,7 +354,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     // 双因素认证
     twoFactor: {
@@ -378,14 +378,14 @@ Authorization: Bearer <JWT_TOKEN>
         location?: string;
         current: boolean;
         lastActiveAt: number;
-        createdAt: number;
+        createdDate: Date
       }>;
     };
 
     // 登录历史
     loginHistory: Array<{
       id: number;
-      timestamp: number;
+      datetime: number;
       ip: string;
       location?: string;
       device: string;
@@ -410,7 +410,7 @@ Authorization: Bearer <JWT_TOKEN>
       addresses: string[];
     };
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -447,7 +447,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "请完成双因素认证设置",
+  msg: "请完成双因素认证设置",
   data: {
     // TOTP方式
     totp?: {
@@ -459,7 +459,7 @@ Authorization: Bearer <JWT_TOKEN>
     // SMS/Email方式
     verificationCodeSent?: boolean;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -495,13 +495,13 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "双因素认证已启用",
+  msg: "双因素认证已启用",
   data: {
     enabled: true;
     method: string;
     setupAt: number;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -532,8 +532,8 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "双因素认证已禁用",
-  timestamp: 1706889600000
+  msg: "双因素认证已禁用",
+  datetime: 1706889600000
 }
 ```
 
@@ -569,11 +569,11 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "密码修改成功",
+  msg: "密码修改成功",
   data: {
     changedAt: number;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -611,8 +611,8 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 204,
-  message: "会话已终止",
-  timestamp: 1706889600000
+  msg: "会话已终止",
+  datetime: 1706889600000
 }
 ```
 
@@ -639,11 +639,11 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "其他会话已全部终止",
+  msg: "其他会话已全部终止",
   data: {
     revokedCount: number;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -665,7 +665,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: [
       {
@@ -695,7 +695,7 @@ Authorization: Bearer <JWT_TOKEN>
       }
     ]
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -748,7 +748,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "集成连接成功",
+  msg: "集成连接成功",
   data: {
     integrationId: string;
     status: 'connected';
@@ -757,7 +757,7 @@ Authorization: Bearer <JWT_TOKEN>
     // OAuth需要重定向
     authUrl?: string;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -787,8 +787,8 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "集成已断开",
-  timestamp: 1706889600000
+  msg: "集成已断开",
+  datetime: 1706889600000
 }
 ```
 
@@ -810,7 +810,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: [
       {
@@ -837,7 +837,7 @@ Authorization: Bearer <JWT_TOKEN>
       }
     ]
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -882,13 +882,13 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 202,
-  message: "导出请求已提交",
+  msg: "导出请求已提交",
   data: {
     exportId: number;
     status: 'processing';
     estimatedTime: number;   // 预计时间（秒）
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -932,12 +932,12 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "账户删除请求已提交",
+  msg: "账户删除请求已提交",
   data: {
     scheduledAt: number;     // 实际删除时间（30天后）
     cancellable: boolean;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -967,8 +967,8 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "账户删除已取消",
-  timestamp: 1706889600000
+  msg: "账户删除已取消",
+  datetime: 1706889600000
 }
 ```
 
@@ -998,13 +998,13 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     key: string;
     value: any;
-    updatedAt: number;
+    lastModifiedDate: Date;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -1042,13 +1042,13 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "偏好设置已保存",
+  msg: "偏好设置已保存",
   data: {
     key: string;
     value: any;
-    updatedAt: number;
+    lastModifiedDate: Date;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 

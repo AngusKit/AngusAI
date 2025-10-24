@@ -39,8 +39,8 @@ Authorization: Bearer <JWT_TOKEN>
   type?: ModelType;           // 模型类型筛选
   provider?: ModelProvider;   // 提供商筛选
   status?: ModelStatus;       // 状态筛选
-  sortBy?: 'createdAt' | 'calls' | 'cost' | 'name';
-  sortOrder?: 'asc' | 'desc';
+  orderBy?: 'createdDate' | 'calls' | 'cost' | 'name';
+  orderSort?: 'asc' | 'desc';
 }
 ```
 
@@ -56,7 +56,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: [
       {
@@ -93,8 +93,8 @@ Authorization: Bearer <JWT_TOKEN>
         deployed: string;        // "2023-10-15"
         deployedAt: number;
 
-        createdAt: number;
-        updatedAt: number;
+        createdDate: Date
+        lastModifiedDate: Date;
       }
     ],
     pagination: {
@@ -104,7 +104,7 @@ Authorization: Bearer <JWT_TOKEN>
       totalPages: number;
     }
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -139,7 +139,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     id: number;
     name: string;
@@ -225,10 +225,10 @@ Authorization: Bearer <JWT_TOKEN>
     deployed: string;
     deployedAt: number;
     lastCallAt?: number;
-    createdAt: number;
-    updatedAt: number;
+    createdDate: Date
+    lastModifiedDate: Date;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -306,16 +306,16 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 201,
-  message: "模型添加成功",
+  msg: "模型添加成功",
   data: {
     id: number;
     name: string;
     type: ModelType;
     provider: ModelProvider;
     status: 'stopped';       // 新添加默认停止
-    createdAt: number;
+    createdDate: Date
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -371,11 +371,11 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "更新成功",
+  msg: "更新成功",
   data: {
     // 返回更新后的模型信息
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -411,8 +411,8 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 204,
-  message: "删除成功",
-  timestamp: 1706889600000
+  msg: "删除成功",
+  datetime: 1706889600000
 }
 ```
 
@@ -448,13 +448,13 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "启动成功",
+  msg: "启动成功",
   data: {
     id: number;
     status: 'deploying';     // 部署中
     estimatedTime: number;   // 预计启动时间（秒）
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -504,12 +504,12 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "停止成功",
+  msg: "停止成功",
   data: {
     id: number;
     status: 'stopped';
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -551,14 +551,14 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "测试成功",
+  msg: "测试成功",
   data: {
     status: 'success' | 'failed';
     responseTime: number;    // 响应时间（毫秒）
     result?: string;         // 测试结果
     error?: string;          // 错误信息
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -599,7 +599,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     period: {
       start: number;
@@ -609,7 +609,7 @@ Authorization: Bearer <JWT_TOKEN>
 
     // 性能指标时序数据
     latency: Array<{
-      timestamp: number;
+      datetime: number;
       value: number;         // 毫秒
       p50?: number;
       p95?: number;
@@ -617,39 +617,39 @@ Authorization: Bearer <JWT_TOKEN>
     }>;
 
     throughput: Array<{
-      timestamp: number;
+      datetime: number;
       value: number;         // 请求数/分钟
     }>;
 
     successRate: Array<{
-      timestamp: number;
+      datetime: number;
       value: number;         // 百分比
     }>;
 
     // 资源使用时序数据
     cpu: Array<{
-      timestamp: number;
+      datetime: number;
       value: number;         // 百分比
     }>;
 
     memory: Array<{
-      timestamp: number;
+      datetime: number;
       value: number;         // MB
     }>;
 
     gpu: Array<{
-      timestamp: number;
+      datetime: number;
       value: number;         // 百分比
     }>;
 
     // 成本数据
     cost: Array<{
-      timestamp: number;
+      datetime: number;
       value: number;
       tokens: number;
     }>;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -693,7 +693,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     overview: {
       totalCalls: number;
@@ -707,7 +707,7 @@ Authorization: Bearer <JWT_TOKEN>
 
     // 调用趋势
     callsTrend: Array<{
-      timestamp: number;
+      datetime: number;
       total: number;
       successful: number;
       failed: number;
@@ -715,7 +715,7 @@ Authorization: Bearer <JWT_TOKEN>
 
     // Token使用
     tokenUsage: Array<{
-      timestamp: number;
+      datetime: number;
       inputTokens: number;
       outputTokens: number;
       totalTokens: number;
@@ -723,7 +723,7 @@ Authorization: Bearer <JWT_TOKEN>
 
     // 成本趋势
     costTrend: Array<{
-      timestamp: number;
+      datetime: number;
       cost: number;
     }>;
 
@@ -742,11 +742,11 @@ Authorization: Bearer <JWT_TOKEN>
       topErrors: Array<{
         type: string;
         count: number;
-        message: string;
+        msg: string;
       }>;
     };
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -768,7 +768,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     totalModels: {
       value: number;
@@ -793,7 +793,7 @@ Authorization: Bearer <JWT_TOKEN>
       trend: 'up' | 'down';  // 延迟降低是up
     }
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -819,7 +819,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: [
       {
@@ -849,7 +849,7 @@ Authorization: Bearer <JWT_TOKEN>
       }
     ]
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -879,12 +879,12 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "重启中",
+  msg: "重启中",
   data: {
     id: number;
     status: 'deploying';
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -915,7 +915,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "批量操作成功",
+  msg: "批量操作成功",
   data: {
     successCount: number;
     failedCount: number;
@@ -925,7 +925,7 @@ Authorization: Bearer <JWT_TOKEN>
       error?: string;
     }>;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -982,12 +982,12 @@ Content-Type: multipart/form-data
 ```typescript
 {
   code: 201,
-  message: "导入成功",
+  msg: "导入成功",
   data: {
     importedCount: number;
     skippedCount: number;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 

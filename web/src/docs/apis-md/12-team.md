@@ -36,8 +36,8 @@ Authorization: Bearer <JWT_TOKEN>
   keyword?: string;           // 搜索姓名、邮箱
   role?: 'owner' | 'admin' | 'member' | 'viewer';
   status?: 'active' | 'inactive' | 'pending';
-  sortBy?: 'joinedDate' | 'lastActive' | 'name';
-  sortOrder?: 'asc' | 'desc';
+  orderBy?: 'joinedDate' | 'lastActive' | 'name';
+  orderSort?: 'asc' | 'desc';
 }
 ```
 
@@ -53,7 +53,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: [
       {
@@ -89,7 +89,7 @@ Authorization: Bearer <JWT_TOKEN>
       totalPages: number;
     }
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -124,7 +124,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     id: number;
     userId: number;
@@ -162,7 +162,7 @@ Authorization: Bearer <JWT_TOKEN>
       id: number;
       action: string;
       resource: string;
-      timestamp: number;
+      datetime: number;
       details?: string;
     }>;
 
@@ -171,7 +171,7 @@ Authorization: Bearer <JWT_TOKEN>
     invitedBy?: number;
     invitedByName?: string;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -231,7 +231,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 201,
-  message: "邀请已发送",
+  msg: "邀请已发送",
   data: {
     invitationId: number;
     email: string;
@@ -240,7 +240,7 @@ Authorization: Bearer <JWT_TOKEN>
     expiresAt: number;
     inviteUrl: string;       // 邀请链接
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -296,13 +296,13 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "角色已更新",
+  msg: "角色已更新",
   data: {
     id: number;
     role: string;
-    updatedAt: number;
+    lastModifiedDate: Date;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -355,13 +355,13 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "权限已更新",
+  msg: "权限已更新",
   data: {
     id: number;
     permissions: any[];
-    updatedAt: number;
+    lastModifiedDate: Date;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -406,8 +406,8 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 204,
-  message: "成员已移除",
-  timestamp: 1706889600000
+  msg: "成员已移除",
+  datetime: 1706889600000
 }
 ```
 
@@ -447,7 +447,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: [
       {
@@ -472,7 +472,7 @@ Authorization: Bearer <JWT_TOKEN>
     ],
     pagination: Pagination;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -508,12 +508,12 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "邀请已重新发送",
+  msg: "邀请已重新发送",
   data: {
     id: number;
     resentAt: number;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -547,8 +547,8 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 204,
-  message: "邀请已撤销",
-  timestamp: 1706889600000
+  msg: "邀请已撤销",
+  datetime: 1706889600000
 }
 ```
 
@@ -582,14 +582,14 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "已加入团队",
+  msg: "已加入团队",
   data: {
     teamId: number;
     teamName: string;
     role: string;
     joinedAt: number;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -620,8 +620,8 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "已拒绝邀请",
-  timestamp: 1706889600000
+  msg: "已拒绝邀请",
+  datetime: 1706889600000
 }
 ```
 
@@ -657,7 +657,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: [
       {
@@ -676,13 +676,13 @@ Authorization: Bearer <JWT_TOKEN>
         ipAddress: string;
         userAgent?: string;
 
-        timestamp: number;
-        createdAt: string;
+        datetime: number;
+        createdDate: Data;
       }
     ],
     pagination: Pagination;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -717,7 +717,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     teamId: number;
     teamName: string;
@@ -751,7 +751,7 @@ Authorization: Bearer <JWT_TOKEN>
       activityAlerts: boolean;
     };
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -799,11 +799,11 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "设置已更新",
+  msg: "设置已更新",
   data: {
     // 返回更新后的设置
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -825,7 +825,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     totalMembers: number;
     activeMembers: number;
@@ -852,7 +852,7 @@ Authorization: Bearer <JWT_TOKEN>
       totalAccesses: number;
     };
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 

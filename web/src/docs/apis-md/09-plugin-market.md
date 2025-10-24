@@ -37,7 +37,7 @@ Authorization: Bearer <JWT_TOKEN>
   pageSize?: number;
   keyword?: string;           // 搜索关键词
   category?: PluginCategory;  // 分类筛选
-  sortBy?: 'popular' | 'latest' | 'rating' | 'downloads';
+  orderBy?: 'popular' | 'latest' | 'rating' | 'downloads';
   installed?: boolean;        // 仅已安装
   price?: 'free' | 'paid' | 'all';  // 价格筛选
   tags?: string[];
@@ -48,7 +48,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 - `keyword` → 搜索框
 - `category` → 分类筛选下拉框
-- `sortBy` → 排序方式选择器
+- `orderBy` → 排序方式选择器
 - 网格/列表视图切换
 
 ### 响应数据
@@ -56,7 +56,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: [
       {
@@ -89,7 +89,7 @@ Authorization: Bearer <JWT_TOKEN>
         healthStatus?: {
           status: 'healthy' | 'warning' | 'error';
           lastCheck: string;
-          message: string;
+          msg: string;
         };
       }
     ],
@@ -100,7 +100,7 @@ Authorization: Bearer <JWT_TOKEN>
       totalPages: number;
     }
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -135,7 +135,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     id: number;
     name: string;
@@ -190,7 +190,7 @@ Authorization: Bearer <JWT_TOKEN>
     healthStatus?: {
       status: 'healthy' | 'warning' | 'error';
       lastCheck: string;
-      message: string;
+      msg: string;
       details?: any;
     };
 
@@ -208,7 +208,7 @@ Authorization: Bearer <JWT_TOKEN>
     lastUpdate?: number;
     installedAt?: number;    // 安装时间
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -252,7 +252,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "安装成功",
+  msg: "安装成功",
   data: {
     id: number;
     name: string;
@@ -261,7 +261,7 @@ Authorization: Bearer <JWT_TOKEN>
     enabled: boolean;
     installedAt: number;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -312,12 +312,12 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "卸载成功",
+  msg: "卸载成功",
   data: {
     id: number;
     installed: false;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -365,12 +365,12 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "状态已更新",
+  msg: "状态已更新",
   data: {
     id: number;
     enabled: boolean;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -417,12 +417,12 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "配置已更新",
+  msg: "配置已更新",
   data: {
     id: number;
     config: Record<string, any>;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -452,7 +452,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     config: Record<string, any>;
     schema: Array<{          // 配置项定义
@@ -465,7 +465,7 @@ Authorization: Bearer <JWT_TOKEN>
       description?: string;
     }>;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -526,7 +526,7 @@ Content-Type: multipart/form-data
 ```typescript
 {
   code: 201,
-  message: "插件上传成功，待审核",
+  msg: "插件上传成功，待审核",
   data: {
     id: number;
     name: string;
@@ -534,7 +534,7 @@ Content-Type: multipart/form-data
     status: 'pending';       // 待审核
     uploadedAt: number;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -589,11 +589,11 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "更新成功",
+  msg: "更新成功",
   data: {
     // 返回更新后的插件信息
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -623,8 +623,8 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 204,
-  message: "删除成功",
-  timestamp: 1706889600000
+  msg: "删除成功",
+  datetime: 1706889600000
 }
 ```
 
@@ -662,7 +662,7 @@ Authorization: Bearer <JWT_TOKEN>
 {
   page?: number;
   pageSize?: number;
-  sortBy?: 'latest' | 'helpful' | 'rating';
+  orderBy?: 'latest' | 'helpful' | 'rating';
   rating?: number;           // 筛选评分
 }
 ```
@@ -672,7 +672,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: [
       {
@@ -682,7 +682,7 @@ Authorization: Bearer <JWT_TOKEN>
         avatar: string;
         rating: number;        // 1-5
         date: string;
-        dateTimestamp: number;
+        datedatetime: number;
         content: string;
         helpful: number;       // 有帮助数
         hasVoted: boolean;     // 当前用户是否已投票
@@ -701,7 +701,7 @@ Authorization: Bearer <JWT_TOKEN>
       };
     };
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -751,14 +751,14 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 201,
-  message: "评价提交成功",
+  msg: "评价提交成功",
   data: {
     id: number;
     rating: number;
     content: string;
-    createdAt: number;
+    createdDate: Date
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -805,11 +805,11 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "评价已更新",
+  msg: "评价已更新",
   data: {
     // 返回更新后的评价
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -840,8 +840,8 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 204,
-  message: "删除成功",
-  timestamp: 1706889600000
+  msg: "删除成功",
+  datetime: 1706889600000
 }
 ```
 
@@ -880,13 +880,13 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     reviewId: number;
     helpful: number;         // 更新后的有帮助数
     hasVoted: boolean;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -924,7 +924,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "购买成功",
+  msg: "购买成功",
   data: {
     orderId: string;
     pluginId: number;
@@ -932,7 +932,7 @@ Authorization: Bearer <JWT_TOKEN>
     paymentStatus: 'paid';
     purchasedAt: number;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -962,11 +962,11 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: Plugin[];         // 包含完整插件信息
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -992,7 +992,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     totalPlugins: {
       value: number;
@@ -1012,7 +1012,7 @@ Authorization: Bearer <JWT_TOKEN>
       value: number;         // 4.5
     }
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -1046,18 +1046,18 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     status: 'healthy' | 'warning' | 'error';
     lastCheck: string;
-    message: string;
+    msg: string;
     details?: {
       responseTime?: number;
       errorRate?: number;
       lastError?: string;
     };
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 

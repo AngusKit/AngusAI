@@ -36,8 +36,8 @@ Authorization: Bearer <JWT_TOKEN>
   pageSize?: number;
   keyword?: string;           // 搜索密钥名称
   status?: 'active' | 'inactive' | 'expired';
-  sortBy?: 'createdAt' | 'lastUsed' | 'usageCount';
-  sortOrder?: 'asc' | 'desc';
+  orderBy?: 'createdDate' | 'lastUsed' | 'usageCount';
+  orderSort?: 'asc' | 'desc';
 }
 ```
 
@@ -52,7 +52,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: [
       {
@@ -84,7 +84,7 @@ Authorization: Bearer <JWT_TOKEN>
         lastUsedAt?: number;
 
         // 时间
-        createdAt: number;
+        createdDate: Date
         created: string;         // "2024-01-15"
         expiresAt?: number;      // 过期时间
         expires?: string;        // "2025-01-15"
@@ -97,7 +97,7 @@ Authorization: Bearer <JWT_TOKEN>
       totalPages: number;
     }
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -132,7 +132,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     id: number;
     name: string;
@@ -171,7 +171,7 @@ Authorization: Bearer <JWT_TOKEN>
 
     // 最近调用记录
     recentCalls?: Array<{
-      timestamp: number;
+      datetime: number;
       endpoint: string;
       method: string;
       statusCode: number;
@@ -179,11 +179,11 @@ Authorization: Bearer <JWT_TOKEN>
       ip: string;
     }>;
 
-    createdAt: number;
+    createdDate: Date
     lastUsedAt?: number;
     expiresAt?: number;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -247,19 +247,19 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 201,
-  message: "API密钥创建成功",
+  msg: "API密钥创建成功",
   data: {
     id: number;
     name: string;
     key: string;             // ⚠️完整密钥仅在此处返回一次
     permissions: string[];
-    createdAt: number;
+    createdDate: Date
     expiresAt?: number;
 
     // 警告信息
     warning: "请立即保存此密钥，它只会显示一次！"
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -325,11 +325,11 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "更新成功",
+  msg: "更新成功",
   data: {
     // 返回更新后的密钥信息
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -365,8 +365,8 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 204,
-  message: "删除成功",
-  timestamp: 1706889600000
+  msg: "删除成功",
+  datetime: 1706889600000
 }
 ```
 
@@ -414,12 +414,12 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "状态已更新",
+  msg: "状态已更新",
   data: {
     id: number;
     status: string;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -449,7 +449,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "密钥已刷新",
+  msg: "密钥已刷新",
   data: {
     id: number;
     key: string;             // ⚠️新密钥仅在此处返回一次
@@ -457,7 +457,7 @@ Authorization: Bearer <JWT_TOKEN>
     refreshedAt: number;
     warning: "旧密钥已失效，请更新你的应用配置！"
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -507,7 +507,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     overview: {
       totalCalls: number;
@@ -519,7 +519,7 @@ Authorization: Bearer <JWT_TOKEN>
 
     // 调用趋势
     callsTrend: Array<{
-      timestamp: number;
+      datetime: number;
       total: number;
       successful: number;
       failed: number;
@@ -550,7 +550,7 @@ Authorization: Bearer <JWT_TOKEN>
       lastOccurred: number;
     }>;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -601,12 +601,12 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: [
       {
         id: number;
-        timestamp: number;
+        datetime: number;
         method: string;        // GET, POST, etc.
         endpoint: string;      // /api/v1/applications
         statusCode: number;
@@ -628,7 +628,7 @@ Authorization: Bearer <JWT_TOKEN>
     ],
     pagination: Pagination;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -655,7 +655,7 @@ X-API-Key: <API_KEY>
 ```typescript
 {
   code: 200,
-  message: "密钥有效",
+  msg: "密钥有效",
   data: {
     valid: boolean;
     keyId: number;
@@ -668,7 +668,7 @@ X-API-Key: <API_KEY>
       resetAt: number;
     }
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -690,7 +690,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: [
       {
@@ -706,7 +706,7 @@ Authorization: Bearer <JWT_TOKEN>
       }
     ]
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -748,11 +748,11 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "批量删除成功",
+  msg: "批量删除成功",
   data: {
     deletedCount: number;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -774,7 +774,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     totalKeys: number;
     activeKeys: number;
@@ -794,7 +794,7 @@ Authorization: Bearer <JWT_TOKEN>
       calls: number;
     }>;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 

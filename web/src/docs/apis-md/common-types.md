@@ -14,8 +14,8 @@ interface User {
   avatar?: string;
   nickname?: string;
   role: UserRole;
-  createdAt: number;
-  updatedAt: number;
+  createdDate: Date
+  lastModifiedDate: Date;
 }
 ```
 
@@ -61,8 +61,8 @@ interface Application {
   description: string;
   category: ApplicationCategory;
   status: ApplicationStatus;
-  createdAt: number;
-  updatedAt: number;
+  createdDate: Date
+  lastModifiedDate: Date;
   createdBy: number; // 创建人ID
   apiCalls: number; // API调用次数
   lastModified: string; // 最后修改时间描述
@@ -105,8 +105,8 @@ interface KnowledgeBase {
   documentsCount: number;
   totalSize: string; // 如 "2.5 MB"
   enabled: boolean;
-  createdAt: number;
-  updatedAt: number;
+  createdDate: Date
+  lastModifiedDate: Date;
   tags?: string[];
 }
 ```
@@ -165,8 +165,8 @@ interface Dataset {
   visibility: Visibility;
   dataCount: string; // 如 "12.5K 条"
   totalSize: string; // 如 "5.2 MB"
-  createdAt: number;
-  updatedAt: number;
+  createdDate: Date
+  lastModifiedDate: Date;
   tags?: string[];
 }
 ```
@@ -206,8 +206,8 @@ interface Workflow {
   nodesCount: number; // 节点数量
   status: WorkflowStatus;
   enabled: boolean;
-  createdAt: number;
-  updatedAt: number;
+  createdDate: Date
+  lastModifiedDate: Date;
   version: string; // 版本号
 }
 ```
@@ -345,8 +345,8 @@ interface Prompt {
   likes: number;
   uses: number;
   isPublic: boolean;
-  createdAt: number;
-  updatedAt: number;
+  createdDate: Date
+  lastModifiedDate: Date;
   createdBy: number;
 }
 ```
@@ -382,8 +382,8 @@ interface Plugin {
   downloads: number; // 下载量
   price: number; // 价格，0表示免费
   isInstalled: boolean;
-  createdAt: number;
-  updatedAt: number;
+  createdDate: Date
+  lastModifiedDate: Date;
 }
 ```
 
@@ -411,7 +411,7 @@ interface ApiKey {
   key: string; // 密钥（部分隐藏）
   permissions: Permission[];
   status: ApiKeyStatus;
-  createdAt: number;
+  createdDate: Date
   lastUsed?: number;
   expiresAt?: number; // 过期时间，null表示永不过期
 }
@@ -509,7 +509,7 @@ interface Subscription {
   currentPeriodStart: number;
   currentPeriodEnd: number;
   cancelAtPeriodEnd: boolean;
-  createdAt: number;
+  createdDate: Date
 }
 ```
 
@@ -573,10 +573,10 @@ enum Theme {
 
 ## 排序方式
 
-### SortOrder（排序方向）
+### orderSort（排序方向）
 
 ```typescript
-enum SortOrder {
+enum orderSort {
   ASC = 'asc', // 升序
   DESC = 'desc', // 降序
 }
@@ -613,9 +613,9 @@ enum UploadStatus {
 ```typescript
 interface ErrorResponse {
   code: number;
-  message: string;
+  msg: string;
   errors?: FieldError[];
-  timestamp: number;
+  datetime: number;
 }
 ```
 
@@ -624,7 +624,7 @@ interface ErrorResponse {
 ```typescript
 interface FieldError {
   field: string;
-  message: string;
+  msg: string;
   value?: any;
 }
 ```

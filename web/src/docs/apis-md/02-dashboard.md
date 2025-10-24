@@ -10,6 +10,14 @@
 - [获取最近应用](#获取最近应用)
 - [获取推荐工具](#获取推荐工具)
 - [获取使用分析](#获取使用分析)
+- [获取快速操作](#获取快速操作)
+- [获取系统通知](#获取系统通知)
+- [标记通知已读](#标记通知已读)
+- [全部标记已读](#全部标记已读)
+- [数据模型定义](#数据模型定义)
+- [业务规则](#业务规则)
+- [错误处理](#错误处理)
+- [性能优化](#性能优化)
 
 ---
 
@@ -29,7 +37,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     // 欢迎信息
     welcome: {
@@ -68,7 +76,7 @@ Authorization: Bearer <JWT_TOKEN>
     // 推荐工具（前3个）
     recommendedTools: RecommendedTool[]
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -108,7 +116,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     totalApplications: {
       value: number;
@@ -147,7 +155,7 @@ Authorization: Bearer <JWT_TOKEN>
       }
     }
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -182,7 +190,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: [
       {
@@ -197,7 +205,7 @@ Authorization: Bearer <JWT_TOKEN>
       }
     ]
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -232,7 +240,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: [
       {
@@ -249,7 +257,7 @@ Authorization: Bearer <JWT_TOKEN>
       }
     ]
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -287,7 +295,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     period: {
       start: number;
@@ -300,7 +308,7 @@ Authorization: Bearer <JWT_TOKEN>
         average: number;
         peak: number;
         data: Array<{
-          timestamp: number;
+          datetime: number;
           value: number;
         }>;
       },
@@ -309,7 +317,7 @@ Authorization: Bearer <JWT_TOKEN>
         average: number;
         peak: number;
         data: Array<{
-          timestamp: number;
+          datetime: number;
           value: number;
         }>;
       },
@@ -318,14 +326,14 @@ Authorization: Bearer <JWT_TOKEN>
         average: number;
         peak: number;
         data: Array<{
-          timestamp: number;
+          datetime: number;
           value: number;
         }>;
       },
       successRate: {
         value: number;       // 成功率百分比
         data: Array<{
-          timestamp: number;
+          datetime: number;
           value: number;
         }>;
       }
@@ -339,7 +347,7 @@ Authorization: Bearer <JWT_TOKEN>
       }
     ]
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -366,7 +374,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: [
       {
@@ -379,7 +387,7 @@ Authorization: Bearer <JWT_TOKEN>
       }
     ]
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -415,7 +423,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: [
       {
@@ -424,7 +432,7 @@ Authorization: Bearer <JWT_TOKEN>
         title: string;
         content: string;
         isRead: boolean;
-        createdAt: number;
+        createdDate: Date
         actionUrl?: string;
         actionLabel?: string;
       }
@@ -437,7 +445,7 @@ Authorization: Bearer <JWT_TOKEN>
     },
     unreadCount: number;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -471,8 +479,8 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
-  timestamp: 1706889600000
+  msg: "success",
+  datetime: 1706889600000
 }
 ```
 
@@ -494,11 +502,11 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "全部已标记为已读",
+  msg: "全部已标记为已读",
   data: {
     updatedCount: number;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 

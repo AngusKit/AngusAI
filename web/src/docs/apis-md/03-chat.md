@@ -40,8 +40,8 @@ Authorization: Bearer <JWT_TOKEN>
   keyword?: string;           // 搜索会话标题或内容
   appId?: number;             // 筛选指定应用
   modelId?: number;           // 筛选使用的模型
-  sortBy?: 'createdAt' | 'updatedAt' | 'messageCount';
-  sortOrder?: 'asc' | 'desc';
+  orderBy?: 'createdDate' | 'lastModifiedDate' | 'messageCount';
+  orderSort?: 'asc' | 'desc';
   isArchived?: boolean;       // 是否已归档
 }
 ```
@@ -56,7 +56,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: [
       {
@@ -71,15 +71,15 @@ Authorization: Bearer <JWT_TOKEN>
         lastMessage?: {
           role: 'user' | 'assistant';
           content: string;       // 消息摘要
-          timestamp: number;
+          datetime: number;
         };
 
         messageCount: number;    // 消息总数
         isArchived: boolean;     // 是否归档
         isPinned: boolean;       // 是否置顶
 
-        createdAt: number;
-        updatedAt: number;
+        createdDate: Date
+        lastModifiedDate: Date;
         createdBy: number;
       }
     ],
@@ -90,7 +90,7 @@ Authorization: Bearer <JWT_TOKEN>
       totalPages: number;
     }
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -125,7 +125,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     id: number;
     title: string;
@@ -146,11 +146,11 @@ Authorization: Bearer <JWT_TOKEN>
     isArchived: boolean;
     isPinned: boolean;
 
-    createdAt: number;
-    updatedAt: number;
+    createdDate: Date
+    lastModifiedDate: Date;
     createdBy: number;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -196,15 +196,15 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 201,
-  message: "会话创建成功",
+  msg: "会话创建成功",
   data: {
     id: number;
     title: string;
     appId: number;
     modelId: number;
-    createdAt: number;
+    createdDate: Date
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -264,11 +264,11 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "更新成功",
+  msg: "更新成功",
   data: {
     // 返回更新后的会话信息
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -298,8 +298,8 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 204,
-  message: "删除成功",
-  timestamp: 1706889600000
+  msg: "删除成功",
+  datetime: 1706889600000
 }
 ```
 
@@ -366,25 +366,25 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 201,
-  message: "success",
+  msg: "success",
   data: {
     // 用户消息
-    userMessage: {
+    usermsg: {
       id: number;
       sessionId: number;
       role: 'user';
       content: string;
       attachments?: Attachment[];
-      timestamp: number;
+      datetime: number;
     },
 
     // AI响应消息
-    assistantMessage: {
+    assistantmsg: {
       id: number;
       sessionId: number;
       role: 'assistant';
       content: string;         // 完整响应内容
-      timestamp: number;
+      datetime: number;
 
       // 使用统计
       usage?: {
@@ -395,7 +395,7 @@ Authorization: Bearer <JWT_TOKEN>
       };
     }
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -476,7 +476,7 @@ data: {"code": 500, "message": "生成失败"}
 | start    | 开始生成 | `{type: "start", messageId: number}`             |
 | content  | 内容增量 | `{type: "content", delta: string}`               |
 | end      | 生成完成 | `{type: "end", usage: {...}}`                    |
-| error    | 错误     | `{type: "error", code: number, message: string}` |
+| error    | 错误     | `{type: "error", code: number, msg: string}` |
 
 ---
 
@@ -515,7 +515,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: [
       {
@@ -541,7 +541,7 @@ Authorization: Bearer <JWT_TOKEN>
           cost: number;
         };
 
-        timestamp: number;
+        datetime: number;
         isStreaming?: boolean;   // 是否正在流式生成
       }
     ],
@@ -553,7 +553,7 @@ Authorization: Bearer <JWT_TOKEN>
       hasMore: boolean;        // 是否有更多消息
     }
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -596,7 +596,7 @@ Content-Type: multipart/form-data
 ```typescript
 {
   code: 201,
-  message: "上传成功",
+  msg: "上传成功",
   data: {
     id: number;
     name: string;
@@ -605,7 +605,7 @@ Content-Type: multipart/form-data
     url: string;             // 访问URL
     uploadedAt: number;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -644,8 +644,8 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 204,
-  message: "删除成功",
-  timestamp: 1706889600000
+  msg: "删除成功",
+  datetime: 1706889600000
 }
 ```
 
@@ -690,13 +690,13 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "提示词应用成功",
+  msg: "提示词应用成功",
   data: {
     content: string;         // 渲染后的提示词内容
     promptId: number;
     appliedAt: number;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -744,13 +744,13 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "切换成功",
+  msg: "切换成功",
   data: {
     sessionId: number;
     appId: number;
     appName: string;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -792,13 +792,13 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "切换成功",
+  msg: "切换成功",
   data: {
     sessionId: number;
     modelId: number;
     modelName: string;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -828,13 +828,13 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "已停止生成",
+  msg: "已停止生成",
   data: {
     messageId: number;
     content: string;         // 已生成的部分内容
     stoppedAt: number;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -869,11 +869,11 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 201,
-  message: "重新生成成功",
+  msg: "重新生成成功",
   data: {
     // 新生成的AI消息
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -941,7 +941,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     totalSessions: number;
     totalMessages: number;
@@ -980,7 +980,7 @@ Authorization: Bearer <JWT_TOKEN>
       tokens: number;
     }>;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -1010,11 +1010,11 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "批量删除成功",
+  msg: "批量删除成功",
   data: {
     deletedCount: number;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -1051,13 +1051,13 @@ Content-Type: multipart/form-data
 ```typescript
 {
   code: 200,
-  message: "识别成功",
+  msg: "识别成功",
   data: {
     text: string;            // 识别的文本
     language: string;        // 检测到的语言
     confidence: number;      // 置信度 0-1
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 

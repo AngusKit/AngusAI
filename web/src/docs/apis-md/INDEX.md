@@ -248,7 +248,7 @@
 
 ### 2. 参数命名规则
 
-- 所有参数使用小驼峰命名：`pageSize`, `createdAt`
+- 所有参数使用小驼峰命名：`pageSize`, `createdDate`
 - 路径使用连字符：`/api/v1/knowledge-bases`
 - 枚举值使用下划线：`CUSTOMER_SERVICE`
 
@@ -263,8 +263,8 @@
 {
   page: 1,
   pageSize: 20,
-  sortBy: 'createdAt',
-  sortOrder: 'desc'
+  orderBy: 'createdDate',
+  orderSort: 'desc'
 }
 ```
 
@@ -273,9 +273,9 @@
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: { ... },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 

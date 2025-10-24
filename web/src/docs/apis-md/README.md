@@ -35,7 +35,7 @@ apis-md/
 ### 2. 命名规范
 
 - **路径**：小写单词，使用连字符分隔，如 `/api/knowledge-bases`
-- **参数**：小驼峰命名，如 `pageSize`, `createdAt`
+- **参数**：小驼峰命名，如 `pageSize`, `createdDate`
 - **响应字段**：小驼峰命名，保持一致性
 
 ### 3. 统一响应格式
@@ -120,8 +120,8 @@ Authorization: Bearer <JWT_TOKEN>
 {
   page?: number;        // 页码，默认1
   pageSize?: number;    // 每页数量，默认20
-  sortBy?: string;      // 排序字段
-  sortOrder?: 'asc' | 'desc';  // 排序方向，默认desc
+  orderBy?: string;      // 排序字段
+  orderSort?: 'asc' | 'desc';  // 排序方向，默认desc
 }
 ```
 

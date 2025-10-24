@@ -45,7 +45,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: [
       {
@@ -92,7 +92,7 @@ Authorization: Bearer <JWT_TOKEN>
       }
     ]
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -119,7 +119,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     subscriptionId: number;
     planId: string;
@@ -169,7 +169,7 @@ Authorization: Bearer <JWT_TOKEN>
       price: number;
     }>;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -219,7 +219,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 201,
-  message: "订阅创建成功",
+  msg: "订阅创建成功",
   data: {
     subscriptionId: number;
     planId: string;
@@ -235,9 +235,9 @@ Authorization: Bearer <JWT_TOKEN>
       expiresAt: number;     // 支付过期时间
     };
 
-    createdAt: number;
+    createdDate: Date
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -281,7 +281,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "计划已更改",
+  msg: "计划已更改",
   data: {
     subscriptionId: number;
     oldPlanId: string;
@@ -302,7 +302,7 @@ Authorization: Bearer <JWT_TOKEN>
       paymentUrl?: string;
     };
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -347,7 +347,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "订阅已取消",
+  msg: "订阅已取消",
   data: {
     subscriptionId: number;
     status: 'canceled';
@@ -355,7 +355,7 @@ Authorization: Bearer <JWT_TOKEN>
     effectiveAt: number;       // 实际取消生效时间
     refundAmount?: number;     // 退款金额
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -383,13 +383,13 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "订阅已重新激活",
+  msg: "订阅已重新激活",
   data: {
     subscriptionId: number;
     status: 'active';
     reactivatedAt: number;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -411,7 +411,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: [
       {
@@ -428,11 +428,11 @@ Authorization: Bearer <JWT_TOKEN>
         account?: string;      // 部分显示
 
         isDefault: boolean;
-        createdAt: number;
+        createdDate: Date
       }
     ]
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -487,15 +487,15 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 201,
-  message: "支付方式已添加",
+  msg: "支付方式已添加",
   data: {
     id: string;
     type: string;
     lastFour?: string;
     isDefault: boolean;
-    createdAt: number;
+    createdDate: Date
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -525,8 +525,8 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 204,
-  message: "删除成功",
-  timestamp: 1706889600000
+  msg: "删除成功",
+  datetime: 1706889600000
 }
 ```
 
@@ -561,12 +561,12 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "默认支付方式已更新",
+  msg: "默认支付方式已更新",
   data: {
     id: string;
     isDefault: true;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -600,14 +600,14 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: [
       {
         id: string;
         invoiceNumber: string;  // "INV-2024-001"
         date: string;           // "2024-01-15"
-        dateTimestamp: number;
+        datedatetime: number;
 
         amount: number;
         currency: string;
@@ -635,7 +635,7 @@ Authorization: Bearer <JWT_TOKEN>
     ],
     pagination: Pagination;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -696,7 +696,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     period: {
       start: number;
@@ -760,7 +760,7 @@ Authorization: Bearer <JWT_TOKEN>
       currency: string;
     }
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -797,7 +797,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "优惠券应用成功",
+  msg: "优惠券应用成功",
   data: {
     couponId: string;
     code: string;
@@ -807,7 +807,7 @@ Authorization: Bearer <JWT_TOKEN>
     expiresAt?: number;
     appliedAt: number;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -844,7 +844,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: [
       {
@@ -858,7 +858,7 @@ Authorization: Bearer <JWT_TOKEN>
         paymentMethod: string;
         description: string;
 
-        createdAt: number;
+        createdDate: Date
         paidAt?: number;
         refundedAt?: number;
 
@@ -867,7 +867,7 @@ Authorization: Bearer <JWT_TOKEN>
     ],
     pagination: Pagination;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -895,7 +895,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success"
+  msg: "success"
 }
 ```
 

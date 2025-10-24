@@ -47,7 +47,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     timeRange: string;
     period: {
@@ -95,7 +95,7 @@ Authorization: Bearer <JWT_TOKEN>
       failed: number;
     };
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -132,11 +132,11 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: [
       {
-        timestamp: number;
+        datetime: number;
         date: string;           // "10/16" 或 "14:00"
         totalCalls: number;
         successfulCalls: number;
@@ -152,7 +152,7 @@ Authorization: Bearer <JWT_TOKEN>
       peakTime: string;
     }
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -190,11 +190,11 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: [
       {
-        timestamp: number;
+        datetime: number;
         date: string;
         inputTokens: number;    // 输入Token
         outputTokens: number;   // 输出Token
@@ -211,7 +211,7 @@ Authorization: Bearer <JWT_TOKEN>
       avgTokensPerCall: number;
     }
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -248,11 +248,11 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: [
       {
-        timestamp: number;
+        datetime: number;
         date: string;
         avgTime: number;        // 平均响应时间（秒）
         p50: number;            // 中位数
@@ -273,7 +273,7 @@ Authorization: Bearer <JWT_TOKEN>
       };
     }
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -309,7 +309,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: [
       {
@@ -329,7 +329,7 @@ Authorization: Bearer <JWT_TOKEN>
       tokens: number;
     }
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -364,7 +364,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: [
       {
@@ -386,7 +386,7 @@ Authorization: Bearer <JWT_TOKEN>
       cost: number;
     }
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -414,7 +414,7 @@ Authorization: Bearer <JWT_TOKEN>
 {
   timeRange?: string;
   limit?: number;             // 默认10
-  sortBy?: 'calls' | 'avgTime' | 'successRate';
+  orderBy?: 'calls' | 'avgTime' | 'successRate';
 }
 ```
 
@@ -423,7 +423,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: [
       {
@@ -439,7 +439,7 @@ Authorization: Bearer <JWT_TOKEN>
       }
     ]
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -475,7 +475,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     // 按错误码统计
     byStatusCode: [
@@ -502,7 +502,7 @@ Authorization: Bearer <JWT_TOKEN>
 
     // 错误趋势
     errorTrend: Array<{
-      timestamp: number;
+      datetime: number;
       date: string;
       total: number;
       code4xx: number;
@@ -519,7 +519,7 @@ Authorization: Bearer <JWT_TOKEN>
       };
     }
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -555,7 +555,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     // 活跃用户趋势
     activeUsersTrend: Array<{
@@ -582,7 +582,7 @@ Authorization: Bearer <JWT_TOKEN>
       lastActive: number;
     }>;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -613,7 +613,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     // 成本趋势
     costTrend: Array<{
@@ -646,7 +646,7 @@ Authorization: Bearer <JWT_TOKEN>
       projectedMonthlyCost: number;  // 预计月成本
     }
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -702,7 +702,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     // 实时指标
     current: {
@@ -714,7 +714,7 @@ Authorization: Bearer <JWT_TOKEN>
 
     // 最近调用（最新10条）
     recentCalls: Array<{
-      timestamp: number;
+      datetime: number;
       endpoint: string;
       method: string;
       statusCode: number;
@@ -731,7 +731,7 @@ Authorization: Bearer <JWT_TOKEN>
       avgTime: number;
     }>;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -758,7 +758,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     // 响应时间对比
     responseTime: {
@@ -781,7 +781,7 @@ Authorization: Bearer <JWT_TOKEN>
       percentile: number;
     };
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 

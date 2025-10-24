@@ -41,8 +41,8 @@ Authorization: Bearer <JWT_TOKEN>
   ownedByMe?: boolean;        // 我创建的
   sharedToMe?: boolean;       // 共享给我的
 
-  sortBy?: 'name' | 'lastShared' | 'views' | 'edits';
-  sortOrder?: 'asc' | 'desc';
+  orderBy?: 'name' | 'lastShared' | 'views' | 'edits';
+  orderSort?: 'asc' | 'desc';
 }
 ```
 
@@ -58,7 +58,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: [
       {
@@ -97,7 +97,7 @@ Authorization: Bearer <JWT_TOKEN>
         lastSharedAt: number;
 
         // 时间
-        createdAt: number;
+        createdDate: Date
         createdDate: string;    // "2024-03-15"
       }
     ],
@@ -126,7 +126,7 @@ Authorization: Bearer <JWT_TOKEN>
       };
     }
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -161,7 +161,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     id: number;
     resourceId: number;
@@ -212,13 +212,13 @@ Authorization: Bearer <JWT_TOKEN>
       userName: string;
       action: 'view' | 'edit' | 'download';
       actionLabel: string;
-      timestamp: number;
+      datetime: number;
     }>;
 
-    createdAt: number;
-    updatedAt: number;
+    createdDate: Date
+    lastModifiedDate: Date;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -276,7 +276,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 201,
-  message: "资源已共享",
+  msg: "资源已共享",
   data: {
     id: number;
     resourceId: number;
@@ -284,9 +284,9 @@ Authorization: Bearer <JWT_TOKEN>
     sharedWith: string;
     permission: string;
     memberCount: number;
-    createdAt: number;
+    createdDate: Date
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -349,13 +349,13 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "共享设置已更新",
+  msg: "共享设置已更新",
   data: {
     id: number;
     updatedFields: string[];
-    updatedAt: number;
+    lastModifiedDate: Date;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -398,8 +398,8 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 204,
-  message: "共享已取消",
-  timestamp: 1706889600000
+  msg: "共享已取消",
+  datetime: 1706889600000
 }
 ```
 
@@ -436,8 +436,8 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 204,
-  message: "成员已移除",
-  timestamp: 1706889600000
+  msg: "成员已移除",
+  datetime: 1706889600000
 }
 ```
 
@@ -478,7 +478,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "成员已添加",
+  msg: "成员已添加",
   data: {
     addedCount: number;
     members: Array<{
@@ -487,7 +487,7 @@ Authorization: Bearer <JWT_TOKEN>
       permission: string;
     }>;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -518,7 +518,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     items: [
       {
@@ -532,7 +532,7 @@ Authorization: Bearer <JWT_TOKEN>
       }
     ]
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -576,7 +576,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     overview: {
       totalViews: number;
@@ -616,7 +616,7 @@ Authorization: Bearer <JWT_TOKEN>
       count: number;
     }>;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -644,7 +644,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     // 我创建的共享
     sharedByMe: {
@@ -675,10 +675,10 @@ Authorization: Bearer <JWT_TOKEN>
       action: string;
       userId: number;
       userName: string;
-      timestamp: number;
+      datetime: number;
     }>;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -709,7 +709,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     hasAccess: boolean;
     permission?: 'view' | 'edit' | 'manage';
@@ -720,7 +720,7 @@ Authorization: Bearer <JWT_TOKEN>
     };
     sharedAt?: number;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -759,8 +759,8 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "已记录",
-  timestamp: 1706889600000
+  msg: "已记录",
+  datetime: 1706889600000
 }
 ```
 

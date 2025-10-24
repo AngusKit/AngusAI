@@ -44,7 +44,7 @@
 ```typescript
 {
   code: 200,
-  message: "登录成功",
+  msg: "登录成功",
   data: {
     token: string;           // JWT Token
     refreshToken: string;    // 刷新Token
@@ -56,10 +56,10 @@
       avatar: string;        // 匹配Figma右上角头像
       nickname: string;
       role: UserRole;        // 控制侧边栏权限菜单显示
-      createdAt: number;
+      createdDate: Date
     }
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -69,26 +69,26 @@
 // 用户名或密码错误
 {
   code: 401,
-  message: "用户名或密码错误",
-  timestamp: 1706889600000
+  msg: "用户名或密码错误",
+  datetime: 1706889600000
 }
 
 // 验证码错误
 {
   code: 400,
-  message: "验证码错误",
+  msg: "验证码错误",
   errors: [{
     field: "captcha",
-    message: "验证码错误或已过期"
+    msg: "验证码错误或已过期"
   }],
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 
 // 账号被禁用
 {
   code: 403,
-  message: "账号已被禁用，请联系管理员",
-  timestamp: 1706889600000
+  msg: "账号已被禁用，请联系管理员",
+  datetime: 1706889600000
 }
 ```
 
@@ -135,13 +135,13 @@
 ```typescript
 {
   code: 201,
-  message: "注册成功",
+  msg: "注册成功",
   data: {
     userId: number;
     username: string;
     email: string;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -151,34 +151,34 @@
 // 用户名已存在
 {
   code: 409,
-  message: "用户名已被使用",
+  msg: "用户名已被使用",
   errors: [{
     field: "username",
-    message: "该用户名已被注册"
+    msg: "该用户名已被注册"
   }],
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 
 // 邮箱已存在
 {
   code: 409,
-  message: "邮箱已被使用",
+  msg: "邮箱已被使用",
   errors: [{
     field: "email",
-    message: "该邮箱已被注册"
+    msg: "该邮箱已被注册"
   }],
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 
 // 验证码错误
 {
   code: 400,
-  message: "验证码错误或已过期",
+  msg: "验证码错误或已过期",
   errors: [{
     field: "emailCode",
-    message: "验证码错误或已过期"
+    msg: "验证码错误或已过期"
   }],
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -203,11 +203,11 @@
 ```typescript
 {
   code: 200,
-  message: "验证码已发送",
+  msg: "验证码已发送",
   data: {
     expiresIn: 300       // 有效期（秒）
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -235,8 +235,8 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "退出成功",
-  timestamp: 1706889600000
+  msg: "退出成功",
+  datetime: 1706889600000
 }
 ```
 
@@ -260,13 +260,13 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "刷新成功",
+  msg: "刷新成功",
   data: {
     token: string;
     refreshToken: string;
     expiresIn: number;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -288,7 +288,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "success",
+  msg: "success",
   data: {
     id: number;
     username: string;
@@ -304,10 +304,10 @@ Authorization: Bearer <JWT_TOKEN>
       theme: Theme;         // 主题设置
       timezone: string;     // 时区
     };
-    createdAt: number;
-    updatedAt: number;
+    createdDate: Date
+    lastModifiedDate: Date;
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -353,11 +353,11 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "更新成功",
+  msg: "更新成功",
   data: {
     // 返回更新后的完整用户信息
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -389,8 +389,8 @@ Authorization: Bearer <JWT_TOKEN>
 ```typescript
 {
   code: 200,
-  message: "密码修改成功",
-  timestamp: 1706889600000
+  msg: "密码修改成功",
+  datetime: 1706889600000
 }
 ```
 
@@ -400,12 +400,12 @@ Authorization: Bearer <JWT_TOKEN>
 // 当前密码错误
 {
   code: 400,
-  message: "当前密码错误",
+  msg: "当前密码错误",
   errors: [{
     field: "oldPassword",
-    message: "当前密码不正确"
+    msg: "当前密码不正确"
   }],
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -436,11 +436,11 @@ Content-Type: multipart/form-data
 ```typescript
 {
   code: 200,
-  message: "上传成功",
+  msg: "上传成功",
   data: {
     avatar: string;      // 头像URL
   },
-  timestamp: 1706889600000
+  datetime: 1706889600000
 }
 ```
 
@@ -474,8 +474,8 @@ Content-Type: multipart/form-data
 ```typescript
 {
   code: 200,
-  message: "密码重置成功",
-  timestamp: 1706889600000
+  msg: "密码重置成功",
+  datetime: 1706889600000
 }
 ```
 
