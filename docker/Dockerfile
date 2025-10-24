@@ -15,7 +15,7 @@ FROM eclipse-temurin:17-jre-alpine
 LABEL maintainer="AngusAI Team"
 
 # Set environment variables (default port 8901)
-ENV TESTER_PORT=2530
+ENV AI_PORT=2530
 
 # Define application directory and create non-root user
 ENV APP_HOME=/opt/AngusAI
@@ -37,11 +37,11 @@ RUN mkdir -p data logs tmp
 VOLUME ["${APP_HOME}/conf", "${APP_HOME}/data", "${APP_HOME}/logs", "${APP_HOME}/plugins", "${APP_HOME}/tmp"]
 
 # Expose application port
-EXPOSE ${TESTER_PORT}
+EXPOSE ${AI_PORT}
 
 # Health check configuration
 HEALTHCHECK --interval=10s --timeout=3s \
-  CMD wget -qO- http://localhost:${TESTER_PORT}/actuator/health | grep '\"status\":\"UP\"' || exit 1
+  CMD wget -qO- http://localhost:${AI_PORT}/actuator/health | grep '\"status\":\"UP\"' || exit 1
 
 # Application entry point
 CMD ["./startup-ai.sh", "--daemon=false"]
