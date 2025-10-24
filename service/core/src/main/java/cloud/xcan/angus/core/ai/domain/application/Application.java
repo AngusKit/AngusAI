@@ -1,0 +1,117 @@
+package cloud.xcan.angus.core.ai.domain.application;
+
+import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
+import cloud.xcan.angus.core.jpa.multitenancy.TenantListener;
+import io.hypersistence.utils.hibernate.type.json.JsonType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+import org.hibernate.annotations.Type;
+
+/**
+ * 应用实体
+ */
+@Entity
+@Table(name = "application")
+@EntityListeners({TenantListener.class})
+@Setter
+@Getter
+@Accessors(chain = true)
+public class Application extends TenantAuditingEntity<Application, Long> {
+
+  @Id
+  private Long id;
+
+  @Column(name = "name", nullable = false, length = 50)
+  private String name;
+
+  @Column(name = "icon", nullable = false)
+  private String icon;
+
+  @Column(name = "description", length = 500)
+  private String description;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "category", nullable = false)
+  private ApplicationCategory category;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "status", nullable = false)
+  private ApplicationStatus status;
+
+  @Column(name = "language", length = 20)
+  private String language;
+
+  @Column(name = "published_date")
+  private LocalDateTime publishedDate;
+
+  // 统计数据
+  @Column(name = "api_calls")
+  private Long apiCalls = 0L;
+
+  @Column(name = "total_tokens")
+  private Long totalTokens = 0L;
+
+  @Column(name = "avg_response_time")
+  private Double avgResponseTime = 0.0;
+
+  @Column(name = "success_rate")
+  private Double successRate = 0.0;
+
+  // 配置信息（JSON格式存储）
+  @Type(JsonType.class)
+  @Column(columnDefinition = "json", name = "config")
+  private ApplicationConfig config;
+
+  // 关联资源
+  @Column(name = "knowledge_base_id")
+  private Long knowledgeBaseId;
+
+  @Column(name = "dataset_id")
+  private Long datasetId;
+
+  @Column(name = "workflow_id")
+  private Long workflowId;
+
+  // 发布设置
+  @Column(name = "public_access")
+  private Boolean publicAccess = false;
+
+  @Column(name = "embed_enabled")
+  private Boolean embedEnabled = false;
+
+  @Column(name = "api_enabled")
+  private Boolean apiEnabled = false;
+
+  // 分享相关
+  @Column(name = "share_id")
+  private String shareId;
+
+  @Column(name = "share_expires_at")
+  private LocalDateTime shareExpiresAt;
+
+  @Type(JsonType.class)
+  @Column(columnDefinition = "json", name = "share")
+  private ApplicationShare share;
+
+  @Transient
+  private boolean sharePublicAccess;
+  @Transient
+  private boolean shareAnonymousAccess;
+  @Transient
+  private boolean shareAuthorizationRequired;
+
+  @Override
+  public Long identity() {
+    return this.id;
+  }
+}
