@@ -1,7 +1,4 @@
 import { Card } from '../ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import { Progress } from '../ui/progress';
-import { TrendingUp, TrendingDown } from 'lucide-react';
 import { useLanguage } from '../layout/LanguageProvider';
 
 export function UsageDetails() {

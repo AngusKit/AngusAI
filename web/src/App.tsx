@@ -1,33 +1,29 @@
-import { Header } from './components';
-import { ThemeProvider } from './components';
-import { LanguageProvider } from './components';
-import { Sidebar } from './components';
-
-import { WelcomeBanner } from './components';
-import { StatsCards } from './components';
-import { RecentApplications } from './components';
-import { UsageDetails } from './components';
-
-import { MyApplications } from './components';
-import { CreateApplication } from './components';
-import { AppSettingsPage } from './components';
-
-import { Chat } from './components';
-
-import { Workflow } from './components';
-import { KnowledgeBase } from './components';
-import { Dataset } from './components';
-import { PluginMarket } from './components';
-import { ModelManagement } from './components';
-import { PromptLibraryPage } from './components';
-
-import { TeamMembers } from './components';
-import { ResourceSharing } from './components';
-import { TeamSettings } from './components';
-
-import { UsageAnalytics } from './components';
-import { APIKeys } from './components';
-import { BillingSubscription } from './components';
+import {
+  APIKeys,
+  AppSettingsPage,
+  BillingSubscription,
+  Chat,
+  CreateApplication,
+  Dataset,
+  Header,
+  KnowledgeBase,
+  LanguageProvider,
+  ModelManagement,
+  MyApplications,
+  PluginMarket,
+  PromptLibraryPage,
+  RecentApplications,
+  ResourceSharing,
+  Sidebar,
+  StatsCards,
+  TeamMembers,
+  TeamSettings,
+  ThemeProvider,
+  UsageAnalytics,
+  UsageDetails,
+  WelcomeBanner,
+  Workflow,
+} from './components';
 
 import { Toaster } from './components/ui/sonner';
 import { useState } from 'react';

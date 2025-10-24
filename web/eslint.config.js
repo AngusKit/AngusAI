@@ -23,6 +23,7 @@ module.exports = [
         sourceType: 'module',
       },
       globals: {
+        // Node.js globals
         console: 'readonly',
         process: 'readonly',
         Buffer: 'readonly',
@@ -32,6 +33,41 @@ module.exports = [
         module: 'readonly',
         require: 'readonly',
         exports: 'readonly',
+        setTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearTimeout: 'readonly',
+        clearInterval: 'readonly',
+
+        // Browser globals
+        window: 'readonly',
+        document: 'readonly',
+        navigator: 'readonly',
+        localStorage: 'readonly',
+        sessionStorage: 'readonly',
+        URL: 'readonly',
+        Blob: 'readonly',
+        File: 'readonly',
+        FileList: 'readonly',
+        HTMLDivElement: 'readonly',
+        HTMLInputElement: 'readonly',
+        HTMLTextAreaElement: 'readonly',
+        HTMLButtonElement: 'readonly',
+        HTMLElement: 'readonly',
+        Element: 'readonly',
+        KeyboardEvent: 'readonly',
+        React: 'readonly',
+        NodeJS: 'readonly',
+
+        // Jest globals
+        jest: 'readonly',
+        describe: 'readonly',
+        it: 'readonly',
+        test: 'readonly',
+        expect: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly',
+        beforeAll: 'readonly',
+        afterAll: 'readonly',
       },
     },
     plugins: {
@@ -109,6 +145,8 @@ module.exports = [
       'public/',
       '*.d.ts',
       'vite.config.ts',
+      'tests/',
+      '__mocks__/',
     ],
   },
 ];

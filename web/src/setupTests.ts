@@ -1,5 +1,7 @@
 // Jest测试环境设置文件
 import '@testing-library/jest-dom';
+// 设置React Testing Library
+import { configure } from '@testing-library/react';
 
 // 模拟window.matchMedia
 Object.defineProperty(window, 'matchMedia', {
@@ -75,7 +77,7 @@ global.fetch = jest.fn();
 
 // 模拟document.createElement
 const originalCreateElement = document.createElement;
-document.createElement = jest.fn((tagName) => {
+document.createElement = jest.fn(tagName => {
   const element = originalCreateElement.call(document, tagName);
   if (tagName === 'textarea') {
     element.style = {} as any;
@@ -107,9 +109,6 @@ Element.prototype.getBoundingClientRect = jest.fn(() => ({
   toJSON: () => ({}),
 }));
 
-// 设置React Testing Library
-import { configure } from '@testing-library/react';
-
 configure({
   testIdAttribute: 'data-testid',
 });
@@ -120,7 +119,9 @@ console.error = (...args) => {
   if (
     typeof args[0] === 'string' &&
     (args[0].includes('Warning: ReactDOM.render is no longer supported') ||
-     args[0].includes('createRoot(...): Target container is not a DOM element'))
+      args[0].includes(
+        'createRoot(...): Target container is not a DOM element'
+      ))
   ) {
     return;
   }

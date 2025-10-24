@@ -1,4 +1,8 @@
-import { getNestedTranslation, languages, defaultLanguage } from '../../src/lib/i18n';
+import {
+  defaultLanguage,
+  getNestedTranslation,
+  languages,
+} from '../../src/lib/i18n';
 
 // Mock localStorage
 const mockLocalStorage = {

@@ -1,10 +1,10 @@
 import {
-  X,
   File,
   FileText,
   Image as ImageIcon,
-  Video,
   Music,
+  Video,
+  X,
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { cn } from '../ui/utils';

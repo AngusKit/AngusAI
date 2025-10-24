@@ -20,16 +20,15 @@ import {
   SelectValue,
 } from '../ui/select';
 import {
-  Save,
-  X,
+  Activity,
   Calendar,
   Clock,
-  TrendingUp,
-  Activity,
-  Tag,
-  Workflow as WorkflowIcon,
   Edit2,
-  Eye,
+  Save,
+  Tag,
+  TrendingUp,
+  Workflow as WorkflowIcon,
+  X,
 } from 'lucide-react';
 import { toast } from 'sonner';
 

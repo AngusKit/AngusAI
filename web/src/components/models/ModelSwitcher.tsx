@@ -1,11 +1,11 @@
-import { Check, ChevronDown, Zap, Brain, Sparkles, Cpu } from 'lucide-react';
+import { Brain, Check, ChevronDown, Cpu, Sparkles, Zap } from 'lucide-react';
 import { Button } from '../ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
   DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
 import { Badge } from '../ui/badge';
 import { cn } from '../ui/utils';

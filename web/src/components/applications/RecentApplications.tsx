@@ -1,11 +1,11 @@
 import {
-  MessageSquare,
-  FileText,
-  Database,
-  ExternalLink,
-  Edit,
-  Clock,
   BarChart,
+  Clock,
+  Database,
+  Edit,
+  ExternalLink,
+  FileText,
+  MessageSquare,
   Settings,
 } from 'lucide-react';
 import { Card } from '../ui/card';

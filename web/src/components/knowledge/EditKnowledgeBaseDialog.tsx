@@ -1,9 +1,9 @@
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from '../ui/dialog';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from '../ui/select';
 import { Badge } from '../ui/badge';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 interface EditKnowledgeBaseDialogProps {

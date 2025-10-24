@@ -1,10 +1,10 @@
 import {
-  FileText,
-  Zap,
   Coins,
-  Users,
-  TrendingUp,
+  FileText,
   TrendingDown,
+  TrendingUp,
+  Users,
+  Zap,
 } from 'lucide-react';
 import { Card } from '../ui/card';
 import { Skeleton } from '../ui/skeleton';

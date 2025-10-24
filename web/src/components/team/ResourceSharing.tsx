@@ -1,27 +1,22 @@
 import { useState } from 'react';
 import { useLanguage } from '../layout/LanguageProvider';
 import {
-  Share2,
-  Search,
-  Filter,
-  Workflow,
   Database,
-  Zap,
-  FileText,
-  Users,
-  Lock,
-  Unlock,
-  Eye,
   Edit,
-  Trash2,
-  MoreHorizontal,
-  TrendingUp,
-  Clock,
-  Shield,
-  CheckCircle,
+  Eye,
+  FileText,
+  Filter,
   Globe,
-  UserCheck,
+  MoreHorizontal,
   Plus,
+  Search,
+  Share2,
+  Shield,
+  Trash2,
+  TrendingUp,
+  UserCheck,
+  Workflow,
+  Zap,
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card } from '../ui/card';
@@ -50,7 +45,6 @@ import {
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
 import { Checkbox } from '../ui/checkbox';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import {
   Pagination,
   PaginationContent,

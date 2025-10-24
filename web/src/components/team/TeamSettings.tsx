@@ -1,26 +1,16 @@
 import { useState } from 'react';
-import { useLanguage } from '../layout/LanguageProvider';
 import {
-  Settings,
-  Users,
-  Shield,
   Bell,
-  Palette,
-  Tag,
-  Save,
-  Upload,
-  Camera,
-  Lock,
   Globe,
-  Mail,
-  CheckCircle,
-  XCircle,
-  Eye,
-  EyeOff,
+  Lock,
+  Save,
+  Settings,
+  Shield,
+  Upload,
+  Users,
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card } from '../ui/card';
-import { Badge } from '../ui/badge';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Textarea } from '../ui/textarea';

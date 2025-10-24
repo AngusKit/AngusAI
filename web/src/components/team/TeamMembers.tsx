@@ -1,23 +1,21 @@
 import { useState } from 'react';
 import { useLanguage } from '../layout/LanguageProvider';
 import {
-  Users,
-  Search,
-  UserPlus,
+  AlertCircle,
+  CheckCircle,
+  Clock,
+  Crown,
+  Eye,
   Mail,
   MoreHorizontal,
-  Shield,
-  Eye,
-  Edit,
-  Trash2,
-  Crown,
-  User,
-  Clock,
-  CheckCircle,
-  XCircle,
-  AlertCircle,
-  Copy,
+  Search,
   Send,
+  Shield,
+  Trash2,
+  User,
+  UserPlus,
+  Users,
+  XCircle,
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card } from '../ui/card';

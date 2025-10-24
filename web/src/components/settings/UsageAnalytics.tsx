@@ -1,20 +1,14 @@
 import { useState } from 'react';
 import {
-  BarChart3,
-  TrendingUp,
-  TrendingDown,
   Activity,
-  Users,
-  MessageSquare,
-  Zap,
   Clock,
-  Calendar,
-  Filter,
-  ChevronDown,
+  TrendingDown,
+  TrendingUp,
+  Users,
+  Zap,
 } from 'lucide-react';
 import { useLanguage } from '../layout/LanguageProvider';
 import { Card } from '../ui/card';
-import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import {
   Select,
@@ -25,21 +19,21 @@ import {
 } from '../ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import {
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  AreaChart,
   Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Legend,
+  Line,
+  LineChart,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
 } from 'recharts';
 
 export function UsageAnalytics() {

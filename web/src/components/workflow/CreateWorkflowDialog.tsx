@@ -1,9 +1,9 @@
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from '../ui/dialog';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -18,16 +18,16 @@ import {
 } from '../ui/select';
 import { Badge } from '../ui/badge';
 import {
-  Workflow,
-  Zap,
   Bot,
-  FileText,
-  Database,
-  MessageSquare,
   Brain,
   Code,
-  Settings,
+  Database,
+  FileText,
   GitBranch,
+  MessageSquare,
+  Settings,
+  Workflow,
+  Zap,
 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';

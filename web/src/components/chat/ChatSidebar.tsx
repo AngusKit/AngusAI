@@ -1,12 +1,12 @@
 import {
-  MessageSquare,
-  Plus,
-  Trash2,
-  MoreVertical,
   ChevronLeft,
-  Search,
   Clock,
+  MessageSquare,
+  MoreVertical,
+  Plus,
+  Search,
   Star,
+  Trash2,
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';

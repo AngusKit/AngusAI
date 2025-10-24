@@ -1,26 +1,24 @@
 import { useState } from 'react';
 import {
-  Key,
-  Plus,
+  AlertCircle,
+  BookOpen,
+  Bot,
+  CheckCircle,
+  Clock,
+  Code,
   Copy,
+  Database,
   Eye,
   EyeOff,
-  Trash2,
-  MoreVertical,
-  CheckCircle,
-  XCircle,
-  AlertCircle,
-  Clock,
-  Shield,
-  Code,
-  RefreshCw,
-  Settings,
-  Zap,
   GitBranch,
-  Database,
-  BookOpen,
+  Key,
+  MoreVertical,
   Package,
-  Bot,
+  Plus,
+  Shield,
+  Trash2,
+  XCircle,
+  Zap,
 } from 'lucide-react';
 import { useLanguage } from '../layout/LanguageProvider';
 import { Button } from '../ui/button';
@@ -28,7 +26,6 @@ import { Card } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
-import { Textarea } from '../ui/textarea';
 import {
   Select,
   SelectContent,

@@ -1,16 +1,16 @@
 import {
-  User,
   Bot,
-  Copy,
-  ThumbsUp,
-  ThumbsDown,
-  RotateCw,
   Check,
+  Copy,
   Download,
+  RotateCw,
+  ThumbsDown,
+  ThumbsUp,
+  User,
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { cn } from '../ui/utils';
 import { toast } from 'sonner';
 import { copyToClipboard } from '../../lib/clipboard';

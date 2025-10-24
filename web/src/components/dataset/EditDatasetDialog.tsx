@@ -2,9 +2,9 @@ import { Check } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from '../ui/dialog';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -20,7 +20,7 @@ import {
 import { Checkbox } from '../ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 import { Slider } from '../ui/slider';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Badge } from '../ui/badge';
 

@@ -1,23 +1,23 @@
 import {
+  Check,
   Database,
-  Plus,
-  Upload,
-  MoreHorizontal,
-  Eye,
-  Trash2,
   Download,
-  FileText,
+  Edit,
+  Eye,
   File,
-  Search,
-  X,
+  Files,
+  FileText,
   Filter,
+  FolderOpen,
   Grid3x3,
   List,
-  Edit,
-  FolderOpen,
-  Files,
-  Check,
+  MoreHorizontal,
+  Plus,
   RefreshCw,
+  Search,
+  Trash2,
+  Upload,
+  X,
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card } from '../ui/card';
@@ -41,13 +41,12 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from '../ui/dialog';
-import { Label } from '../ui/label';
 import { Switch } from '../ui/switch';
-import { useState, useRef, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLanguage } from '../layout/LanguageProvider';
 import { toast } from 'sonner';
 import { EditKnowledgeBaseDialog } from './EditKnowledgeBaseDialog';

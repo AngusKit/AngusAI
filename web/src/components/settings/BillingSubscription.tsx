@@ -1,37 +1,27 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLanguage } from '../layout/LanguageProvider';
 import {
+  AlertCircle,
+  Building2,
+  Check,
+  CheckCircle2,
+  Clock,
   CreditCard,
   Download,
-  Calendar,
-  TrendingUp,
-  Check,
-  Zap,
-  Crown,
-  Rocket,
-  ChevronRight,
-  AlertCircle,
   FileText,
-  DollarSign,
-  Clock,
-  Package,
-  RefreshCw,
-  Settings,
-  Building2,
-  Users,
-  Plus,
-  Smartphone,
-  X,
-  CheckCircle2,
   Loader2,
+  Package,
+  Plus,
   QrCode,
+  Settings,
+  Smartphone,
   XCircle,
+  Zap,
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Progress } from '../ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Separator } from '../ui/separator';
 import {
   Dialog,

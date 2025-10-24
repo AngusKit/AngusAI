@@ -1,18 +1,18 @@
 import {
+  Bot,
   Check,
   ChevronDown,
-  Zap,
-  Bot,
   MessageSquare,
   Sparkles,
+  Zap,
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
   DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
 import { Badge } from '../ui/badge';
 import { cn } from '../ui/utils';

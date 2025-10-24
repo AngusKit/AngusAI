@@ -111,7 +111,6 @@ export const enUS: TranslationKeys = {
     viewAll: 'View All',
   },
 
-
   // Quick Actions
   quickActions: {
     title: 'Quick Actions',
@@ -387,7 +386,6 @@ export const enUS: TranslationKeys = {
     installed: 'Installed',
     viewDetails: 'View Details',
   },
-
 
   // Knowledge Base File Upload
   knowledgeUpload: {

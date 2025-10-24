@@ -1,34 +1,32 @@
 import {
-  Search,
-  Bell,
-  HelpCircle,
-  Languages,
-  Sun,
-  Moon,
-  User,
-  Shield,
-  Key,
-  MessageSquare,
-  Copy,
-  Check,
-  LogOut,
-  FileText,
-  Sparkles,
   AlertCircle,
-  CheckCircle,
-  Info,
-  ExternalLink,
+  Bell,
   BookOpen,
-  Video,
-  FileQuestion,
+  Check,
+  CheckCircle,
   Clock,
-  TrendingUp,
-  Zap,
+  Copy,
   Database,
+  ExternalLink,
+  FileQuestion,
+  FileText,
   GitBranch,
+  HelpCircle,
+  Info,
+  Key,
+  Languages,
+  LogOut,
+  MessageSquare,
+  Moon,
+  Search,
+  Shield,
+  Sparkles,
+  Sun,
+  TrendingUp,
+  Video,
   X,
+  Zap,
 } from 'lucide-react';
-import { Button } from '../ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import {
   DropdownMenu,
@@ -42,7 +40,7 @@ import { Badge } from '../ui/badge';
 import { useState } from 'react';
 import { useTheme } from './ThemeProvider';
 import { useLanguage } from './LanguageProvider';
-import { languages, Language } from '../../lib/i18n';
+import { Language, languages } from '../../lib/i18n';
 import { toast } from 'sonner';
 import { copyToClipboard } from '../../lib/clipboard';
 

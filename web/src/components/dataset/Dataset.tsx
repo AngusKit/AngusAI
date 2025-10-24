@@ -1,25 +1,20 @@
 import {
-  Database,
-  Plus,
-  MoreHorizontal,
-  Eye,
-  Trash2,
-  Edit,
-  FileText,
   Copy,
-  Search,
-  X,
+  Database,
+  Download,
+  Edit,
+  Eye,
+  FileText,
   Filter,
   Grid3x3,
   List,
-  Upload,
-  File,
-  Download,
-  Code,
-  Globe,
-  Cloud,
-  Link as LinkIcon,
+  MoreHorizontal,
+  Plus,
   RefreshCw,
+  Search,
+  Trash2,
+  Upload,
+  X,
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card } from '../ui/card';
@@ -32,16 +27,8 @@ import {
 } from '../ui/dropdown-menu';
 import { Input } from '../ui/input';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../ui/select';
-import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
@@ -51,9 +38,9 @@ import { Progress } from '../ui/progress';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from '../ui/dialog';
 import {
   AlertDialog,

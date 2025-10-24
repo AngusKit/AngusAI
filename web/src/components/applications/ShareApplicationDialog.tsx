@@ -12,16 +12,15 @@ import { Textarea } from '../ui/textarea';
 import { Label } from '../ui/label';
 import { Switch } from '../ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import { Badge } from '../ui/badge';
 import {
   Copy,
+  Eye,
+  Globe,
   Link2,
+  Lock,
   Mail,
   QrCode,
-  Globe,
-  Lock,
   Users,
-  Eye,
 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';

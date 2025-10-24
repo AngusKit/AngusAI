@@ -52,7 +52,7 @@ describe('clipboard', () => {
     it('should copy text to clipboard using navigator.clipboard when available', async () => {
       const text = 'test text';
       mockWriteText.mockResolvedValue(undefined);
-      
+
       // 确保navigator.clipboard可用
       Object.defineProperty(navigator, 'clipboard', {
         value: {

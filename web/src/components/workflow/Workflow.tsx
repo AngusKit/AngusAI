@@ -1,18 +1,17 @@
 import {
-  Workflow as WorkflowIcon,
-  Plus,
-  Play,
-  Edit,
-  Trash2,
-  MoreHorizontal,
-  Eye,
   Copy,
-  ChevronDown,
-  Search,
-  X,
+  Edit,
+  Eye,
   Filter,
   Grid3x3,
   List,
+  MoreHorizontal,
+  Play,
+  Plus,
+  Search,
+  Trash2,
+  Workflow as WorkflowIcon,
+  X,
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card } from '../ui/card';

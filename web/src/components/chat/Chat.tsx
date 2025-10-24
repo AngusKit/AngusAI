@@ -1,19 +1,19 @@
-import { useState, useRef, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
-  Send,
-  Paperclip,
-  Mic,
-  StopCircle,
-  MoreVertical,
-  Sparkles,
-  BookmarkPlus,
-  Settings,
-  Maximize2,
   ArrowLeft,
-  Download,
-  Share2,
-  Palette,
+  BookmarkPlus,
   Check,
+  Download,
+  Maximize2,
+  Mic,
+  MoreVertical,
+  Palette,
+  Paperclip,
+  Send,
+  Settings,
+  Share2,
+  Sparkles,
+  StopCircle,
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
@@ -33,7 +33,6 @@ import {
   DialogTitle,
 } from '../ui/dialog';
 import { Label } from '../ui/label';
-import { Input } from '../ui/input';
 import { Slider } from '../ui/slider';
 import { Switch } from '../ui/switch';
 import {
