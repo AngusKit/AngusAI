@@ -39,8 +39,17 @@ Authorization: Bearer <JWT_TOKEN>
 
 **Figma对应**：
 
-- `timeRange` → 时间范围选择器
-- `appId` → 应用筛选下拉框
+- `timeRange` → 时间范围选择器（最近24小时/最近7天/最近30天/最近90天）
+- `appId` → 应用筛选下拉框（全部应用/具体应用）
+- 统计卡片网格布局（4个关键指标）
+
+**时间范围说明**：
+- **24hours**：最近24小时数据，按小时聚合
+- **7days**：最近7天数据，按天聚合（默认）
+- **30days**：最近30天数据，按天聚合
+- **90days**：最近90天数据，按周聚合
+
+---
 
 ### 响应数据
 
@@ -103,6 +112,27 @@ Authorization: Bearer <JWT_TOKEN>
 
 - 统计卡片（4个关键指标）
 - 趋势箭头和百分比变化
+- 卡片颜色区分（blue/green/purple/orange）
+
+**统计卡片UI规范**：
+```typescript
+// 卡片数据结构
+{
+  label: string;           // "API总调用"
+  value: string;          // "25,590" - 格式化显示
+  change: string;         // "+12.5%" - 变化百分比
+  trend: 'up' | 'down';   // 趋势方向
+  icon: IconComponent;    // 图标组件
+  color: string;          // 'blue' | 'green' | 'purple' | 'orange'
+}
+
+// 卡片显示规则
+- 数值格式化：千位分隔符（25,590）
+- 大数值简化：M表示百万（1.2M）
+- 趋势向上：绿色，向下箭头图标
+- 趋势向下：红色（响应时间等指标向下是好事）
+- 与上周期对比计算变化百分比
+```
 
 ---
 
@@ -447,6 +477,29 @@ Authorization: Bearer <JWT_TOKEN>
 
 - Top接口列表表格
 - 调用次数、响应时间、成功率列
+- 接口地址代码样式显示
+- 徽章显示调用次数
+
+**表格UI规范**：
+```typescript
+// 表格列定义
+{
+  endpoint: string;      // 接口路径，代码样式显示
+  method: string;        // HTTP方法（POST/GET等）
+  calls: number;         // 调用次数
+  avgTime: string;       // 平均响应时间（格式化）
+  avgTimeMs: number;     // 毫秒数（原始值）
+  successRate: string;   // 成功率百分比
+  errors: number;        // 错误次数
+}
+
+// 显示规则
+- 接口路径使用代码样式（灰色背景）
+- 调用次数使用蓝色徽章显示
+- 成功率高于95%显示绿色
+- 成功率低于90%显示红色警告
+- 响应时间超过3秒显示黄色警告
+```
 
 ---
 
@@ -528,6 +581,35 @@ Authorization: Bearer <JWT_TOKEN>
 - 错误分析柱状图
 - 错误分布饼图
 - 错误趋势折线图
+- 错误列表表格
+
+**错误分析UI规范**：
+```typescript
+// 错误项数据结构
+{
+  statusCode: number;    // HTTP状态码（429, 500等）
+  name: string;          // 错误名称（Rate Limit, Internal Error等）
+  count: number;         // 错误次数
+  percentage: string;    // 百分比（"45%"）
+  change: string;        // 变化趋势（"+12%"）
+}
+
+// 显示规则
+- 状态码使用红色徽章
+- 错误次数使用千位分隔符
+- 百分比进度条显示占比
+- 错误趋势显示增减百分比
+- 4xx错误显示黄色
+- 5xx错误显示红色
+```
+
+**常见错误码说明**：
+- **429 Rate Limit**：超过速率限制
+- **500 Internal Error**：内部服务器错误
+- **401 Unauthorized**：未授权访问
+- **400 Bad Request**：请求参数错误
+- **503 Service Unavailable**：服务不可用
+- **504 Gateway Timeout**：网关超时
 
 ---
 
@@ -789,12 +871,73 @@ Authorization: Bearer <JWT_TOKEN>
 
 ## 业务规则说明
 
+### 图表配置规范
+
+**颜色定义**：
+```typescript
+const COLORS = {
+  primary: '#3b82f6',      // 蓝色 - 主要数据
+  secondary: '#8b5cf6',    // 紫色 - 次要数据
+  success: '#10b981',      // 绿色 - 成功/正向指标
+  warning: '#f59e0b',      // 橙色 - 警告
+  danger: '#ef4444',       // 红色 - 错误/失败
+  gray: '#6b7280'          // 灰色 - 其他
+};
+
+// 模型分布颜色
+const MODEL_COLORS = {
+  'GPT-4': '#3b82f6',
+  'GPT-4 Turbo': '#8b5cf6',
+  'GPT-3.5 Turbo': '#10b981',
+  'Claude 3': '#f59e0b'
+};
+```
+
+**图表类型使用场景**：
+- **AreaChart（面积图）**：API调用趋势，显示总量和成功/失败堆叠
+- **BarChart（柱状图）**：令牌使用，显示输入/输出对比
+- **LineChart（折线图）**：响应时间分析，显示平均值、P95、P99
+- **PieChart（饼图）**：模型使用分布，显示占比
+- **进度条**：应用使用分布，显示百分比
+
+**图表通用配置**：
+```typescript
+{
+  // 响应式容器
+  width: '100%',
+  height: 350,  // API调用趋势、令牌使用、响应时间
+  height: 200,  // 饼图
+
+  // 网格线
+  strokeDasharray: '3 3',
+  stroke: '#374151',
+
+  // 坐标轴
+  axisStroke: '#9ca3af',
+
+  // 工具提示
+  tooltip: {
+    backgroundColor: '#1f2937',
+    border: '1px solid #374151',
+    borderRadius: '8px',
+    color: '#fff'
+  },
+
+  // 暗色主题适配
+  darkMode: true
+}
+```
+
+---
+
 ### 时间范围
 
 - **24hours**：最近24小时，按小时聚合
 - **7days**：最近7天，按天聚合
 - **30days**：最近30天，按天聚合
 - **90days**：最近90天，按周聚合
+
+---
 
 ### 数据更新频率
 

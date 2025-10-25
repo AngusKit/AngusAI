@@ -908,6 +908,227 @@ Authorization: Bearer <JWT_TOKEN>
 
 ---
 
+## 查询支付状态
+
+**接口路径**：`GET /api/v1/billing/payments/:orderId/status`  
+**接口说明**：查询支付订单状态（用于轮询）
+
+### 请求头
+
+```http
+Authorization: Bearer <JWT_TOKEN>
+```
+
+### 路径参数
+
+```typescript
+{
+  orderId: string; // 订单ID
+}
+```
+
+### 响应数据
+
+```typescript
+{
+  code: 200,
+  msg: "success",
+  data: {
+    orderId: string;
+    status: 'pending' | 'processing' | 'success' | 'failed' | 'timeout';
+    amount: number;
+    currency: string;
+    paymentMethod: 'visa' | 'alipay' | 'wechat';
+    
+    // 支付宝/微信特有
+    qrCodeUrl?: string;        // 二维码URL
+    expiresAt?: number;        // 二维码过期时间
+    remainingSeconds?: number; // 剩余秒数
+    
+    // 支付完成信息
+    paidAt?: number;
+    transactionId?: string;
+    
+    // 失败信息
+    failureReason?: string;
+  },
+  datetime: 1706889600000
+}
+```
+
+**Figma对应**：
+
+- 支付弹窗中的状态显示
+- 二维码倒计时
+- 支付结果反馈
+
+### 业务规则
+
+1. 二维码支付需要客户端轮询此接口（建议2秒一次）
+2. 二维码有效期5分钟（300秒）
+3. 超时后返回timeout状态
+4. 支付成功后停止轮询
+
+---
+
+## 支付状态流转
+
+**支付状态机**：
+
+```
+                   创建支付订单
+                        ↓
+idle（空闲） → processing（处理中）
+                        ↓
+              ┌─────────┴─────────┐
+              ↓                   ↓
+    verifying（等待确认）    failed（失败）
+    （支付宝/微信二维码）          ↓
+              ↓                 可重试
+              ↓
+        ┌─────┴─────┐
+        ↓           ↓
+    success     timeout
+    （成功）    （超时）
+        ↓           ↓
+      完成        可重试
+```
+
+**各状态说明**：
+- **idle**：初始状态，未开始支付
+- **processing**：信用卡支付处理中（与银行通讯）
+- **verifying**：等待用户扫码支付（支付宝/微信）
+- **success**：支付成功
+- **failed**：支付失败（可重试）
+- **timeout**：二维码过期（可重试）
+
+---
+
+## 支付表单验证规则
+
+### 信用卡验证
+
+```typescript
+// 卡号验证
+- 必填
+- 13-19位数字
+- 支持Luhn算法校验
+- 示例：4242 4242 4242 4242
+
+// 持卡人姓名验证
+- 必填
+- 至少2个字符
+- 支持字母和空格
+- 示例：ZHANG SAN
+
+// 有效期验证
+- 必填
+- 格式：MM/YY
+- 月份：01-12
+- 年份：当前年份或未来
+- 示例：12/25
+
+// CVV验证
+- 必填
+- 3-4位数字
+- 不存储，仅用于本次交易
+- 示例：123
+```
+
+**表单错误提示**：
+```typescript
+{
+  cardNumber: "请输入有效的卡号",
+  cardName: "姓名至少2个字符",
+  expiry: "格式：MM/YY",
+  cvv: "请输入3-4位数字"
+}
+```
+
+---
+
+## 二维码支付详细流程
+
+### 1. 发起支付（支付宝/微信）
+
+**请求**：
+```http
+POST /api/v1/billing/subscriptions
+Content-Type: application/json
+
+{
+  "planId": "enterprise",
+  "billingCycle": "monthly",
+  "paymentMethodId": "alipay"
+}
+```
+
+**响应**：
+```json
+{
+  "code": 201,
+  "data": {
+    "subscriptionId": 123,
+    "status": "pending_payment",
+    "payment": {
+      "orderId": "ORDER-1706889600000",
+      "amount": 299,
+      "currency": "CNY",
+      "qrCodeUrl": "https://api.example.com/qr/alipay?order=...",
+      "expiresAt": 1706890200000,  // 当前时间+5分钟
+      "remainingSeconds": 300
+    }
+  }
+}
+```
+
+### 2. 客户端轮询（每2秒）
+
+```typescript
+// 前端轮询逻辑
+const pollingIntervalRef = setInterval(() => {
+  fetch(`/api/v1/billing/payments/${orderId}/status`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.data.status === 'success') {
+        clearInterval(pollingIntervalRef);
+        handlePaymentSuccess();
+      }
+    });
+}, 2000);
+
+// 倒计时逻辑
+const countdownIntervalRef = setInterval(() => {
+  setCountdown(prev => {
+    if (prev <= 1) {
+      clearInterval(countdownIntervalRef);
+      clearInterval(pollingIntervalRef);
+      handleTimeout();
+      return 0;
+    }
+    return prev - 1;
+  });
+}, 1000);
+```
+
+### 3. 用户扫码支付
+
+用户使用支付宝/微信APP扫描二维码，完成支付
+
+### 4. 支付平台回调
+
+支付平台通过webhook通知系统支付结果
+
+### 5. 返回支付成功
+
+客户端轮询获取到success状态，显示支付成功
+
+### 6. 超时处理
+
+5分钟内未完成支付，状态变为timeout，用户可重新发起支付
+
+---
+
 ## 业务规则说明
 
 ### 订阅状态流转
@@ -920,9 +1141,35 @@ trial（试用） → active（激活） → past_due（逾期） → canceled�
 
 ### 计费周期
 
-- **月付（monthly）**：每月1号扣费
-- **季付（quarterly）**：每季度1号扣费，节省10%
-- **年付（yearly）**：每年1号扣费，节省20%
+- **月付（monthly）**：每月1号扣费，灵活性高
+- **季付（quarterly）**：每季度1号扣费，9折优惠（节省10%）
+- **年付（yearly）**：每年1号扣费，8折优惠（节省20%）
+
+**折扣计算逻辑**：
+```typescript
+// 计费周期配置
+const billingCycleConfig = {
+  monthly: { months: 1, discount: 0, label: '按月' },
+  quarterly: { months: 3, discount: 0.1, label: '按季度' },  // 9折
+  yearly: { months: 12, discount: 0.2, label: '按年' }      // 8折
+};
+
+// 价格计算公式
+const calculatePrice = (monthlyPrice, cycle) => {
+  const config = billingCycleConfig[cycle];
+  const totalMonths = config.months;
+  const basePrice = monthlyPrice * totalMonths;
+  const discountedPrice = basePrice * (1 - config.discount);
+  return Math.round(discountedPrice);
+};
+
+// 示例：企业版299元/月
+// 月付：299元
+// 季付：299 × 3 × 0.9 = 807元（节省90元）
+// 年付：299 × 12 × 0.8 = 2870元（节省718元）
+```
+
+---
 
 ### 升级/降级规则
 
