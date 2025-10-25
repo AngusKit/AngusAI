@@ -48,3 +48,5 @@ build/
 nbbuild/
 nbdist/
 .nb-gradle/
+/.github/
+/.vscode/

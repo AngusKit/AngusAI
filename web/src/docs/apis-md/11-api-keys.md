@@ -425,6 +425,61 @@ Authorization: Bearer <JWT_TOKEN>
 
 ---
 
+## 撤销密钥
+
+**接口路径**：`POST /api/v1/api-keys/:id/revoke`  
+**接口说明**：撤销API密钥（将状态设为inactive）
+
+### 请求头
+
+```http
+Authorization: Bearer <JWT_TOKEN>
+```
+
+### 路径参数
+
+```typescript
+{
+  id: number; // 密钥ID
+}
+```
+
+### 请求参数
+
+```typescript
+{
+  reason?: string;           // 可选|撤销原因
+}
+```
+
+**Figma对应**：
+
+- 密钥操作下拉菜单中的"撤销密钥"选项
+
+### 响应数据
+
+```typescript
+{
+  code: 200,
+  msg: "密钥已撤销",
+  data: {
+    id: number;
+    status: 'inactive';
+    revokedAt: number;
+    reason?: string;
+  },
+  datetime: 1706889600000
+}
+```
+
+### 业务规则
+
+1. 撤销后密钥状态变为inactive
+2. 可以重新启用已撤销的密钥
+3. 记录撤销时间和原因
+
+---
+
 ## 刷新密钥
 
 **接口路径**：`POST /api/v1/api-keys/:id/refresh`  
@@ -819,15 +874,49 @@ sk-[40位随机字符]
 ### 资源授权
 
 ```typescript
+### 资源授权
+
+```typescript
+// 资源类型定义
+type ResourceType = 
+  | 'application'  // 应用
+  | 'workflow'     // 工作流
+  | 'dataset'      // 数据集
+  | 'knowledge'    // 知识库
+  | 'plugin'       // 插件
+  | 'model';       // 模型
+
+// 授权所有应用
 {
   type: 'application',
   ids: []                    // 空数组 = 所有应用
 }
 
+// 授权指定工作流
 {
   type: 'workflow',
   ids: [1, 2, 3]            // 指定ID = 仅这3个工作流
 }
+
+// 完整授权资源示例
+authorizedResources: [
+  { type: 'application', ids: [] },        // 所有应用
+  { type: 'workflow', ids: [1, 2] },       // 工作流1和2
+  { type: 'dataset', ids: [] },            // 所有数据集
+  { type: 'knowledge', ids: [5] },         // 知识库5
+  { type: 'plugin', ids: [] },             // 所有插件
+  { type: 'model', ids: [] }               // 所有模型
+]
+```
+
+**资源选择UI规则**：
+- 未选择任何资源类型 = 该密钥无任何资源访问权限
+- 选择资源类型但ids为空数组 = 该类型的所有资源
+- 选择资源类型且ids有值 = 仅指定的资源
+- 支持全选/取消全选功能
+- 至少需要选择一种资源类型才能创建密钥
+
+---
 ```
 
 ### 速率限制
