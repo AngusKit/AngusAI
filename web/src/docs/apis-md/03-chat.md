@@ -14,9 +14,19 @@
 - [流式响应](#流式响应)
 - [获取消息历史](#获取消息历史)
 - [上传附件](#上传附件)
+- [删除附件](#删除附件)
 - [应用提示词](#应用提示词)
 - [切换应用](#切换应用)
 - [切换模型](#切换模型)
+- [停止生成](#停止生成)
+- [重新生成](#重新生成)
+- [消息反馈](#消息反馈)
+- [导出会话](#导出会话)
+- [清空当前对话](#清空当前对话)
+- [收藏/取消收藏会话](#收藏取消收藏会话)
+- [批量删除会话](#批量删除会话)
+- [语音输入](#语音输入)
+- [获取对话统计](#获取对话统计)
 
 ---
 
@@ -43,6 +53,8 @@ Authorization: Bearer <JWT_TOKEN>
   orderBy?: 'createdDate' | 'lastModifiedDate' | 'messageCount';
   orderSort?: 'asc' | 'desc';
   isArchived?: boolean;       // 是否已归档
+  isStarred?: boolean;        // 是否已收藏（星标）
+  isPinned?: boolean;         // 是否已置顶
 }
 ```
 
@@ -77,6 +89,7 @@ Authorization: Bearer <JWT_TOKEN>
         messageCount: number;    // 消息总数
         isArchived: boolean;     // 是否归档
         isPinned: boolean;       // 是否置顶
+        isStarred: boolean;      // 是否收藏（前端使用星标功能）
 
         createdDate: Date
         lastModifiedDate: Date;
@@ -139,12 +152,15 @@ Authorization: Bearer <JWT_TOKEN>
       temperature?: number;
       maxTokens?: number;
       topP?: number;
-      systemPrompt?: string;  // 系统提示词
+      frequencyPenalty?: number;  // 频率惩罚 0-2
+      presencePenalty?: number;   // 存在惩罚 0-2
+      systemPrompt?: string;      // 系统提示词
     };
 
     messageCount: number;
     isArchived: boolean;
     isPinned: boolean;
+    isStarred: boolean;      // 是否收藏
 
     createdDate: Date
     lastModifiedDate: Date;
@@ -180,7 +196,11 @@ Authorization: Bearer <JWT_TOKEN>
     temperature?: number;    // 温度参数 0-2
     maxTokens?: number;      // 最大令牌数
     topP?: number;           // 0-1
+    frequencyPenalty?: number;  // 频率惩罚 0-2
+    presencePenalty?: number;   // 存在惩罚 0-2
     systemPrompt?: string;   // 系统提示词
+    streamResponse?: boolean;  // 是否启用流式响应
+    saveHistory?: boolean;     // 是否保存历史记录
   };
 }
 ```
@@ -246,9 +266,14 @@ Authorization: Bearer <JWT_TOKEN>
     temperature?: number;
     maxTokens?: number;
     topP?: number;
+    frequencyPenalty?: number;
+    presencePenalty?: number;
     systemPrompt?: string;
+    streamResponse?: boolean;
+    saveHistory?: boolean;
   };
   isPinned?: boolean;        // 置顶
+  isStarred?: boolean;       // 收藏（星标）
   isArchived?: boolean;      // 归档
 }
 ```
@@ -884,6 +909,57 @@ Authorization: Bearer <JWT_TOKEN>
 
 ---
 
+## 消息反馈
+
+**接口路径**：`POST /api/v1/chat/sessions/:sessionId/messages/:messageId/feedback`  
+**接口说明**：对AI消息进行反馈（点赞/点踩）
+
+### 请求头
+
+```http
+Authorization: Bearer <JWT_TOKEN>
+```
+
+### 路径参数
+
+```typescript
+{
+  sessionId: number;  // 会话ID
+  messageId: number;  // 消息ID（必须是assistant消息）
+}
+```
+
+### 请求参数
+
+```typescript
+{
+  feedbackType: 'like' | 'dislike';  // 反馈类型
+  comment?: string;                   // 可选|反馈说明
+}
+```
+
+### 响应数据
+
+```typescript
+{
+  code: 200,
+  msg: "反馈已提交",
+  data: {
+    messageId: number;
+    feedbackType: 'like' | 'dislike';
+    submittedAt: number;
+  },
+  datetime: 1706889600000
+}
+```
+
+**Figma对应**：
+
+- AI消息下方的点赞/点踩按钮
+- 反馈后按钮状态变化
+
+---
+
 ## 导出会话
 
 **接口路径**：`GET /api/v1/chat/sessions/:sessionId/export`  
@@ -986,6 +1062,93 @@ Authorization: Bearer <JWT_TOKEN>
 
 ---
 
+## 清空当前对话
+
+**接口路径**：`DELETE /api/v1/chat/sessions/:sessionId/messages`  
+**接口说明**：清空指定会话的所有消息
+
+### 请求头
+
+```http
+Authorization: Bearer <JWT_TOKEN>
+```
+
+### 路径参数
+
+```typescript
+{
+  sessionId: number; // 会话ID
+}
+```
+
+### 响应数据
+
+```typescript
+{
+  code: 200,
+  msg: "对话已清空",
+  data: {
+    sessionId: number;
+    clearedCount: number;  // 清空的消息数量
+  },
+  datetime: 1706889600000
+}
+```
+
+**Figma对应**：
+
+- 更多菜单中的"清空当前对话"选项
+
+---
+
+## 收藏/取消收藏会话
+
+**接口路径**：`PATCH /api/v1/chat/sessions/:sessionId/star`  
+**接口说明**：收藏或取消收藏会话（前端显示为星标）
+
+### 请求头
+
+```http
+Authorization: Bearer <JWT_TOKEN>
+```
+
+### 路径参数
+
+```typescript
+{
+  sessionId: number; // 会话ID
+}
+```
+
+### 请求参数
+
+```typescript
+{
+  isStarred: boolean;  // true=收藏，false=取消收藏
+}
+```
+
+### 响应数据
+
+```typescript
+{
+  code: 200,
+  msg: "操作成功",
+  data: {
+    sessionId: number;
+    isStarred: boolean;
+  },
+  datetime: 1706889600000
+}
+```
+
+**Figma对应**：
+
+- 会话列表中的星标图标
+- 会话操作菜单中的"收藏/取消收藏"
+
+---
+
 ## 批量删除会话
 
 **接口路径**：`POST /api/v1/chat/sessions/batch-delete`  
@@ -1068,9 +1231,12 @@ Content-Type: multipart/form-data
 ### 会话管理
 
 - 每个用户最多1000个会话
-- 会话标题自动从首条消息生成
-- 支持置顶、归档功能
+- 会话标题自动从首条消息生成（默认"新对话"）
+- 支持置顶、归档、收藏（星标）功能
 - 删除后保留30天可恢复
+- 会话按时间分组：今天、昨天、最近7天、更早
+- 支持搜索会话标题和内容
+- 支持重命名会话
 
 ### 消息发送
 
@@ -1115,6 +1281,71 @@ Content-Type: multipart/form-data
 | 40307  | 模型不可用     |
 | 40308  | 生成超时       |
 | 40309  | 内容违规       |
+
+---
+
+**前端特性说明**：
+
+### 主题外观
+
+前端支持4种对话界面主题模板：
+1. **现代蓝** (modern-blue)：专业清新的蓝色主题
+2. **简约灰** (minimal-gray)：简洁优雅的灰色主题
+3. **优雅紫** (elegant-purple)：高雅精致的紫色主题
+4. **温暖橙** (warm-orange)：活力温馨的橙色主题
+
+每个主题包含：
+- primaryColor：主色调（按钮、高亮）
+- secondaryColor：次要背景色
+- accentColor：边框颜色
+- hoverColor：悬停效果色
+
+主题选择存储在前端本地，不需要后端API支持。
+
+### 消息格式化
+
+前端支持的Markdown格式：
+- **粗体**：`**文本**`
+- *斜体*：`*文本*`
+- 行内代码：`` `代码` ``
+- 代码块：` ```语言\n代码\n``` `
+- 链接：`[文本](URL)`
+- 无序列表：`- 项目`
+
+### 侧边栏功能
+
+- 可折叠侧边栏（保留最小宽度显示图标）
+- 会话列表支持搜索和时间分组
+- 支持拖拽重命名会话
+- 收藏的会话显示星标图标
+- 悬停显示会话操作菜单
+- 显示会话消息数量
+
+### 顶部工具栏
+
+- 应用切换器：快速切换不同应用
+- 模型切换器：切换AI模型
+- 提示词库按钮：快速访问提示词
+- 外观设置（主题选择）：4种主题模板
+- 对话设置：温度、Token等参数配置
+- 全屏模式：进入/退出全屏显示
+- 更多操作：导出对话、分享对话、清空对话
+
+### 输入框功能
+
+- 自动调整高度（最小80px，最大240px）
+- Shift + Enter 换行，Enter 发送
+- 支持附件预览和移除
+- 语音录音指示器
+- 发送按钮禁用状态（无内容且无附件时）
+
+### 消息交互
+
+- 用户消息右对齐，AI消息左对齐
+- 支持复制、点赞/点踩、重新生成
+- 流式响应显示打字机效果和加载动画
+- 代码块支持语法高亮和复制
+- 附件支持预览和下载
 
 ---
 
