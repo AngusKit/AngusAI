@@ -129,21 +129,6 @@ public class DatasetQueryImpl implements DatasetQuery {
   }
 
   @Override
-  public Page<Dataset> findDatasetsWithDataSources(PageRequest pageable) {
-    return datasetRepo.findDatasetsWithDataSources(pageable);
-  }
-
-  @Override
-  public Page<Dataset> findDatasetsWithoutDataSources(PageRequest pageable) {
-    return datasetRepo.findDatasetsWithoutDataSources(pageable);
-  }
-
-  @Override
-  public Page<Dataset> findDatasetsNeedingSync(PageRequest pageable) {
-    return datasetRepo.findDatasetsNeedingSync(pageable);
-  }
-
-  @Override
   public Page<Dataset> findFailedDatasets(PageRequest pageable) {
     return datasetRepo.findFailedDatasets(pageable);
   }

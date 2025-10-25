@@ -11,19 +11,14 @@ import cloud.xcan.angus.core.ai.interfaces.dataset.facade.DatasetFacade;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetFindDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetUpdateDto;
-import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DataSourceCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DataUploadDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.BatchDeleteDto;
-import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.ConnectionTestDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.internal.assembler.DatasetAssembler;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetListVo;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetStatisticsVo;
-import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DataSourceListVo;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DataPreviewVo;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.UploadResultVo;
-import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.SyncResultVo;
-import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.ConnectionTestVo;
 import cloud.xcan.angus.core.biz.NameJoin;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.PageResult;
@@ -91,35 +86,6 @@ public class DatasetFacadeImpl implements DatasetFacade {
   }
 
   @Override
-  public DatasetDetailVo addDataSource(Long id, DataSourceCreateDto dto) {
-    Dataset saved = datasetCmd.addDataSource(id, dto);
-    return DatasetAssembler.toDetailVo(saved);
-  }
-
-  @Override
-  public PageResult<DataSourceListVo> getDataSources(Long id, Integer pageNo, Integer pageSize, String sourceType, String status) {
-    // 这里应该调用数据源查询服务
-    // 暂时返回模拟数据
-    PageResult<DataSourceListVo> result = new PageResult<>();
-    // TODO: 实现数据源查询逻辑
-    return result;
-  }
-
-  @Override
-  public SyncResultVo syncDataSource(Long datasetId, Long sourceId) {
-    // 这里应该调用数据同步服务
-    // 暂时返回模拟数据
-    SyncResultVo result = new SyncResultVo();
-    // TODO: 实现数据同步逻辑
-    return result;
-  }
-
-  @Override
-  public void deleteDataSource(Long datasetId, Long sourceId) {
-    datasetCmd.deleteDataSource(datasetId, sourceId);
-  }
-
-  @Override
   public DataPreviewVo previewData(Long id, Integer pageNo, Integer pageSize, Long sourceId) {
     // 这里应该调用数据预览服务
     // 暂时返回模拟数据
@@ -142,15 +108,6 @@ public class DatasetFacadeImpl implements DatasetFacade {
     DatasetStatisticsVo statistics = new DatasetStatisticsVo();
     // TODO: 实现统计逻辑
     return statistics;
-  }
-
-  @Override
-  public ConnectionTestVo testConnection(ConnectionTestDto dto) {
-    // 这里应该调用连接测试服务
-    // 暂时返回模拟数据
-    ConnectionTestVo result = new ConnectionTestVo();
-    // TODO: 实现连接测试逻辑
-    return result;
   }
 
   @Override

@@ -6,7 +6,6 @@ import cloud.xcan.angus.core.ai.domain.dataset.Dataset;
 import cloud.xcan.angus.core.ai.domain.dataset.DatasetConfig;
 import cloud.xcan.angus.core.ai.domain.dataset.DatasetRepo;
 import cloud.xcan.angus.core.ai.domain.dataset.DatasetStatus;
-import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DataSourceCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DataUploadDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.BatchDeleteDto;
 import cloud.xcan.angus.core.biz.Biz;
@@ -118,39 +117,6 @@ public class DatasetCmdImpl extends CommCmd<Dataset, Long> implements DatasetCmd
   }
 
   @Override
-  public Dataset addDataSource(Long id, DataSourceCreateDto dto) {
-    return new BizTemplate<Dataset>() {
-      Dataset datasetDb;
-
-      @Override
-      protected void checkParams() {
-        // 获取数据集并验证是否存在
-        datasetDb = datasetQuery.findById(id);
-        if (datasetDb == null) {
-          throw ResourceNotFound.of("数据集不存在", new Object[]{});
-        }
-      }
-
-      @Override
-      protected Dataset process() {
-        // TODO: 实现添加数据源逻辑
-        return datasetDb;
-      }
-    }.execute();
-  }
-
-  @Override
-  public void deleteDataSource(Long datasetId, Long sourceId) {
-    new BizTemplate<Void>() {
-      @Override
-      protected Void process() {
-        // TODO: 实现删除数据源逻辑
-        return null;
-      }
-    }.execute();
-  }
-
-  @Override
   public Dataset uploadData(Long id, DataUploadDto dto) {
     return new BizTemplate<Dataset>() {
       Dataset datasetDb;
@@ -167,28 +133,6 @@ public class DatasetCmdImpl extends CommCmd<Dataset, Long> implements DatasetCmd
       @Override
       protected Dataset process() {
         // TODO: 实现数据上传逻辑
-        return datasetDb;
-      }
-    }.execute();
-  }
-
-  @Override
-  public Dataset syncDataSource(Long datasetId, Long sourceId) {
-    return new BizTemplate<Dataset>() {
-      Dataset datasetDb;
-
-      @Override
-      protected void checkParams() {
-        // 获取数据集并验证是否存在
-        datasetDb = datasetQuery.findById(datasetId);
-        if (datasetDb == null) {
-          throw ResourceNotFound.of("数据集不存在", new Object[]{});
-        }
-      }
-
-      @Override
-      protected Dataset process() {
-        // TODO: 实现数据源同步逻辑
         return datasetDb;
       }
     }.execute();
@@ -234,17 +178,6 @@ public class DatasetCmdImpl extends CommCmd<Dataset, Long> implements DatasetCmd
       protected Dataset process() {
         // TODO: 实现批量删除数据逻辑
         return datasetDb;
-      }
-    }.execute();
-  }
-
-  @Override
-  public boolean testDataSourceConnection(DataSourceCreateDto dto) {
-    return new BizTemplate<Boolean>() {
-      @Override
-      protected Boolean process() {
-        // TODO: 实现数据源连接测试逻辑
-        return true;
       }
     }.execute();
   }
