@@ -9,24 +9,21 @@ import cloud.xcan.angus.core.ai.domain.application.Application;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationConfig;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationRepo;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
-import cloud.xcan.angus.core.biz.Biz;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
 import cloud.xcan.angus.core.utils.CoreUtils;
 import cloud.xcan.angus.remote.message.http.ResourceExisted;
-import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import cloud.xcan.angus.spec.annotations.DoInFuture;
 import cloud.xcan.angus.spec.utils.ObjectUtils;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 @DoInFuture("添加权限校验")
-@Component
-@Biz
+@Service
 public class ApplicationCmdImpl extends CommCmd<Application, Long> implements ApplicationCmd {
 
   @Resource
@@ -59,27 +56,24 @@ public class ApplicationCmdImpl extends CommCmd<Application, Long> implements Ap
   @Transactional
   public Application duplicate(Long sourceId, String name) {
     return new BizTemplate<Application>() {
-      Application sourceApplication;
+      Application applicationDb;
 
       @Override
       protected void checkParams() {
         // 获取源应用并检查是否存在
-        sourceApplication = applicationQuery.findById(sourceId);
-        if (sourceApplication == null) {
-          throw ResourceNotFound.of("应用不存在，应用可能已被删除", new Object[]{});
-        }
+        applicationDb = applicationQuery.findAndCheck(sourceId);
       }
 
       @Override
       protected Application process() {
         // 复制源应用的配置
-        String newName = StringUtils.hasText(name) ? name : sourceApplication.getName() + "-Copy";
+        String newName = StringUtils.hasText(name) ? name : applicationDb.getName() + "-Copy";
         // 检查新名称是否已存在
         if (applicationQuery.existsByName(newName)) {
           newName = newName + "-" + RandomStringUtils.randomAlphabetic(5);
         }
 
-        Application newApplication = toDuplicateApplication(newName, sourceApplication);
+        Application newApplication = toDuplicateApplication(newName, applicationDb);
         return applicationRepo.save(newApplication);
       }
     }.execute();
@@ -93,11 +87,8 @@ public class ApplicationCmdImpl extends CommCmd<Application, Long> implements Ap
 
       @Override
       protected void checkParams() {
-        // 获取应用并验证是否存在
-        applicationDb = applicationQuery.findById(application.getId());
-        if (applicationDb == null) {
-          throw ResourceNotFound.of("应用不存在", new Object[]{});
-        }
+        // 获取源应用并检查是否存在
+        applicationDb = applicationQuery.findAndCheck(application.getId());
 
         // 检查名称是否已存在（排除当前应用）
         if (ObjectUtils.isNotEmpty(application.getName())
@@ -123,11 +114,8 @@ public class ApplicationCmdImpl extends CommCmd<Application, Long> implements Ap
 
       @Override
       protected void checkParams() {
-        // 获取应用并验证是否存在
-        applicationDb = applicationQuery.findById(id);
-        if (applicationDb == null) {
-          throw ResourceNotFound.of("应用不存在", new Object[]{});
-        }
+        // 获取源应用并检查是否存在
+        applicationDb = applicationQuery.findAndCheck(id);
       }
 
       @Override
@@ -145,11 +133,8 @@ public class ApplicationCmdImpl extends CommCmd<Application, Long> implements Ap
 
       @Override
       protected void checkParams() {
-        // 获取应用并验证是否存在
-        applicationDb = applicationQuery.findById(id);
-        if (applicationDb == null) {
-          throw ResourceNotFound.of("应用不存在", new Object[]{});
-        }
+        // 获取源应用并检查是否存在
+        applicationDb = applicationQuery.findAndCheck(id);
       }
 
       @Override
@@ -168,11 +153,8 @@ public class ApplicationCmdImpl extends CommCmd<Application, Long> implements Ap
 
       @Override
       protected void checkParams() {
-        // 获取应用并验证是否存在
-        applicationDb = applicationQuery.findById(application.getId());
-        if (applicationDb == null) {
-          throw ResourceNotFound.of("应用不存在", new Object[]{});
-        }
+        // 获取源应用并检查是否存在
+        applicationDb = applicationQuery.findAndCheck(application.getId());
       }
 
       @Override

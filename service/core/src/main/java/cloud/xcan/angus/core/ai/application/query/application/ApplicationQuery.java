@@ -9,15 +9,15 @@ import org.springframework.data.domain.PageRequest;
 public interface ApplicationQuery {
 
   /**
+   * 查询应用并检查是否存在
+   */
+  Application findAndCheck(Long id);
+
+  /**
    * 查询应用列表
    */
   Page<Application> find(GenericSpecification<Application> spec, PageRequest pageable,
       boolean fullTextSearch, String[] match);
-
-  /**
-   * 根据ID查询应用
-   */
-  Application findById(Long id);
 
   /**
    * 根据分享ID查询应用
@@ -73,4 +73,5 @@ public interface ApplicationQuery {
    * 根据工作流ID查询关联的应用
    */
   Page<Application> findByWorkflowId(Long workflowId, PageRequest pageable);
+
 }

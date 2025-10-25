@@ -17,7 +17,7 @@ public class ApplicationShareDto {
   @Schema(description = "授权访问：只有授权用户才可访问")
   private boolean authorizationRequired = true;
 
-  @Min(value = 0, message = "有效期不能小于0")
+  @Min(value = 0)
   @Schema(description = "有效期（小时），0表示永久", example = "24")
   private int expiresIn = 0;
 

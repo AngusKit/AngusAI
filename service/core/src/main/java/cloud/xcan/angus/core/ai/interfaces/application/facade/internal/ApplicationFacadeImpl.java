@@ -81,7 +81,7 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
   @NameJoin
   @Override
   public ApplicationDetailVo getDetail(Long id) {
-    Application application = applicationQuery.findById(id);
+    Application application = applicationQuery.findAndCheck(id);
     return ApplicationAssembler.toDetailVo(application);
   }
 

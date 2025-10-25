@@ -22,18 +22,19 @@ import cloud.xcan.angus.remote.search.SearchCriteria;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Set;
-import org.springframework.util.StringUtils;
 
 public class ApplicationAssembler {
 
   public static Application toDomain(ApplicationCreateDto dto) {
-    return new Application()
+    Application application = new Application()
         .setName(dto.getName())
         .setIcon(dto.getIcon())
         .setDescription(dto.getDescription())
         .setCategory(dto.getCategory())
-        .setStatus(ApplicationStatus.DRAFT)
-        .setLanguage(dto.getLanguage())
+        .setLanguage(dto.getLanguage());
+
+    // 设置默认值
+    application.setStatus(ApplicationStatus.DRAFT)
         .setApiCalls(0L)
         .setTotalTokens(0L)
         .setAvgResponseTime(0.0)
@@ -41,26 +42,17 @@ public class ApplicationAssembler {
         .setPublicAccess(false)
         .setEmbedEnabled(false)
         .setApiEnabled(false);
+    return application;
   }
 
   public static Application updateDomain(Long id, ApplicationUpdateDto dto) {
     Application application = new Application();
     application.setId(id);
-    if (StringUtils.hasText(dto.getName())) {
-      application.setName(dto.getName());
-    }
-    if (StringUtils.hasText(dto.getIcon())) {
-      application.setIcon(dto.getIcon());
-    }
-    if (StringUtils.hasText(dto.getDescription())) {
-      application.setDescription(dto.getDescription());
-    }
-    if (dto.getCategory() != null) {
-      application.setCategory(dto.getCategory());
-    }
-    if (StringUtils.hasText(dto.getLanguage())) {
-      application.setLanguage(dto.getLanguage());
-    }
+    application.setName(dto.getName());
+    application.setIcon(dto.getIcon());
+    application.setDescription(dto.getDescription());
+    application.setCategory(dto.getCategory());
+    application.setLanguage(dto.getLanguage());
     return application;
   }
 
@@ -86,23 +78,29 @@ public class ApplicationAssembler {
     vo.setCategory(application.getCategory());
     vo.setStatus(application.getStatus());
     vo.setLanguage(application.getLanguage());
+    vo.setPublishedDate(application.getPublishedDate());
+
+    // 设置审计信息
     vo.setTenantId(application.getTenantId());
     vo.setCreatedBy(application.getCreatedBy());
     vo.setCreatedDate(application.getCreatedDate());
     vo.setLastModifiedBy(application.getLastModifiedBy());
     vo.setLastModifiedDate(application.getLastModifiedDate());
-    vo.setPublishedDate(application.getPublishedDate());
+
+    // 设置配置信息
     ApplicationConfigVo configVo = new ApplicationConfigVo();
     CoreUtils.copyProperties(application.getConfig(), configVo);
     Objects.requireNonNull(SpringContextHolder.getBean(JoinSupplier.class))
         .execute(() -> joinResourceName(configVo));
     vo.setConfig(configVo);
+    // 设置分享信息
     vo.setShare(CoreUtils.copyProperties(application.getShare(), new ApplicationShareVo()));
     ApplicationStatsVo statsVo = new ApplicationStatsVo();
     statsVo.setTotalApiCalls(application.getApiCalls());
     statsVo.setTotalTokens(application.getTotalTokens());
     statsVo.setAvgResponseTime(application.getAvgResponseTime());
     statsVo.setSuccessRate(application.getSuccessRate());
+    // 设置统计信息
     vo.setStats(statsVo);
     return vo;
   }
@@ -124,12 +122,14 @@ public class ApplicationAssembler {
     vo.setPublicAccess(application.getPublicAccess());
     vo.setEmbedEnabled(application.getEmbedEnabled());
     vo.setApiEnabled(application.getApiEnabled());
+    vo.setPublishedDate(application.getPublishedDate());
+
+    // 设置审计信息
     vo.setTenantId(application.getTenantId());
     vo.setCreatedBy(application.getCreatedBy());
     vo.setCreatedDate(application.getCreatedDate());
     vo.setLastModifiedBy(application.getLastModifiedBy());
     vo.setLastModifiedDate(application.getLastModifiedDate());
-    vo.setPublishedDate(application.getPublishedDate());
     return vo;
   }
 
@@ -137,7 +137,8 @@ public class ApplicationAssembler {
     // Build the final filters
     Set<SearchCriteria> filters = new SearchCriteriaBuilder<>(dto)
         .rangeSearchFields("id", "createdDate", "lastModifiedDate")
-        .orderByFields("id", "createdDate", "lastModifiedDate", "apiCalls", "name")
+        .orderByFields("id", "createdDate", "lastModifiedDate", "apiCalls", "category", "status",
+            "name")
         .matchSearchFields("name", "description")
         .inAndNotFields("category", "status", "createdBy")
         .build();

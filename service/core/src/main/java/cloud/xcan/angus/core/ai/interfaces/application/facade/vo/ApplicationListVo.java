@@ -2,14 +2,16 @@ package cloud.xcan.angus.core.ai.interfaces.application.facade.vo;
 
 import cloud.xcan.angus.core.ai.domain.application.ApplicationCategory;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
-import cloud.xcan.angus.remote.NameJoinField;
+import cloud.xcan.angus.remote.vo.TenantAuditingVo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Schema(description = "应用列表项")
-public class ApplicationListVo {
+public class ApplicationListVo extends TenantAuditingVo {
 
   @Schema(description = "应用ID")
   private Long id;
@@ -50,28 +52,7 @@ public class ApplicationListVo {
   @Schema(description = "API调用次数")
   private Long apiCalls;
 
-  @Schema(description = "租户ID")
-  private Long tenantId;
-
-  @Schema(description = "创建者ID")
-  private Long createdBy;
-
-  @Schema(description = "创建者姓名")
-  @NameJoinField(id = "createdBy", repository = "commonUserBaseRepo")
-  private String createdByName;
-
-  @Schema(description = "创建时间")
-  private LocalDateTime createdDate;
-
-  @Schema(description = "最后修改人ID")
-  protected Long lastModifiedBy;
-
-  @NameJoinField(id = "lastModifiedBy", repository = "commonUserBaseRepo")
-  private String lastModifiedByName;
-
-  @Schema(description = "最后修改时间")
-  private LocalDateTime lastModifiedDate;
-
   @Schema(description = "发布时间")
   private LocalDateTime publishedDate;
+
 }

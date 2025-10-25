@@ -34,17 +34,24 @@ public class ApplicationFindDto extends PageQuery {
   @Schema(description = "是否模板")
   private Boolean isTemplate;
 
-  @Schema(description = "创建者ID")
+  @Schema(description = "所属租户ID", example = "1")
+  private Long tenantId;
+
+  @Schema(description = "创建人ID", example = "1")
   private Long createdBy;
 
-  @Schema(description = "创建时间")
+  @Schema(description = "创建时间", example = "2024-10-12 00:00:00")
   private LocalDateTime createdDate;
 
-  @Schema(description = "最后修改人ID")
-  protected Long lastModifiedBy;
+  @Schema(description = "最后修改人ID", example = "1")
+  private Long lastModifiedBy;
 
-  @Schema(description = "最后修改时间")
+  @Schema(description = "最后修改时间", example = "2024-10-12 00:00:00")
   private LocalDateTime lastModifiedDate;
+
+  @Schema(description = "排序字段", example = "lastModifiedDate", allowableValues = {"createdDate",
+      "lastModifiedDate", "status", "category", "name"})
+  private String orderBy = "lastModifiedDate";
 
   @Override
   public String getDefaultOrderBy() {

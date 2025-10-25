@@ -1,5 +1,6 @@
 package cloud.xcan.angus.core.ai.domain.application;
 
+import cloud.xcan.angus.core.ai.domain.Constants;
 import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
 import cloud.xcan.angus.core.jpa.multitenancy.TenantListener;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
@@ -31,13 +32,13 @@ public class Application extends TenantAuditingEntity<Application, Long> {
   @Id
   private Long id;
 
-  @Column(name = "name", nullable = false, length = 50)
+  @Column(name = "name", nullable = false, length = Constants.APPLICATION_NAME_MAX_LENGTH)
   private String name;
 
   @Column(name = "icon", nullable = false)
   private String icon;
 
-  @Column(name = "description", length = 500)
+  @Column(name = "description", length = Constants.APPLICATION_DESCRIPTION_DB_LENGTH)
   private String description;
 
   @Enumerated(EnumType.STRING)
@@ -48,7 +49,7 @@ public class Application extends TenantAuditingEntity<Application, Long> {
   @Column(name = "status", nullable = false)
   private ApplicationStatus status;
 
-  @Column(name = "language", length = 20)
+  @Column(name = "language", length = Constants.APPLICATION_LANGUAGE_MAX_LENGTH)
   private String language;
 
   @Column(name = "published_date")

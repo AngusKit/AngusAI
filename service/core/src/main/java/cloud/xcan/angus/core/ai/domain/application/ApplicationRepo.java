@@ -13,32 +13,6 @@ import org.springframework.data.repository.query.Param;
 public interface ApplicationRepo extends BaseRepository<Application, Long> {
 
   /**
-   * 根据创建者查询应用列表
-   */
-  List<Application> findByCreatedByOrderByLastModifiedDateDesc(Long createdBy);
-
-  /**
-   * 根据状态查询应用列表
-   */
-  List<Application> findByStatusOrderByLastModifiedDateDesc(ApplicationStatus status);
-
-  /**
-   * 根据分类查询应用列表
-   */
-  List<Application> findByCategoryOrderByLastModifiedDateDesc(ApplicationCategory category);
-
-  /**
-   * 根据创建者和状态查询应用列表
-   */
-  List<Application> findByCreatedByAndStatusOrderByLastModifiedDateDesc(Long createdBy,
-      ApplicationStatus status);
-
-  /**
-   * 根据名称模糊查询
-   */
-  List<Application> findByNameContainingIgnoreCaseOrderByLastModifiedDateDesc(String name);
-
-  /**
    * 根据分享ID查询应用
    */
   Optional<Application> findByShareId(String shareId);
@@ -51,7 +25,7 @@ public interface ApplicationRepo extends BaseRepository<Application, Long> {
   /**
    * 检查应用名称是否已存在（排除指定ID）
    */
-  boolean existsByNameAndCreatedByAndIdNot(String name, Long createdBy, Long id);
+  boolean existsByNameAndIdNot(String name, Long id);
 
   /**
    * 统计用户的应用程序数量
@@ -62,16 +36,6 @@ public interface ApplicationRepo extends BaseRepository<Application, Long> {
    * 统计指定状态的应用数量
    */
   long countByStatus(ApplicationStatus status);
-
-  /**
-   * 根据模板ID查询应用列表
-   */
-  List<Application> findByTemplateIdOrderByCreatedDateDesc(Long templateId);
-
-  /**
-   * 查询公开应用列表
-   */
-  List<Application> findByPublicAccessTrueOrderByLastModifiedDateDesc();
 
   /**
    * 更新API调用次数
@@ -114,15 +78,5 @@ public interface ApplicationRepo extends BaseRepository<Application, Long> {
   @Modifying
   @Query("UPDATE Application a SET a.shareId = NULL, a.shareExpiresAt = NULL WHERE a.shareExpiresAt IS NOT NULL AND a.shareExpiresAt < :now")
   void clearExpiredShareLinks(@Param("now") LocalDateTime now);
-
-  /**
-   * 根据知识库ID查询关联的应用
-   */
-  List<Application> findByKnowledgeBaseId(Long knowledgeBaseId);
-
-  /**
-   * 根据数据集ID查询关联的应用
-   */
-  List<Application> findByDatasetId(Long datasetId);
 
 }

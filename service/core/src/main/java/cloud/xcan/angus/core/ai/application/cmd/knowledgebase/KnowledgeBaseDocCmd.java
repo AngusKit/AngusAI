@@ -1,0 +1,35 @@
+package cloud.xcan.angus.core.ai.application.cmd.knowledgebase;
+
+import cloud.xcan.angus.core.ai.domain.knowledgebase.KnowledgeBaseDoc;
+import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo.KnowledgeBaseDocListVo;
+import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
+
+public interface KnowledgeBaseDocCmd {
+
+  /**
+   * 上传文档
+   */
+  List<KnowledgeBaseDocListVo> uploadDocuments(Long knowledgeBaseId, MultipartFile[] files);
+
+  /**
+   * 切换文档状态
+   */
+  KnowledgeBaseDocListVo toggleDocument(Long knowledgeBaseId, Long documentId, Boolean enabled);
+
+  /**
+   * 重新处理文档
+   */
+  KnowledgeBaseDoc reprocessDocument(Long knowledgeBaseId, Long documentId);
+
+  /**
+   * 删除文档
+   */
+  void deleteDocument(Long knowledgeBaseId, Long documentId);
+
+  /**
+   * 批量删除文档
+   */
+  void batchDeleteDocuments(Long knowledgeBaseId, List<Long> documentIds);
+
+}
