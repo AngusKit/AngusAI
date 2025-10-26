@@ -1,6 +1,5 @@
 package cloud.xcan.angus.core.ai.application.cmd.chat;
 
-import cloud.xcan.angus.core.ai.domain.chat.Message;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRole;
 import cloud.xcan.angus.core.ai.domain.chat.MessageUsage;
 
@@ -41,6 +40,11 @@ public interface MessageCmd {
   void addFeedback(Long id, String feedbackType, String feedbackComment);
 
   /**
+   * 重新生成消息（删除原消息，创建新消息）
+   */
+  Long regenerateMessage(Long originalMessageId, String newContent);
+
+  /**
    * 删除消息
    */
   void delete(Long id);
@@ -54,9 +58,4 @@ public interface MessageCmd {
    * 删除会话的所有消息
    */
   void deleteBySessionId(Long sessionId);
-
-  /**
-   * 重新生成消息（删除原消息，创建新消息）
-   */
-  Long regenerateMessage(Long originalMessageId, String newContent);
 }

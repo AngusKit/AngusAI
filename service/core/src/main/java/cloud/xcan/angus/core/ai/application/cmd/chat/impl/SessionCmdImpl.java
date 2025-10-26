@@ -100,27 +100,6 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
 
   @Override
   @Transactional
-  public void delete(Long id) {
-    new BizTemplate<Void>() {
-      @Override
-      protected void checkParams() {
-        sessionRepo.findById(id)
-            .orElseThrow(() -> ResourceNotFound.of("会话不存在", new Object[]{}));
-      }
-
-      @Override
-      protected Void process() {
-        // 删除会话的所有消息
-        messageRepo.deleteBySessionId(id);
-        // 删除会话
-        sessionRepo.deleteById(id);
-        return null;
-      }
-    }.execute();
-  }
-
-  @Override
-  @Transactional
   public void switchApp(Long id, Long appId) {
     new BizTemplate<Void>() {
       Session session;
@@ -184,6 +163,61 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
 
   @Override
   @Transactional
+  public void updateLastMessage(Long sessionId, String content, MessageRole role) {
+    new BizTemplate<Void>() {
+      @Override
+      protected Void process() {
+        Session session = sessionRepo.findById(sessionId).orElse(null);
+        if (session != null) {
+          session.setLastMessageContent(content.length() > 200 ? content.substring(0, 200) : content);
+          session.setLastMessageRole(role);
+          session.setLastMessageTime(System.currentTimeMillis());
+          sessionRepo.save(session);
+        }
+        return null;
+      }
+    }.execute();
+  }
+
+  @Override
+  @Transactional
+  public void incrementMessageCount(Long sessionId) {
+    new BizTemplate<Void>() {
+      @Override
+      protected Void process() {
+        Session session = sessionRepo.findById(sessionId).orElse(null);
+        if (session != null) {
+          session.setMessageCount(session.getMessageCount() + 1);
+          sessionRepo.save(session);
+        }
+        return null;
+      }
+    }.execute();
+  }
+
+  @Override
+  @Transactional
+  public void delete(Long id) {
+    new BizTemplate<Void>() {
+      @Override
+      protected void checkParams() {
+        sessionRepo.findById(id)
+            .orElseThrow(() -> ResourceNotFound.of("会话不存在", new Object[]{}));
+      }
+
+      @Override
+      protected Void process() {
+        // 删除会话的所有消息
+        messageRepo.deleteBySessionId(id);
+        // 删除会话
+        sessionRepo.deleteById(id);
+        return null;
+      }
+    }.execute();
+  }
+
+  @Override
+  @Transactional
   public Integer clearMessages(Long id) {
     return new BizTemplate<Integer>() {
       Session session;
@@ -227,40 +261,6 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
           }
         }
         return count;
-      }
-    }.execute();
-  }
-
-  @Override
-  @Transactional
-  public void updateLastMessage(Long sessionId, String content, MessageRole role) {
-    new BizTemplate<Void>() {
-      @Override
-      protected Void process() {
-        Session session = sessionRepo.findById(sessionId).orElse(null);
-        if (session != null) {
-          session.setLastMessageContent(content.length() > 200 ? content.substring(0, 200) : content);
-          session.setLastMessageRole(role);
-          session.setLastMessageTime(System.currentTimeMillis());
-          sessionRepo.save(session);
-        }
-        return null;
-      }
-    }.execute();
-  }
-
-  @Override
-  @Transactional
-  public void incrementMessageCount(Long sessionId) {
-    new BizTemplate<Void>() {
-      @Override
-      protected Void process() {
-        Session session = sessionRepo.findById(sessionId).orElse(null);
-        if (session != null) {
-          session.setMessageCount(session.getMessageCount() + 1);
-          sessionRepo.save(session);
-        }
-        return null;
       }
     }.execute();
   }

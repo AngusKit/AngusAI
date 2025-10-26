@@ -51,35 +51,6 @@ public class SessionRest {
     return ApiLocaleResult.success(sessionFacade.updateSession(id, dto));
   }
 
-  @Operation(operationId = "deleteSession", summary = "删除会话", description = "删除指定会话")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "204", description = "删除成功")
-  })
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  @DeleteMapping("/{id}")
-  public void delete(@Parameter(description = "会话ID") @PathVariable Long id) {
-    sessionFacade.deleteSession(id);
-  }
-
-  @Operation(operationId = "getSessionDetail", summary = "获取会话详情", description = "获取指定会话的详细信息")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "会话详情获取成功"),
-      @ApiResponse(responseCode = "404", description = "会话不存在")
-  })
-  @GetMapping("/{id}")
-  public ApiLocaleResult<SessionDetailVo> getDetail(@Parameter(description = "会话ID") @PathVariable Long id) {
-    return ApiLocaleResult.success(sessionFacade.getSessionDetail(id));
-  }
-
-  @Operation(operationId = "getSessionList", summary = "获取会话列表", description = "获取用户的对话会话列表，支持分页、搜索和筛选")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "会话列表获取成功")
-  })
-  @GetMapping
-  public ApiLocaleResult<PageResult<SessionListVo>> list(@Valid @ParameterObject SessionFindDto dto) {
-    return ApiLocaleResult.success(sessionFacade.listSessions(dto));
-  }
-
   @Operation(operationId = "switchApp", summary = "切换应用", description = "切换会话使用的应用")
   @PatchMapping("/{sessionId}/switch-app")
   public ApiLocaleResult<SessionDetailVo> switchApp(
@@ -104,10 +75,48 @@ public class SessionRest {
     return ApiLocaleResult.success(sessionFacade.starSession(sessionId, dto));
   }
 
+  @Operation(operationId = "applyPrompt", summary = "应用提示词", description = "将提示词库中的提示词应用到当前会话")
+  @PostMapping("/{sessionId}/apply-prompt")
+  @SuppressWarnings("unchecked")
+  public ApiLocaleResult<String> applyPrompt(
+      @Parameter(description = "会话ID") @PathVariable Long sessionId,
+      @Valid @RequestBody PromptApplyDto dto) {
+    return (ApiLocaleResult<String>) ApiLocaleResult.success(sessionFacade.applyPrompt(sessionId, dto));
+  }
+
+  @Operation(operationId = "deleteSession", summary = "删除会话", description = "删除指定会话")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "204", description = "删除成功")
+  })
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @DeleteMapping("/{id}")
+  public void delete(@Parameter(description = "会话ID") @PathVariable Long id) {
+    sessionFacade.deleteSession(id);
+  }
+
   @Operation(operationId = "batchDeleteSessions", summary = "批量删除会话", description = "批量删除会话")
   @PostMapping("/batch-delete")
   public ApiLocaleResult<Integer> batchDelete(@Valid @RequestBody SessionBatchDeleteDto dto) {
     return ApiLocaleResult.success(sessionFacade.batchDeleteSessions(dto));
+  }
+
+  @Operation(operationId = "getSessionDetail", summary = "获取会话详情", description = "获取指定会话的详细信息")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "会话详情获取成功"),
+      @ApiResponse(responseCode = "404", description = "会话不存在")
+  })
+  @GetMapping("/{id}")
+  public ApiLocaleResult<SessionDetailVo> getDetail(@Parameter(description = "会话ID") @PathVariable Long id) {
+    return ApiLocaleResult.success(sessionFacade.getSessionDetail(id));
+  }
+
+  @Operation(operationId = "getSessionList", summary = "获取会话列表", description = "获取用户的对话会话列表，支持分页、搜索和筛选")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "会话列表获取成功")
+  })
+  @GetMapping
+  public ApiLocaleResult<PageResult<SessionListVo>> list(@Valid @ParameterObject SessionFindDto dto) {
+    return ApiLocaleResult.success(sessionFacade.listSessions(dto));
   }
 
   @Operation(operationId = "exportSession", summary = "导出会话", description = "导出会话内容")
@@ -116,13 +125,5 @@ public class SessionRest {
       @Parameter(description = "会话ID") @PathVariable Long sessionId,
       @Parameter(description = "导出格式") @RequestParam(required = false, defaultValue = "json") String format) {
     // TODO: 实现导出逻辑
-  }
-
-  @Operation(operationId = "applyPrompt", summary = "应用提示词", description = "将提示词库中的提示词应用到当前会话")
-  @PostMapping("/{sessionId}/apply-prompt")
-  public ApiLocaleResult<String> applyPrompt(
-      @Parameter(description = "会话ID") @PathVariable Long sessionId,
-      @Valid @RequestBody PromptApplyDto dto) {
-    return ApiLocaleResult.success(sessionFacade.applyPrompt(sessionId, dto));
   }
 }

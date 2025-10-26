@@ -27,9 +27,9 @@ public interface MessageFacade {
   Object sendMessageStream(Long sessionId, MessageSendDto dto);
 
   /**
-   * 获取消息历史
+   * 上传附件
    */
-  PageResult<MessageVo> listMessages(Long sessionId, MessageFindDto dto);
+  AttachmentUploadVo uploadAttachment(MultipartFile file, Long sessionId);
 
   /**
    * 重新生成消息
@@ -52,14 +52,14 @@ public interface MessageFacade {
   Integer clearSessionMessages(Long sessionId);
 
   /**
-   * 上传附件
-   */
-  AttachmentUploadVo uploadAttachment(MultipartFile file, Long sessionId);
-
-  /**
    * 删除附件
    */
   void deleteAttachment(Long id);
+
+  /**
+   * 获取消息历史
+   */
+  PageResult<MessageVo> listMessages(Long sessionId, MessageFindDto dto);
 
   /**
    * 获取对话统计

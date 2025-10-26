@@ -193,6 +193,42 @@ public class MessageCmdImpl extends CommCmd<Message, Long> implements MessageCmd
 
   @Override
   @Transactional
+  public Long regenerateMessage(Long originalMessageId, String newContent) {
+    return new BizTemplate<Long>() {
+      Message originalMessage;
+
+      @Override
+      protected void checkParams() {
+        originalMessage = messageRepo.findById(originalMessageId)
+            .orElseThrow(() -> ResourceNotFound.of("原消息不存在", new Object[]{}));
+      }
+
+      @Override
+      protected Long process() {
+        // 删除原消息
+        messageRepo.deleteById(originalMessageId);
+        
+        // 创建新消息
+        Message newMessage = new Message();
+        newMessage.setSessionId(originalMessage.getSessionId());
+        newMessage.setRole(originalMessage.getRole());
+        newMessage.setContent(newContent);
+        newMessage.setAttachments(originalMessage.getAttachments());
+        newMessage.setIsStreaming(false);
+        newMessage.setParentMessageId(originalMessageId);
+
+        Message savedMessage = messageRepo.save(newMessage);
+        
+        // 更新会话的最后消息
+        sessionCmd.updateLastMessage(originalMessage.getSessionId(), newContent, originalMessage.getRole());
+        
+        return savedMessage.getId();
+      }
+    }.execute();
+  }
+
+  @Override
+  @Transactional
   public void delete(Long id) {
     new BizTemplate<Void>() {
       @Override
@@ -237,42 +273,6 @@ public class MessageCmdImpl extends CommCmd<Message, Long> implements MessageCmd
       protected Void process() {
         messageRepo.deleteBySessionId(sessionId);
         return null;
-      }
-    }.execute();
-  }
-
-  @Override
-  @Transactional
-  public Long regenerateMessage(Long originalMessageId, String newContent) {
-    return new BizTemplate<Long>() {
-      Message originalMessage;
-
-      @Override
-      protected void checkParams() {
-        originalMessage = messageRepo.findById(originalMessageId)
-            .orElseThrow(() -> ResourceNotFound.of("原消息不存在", new Object[]{}));
-      }
-
-      @Override
-      protected Long process() {
-        // 删除原消息
-        messageRepo.deleteById(originalMessageId);
-        
-        // 创建新消息
-        Message newMessage = new Message();
-        newMessage.setSessionId(originalMessage.getSessionId());
-        newMessage.setRole(originalMessage.getRole());
-        newMessage.setContent(newContent);
-        newMessage.setAttachments(originalMessage.getAttachments());
-        newMessage.setIsStreaming(false);
-        newMessage.setParentMessageId(originalMessageId);
-
-        Message savedMessage = messageRepo.save(newMessage);
-        
-        // 更新会话的最后消息
-        sessionCmd.updateLastMessage(originalMessage.getSessionId(), newContent, originalMessage.getRole());
-        
-        return savedMessage.getId();
       }
     }.execute();
   }

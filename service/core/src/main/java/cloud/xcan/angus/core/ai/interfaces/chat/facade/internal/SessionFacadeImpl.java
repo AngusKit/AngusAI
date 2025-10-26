@@ -49,27 +49,6 @@ public class SessionFacadeImpl implements SessionFacade {
   }
 
   @Override
-  public void deleteSession(Long id) {
-    sessionCmd.delete(id);
-  }
-
-  @NameJoin
-  @Override
-  public SessionDetailVo getSessionDetail(Long id) {
-    Session session = sessionQuery.findAndCheck(id);
-    return SessionAssembler.toDetailVo(session);
-  }
-
-  @NameJoin
-  @Override
-  public PageResult<SessionListVo> listSessions(SessionFindDto dto) {
-    GenericSpecification<Session> spec = SessionAssembler.getSpecification(dto);
-    PageRequest pageRequest = PageRequest.of(dto.getPageNo() - 1, dto.getPageSize());
-    Page<Session> page = sessionQuery.find(spec, pageRequest, false, null);
-    return buildVoPageResult(page, SessionAssembler::toListVo);
-  }
-
-  @Override
   public SessionDetailVo switchApp(Long sessionId, SessionSwitchAppDto dto) {
     sessionCmd.switchApp(sessionId, dto.getAppId());
     Session session = sessionQuery.findAndCheck(sessionId);
@@ -91,16 +70,37 @@ public class SessionFacadeImpl implements SessionFacade {
   }
 
   @Override
-  public Integer batchDeleteSessions(SessionBatchDeleteDto dto) {
-    return sessionCmd.batchDelete(dto.getSessionIds());
-  }
-
-  @Override
   public String applyPrompt(Long sessionId, PromptApplyDto dto) {
     // TODO: 实现提示词应用
     // 1. 从提示词库获取提示词模板
     // 2. 替换变量
     // 3. 返回渲染后的提示词
     return "渲染后的提示词内容";
+  }
+
+  @Override
+  public void deleteSession(Long id) {
+    sessionCmd.delete(id);
+  }
+
+  @Override
+  public Integer batchDeleteSessions(SessionBatchDeleteDto dto) {
+    return sessionCmd.batchDelete(dto.getSessionIds());
+  }
+
+  @NameJoin
+  @Override
+  public SessionDetailVo getSessionDetail(Long id) {
+    Session session = sessionQuery.findAndCheck(id);
+    return SessionAssembler.toDetailVo(session);
+  }
+
+  @NameJoin
+  @Override
+  public PageResult<SessionListVo> listSessions(SessionFindDto dto) {
+    GenericSpecification<Session> spec = SessionAssembler.getSpecification(dto);
+    PageRequest pageRequest = PageRequest.of(dto.getPageNo() - 1, dto.getPageSize());
+    Page<Session> page = sessionQuery.find(spec, pageRequest, false, null);
+    return buildVoPageResult(page, SessionAssembler::toListVo);
   }
 }

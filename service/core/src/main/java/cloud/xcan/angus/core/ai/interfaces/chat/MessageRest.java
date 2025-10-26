@@ -23,7 +23,6 @@ import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
  * 对话消息REST接口
@@ -51,18 +50,19 @@ public class MessageRest {
 
   @Operation(operationId = "sendMessageStream", summary = "发送消息（流式）", description = "发送消息并获取流式AI响应（Server-Sent Events）")
   @PostMapping(value = "/{sessionId}/messages/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-  public SseEmitter sendMessageStream(
+  public Object sendMessageStream(
       @Parameter(description = "会话ID") @PathVariable Long sessionId,
       @Valid @RequestBody MessageSendDto dto) {
     return messageFacade.sendMessageStream(sessionId, dto);
   }
 
-  @Operation(operationId = "getMessageHistory", summary = "获取消息历史", description = "获取会话的消息历史")
-  @GetMapping("/{sessionId}/messages")
-  public ApiLocaleResult<PageResult<MessageVo>> getMessages(
-      @Parameter(description = "会话ID") @PathVariable Long sessionId,
-      @Valid @ParameterObject MessageFindDto dto) {
-    return ApiLocaleResult.success(messageFacade.listMessages(sessionId, dto));
+  @Operation(operationId = "uploadAttachment", summary = "上传附件", description = "上传消息附件")
+  @ResponseStatus(HttpStatus.CREATED)
+  @PostMapping("/attachments")
+  public ApiLocaleResult<AttachmentUploadVo> uploadAttachment(
+      @Parameter(description = "文件") @RequestParam("file") MultipartFile file,
+      @Parameter(description = "关联会话ID") @RequestParam(required = false) Long sessionId) {
+    return ApiLocaleResult.success(messageFacade.uploadAttachment(file, sessionId));
   }
 
   @Operation(operationId = "regenerateMessage", summary = "重新生成", description = "重新生成AI响应")
@@ -95,15 +95,6 @@ public class MessageRest {
     return ApiLocaleResult.success(messageFacade.clearSessionMessages(sessionId));
   }
 
-  @Operation(operationId = "uploadAttachment", summary = "上传附件", description = "上传消息附件")
-  @ResponseStatus(HttpStatus.CREATED)
-  @PostMapping("/attachments")
-  public ApiLocaleResult<AttachmentUploadVo> uploadAttachment(
-      @Parameter(description = "文件") @RequestParam("file") MultipartFile file,
-      @Parameter(description = "关联会话ID") @RequestParam(required = false) Long sessionId) {
-    return ApiLocaleResult.success(messageFacade.uploadAttachment(file, sessionId));
-  }
-
   @Operation(operationId = "deleteAttachment", summary = "删除附件", description = "删除附件")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @DeleteMapping("/attachments/{id}")
@@ -111,13 +102,22 @@ public class MessageRest {
     messageFacade.deleteAttachment(id);
   }
 
+  @Operation(operationId = "getMessageHistory", summary = "获取消息历史", description = "获取会话的消息历史")
+  @GetMapping("/{sessionId}/messages")
+  public ApiLocaleResult<PageResult<MessageVo>> getMessages(
+      @Parameter(description = "会话ID") @PathVariable Long sessionId,
+      @Valid @ParameterObject MessageFindDto dto) {
+    return ApiLocaleResult.success(messageFacade.listMessages(sessionId, dto));
+  }
+
   @Operation(operationId = "voiceToText", summary = "语音输入", description = "语音转文字")
   @PostMapping("/voice-to-text")
+  @SuppressWarnings("unchecked")
   public ApiLocaleResult<String> voiceToText(
       @Parameter(description = "音频文件") @RequestParam("audio") MultipartFile audio,
       @Parameter(description = "语言代码") @RequestParam(required = false) String language) {
     // TODO: 实现语音识别逻辑
-    return ApiLocaleResult.success("识别的文本内容");
+    return (ApiLocaleResult<String>) ApiLocaleResult.success("识别的文本内容");
   }
 
   @Operation(operationId = "getChatStatistics", summary = "获取对话统计", description = "获取对话模块统计数据")

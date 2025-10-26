@@ -21,21 +21,6 @@ public interface SessionFacade {
   SessionDetailVo updateSession(Long id, SessionUpdateDto dto);
 
   /**
-   * 删除会话
-   */
-  void deleteSession(Long id);
-
-  /**
-   * 获取会话详情
-   */
-  SessionDetailVo getSessionDetail(Long id);
-
-  /**
-   * 获取会话列表
-   */
-  PageResult<SessionListVo> listSessions(SessionFindDto dto);
-
-  /**
    * 切换应用
    */
   SessionDetailVo switchApp(Long sessionId, SessionSwitchAppDto dto);
@@ -51,12 +36,27 @@ public interface SessionFacade {
   SessionDetailVo starSession(Long sessionId, SessionStarDto dto);
 
   /**
+   * 应用提示词
+   */
+  String applyPrompt(Long sessionId, PromptApplyDto dto);
+
+  /**
+   * 删除会话
+   */
+  void deleteSession(Long id);
+
+  /**
    * 批量删除会话
    */
   Integer batchDeleteSessions(SessionBatchDeleteDto dto);
 
   /**
-   * 应用提示词
+   * 获取会话详情
    */
-  String applyPrompt(Long sessionId, PromptApplyDto dto);
+  SessionDetailVo getSessionDetail(Long id);
+
+  /**
+   * 获取会话列表
+   */
+  PageResult<SessionListVo> listSessions(SessionFindDto dto);
 }

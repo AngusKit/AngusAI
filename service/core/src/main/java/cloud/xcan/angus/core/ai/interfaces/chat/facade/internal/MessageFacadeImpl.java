@@ -89,15 +89,18 @@ public class MessageFacadeImpl implements MessageFacade {
   }
 
   @Override
-  public PageResult<MessageVo> listMessages(Long sessionId, MessageFindDto dto) {
-    PageRequest pageable = PageRequest.of(dto.getPageNo() - 1, dto.getPageSize());
-    Page<Message> page = messageQuery.findBySessionId(sessionId, pageable);
-    
-    List<MessageVo> content = page.getContent().stream()
-        .map(MessageAssembler::toMessageVo)
-        .collect(Collectors.toList());
-    
-    return PageResult.of(page.getTotalElements(), content);
+  public AttachmentUploadVo uploadAttachment(MultipartFile file, Long sessionId) {
+    // TODO: 实现附件上传
+    // 1. 验证文件类型和大小
+    // 2. 上传文件到OSS/S3
+    // 3. 创建附件记录
+    // 4. 返回附件信息
+    AttachmentUploadVo vo = new AttachmentUploadVo();
+    vo.setName(file.getOriginalFilename());
+    vo.setSize(file.getSize());
+    vo.setType(file.getContentType());
+    // TODO: 实现实际的上传逻辑
+    return vo;
   }
 
   @Override
@@ -149,26 +152,23 @@ public class MessageFacadeImpl implements MessageFacade {
   }
 
   @Override
-  public AttachmentUploadVo uploadAttachment(MultipartFile file, Long sessionId) {
-    // TODO: 实现附件上传
-    // 1. 验证文件类型和大小
-    // 2. 上传文件到OSS/S3
-    // 3. 创建附件记录
-    // 4. 返回附件信息
-    AttachmentUploadVo vo = new AttachmentUploadVo();
-    vo.setName(file.getOriginalFilename());
-    vo.setSize(file.getSize());
-    vo.setType(file.getContentType());
-    // TODO: 实现实际的上传逻辑
-    return vo;
-  }
-
-  @Override
   public void deleteAttachment(Long id) {
     // TODO: 实现附件删除
     // 1. 查询附件记录
     // 2. 删除OSS/S3文件
     // 3. 删除数据库记录
+  }
+
+  @Override
+  public PageResult<MessageVo> listMessages(Long sessionId, MessageFindDto dto) {
+    PageRequest pageable = PageRequest.of(dto.getPageNo() - 1, dto.getPageSize());
+    Page<Message> page = messageQuery.findBySessionId(sessionId, pageable);
+    
+    List<MessageVo> content = page.getContent().stream()
+        .map(MessageAssembler::toMessageVo)
+        .collect(Collectors.toList());
+    
+    return PageResult.of(page.getTotalElements(), content);
   }
 
   @Override
