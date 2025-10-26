@@ -11,14 +11,14 @@ public interface DatasetDatasourceCmd {
   Dataset addDataSource(Long datasetId, DataSourceCreateDto dto);
 
   /**
-   * 删除数据源
-   */
-  void deleteDataSource(Long datasetId, Long sourceId);
-
-  /**
    * 同步数据源
    */
   Dataset syncDataSource(Long datasetId, Long sourceId);
+
+  /**
+   * 删除数据源
+   */
+  void deleteDataSource(Long datasetId, Long sourceId);
 
   /**
    * 测试数据源连接

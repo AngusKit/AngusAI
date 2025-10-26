@@ -16,11 +16,6 @@ public interface DatasetDatasourceFacade {
   DatasetDetailVo addDataSource(Long datasetId, DataSourceCreateDto dto);
 
   /**
-   * 获取数据源列表
-   */
-  PageResult<DataSourceListVo> getDataSources(Long datasetId, Integer pageNo, Integer pageSize, String sourceType, String status);
-
-  /**
    * 同步数据源
    */
   SyncResultVo syncDataSource(Long datasetId, Long sourceId);
@@ -29,6 +24,11 @@ public interface DatasetDatasourceFacade {
    * 删除数据源
    */
   void deleteDataSource(Long datasetId, Long sourceId);
+
+  /**
+   * 获取数据源列表
+   */
+  PageResult<DataSourceListVo> getDataSources(Long datasetId, Integer pageNo, Integer pageSize, String sourceType, String status);
 
   /**
    * 测试数据源连接

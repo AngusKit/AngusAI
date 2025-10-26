@@ -31,15 +31,6 @@ public class DatasetDatasourceFacadeImpl implements DatasetDatasourceFacade {
   }
 
   @Override
-  public PageResult<DataSourceListVo> getDataSources(Long datasetId, Integer pageNo, Integer pageSize, String sourceType, String status) {
-    // 这里应该调用数据源查询服务
-    // 暂时返回模拟数据
-    PageResult<DataSourceListVo> result = new PageResult<>();
-    // TODO: 实现数据源查询逻辑
-    return result;
-  }
-
-  @Override
   public SyncResultVo syncDataSource(Long datasetId, Long sourceId) {
     datasetDatasourceCmd.syncDataSource(datasetId, sourceId);
     // 这里应该调用数据同步服务
@@ -52,6 +43,15 @@ public class DatasetDatasourceFacadeImpl implements DatasetDatasourceFacade {
   @Override
   public void deleteDataSource(Long datasetId, Long sourceId) {
     datasetDatasourceCmd.deleteDataSource(datasetId, sourceId);
+  }
+
+  @Override
+  public PageResult<DataSourceListVo> getDataSources(Long datasetId, Integer pageNo, Integer pageSize, String sourceType, String status) {
+    // 这里应该调用数据源查询服务
+    // 暂时返回模拟数据
+    PageResult<DataSourceListVo> result = new PageResult<>();
+    // TODO: 实现数据源查询逻辑
+    return result;
   }
 
   @Override

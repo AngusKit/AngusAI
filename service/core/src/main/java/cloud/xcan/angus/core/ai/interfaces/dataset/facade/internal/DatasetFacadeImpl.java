@@ -24,6 +24,7 @@ import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.PageResult;
 import jakarta.annotation.Resource;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -56,8 +57,26 @@ public class DatasetFacadeImpl implements DatasetFacade {
   }
 
   @Override
+  public UploadResultVo uploadData(Long id, DataUploadDto dto) {
+    // 这里应该调用数据上传服务
+    // 暂时返回模拟数据
+    UploadResultVo result = new UploadResultVo();
+    // TODO: 实现数据上传逻辑
+    return result;
+  }
+
+  @Override
   public void delete(Long id) {
     datasetCmd.delete(id);
+  }
+
+  @Override
+  public DatasetStatisticsVo batchDeleteData(Long id, BatchDeleteDto dto) {
+    // 这里应该调用批量删除服务
+    // 暂时返回模拟数据
+    DatasetStatisticsVo result = new DatasetStatisticsVo();
+    // TODO: 实现批量删除逻辑
+    return result;
   }
 
   @NameJoin
@@ -71,18 +90,12 @@ public class DatasetFacadeImpl implements DatasetFacade {
   @Override
   public PageResult<DatasetListVo> list(DatasetFindDto dto) {
     GenericSpecification<Dataset> spec = DatasetAssembler.getSpecification(dto);
-    Page<Dataset> page = datasetQuery.find(spec, dto.tranPage(),
-        dto.fullTextSearch, getMatchSearchFields(dto.getClass()));
+    // 使用默认分页参数，因为DatasetFindDto继承的是SearchCriteria而不是PageQuery
+    Page<Dataset> page = datasetQuery.find(spec, 
+        PageRequest.of(0, 20), 
+        false, 
+        null);
     return buildVoPageResult(page, DatasetAssembler::toListVo);
-  }
-
-  @Override
-  public UploadResultVo uploadData(Long id, DataUploadDto dto) {
-    // 这里应该调用数据上传服务
-    // 暂时返回模拟数据
-    UploadResultVo result = new UploadResultVo();
-    // TODO: 实现数据上传逻辑
-    return result;
   }
 
   @Override
@@ -108,14 +121,5 @@ public class DatasetFacadeImpl implements DatasetFacade {
     DatasetStatisticsVo statistics = new DatasetStatisticsVo();
     // TODO: 实现统计逻辑
     return statistics;
-  }
-
-  @Override
-  public DatasetStatisticsVo batchDeleteData(Long id, BatchDeleteDto dto) {
-    // 这里应该调用批量删除服务
-    // 暂时返回模拟数据
-    DatasetStatisticsVo result = new DatasetStatisticsVo();
-    // TODO: 实现批量删除逻辑
-    return result;
   }
 }
