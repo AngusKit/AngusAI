@@ -19,7 +19,6 @@ import lombok.experimental.Accessors;
  */
 @Entity
 @Table(name = "data_export")
-@EntityListeners({TenantListener.class})
 @Setter
 @Getter
 @Accessors(chain = true)

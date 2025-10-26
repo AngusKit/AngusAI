@@ -19,7 +19,6 @@ import lombok.experimental.Accessors;
  */
 @Entity
 @Table(name = "usage_statistics")
-@EntityListeners({TenantListener.class})
 @Setter
 @Getter
 @Accessors(chain = true)

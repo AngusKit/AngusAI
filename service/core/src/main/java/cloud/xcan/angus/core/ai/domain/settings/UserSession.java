@@ -17,7 +17,6 @@ import lombok.experimental.Accessors;
  */
 @Entity
 @Table(name = "user_session")
-@EntityListeners({TenantListener.class})
 @Setter
 @Getter
 @Accessors(chain = true)

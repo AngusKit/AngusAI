@@ -19,7 +19,6 @@ import lombok.experimental.Accessors;
  */
 @Entity
 @Table(name = "resource_sharing_member")
-@EntityListeners({TenantListener.class})
 @Setter
 @Getter
 @Accessors(chain = true)

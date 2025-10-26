@@ -23,7 +23,6 @@ import org.hibernate.annotations.Type;
  */
 @Entity
 @Table(name = "knowledge_base")
-@EntityListeners({TenantListener.class})
 @Setter
 @Getter
 @Accessors(chain = true)

@@ -20,7 +20,6 @@ import org.hibernate.annotations.Type;
  */
 @Entity
 @Table(name = "user_settings")
-@EntityListeners({TenantListener.class})
 @Setter
 @Getter
 @Accessors(chain = true)

@@ -22,7 +22,6 @@ import org.hibernate.annotations.Type;
  */
 @Entity
 @Table(name = "model")
-@EntityListeners({TenantListener.class})
 @Setter
 @Getter
 @Accessors(chain = true)

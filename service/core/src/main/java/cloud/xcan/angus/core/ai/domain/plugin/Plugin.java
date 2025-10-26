@@ -21,7 +21,6 @@ import org.hibernate.annotations.Type;
  */
 @Entity
 @Table(name = "plugin")
-@EntityListeners({TenantListener.class})
 @Setter
 @Getter
 @Accessors(chain = true)

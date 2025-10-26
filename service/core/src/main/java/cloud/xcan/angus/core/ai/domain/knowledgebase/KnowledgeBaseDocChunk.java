@@ -16,7 +16,6 @@ import lombok.experimental.Accessors;
  */
 @Entity
 @Table(name = "knowledge_base_document_chunk")
-@EntityListeners({TenantListener.class})
 @Setter
 @Getter
 @Accessors(chain = true)

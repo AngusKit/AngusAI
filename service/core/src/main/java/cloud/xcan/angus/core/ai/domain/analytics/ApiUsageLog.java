@@ -17,7 +17,6 @@ import lombok.experimental.Accessors;
  */
 @Entity
 @Table(name = "api_usage_log")
-@EntityListeners({TenantListener.class})
 @Setter
 @Getter
 @Accessors(chain = true)

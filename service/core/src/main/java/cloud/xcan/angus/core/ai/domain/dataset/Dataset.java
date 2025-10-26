@@ -23,7 +23,6 @@ import org.hibernate.annotations.Type;
  */
 @Entity
 @Table(name = "dataset")
-@EntityListeners({TenantListener.class})
 @Setter
 @Getter
 @Accessors(chain = true)

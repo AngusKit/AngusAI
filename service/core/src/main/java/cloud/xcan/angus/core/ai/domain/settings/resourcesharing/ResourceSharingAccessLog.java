@@ -21,7 +21,6 @@ import org.hibernate.annotations.Type;
  */
 @Entity
 @Table(name = "resource_sharing_access_log")
-@EntityListeners({TenantListener.class})
 @Setter
 @Getter
 @Accessors(chain = true)

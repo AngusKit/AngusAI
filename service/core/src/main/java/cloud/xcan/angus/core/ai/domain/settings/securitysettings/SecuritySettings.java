@@ -20,7 +20,6 @@ import lombok.experimental.Accessors;
  */
 @Entity
 @Table(name = "security_settings")
-@EntityListeners({TenantListener.class})
 @Setter
 @Getter
 @Accessors(chain = true)
