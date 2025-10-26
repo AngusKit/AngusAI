@@ -10,10 +10,12 @@ import cloud.xcan.angus.core.ai.interfaces.prompt.facade.dto.PromptUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.prompt.facade.internal.assembler.PromptAssembler;
 import cloud.xcan.angus.core.ai.interfaces.prompt.facade.vo.PromptDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.prompt.facade.vo.PromptListVo;
+import cloud.xcan.angus.core.utils.CoreUtils;
 import cloud.xcan.angus.remote.PageResult;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import jakarta.annotation.Resource;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 /**
@@ -46,33 +48,6 @@ public class PromptFacadeImpl implements PromptFacade {
   }
 
   @Override
-  public void delete(Long id) {
-    promptCmd.delete(id);
-  }
-
-  @Override
-  public PromptDetailVo getDetail(Long id) {
-    Prompt prompt = promptQuery.findById(id);
-    if (prompt == null) {
-      throw ResourceNotFound.of("提示词不存在", new Object[]{});
-    }
-    return promptAssembler.toDetailVo(prompt);
-  }
-
-  @Override
-  public PageResult<PromptListVo> list(PromptFindDto dto) {
-    Page<Prompt> page = promptQuery.findByConditions(dto);
-    return PageResult.of(
-        page.getContent().stream()
-            .map(promptAssembler::toListVo)
-            .toList(),
-        page.getTotalElements(),
-        page.getNumber(),
-        page.getSize()
-    );
-  }
-
-  @Override
   public PromptDetailVo toggleFavorite(Long id, Boolean isFavorite) {
     Prompt prompt = promptCmd.toggleFavorite(id, isFavorite);
     return promptAssembler.toDetailVo(prompt);
@@ -88,6 +63,38 @@ public class PromptFacadeImpl implements PromptFacade {
   public PromptDetailVo use(Long id) {
     Prompt prompt = promptCmd.use(id);
     return promptAssembler.toDetailVo(prompt);
+  }
+
+  @Override
+  public void delete(Long id) {
+    promptCmd.delete(id);
+  }
+
+  @Override
+  public PromptDetailVo getDetail(Long id) {
+    Prompt prompt = promptQuery.findById(id);
+    if (prompt == null) {
+      throw ResourceNotFound.of("提示词不存在", new Object[]{});
+    }
+    return promptAssembler.toDetailVo(prompt);
+  }
+
+  @Override
+  public PageResult<PromptListVo> list(PromptFindDto dto) {
+    // 使用固定分页参数
+    PageRequest pageRequest = PageRequest.of(0, 20);
+    
+    // 根据条件选择不同的查询方法
+    Page<Prompt> page;
+    if (dto.getIsFavorite() != null && dto.getIsFavorite()) {
+      // 查询收藏的提示词
+      page = promptQuery.findFavoritePrompts(null, pageRequest);
+    } else {
+      // 查询最近的提示词
+      page = promptQuery.findRecentPrompts(pageRequest);
+    }
+    
+    return CoreUtils.buildVoPageResult(page, promptAssembler::toListVo);
   }
 
 }

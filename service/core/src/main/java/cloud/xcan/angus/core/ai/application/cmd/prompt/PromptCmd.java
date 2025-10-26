@@ -15,11 +15,6 @@ public interface PromptCmd {
   Prompt update(Prompt prompt);
 
   /**
-   * 删除提示词
-   */
-  void delete(Long id);
-
-  /**
    * 收藏/取消收藏
    */
   Prompt toggleFavorite(Long id, Boolean isFavorite);
@@ -43,5 +38,10 @@ public interface PromptCmd {
    * 取消归档
    */
   Prompt unarchive(Long id);
+
+  /**
+   * 删除提示词
+   */
+  void delete(Long id);
 
 }

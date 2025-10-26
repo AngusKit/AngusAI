@@ -5,6 +5,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,6 +21,9 @@ import org.hibernate.type.SqlTypes;
 @Entity
 @Table(name = "ai_prompt")
 public class Prompt extends BaseEntity {
+
+  @Id
+  private Long id;
 
   @Column(name = "title", nullable = false, length = 100)
   private String title;

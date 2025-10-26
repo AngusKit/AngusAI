@@ -62,40 +62,6 @@ public class PromptRest {
     return ApiLocaleResult.success(promptFacade.update(id, dto));
   }
 
-  @Operation(operationId = "deletePrompt", summary = "删除提示词", description = "删除指定提示词")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "204", description = "删除成功")
-  })
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  @DeleteMapping("/{id}")
-  public void delete(
-      @Parameter(description = "提示词ID") @PathVariable Long id) {
-    promptFacade.delete(id);
-  }
-
-  @Operation(operationId = "getPromptDetail", summary = "获取提示词详情", description = "获取指定提示词的详细信息")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "提示词详情获取成功"),
-      @ApiResponse(responseCode = "404", description = "提示词不存在")
-  })
-  @ResponseStatus(HttpStatus.OK)
-  @GetMapping("/{id}")
-  public ApiLocaleResult<PromptDetailVo> getDetail(
-      @Parameter(description = "提示词ID") @PathVariable Long id) {
-    return ApiLocaleResult.success(promptFacade.getDetail(id));
-  }
-
-  @Operation(operationId = "getPromptList", summary = "获取提示词列表", description = "获取当前用户的提示词列表，支持分页、搜索和筛选")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "提示词列表获取成功")
-  })
-  @ResponseStatus(HttpStatus.OK)
-  @GetMapping
-  public ApiLocaleResult<PageResult<PromptListVo>> list(
-      @Valid @ParameterObject PromptFindDto dto) {
-    return ApiLocaleResult.success(promptFacade.list(dto));
-  }
-
   @Operation(operationId = "toggleFavorite", summary = "收藏/取消收藏", description = "收藏或取消收藏提示词")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "操作成功")
@@ -129,6 +95,40 @@ public class PromptRest {
   public ApiLocaleResult<PromptDetailVo> use(
       @Parameter(description = "提示词ID") @PathVariable Long id) {
     return ApiLocaleResult.success(promptFacade.use(id));
+  }
+
+  @Operation(operationId = "deletePrompt", summary = "删除提示词", description = "删除指定提示词")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "204", description = "删除成功")
+  })
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @DeleteMapping("/{id}")
+  public void delete(
+      @Parameter(description = "提示词ID") @PathVariable Long id) {
+    promptFacade.delete(id);
+  }
+
+  @Operation(operationId = "getPromptDetail", summary = "获取提示词详情", description = "获取指定提示词的详细信息")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "提示词详情获取成功"),
+      @ApiResponse(responseCode = "404", description = "提示词不存在")
+  })
+  @ResponseStatus(HttpStatus.OK)
+  @GetMapping("/{id}")
+  public ApiLocaleResult<PromptDetailVo> getDetail(
+      @Parameter(description = "提示词ID") @PathVariable Long id) {
+    return ApiLocaleResult.success(promptFacade.getDetail(id));
+  }
+
+  @Operation(operationId = "getPromptList", summary = "获取提示词列表", description = "获取当前用户的提示词列表，支持分页、搜索和筛选")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "提示词列表获取成功")
+  })
+  @ResponseStatus(HttpStatus.OK)
+  @GetMapping
+  public ApiLocaleResult<PageResult<PromptListVo>> list(
+      @Valid @ParameterObject PromptFindDto dto) {
+    return ApiLocaleResult.success(promptFacade.list(dto));
   }
 
 }

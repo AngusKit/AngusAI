@@ -7,8 +7,6 @@ import cloud.xcan.angus.core.ai.domain.prompt.Prompt;
 import cloud.xcan.angus.core.ai.domain.prompt.PromptRepo;
 import cloud.xcan.angus.core.biz.Biz;
 import cloud.xcan.angus.core.biz.BizTemplate;
-import cloud.xcan.angus.core.biz.cmd.CommCmd;
-import cloud.xcan.angus.core.jpa.repository.BaseRepository;
 import cloud.xcan.angus.core.utils.CoreUtils;
 import cloud.xcan.angus.remote.message.http.ResourceExisted;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
@@ -21,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @DoInFuture("添加权限校验")
 @Component
 @Biz
-public class PromptCmdImpl extends CommCmd<Prompt, Long> implements PromptCmd {
+public class PromptCmdImpl implements PromptCmd {
 
   @Resource
   private PromptRepo promptRepo;
@@ -51,8 +49,7 @@ public class PromptCmdImpl extends CommCmd<Prompt, Long> implements PromptCmd {
 
       @Override
       protected Prompt process() {
-        insert0(prompt);
-        return prompt;
+        return promptRepo.save(prompt);
       }
     }.execute();
   }
@@ -92,34 +89,6 @@ public class PromptCmdImpl extends CommCmd<Prompt, Long> implements PromptCmd {
       protected Prompt process() {
         CoreUtils.copyPropertiesIgnoreNull(prompt, promptDb);
         return promptRepo.save(promptDb);
-      }
-    }.execute();
-  }
-
-  @Override
-  @Transactional
-  public void delete(Long id) {
-    new BizTemplate<Void>() {
-      Prompt promptDb;
-
-      @Override
-      protected void checkParams() {
-        // 获取提示词并验证是否存在
-        promptDb = promptQuery.findById(id);
-        if (promptDb == null) {
-          throw ResourceNotFound.of("提示词不存在", new Object[]{});
-        }
-
-        // 检查是否为系统模板
-        if (promptDb.getIsSystem()) {
-          throw ResourceExisted.of("系统模板不可删除", new Object[]{});
-        }
-      }
-
-      @Override
-      protected Void process() {
-        promptRepo.deleteById(id);
-        return null;
       }
     }.execute();
   }
@@ -169,8 +138,7 @@ public class PromptCmdImpl extends CommCmd<Prompt, Long> implements PromptCmd {
         newPrompt.setUsageCount(0L);
         newPrompt.setIsFavorite(false);
         newPrompt.setIsSystem(false);
-        insert0(newPrompt);
-        return newPrompt;
+        return promptRepo.save(newPrompt);
       }
     }.execute();
   }
@@ -244,7 +212,31 @@ public class PromptCmdImpl extends CommCmd<Prompt, Long> implements PromptCmd {
   }
 
   @Override
-  protected BaseRepository<Prompt, Long> getRepository() {
-    return promptRepo;
+  @Transactional
+  public void delete(Long id) {
+    new BizTemplate<Void>() {
+      Prompt promptDb;
+
+      @Override
+      protected void checkParams() {
+        // 获取提示词并验证是否存在
+        promptDb = promptQuery.findById(id);
+        if (promptDb == null) {
+          throw ResourceNotFound.of("提示词不存在", new Object[]{});
+        }
+
+        // 检查是否为系统模板
+        if (promptDb.getIsSystem()) {
+          throw ResourceExisted.of("系统模板不可删除", new Object[]{});
+        }
+      }
+
+      @Override
+      protected Void process() {
+        promptRepo.deleteById(id);
+        return null;
+      }
+    }.execute();
   }
+
 }
