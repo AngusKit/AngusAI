@@ -1,7 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.model;
 
 import cloud.xcan.angus.core.ai.domain.model.ModelConfig;
-import cloud.xcan.angus.core.ai.domain.model.ModelStatus;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.ModelFacade;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelFindDto;
@@ -126,6 +125,27 @@ public class ModelRest {
     return ApiLocaleResult.success(modelFacade.test(id, dto));
   }
 
+  @Operation(operationId = "batchOperationModels", summary = "批量操作模型", description = "批量启动/停止模型")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "批量操作成功")
+  })
+  @PostMapping("/batch")
+  public ApiLocaleResult<ModelStatisticsVo> batchOperation(
+      @Valid @RequestBody ModelStatisticsVo dto) {
+    return ApiLocaleResult.success(modelFacade.batchOperation(dto));
+  }
+
+  @Operation(operationId = "importModelConfig", summary = "导入模型配置", description = "导入模型配置")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "201", description = "导入成功")
+  })
+  @ResponseStatus(HttpStatus.CREATED)
+  @PostMapping("/import")
+  public ApiLocaleResult<ModelStatisticsVo> importConfig(
+      @Valid @RequestBody ModelStatisticsVo dto) {
+    return ApiLocaleResult.success(modelFacade.importConfig(dto));
+  }
+
   @Operation(operationId = "deleteModel", summary = "删除模型", description = "删除指定模型")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "204", description = "删除成功")
@@ -158,6 +178,25 @@ public class ModelRest {
   public ApiLocaleResult<PageResult<ModelListVo>> list(
       @Valid @ParameterObject ModelFindDto dto) {
     return ApiLocaleResult.success(modelFacade.list(dto));
+  }
+
+  @Operation(operationId = "getModelProviders", summary = "获取可用模型提供商", description = "获取支持的模型提供商列表")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "提供商列表获取成功")
+  })
+  @GetMapping("/providers")
+  public ApiLocaleResult<ModelStatisticsVo> getProviders() {
+    return ApiLocaleResult.success(modelFacade.getProviders());
+  }
+
+  @Operation(operationId = "exportModelConfig", summary = "导出模型配置", description = "导出模型配置")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "导出成功")
+  })
+  @GetMapping("/{id}/export")
+  public ApiLocaleResult<ModelDetailVo> export(
+      @Parameter(description = "模型ID") @PathVariable Long id) {
+    return ApiLocaleResult.success(modelFacade.export(id));
   }
 
   @Operation(operationId = "getModelMetrics", summary = "获取模型性能监控", description = "获取模型性能监控数据")
@@ -195,46 +234,6 @@ public class ModelRest {
   @GetMapping("/statistics")
   public ApiLocaleResult<ModelStatisticsVo> getListStatistics() {
     return ApiLocaleResult.success(modelFacade.getListStatistics());
-  }
-
-  @Operation(operationId = "getModelProviders", summary = "获取可用模型提供商", description = "获取支持的模型提供商列表")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "提供商列表获取成功")
-  })
-  @GetMapping("/providers")
-  public ApiLocaleResult<ModelStatisticsVo> getProviders() {
-    return ApiLocaleResult.success(modelFacade.getProviders());
-  }
-
-  @Operation(operationId = "batchOperationModels", summary = "批量操作模型", description = "批量启动/停止模型")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "批量操作成功")
-  })
-  @PostMapping("/batch")
-  public ApiLocaleResult<ModelStatisticsVo> batchOperation(
-      @Valid @RequestBody ModelStatisticsVo dto) {
-    return ApiLocaleResult.success(modelFacade.batchOperation(dto));
-  }
-
-  @Operation(operationId = "exportModelConfig", summary = "导出模型配置", description = "导出模型配置")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "导出成功")
-  })
-  @GetMapping("/{id}/export")
-  public ApiLocaleResult<ModelDetailVo> export(
-      @Parameter(description = "模型ID") @PathVariable Long id) {
-    return ApiLocaleResult.success(modelFacade.export(id));
-  }
-
-  @Operation(operationId = "importModelConfig", summary = "导入模型配置", description = "导入模型配置")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "201", description = "导入成功")
-  })
-  @ResponseStatus(HttpStatus.CREATED)
-  @PostMapping("/import")
-  public ApiLocaleResult<ModelStatisticsVo> importConfig(
-      @Valid @RequestBody ModelStatisticsVo dto) {
-    return ApiLocaleResult.success(modelFacade.importConfig(dto));
   }
 
 }

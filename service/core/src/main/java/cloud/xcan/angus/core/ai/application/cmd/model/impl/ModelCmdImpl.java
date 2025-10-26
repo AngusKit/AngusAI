@@ -16,10 +16,8 @@ import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import cloud.xcan.angus.spec.annotations.DoInFuture;
 import cloud.xcan.angus.spec.utils.ObjectUtils;
 import jakarta.annotation.Resource;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 @DoInFuture("添加权限校验")
 @Component
@@ -193,79 +191,6 @@ public class ModelCmdImpl extends CommCmd<Model, Long> implements ModelCmd {
   }
 
   @Override
-  @Transactional
-  public void delete(Long id) {
-    new BizTemplate<Void>() {
-      @Override
-      protected Void process() {
-        modelRepo.deleteById(id);
-        return null;
-      }
-    }.execute();
-  }
-
-  @Override
-  public void batchStart(Long[] ids) {
-    for (Long id : ids) {
-      start(id);
-    }
-  }
-
-  @Override
-  public void batchStop(Long[] ids, Boolean graceful) {
-    for (Long id : ids) {
-      stop(id, graceful);
-    }
-  }
-
-  @Override
-  public void batchRestart(Long[] ids) {
-    for (Long id : ids) {
-      restart(id);
-    }
-  }
-
-  @Override
-  public void batchDelete(Long[] ids) {
-    for (Long id : ids) {
-      delete(id);
-    }
-  }
-
-  @Override
-  public String exportConfig(Long id) {
-    Model model = modelRepo.findById(id);
-    if (model != null) {
-      // TODO: 实现导出逻辑
-      return "{}";
-    }
-    return null;
-  }
-
-  @Override
-  public Model importConfig(String configJson) {
-    // TODO: 实现导入逻辑
-    return new Model();
-  }
-
-  @Override
-  public boolean validateConfig(ModelConfig config) {
-    // TODO: 实现配置验证逻辑
-    return true;
-  }
-
-  @Override
-  public boolean checkDependencies(Long id) {
-    // TODO: 实现依赖检查逻辑
-    return true;
-  }
-
-  @Override
-  public void cleanupResources(Long id) {
-    // TODO: 实现资源清理逻辑
-  }
-
-  @Override
   public Model updateStatus(Long id, String status) {
     return new BizTemplate<Model>() {
       Model modelDb;
@@ -336,6 +261,79 @@ public class ModelCmdImpl extends CommCmd<Model, Long> implements ModelCmd {
         return null;
       }
     }.execute();
+  }
+
+  @Override
+  public void batchStart(Long[] ids) {
+    for (Long id : ids) {
+      start(id);
+    }
+  }
+
+  @Override
+  public void batchStop(Long[] ids, Boolean graceful) {
+    for (Long id : ids) {
+      stop(id, graceful);
+    }
+  }
+
+  @Override
+  public void batchRestart(Long[] ids) {
+    for (Long id : ids) {
+      restart(id);
+    }
+  }
+
+  @Override
+  public void batchDelete(Long[] ids) {
+    for (Long id : ids) {
+      delete(id);
+    }
+  }
+
+  @Override
+  public Model importConfig(String configJson) {
+    // TODO: 实现导入逻辑
+    return new Model();
+  }
+
+  @Override
+  public void cleanupResources(Long id) {
+    // TODO: 实现资源清理逻辑
+  }
+
+  @Override
+  @Transactional
+  public void delete(Long id) {
+    new BizTemplate<Void>() {
+      @Override
+      protected Void process() {
+        modelRepo.deleteById(id);
+        return null;
+      }
+    }.execute();
+  }
+
+  @Override
+  public String exportConfig(Long id) {
+    Model model = modelRepo.findById(id);
+    if (model != null) {
+      // TODO: 实现导出逻辑
+      return "{}";
+    }
+    return null;
+  }
+
+  @Override
+  public boolean validateConfig(ModelConfig config) {
+    // TODO: 实现配置验证逻辑
+    return true;
+  }
+
+  @Override
+  public boolean checkDependencies(Long id) {
+    // TODO: 实现依赖检查逻辑
+    return true;
   }
 
   @Override

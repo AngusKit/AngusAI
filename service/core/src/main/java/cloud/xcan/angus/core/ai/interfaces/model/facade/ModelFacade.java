@@ -49,6 +49,16 @@ public interface ModelFacade {
   ModelDetailVo test(Long id, ModelTestDto dto);
 
   /**
+   * 批量操作模型
+   */
+  ModelStatisticsVo batchOperation(ModelStatisticsVo dto);
+
+  /**
+   * 导入模型配置
+   */
+  ModelStatisticsVo importConfig(ModelStatisticsVo dto);
+
+  /**
    * 删除模型
    */
   void delete(Long id);
@@ -64,6 +74,16 @@ public interface ModelFacade {
   PageResult<ModelListVo> list(ModelFindDto dto);
 
   /**
+   * 获取可用模型提供商
+   */
+  ModelStatisticsVo getProviders();
+
+  /**
+   * 导出模型配置
+   */
+  ModelDetailVo export(Long id);
+
+  /**
    * 获取模型性能监控
    */
   ModelMetricsVo getMetrics(Long id, String period, Long startTime, Long endTime, String[] metrics);
@@ -77,25 +97,5 @@ public interface ModelFacade {
    * 获取模型列表统计
    */
   ModelStatisticsVo getListStatistics();
-
-  /**
-   * 获取可用模型提供商
-   */
-  ModelStatisticsVo getProviders();
-
-  /**
-   * 批量操作模型
-   */
-  ModelStatisticsVo batchOperation(ModelStatisticsVo dto);
-
-  /**
-   * 导出模型配置
-   */
-  ModelDetailVo export(Long id);
-
-  /**
-   * 导入模型配置
-   */
-  ModelStatisticsVo importConfig(ModelStatisticsVo dto);
 
 }

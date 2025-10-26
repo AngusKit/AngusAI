@@ -41,9 +41,19 @@ public interface ModelCmd {
   Model test(Long id, String testPrompt);
 
   /**
-   * 删除模型
+   * 更新模型状态
    */
-  void delete(Long id);
+  Model updateStatus(Long id, String status);
+
+  /**
+   * 记录模型调用
+   */
+  void recordCall(Long id, Long tokens, Double cost, Long responseTime);
+
+  /**
+   * 更新模型性能指标
+   */
+  void updateMetrics(Long id, Double latency, Double throughput, Double accuracy);
 
   /**
    * 批量启动模型
@@ -66,14 +76,24 @@ public interface ModelCmd {
   void batchDelete(Long[] ids);
 
   /**
-   * 导出模型配置
-   */
-  String exportConfig(Long id);
-
-  /**
    * 导入模型配置
    */
   Model importConfig(String configJson);
+
+  /**
+   * 清理模型资源
+   */
+  void cleanupResources(Long id);
+
+  /**
+   * 删除模型
+   */
+  void delete(Long id);
+
+  /**
+   * 导出模型配置
+   */
+  String exportConfig(Long id);
 
   /**
    * 验证模型配置
@@ -84,25 +104,5 @@ public interface ModelCmd {
    * 检查模型依赖
    */
   boolean checkDependencies(Long id);
-
-  /**
-   * 清理模型资源
-   */
-  void cleanupResources(Long id);
-
-  /**
-   * 更新模型状态
-   */
-  Model updateStatus(Long id, String status);
-
-  /**
-   * 记录模型调用
-   */
-  void recordCall(Long id, Long tokens, Double cost, Long responseTime);
-
-  /**
-   * 更新模型性能指标
-   */
-  void updateMetrics(Long id, Double latency, Double throughput, Double accuracy);
 
 }
