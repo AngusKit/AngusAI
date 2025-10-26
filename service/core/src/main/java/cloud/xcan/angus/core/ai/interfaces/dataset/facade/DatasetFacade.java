@@ -31,9 +31,19 @@ public interface DatasetFacade {
   DatasetDetailVo updateConfig(Long id, DatasetConfig config);
 
   /**
+   * 上传数据
+   */
+  UploadResultVo uploadData(Long id, DataUploadDto dto);
+
+  /**
    * 删除数据集
    */
   void delete(Long id);
+
+  /**
+   * 批量删除数据
+   */
+  DatasetStatisticsVo batchDeleteData(Long id, BatchDeleteDto dto);
 
   /**
    * 获取数据集详情
@@ -44,11 +54,6 @@ public interface DatasetFacade {
    * 获取数据集列表
    */
   PageResult<DatasetListVo> list(DatasetFindDto dto);
-
-  /**
-   * 上传数据
-   */
-  UploadResultVo uploadData(Long id, DataUploadDto dto);
 
   /**
    * 数据预览
@@ -64,10 +69,5 @@ public interface DatasetFacade {
    * 获取数据集统计
    */
   DatasetStatisticsVo getStatistics();
-
-  /**
-   * 批量删除数据
-   */
-  DatasetStatisticsVo batchDeleteData(Long id, BatchDeleteDto dto);
 
 }

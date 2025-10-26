@@ -105,6 +105,28 @@ public class DatasetCmdImpl extends CommCmd<Dataset, Long> implements DatasetCmd
   }
 
   @Override
+  public Dataset updateStatus(Long id, String status) {
+    return new BizTemplate<Dataset>() {
+      Dataset datasetDb;
+
+      @Override
+      protected void checkParams() {
+        // 获取数据集并验证是否存在
+        datasetDb = datasetQuery.findById(id);
+        if (datasetDb == null) {
+          throw ResourceNotFound.of("数据集不存在", new Object[]{});
+        }
+      }
+
+      @Override
+      protected Dataset process() {
+        datasetDb.setStatus(DatasetStatus.valueOf(status));
+        return datasetRepo.save(datasetDb);
+      }
+    }.execute();
+  }
+
+  @Override
   @Transactional
   public void delete(Long id) {
     new BizTemplate<Void>() {
@@ -112,6 +134,28 @@ public class DatasetCmdImpl extends CommCmd<Dataset, Long> implements DatasetCmd
       protected Void process() {
         datasetRepo.deleteById(id);
         return null;
+      }
+    }.execute();
+  }
+
+  @Override
+  public Dataset batchDeleteData(Long id, BatchDeleteDto dto) {
+    return new BizTemplate<Dataset>() {
+      Dataset datasetDb;
+
+      @Override
+      protected void checkParams() {
+        // 获取数据集并验证是否存在
+        datasetDb = datasetQuery.findById(id);
+        if (datasetDb == null) {
+          throw ResourceNotFound.of("数据集不存在", new Object[]{});
+        }
+      }
+
+      @Override
+      protected Dataset process() {
+        // TODO: 实现批量删除数据逻辑
+        return datasetDb;
       }
     }.execute();
   }
@@ -156,132 +200,6 @@ public class DatasetCmdImpl extends CommCmd<Dataset, Long> implements DatasetCmd
       protected String process() {
         // TODO: 实现数据导出逻辑
         return "export_url";
-      }
-    }.execute();
-  }
-
-  @Override
-  public Dataset batchDeleteData(Long id, BatchDeleteDto dto) {
-    return new BizTemplate<Dataset>() {
-      Dataset datasetDb;
-
-      @Override
-      protected void checkParams() {
-        // 获取数据集并验证是否存在
-        datasetDb = datasetQuery.findById(id);
-        if (datasetDb == null) {
-          throw ResourceNotFound.of("数据集不存在", new Object[]{});
-        }
-      }
-
-      @Override
-      protected Dataset process() {
-        // TODO: 实现批量删除数据逻辑
-        return datasetDb;
-      }
-    }.execute();
-  }
-
-  @Override
-  public boolean validateConfig(DatasetConfig config) {
-    return new BizTemplate<Boolean>() {
-      @Override
-      protected Boolean process() {
-        // TODO: 实现配置验证逻辑
-        return true;
-      }
-    }.execute();
-  }
-
-  @Override
-  public boolean checkDependencies(Long id) {
-    return new BizTemplate<Boolean>() {
-      @Override
-      protected Boolean process() {
-        // TODO: 实现依赖检查逻辑
-        return true;
-      }
-    }.execute();
-  }
-
-  @Override
-  public void cleanupResources(Long id) {
-    new BizTemplate<Void>() {
-      @Override
-      protected Void process() {
-        // TODO: 实现资源清理逻辑
-        return null;
-      }
-    }.execute();
-  }
-
-  @Override
-  public Dataset updateStatus(Long id, String status) {
-    return new BizTemplate<Dataset>() {
-      Dataset datasetDb;
-
-      @Override
-      protected void checkParams() {
-        // 获取数据集并验证是否存在
-        datasetDb = datasetQuery.findById(id);
-        if (datasetDb == null) {
-          throw ResourceNotFound.of("数据集不存在", new Object[]{});
-        }
-      }
-
-      @Override
-      protected Dataset process() {
-        datasetDb.setStatus(DatasetStatus.valueOf(status));
-        return datasetRepo.save(datasetDb);
-      }
-    }.execute();
-  }
-
-  @Override
-  public void recordAccess(Long id) {
-    new BizTemplate<Void>() {
-      Dataset datasetDb;
-
-      @Override
-      protected void checkParams() {
-        // 获取数据集并验证是否存在
-        datasetDb = datasetQuery.findById(id);
-        if (datasetDb == null) {
-          throw ResourceNotFound.of("数据集不存在", new Object[]{});
-        }
-      }
-
-      @Override
-      protected Void process() {
-        datasetDb.setAccessCount(datasetDb.getAccessCount() + 1);
-        datasetDb.setLastAccessTime(System.currentTimeMillis());
-        datasetRepo.save(datasetDb);
-        return null;
-      }
-    }.execute();
-  }
-
-  @Override
-  public void updateStatistics(Long id, Long recordCount, Long totalSize) {
-    new BizTemplate<Void>() {
-      Dataset datasetDb;
-
-      @Override
-      protected void checkParams() {
-        // 获取数据集并验证是否存在
-        datasetDb = datasetQuery.findById(id);
-        if (datasetDb == null) {
-          throw ResourceNotFound.of("数据集不存在", new Object[]{});
-        }
-      }
-
-      @Override
-      protected Void process() {
-        datasetDb.setTotalRecords(recordCount);
-        datasetDb.setTotalSize(totalSize);
-        datasetDb.setLastUpdateTime(System.currentTimeMillis());
-        datasetRepo.save(datasetDb);
-        return null;
       }
     }.execute();
   }
@@ -353,17 +271,6 @@ public class DatasetCmdImpl extends CommCmd<Dataset, Long> implements DatasetCmd
   }
 
   @Override
-  public void batchOperation(Long[] ids, String operation) {
-    new BizTemplate<Void>() {
-      @Override
-      protected Void process() {
-        // TODO: 实现批量操作逻辑
-        return null;
-      }
-    }.execute();
-  }
-
-  @Override
   public Dataset archiveDataset(Long id) {
     return new BizTemplate<Dataset>() {
       Dataset datasetDb;
@@ -405,6 +312,99 @@ public class DatasetCmdImpl extends CommCmd<Dataset, Long> implements DatasetCmd
         datasetDb.setArchived(false);
         datasetDb.setArchivedAt(null);
         return datasetRepo.save(datasetDb);
+      }
+    }.execute();
+  }
+
+  @Override
+  public void recordAccess(Long id) {
+    new BizTemplate<Void>() {
+      Dataset datasetDb;
+
+      @Override
+      protected void checkParams() {
+        // 获取数据集并验证是否存在
+        datasetDb = datasetQuery.findById(id);
+        if (datasetDb == null) {
+          throw ResourceNotFound.of("数据集不存在", new Object[]{});
+        }
+      }
+
+      @Override
+      protected Void process() {
+        datasetDb.setAccessCount(datasetDb.getAccessCount() + 1);
+        datasetDb.setLastAccessTime(System.currentTimeMillis());
+        datasetRepo.save(datasetDb);
+        return null;
+      }
+    }.execute();
+  }
+
+  @Override
+  public void updateStatistics(Long id, Long recordCount, Long totalSize) {
+    new BizTemplate<Void>() {
+      Dataset datasetDb;
+
+      @Override
+      protected void checkParams() {
+        // 获取数据集并验证是否存在
+        datasetDb = datasetQuery.findById(id);
+        if (datasetDb == null) {
+          throw ResourceNotFound.of("数据集不存在", new Object[]{});
+        }
+      }
+
+      @Override
+      protected Void process() {
+        datasetDb.setTotalRecords(recordCount);
+        datasetDb.setTotalSize(totalSize);
+        datasetDb.setLastUpdateTime(System.currentTimeMillis());
+        datasetRepo.save(datasetDb);
+        return null;
+      }
+    }.execute();
+  }
+
+  @Override
+  public boolean validateConfig(DatasetConfig config) {
+    return new BizTemplate<Boolean>() {
+      @Override
+      protected Boolean process() {
+        // TODO: 实现配置验证逻辑
+        return true;
+      }
+    }.execute();
+  }
+
+  @Override
+  public boolean checkDependencies(Long id) {
+    return new BizTemplate<Boolean>() {
+      @Override
+      protected Boolean process() {
+        // TODO: 实现依赖检查逻辑
+        return true;
+      }
+    }.execute();
+  }
+
+  @Override
+  public void cleanupResources(Long id) {
+    new BizTemplate<Void>() {
+      @Override
+      protected Void process() {
+        // TODO: 实现资源清理逻辑
+        return null;
+      }
+    }.execute();
+  }
+
+  @Override
+  public void batchOperation(Long[] ids, String operation) {
+    new BizTemplate<Void>() {
+      @Override
+      protected Void process() {
+        // TODO: 实现批量操作逻辑
+        return null;
       }
     }.execute();
   }

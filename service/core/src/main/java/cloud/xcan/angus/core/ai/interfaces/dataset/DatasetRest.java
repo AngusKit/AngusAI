@@ -43,7 +43,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class DatasetRest {
 
   @Resource
-  private DatasetFacade datasetFacade;
+ private DatasetFacade datasetFacade;
 
   @Operation(operationId = "createDataset", summary = "创建数据集", description = "创建新数据集")
   @ApiResponses(value = {
@@ -81,6 +81,18 @@ public class DatasetRest {
     return ApiLocaleResult.success(datasetFacade.updateConfig(id, dto));
   }
 
+  @Operation(operationId = "uploadData", summary = "上传数据", description = "上传数据到数据集")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "201", description = "上传成功，开始处理")
+  })
+  @ResponseStatus(HttpStatus.CREATED)
+  @PostMapping("/{id}/upload")
+  public ApiLocaleResult<UploadResultVo> uploadData(
+      @Parameter(description = "数据集ID") @PathVariable Long id,
+      @Valid @RequestBody DataUploadDto dto) {
+    return ApiLocaleResult.success(datasetFacade.uploadData(id, dto));
+  }
+
   @Operation(operationId = "deleteDataset", summary = "删除数据集", description = "删除指定数据集")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "204", description = "删除成功")
@@ -90,6 +102,17 @@ public class DatasetRest {
   public void delete(
       @Parameter(description = "数据集ID") @PathVariable Long id) {
     datasetFacade.delete(id);
+  }
+
+  @Operation(operationId = "batchDeleteData", summary = "批量删除数据", description = "批量删除数据记录")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "批量删除成功")
+  })
+  @PostMapping("/{id}/batch-delete")
+  public ApiLocaleResult<DatasetStatisticsVo> batchDeleteData(
+      @Parameter(description = "数据集ID") @PathVariable Long id,
+      @Valid @RequestBody BatchDeleteDto dto) {
+    return ApiLocaleResult.success(datasetFacade.batchDeleteData(id, dto));
   }
 
   @Operation(operationId = "getDatasetDetail", summary = "获取数据集详情", description = "获取指定数据集的详细信息")
@@ -113,18 +136,6 @@ public class DatasetRest {
   public ApiLocaleResult<PageResult<DatasetListVo>> list(
       @Valid @ParameterObject DatasetFindDto dto) {
     return ApiLocaleResult.success(datasetFacade.list(dto));
-  }
-
-  @Operation(operationId = "uploadData", summary = "上传数据", description = "上传数据到数据集")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "201", description = "上传成功，开始处理")
-  })
-  @ResponseStatus(HttpStatus.CREATED)
-  @PostMapping("/{id}/upload")
-  public ApiLocaleResult<UploadResultVo> uploadData(
-      @Parameter(description = "数据集ID") @PathVariable Long id,
-      @Valid @RequestBody DataUploadDto dto) {
-    return ApiLocaleResult.success(datasetFacade.uploadData(id, dto));
   }
 
   @Operation(operationId = "previewData", summary = "数据预览", description = "预览数据集数据")
@@ -159,17 +170,6 @@ public class DatasetRest {
   @GetMapping("/statistics")
   public ApiLocaleResult<DatasetStatisticsVo> getStatistics() {
     return ApiLocaleResult.success(datasetFacade.getStatistics());
-  }
-
-  @Operation(operationId = "batchDeleteData", summary = "批量删除数据", description = "批量删除数据记录")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "批量删除成功")
-  })
-  @PostMapping("/{id}/batch-delete")
-  public ApiLocaleResult<DatasetStatisticsVo> batchDeleteData(
-      @Parameter(description = "数据集ID") @PathVariable Long id,
-      @Valid @RequestBody BatchDeleteDto dto) {
-    return ApiLocaleResult.success(datasetFacade.batchDeleteData(id, dto));
   }
 
 }

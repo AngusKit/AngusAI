@@ -42,26 +42,6 @@ public class DatasetDatasourceCmdImpl implements DatasetDatasourceCmd {
   }
 
   @Override
-  public void deleteDataSource(Long datasetId, Long sourceId) {
-    new BizTemplate<Void>() {
-      @Override
-      protected void checkParams() {
-        // 验证数据集是否存在
-        Dataset datasetDb = datasetQuery.findById(datasetId);
-        if (datasetDb == null) {
-          throw ResourceNotFound.of("数据集不存在", new Object[]{});
-        }
-      }
-
-      @Override
-      protected Void process() {
-        // TODO: 实现删除数据源逻辑
-        return null;
-      }
-    }.execute();
-  }
-
-  @Override
   public Dataset syncDataSource(Long datasetId, Long sourceId) {
     return new BizTemplate<Dataset>() {
       Dataset datasetDb;
@@ -79,6 +59,26 @@ public class DatasetDatasourceCmdImpl implements DatasetDatasourceCmd {
       protected Dataset process() {
         // TODO: 实现数据源同步逻辑
         return datasetDb;
+      }
+    }.execute();
+  }
+
+  @Override
+  public void deleteDataSource(Long datasetId, Long sourceId) {
+    new BizTemplate<Void>() {
+      @Override
+      protected void checkParams() {
+        // 验证数据集是否存在
+        Dataset datasetDb = datasetQuery.findById(datasetId);
+        if (datasetDb == null) {
+          throw ResourceNotFound.of("数据集不存在", new Object[]{});
+        }
+      }
+
+      @Override
+      protected Void process() {
+        // TODO: 实现删除数据源逻辑
+        return null;
       }
     }.execute();
   }

@@ -49,20 +49,6 @@ public class DatasetDatasourceRest {
     return ApiLocaleResult.success(datasetDatasourceFacade.addDataSource(id, dto));
   }
 
-  @Operation(operationId = "getDataSourceList", summary = "获取数据源列表", description = "获取数据集的数据源列表")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "数据源列表获取成功")
-  })
-  @GetMapping("/{id}/datasources")
-  public ApiLocaleResult<PageResult<DataSourceListVo>> getDataSources(
-      @Parameter(description = "数据集ID") @PathVariable Long id,
-      @Parameter(description = "页码") @RequestParam(required = false, defaultValue = "1") Integer pageNo,
-      @Parameter(description = "每页数量") @RequestParam(required = false, defaultValue = "20") Integer pageSize,
-      @Parameter(description = "数据源类型筛选") @RequestParam(required = false) String sourceType,
-      @Parameter(description = "状态筛选") @RequestParam(required = false) String status) {
-    return ApiLocaleResult.success(datasetDatasourceFacade.getDataSources(id, pageNo, pageSize, sourceType, status));
-  }
-
   @Operation(operationId = "syncDataSource", summary = "同步数据源", description = "手动触发数据源同步")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "同步已启动")
@@ -84,6 +70,20 @@ public class DatasetDatasourceRest {
       @Parameter(description = "数据集ID") @PathVariable Long datasetId,
       @Parameter(description = "数据源ID") @PathVariable Long sourceId) {
     datasetDatasourceFacade.deleteDataSource(datasetId, sourceId);
+  }
+
+  @Operation(operationId = "getDataSourceList", summary = "获取数据源列表", description = "获取数据集的数据源列表")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "数据源列表获取成功")
+  })
+  @GetMapping("/{id}/datasources")
+  public ApiLocaleResult<PageResult<DataSourceListVo>> getDataSources(
+      @Parameter(description = "数据集ID") @PathVariable Long id,
+      @Parameter(description = "页码") @RequestParam(required = false, defaultValue = "1") Integer pageNo,
+      @Parameter(description = "每页数量") @RequestParam(required = false, defaultValue = "20") Integer pageSize,
+      @Parameter(description = "数据源类型筛选") @RequestParam(required = false) String sourceType,
+      @Parameter(description = "状态筛选") @RequestParam(required = false) String status) {
+    return ApiLocaleResult.success(datasetDatasourceFacade.getDataSources(id, pageNo, pageSize, sourceType, status));
   }
 
   @Operation(operationId = "testConnection", summary = "测试数据源连接", description = "测试数据源连接是否可用")
