@@ -1,10 +1,11 @@
 package cloud.xcan.angus.core.ai.interfaces.chat.facade.internal;
 
-import static cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder.getMatchSearchFields;
 import static cloud.xcan.angus.core.utils.CoreUtils.buildVoPageResult;
 
 import cloud.xcan.angus.core.ai.application.cmd.chat.SessionCmd;
+import cloud.xcan.angus.core.ai.application.query.chat.SessionQuery;
 import cloud.xcan.angus.core.ai.domain.chat.Session;
+import cloud.xcan.angus.core.ai.domain.chat.SessionConfig;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.SessionFacade;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.*;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.internal.assembler.SessionAssembler;
@@ -15,6 +16,7 @@ import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.PageResult;
 import jakarta.annotation.Resource;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 /**
@@ -26,22 +28,24 @@ public class SessionFacadeImpl implements SessionFacade {
   @Resource
   private SessionCmd sessionCmd;
 
-  // TODO: 需要注入 SessionQuery
-  // @Resource
-  // private SessionQuery sessionQuery;
+  @Resource
+  private SessionQuery sessionQuery;
 
   @Override
   public SessionDetailVo createSession(SessionCreateDto dto) {
-    Session session = SessionAssembler.toDomain(dto);
-    Session saved = sessionCmd.create(session);
-    return SessionAssembler.toDetailVo(saved);
+    Long sessionId = sessionCmd.create(dto.getTitle(), dto.getAppId(), dto.getModelId(), 
+        SessionAssembler.toConfig(dto.getConfig()));
+    Session session = sessionQuery.findAndCheck(sessionId);
+    return SessionAssembler.toDetailVo(session);
   }
 
   @Override
   public SessionDetailVo updateSession(Long id, SessionUpdateDto dto) {
-    Session session = SessionAssembler.updateDomain(id, dto);
-    Session saved = sessionCmd.update(session);
-    return SessionAssembler.toDetailVo(saved);
+    SessionConfig config = dto.getConfig() != null ? SessionAssembler.toConfig(dto.getConfig()) : null;
+    sessionCmd.update(id, dto.getTitle(), null, null, config, 
+        dto.getIsPinned(), dto.getIsStarred(), dto.getIsArchived());
+    Session session = sessionQuery.findAndCheck(id);
+    return SessionAssembler.toDetailVo(session);
   }
 
   @Override
@@ -52,42 +56,38 @@ public class SessionFacadeImpl implements SessionFacade {
   @NameJoin
   @Override
   public SessionDetailVo getSessionDetail(Long id) {
-    // TODO: 使用SessionQuery查询
-    // Session session = sessionQuery.findById(id);
-    // return SessionAssembler.toDetailVo(session);
-    return null;
+    Session session = sessionQuery.findAndCheck(id);
+    return SessionAssembler.toDetailVo(session);
   }
 
   @NameJoin
   @Override
   public PageResult<SessionListVo> listSessions(SessionFindDto dto) {
-    // TODO: 使用SessionQuery查询
-    // GenericSpecification<Session> spec = SessionAssembler.getSpecification(dto);
-    // Page<Session> page = sessionQuery.find(spec, dto.tranPage(),
-    //     dto.fullTextSearch, getMatchSearchFields(dto.getClass()));
-    // return buildVoPageResult(page, SessionAssembler::toListVo);
-    return new PageResult<>();
+    GenericSpecification<Session> spec = SessionAssembler.getSpecification(dto);
+    PageRequest pageRequest = PageRequest.of(dto.getPageNo() - 1, dto.getPageSize());
+    Page<Session> page = sessionQuery.find(spec, pageRequest, false, null);
+    return buildVoPageResult(page, SessionAssembler::toListVo);
   }
 
   @Override
   public SessionDetailVo switchApp(Long sessionId, SessionSwitchAppDto dto) {
     sessionCmd.switchApp(sessionId, dto.getAppId());
-    // TODO: 查询并返回更新后的session
-    return null;
+    Session session = sessionQuery.findAndCheck(sessionId);
+    return SessionAssembler.toDetailVo(session);
   }
 
   @Override
   public SessionDetailVo switchModel(Long sessionId, SessionSwitchModelDto dto) {
     sessionCmd.switchModel(sessionId, dto.getModelId());
-    // TODO: 查询并返回更新后的session
-    return null;
+    Session session = sessionQuery.findAndCheck(sessionId);
+    return SessionAssembler.toDetailVo(session);
   }
 
   @Override
   public SessionDetailVo starSession(Long sessionId, SessionStarDto dto) {
     sessionCmd.star(sessionId, dto.getIsStarred());
-    // TODO: 查询并返回更新后的session
-    return null;
+    Session session = sessionQuery.findAndCheck(sessionId);
+    return SessionAssembler.toDetailVo(session);
   }
 
   @Override

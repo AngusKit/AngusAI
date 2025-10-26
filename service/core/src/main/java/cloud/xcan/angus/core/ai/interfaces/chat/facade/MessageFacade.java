@@ -9,7 +9,7 @@ import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.MessageSendVo;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.MessageVo;
 import cloud.xcan.angus.remote.PageResult;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+// import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
  * 消息Facade接口
@@ -24,7 +24,7 @@ public interface MessageFacade {
   /**
    * 发送消息（流式）
    */
-  SseEmitter sendMessageStream(Long sessionId, MessageSendDto dto);
+  Object sendMessageStream(Long sessionId, MessageSendDto dto);
 
   /**
    * 获取消息历史

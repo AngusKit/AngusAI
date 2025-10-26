@@ -1,12 +1,13 @@
 package cloud.xcan.angus.core.ai.domain.chat;
 
-import cloud.xcan.angus.infra.jpa.common.TenantAuditingEntity;
+import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,7 +21,10 @@ import org.hibernate.annotations.Type;
 @Entity
 @Table(name = "chat_session")
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Session extends TenantAuditingEntity<Long> {
+public class Session extends TenantAuditingEntity<Session, Long> {
+
+  @Id
+  private Long id;
 
   /**
    * 会话标题
@@ -89,4 +93,9 @@ public class Session extends TenantAuditingEntity<Long> {
    */
   @Column
   private Long lastMessageTime;
+
+  @Override
+  public Long identity() {
+    return id;
+  }
 }

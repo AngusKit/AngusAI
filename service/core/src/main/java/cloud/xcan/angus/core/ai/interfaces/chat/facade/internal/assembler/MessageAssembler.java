@@ -28,10 +28,7 @@ public class MessageAssembler {
     message.setIsStreaming(false);
     
     if (dto.getAttachments() != null && !dto.getAttachments().isEmpty()) {
-      // TODO: 转换附件信息
-      // message.setAttachments(dto.getAttachments().stream()
-      //     .map(MessageAssembler::toAttachmentDomain)
-      //     .collect(Collectors.toList()));
+      message.setAttachments(dto.getAttachments());
     }
     
     return message;
@@ -60,47 +57,16 @@ public class MessageAssembler {
     MessageVo vo = new MessageVo();
     vo.setId(message.identity());
     vo.setSessionId(message.getSessionId());
-    vo.setRole(message.getRole().name());
+    vo.setRole(message.getRole());
     vo.setContent(message.getContent());
+    vo.setAttachments(message.getAttachments());
+    vo.setUsage(message.getUsage());
     vo.setIsStreaming(message.getIsStreaming());
-    vo.setFeedback(message.getFeedback());
     
     if (message.getCreatedDate() != null) {
-      vo.setCreatedDate(message.getCreatedDate());
+      vo.setDatetime(message.getCreatedDate().getTime());
     }
     
-    // 转换附件
-    if (message.getAttachments() != null && !message.getAttachments().isEmpty()) {
-      vo.setAttachments(message.getAttachments().stream()
-          .map(MessageAssembler::toAttachmentVo)
-          .collect(Collectors.toList()));
-    }
-    
-    // 转换使用情况
-    if (message.getUsage() != null) {
-      MessageVo.MessageUsageVo usageVo = new MessageVo.MessageUsageVo();
-      CoreUtils.copyProperties(message.getUsage(), usageVo);
-      vo.setUsage(usageVo);
-    }
-    
-    return vo;
-  }
-
-  /**
-   * MessageAttachment -> AttachmentVo
-   */
-  private static MessageVo.AttachmentVo toAttachmentVo(
-      cloud.xcan.angus.core.ai.domain.chat.MessageAttachment attachment) {
-    if (attachment == null) {
-      return null;
-    }
-    
-    MessageVo.AttachmentVo vo = new MessageVo.AttachmentVo();
-    vo.setId(attachment.getId());
-    vo.setName(attachment.getName());
-    vo.setType(attachment.getType());
-    vo.setUrl(attachment.getUrl());
-    vo.setSize(attachment.getSize());
     return vo;
   }
 
