@@ -20,21 +20,6 @@ public interface PromptFacade {
   PromptDetailVo update(Long id, PromptUpdateDto dto);
 
   /**
-   * 删除提示词
-   */
-  void delete(Long id);
-
-  /**
-   * 获取提示词详情
-   */
-  PromptDetailVo getDetail(Long id);
-
-  /**
-   * 获取提示词列表
-   */
-  PageResult<PromptListVo> list(PromptFindDto dto);
-
-  /**
    * 收藏/取消收藏
    */
   PromptDetailVo toggleFavorite(Long id, Boolean isFavorite);
@@ -48,5 +33,20 @@ public interface PromptFacade {
    * 标记使用
    */
   PromptDetailVo use(Long id);
+
+  /**
+   * 删除提示词
+   */
+  void delete(Long id);
+
+  /**
+   * 获取提示词详情
+   */
+  PromptDetailVo getDetail(Long id);
+
+  /**
+   * 获取提示词列表
+   */
+  PageResult<PromptListVo> list(PromptFindDto dto);
 
 }

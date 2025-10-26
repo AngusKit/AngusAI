@@ -33,19 +33,19 @@ public interface PromptCategoryCmd {
   PromptCategory update(Long id, String name, String description, String icon, String color, Long parentId);
 
   /**
-   * 删除提示词分类
-   *
-   * @param id 分类ID
-   */
-  void delete(Long id);
-
-  /**
    * 调整分类顺序
    *
    * @param id          分类ID
    * @param newPosition 新位置
    */
   void updateOrder(Long id, Integer newPosition);
+
+  /**
+   * 删除提示词分类
+   *
+   * @param id 分类ID
+   */
+  void delete(Long id);
 
   /**
    * 批量删除分类

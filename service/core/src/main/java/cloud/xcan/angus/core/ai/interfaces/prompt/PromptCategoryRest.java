@@ -60,6 +60,18 @@ public class PromptCategoryRest {
     return ApiLocaleResult.success(promptCategoryFacade.update(id, dto));
   }
 
+  @Operation(operationId = "updatePromptCategoryOrder", summary = "调整分类顺序", description = "调整分类在同级中的显示顺序")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "顺序调整成功")
+  })
+  @ResponseStatus(HttpStatus.OK)
+  @PatchMapping("/{id}/order")
+  public ApiLocaleResult<PromptCategoryVo> updateOrder(
+      @Parameter(description = "分类ID") @PathVariable Long id,
+      @Parameter(description = "新位置（从0开始）") @RequestParam Integer position) {
+    return ApiLocaleResult.success(promptCategoryFacade.updateOrder(id, position));
+  }
+
   @Operation(operationId = "deletePromptCategory", summary = "删除分类", description = "删除指定提示词分类")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "204", description = "删除成功")
@@ -69,6 +81,17 @@ public class PromptCategoryRest {
   public void delete(
       @Parameter(description = "分类ID") @PathVariable Long id) {
     promptCategoryFacade.delete(id);
+  }
+
+  @Operation(operationId = "batchDeletePromptCategories", summary = "批量删除分类", description = "批量删除多个提示词分类")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "204", description = "批量删除成功")
+  })
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @DeleteMapping("/batch")
+  public void batchDelete(
+      @Parameter(description = "分类ID数组") @RequestParam Long[] ids) {
+    promptCategoryFacade.batchDelete(ids);
   }
 
   @Operation(operationId = "getPromptCategoryDetail", summary = "获取分类详情", description = "获取指定分类的详细信息")
@@ -91,29 +114,6 @@ public class PromptCategoryRest {
   @GetMapping("/tree")
   public ApiLocaleResult<List<PromptCategoryVo>> getTree() {
     return ApiLocaleResult.success(promptCategoryFacade.getTree());
-  }
-
-  @Operation(operationId = "updatePromptCategoryOrder", summary = "调整分类顺序", description = "调整分类在同级中的显示顺序")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "顺序调整成功")
-  })
-  @ResponseStatus(HttpStatus.OK)
-  @PatchMapping("/{id}/order")
-  public ApiLocaleResult<PromptCategoryVo> updateOrder(
-      @Parameter(description = "分类ID") @PathVariable Long id,
-      @Parameter(description = "新位置（从0开始）") @RequestParam Integer position) {
-    return ApiLocaleResult.success(promptCategoryFacade.updateOrder(id, position));
-  }
-
-  @Operation(operationId = "batchDeletePromptCategories", summary = "批量删除分类", description = "批量删除多个提示词分类")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "204", description = "批量删除成功")
-  })
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  @DeleteMapping("/batch")
-  public void batchDelete(
-      @Parameter(description = "分类ID数组") @RequestParam Long[] ids) {
-    promptCategoryFacade.batchDelete(ids);
   }
 
 }

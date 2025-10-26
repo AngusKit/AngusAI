@@ -8,7 +8,7 @@ import cloud.xcan.angus.core.ai.interfaces.prompt.facade.dto.PromptCategoryCreat
 import cloud.xcan.angus.core.ai.interfaces.prompt.facade.dto.PromptCategoryUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.prompt.facade.internal.assembler.PromptCategoryAssembler;
 import cloud.xcan.angus.core.ai.interfaces.prompt.facade.vo.PromptCategoryVo;
-import cloud.xcan.angus.infra.exception.ServiceException;
+import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
@@ -59,15 +59,27 @@ public class PromptCategoryFacadeImpl implements PromptCategoryFacade {
   }
 
   @Override
+  public PromptCategoryVo updateOrder(Long id, Integer newPosition) {
+    promptCategoryCmd.updateOrder(id, newPosition);
+    PromptCategory category = promptCategoryQuery.findById(id);
+    return promptCategoryAssembler.toVo(category);
+  }
+
+  @Override
   public void delete(Long id) {
     promptCategoryCmd.delete(id);
+  }
+
+  @Override
+  public void batchDelete(Long[] ids) {
+    promptCategoryCmd.batchDelete(ids);
   }
 
   @Override
   public PromptCategoryVo getDetail(Long id) {
     PromptCategory category = promptCategoryQuery.findById(id);
     if (category == null) {
-      throw ServiceException.with("prompt.category.not.found");
+      throw ResourceNotFound.of("分类不存在", new Object[]{});
     }
     return promptCategoryAssembler.toVo(category);
   }
@@ -76,18 +88,6 @@ public class PromptCategoryFacadeImpl implements PromptCategoryFacade {
   public List<PromptCategoryVo> getTree() {
     List<PromptCategory> allCategories = promptCategoryQuery.findAll();
     return buildTree(allCategories);
-  }
-
-  @Override
-  public PromptCategoryVo updateOrder(Long id, Integer newPosition) {
-    promptCategoryCmd.updateOrder(id, newPosition);
-    PromptCategory category = promptCategoryQuery.findById(id);
-    return promptCategoryAssembler.toVo(category);
-  }
-
-  @Override
-  public void batchDelete(Long[] ids) {
-    promptCategoryCmd.batchDelete(ids);
   }
 
   /**

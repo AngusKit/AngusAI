@@ -29,11 +29,27 @@ public interface PromptCategoryFacade {
   PromptCategoryVo update(Long id, PromptCategoryUpdateDto dto);
 
   /**
+   * 调整分类顺序
+   *
+   * @param id          分类ID
+   * @param newPosition 新位置
+   * @return 分类视图对象
+   */
+  PromptCategoryVo updateOrder(Long id, Integer newPosition);
+
+  /**
    * 删除分类
    *
    * @param id 分类ID
    */
   void delete(Long id);
+
+  /**
+   * 批量删除分类
+   *
+   * @param ids 分类ID数组
+   */
+  void batchDelete(Long[] ids);
 
   /**
    * 获取分类详情
@@ -49,21 +65,5 @@ public interface PromptCategoryFacade {
    * @return 分类树
    */
   List<PromptCategoryVo> getTree();
-
-  /**
-   * 调整分类顺序
-   *
-   * @param id          分类ID
-   * @param newPosition 新位置
-   * @return 分类视图对象
-   */
-  PromptCategoryVo updateOrder(Long id, Integer newPosition);
-
-  /**
-   * 批量删除分类
-   *
-   * @param ids 分类ID数组
-   */
-  void batchDelete(Long[] ids);
 
 }
