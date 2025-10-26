@@ -44,13 +44,6 @@ public class PluginFacadeImpl implements PluginFacade {
   }
 
   @Override
-  public PluginDetailVo duplicate(Long id, PluginDuplicateDto dto) {
-    Plugin saved = pluginCmd.duplicate(id, dto.getName(), dto.getCopyConfig(), 
-        dto.getCopyPermissions(), dto.getCopyTags());
-    return PluginAssembler.toDetailVo(saved);
-  }
-
-  @Override
   public PluginDetailVo update(Long id, PluginUpdateDto dto) {
     Plugin plugin = PluginAssembler.updateDomain(id, dto);
     Plugin saved = pluginCmd.update(plugin);
@@ -70,24 +63,10 @@ public class PluginFacadeImpl implements PluginFacade {
   }
 
   @Override
-  public void delete(Long id) {
-    pluginCmd.delete(id);
-  }
-
-  @NameJoin
-  @Override
-  public PluginDetailVo getDetail(Long id) {
-    Plugin plugin = pluginQuery.findById(id);
-    return PluginAssembler.toDetailVo(plugin);
-  }
-
-  @NameJoin
-  @Override
-  public PageResult<PluginListVo> list(PluginFindDto dto) {
-    GenericSpecification<Plugin> spec = PluginAssembler.getSpecification(dto);
-    Page<Plugin> page = pluginQuery.find(spec, dto.tranPage(),
-        dto.fullTextSearch, getMatchSearchFields(dto.getClass()));
-    return buildVoPageResult(page, PluginAssembler::toListVo);
+  public PluginDetailVo duplicate(Long id, PluginDuplicateDto dto) {
+    Plugin saved = pluginCmd.duplicate(id, dto.getName(), dto.getCopyConfig(), 
+        dto.getCopyPermissions(), dto.getCopyTags());
+    return PluginAssembler.toDetailVo(saved);
   }
 
   @Override
@@ -127,10 +106,24 @@ public class PluginFacadeImpl implements PluginFacade {
   }
 
   @Override
-  public PluginStatisticsVo getStatistics(String period) {
-    // TODO: 实现统计逻辑
-    PluginStatisticsVo statistics = new PluginStatisticsVo();
-    return statistics;
+  public void delete(Long id) {
+    pluginCmd.delete(id);
+  }
+
+  @NameJoin
+  @Override
+  public PluginDetailVo getDetail(Long id) {
+    Plugin plugin = pluginQuery.findById(id);
+    return PluginAssembler.toDetailVo(plugin);
+  }
+
+  @NameJoin
+  @Override
+  public PageResult<PluginListVo> list(PluginFindDto dto) {
+    GenericSpecification<Plugin> spec = PluginAssembler.getSpecification(dto);
+    Page<Plugin> page = pluginQuery.find(spec, dto.tranPage(),
+        dto.fullTextSearch, getMatchSearchFields(dto.getClass()));
+    return buildVoPageResult(page, PluginAssembler::toListVo);
   }
 
   @NameJoin
@@ -146,5 +139,12 @@ public class PluginFacadeImpl implements PluginFacade {
     PageRequest pageable = PageRequest.of(0, limit != null ? limit : 10);
     Page<Plugin> page = pluginQuery.findTrendingPlugins(pageable);
     return buildVoPageResult(page, PluginAssembler::toListVo);
+  }
+
+  @Override
+  public PluginStatisticsVo getStatistics(String period) {
+    // TODO: 实现统计逻辑
+    PluginStatisticsVo statistics = new PluginStatisticsVo();
+    return statistics;
   }
 }

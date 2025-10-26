@@ -21,11 +21,6 @@ public interface PluginFacade {
   PluginDetailVo create(PluginCreateDto dto);
 
   /**
-   * 复制插件
-   */
-  PluginDetailVo duplicate(Long id, PluginDuplicateDto dto);
-
-  /**
    * 更新插件基本信息
    */
   PluginDetailVo update(Long id, PluginUpdateDto dto);
@@ -41,19 +36,9 @@ public interface PluginFacade {
   PluginDetailVo modifyStatus(Long id, PluginStatus status);
 
   /**
-   * 删除插件
+   * 复制插件
    */
-  void delete(Long id);
-
-  /**
-   * 获取插件详情
-   */
-  PluginDetailVo getDetail(Long id);
-
-  /**
-   * 获取插件列表
-   */
-  PageResult<PluginListVo> list(PluginFindDto dto);
+  PluginDetailVo duplicate(Long id, PluginDuplicateDto dto);
 
   /**
    * 收藏/取消收藏插件
@@ -86,9 +71,19 @@ public interface PluginFacade {
   PluginDetailVo verify(Long id, Boolean verified);
 
   /**
-   * 获取插件统计
+   * 删除插件
    */
-  PluginStatisticsVo getStatistics(String period);
+  void delete(Long id);
+
+  /**
+   * 获取插件详情
+   */
+  PluginDetailVo getDetail(Long id);
+
+  /**
+   * 获取插件列表
+   */
+  PageResult<PluginListVo> list(PluginFindDto dto);
 
   /**
    * 搜索插件
@@ -99,4 +94,9 @@ public interface PluginFacade {
    * 获取热门插件
    */
   PageResult<PluginListVo> getTrendingPlugins(Integer limit);
+
+  /**
+   * 获取插件统计
+   */
+  PluginStatisticsVo getStatistics(String period);
 }

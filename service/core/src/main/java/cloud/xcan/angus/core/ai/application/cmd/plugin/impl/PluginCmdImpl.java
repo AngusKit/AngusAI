@@ -65,75 +65,6 @@ public class PluginCmdImpl extends CommCmd<Plugin, Long> implements PluginCmd {
 
   @Override
   @Transactional
-  public Plugin duplicate(Long sourceId, String name, Boolean copyConfig, Boolean copyPermissions, Boolean copyTags) {
-    return new BizTemplate<Plugin>() {
-      Plugin sourcePlugin;
-
-      @Override
-      protected void checkParams() {
-        // 获取源插件并检查是否存在
-        sourcePlugin = pluginQuery.findById(sourceId);
-        if (sourcePlugin == null) {
-          throw ResourceNotFound.of("插件不存在，插件可能已被删除", new Object[]{});
-        }
-      }
-
-      @Override
-      protected Plugin process() {
-        // 检查新名称是否重复，如果重复则添加随机后缀
-        String newName = name;
-        if (pluginQuery.existsByName(newName)) {
-          newName = newName + "-" + RandomStringUtils.randomAlphabetic(5);
-        }
-
-        Plugin plugin = new Plugin();
-        plugin.setName(newName);
-        plugin.setNameEn(sourcePlugin.getNameEn() != null ? sourcePlugin.getNameEn() + " Copy" : null);
-        plugin.setIcon(sourcePlugin.getIcon());
-        plugin.setDescription(sourcePlugin.getDescription());
-        plugin.setAuthor(sourcePlugin.getAuthor());
-        plugin.setVersion(sourcePlugin.getVersion());
-        plugin.setCategory(sourcePlugin.getCategory());
-        plugin.setType(sourcePlugin.getType());
-        plugin.setStatus(PluginStatus.INACTIVE);
-
-        // 根据参数决定是否复制
-        if (Boolean.TRUE.equals(copyConfig)) {
-          plugin.setConfig(sourcePlugin.getConfig());
-        }
-        if (Boolean.TRUE.equals(copyPermissions)) {
-          plugin.setPermissions(sourcePlugin.getPermissions());
-        }
-        if (Boolean.TRUE.equals(copyTags)) {
-          plugin.setTags(sourcePlugin.getTags());
-        }
-
-        plugin.setMinVersion(sourcePlugin.getMinVersion());
-        plugin.setHomepageUrl(sourcePlugin.getHomepageUrl());
-        plugin.setDocumentationUrl(sourcePlugin.getDocumentationUrl());
-        plugin.setRepositoryUrl(sourcePlugin.getRepositoryUrl());
-        plugin.setSupportUrl(sourcePlugin.getSupportUrl());
-        plugin.setLicense(sourcePlugin.getLicense());
-        plugin.setPrice(sourcePlugin.getPrice());
-        plugin.setCurrency(sourcePlugin.getCurrency());
-
-        // 初始化统计数据
-        plugin.setInstallCount(0L);
-        plugin.setUsageCount(0L);
-        plugin.setRating(0.0);
-        plugin.setReviewCount(0L);
-        plugin.setIsFavorite(false);
-        plugin.setIsSystem(false);
-        plugin.setIsPublic(false);
-        plugin.setIsVerified(false);
-
-        return pluginRepo.save(plugin);
-      }
-    }.execute();
-  }
-
-  @Override
-  @Transactional
   public Plugin update(Plugin plugin) {
     return new BizTemplate<Plugin>() {
       Plugin pluginDb;
@@ -219,28 +150,69 @@ public class PluginCmdImpl extends CommCmd<Plugin, Long> implements PluginCmd {
 
   @Override
   @Transactional
-  public void delete(Long id) {
-    new BizTemplate<Void>() {
-      Plugin pluginDb;
+  public Plugin duplicate(Long sourceId, String name, Boolean copyConfig, Boolean copyPermissions, Boolean copyTags) {
+    return new BizTemplate<Plugin>() {
+      Plugin sourcePlugin;
 
       @Override
       protected void checkParams() {
-        // 获取插件并验证是否存在
-        pluginDb = pluginQuery.findById(id);
-        if (pluginDb == null) {
-          throw ResourceNotFound.of("插件不存在", new Object[]{});
-        }
-
-        // 系统插件不能删除
-        if (Boolean.TRUE.equals(pluginDb.getIsSystem())) {
-          throw ResourceExisted.of("系统插件不能删除", new Object[]{});
+        // 获取源插件并检查是否存在
+        sourcePlugin = pluginQuery.findById(sourceId);
+        if (sourcePlugin == null) {
+          throw ResourceNotFound.of("插件不存在，插件可能已被删除", new Object[]{});
         }
       }
 
       @Override
-      protected Void process() {
-        pluginRepo.deleteById(id);
-        return null;
+      protected Plugin process() {
+        // 检查新名称是否重复，如果重复则添加随机后缀
+        String newName = name;
+        if (pluginQuery.existsByName(newName)) {
+          newName = newName + "-" + RandomStringUtils.randomAlphabetic(5);
+        }
+
+        Plugin plugin = new Plugin();
+        plugin.setName(newName);
+        plugin.setNameEn(sourcePlugin.getNameEn() != null ? sourcePlugin.getNameEn() + " Copy" : null);
+        plugin.setIcon(sourcePlugin.getIcon());
+        plugin.setDescription(sourcePlugin.getDescription());
+        plugin.setAuthor(sourcePlugin.getAuthor());
+        plugin.setVersion(sourcePlugin.getVersion());
+        plugin.setCategory(sourcePlugin.getCategory());
+        plugin.setType(sourcePlugin.getType());
+        plugin.setStatus(PluginStatus.INACTIVE);
+
+        // 根据参数决定是否复制
+        if (Boolean.TRUE.equals(copyConfig)) {
+          plugin.setConfig(sourcePlugin.getConfig());
+        }
+        if (Boolean.TRUE.equals(copyPermissions)) {
+          plugin.setPermissions(sourcePlugin.getPermissions());
+        }
+        if (Boolean.TRUE.equals(copyTags)) {
+          plugin.setTags(sourcePlugin.getTags());
+        }
+
+        plugin.setMinVersion(sourcePlugin.getMinVersion());
+        plugin.setHomepageUrl(sourcePlugin.getHomepageUrl());
+        plugin.setDocumentationUrl(sourcePlugin.getDocumentationUrl());
+        plugin.setRepositoryUrl(sourcePlugin.getRepositoryUrl());
+        plugin.setSupportUrl(sourcePlugin.getSupportUrl());
+        plugin.setLicense(sourcePlugin.getLicense());
+        plugin.setPrice(sourcePlugin.getPrice());
+        plugin.setCurrency(sourcePlugin.getCurrency());
+
+        // 初始化统计数据
+        plugin.setInstallCount(0L);
+        plugin.setUsageCount(0L);
+        plugin.setRating(0.0);
+        plugin.setReviewCount(0L);
+        plugin.setIsFavorite(false);
+        plugin.setIsSystem(false);
+        plugin.setIsPublic(false);
+        plugin.setIsVerified(false);
+
+        return pluginRepo.save(plugin);
       }
     }.execute();
   }
@@ -387,6 +359,34 @@ public class PluginCmdImpl extends CommCmd<Plugin, Long> implements PluginCmd {
       protected Plugin process() {
         pluginDb.setIsVerified(verified);
         return pluginRepo.save(pluginDb);
+      }
+    }.execute();
+  }
+
+  @Override
+  @Transactional
+  public void delete(Long id) {
+    new BizTemplate<Void>() {
+      Plugin pluginDb;
+
+      @Override
+      protected void checkParams() {
+        // 获取插件并验证是否存在
+        pluginDb = pluginQuery.findById(id);
+        if (pluginDb == null) {
+          throw ResourceNotFound.of("插件不存在", new Object[]{});
+        }
+
+        // 系统插件不能删除
+        if (Boolean.TRUE.equals(pluginDb.getIsSystem())) {
+          throw ResourceExisted.of("系统插件不能删除", new Object[]{});
+        }
+      }
+
+      @Override
+      protected Void process() {
+        pluginRepo.deleteById(id);
+        return null;
       }
     }.execute();
   }

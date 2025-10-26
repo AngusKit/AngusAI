@@ -12,11 +12,6 @@ public interface PluginCmd {
   Plugin create(Plugin plugin);
 
   /**
-   * 复制插件
-   */
-  Plugin duplicate(Long sourceId, String name, Boolean copyConfig, Boolean copyPermissions, Boolean copyTags);
-
-  /**
    * 更新插件基本信息
    */
   Plugin update(Plugin plugin);
@@ -32,9 +27,9 @@ public interface PluginCmd {
   Plugin modifyStatus(Long id, PluginStatus status);
 
   /**
-   * 删除插件
+   * 复制插件
    */
-  void delete(Long id);
+  Plugin duplicate(Long sourceId, String name, Boolean copyConfig, Boolean copyPermissions, Boolean copyTags);
 
   /**
    * 收藏/取消收藏插件
@@ -65,4 +60,9 @@ public interface PluginCmd {
    * 验证插件
    */
   Plugin verify(Long id, Boolean verified);
+
+  /**
+   * 删除插件
+   */
+  void delete(Long id);
 }

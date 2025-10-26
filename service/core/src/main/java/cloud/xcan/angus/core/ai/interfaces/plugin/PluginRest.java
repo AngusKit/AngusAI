@@ -57,19 +57,6 @@ public class PluginRest {
     return ApiLocaleResult.success(result);
   }
 
-  @Operation(operationId = "duplicatePlugin", summary = "复制插件", description = "复制插件，包含配置")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "201", description = "复制成功")
-  })
-  @ResponseStatus(HttpStatus.CREATED)
-  @PostMapping("/{id}/duplicate")
-  public ApiLocaleResult<PluginDetailVo> duplicate(
-      @Parameter(description = "源插件ID") @PathVariable Long id,
-      @Valid @RequestBody PluginDuplicateDto dto) {
-    PluginDetailVo result = pluginFacade.duplicate(id, dto);
-    return ApiLocaleResult.success(result);
-  }
-
   @Operation(operationId = "updatePlugin", summary = "更新插件基本信息", description = "更新插件的基本信息")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "更新成功")
@@ -106,38 +93,17 @@ public class PluginRest {
     return ApiLocaleResult.success(pluginFacade.modifyStatus(id, status));
   }
 
-  @Operation(operationId = "deletePlugin", summary = "删除插件", description = "删除指定插件")
+  @Operation(operationId = "duplicatePlugin", summary = "复制插件", description = "复制插件，包含配置")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "204", description = "删除成功")
+      @ApiResponse(responseCode = "201", description = "复制成功")
   })
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  @DeleteMapping("/{id}")
-  public void delete(
-      @Parameter(description = "插件ID") @PathVariable Long id) {
-    pluginFacade.delete(id);
-  }
-
-  @Operation(operationId = "getPluginDetail", summary = "获取插件详情", description = "获取指定插件的详细信息")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "插件详情获取成功"),
-      @ApiResponse(responseCode = "404", description = "插件不存在")
-  })
-  @ResponseStatus(HttpStatus.OK)
-  @GetMapping("/{id}")
-  public ApiLocaleResult<PluginDetailVo> getDetail(
-      @Parameter(description = "插件ID") @PathVariable Long id) {
-    return ApiLocaleResult.success(pluginFacade.getDetail(id));
-  }
-
-  @Operation(operationId = "getPluginList", summary = "获取插件列表", description = "获取插件列表，支持分页、搜索和筛选")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "插件列表获取成功")
-  })
-  @ResponseStatus(HttpStatus.OK)
-  @GetMapping
-  public ApiLocaleResult<PageResult<PluginListVo>> list(
-      @Valid @ParameterObject PluginFindDto dto) {
-    return ApiLocaleResult.success(pluginFacade.list(dto));
+  @ResponseStatus(HttpStatus.CREATED)
+  @PostMapping("/{id}/duplicate")
+  public ApiLocaleResult<PluginDetailVo> duplicate(
+      @Parameter(description = "源插件ID") @PathVariable Long id,
+      @Valid @RequestBody PluginDuplicateDto dto) {
+    PluginDetailVo result = pluginFacade.duplicate(id, dto);
+    return ApiLocaleResult.success(result);
   }
 
   @Operation(operationId = "favoritePlugin", summary = "收藏/取消收藏插件", description = "收藏或取消收藏插件")
@@ -212,14 +178,38 @@ public class PluginRest {
     return ApiLocaleResult.success(pluginFacade.verify(id, verified));
   }
 
-  @Operation(operationId = "getPluginStatistics", summary = "获取插件统计", description = "获取插件的详细统计数据")
+  @Operation(operationId = "deletePlugin", summary = "删除插件", description = "删除指定插件")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "统计数据获取成功")
+      @ApiResponse(responseCode = "204", description = "删除成功")
   })
-  @GetMapping("/statistics")
-  public ApiLocaleResult<PluginStatisticsVo> getStatistics(
-      @Parameter(description = "统计周期") @RequestParam(required = false) String period) {
-    return ApiLocaleResult.success(pluginFacade.getStatistics(period));
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @DeleteMapping("/{id}")
+  public void delete(
+      @Parameter(description = "插件ID") @PathVariable Long id) {
+    pluginFacade.delete(id);
+  }
+
+  @Operation(operationId = "getPluginDetail", summary = "获取插件详情", description = "获取指定插件的详细信息")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "插件详情获取成功"),
+      @ApiResponse(responseCode = "404", description = "插件不存在")
+  })
+  @ResponseStatus(HttpStatus.OK)
+  @GetMapping("/{id}")
+  public ApiLocaleResult<PluginDetailVo> getDetail(
+      @Parameter(description = "插件ID") @PathVariable Long id) {
+    return ApiLocaleResult.success(pluginFacade.getDetail(id));
+  }
+
+  @Operation(operationId = "getPluginList", summary = "获取插件列表", description = "获取插件列表，支持分页、搜索和筛选")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "插件列表获取成功")
+  })
+  @ResponseStatus(HttpStatus.OK)
+  @GetMapping
+  public ApiLocaleResult<PageResult<PluginListVo>> list(
+      @Valid @ParameterObject PluginFindDto dto) {
+    return ApiLocaleResult.success(pluginFacade.list(dto));
   }
 
   @Operation(operationId = "searchPlugins", summary = "搜索插件", description = "根据关键词搜索插件")
@@ -241,5 +231,15 @@ public class PluginRest {
   public ApiLocaleResult<PageResult<PluginListVo>> getTrendingPlugins(
       @Parameter(description = "返回数量，默认10") @RequestParam(required = false) Integer limit) {
     return ApiLocaleResult.success(pluginFacade.getTrendingPlugins(limit));
+  }
+
+  @Operation(operationId = "getPluginStatistics", summary = "获取插件统计", description = "获取插件的详细统计数据")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "统计数据获取成功")
+  })
+  @GetMapping("/statistics")
+  public ApiLocaleResult<PluginStatisticsVo> getStatistics(
+      @Parameter(description = "统计周期") @RequestParam(required = false) String period) {
+    return ApiLocaleResult.success(pluginFacade.getStatistics(period));
   }
 }
