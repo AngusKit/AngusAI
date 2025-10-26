@@ -89,6 +89,51 @@ public class WorkflowRest {
     return ApiLocaleResult.success(workflowFacade.updateConfig(id, dto));
   }
 
+  @Operation(operationId = "toggleWorkflow", summary = "启用/禁用工作流", description = "切换工作流的启用状态")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "状态已更新")
+  })
+  @PatchMapping("/{id}/toggle")
+  public ApiLocaleResult<WorkflowToggleResultVo> toggle(
+      @Parameter(description = "工作流ID") @PathVariable Long id,
+      @Valid @RequestBody WorkflowToggleDto dto) {
+    return ApiLocaleResult.success(workflowFacade.toggle(id, dto));
+  }
+
+  @Operation(operationId = "executeWorkflow", summary = "执行工作流", description = "手动执行工作流")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "执行成功"),
+      @ApiResponse(responseCode = "202", description = "执行已启动")
+  })
+  @PostMapping("/{id}/execute")
+  public ApiLocaleResult<WorkflowExecuteResultVo> execute(
+      @Parameter(description = "工作流ID") @PathVariable Long id,
+      @Valid @RequestBody WorkflowExecuteDto dto) {
+    return ApiLocaleResult.success(workflowFacade.execute(id, dto));
+  }
+
+  @Operation(operationId = "stopWorkflow", summary = "停止工作流执行", description = "停止正在运行的工作流")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "已停止")
+  })
+  @PostMapping("/{id}/stop")
+  public ApiLocaleResult<WorkflowStopResultVo> stop(
+      @Parameter(description = "工作流ID") @PathVariable Long id,
+      @Valid @RequestBody WorkflowStopDto dto) {
+    return ApiLocaleResult.success(workflowFacade.stop(id, dto));
+  }
+
+  @Operation(operationId = "restoreWorkflowVersion", summary = "恢复到特定版本", description = "恢复工作流到特定版本")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "已恢复到指定版本")
+  })
+  @PostMapping("/{id}/versions/{versionId}/restore")
+  public ApiLocaleResult<WorkflowRestoreResultVo> restoreVersion(
+      @Parameter(description = "工作流ID") @PathVariable Long id,
+      @Parameter(description = "版本ID") @PathVariable Long versionId) {
+    return ApiLocaleResult.success(workflowFacade.restoreVersion(id, versionId));
+  }
+
   @Operation(operationId = "deleteWorkflow", summary = "删除工作流", description = "删除指定工作流")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "204", description = "删除成功")
@@ -145,29 +190,6 @@ public class WorkflowRest {
     return ApiLocaleResult.success(workflowFacade.getStatistics(period));
   }
 
-  @Operation(operationId = "executeWorkflow", summary = "执行工作流", description = "手动执行工作流")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "执行成功"),
-      @ApiResponse(responseCode = "202", description = "执行已启动")
-  })
-  @PostMapping("/{id}/execute")
-  public ApiLocaleResult<WorkflowExecuteResultVo> execute(
-      @Parameter(description = "工作流ID") @PathVariable Long id,
-      @Valid @RequestBody WorkflowExecuteDto dto) {
-    return ApiLocaleResult.success(workflowFacade.execute(id, dto));
-  }
-
-  @Operation(operationId = "stopWorkflow", summary = "停止工作流执行", description = "停止正在运行的工作流")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "已停止")
-  })
-  @PostMapping("/{id}/stop")
-  public ApiLocaleResult<WorkflowStopResultVo> stop(
-      @Parameter(description = "工作流ID") @PathVariable Long id,
-      @Valid @RequestBody WorkflowStopDto dto) {
-    return ApiLocaleResult.success(workflowFacade.stop(id, dto));
-  }
-
   @Operation(operationId = "getExecutionLogs", summary = "获取执行日志", description = "获取工作流执行日志")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "执行日志获取成功")
@@ -209,28 +231,6 @@ public class WorkflowRest {
       @Parameter(description = "工作流ID") @PathVariable Long id,
       @Parameter(description = "版本ID") @PathVariable Long versionId) {
     return ApiLocaleResult.success(workflowFacade.getVersion(id, versionId));
-  }
-
-  @Operation(operationId = "restoreWorkflowVersion", summary = "恢复到特定版本", description = "恢复工作流到特定版本")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "已恢复到指定版本")
-  })
-  @PostMapping("/{id}/versions/{versionId}/restore")
-  public ApiLocaleResult<WorkflowRestoreResultVo> restoreVersion(
-      @Parameter(description = "工作流ID") @PathVariable Long id,
-      @Parameter(description = "版本ID") @PathVariable Long versionId) {
-    return ApiLocaleResult.success(workflowFacade.restoreVersion(id, versionId));
-  }
-
-  @Operation(operationId = "toggleWorkflow", summary = "启用/禁用工作流", description = "切换工作流的启用状态")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "状态已更新")
-  })
-  @PatchMapping("/{id}/toggle")
-  public ApiLocaleResult<WorkflowToggleResultVo> toggle(
-      @Parameter(description = "工作流ID") @PathVariable Long id,
-      @Valid @RequestBody WorkflowToggleDto dto) {
-    return ApiLocaleResult.success(workflowFacade.toggle(id, dto));
   }
 
 }
