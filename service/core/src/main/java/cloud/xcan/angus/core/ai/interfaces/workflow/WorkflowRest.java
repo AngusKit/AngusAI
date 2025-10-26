@@ -1,6 +1,5 @@
 package cloud.xcan.angus.core.ai.interfaces.workflow;
 
-import cloud.xcan.angus.core.ai.domain.workflow.WorkflowConfig;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.WorkflowFacade;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowFindDto;
@@ -9,7 +8,7 @@ import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowConfigUpd
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowExecuteDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowStopDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowToggleDto;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.ExecutionLogFindDto;
+import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowExecutionLogFindDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowDuplicateDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowListVo;
@@ -175,7 +174,7 @@ public class WorkflowRest {
   })
   @GetMapping("/execution-logs")
   public ApiLocaleResult<PageResult<ExecutionLogVo>> getExecutionLogs(
-      @Valid @ParameterObject ExecutionLogFindDto dto) {
+      @Valid @ParameterObject WorkflowExecutionLogFindDto dto) {
     return ApiLocaleResult.success(workflowFacade.getExecutionLogs(dto));
   }
 

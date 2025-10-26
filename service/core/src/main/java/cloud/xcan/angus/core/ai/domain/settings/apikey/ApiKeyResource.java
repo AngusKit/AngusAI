@@ -1,7 +1,7 @@
 package cloud.xcan.angus.core.ai.domain.settings.apikey;
 
-import cloud.xcan.angus.jpa.base.TenantEntity;
-import cloud.xcan.angus.jpa.base.TenantListener;
+import cloud.xcan.angus.core.jpa.multitenancy.TenantEntity;
+import cloud.xcan.angus.core.jpa.multitenancy.TenantListener;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -18,7 +18,6 @@ import lombok.experimental.Accessors;
  */
 @Entity
 @Table(name = "api_key_resource")
-@EntityListeners({TenantListener.class})
 @Setter
 @Getter
 @Accessors(chain = true)
@@ -51,4 +50,9 @@ public class ApiKeyResource extends TenantEntity<ApiKeyResource, Long> {
    */
   @Column(name = "resource_name", length = 200)
   private String resourceName;
+
+  @Override
+  public Long identity() {
+    return id;
+  }
 }

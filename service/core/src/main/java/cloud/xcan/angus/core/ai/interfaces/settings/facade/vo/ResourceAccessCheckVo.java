@@ -1,6 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.settings.facade.vo;
 
-import cloud.xcan.angus.core.ai.domain.settings.Permission;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.SharePermission;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -12,7 +12,7 @@ public class ResourceAccessCheckVo {
   private Boolean hasAccess;
 
   @Schema(description = "权限")
-  private Permission permission;
+  private SharePermission permission;
 
   @Schema(description = "权限标签")
   private String permissionLabel;

@@ -1,15 +1,16 @@
 package cloud.xcan.angus.core.ai.application.query.settings.impl;
 
 import cloud.xcan.angus.core.ai.application.query.settings.ResourceSharingQuery;
-import cloud.xcan.angus.core.ai.domain.settings.ResourceSharing;
-import cloud.xcan.angus.core.ai.domain.settings.ResourceSharingAccessLog;
-import cloud.xcan.angus.core.ai.domain.settings.ResourceSharingAccessLogRepo;
-import cloud.xcan.angus.core.ai.domain.settings.ResourceSharingMember;
-import cloud.xcan.angus.core.ai.domain.settings.ResourceSharingMemberRepo;
-import cloud.xcan.angus.core.ai.domain.settings.ResourceSharingRepo;
-import cloud.xcan.angus.core.ai.domain.settings.ResourceType;
-import cloud.xcan.angus.core.ai.domain.settings.ShareAction;
-import cloud.xcan.angus.core.ai.domain.settings.SharedWith;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.SharePermission;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.ResourceSharing;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.ResourceSharingAccessLog;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.ResourceSharingAccessLogRepo;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.ResourceSharingMember;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.ResourceSharingMemberRepo;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.ResourceSharingRepo;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.ResourceType;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.ShareAction;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.SharedWith;
 import cloud.xcan.angus.core.ai.interfaces.settings.facade.dto.ResourceSharingFindDto;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
@@ -186,7 +187,7 @@ public class ResourceSharingQueryImpl implements ResourceSharingQuery {
       ResourceSharingMember member = new ResourceSharingMember();
       member.setSharingId(sharing.getId());
       member.setUserId(userId);
-      member.setPermission(cloud.xcan.angus.core.ai.domain.settings.Permission.MANAGE);
+      member.setPermission(SharePermission.MANAGE);
       return member;
     }
 

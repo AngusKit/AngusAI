@@ -1,11 +1,9 @@
 package cloud.xcan.angus.core.ai.application.cmd.settings;
 
-import cloud.xcan.angus.core.ai.domain.settings.DataExport;
-import cloud.xcan.angus.core.ai.domain.settings.ExportFormat;
-import cloud.xcan.angus.core.ai.domain.settings.ExportType;
+import cloud.xcan.angus.core.ai.domain.settings.dataexport.DataExport;
 import cloud.xcan.angus.core.ai.domain.settings.NotificationSettings;
 import cloud.xcan.angus.core.ai.domain.settings.PrivacySettings;
-import cloud.xcan.angus.core.ai.domain.settings.SecuritySettings;
+import cloud.xcan.angus.core.ai.domain.settings.securitysettings.SecuritySettings;
 import cloud.xcan.angus.core.ai.domain.settings.TwoFactorMethod;
 import cloud.xcan.angus.core.ai.domain.settings.UserPreferences;
 import cloud.xcan.angus.core.ai.domain.settings.UserSettings;

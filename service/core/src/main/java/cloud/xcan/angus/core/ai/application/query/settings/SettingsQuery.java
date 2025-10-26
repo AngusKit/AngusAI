@@ -1,8 +1,8 @@
 package cloud.xcan.angus.core.ai.application.query.settings;
 
-import cloud.xcan.angus.core.ai.domain.settings.DataExport;
-import cloud.xcan.angus.core.ai.domain.settings.LoginHistory;
-import cloud.xcan.angus.core.ai.domain.settings.SecuritySettings;
+import cloud.xcan.angus.core.ai.domain.settings.dataexport.DataExport;
+import cloud.xcan.angus.core.ai.domain.settings.loginhistory.LoginHistory;
+import cloud.xcan.angus.core.ai.domain.settings.securitysettings.SecuritySettings;
 import cloud.xcan.angus.core.ai.domain.settings.UserSession;
 import cloud.xcan.angus.core.ai.domain.settings.UserSettings;
 import java.util.List;

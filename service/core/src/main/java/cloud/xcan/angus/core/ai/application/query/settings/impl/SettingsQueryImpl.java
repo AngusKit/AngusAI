@@ -1,12 +1,12 @@
 package cloud.xcan.angus.core.ai.application.query.settings.impl;
 
 import cloud.xcan.angus.core.ai.application.query.settings.SettingsQuery;
-import cloud.xcan.angus.core.ai.domain.settings.DataExport;
-import cloud.xcan.angus.core.ai.domain.settings.DataExportRepo;
-import cloud.xcan.angus.core.ai.domain.settings.LoginHistory;
-import cloud.xcan.angus.core.ai.domain.settings.LoginHistoryRepo;
-import cloud.xcan.angus.core.ai.domain.settings.SecuritySettings;
-import cloud.xcan.angus.core.ai.domain.settings.SecuritySettingsRepo;
+import cloud.xcan.angus.core.ai.domain.settings.dataexport.DataExport;
+import cloud.xcan.angus.core.ai.domain.settings.dataexport.DataExportRepo;
+import cloud.xcan.angus.core.ai.domain.settings.loginhistory.LoginHistory;
+import cloud.xcan.angus.core.ai.domain.settings.loginhistory.LoginHistoryRepo;
+import cloud.xcan.angus.core.ai.domain.settings.securitysettings.SecuritySettings;
+import cloud.xcan.angus.core.ai.domain.settings.securitysettings.SecuritySettingsRepo;
 import cloud.xcan.angus.core.ai.domain.settings.UserSession;
 import cloud.xcan.angus.core.ai.domain.settings.UserSessionRepo;
 import cloud.xcan.angus.core.ai.domain.settings.UserSettings;

@@ -1,7 +1,10 @@
 package cloud.xcan.angus.core.ai.application.converter;
 
-import cloud.xcan.angus.core.ai.domain.settings.ResourceSharing;
-import cloud.xcan.angus.core.ai.domain.settings.ResourceSharingMember;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.SharePermission;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.ResourceSharing;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.ResourceSharingMember;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.ResourceType;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.SharedWith;
 import cloud.xcan.angus.core.ai.interfaces.settings.facade.vo.ResourceSharingDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.settings.facade.vo.ResourceSharingListVo;
 import java.time.LocalDateTime;
@@ -114,7 +117,7 @@ public class ResourceSharingConverter {
    * 获取资源类型标签
    */
   private static String getResourceTypeLabel(
-      cloud.xcan.angus.core.ai.domain.settings.ResourceType type) {
+      ResourceType type) {
     if (type == null) {
       return "";
     }
@@ -138,7 +141,7 @@ public class ResourceSharingConverter {
    * 获取共享范围标签
    */
   private static String getSharedWithLabel(
-      cloud.xcan.angus.core.ai.domain.settings.SharedWith sharedWith) {
+      SharedWith sharedWith) {
     if (sharedWith == null) {
       return "";
     }
@@ -156,7 +159,7 @@ public class ResourceSharingConverter {
    * 获取权限标签
    */
   private static String getPermissionLabel(
-      cloud.xcan.angus.core.ai.domain.settings.Permission permission) {
+      SharePermission permission) {
     if (permission == null) {
       return "";
     }

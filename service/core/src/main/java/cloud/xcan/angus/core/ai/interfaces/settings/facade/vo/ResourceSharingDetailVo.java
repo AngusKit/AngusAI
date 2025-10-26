@@ -1,8 +1,8 @@
 package cloud.xcan.angus.core.ai.interfaces.settings.facade.vo;
 
-import cloud.xcan.angus.core.ai.domain.settings.Permission;
-import cloud.xcan.angus.core.ai.domain.settings.ResourceType;
-import cloud.xcan.angus.core.ai.domain.settings.SharedWith;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.SharePermission;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.ResourceType;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.SharedWith;
 import cloud.xcan.angus.remote.NameJoinField;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
@@ -38,7 +38,7 @@ public class ResourceSharingDetailVo {
   private String sharedWithLabel;
 
   @Schema(description = "默认权限")
-  private Permission permission;
+  private SharePermission permission;
 
   @Schema(description = "权限标签")
   private String permissionLabel;
@@ -98,7 +98,7 @@ public class ResourceSharingDetailVo {
     private String avatar;
 
     @Schema(description = "权限")
-    private Permission permission;
+    private SharePermission permission;
 
     @Schema(description = "权限标签")
     private String permissionLabel;

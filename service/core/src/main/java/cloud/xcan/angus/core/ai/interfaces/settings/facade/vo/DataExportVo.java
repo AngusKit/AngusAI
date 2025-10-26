@@ -1,8 +1,8 @@
 package cloud.xcan.angus.core.ai.interfaces.settings.facade.vo;
 
-import cloud.xcan.angus.core.ai.domain.settings.ExportFormat;
-import cloud.xcan.angus.core.ai.domain.settings.ExportStatus;
-import cloud.xcan.angus.core.ai.domain.settings.ExportType;
+import cloud.xcan.angus.core.ai.domain.settings.dataexport.ExportFormat;
+import cloud.xcan.angus.core.ai.domain.settings.dataexport.ExportStatus;
+import cloud.xcan.angus.core.ai.domain.settings.dataexport.ExportType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import lombok.Data;

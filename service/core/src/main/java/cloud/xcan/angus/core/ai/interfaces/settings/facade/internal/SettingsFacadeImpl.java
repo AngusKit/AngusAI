@@ -2,10 +2,10 @@ package cloud.xcan.angus.core.ai.interfaces.settings.facade.internal;
 
 import cloud.xcan.angus.core.ai.application.cmd.settings.SettingsCmd;
 import cloud.xcan.angus.core.ai.application.query.settings.SettingsQuery;
-import cloud.xcan.angus.core.ai.domain.settings.DataExport;
-import cloud.xcan.angus.core.ai.domain.settings.LoginHistory;
+import cloud.xcan.angus.core.ai.domain.settings.dataexport.DataExport;
+import cloud.xcan.angus.core.ai.domain.settings.loginhistory.LoginHistory;
 import cloud.xcan.angus.core.ai.domain.settings.NotificationSettings;
-import cloud.xcan.angus.core.ai.domain.settings.SecuritySettings;
+import cloud.xcan.angus.core.ai.domain.settings.securitysettings.SecuritySettings;
 import cloud.xcan.angus.core.ai.domain.settings.UserSession;
 import cloud.xcan.angus.core.ai.domain.settings.UserSettings;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
@@ -58,7 +58,7 @@ public class SettingsFacadeImpl implements SettingsFacade {
   @Override
   public UserSettingsVo updateUserSettings(Long userId, UserSettingsUpdateDto dto) {
     UserSettings settings = settingsQuery.findUserSettingsByUserId(userId);
-    
+
     // 更新个人资料
     if (dto.getProfile() != null) {
       java.util.Map<String, Object> profile = new java.util.HashMap<>();
@@ -82,7 +82,7 @@ public class SettingsFacadeImpl implements SettingsFacade {
       }
       settings = settingsCmd.updateProfile(userId, profile);
     }
-    
+
     // 更新偏好设置
     if (dto.getPreferences() != null && settings.getPreferences() != null) {
       cloud.xcan.angus.core.ai.domain.settings.UserPreferences prefs = settings.getPreferences();
@@ -103,7 +103,7 @@ public class SettingsFacadeImpl implements SettingsFacade {
       }
       settings = settingsCmd.updatePreferences(userId, prefs);
     }
-    
+
     // 更新隐私设置
     if (dto.getPrivacy() != null && settings.getPrivacy() != null) {
       cloud.xcan.angus.core.ai.domain.settings.PrivacySettings privacy = settings.getPrivacy();
@@ -118,7 +118,7 @@ public class SettingsFacadeImpl implements SettingsFacade {
       }
       settings = settingsCmd.updatePrivacy(userId, privacy);
     }
-    
+
     return SettingsAssembler.toUserSettingsVo(settings);
   }
 
@@ -127,7 +127,7 @@ public class SettingsFacadeImpl implements SettingsFacade {
     // TODO: 实现文件上传到OSS,这里模拟返回URL
     String avatarUrl = "https://example.com/avatars/" + userId + ".jpg";
     settingsCmd.uploadAvatar(userId, avatarUrl);
-    
+
     UploadAvatarVo vo = new UploadAvatarVo();
     vo.setAvatarUrl(avatarUrl);
     vo.setUploadedAt(System.currentTimeMillis());
@@ -156,13 +156,13 @@ public class SettingsFacadeImpl implements SettingsFacade {
     if (settings == null) {
       throw ResourceNotFound.of("用户设置不存在", new Object[]{});
     }
-    
+
     // 构建NotificationSettings对象
     NotificationSettings notificationSettings = settings.getNotificationSettings();
     if (notificationSettings == null) {
       notificationSettings = new NotificationSettings();
     }
-    
+
     // 更新邮件通知
     if (dto.getEmail() != null) {
       if (notificationSettings.getEmail() == null) {
@@ -176,9 +176,9 @@ public class SettingsFacadeImpl implements SettingsFacade {
       }
       // 更新具体通知类型...
     }
-    
+
     // 更新其他通知类型...
-    
+
     settings = settingsCmd.updateNotificationSettings(userId, notificationSettings);
     return SettingsAssembler.toNotificationSettingsVo(settings.getNotificationSettings());
   }
@@ -188,7 +188,7 @@ public class SettingsFacadeImpl implements SettingsFacade {
     SecuritySettings securitySettings = settingsQuery.findSecuritySettingsByUserId(userId);
     List<UserSession> sessions = settingsQuery.findActiveSessionsByUserId(userId);
     List<LoginHistory> loginHistory = settingsQuery.findRecentLoginHistory(userId);
-    
+
     return SettingsAssembler.toSecuritySettingsVo(securitySettings, sessions, loginHistory);
   }
 
@@ -203,7 +203,7 @@ public class SettingsFacadeImpl implements SettingsFacade {
     SecuritySettings settings = settingsCmd.verify2FA(userId, dto.getCode());
     List<UserSession> sessions = settingsQuery.findActiveSessionsByUserId(userId);
     List<LoginHistory> loginHistory = settingsQuery.findRecentLoginHistory(userId);
-    
+
     return SettingsAssembler.toSecuritySettingsVo(settings, sessions, loginHistory);
   }
 
@@ -214,9 +214,9 @@ public class SettingsFacadeImpl implements SettingsFacade {
 
   @Override
   public ChangePasswordVo changePassword(Long userId, ChangePasswordDto dto) {
-    LocalDateTime changedAt = settingsCmd.changePassword(userId, 
+    LocalDateTime changedAt = settingsCmd.changePassword(userId,
         dto.getCurrentPassword(), dto.getNewPassword());
-    
+
     ChangePasswordVo vo = new ChangePasswordVo();
     vo.setChangedAt(changedAt);
     return vo;
@@ -248,9 +248,9 @@ public class SettingsFacadeImpl implements SettingsFacade {
 
   @Override
   public DeleteAccountVo deleteAccount(Long userId, DeleteAccountDto dto) {
-    LocalDateTime scheduledAt = settingsCmd.requestDeleteAccount(userId, 
+    LocalDateTime scheduledAt = settingsCmd.requestDeleteAccount(userId,
         dto.getPassword(), dto.getReason(), dto.getFeedback());
-    
+
     DeleteAccountVo vo = new DeleteAccountVo();
     vo.setScheduledAt(scheduledAt);
     vo.setCancellable(true);

@@ -1,6 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.settings.facade.dto;
 
-import cloud.xcan.angus.core.ai.domain.settings.ShareAction;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.ShareAction;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import java.util.Map;

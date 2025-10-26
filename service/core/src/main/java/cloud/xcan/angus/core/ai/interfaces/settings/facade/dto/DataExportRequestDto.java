@@ -1,7 +1,7 @@
 package cloud.xcan.angus.core.ai.interfaces.settings.facade.dto;
 
-import cloud.xcan.angus.core.ai.domain.settings.ExportFormat;
-import cloud.xcan.angus.core.ai.domain.settings.ExportType;
+import cloud.xcan.angus.core.ai.domain.settings.dataexport.ExportFormat;
+import cloud.xcan.angus.core.ai.domain.settings.dataexport.ExportType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

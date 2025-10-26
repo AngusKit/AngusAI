@@ -1,6 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.settings.facade.dto;
 
-import cloud.xcan.angus.core.ai.domain.settings.Permission;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.SharePermission;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import java.util.List;
@@ -15,7 +15,7 @@ public class ResourceSharingAddMembersDto {
   private List<Long> memberIds;
 
   @Schema(description = "权限（默认继承共享设置）")
-  private Permission permission;
+  private SharePermission permission;
 
   @Schema(description = "是否通知成员", defaultValue = "true")
   private Boolean notifyMembers = true;

@@ -1,8 +1,8 @@
 package cloud.xcan.angus.core.ai.interfaces.settings.facade.dto;
 
-import cloud.xcan.angus.core.ai.domain.settings.Permission;
-import cloud.xcan.angus.core.ai.domain.settings.ResourceType;
-import cloud.xcan.angus.core.ai.domain.settings.SharedWith;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.SharePermission;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.ResourceType;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.SharedWith;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
@@ -26,7 +26,7 @@ public class ResourceSharingCreateDto {
 
   @NotNull(message = "权限不能为空")
   @Schema(description = "权限（view-查看，edit-编辑，manage-管理）", required = true)
-  private Permission permission;
+  private SharePermission permission;
 
   @Schema(description = "指定成员ID列表（sharedWith为specific时必填）")
   private List<Long> memberIds;

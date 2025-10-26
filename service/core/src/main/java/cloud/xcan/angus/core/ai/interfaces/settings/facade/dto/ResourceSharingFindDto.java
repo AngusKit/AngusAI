@@ -1,8 +1,8 @@
 package cloud.xcan.angus.core.ai.interfaces.settings.facade.dto;
 
-import cloud.xcan.angus.core.ai.domain.settings.Permission;
-import cloud.xcan.angus.core.ai.domain.settings.ResourceType;
-import cloud.xcan.angus.core.ai.domain.settings.SharedWith;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.SharePermission;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.ResourceType;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.SharedWith;
 import cloud.xcan.angus.remote.PageQuery;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -20,7 +20,7 @@ public class ResourceSharingFindDto extends PageQuery {
   private ResourceType type;
 
   @Schema(description = "权限筛选")
-  private Permission permission;
+  private SharePermission permission;
 
   @Schema(description = "共享范围筛选")
   private SharedWith sharedWith;

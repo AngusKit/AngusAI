@@ -1,9 +1,9 @@
 package cloud.xcan.angus.core.ai.interfaces.settings.facade.internal.assembler;
 
-import cloud.xcan.angus.core.ai.domain.settings.DataExport;
-import cloud.xcan.angus.core.ai.domain.settings.LoginHistory;
+import cloud.xcan.angus.core.ai.domain.settings.dataexport.DataExport;
+import cloud.xcan.angus.core.ai.domain.settings.loginhistory.LoginHistory;
 import cloud.xcan.angus.core.ai.domain.settings.NotificationSettings;
-import cloud.xcan.angus.core.ai.domain.settings.SecuritySettings;
+import cloud.xcan.angus.core.ai.domain.settings.securitysettings.SecuritySettings;
 import cloud.xcan.angus.core.ai.domain.settings.UserSession;
 import cloud.xcan.angus.core.ai.domain.settings.UserSettings;
 import cloud.xcan.angus.core.ai.interfaces.settings.facade.vo.DataExportVo;
@@ -87,7 +87,7 @@ public class SettingsAssembler {
       NotificationSettingsVo.EmailNotificationVo email = new NotificationSettingsVo.EmailNotificationVo();
       email.setEnabled(settings.getEmail().getEnabled());
       email.setFrequency(settings.getEmail().getFrequency());
-      
+
       if (settings.getEmail().getNotifications() != null) {
         NotificationSettingsVo.NotificationTypesVo types = new NotificationSettingsVo.NotificationTypesVo();
         types.setSystemUpdates(settings.getEmail().getNotifications().getSystemUpdates());
@@ -107,7 +107,7 @@ public class SettingsAssembler {
     if (settings.getBrowser() != null) {
       NotificationSettingsVo.BrowserNotificationVo browser = new NotificationSettingsVo.BrowserNotificationVo();
       browser.setEnabled(settings.getBrowser().getEnabled());
-      
+
       if (settings.getBrowser().getNotifications() != null) {
         NotificationSettingsVo.BrowserNotificationTypesVo types = new NotificationSettingsVo.BrowserNotificationTypesVo();
         types.setChatMessages(settings.getBrowser().getNotifications().getChatMessages());
@@ -131,7 +131,7 @@ public class SettingsAssembler {
     if (settings.getMobile() != null) {
       NotificationSettingsVo.MobileNotificationVo mobile = new NotificationSettingsVo.MobileNotificationVo();
       mobile.setEnabled(settings.getMobile().getEnabled());
-      
+
       if (settings.getMobile().getQuietHours() != null) {
         NotificationSettingsVo.QuietHoursVo quietHours = new NotificationSettingsVo.QuietHoursVo();
         quietHours.setEnabled(settings.getMobile().getQuietHours().getEnabled());
@@ -263,14 +263,14 @@ public class SettingsAssembler {
       totp.setSecret(settings.getTwoFactorSecret());
       // TODO: 生成真实的二维码URL
       totp.setQrCode("https://example.com/qr/" + settings.getTwoFactorSecret());
-      
+
       // 生成备用码
       List<String> backupCodes = new ArrayList<>();
       for (int i = 0; i < 10; i++) {
         backupCodes.add(RandomStringUtils.randomAlphanumeric(8).toUpperCase());
       }
       totp.setBackupCodes(backupCodes);
-      
+
       vo.setTotp(totp);
     } else {
       vo.setVerificationCodeSent(true);

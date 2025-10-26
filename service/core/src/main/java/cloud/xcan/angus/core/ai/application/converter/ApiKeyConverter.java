@@ -2,8 +2,8 @@ package cloud.xcan.angus.core.ai.application.converter;
 
 import cloud.xcan.angus.core.ai.domain.settings.apikey.ApiKey;
 import cloud.xcan.angus.core.ai.domain.settings.apikey.ApiKeyResource;
-import cloud.xcan.angus.core.ai.interfaces.settings.apikey.facade.vo.ApiKeyDetailVo;
-import cloud.xcan.angus.core.ai.interfaces.settings.apikey.facade.vo.ApiKeyListVo;
+import cloud.xcan.angus.core.ai.interfaces.settings.facade.vo.ApiKeyDetailVo;
+import cloud.xcan.angus.core.ai.interfaces.settings.facade.vo.ApiKeyListVo;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;

@@ -3,9 +3,10 @@ package cloud.xcan.angus.core.ai.interfaces.settings.facade.internal;
 import cloud.xcan.angus.core.ai.application.cmd.settings.ResourceSharingCmd;
 import cloud.xcan.angus.core.ai.application.converter.ResourceSharingConverter;
 import cloud.xcan.angus.core.ai.application.query.settings.ResourceSharingQuery;
-import cloud.xcan.angus.core.ai.domain.settings.ResourceSharing;
-import cloud.xcan.angus.core.ai.domain.settings.ResourceSharingMember;
-import cloud.xcan.angus.core.ai.domain.settings.ResourceType;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.SharePermission;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.ResourceSharing;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.ResourceSharingMember;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.ResourceType;
 import cloud.xcan.angus.core.ai.interfaces.settings.facade.ResourceSharingFacade;
 import cloud.xcan.angus.core.ai.interfaces.settings.facade.dto.ResourceSharingAccessDto;
 import cloud.xcan.angus.core.ai.interfaces.settings.facade.dto.ResourceSharingAddMembersDto;
@@ -265,7 +266,7 @@ public class ResourceSharingFacadeImpl implements ResourceSharingFacade {
    * 获取权限标签
    */
   private String getPermissionLabel(
-      cloud.xcan.angus.core.ai.domain.settings.Permission permission) {
+      SharePermission permission) {
     if (permission == null) {
       return "";
     }

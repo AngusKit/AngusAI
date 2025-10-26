@@ -1,6 +1,5 @@
 package cloud.xcan.angus.core.ai.interfaces.workflow.facade;
 
-import cloud.xcan.angus.core.ai.domain.workflow.WorkflowConfig;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowFindDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowUpdateDto;
@@ -8,7 +7,7 @@ import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowConfigUpd
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowExecuteDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowStopDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowToggleDto;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.ExecutionLogFindDto;
+import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowExecutionLogFindDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowDuplicateDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowListVo;
@@ -77,7 +76,7 @@ public interface WorkflowFacade {
   /**
    * 获取执行日志
    */
-  PageResult<ExecutionLogVo> getExecutionLogs(ExecutionLogFindDto dto);
+  PageResult<ExecutionLogVo> getExecutionLogs(WorkflowExecutionLogFindDto dto);
 
   /**
    * 获取执行详情

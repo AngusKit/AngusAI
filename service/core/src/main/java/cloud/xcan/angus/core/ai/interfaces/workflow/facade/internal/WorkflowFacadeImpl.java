@@ -15,7 +15,7 @@ import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowConfigUpd
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowExecuteDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowStopDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowToggleDto;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.ExecutionLogFindDto;
+import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowExecutionLogFindDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowDuplicateDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.internal.assembler.WorkflowAssembler;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowDetailVo;
@@ -120,7 +120,7 @@ public class WorkflowFacadeImpl implements WorkflowFacade {
   }
 
   @Override
-  public PageResult<ExecutionLogVo> getExecutionLogs(ExecutionLogFindDto dto) {
+  public PageResult<ExecutionLogVo> getExecutionLogs(WorkflowExecutionLogFindDto dto) {
     // 这里应该调用执行日志查询服务
     // 暂时返回模拟数据
     PageResult<ExecutionLogVo> result = new PageResult<>();

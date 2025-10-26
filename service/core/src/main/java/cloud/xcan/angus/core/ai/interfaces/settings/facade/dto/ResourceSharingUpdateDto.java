@@ -1,7 +1,7 @@
 package cloud.xcan.angus.core.ai.interfaces.settings.facade.dto;
 
-import cloud.xcan.angus.core.ai.domain.settings.Permission;
-import cloud.xcan.angus.core.ai.domain.settings.SharedWith;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.SharePermission;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.SharedWith;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.Data;
@@ -14,7 +14,7 @@ public class ResourceSharingUpdateDto {
   private SharedWith sharedWith;
 
   @Schema(description = "权限")
-  private Permission permission;
+  private SharePermission permission;
 
   @Schema(description = "成员ID列表")
   private List<Long> memberIds;

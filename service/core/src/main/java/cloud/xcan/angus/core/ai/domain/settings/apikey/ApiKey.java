@@ -1,6 +1,7 @@
 package cloud.xcan.angus.core.ai.domain.settings.apikey;
 
 import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
+import cloud.xcan.angus.core.jpa.multitenancy.TenantEntity;
 import cloud.xcan.angus.core.jpa.multitenancy.TenantListener;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -26,11 +27,10 @@ import java.util.List;
  */
 @Entity
 @Table(name = "api_key")
-@EntityListeners({TenantListener.class})
 @Setter
 @Getter
 @Accessors(chain = true)
-public class ApiKey extends TenantAuditingEntity<ApiKey, Long> {
+public class ApiKey extends TenantEntity<ApiKey, Long> {
 
   @Id
   private Long id;

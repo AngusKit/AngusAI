@@ -1,6 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.settings.facade;
 
-import cloud.xcan.angus.core.ai.domain.settings.ResourceType;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.ResourceType;
 import cloud.xcan.angus.core.ai.interfaces.settings.facade.dto.ResourceSharingAccessDto;
 import cloud.xcan.angus.core.ai.interfaces.settings.facade.dto.ResourceSharingAddMembersDto;
 import cloud.xcan.angus.core.ai.interfaces.settings.facade.dto.ResourceSharingCreateDto;

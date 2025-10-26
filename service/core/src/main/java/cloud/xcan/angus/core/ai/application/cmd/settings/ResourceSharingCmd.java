@@ -1,8 +1,8 @@
 package cloud.xcan.angus.core.ai.application.cmd.settings;
 
-import cloud.xcan.angus.core.ai.domain.settings.ResourceSharing;
-import cloud.xcan.angus.core.ai.domain.settings.ResourceSharingMember;
-import cloud.xcan.angus.core.ai.domain.settings.ResourceType;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.ResourceSharing;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.ResourceSharingMember;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.ResourceType;
 import cloud.xcan.angus.core.ai.interfaces.settings.facade.dto.ResourceSharingAccessDto;
 import cloud.xcan.angus.core.ai.interfaces.settings.facade.dto.ResourceSharingCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.settings.facade.dto.ResourceSharingUpdateDto;
