@@ -1,5 +1,7 @@
 package cloud.xcan.angus.core.ai.interfaces.chat.facade.internal.assembler;
 
+import static cloud.xcan.angus.spec.utils.ObjectUtils.nullSafe;
+
 import cloud.xcan.angus.core.ai.domain.chat.Session;
 import cloud.xcan.angus.core.ai.domain.chat.SessionConfig;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.SessionCreateDto;
@@ -8,67 +10,37 @@ import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.SessionUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.SessionDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.SessionListVo;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
-import cloud.xcan.angus.core.utils.CoreUtils;
-import org.springframework.util.StringUtils;
-
 import java.time.ZoneId;
 import java.util.Date;
+import org.springframework.util.StringUtils;
 
-/**
- * Session转换器
- */
 public class SessionAssembler {
 
-  /**
-   * SessionCreateDto -> Session
-   */
   public static Session toDomain(SessionCreateDto dto) {
     Session session = new Session();
-    session.setTitle(dto.getTitle() != null ? dto.getTitle() : "新对话");
     session.setAppId(dto.getAppId());
     session.setModelId(dto.getModelId());
-    
+
     // 设置配置
-    if (dto.getConfig() != null) {
-      SessionConfig config = new SessionConfig();
-      CoreUtils.copyProperties(dto.getConfig(), config);
-      session.setConfig(config);
-    } else {
-      session.setConfig(new SessionConfig());
-    }
-    
+    session.setConfig(nullSafe(dto.getConfig(), new SessionConfig()));
+
     // 初始化计数和标志
     session.setMessageCount(0);
     session.setIsArchived(false);
     session.setIsPinned(false);
     session.setIsStarred(false);
-    
     return session;
   }
 
-  /**
-   * SessionUpdateDto -> Session (更新)
-   */
   public static Session updateDomain(Long id, SessionUpdateDto dto) {
     Session session = new Session();
-    // Note: Session实体使用BaseEntity,可能没有setId方法
-    // 在实际使用中,通过sessionCmd.update()时会先查询现有session
-    
-    if (dto.getTitle() != null) {
-      session.setTitle(dto.getTitle());
-    }
-    if (dto.getIsPinned() != null) {
-      session.setIsPinned(dto.getIsPinned());
-    }
-    if (dto.getIsArchived() != null) {
-      session.setIsArchived(dto.getIsArchived());
-    }
-    if (dto.getConfig() != null) {
-      SessionConfig config = new SessionConfig();
-      CoreUtils.copyProperties(dto.getConfig(), config);
-      session.setConfig(config);
-    }
-    
+    session.setId(id);
+    session.setTitle(dto.getTitle());
+    session.setAppId(dto.getAppId());
+    session.setModelId(dto.getModelId());
+    session.setIsPinned(dto.getIsPinned());
+    session.setIsArchived(dto.getIsArchived());
+    session.setConfig(dto.getConfig());
     return session;
   }
 
@@ -79,7 +51,7 @@ public class SessionAssembler {
     if (session == null) {
       return null;
     }
-    
+
     SessionDetailVo vo = new SessionDetailVo();
     // Note: 这些getter方法由BaseEntity提供
     vo.setId(session.identity());
@@ -90,23 +62,24 @@ public class SessionAssembler {
     vo.setIsArchived(session.getIsArchived());
     vo.setIsPinned(session.getIsPinned());
     vo.setIsStarred(session.getIsStarred());
-    
+
     // 审计字段从TenantAuditingEntity继承
     if (session.getCreatedBy() != null) {
       vo.setCreatedBy(session.getCreatedBy());
     }
     if (session.getCreatedDate() != null) {
-      vo.setCreatedDate(Date.from(session.getCreatedDate().atZone(ZoneId.systemDefault()).toInstant()));
+      vo.setCreatedDate(
+          Date.from(session.getCreatedDate().atZone(ZoneId.systemDefault()).toInstant()));
     }
     if (session.getLastModifiedDate() != null) {
-      vo.setLastModifiedDate(Date.from(session.getLastModifiedDate().atZone(ZoneId.systemDefault()).toInstant()));
+      vo.setLastModifiedDate(
+          Date.from(session.getLastModifiedDate().atZone(ZoneId.systemDefault()).toInstant()));
     }
-    
+
     // 转换配置
     if (session.getConfig() != null) {
       vo.setConfig(session.getConfig());
     }
-    
     return vo;
   }
 
@@ -117,7 +90,7 @@ public class SessionAssembler {
     if (session == null) {
       return null;
     }
-    
+
     SessionListVo vo = new SessionListVo();
     vo.setId(session.identity());
     vo.setTitle(session.getTitle());
@@ -127,14 +100,16 @@ public class SessionAssembler {
     vo.setIsArchived(session.getIsArchived());
     vo.setIsPinned(session.getIsPinned());
     vo.setIsStarred(session.getIsStarred());
-    
+
     if (session.getCreatedDate() != null) {
-      vo.setCreatedDate(Date.from(session.getCreatedDate().atZone(ZoneId.systemDefault()).toInstant()));
+      vo.setCreatedDate(
+          Date.from(session.getCreatedDate().atZone(ZoneId.systemDefault()).toInstant()));
     }
     if (session.getLastModifiedDate() != null) {
-      vo.setLastModifiedDate(Date.from(session.getLastModifiedDate().atZone(ZoneId.systemDefault()).toInstant()));
+      vo.setLastModifiedDate(
+          Date.from(session.getLastModifiedDate().atZone(ZoneId.systemDefault()).toInstant()));
     }
-    
+
     // 最后一条消息
     if (StringUtils.hasText(session.getLastMessageContent())) {
       SessionListVo.LastMessage lastMessage = new SessionListVo.LastMessage();
@@ -145,7 +120,7 @@ public class SessionAssembler {
       }
       vo.setLastMessage(lastMessage);
     }
-    
+
     return vo;
   }
 
@@ -159,16 +134,4 @@ public class SessionAssembler {
     return new GenericSpecification<>();
   }
 
-  /**
-   * DTO配置转SessionConfig
-   */
-  public static SessionConfig toConfig(Object configDto) {
-    if (configDto == null) {
-      return new SessionConfig();
-    }
-    
-    SessionConfig config = new SessionConfig();
-    CoreUtils.copyProperties(configDto, config);
-    return config;
-  }
 }

@@ -33,18 +33,13 @@ public class SessionFacadeImpl implements SessionFacade {
 
   @Override
   public SessionDetailVo createSession(SessionCreateDto dto) {
-    Long sessionId = sessionCmd.create(dto.getTitle(), dto.getAppId(), dto.getModelId(), 
-        SessionAssembler.toConfig(dto.getConfig()));
-    Session session = sessionQuery.findAndCheck(sessionId);
-    return SessionAssembler.toDetailVo(session);
+    Session saved = sessionCmd.create(SessionAssembler.toDomain(dto));
+    return SessionAssembler.toDetailVo(saved);
   }
 
   @Override
   public SessionDetailVo updateSession(Long id, SessionUpdateDto dto) {
-    SessionConfig config = dto.getConfig() != null ? SessionAssembler.toConfig(dto.getConfig()) : null;
-    sessionCmd.update(id, dto.getTitle(), null, null, config, 
-        dto.getIsPinned(), dto.getIsStarred(), dto.getIsArchived());
-    Session session = sessionQuery.findAndCheck(id);
+    Session session = sessionCmd.update(SessionAssembler.updateDomain(id, dto));
     return SessionAssembler.toDetailVo(session);
   }
 
@@ -67,15 +62,6 @@ public class SessionFacadeImpl implements SessionFacade {
     sessionCmd.star(sessionId, dto.getIsStarred());
     Session session = sessionQuery.findAndCheck(sessionId);
     return SessionAssembler.toDetailVo(session);
-  }
-
-  @Override
-  public String applyPrompt(Long sessionId, PromptApplyDto dto) {
-    // TODO: 实现提示词应用
-    // 1. 从提示词库获取提示词模板
-    // 2. 替换变量
-    // 3. 返回渲染后的提示词
-    return "渲染后的提示词内容";
   }
 
   @Override

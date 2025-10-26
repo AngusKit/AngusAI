@@ -18,7 +18,7 @@ public class MessageSendDto {
 
   @Schema(description = "消息内容", required = true)
   @NotBlank(message = "消息内容不能为空")
-  @Size(max = 10000, message = "消息内容不能超过10000字符")
+  @Size(max = 60000, message = "消息内容不能超过60000字符")
   private String content;
 
   @Schema(description = "附件列表")

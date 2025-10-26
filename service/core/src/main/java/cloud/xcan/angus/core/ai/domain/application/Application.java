@@ -1,12 +1,11 @@
 package cloud.xcan.angus.core.ai.domain.application;
 
 import cloud.xcan.angus.core.ai.domain.Constants;
+import cloud.xcan.angus.core.ai.domain.model.Model;
 import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
-import cloud.xcan.angus.core.jpa.multitenancy.TenantListener;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
@@ -72,7 +71,10 @@ public class Application extends TenantAuditingEntity<Application, Long> {
   @Column(columnDefinition = "json", name = "config")
   private ApplicationConfig config;
 
-  // 关联资源
+  // 关联资源（冗余字段）
+  @Column(name = "model_id")
+  private Long modelId;
+
   @Column(name = "knowledge_base_id")
   private Long knowledgeBaseId;
 
@@ -109,6 +111,10 @@ public class Application extends TenantAuditingEntity<Application, Long> {
   private boolean shareAnonymousAccess;
   @Transient
   private boolean shareAuthorizationRequired;
+  @Transient
+  private Model appModel;
+  @Transient
+  private Model currentTempModel;
 
   @Override
   public Long identity() {

@@ -2,10 +2,9 @@ package cloud.xcan.angus.core.ai.application.query.chat;
 
 import cloud.xcan.angus.core.ai.domain.chat.Session;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-
-import java.util.List;
 
 /**
  * 会话查询接口
@@ -13,14 +12,15 @@ import java.util.List;
 public interface SessionQuery {
 
   /**
-   * 根据ID查找会话
-   */
-  Session findById(Long id);
-
-  /**
-   * 根据ID查找并检查会话是否存在
+   * 查找并检查会话是否存在
    */
   Session findAndCheck(Long id);
+
+  /**
+   * 根据条件查询会话（支持全文搜索）
+   */
+  Page<Session> find(GenericSpecification<Session> spec, PageRequest pageable,
+      boolean fullTextSearch, String[] match);
 
   /**
    * 根据应用ID查询会话列表
@@ -48,15 +48,14 @@ public interface SessionQuery {
   List<Session> findArchivedSessions(Long userId);
 
   /**
-   * 根据条件查询会话
+   * 查询最近创建的会话
    */
-  Page<Session> find(GenericSpecification<Session> spec, PageRequest pageable);
+  List<Session> findRecentSessions(Long userId, int limit);
 
   /**
-   * 根据条件查询会话（支持全文搜索）
+   * 查询最近活跃的会话
    */
-  Page<Session> find(GenericSpecification<Session> spec, PageRequest pageable, 
-                     boolean fullTextSearch, String[] match);
+  List<Session> findRecentActiveSessions(Long userId, int limit);
 
   /**
    * 统计用户的会话数量
@@ -73,13 +72,4 @@ public interface SessionQuery {
    */
   long countByModelId(Long modelId);
 
-  /**
-   * 查询最近创建的会话
-   */
-  List<Session> findRecentSessions(Long userId, int limit);
-
-  /**
-   * 查询最近活跃的会话
-   */
-  List<Session> findRecentActiveSessions(Long userId, int limit);
 }

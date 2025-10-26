@@ -16,14 +16,13 @@ import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.MessageSendVo;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.MessageVo;
 import cloud.xcan.angus.remote.PageResult;
 import jakarta.annotation.Resource;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-// import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
  * Message Facade实现
@@ -44,9 +43,9 @@ public class MessageFacadeImpl implements MessageFacade {
   public MessageSendVo sendMessage(Long sessionId, MessageSendDto dto) {
     // 1. 创建用户消息
     Long userMessageId = messageCmd.createWithAttachments(
-        sessionId, 
-        MessageRole.USER, 
-        dto.getContent(), 
+        sessionId,
+        MessageRole.USER,
+        dto.getContent(),
         dto.getAttachments()
     );
 
@@ -62,18 +61,17 @@ public class MessageFacadeImpl implements MessageFacade {
     Message assistantMsg = messageQuery.findById(assistantMessageId);
     vo.setUserMsg(MessageAssembler.toMessageVo(userMsg));
     vo.setAssistantMsg(MessageAssembler.toMessageVo(assistantMsg));
-
     return vo;
   }
 
   @Override
-  public Object sendMessageStream(Long sessionId, MessageSendDto dto) {
+  public SseEmitter sendMessageStream(Long sessionId, MessageSendDto dto) {
     // TODO: 实现流式消息发送
     // 1. 创建用户消息
     messageCmd.createWithAttachments(
-        sessionId, 
-        MessageRole.USER, 
-        dto.getContent(), 
+        sessionId,
+        MessageRole.USER,
+        dto.getContent(),
         dto.getAttachments()
     );
 
@@ -84,7 +82,7 @@ public class MessageFacadeImpl implements MessageFacade {
     // 3. 异步流式调用AI服务
     // TODO: 实现具体的流式响应逻辑
     // 这里应该启动异步任务来处理流式响应
-    
+
     return null; // TODO: 返回实际的流式响应对象
   }
 
@@ -107,13 +105,13 @@ public class MessageFacadeImpl implements MessageFacade {
   public MessageVo regenerateMessage(Long sessionId, Long messageId) {
     // 1. 获取原消息
     Message originalMessage = messageQuery.findAndCheck(messageId);
-    
+
     // 2. 重新调用AI生成
     String newContent = callAIService(sessionId, originalMessage.getContent(), null);
-    
+
     // 3. 重新生成消息
     Long newMessageId = messageCmd.regenerateMessage(messageId, newContent);
-    
+
     // 4. 返回新消息
     Message newMessage = messageQuery.findById(newMessageId);
     return MessageAssembler.toMessageVo(newMessage);
@@ -123,7 +121,7 @@ public class MessageFacadeImpl implements MessageFacade {
   public MessageVo feedbackMessage(Long sessionId, Long messageId, MessageFeedbackDto dto) {
     // 添加消息反馈
     messageCmd.addFeedback(messageId, dto.getFeedbackType(), dto.getComment());
-    
+
     // 返回更新后的消息
     Message message = messageQuery.findById(messageId);
     return MessageAssembler.toMessageVo(message);
@@ -133,16 +131,16 @@ public class MessageFacadeImpl implements MessageFacade {
   public MessageVo stopGeneration(Long sessionId) {
     // 1. 查找正在流式生成的消息
     List<Message> streamingMessages = messageQuery.findStreamingMessages(sessionId);
-    
+
     if (!streamingMessages.isEmpty()) {
       Message message = streamingMessages.get(0);
       // 2. 停止流式生成
       messageCmd.setStreaming(message.getId(), false);
-      
+
       // 3. 返回当前消息状态
       return MessageAssembler.toMessageVo(message);
     }
-    
+
     return new MessageVo();
   }
 
@@ -163,11 +161,11 @@ public class MessageFacadeImpl implements MessageFacade {
   public PageResult<MessageVo> listMessages(Long sessionId, MessageFindDto dto) {
     PageRequest pageable = PageRequest.of(dto.getPageNo() - 1, dto.getPageSize());
     Page<Message> page = messageQuery.findBySessionId(sessionId, pageable);
-    
+
     List<MessageVo> content = page.getContent().stream()
         .map(MessageAssembler::toMessageVo)
         .collect(Collectors.toList());
-    
+
     return PageResult.of(page.getTotalElements(), content);
   }
 
@@ -178,13 +176,13 @@ public class MessageFacadeImpl implements MessageFacade {
     // 2. 查询消息统计数据
     // 3. 聚合并返回
     ChatStatisticsVo vo = new ChatStatisticsVo();
-    
+
     // TODO: 实现具体统计逻辑
     // - 今日会话数/消息数
     // - 使用趋势
     // - 热门应用
     // - 热门模型
-    
+
     return vo;
   }
 
@@ -195,7 +193,7 @@ public class MessageFacadeImpl implements MessageFacade {
     // TODO: 集成实际的AI服务
     // 这里应该调用AI服务API，传入会话ID、消息内容、配置等参数
     // 返回AI生成的响应内容
-    
+
     // 模拟AI响应
     return "这是AI的模拟响应：" + content;
   }

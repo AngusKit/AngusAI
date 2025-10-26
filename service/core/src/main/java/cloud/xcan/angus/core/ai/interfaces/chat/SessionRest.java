@@ -1,7 +1,13 @@
 package cloud.xcan.angus.core.ai.interfaces.chat;
 
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.SessionFacade;
-import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.*;
+import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.SessionBatchDeleteDto;
+import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.SessionCreateDto;
+import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.SessionFindDto;
+import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.SessionStarDto;
+import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.SessionSwitchAppDto;
+import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.SessionSwitchModelDto;
+import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.SessionUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.SessionDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.SessionListVo;
 import cloud.xcan.angus.remote.ApiLocaleResult;
@@ -16,12 +22,18 @@ import jakarta.validation.Valid;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
-/**
- * 对话会话REST接口
- */
-@Tag(name = "Chat Session", description = "对话会话管理 - 会话创建、更新、删除、切换等功能")
+@Tag(name = "对话会话", description = "对话会话管理 - 会话创建、更新、删除、切换等功能")
 @Validated
 @RestController
 @RequestMapping("/api/v1/chat/sessions")
@@ -75,15 +87,6 @@ public class SessionRest {
     return ApiLocaleResult.success(sessionFacade.starSession(sessionId, dto));
   }
 
-  @Operation(operationId = "applyPrompt", summary = "应用提示词", description = "将提示词库中的提示词应用到当前会话")
-  @PostMapping("/{sessionId}/apply-prompt")
-  @SuppressWarnings("unchecked")
-  public ApiLocaleResult<String> applyPrompt(
-      @Parameter(description = "会话ID") @PathVariable Long sessionId,
-      @Valid @RequestBody PromptApplyDto dto) {
-    return (ApiLocaleResult<String>) ApiLocaleResult.success(sessionFacade.applyPrompt(sessionId, dto));
-  }
-
   @Operation(operationId = "deleteSession", summary = "删除会话", description = "删除指定会话")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "204", description = "删除成功")
@@ -106,7 +109,8 @@ public class SessionRest {
       @ApiResponse(responseCode = "404", description = "会话不存在")
   })
   @GetMapping("/{id}")
-  public ApiLocaleResult<SessionDetailVo> getDetail(@Parameter(description = "会话ID") @PathVariable Long id) {
+  public ApiLocaleResult<SessionDetailVo> getDetail(
+      @Parameter(description = "会话ID") @PathVariable Long id) {
     return ApiLocaleResult.success(sessionFacade.getSessionDetail(id));
   }
 
@@ -115,7 +119,8 @@ public class SessionRest {
       @ApiResponse(responseCode = "200", description = "会话列表获取成功")
   })
   @GetMapping
-  public ApiLocaleResult<PageResult<SessionListVo>> list(@Valid @ParameterObject SessionFindDto dto) {
+  public ApiLocaleResult<PageResult<SessionListVo>> list(
+      @Valid @ParameterObject SessionFindDto dto) {
     return ApiLocaleResult.success(sessionFacade.listSessions(dto));
   }
 

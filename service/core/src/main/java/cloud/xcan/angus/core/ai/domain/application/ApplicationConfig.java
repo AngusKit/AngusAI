@@ -1,8 +1,11 @@
 package cloud.xcan.angus.core.ai.domain.application;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.Data;
 
@@ -10,13 +13,17 @@ import lombok.Data;
 @Schema(description = "应用配置更新请求参数")
 public class ApplicationConfig {
 
-  @Schema(description = "模型配置")
+  @Valid
+  @NotNull
+  @Schema(description = "模型配置", requiredMode = RequiredMode.REQUIRED)
   private ModelConfig model;
 
   @Schema(description = "关联资源")
   private ResourcesConfig resources;
 
-  @Schema(description = "提示词配置")
+  @Valid
+  @NotNull
+  @Schema(description = "提示词配置", requiredMode = RequiredMode.REQUIRED)
   private PromptsConfig prompts;
 
   @Schema(description = "对话设置")
@@ -32,8 +39,12 @@ public class ApplicationConfig {
   private PublishConfig publish;
 
   @Data
-  @Schema(description = "模型配置")
+  @Schema(description = "默认模型配置")
   public static class ModelConfig {
+
+    @Schema(description = "模型Id", requiredMode = RequiredMode.REQUIRED)
+    @NotNull
+    private Long id;
 
     @Schema(description = "模型提供商", example = "openai")
     private String provider;

@@ -1,6 +1,12 @@
 package cloud.xcan.angus.core.ai.interfaces.chat.facade;
 
-import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.*;
+import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.SessionBatchDeleteDto;
+import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.SessionCreateDto;
+import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.SessionFindDto;
+import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.SessionStarDto;
+import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.SessionSwitchAppDto;
+import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.SessionSwitchModelDto;
+import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.SessionUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.SessionDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.SessionListVo;
 import cloud.xcan.angus.remote.PageResult;
@@ -34,11 +40,6 @@ public interface SessionFacade {
    * 收藏/取消收藏会话
    */
   SessionDetailVo starSession(Long sessionId, SessionStarDto dto);
-
-  /**
-   * 应用提示词
-   */
-  String applyPrompt(Long sessionId, PromptApplyDto dto);
 
   /**
    * 删除会话

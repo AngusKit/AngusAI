@@ -21,13 +21,19 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-/**
- * 对话消息REST接口
- */
-@Tag(name = "Chat Message", description = "对话消息管理 - 消息发送、接收、历史查询、反馈等功能")
+@Tag(name = "对话消息", description = "对话消息管理 - 消息发送、接收、历史查询、反馈等功能")
 @Validated
 @RestController
 @RequestMapping("/api/v1/chat/sessions")
@@ -49,9 +55,12 @@ public class MessageRest {
   }
 
   @Operation(operationId = "sendMessageStream", summary = "发送消息（流式）", description = "发送消息并获取流式AI响应（Server-Sent Events）")
-  @PostMapping(value = "/{sessionId}/messages/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-  public Object sendMessageStream(
-      @Parameter(description = "会话ID") @PathVariable Long sessionId,
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "SSE流式响应")
+  })
+  @PostMapping(value = "/sessions/{sessionId}/messages/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+  public SseEmitter sendMessageStream(
+      @PathVariable @Parameter(description = "会话ID") Long sessionId,
       @Valid @RequestBody MessageSendDto dto) {
     return messageFacade.sendMessageStream(sessionId, dto);
   }
@@ -85,13 +94,15 @@ public class MessageRest {
 
   @Operation(operationId = "stopGeneration", summary = "停止生成", description = "停止当前正在生成的消息")
   @PostMapping("/{sessionId}/stop")
-  public ApiLocaleResult<MessageVo> stop(@Parameter(description = "会话ID") @PathVariable Long sessionId) {
+  public ApiLocaleResult<MessageVo> stop(
+      @Parameter(description = "会话ID") @PathVariable Long sessionId) {
     return ApiLocaleResult.success(messageFacade.stopGeneration(sessionId));
   }
 
   @Operation(operationId = "clearMessages", summary = "清空当前对话", description = "清空指定会话的所有消息")
   @DeleteMapping("/{sessionId}/messages")
-  public ApiLocaleResult<Integer> clearMessages(@Parameter(description = "会话ID") @PathVariable Long sessionId) {
+  public ApiLocaleResult<Integer> clearMessages(
+      @Parameter(description = "会话ID") @PathVariable Long sessionId) {
     return ApiLocaleResult.success(messageFacade.clearSessionMessages(sessionId));
   }
 
@@ -112,12 +123,11 @@ public class MessageRest {
 
   @Operation(operationId = "voiceToText", summary = "语音输入", description = "语音转文字")
   @PostMapping("/voice-to-text")
-  @SuppressWarnings("unchecked")
   public ApiLocaleResult<String> voiceToText(
       @Parameter(description = "音频文件") @RequestParam("audio") MultipartFile audio,
       @Parameter(description = "语言代码") @RequestParam(required = false) String language) {
     // TODO: 实现语音识别逻辑
-    return (ApiLocaleResult<String>) ApiLocaleResult.success("识别的文本内容");
+    return null;
   }
 
   @Operation(operationId = "getChatStatistics", summary = "获取对话统计", description = "获取对话模块统计数据")

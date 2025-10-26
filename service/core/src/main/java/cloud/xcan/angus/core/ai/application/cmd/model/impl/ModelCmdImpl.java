@@ -59,7 +59,7 @@ public class ModelCmdImpl extends CommCmd<Model, Long> implements ModelCmd {
       @Override
       protected void checkParams() {
         // 获取模型并验证是否存在
-        modelDb = modelQuery.findById(model.getId());
+        modelDb = modelQuery.findAndCheck(model.getId());
         if (modelDb == null) {
           throw ResourceNotFound.of("模型不存在", new Object[]{});
         }
@@ -88,7 +88,7 @@ public class ModelCmdImpl extends CommCmd<Model, Long> implements ModelCmd {
       @Override
       protected void checkParams() {
         // 获取模型并验证是否存在
-        modelDb = modelQuery.findById(id);
+        modelDb = modelQuery.findAndCheck(id);
         if (modelDb == null) {
           throw ResourceNotFound.of("模型不存在", new Object[]{});
         }
@@ -110,7 +110,7 @@ public class ModelCmdImpl extends CommCmd<Model, Long> implements ModelCmd {
       @Override
       protected void checkParams() {
         // 获取模型并验证是否存在
-        modelDb = modelQuery.findById(id);
+        modelDb = modelQuery.findAndCheck(id);
         if (modelDb == null) {
           throw ResourceNotFound.of("模型不存在", new Object[]{});
         }
@@ -132,7 +132,7 @@ public class ModelCmdImpl extends CommCmd<Model, Long> implements ModelCmd {
       @Override
       protected void checkParams() {
         // 获取模型并验证是否存在
-        modelDb = modelQuery.findById(id);
+        modelDb = modelQuery.findAndCheck(id);
         if (modelDb == null) {
           throw ResourceNotFound.of("模型不存在", new Object[]{});
         }
@@ -154,7 +154,7 @@ public class ModelCmdImpl extends CommCmd<Model, Long> implements ModelCmd {
       @Override
       protected void checkParams() {
         // 获取模型并验证是否存在
-        modelDb = modelQuery.findById(id);
+        modelDb = modelQuery.findAndCheck(id);
         if (modelDb == null) {
           throw ResourceNotFound.of("模型不存在", new Object[]{});
         }
@@ -176,7 +176,7 @@ public class ModelCmdImpl extends CommCmd<Model, Long> implements ModelCmd {
       @Override
       protected void checkParams() {
         // 获取模型并验证是否存在
-        modelDb = modelQuery.findById(id);
+        modelDb = modelQuery.findAndCheck(id);
         if (modelDb == null) {
           throw ResourceNotFound.of("模型不存在", new Object[]{});
         }
@@ -198,7 +198,7 @@ public class ModelCmdImpl extends CommCmd<Model, Long> implements ModelCmd {
       @Override
       protected void checkParams() {
         // 获取模型并验证是否存在
-        modelDb = modelQuery.findById(id);
+        modelDb = modelQuery.findAndCheck(id);
         if (modelDb == null) {
           throw ResourceNotFound.of("模型不存在", new Object[]{});
         }
@@ -220,7 +220,7 @@ public class ModelCmdImpl extends CommCmd<Model, Long> implements ModelCmd {
       @Override
       protected void checkParams() {
         // 获取模型并验证是否存在
-        modelDb = modelQuery.findById(id);
+        modelDb = modelQuery.findAndCheck(id);
         if (modelDb == null) {
           throw ResourceNotFound.of("模型不存在", new Object[]{});
         }
@@ -246,7 +246,7 @@ public class ModelCmdImpl extends CommCmd<Model, Long> implements ModelCmd {
       @Override
       protected void checkParams() {
         // 获取模型并验证是否存在
-        modelDb = modelQuery.findById(id);
+        modelDb = modelQuery.findAndCheck(id);
         if (modelDb == null) {
           throw ResourceNotFound.of("模型不存在", new Object[]{});
         }

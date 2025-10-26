@@ -70,7 +70,7 @@ public class Session extends TenantAuditingEntity<Session, Long> {
   private Boolean isPinned = false;
 
   /**
-   * 是否收藏（星标）
+   * 是否收藏（星标） TODO 一对多，需建立子表
    */
   @Column(nullable = false)
   private Boolean isStarred = false;
@@ -78,7 +78,7 @@ public class Session extends TenantAuditingEntity<Session, Long> {
   /**
    * 最后一条消息内容摘要
    */
-  @Column(length = 500)
+  @Column(length = 60000, columnDefinition = "MEDIUMTEXT")
   private String lastMessageContent;
 
   /**

@@ -103,7 +103,7 @@ public class ModelFacadeImpl implements ModelFacade {
   @NameJoin
   @Override
   public ModelDetailVo getDetail(Long id) {
-    Model model = modelQuery.findById(id);
+    Model model = modelQuery.findAndCheck(id);
     return ModelAssembler.toDetailVo(model);
   }
 
@@ -111,9 +111,9 @@ public class ModelFacadeImpl implements ModelFacade {
   @Override
   public PageResult<ModelListVo> list(ModelFindDto dto) {
     GenericSpecification<Model> spec = ModelAssembler.getSpecification(dto);
-    Page<Model> page = modelQuery.find(spec, 
-        PageRequest.of(0, 20), 
-        false, 
+    Page<Model> page = modelQuery.find(spec,
+        PageRequest.of(0, 20),
+        false,
         null);
     return buildVoPageResult(page, ModelAssembler::toListVo);
   }
@@ -129,7 +129,7 @@ public class ModelFacadeImpl implements ModelFacade {
 
   @Override
   public ModelDetailVo export(Long id) {
-    Model model = modelQuery.findById(id);
+    Model model = modelQuery.findAndCheck(id);
     return ModelAssembler.toDetailVo(model);
   }
 

@@ -1,5 +1,7 @@
 package cloud.xcan.angus.core.ai.application.cmd.chat;
 
+import cloud.xcan.angus.core.ai.domain.chat.MessageRole;
+import cloud.xcan.angus.core.ai.domain.chat.Session;
 import cloud.xcan.angus.core.ai.domain.chat.SessionConfig;
 
 /**
@@ -10,13 +12,12 @@ public interface SessionCmd {
   /**
    * 创建会话
    */
-  Long create(String title, Long appId, Long modelId, SessionConfig config);
+  Session create(Session session);
 
   /**
    * 更新会话
    */
-  void update(Long id, String title, Long appId, Long modelId, SessionConfig config,
-              Boolean isPinned, Boolean isStarred, Boolean isArchived);
+  Session update(Session session);
 
   /**
    * 切换应用
@@ -36,7 +37,7 @@ public interface SessionCmd {
   /**
    * 更新会话的最后消息信息
    */
-  void updateLastMessage(Long sessionId, String content, cloud.xcan.angus.core.ai.domain.chat.MessageRole role);
+  void updateLastMessage(Long sessionId, String content, MessageRole role);
 
   /**
    * 增加消息计数

@@ -2,6 +2,7 @@ package cloud.xcan.angus.core.ai.application.cmd.application.impl;
 
 import static cloud.xcan.angus.core.ai.application.converter.ApplicationConverter.toApplicationShare;
 import static cloud.xcan.angus.core.ai.application.converter.ApplicationConverter.toDuplicateApplication;
+import static cloud.xcan.angus.core.ai.application.converter.ApplicationConverter.updateAssociatedIds;
 
 import cloud.xcan.angus.core.ai.application.cmd.application.ApplicationCmd;
 import cloud.xcan.angus.core.ai.application.query.application.ApplicationQuery;
@@ -96,11 +97,16 @@ public class ApplicationCmdImpl extends CommCmd<Application, Long> implements Ap
             applicationDb.getId())) {
           throw ResourceExisted.of("应用名称「{0}」已存在", new Object[]{application.getName()});
         }
+
+        // 检查应用关联资源（模型、知识库、数据集、工作流）是否存在 TODO
       }
 
       @Override
       protected Application process() {
+        // 更新修改字段
         CoreUtils.copyPropertiesIgnoreNull(application, applicationDb);
+        // 设置关联资源ID（冗余字段）
+        updateAssociatedIds(application.getConfig(), applicationDb);
         return applicationRepo.save(applicationDb);
       }
     }.execute();
@@ -116,11 +122,19 @@ public class ApplicationCmdImpl extends CommCmd<Application, Long> implements Ap
       protected void checkParams() {
         // 获取源应用并检查是否存在
         applicationDb = applicationQuery.findAndCheck(id);
+
+        // 检查应用关联资源（模型、知识库、数据集、工作流）是否存在 TODO
       }
 
       @Override
       protected Application process() {
+        // TODO 如果信息应用模型被修改，同步更新已有会话默认模型
+
+        // 更新配置
         applicationDb.setConfig(config);
+
+        // 设置关联资源ID（冗余字段）
+        updateAssociatedIds(config, applicationDb);
         return applicationRepo.save(applicationDb);
       }
     }.execute();

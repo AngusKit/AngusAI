@@ -7,19 +7,6 @@ import org.springframework.data.domain.PageRequest;
 
 public interface ModelRepo extends BaseRepository<Model, Long> {
 
-  // ==================== 查询方法 ====================
-  
-  /**
-   * 查询模型列表
-   */
-  Page<Model> find(GenericSpecification<Model> spec, PageRequest pageable,
-      boolean fullTextSearch, String[] match);
-
-  /**
-   * 根据ID查询模型
-   */
-  Model findById(Long id);
-
   /**
    * 根据状态查询模型列表
    */
@@ -76,7 +63,7 @@ public interface ModelRepo extends BaseRepository<Model, Long> {
   Page<Model> findModelsNeedingMonitoring(PageRequest pageable);
 
   // ==================== 统计方法 ====================
-  
+
   /**
    * 统计模型数量
    */
@@ -98,7 +85,7 @@ public interface ModelRepo extends BaseRepository<Model, Long> {
   long countByProvider(ModelProvider provider);
 
   // ==================== 修改方法 ====================
-  
+
   /**
    * 检查模型名称是否存在
    */

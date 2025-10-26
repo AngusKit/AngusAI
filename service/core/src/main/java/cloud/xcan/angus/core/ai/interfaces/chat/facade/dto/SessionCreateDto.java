@@ -2,7 +2,6 @@ package cloud.xcan.angus.core.ai.interfaces.chat.facade.dto;
 
 import cloud.xcan.angus.core.ai.domain.chat.SessionConfig;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -22,10 +21,10 @@ public class SessionCreateDto {
   @NotNull(message = "应用ID不能为空")
   private Long appId;
 
-  @Schema(description = "使用的模型ID", required = true)
-  @NotNull(message = "模型ID不能为空")
+  @Schema(description = "使用的模型ID")
   private Long modelId;
 
   @Schema(description = "会话配置")
   private SessionConfig config;
+
 }

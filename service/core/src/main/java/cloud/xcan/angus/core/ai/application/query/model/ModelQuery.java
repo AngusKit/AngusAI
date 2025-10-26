@@ -11,15 +11,16 @@ import org.springframework.data.domain.PageRequest;
 public interface ModelQuery {
 
   /**
+   * 查询模型并检查是否存在
+   */
+  Model findAndCheck(Long id);
+
+  /**
    * 查询模型列表
    */
   Page<Model> find(GenericSpecification<Model> spec, PageRequest pageable,
       boolean fullTextSearch, String[] match);
 
-  /**
-   * 根据ID查询模型
-   */
-  Model findById(Long id);
 
   /**
    * 检查模型名称是否存在

@@ -1,10 +1,14 @@
 package cloud.xcan.angus.core.ai.application.query.application.impl;
 
+import static java.util.Objects.nonNull;
+
 import cloud.xcan.angus.core.ai.application.query.application.ApplicationQuery;
+import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.domain.application.Application;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationRepo;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationSearchRepo;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
+import cloud.xcan.angus.core.ai.domain.model.Model;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
@@ -13,6 +17,7 @@ import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -24,6 +29,9 @@ public class ApplicationQueryImpl implements ApplicationQuery {
   @Resource
   private ApplicationSearchRepo applicationSearchRepo;
 
+  @Resource
+  private ModelQuery modelQuery;
+
   @Override
   public Application findAndCheck(Long id) {
     return new BizTemplate<Application>() {
@@ -31,6 +39,31 @@ public class ApplicationQueryImpl implements ApplicationQuery {
       protected Application process() {
         return applicationRepo.findById(id)
             .orElseThrow(() -> ResourceNotFound.of("应用不存在", new Object[]{}));
+      }
+    }.execute();
+  }
+
+  @Override
+  public Application findAndCheck(Long id, @Nullable Long currentTempModelId) {
+    return new BizTemplate<Application>() {
+      Application application;
+      Model currentTempMode;
+
+      @Override
+      protected void checkParams() {
+        application = findAndCheck(id);
+        if (nonNull(currentTempModelId)){
+          currentTempMode = modelQuery.findAndCheck(currentTempModelId);
+        }
+      }
+
+      @Override
+      protected Application process() {
+        if (nonNull(application.getModelId())) {
+          application.setAppModel(modelQuery.findAndCheck(application.getModelId()));
+        }
+        application.setCurrentTempModel(currentTempMode);
+        return application;
       }
     }.execute();
   }

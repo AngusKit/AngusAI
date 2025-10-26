@@ -14,6 +14,11 @@ public interface ApplicationQuery {
   Application findAndCheck(Long id);
 
   /**
+   * 查询应用并检查应用和模型是否存在
+   */
+  Application findAndCheck(Long id, Long modelId);
+
+  /**
    * 查询应用列表
    */
   Page<Application> find(GenericSpecification<Application> spec, PageRequest pageable,

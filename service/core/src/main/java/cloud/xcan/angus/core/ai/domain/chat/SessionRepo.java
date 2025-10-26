@@ -13,8 +13,6 @@ import java.util.List;
 @NoRepositoryBean
 public interface SessionRepo extends BaseRepository<Session, Long> {
 
-  // ==================== 查询方法 ====================
-  
   /**
    * 根据应用ID查询会话列表
    */
@@ -50,8 +48,6 @@ public interface SessionRepo extends BaseRepository<Session, Long> {
    */
   Page<Session> findByCreatedByOrderByLastModifiedDateDesc(Long userId, Pageable pageable);
 
-  // ==================== 统计方法 ====================
-  
   /**
    * 统计用户的会话数量
    */
@@ -67,4 +63,8 @@ public interface SessionRepo extends BaseRepository<Session, Long> {
    */
   long countByModelId(Long modelId);
 
+  /**
+   * 批量删除消息
+   */
+  int deleteByIdIn(List<Long> ids);
 }

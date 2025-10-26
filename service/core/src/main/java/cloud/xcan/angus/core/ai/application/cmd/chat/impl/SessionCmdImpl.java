@@ -1,20 +1,25 @@
 package cloud.xcan.angus.core.ai.application.cmd.chat.impl;
 
+import static cloud.xcan.angus.spec.utils.ObjectUtils.nullSafe;
+import static java.util.Objects.nonNull;
+
 import cloud.xcan.angus.core.ai.application.cmd.chat.SessionCmd;
+import cloud.xcan.angus.core.ai.application.query.application.ApplicationQuery;
+import cloud.xcan.angus.core.ai.application.query.chat.SessionQuery;
+import cloud.xcan.angus.core.ai.domain.application.Application;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRepo;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRole;
 import cloud.xcan.angus.core.ai.domain.chat.Session;
-import cloud.xcan.angus.core.ai.domain.chat.SessionConfig;
 import cloud.xcan.angus.core.ai.domain.chat.SessionRepo;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
 import cloud.xcan.angus.core.utils.CoreUtils;
-import cloud.xcan.angus.remote.message.http.ResourceNotFound;
+import cloud.xcan.angus.remote.message.ProtocolException;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import java.util.List;
-import org.apache.commons.lang3.ObjectUtils;
+import java.util.Objects;
 import org.springframework.stereotype.Component;
 
 /**
@@ -29,70 +34,77 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
   @Resource
   private MessageRepo messageRepo;
 
+  @Resource
+  private SessionQuery sessionQuery;
+
+  @Resource
+  private ApplicationQuery applicationQuery;
+
   @Override
   @Transactional
-  public Long create(String title, Long appId, Long modelId, SessionConfig config) {
-    return new BizTemplate<Long>() {
+  public Session create(Session session) {
+    return new BizTemplate<Session>() {
       @Override
       protected void checkParams() {
-        // 参数验证
-        if (appId == null) {
-          throw new IllegalArgumentException("应用ID不能为空");
+        // 检查应用和模型是否存在
+        Application application = applicationQuery.findAndCheck(
+            session.getId(), session.getModelId());
+
+        // 切换应用模型时，检查模型类型是否一致
+        if (nonNull(session.getModelId()) && nonNull(application.getModelId())
+            && !Objects.equals(session.getModelId(), application.getModelId())
+            && !Objects.equals(application.getCurrentTempModel().getType(),
+            application.getAppModel().getType())) {
+          throw ProtocolException.of("当前选择模型类型[{0}]与应用默认模型类型[{1}]不一致",
+              new Object[]{application.getCurrentTempModel().getType(),
+                  application.getAppModel().getType()});
         }
-        if (modelId == null) {
-          throw new IllegalArgumentException("模型ID不能为空");
-        }
+
+        // TODO 检查会话配额，默认每个用户应用会话数不超过500，应用总会话不超过10000
       }
 
       @Override
-      protected Long process() {
-        Session session = new Session();
-        session.setTitle(ObjectUtils.defaultIfNull(title, "新对话"));
-        session.setAppId(appId);
-        session.setModelId(modelId);
-        session.setConfig(config);
-        session.setMessageCount(0);
-        session.setIsArchived(false);
-        session.setIsPinned(false);
-        session.setIsStarred(false);
+      protected Session process() {
+        session.setTitle(nullSafe(session.getTitle(), "新对话"));
 
-        Session savedSession = sessionRepo.save(session);
-        return savedSession.getId();
+        insert0(sessionRepo.save(session));
+        return session;
       }
     }.execute();
   }
 
   @Override
   @Transactional
-  public void update(Long id, String title, Long appId, Long modelId, SessionConfig config,
-                     Boolean isPinned, Boolean isStarred, Boolean isArchived) {
-    new BizTemplate<Void>() {
-      Session session;
+  public Session update(Session session) {
+    return new BizTemplate<Session>() {
+      Session sessionDb;
 
       @Override
       protected void checkParams() {
-        session = sessionRepo.findById(id)
-            .orElseThrow(() -> ResourceNotFound.of("会话不存在", new Object[]{}));
+        // 查找并检查会话是否存在
+        sessionDb = sessionQuery.findAndCheck(session.getId());
+
+        // 检查应用和模型是否存在
+        Application application = applicationQuery.findAndCheck(session.getAppId(),
+            session.getModelId());
+
+        // 切换应用模型时，检查模型类型是否一致
+        if (nonNull(session.getModelId()) && nonNull(application.getModelId())
+            && !Objects.equals(session.getModelId(), application.getModelId())
+            && !Objects.equals(application.getCurrentTempModel().getType(),
+            application.getAppModel().getType())) {
+          throw ProtocolException.of("当前选择模型类型[{0}]与应用默认模型类型[{1}]不一致",
+              new Object[]{application.getCurrentTempModel().getType(),
+                  application.getAppModel().getType()});
+        }
+
+        // TODO 检查会话配额，默认每个用户应用会话数不超过500，应用总会话不超过10000
       }
 
       @Override
-      protected Void process() {
-        if (title != null) session.setTitle(title);
-        if (appId != null) session.setAppId(appId);
-        if (modelId != null) session.setModelId(modelId);
-        if (config != null) {
-          SessionConfig existingConfig = session.getConfig();
-          if (existingConfig == null) {
-            session.setConfig(config);
-          } else {
-            CoreUtils.copyPropertiesIgnoreNull(config, existingConfig);
-          }
-        }
-        if (isPinned != null) session.setIsPinned(isPinned);
-        if (isStarred != null) session.setIsStarred(isStarred);
-        if (isArchived != null) session.setIsArchived(isArchived);
-
-        sessionRepo.save(session);
+      protected Session process() {
+        CoreUtils.copyPropertiesIgnoreNull(session, sessionDb);
+        sessionRepo.save(sessionDb);
         return null;
       }
     }.execute();
@@ -103,16 +115,21 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
   public void switchApp(Long id, Long appId) {
     new BizTemplate<Void>() {
       Session session;
+      Application application;
 
       @Override
       protected void checkParams() {
-        session = sessionRepo.findById(id)
-            .orElseThrow(() -> ResourceNotFound.of("会话不存在", new Object[]{}));
+        // 查找并检查会话是否存在
+        session = sessionQuery.findAndCheck(id);
+
+        // 检查应用是否存在
+        applicationQuery.findAndCheck(appId);
       }
 
       @Override
       protected Void process() {
         session.setAppId(appId);
+        session.setModelId(application.getModelId());
         sessionRepo.save(session);
         return null;
       }
@@ -127,8 +144,21 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
 
       @Override
       protected void checkParams() {
-        session = sessionRepo.findById(id)
-            .orElseThrow(() -> ResourceNotFound.of("会话不存在", new Object[]{}));
+        // 查找并检查会话是否存在
+        session = sessionQuery.findAndCheck(id);
+
+        // 检查应用和模型是否存在
+        Application application = applicationQuery.findAndCheck(session.getAppId(), modelId);
+
+        // 切换应用模型时，检查模型类型是否一致
+        if (nonNull(modelId) && nonNull(application.getModelId())
+            && !Objects.equals(modelId, application.getModelId())
+            && !Objects.equals(application.getCurrentTempModel().getType(),
+            application.getAppModel().getType())) {
+          throw ProtocolException.of("当前选择模型类型[{0}]与应用默认模型类型[{1}]不一致",
+              new Object[]{application.getCurrentTempModel().getType(),
+                  application.getAppModel().getType()});
+        }
       }
 
       @Override
@@ -148,12 +178,13 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
 
       @Override
       protected void checkParams() {
-        session = sessionRepo.findById(id)
-            .orElseThrow(() -> ResourceNotFound.of("会话不存在", new Object[]{}));
+        // 查找并检查会话是否存在
+        session = sessionQuery.findAndCheck(id);
       }
 
       @Override
       protected Void process() {
+        // TODO 一对多，需建立子表
         session.setIsStarred(isStarred);
         sessionRepo.save(session);
         return null;
@@ -166,10 +197,17 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
   public void updateLastMessage(Long sessionId, String content, MessageRole role) {
     new BizTemplate<Void>() {
       @Override
+      protected void checkParams() {
+        if (content.length() > 60000) {
+          throw ProtocolException.of("消息长度不能超过{0}个字符", new Object[]{60000});
+        }
+      }
+
+      @Override
       protected Void process() {
         Session session = sessionRepo.findById(sessionId).orElse(null);
         if (session != null) {
-          session.setLastMessageContent(content.length() > 200 ? content.substring(0, 200) : content);
+          session.setLastMessageContent(content);
           session.setLastMessageRole(role);
           session.setLastMessageTime(System.currentTimeMillis());
           sessionRepo.save(session);
@@ -200,12 +238,6 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
   public void delete(Long id) {
     new BizTemplate<Void>() {
       @Override
-      protected void checkParams() {
-        sessionRepo.findById(id)
-            .orElseThrow(() -> ResourceNotFound.of("会话不存在", new Object[]{}));
-      }
-
-      @Override
       protected Void process() {
         // 删除会话的所有消息
         messageRepo.deleteBySessionId(id);
@@ -218,14 +250,28 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
 
   @Override
   @Transactional
+  public Integer batchDelete(List<Long> sessionIds) {
+    return new BizTemplate<Integer>() {
+      @Override
+      protected Integer process() {
+        // 删除会话的所有消息
+        messageRepo.deleteBySessionIdIn(sessionIds);
+        // 删除会话
+        return sessionRepo.deleteByIdIn(sessionIds);
+      }
+    }.execute();
+  }
+
+  @Override
+  @Transactional
   public Integer clearMessages(Long id) {
     return new BizTemplate<Integer>() {
       Session session;
 
       @Override
       protected void checkParams() {
-        session = sessionRepo.findById(id)
-            .orElseThrow(() -> ResourceNotFound.of("会话不存在", new Object[]{}));
+        // 查找并检查会话是否存在
+        session = sessionQuery.findAndCheck(id);
       }
 
       @Override
@@ -239,28 +285,7 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
         session.setLastMessageRole(null);
         session.setLastMessageTime(null);
         sessionRepo.save(session);
-
         return (int) count;
-      }
-    }.execute();
-  }
-
-  @Override
-  @Transactional
-  public Integer batchDelete(List<Long> sessionIds) {
-    return new BizTemplate<Integer>() {
-      @Override
-      protected Integer process() {
-        int count = 0;
-        for (Long id : sessionIds) {
-          try {
-            delete(id);
-            count++;
-          } catch (Exception e) {
-            // 记录日志，继续删除其他会话
-          }
-        }
-        return count;
       }
     }.execute();
   }

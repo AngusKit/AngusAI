@@ -3,9 +3,13 @@ package cloud.xcan.angus.core.ai.application.query.model.impl;
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.domain.model.Model;
 import cloud.xcan.angus.core.ai.domain.model.ModelProvider;
+import cloud.xcan.angus.core.ai.domain.model.ModelRepo;
+import cloud.xcan.angus.core.ai.domain.model.ModelSearchRepo;
 import cloud.xcan.angus.core.ai.domain.model.ModelStatus;
 import cloud.xcan.angus.core.ai.domain.model.ModelType;
+import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
+import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import jakarta.annotation.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,17 +19,33 @@ import org.springframework.stereotype.Component;
 public class ModelQueryImpl implements ModelQuery {
 
   @Resource
-  private cloud.xcan.angus.core.ai.domain.model.ModelRepo modelRepo;
+  private ModelRepo modelRepo;
+
+  @Resource
+  private ModelSearchRepo modelSearchRepo;
+
+  @Override
+  public Model findAndCheck(Long id) {
+    return new BizTemplate<Model>() {
+      @Override
+      protected Model process() {
+        return modelRepo.findById(id)
+            .orElseThrow(() -> ResourceNotFound.of("模型不存在", new Object[]{}));
+      }
+    }.execute();
+  }
 
   @Override
   public Page<Model> find(GenericSpecification<Model> spec, PageRequest pageable,
       boolean fullTextSearch, String[] match) {
-    return modelRepo.find(spec, pageable, fullTextSearch, match);
-  }
-
-  @Override
-  public Model findById(Long id) {
-    return modelRepo.findById(id);
+    return new BizTemplate<Page<Model>>() {
+      @Override
+      protected Page<Model> process() {
+        return fullTextSearch
+            ? modelSearchRepo.find(spec.getCriteria(), pageable, Model.class, match)
+            : modelRepo.findAll(spec, pageable);
+      }
+    }.execute();
   }
 
   @Override

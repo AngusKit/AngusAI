@@ -54,11 +54,11 @@ public class MessageCmdImpl extends CommCmd<Message, Long> implements MessageCmd
         message.setIsStreaming(false);
 
         Message savedMessage = messageRepo.save(message);
-        
+
         // 更新会话统计
         sessionCmd.incrementMessageCount(sessionId);
         sessionCmd.updateLastMessage(sessionId, content, role);
-        
+
         return savedMessage.getId();
       }
     }.execute();
@@ -66,8 +66,8 @@ public class MessageCmdImpl extends CommCmd<Message, Long> implements MessageCmd
 
   @Override
   @Transactional
-  public Long createWithAttachments(Long sessionId, MessageRole role, String content, 
-                                   List<MessageAttachment> attachments) {
+  public Long createWithAttachments(Long sessionId, MessageRole role, String content,
+      List<MessageAttachment> attachments) {
     return new BizTemplate<Long>() {
       @Override
       protected void checkParams() {
@@ -92,11 +92,11 @@ public class MessageCmdImpl extends CommCmd<Message, Long> implements MessageCmd
         message.setIsStreaming(false);
 
         Message savedMessage = messageRepo.save(message);
-        
+
         // 更新会话统计
         sessionCmd.incrementMessageCount(sessionId);
         sessionCmd.updateLastMessage(sessionId, content, role);
-        
+
         return savedMessage.getId();
       }
     }.execute();
@@ -118,10 +118,10 @@ public class MessageCmdImpl extends CommCmd<Message, Long> implements MessageCmd
       protected Void process() {
         message.setContent(content);
         messageRepo.save(message);
-        
+
         // 更新会话的最后消息
         sessionCmd.updateLastMessage(message.getSessionId(), content, message.getRole());
-        
+
         return null;
       }
     }.execute();
@@ -207,7 +207,7 @@ public class MessageCmdImpl extends CommCmd<Message, Long> implements MessageCmd
       protected Long process() {
         // 删除原消息
         messageRepo.deleteById(originalMessageId);
-        
+
         // 创建新消息
         Message newMessage = new Message();
         newMessage.setSessionId(originalMessage.getSessionId());
@@ -218,10 +218,11 @@ public class MessageCmdImpl extends CommCmd<Message, Long> implements MessageCmd
         newMessage.setParentMessageId(originalMessageId);
 
         Message savedMessage = messageRepo.save(newMessage);
-        
+
         // 更新会话的最后消息
-        sessionCmd.updateLastMessage(originalMessage.getSessionId(), newContent, originalMessage.getRole());
-        
+        sessionCmd.updateLastMessage(originalMessage.getSessionId(), newContent,
+            originalMessage.getRole());
+
         return savedMessage.getId();
       }
     }.execute();
