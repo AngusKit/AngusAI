@@ -1,6 +1,5 @@
 package cloud.xcan.angus.core.ai.interfaces.dataset.facade.internal;
 
-import static cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder.getMatchSearchFields;
 import static cloud.xcan.angus.core.utils.CoreUtils.buildVoPageResult;
 
 import cloud.xcan.angus.core.ai.application.cmd.dataset.DatasetCmd;
@@ -66,17 +65,17 @@ public class DatasetFacadeImpl implements DatasetFacade {
   }
 
   @Override
-  public void delete(Long id) {
-    datasetCmd.delete(id);
-  }
-
-  @Override
   public DatasetStatisticsVo batchDeleteData(Long id, BatchDeleteDto dto) {
     // 这里应该调用批量删除服务
     // 暂时返回模拟数据
     DatasetStatisticsVo result = new DatasetStatisticsVo();
     // TODO: 实现批量删除逻辑
     return result;
+  }
+
+  @Override
+  public void delete(Long id) {
+    datasetCmd.delete(id);
   }
 
   @NameJoin

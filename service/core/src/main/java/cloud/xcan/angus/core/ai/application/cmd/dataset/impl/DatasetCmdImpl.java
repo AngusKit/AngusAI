@@ -127,18 +127,6 @@ public class DatasetCmdImpl extends CommCmd<Dataset, Long> implements DatasetCmd
   }
 
   @Override
-  @Transactional
-  public void delete(Long id) {
-    new BizTemplate<Void>() {
-      @Override
-      protected Void process() {
-        datasetRepo.deleteById(id);
-        return null;
-      }
-    }.execute();
-  }
-
-  @Override
   public Dataset batchDeleteData(Long id, BatchDeleteDto dto) {
     return new BizTemplate<Dataset>() {
       Dataset datasetDb;
@@ -178,28 +166,6 @@ public class DatasetCmdImpl extends CommCmd<Dataset, Long> implements DatasetCmd
       protected Dataset process() {
         // TODO: 实现数据上传逻辑
         return datasetDb;
-      }
-    }.execute();
-  }
-
-  @Override
-  public String exportData(Long id, String format, Long sourceId) {
-    return new BizTemplate<String>() {
-      Dataset datasetDb;
-
-      @Override
-      protected void checkParams() {
-        // 获取数据集并验证是否存在
-        datasetDb = datasetQuery.findById(id);
-        if (datasetDb == null) {
-          throw ResourceNotFound.of("数据集不存在", new Object[]{});
-        }
-      }
-
-      @Override
-      protected String process() {
-        // TODO: 实现数据导出逻辑
-        return "export_url";
       }
     }.execute();
   }
@@ -366,28 +332,6 @@ public class DatasetCmdImpl extends CommCmd<Dataset, Long> implements DatasetCmd
   }
 
   @Override
-  public boolean validateConfig(DatasetConfig config) {
-    return new BizTemplate<Boolean>() {
-      @Override
-      protected Boolean process() {
-        // TODO: 实现配置验证逻辑
-        return true;
-      }
-    }.execute();
-  }
-
-  @Override
-  public boolean checkDependencies(Long id) {
-    return new BizTemplate<Boolean>() {
-      @Override
-      protected Boolean process() {
-        // TODO: 实现依赖检查逻辑
-        return true;
-      }
-    }.execute();
-  }
-
-  @Override
   public void cleanupResources(Long id) {
     new BizTemplate<Void>() {
       @Override
@@ -405,6 +349,62 @@ public class DatasetCmdImpl extends CommCmd<Dataset, Long> implements DatasetCmd
       protected Void process() {
         // TODO: 实现批量操作逻辑
         return null;
+      }
+    }.execute();
+  }
+
+  @Override
+  @Transactional
+  public void delete(Long id) {
+    new BizTemplate<Void>() {
+      @Override
+      protected Void process() {
+        datasetRepo.deleteById(id);
+        return null;
+      }
+    }.execute();
+  }
+
+  @Override
+  public String exportData(Long id, String format, Long sourceId) {
+    return new BizTemplate<String>() {
+      Dataset datasetDb;
+
+      @Override
+      protected void checkParams() {
+        // 获取数据集并验证是否存在
+        datasetDb = datasetQuery.findById(id);
+        if (datasetDb == null) {
+          throw ResourceNotFound.of("数据集不存在", new Object[]{});
+        }
+      }
+
+      @Override
+      protected String process() {
+        // TODO: 实现数据导出逻辑
+        return "export_url";
+      }
+    }.execute();
+  }
+
+  @Override
+  public boolean validateConfig(DatasetConfig config) {
+    return new BizTemplate<Boolean>() {
+      @Override
+      protected Boolean process() {
+        // TODO: 实现配置验证逻辑
+        return true;
+      }
+    }.execute();
+  }
+
+  @Override
+  public boolean checkDependencies(Long id) {
+    return new BizTemplate<Boolean>() {
+      @Override
+      protected Boolean process() {
+        // TODO: 实现依赖检查逻辑
+        return true;
       }
     }.execute();
   }

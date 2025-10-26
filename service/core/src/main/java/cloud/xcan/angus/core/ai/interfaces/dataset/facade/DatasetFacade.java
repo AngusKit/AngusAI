@@ -36,14 +36,14 @@ public interface DatasetFacade {
   UploadResultVo uploadData(Long id, DataUploadDto dto);
 
   /**
-   * 删除数据集
-   */
-  void delete(Long id);
-
-  /**
    * 批量删除数据
    */
   DatasetStatisticsVo batchDeleteData(Long id, BatchDeleteDto dto);
+
+  /**
+   * 删除数据集
+   */
+  void delete(Long id);
 
   /**
    * 获取数据集详情

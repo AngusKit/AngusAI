@@ -93,17 +93,6 @@ public class DatasetRest {
     return ApiLocaleResult.success(datasetFacade.uploadData(id, dto));
   }
 
-  @Operation(operationId = "deleteDataset", summary = "删除数据集", description = "删除指定数据集")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "204", description = "删除成功")
-  })
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  @DeleteMapping("/{id}")
-  public void delete(
-      @Parameter(description = "数据集ID") @PathVariable Long id) {
-    datasetFacade.delete(id);
-  }
-
   @Operation(operationId = "batchDeleteData", summary = "批量删除数据", description = "批量删除数据记录")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "批量删除成功")
@@ -113,6 +102,17 @@ public class DatasetRest {
       @Parameter(description = "数据集ID") @PathVariable Long id,
       @Valid @RequestBody BatchDeleteDto dto) {
     return ApiLocaleResult.success(datasetFacade.batchDeleteData(id, dto));
+  }
+
+  @Operation(operationId = "deleteDataset", summary = "删除数据集", description = "删除指定数据集")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "204", description = "删除成功")
+  })
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @DeleteMapping("/{id}")
+  public void delete(
+      @Parameter(description = "数据集ID") @PathVariable Long id) {
+    datasetFacade.delete(id);
   }
 
   @Operation(operationId = "getDatasetDetail", summary = "获取数据集详情", description = "获取指定数据集的详细信息")
@@ -156,11 +156,13 @@ public class DatasetRest {
       @ApiResponse(responseCode = "200", description = "导出成功")
   })
   @GetMapping("/{id}/export")
+  @SuppressWarnings("unchecked")
   public ApiLocaleResult<String> exportData(
       @Parameter(description = "数据集ID") @PathVariable Long id,
       @Parameter(description = "导出格式") @RequestParam(required = false, defaultValue = "csv") String format,
       @Parameter(description = "数据源ID") @RequestParam(required = false) Long sourceId) {
-    return ApiLocaleResult.success(datasetFacade.exportData(id, format, sourceId));
+    String result = datasetFacade.exportData(id, format, sourceId);
+    return (ApiLocaleResult<String>) ApiLocaleResult.success(result);
   }
 
   @Operation(operationId = "getDatasetStatistics", summary = "获取数据集统计", description = "获取数据集模块的统计数据")

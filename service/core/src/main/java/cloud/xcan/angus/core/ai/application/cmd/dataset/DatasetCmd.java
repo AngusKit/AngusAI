@@ -28,11 +28,6 @@ public interface DatasetCmd {
   Dataset updateStatus(Long id, String status);
 
   /**
-   * 删除数据集
-   */
-  void delete(Long id);
-
-  /**
    * 批量删除数据
    */
   Dataset batchDeleteData(Long id, BatchDeleteDto dto);
@@ -41,11 +36,6 @@ public interface DatasetCmd {
    * 上传数据
    */
   Dataset uploadData(Long id, DataUploadDto dto);
-
-  /**
-   * 导出数据
-   */
-  String exportData(Long id, String format, Long sourceId);
 
   /**
    * 备份数据集
@@ -83,16 +73,6 @@ public interface DatasetCmd {
   void updateStatistics(Long id, Long recordCount, Long totalSize);
 
   /**
-   * 验证数据集配置
-   */
-  boolean validateConfig(DatasetConfig config);
-
-  /**
-   * 检查数据集依赖
-   */
-  boolean checkDependencies(Long id);
-
-  /**
    * 清理数据集资源
    */
   void cleanupResources(Long id);
@@ -101,5 +81,25 @@ public interface DatasetCmd {
    * 批量操作数据集
    */
   void batchOperation(Long[] ids, String operation);
+
+  /**
+   * 删除数据集
+   */
+  void delete(Long id);
+
+  /**
+   * 导出数据
+   */
+  String exportData(Long id, String format, Long sourceId);
+
+  /**
+   * 验证数据集配置
+   */
+  boolean validateConfig(DatasetConfig config);
+
+  /**
+   * 检查数据集依赖
+   */
+  boolean checkDependencies(Long id);
 
 }
