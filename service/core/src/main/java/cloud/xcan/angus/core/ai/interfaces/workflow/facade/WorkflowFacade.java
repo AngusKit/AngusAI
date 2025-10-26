@@ -39,6 +39,26 @@ public interface WorkflowFacade {
   WorkflowDetailVo updateConfig(Long id, WorkflowConfigUpdateDto dto);
 
   /**
+   * 启用/禁用工作流
+   */
+  WorkflowToggleResultVo toggle(Long id, WorkflowToggleDto dto);
+
+  /**
+   * 执行工作流
+   */
+  WorkflowExecuteResultVo execute(Long id, WorkflowExecuteDto dto);
+
+  /**
+   * 停止工作流执行
+   */
+  WorkflowStopResultVo stop(Long id, WorkflowStopDto dto);
+
+  /**
+   * 恢复到特定版本
+   */
+  WorkflowRestoreResultVo restoreVersion(Long id, Long versionId);
+
+  /**
    * 删除工作流
    */
   void delete(Long id);
@@ -64,16 +84,6 @@ public interface WorkflowFacade {
   WorkflowStatisticsVo getStatistics(String period);
 
   /**
-   * 执行工作流
-   */
-  WorkflowExecuteResultVo execute(Long id, WorkflowExecuteDto dto);
-
-  /**
-   * 停止工作流执行
-   */
-  WorkflowStopResultVo stop(Long id, WorkflowStopDto dto);
-
-  /**
    * 获取执行日志
    */
   PageResult<ExecutionLogVo> getExecutionLogs(WorkflowExecutionLogFindDto dto);
@@ -92,15 +102,5 @@ public interface WorkflowFacade {
    * 获取特定版本
    */
   WorkflowVersionVo getVersion(Long id, Long versionId);
-
-  /**
-   * 恢复到特定版本
-   */
-  WorkflowRestoreResultVo restoreVersion(Long id, Long versionId);
-
-  /**
-   * 启用/禁用工作流
-   */
-  WorkflowToggleResultVo toggle(Long id, WorkflowToggleDto dto);
 
 }

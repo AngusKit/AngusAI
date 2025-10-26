@@ -24,14 +24,9 @@ public interface WorkflowCmd {
   Workflow updateConfig(Long id, WorkflowConfig config);
 
   /**
-   * 删除工作流
+   * 启用/禁用工作流
    */
-  void delete(Long id);
-
-  /**
-   * 复制工作流
-   */
-  Workflow duplicate(Long id, String name);
+  Workflow toggle(Long id, WorkflowToggleDto dto);
 
   /**
    * 执行工作流
@@ -44,9 +39,54 @@ public interface WorkflowCmd {
   Workflow stop(Long id, WorkflowStopDto dto);
 
   /**
-   * 启用/禁用工作流
+   * 恢复到特定版本
    */
-  Workflow toggle(Long id, WorkflowToggleDto dto);
+  Workflow restoreVersion(Long id, Long versionId);
+
+  /**
+   * 恢复工作流
+   */
+  Workflow restoreWorkflow(Long id, String backupId);
+
+  /**
+   * 暂停工作流执行
+   */
+  Workflow pauseExecution(Long id, String executionId);
+
+  /**
+   * 恢复工作流执行
+   */
+  Workflow resumeExecution(Long id, String executionId);
+
+  /**
+   * 取消工作流执行
+   */
+  Workflow cancelExecution(Long id, String executionId);
+
+  /**
+   * 归档工作流
+   */
+  Workflow archiveWorkflow(Long id);
+
+  /**
+   * 取消归档工作流
+   */
+  Workflow unarchiveWorkflow(Long id);
+
+  /**
+   * 更新工作流状态
+   */
+  Workflow updateStatus(Long id, String status);
+
+  /**
+   * 删除工作流
+   */
+  void delete(Long id);
+
+  /**
+   * 复制工作流
+   */
+  Workflow duplicate(Long id, String name);
 
   /**
    * 创建工作流版本
@@ -54,29 +94,14 @@ public interface WorkflowCmd {
   Workflow createVersion(Long id, String description);
 
   /**
-   * 恢复到特定版本
+   * 备份工作流
    */
-  Workflow restoreVersion(Long id, Long versionId);
+  Workflow backupWorkflow(Long id);
 
   /**
-   * 验证工作流配置
+   * 获取工作流执行状态
    */
-  boolean validateConfig(WorkflowConfig config);
-
-  /**
-   * 检查工作流依赖
-   */
-  boolean checkDependencies(Long id);
-
-  /**
-   * 清理工作流资源
-   */
-  void cleanupResources(Long id);
-
-  /**
-   * 更新工作流状态
-   */
-  Workflow updateStatus(Long id, String status);
+  String getExecutionStatus(Long id, String executionId);
 
   /**
    * 记录工作流执行
@@ -90,29 +115,14 @@ public interface WorkflowCmd {
       Long failedExecutions, Double avgExecutionTime);
 
   /**
-   * 备份工作流
+   * 验证工作流配置
    */
-  Workflow backupWorkflow(Long id);
+  boolean validateConfig(WorkflowConfig config);
 
   /**
-   * 恢复工作流
+   * 检查工作流依赖
    */
-  Workflow restoreWorkflow(Long id, String backupId);
-
-  /**
-   * 批量操作工作流
-   */
-  void batchOperation(Long[] ids, String operation);
-
-  /**
-   * 归档工作流
-   */
-  Workflow archiveWorkflow(Long id);
-
-  /**
-   * 取消归档工作流
-   */
-  Workflow unarchiveWorkflow(Long id);
+  boolean checkDependencies(Long id);
 
   /**
    * 验证节点连接
@@ -135,6 +145,11 @@ public interface WorkflowCmd {
   String generateVersionNumber(Long id);
 
   /**
+   * 清理工作流资源
+   */
+  void cleanupResources(Long id);
+
+  /**
    * 清理过期版本
    */
   void cleanupExpiredVersions(Long id);
@@ -145,23 +160,8 @@ public interface WorkflowCmd {
   void cleanupExpiredExecutions(Long id);
 
   /**
-   * 暂停工作流执行
+   * 批量操作工作流
    */
-  Workflow pauseExecution(Long id, String executionId);
-
-  /**
-   * 恢复工作流执行
-   */
-  Workflow resumeExecution(Long id, String executionId);
-
-  /**
-   * 获取工作流执行状态
-   */
-  String getExecutionStatus(Long id, String executionId);
-
-  /**
-   * 取消工作流执行
-   */
-  Workflow cancelExecution(Long id, String executionId);
+  void batchOperation(Long[] ids, String operation);
 
 }
