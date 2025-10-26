@@ -10,6 +10,8 @@ import org.springframework.data.repository.query.Param;
 @NoRepositoryBean
 public interface UsageStatisticsRepo extends BaseRepository<UsageStatistics, Long> {
 
+  // ==================== 查询方法 ====================
+  
   /**
    * 查询时间范围内的统计数据
    */

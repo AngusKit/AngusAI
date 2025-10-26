@@ -14,6 +14,8 @@ import org.springframework.data.repository.NoRepositoryBean;
 @NoRepositoryBean
 public interface LoginHistoryRepo extends BaseRepository<LoginHistory, Long> {
 
+  // ==================== 查询方法 ====================
+  
   /**
    * 分页查询用户登录历史
    */
@@ -30,6 +32,8 @@ public interface LoginHistoryRepo extends BaseRepository<LoginHistory, Long> {
    */
   List<LoginHistory> findTop10ByUserIdOrderByLoginDatetimeDesc(Long userId);
 
+  // ==================== 删除方法 ====================
+  
   /**
    * 根据用户ID删除登录历史
    */

@@ -11,11 +11,15 @@ import java.util.List;
 @Repository
 public interface AttachmentRepo extends BaseRepository<Attachment, Long> {
 
+  // ==================== 查询方法 ====================
+  
   /**
    * 根据会话ID查询附件列表
    */
   List<Attachment> findBySessionId(Long sessionId);
 
+  // ==================== 删除方法 ====================
+  
   /**
    * 删除会话的所有附件
    */

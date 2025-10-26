@@ -10,6 +10,8 @@ import org.springframework.stereotype.Repository;
 @NoRepositoryBean
 public interface KnowledgeBaseDocRepo extends BaseRepository<KnowledgeBaseDoc, Long> {
 
+  // ==================== 查询方法 ====================
+  
   /**
    * 根据知识库ID查找文档
    */
@@ -36,6 +38,8 @@ public interface KnowledgeBaseDocRepo extends BaseRepository<KnowledgeBaseDoc, L
    */
   KnowledgeBaseDoc findByKnowledgeBaseIdAndName(Long knowledgeBaseId, String name);
 
+  // ==================== 统计方法 ====================
+  
   /**
    * 统计知识库的文档数量
    */
@@ -54,6 +58,8 @@ public interface KnowledgeBaseDocRepo extends BaseRepository<KnowledgeBaseDoc, L
   @Query("SELECT COALESCE(SUM(d.size), 0) FROM KnowledgeBaseDoc d WHERE d.knowledgeBaseId = :knowledgeBaseId")
   Long sumSizeByKnowledgeBaseId(@Param("knowledgeBaseId") Long knowledgeBaseId);
 
+  // ==================== 删除方法 ====================
+  
   /**
    * 根据知识库ID删除文档
    */

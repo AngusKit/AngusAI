@@ -7,6 +7,8 @@ import org.springframework.data.domain.PageRequest;
 
 public interface DatasetRepo extends BaseRepository<Dataset, Long> {
 
+  // ==================== 查询方法 ====================
+  
   /**
    * 查询数据集列表
    */
@@ -17,36 +19,6 @@ public interface DatasetRepo extends BaseRepository<Dataset, Long> {
    * 根据ID查询数据集
    */
   Dataset findById(Long id);
-
-  /**
-   * 检查数据集名称是否存在
-   */
-  boolean existsByName(String name);
-
-  /**
-   * 检查数据集名称是否存在（排除指定ID）
-   */
-  boolean existsByNameAndIdNot(String name, Long id);
-
-  /**
-   * 统计数据集数量
-   */
-  long countByCreatedBy(Long createdBy);
-
-  /**
-   * 统计指定状态的数据集数量
-   */
-  long countByStatus(DatasetStatus status);
-
-  /**
-   * 统计指定类型的数据集数量
-   */
-  long countByType(DatasetType type);
-
-  /**
-   * 统计指定可见性的数据集数量
-   */
-  long countByVisibility(Visibility visibility);
 
   /**
    * 根据状态查询数据集列表
@@ -137,4 +109,39 @@ public interface DatasetRepo extends BaseRepository<Dataset, Long> {
    * 查询需要备份的数据集
    */
   Page<Dataset> findDatasetsNeedingBackup(PageRequest pageable);
+
+  // ==================== 统计方法 ====================
+  
+  /**
+   * 统计数据集数量
+   */
+  long countByCreatedBy(Long createdBy);
+
+  /**
+   * 统计指定状态的数据集数量
+   */
+  long countByStatus(DatasetStatus status);
+
+  /**
+   * 统计指定类型的数据集数量
+   */
+  long countByType(DatasetType type);
+
+  /**
+   * 统计指定可见性的数据集数量
+   */
+  long countByVisibility(Visibility visibility);
+
+  // ==================== 修改方法 ====================
+  
+  /**
+   * 检查数据集名称是否存在
+   */
+  boolean existsByName(String name);
+
+  /**
+   * 检查数据集名称是否存在（排除指定ID）
+   */
+  boolean existsByNameAndIdNot(String name, Long id);
+
 }

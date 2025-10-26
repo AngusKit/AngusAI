@@ -10,6 +10,8 @@ import org.springframework.data.repository.query.Param;
 @NoRepositoryBean
 public interface ApiUsageLogRepo extends BaseRepository<ApiUsageLog, Long> {
 
+  // ==================== 查询方法 ====================
+  
   /**
    * 查询时间范围内的日志
    */
@@ -20,6 +22,14 @@ public interface ApiUsageLogRepo extends BaseRepository<ApiUsageLog, Long> {
    */
   List<ApiUsageLog> findByAppIdAndRequestTimeBetween(Long appId, LocalDateTime start, LocalDateTime end);
 
+  /**
+   * 查询最近的调用记录
+   */
+  @Query("SELECT l FROM ApiUsageLog l ORDER BY l.requestTime DESC")
+  List<ApiUsageLog> findRecentCalls(org.springframework.data.domain.Pageable pageable);
+
+  // ==================== 统计方法 ====================
+  
   /**
    * 统计总调用次数
    */
@@ -85,11 +95,5 @@ public interface ApiUsageLogRepo extends BaseRepository<ApiUsageLog, Long> {
       "WHERE l.requestTime BETWEEN :start AND :end AND l.isSuccessful = false " +
       "GROUP BY l.statusCode ORDER BY COUNT(l) DESC")
   List<Object[]> groupByStatusCode(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
-
-  /**
-   * 查询最近的调用记录
-   */
-  @Query("SELECT l FROM ApiUsageLog l ORDER BY l.requestTime DESC")
-  List<ApiUsageLog> findRecentCalls(org.springframework.data.domain.Pageable pageable);
 
 }

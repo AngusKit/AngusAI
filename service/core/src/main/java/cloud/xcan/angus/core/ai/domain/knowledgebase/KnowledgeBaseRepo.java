@@ -10,6 +10,8 @@ import org.springframework.stereotype.Repository;
 @NoRepositoryBean
 public interface KnowledgeBaseRepo extends BaseRepository<KnowledgeBase, Long> {
 
+  // ==================== 查询方法 ====================
+  
   /**
    * 根据名称查找知识库
    */
@@ -26,12 +28,6 @@ public interface KnowledgeBaseRepo extends BaseRepository<KnowledgeBase, Long> {
   List<KnowledgeBase> findByEnabled(Boolean enabled);
 
   /**
-   * 统计知识库数量
-   */
-  @Query("SELECT COUNT(kb) FROM KnowledgeBase kb WHERE kb.enabled = :enabled")
-  Long countByEnabled(@Param("enabled") Boolean enabled);
-
-  /**
    * 获取用户的知识库列表（按创建时间倒序）
    */
   @Query("SELECT kb FROM KnowledgeBase kb ORDER BY kb.createdDate DESC")
@@ -42,4 +38,13 @@ public interface KnowledgeBaseRepo extends BaseRepository<KnowledgeBase, Long> {
    */
   @Query("SELECT kb FROM KnowledgeBase kb WHERE JSON_CONTAINS(kb.tags, :tag)")
   List<KnowledgeBase> findByTag(@Param("tag") String tag);
+
+  // ==================== 统计方法 ====================
+  
+  /**
+   * 统计知识库数量
+   */
+  @Query("SELECT COUNT(kb) FROM KnowledgeBase kb WHERE kb.enabled = :enabled")
+  Long countByEnabled(@Param("enabled") Boolean enabled);
+
 }

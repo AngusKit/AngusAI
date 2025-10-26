@@ -13,6 +13,8 @@ import java.util.List;
 @NoRepositoryBean
 public interface SessionRepo extends BaseRepository<Session, Long> {
 
+  // ==================== 查询方法 ====================
+  
   /**
    * 根据应用ID查询会话列表
    */
@@ -39,6 +41,18 @@ public interface SessionRepo extends BaseRepository<Session, Long> {
   List<Session> findByCreatedByAndIsArchivedTrueOrderByLastModifiedDateDesc(Long userId);
 
   /**
+   * 查询用户最近创建的会话
+   */
+  Page<Session> findByCreatedByOrderByCreatedDateDesc(Long userId, Pageable pageable);
+
+  /**
+   * 查询用户最近活跃的会话
+   */
+  Page<Session> findByCreatedByOrderByLastModifiedDateDesc(Long userId, Pageable pageable);
+
+  // ==================== 统计方法 ====================
+  
+  /**
    * 统计用户的会话数量
    */
   long countByCreatedBy(Long createdBy);
@@ -53,13 +67,4 @@ public interface SessionRepo extends BaseRepository<Session, Long> {
    */
   long countByModelId(Long modelId);
 
-  /**
-   * 查询用户最近创建的会话
-   */
-  Page<Session> findByCreatedByOrderByCreatedDateDesc(Long userId, Pageable pageable);
-
-  /**
-   * 查询用户最近活跃的会话
-   */
-  Page<Session> findByCreatedByOrderByLastModifiedDateDesc(Long userId, Pageable pageable);
 }

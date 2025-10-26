@@ -10,6 +10,8 @@ import org.springframework.stereotype.Repository;
 @NoRepositoryBean
 public interface KnowledgeBaseDocChunkRepo extends BaseRepository<KnowledgeBaseDocChunk, Long> {
 
+  // ==================== 查询方法 ====================
+  
   /**
    * 根据文档ID查找分段
    */
@@ -21,10 +23,13 @@ public interface KnowledgeBaseDocChunkRepo extends BaseRepository<KnowledgeBaseD
   KnowledgeBaseDocChunk findByDocumentIdAndChunkIndex(Long documentId, Integer chunkIndex);
 
   /**
-   * 根据文档ID删除分段
+   * 根据知识库ID查找所有分段
    */
-  void deleteByDocumentId(Long documentId);
+  @Query("SELECT dc FROM KnowledgeBaseDocChunk dc JOIN KnowledgeBaseDoc d ON dc.documentId = d.id WHERE d.knowledgeBaseId = :knowledgeBaseId")
+  List<KnowledgeBaseDocChunk> findByKnowledgeBaseId(@Param("knowledgeBaseId") Long knowledgeBaseId);
 
+  // ==================== 统计方法 ====================
+  
   /**
    * 统计文档的分段数量
    */
@@ -32,14 +37,16 @@ public interface KnowledgeBaseDocChunkRepo extends BaseRepository<KnowledgeBaseD
   Long countByDocumentId(@Param("documentId") Long documentId);
 
   /**
-   * 根据知识库ID查找所有分段
-   */
-  @Query("SELECT dc FROM KnowledgeBaseDocChunk dc JOIN KnowledgeBaseDoc d ON dc.documentId = d.id WHERE d.knowledgeBaseId = :knowledgeBaseId")
-  List<KnowledgeBaseDocChunk> findByKnowledgeBaseId(@Param("knowledgeBaseId") Long knowledgeBaseId);
-
-  /**
    * 根据知识库ID统计总分段数
    */
   @Query("SELECT COUNT(dc) FROM KnowledgeBaseDocChunk dc JOIN KnowledgeBaseDoc d ON dc.documentId = d.id WHERE d.knowledgeBaseId = :knowledgeBaseId")
   Long countByKnowledgeBaseId(@Param("knowledgeBaseId") Long knowledgeBaseId);
+
+  // ==================== 删除方法 ====================
+  
+  /**
+   * 根据文档ID删除分段
+   */
+  void deleteByDocumentId(Long documentId);
+
 }

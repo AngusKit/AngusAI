@@ -13,6 +13,8 @@ import java.util.List;
 @NoRepositoryBean
 public interface MessageRepo extends BaseRepository<Message, Long> {
 
+  // ==================== 查询方法 ====================
+  
   /**
    * 根据会话ID查询消息列表
    */
@@ -22,16 +24,6 @@ public interface MessageRepo extends BaseRepository<Message, Long> {
    * 根据会话ID分页查询消息
    */
   Page<Message> findBySessionIdOrderByCreatedDateDesc(Long sessionId, Pageable pageable);
-
-  /**
-   * 统计会话的消息数量
-   */
-  long countBySessionId(Long sessionId);
-
-  /**
-   * 删除会话的所有消息
-   */
-  void deleteBySessionId(Long sessionId);
 
   /**
    * 查询会话的最后一条消息
@@ -52,4 +44,19 @@ public interface MessageRepo extends BaseRepository<Message, Long> {
    * 根据父消息ID查询子消息
    */
   List<Message> findByParentMessageId(Long parentMessageId);
+
+  // ==================== 统计方法 ====================
+  
+  /**
+   * 统计会话的消息数量
+   */
+  long countBySessionId(Long sessionId);
+
+  // ==================== 删除方法 ====================
+  
+  /**
+   * 删除会话的所有消息
+   */
+  void deleteBySessionId(Long sessionId);
+
 }

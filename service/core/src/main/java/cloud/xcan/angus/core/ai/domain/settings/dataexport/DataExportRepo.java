@@ -12,22 +12,28 @@ import org.springframework.data.repository.NoRepositoryBean;
 @NoRepositoryBean
 public interface DataExportRepo extends BaseRepository<DataExport, Long> {
 
+  // ==================== 查询方法 ====================
+  
   /**
    * 查询用户的所有导出记录
    */
   List<DataExport> findByUserIdOrderByRequestedAtDesc(Long userId);
 
   /**
+   * 查询未完成的导出任务
+   */
+  List<DataExport> findByStatusOrderByRequestedAtAsc(ExportStatus status);
+
+  // ==================== 统计方法 ====================
+  
+  /**
    * 查询用户今天的导出次数
    */
   @Query("SELECT COUNT(de) FROM DataExport de WHERE de.userId = ?1 AND de.requestedAt >= ?2")
   int countTodayExportsByUserId(Long userId, LocalDateTime startOfDay);
 
-  /**
-   * 查询未完成的导出任务
-   */
-  List<DataExport> findByStatusOrderByRequestedAtAsc(ExportStatus status);
-
+  // ==================== 删除方法 ====================
+  
   /**
    * 根据用户ID删除导出记录
    */

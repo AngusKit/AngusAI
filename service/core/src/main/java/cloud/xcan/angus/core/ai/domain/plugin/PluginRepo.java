@@ -12,20 +12,12 @@ import org.springframework.data.repository.NoRepositoryBean;
 @NoRepositoryBean
 public interface PluginRepo extends BaseRepository<Plugin, Long> {
 
+  // ==================== 查询方法 ====================
+  
   /**
    * 根据名称查找插件
    */
   Optional<Plugin> findByName(String name);
-
-  /**
-   * 检查名称是否存在
-   */
-  boolean existsByName(String name);
-
-  /**
-   * 检查名称是否存在（排除指定ID）
-   */
-  boolean existsByNameAndIdNot(String name, Long id);
 
   /**
    * 根据分类查询插件
@@ -57,6 +49,8 @@ public interface PluginRepo extends BaseRepository<Plugin, Long> {
    */
   Page<Plugin> findByIsVerifiedTrue(Pageable pageable);
 
+  // ==================== 统计方法 ====================
+  
   /**
    * 统计指定分类的插件数量
    */
@@ -71,4 +65,17 @@ public interface PluginRepo extends BaseRepository<Plugin, Long> {
    * 统计用户创建的插件数量
    */
   long countByCreatedBy(Long createdBy);
+
+  // ==================== 修改方法 ====================
+  
+  /**
+   * 检查名称是否存在
+   */
+  boolean existsByName(String name);
+
+  /**
+   * 检查名称是否存在（排除指定ID）
+   */
+  boolean existsByNameAndIdNot(String name, Long id);
+
 }

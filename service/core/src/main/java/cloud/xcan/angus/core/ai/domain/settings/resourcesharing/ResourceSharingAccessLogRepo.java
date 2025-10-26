@@ -12,6 +12,8 @@ import org.springframework.data.repository.query.Param;
 @NoRepositoryBean
 public interface ResourceSharingAccessLogRepo extends BaseRepository<ResourceSharingAccessLog, Long> {
 
+  // ==================== 查询方法 ====================
+  
   /**
    * 根据共享ID查询访问日志
    */
@@ -28,6 +30,8 @@ public interface ResourceSharingAccessLogRepo extends BaseRepository<ResourceSha
   List<ResourceSharingAccessLog> findByResourceIdAndResourceTypeOrderByCreatedDateDesc(
       Long resourceId, ResourceType resourceType);
 
+  // ==================== 统计方法 ====================
+  
   /**
    * 统计时间范围内的访问次数
    */

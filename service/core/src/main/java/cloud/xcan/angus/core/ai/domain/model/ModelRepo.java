@@ -7,6 +7,8 @@ import org.springframework.data.domain.PageRequest;
 
 public interface ModelRepo extends BaseRepository<Model, Long> {
 
+  // ==================== 查询方法 ====================
+  
   /**
    * 查询模型列表
    */
@@ -17,36 +19,6 @@ public interface ModelRepo extends BaseRepository<Model, Long> {
    * 根据ID查询模型
    */
   Model findById(Long id);
-
-  /**
-   * 检查模型名称是否存在
-   */
-  boolean existsByName(String name);
-
-  /**
-   * 检查模型名称是否存在（排除指定ID）
-   */
-  boolean existsByNameAndIdNot(String name, Long id);
-
-  /**
-   * 统计模型数量
-   */
-  long countByCreatedBy(Long createdBy);
-
-  /**
-   * 统计指定状态的模型数量
-   */
-  long countByStatus(ModelStatus status);
-
-  /**
-   * 统计指定类型的模型数量
-   */
-  long countByType(ModelType type);
-
-  /**
-   * 统计指定提供商的模型数量
-   */
-  long countByProvider(ModelProvider provider);
 
   /**
    * 根据状态查询模型列表
@@ -102,4 +74,39 @@ public interface ModelRepo extends BaseRepository<Model, Long> {
    * 查询需要监控的模型
    */
   Page<Model> findModelsNeedingMonitoring(PageRequest pageable);
+
+  // ==================== 统计方法 ====================
+  
+  /**
+   * 统计模型数量
+   */
+  long countByCreatedBy(Long createdBy);
+
+  /**
+   * 统计指定状态的模型数量
+   */
+  long countByStatus(ModelStatus status);
+
+  /**
+   * 统计指定类型的模型数量
+   */
+  long countByType(ModelType type);
+
+  /**
+   * 统计指定提供商的模型数量
+   */
+  long countByProvider(ModelProvider provider);
+
+  // ==================== 修改方法 ====================
+  
+  /**
+   * 检查模型名称是否存在
+   */
+  boolean existsByName(String name);
+
+  /**
+   * 检查模型名称是否存在（排除指定ID）
+   */
+  boolean existsByNameAndIdNot(String name, Long id);
+
 }

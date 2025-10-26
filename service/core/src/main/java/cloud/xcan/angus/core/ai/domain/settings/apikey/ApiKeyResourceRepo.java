@@ -11,6 +11,8 @@ import java.util.List;
 @NoRepositoryBean
 public interface ApiKeyResourceRepo extends BaseRepository<ApiKeyResource, Long> {
 
+  // ==================== 查询方法 ====================
+  
   /**
    * 根据API密钥ID查找所有授权资源
    */
@@ -21,13 +23,17 @@ public interface ApiKeyResourceRepo extends BaseRepository<ApiKeyResource, Long>
    */
   List<ApiKeyResource> findByApiKeyIdAndResourceType(Long apiKeyId, ResourceType resourceType);
 
-  /**
-   * 删除API密钥的所有授权资源
-   */
-  void deleteByApiKeyId(Long apiKeyId);
-
+  // ==================== 修改方法 ====================
+  
   /**
    * 检查是否有权限访问特定资源
    */
   boolean existsByApiKeyIdAndResourceTypeAndResourceIdIn(Long apiKeyId, ResourceType resourceType, List<Long> resourceIds);
+
+  // ==================== 删除方法 ====================
+  
+  /**
+   * 删除API密钥的所有授权资源
+   */
+  void deleteByApiKeyId(Long apiKeyId);
 }

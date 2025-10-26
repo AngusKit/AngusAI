@@ -14,6 +14,8 @@ import java.util.Optional;
 @NoRepositoryBean
 public interface ApiKeyRepo extends BaseRepository<ApiKey, Long> {
 
+  // ==================== 查询方法 ====================
+  
   /**
    * 根据密钥哈希查找
    */
@@ -31,15 +33,19 @@ public interface ApiKeyRepo extends BaseRepository<ApiKey, Long> {
   List<ApiKey> findExpiredActiveKeys(LocalDateTime now);
 
   /**
-   * 统计用户的密钥数量
-   */
-  long countByCreatedBy(Long userId);
-
-  /**
    * 查找用户的所有密钥
    */
   List<ApiKey> findByCreatedByOrderByCreatedAtDesc(Long userId);
 
+  // ==================== 统计方法 ====================
+  
+  /**
+   * 统计用户的密钥数量
+   */
+  long countByCreatedBy(Long userId);
+
+  // ==================== 修改方法 ====================
+  
   /**
    * 更新使用统计
    */

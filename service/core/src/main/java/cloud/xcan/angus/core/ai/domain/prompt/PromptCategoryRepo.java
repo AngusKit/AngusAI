@@ -10,31 +10,36 @@ import java.util.List;
 @Repository
 public interface PromptCategoryRepo extends BaseRepository<PromptCategory, Long> {
 
-  boolean existsByName(String name);
-
-  boolean existsByNameAndIdNot(String name, Long id);
-
-  long countByCreatedBy(Long createdBy);
-
-  long countByIsSystem(Boolean isSystem);
-
+  // ==================== 查询方法 ====================
+  
   List<PromptCategory> findAllByOrderByOrderNumAsc();
 
   Page<PromptCategory> findByCreatedBy(Long createdBy, PageRequest pageable);
 
   Page<PromptCategory> findByIsSystem(Boolean isSystem, PageRequest pageable);
 
-  // 新增方法
-  boolean existsByNameAndParentId(String name, Long parentId);
-
-  boolean existsByNameAndParentIdAndIdNot(String name, Long parentId, Long id);
-
-  Integer findMaxOrderByParentId(Long parentId);
-
-  long countByParentId(Long parentId);
-
   List<PromptCategory> findByParentIdOrderByOrderNum(Long parentId);
 
   List<PromptCategory> findAllOrderByOrderNum();
+
+  // ==================== 统计方法 ====================
+  
+  long countByCreatedBy(Long createdBy);
+
+  long countByIsSystem(Boolean isSystem);
+
+  long countByParentId(Long parentId);
+
+  Integer findMaxOrderByParentId(Long parentId);
+
+  // ==================== 修改方法 ====================
+  
+  boolean existsByName(String name);
+
+  boolean existsByNameAndIdNot(String name, Long id);
+
+  boolean existsByNameAndParentId(String name, Long parentId);
+
+  boolean existsByNameAndParentIdAndIdNot(String name, Long parentId, Long id);
 
 }

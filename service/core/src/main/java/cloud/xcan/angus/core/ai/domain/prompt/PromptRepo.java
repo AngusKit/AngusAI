@@ -8,18 +8,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PromptRepo extends BaseRepository<Prompt, Long> {
 
-  boolean existsByTitle(String title);
-
-  boolean existsByTitleAndIdNot(String title, Long id);
-
-  long countByCreatedBy(Long createdBy);
-
-  long countByStatus(PromptStatus status);
-
-  long countByCategoryId(Long categoryId);
-
-  long countByIsPublic(Boolean isPublic);
-
+  // ==================== 查询方法 ====================
+  
   Page<Prompt> findByStatus(PromptStatus status, PageRequest pageable);
 
   Page<Prompt> findByCategoryId(Long categoryId, PageRequest pageable);
@@ -35,5 +25,21 @@ public interface PromptRepo extends BaseRepository<Prompt, Long> {
   Page<Prompt> findTrendingPrompts(PageRequest pageable);
 
   Page<Prompt> findByArchivedAndCreatedBy(Boolean archived, Long createdBy, PageRequest pageable);
+
+  // ==================== 统计方法 ====================
+  
+  long countByCreatedBy(Long createdBy);
+
+  long countByStatus(PromptStatus status);
+
+  long countByCategoryId(Long categoryId);
+
+  long countByIsPublic(Boolean isPublic);
+
+  // ==================== 修改方法 ====================
+  
+  boolean existsByTitle(String title);
+
+  boolean existsByTitleAndIdNot(String title, Long id);
 
 }
