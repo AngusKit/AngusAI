@@ -1,11 +1,22 @@
 package cloud.xcan.angus.core.ai.interfaces.analytics.facade.internal;
 
+import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.determineGranularity;
+import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.parseTimeRange;
+
 import cloud.xcan.angus.core.ai.application.query.analytics.AnalyticsQuery;
+import cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.TimeRange;
 import cloud.xcan.angus.core.ai.interfaces.analytics.facade.AnalyticsFacade;
 import cloud.xcan.angus.core.ai.interfaces.analytics.facade.dto.AnalyticsQueryDto;
-import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.*;
+import cloud.xcan.angus.core.ai.interfaces.analytics.facade.internal.assembler.AnalyticsAssembler;
+import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.AnalyticsOverviewVo;
+import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.ApiCallsTrendVo;
+import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.AppDistributionVo;
+import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.ErrorAnalysisVo;
+import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.ModelDistributionVo;
+import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.ResponseTimeAnalysisVo;
+import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.TokenUsageTrendVo;
+import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.TopEndpointsVo;
 import jakarta.annotation.Resource;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +35,7 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
     Map<String, Object> stats = analyticsQuery.getOverviewStats(
         timeRange.start, timeRange.end, dto.getAppId());
 
-    return AnalyticsConverter.toOverviewVo(stats, dto.getTimeRange(),
+    return AnalyticsAssembler.toOverviewVo(stats, dto.getTimeRange(),
         timeRange.start.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(),
         timeRange.end.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
   }
@@ -36,8 +47,7 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
 
     List<Map<String, Object>> trendData = analyticsQuery.getApiCallsTrend(
         timeRange.start, timeRange.end, dto.getAppId(), granularity);
-
-    return AnalyticsConverter.toApiCallsTrendVo(trendData);
+    return AnalyticsAssembler.toApiCallsTrendVo(trendData);
   }
 
   @Override
@@ -47,8 +57,7 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
 
     List<Map<String, Object>> trendData = analyticsQuery.getTokenUsageTrend(
         timeRange.start, timeRange.end, dto.getAppId(), granularity);
-
-    return AnalyticsConverter.toTokenUsageTrendVo(trendData);
+    return AnalyticsAssembler.toTokenUsageTrendVo(trendData);
   }
 
   @Override
@@ -71,8 +80,7 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
 
     List<Map<String, Object>> distributionData = analyticsQuery.getAppDistribution(
         timeRange.start, timeRange.end, limit != null ? limit : 10);
-
-    return AnalyticsConverter.toAppDistributionVo(distributionData);
+    return AnalyticsAssembler.toAppDistributionVo(distributionData);
   }
 
   @Override
@@ -81,8 +89,7 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
 
     List<Map<String, Object>> distributionData = analyticsQuery.getModelDistribution(
         timeRange.start, timeRange.end);
-
-    return AnalyticsConverter.toModelDistributionVo(distributionData);
+    return AnalyticsAssembler.toModelDistributionVo(distributionData);
   }
 
   @Override
@@ -91,8 +98,7 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
 
     List<Map<String, Object>> endpointsData = analyticsQuery.getTopEndpoints(
         timeRange.start, timeRange.end, limit != null ? limit : 10, orderBy);
-
-    return AnalyticsConverter.toTopEndpointsVo(endpointsData);
+    return AnalyticsAssembler.toTopEndpointsVo(endpointsData);
   }
 
   @Override
@@ -101,70 +107,7 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
 
     Map<String, Object> analysisData = analyticsQuery.getErrorAnalysis(
         timeRange.start, timeRange.end, dto.getAppId());
-
-    return AnalyticsConverter.toErrorAnalysisVo(analysisData);
-  }
-
-  // ==================== 辅助方法 ====================
-
-  /**
-   * 解析时间范围
-   */
-  private TimeRange parseTimeRange(String timeRangeStr) {
-    LocalDateTime end = LocalDateTime.now();
-    LocalDateTime start;
-
-    switch (timeRangeStr) {
-      case "24hours":
-        start = end.minusHours(24);
-        break;
-      case "30days":
-        start = end.minusDays(30);
-        break;
-      case "90days":
-        start = end.minusDays(90);
-        break;
-      case "7days":
-      default:
-        start = end.minusDays(7);
-        break;
-    }
-
-    return new TimeRange(start, end);
-  }
-
-  /**
-   * 确定数据粒度
-   */
-  private String determineGranularity(String timeRange, String granularity) {
-    if (granularity != null) {
-      return granularity;
-    }
-
-    // 根据时间范围自动确定粒度
-    switch (timeRange) {
-      case "24hours":
-        return "hour";
-      case "90days":
-        return "week";
-      case "7days":
-      case "30days":
-      default:
-        return "day";
-    }
-  }
-
-  /**
-   * 时间范围内部类
-   */
-  private static class TimeRange {
-    final LocalDateTime start;
-    final LocalDateTime end;
-
-    TimeRange(LocalDateTime start, LocalDateTime end) {
-      this.start = start;
-      this.end = end;
-    }
+    return AnalyticsAssembler.toErrorAnalysisVo(analysisData);
   }
 
 }

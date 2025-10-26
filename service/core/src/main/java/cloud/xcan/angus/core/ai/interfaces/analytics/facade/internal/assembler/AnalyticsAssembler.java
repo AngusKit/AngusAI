@@ -1,7 +1,19 @@
-package cloud.xcan.angus.core.ai.interfaces.analytics.facade.internal;
+package cloud.xcan.angus.core.ai.interfaces.analytics.facade.internal.assembler;
 
-import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.*;
-import java.text.DecimalFormat;
+import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.PERCENTAGE_FORMAT;
+import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatLargeNumber;
+import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatNumber;
+import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatPercentage;
+import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatResponseTime;
+import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.getTrend;
+
+import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.AnalyticsOverviewVo;
+import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.ApiCallsTrendVo;
+import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.AppDistributionVo;
+import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.ErrorAnalysisVo;
+import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.ModelDistributionVo;
+import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.TokenUsageTrendVo;
+import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.TopEndpointsVo;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -9,10 +21,7 @@ import java.util.Map;
 /**
  * Analytics数据转换器
  */
-public class AnalyticsConverter {
-
-  private static final DecimalFormat NUMBER_FORMAT = new DecimalFormat("#,###");
-  private static final DecimalFormat PERCENTAGE_FORMAT = new DecimalFormat("0.0");
+public class AnalyticsAssembler {
 
   /**
    * 转换概览统计数据
@@ -102,7 +111,7 @@ public class AnalyticsConverter {
       item.setDate((String) data.get("date"));
       item.setDatetime(data.get("datetime") != null ? System.currentTimeMillis() : null);
 
-      Integer calls = ((Number) data.get("totalCalls")).intValue();
+      int calls = ((Number) data.get("totalCalls")).intValue();
       item.setTotalCalls(calls);
       item.setSuccessfulCalls(((Number) data.get("successfulCalls")).intValue());
       item.setFailedCalls(((Number) data.get("failedCalls")).intValue());
@@ -147,10 +156,10 @@ public class AnalyticsConverter {
       item.setDate((String) data.get("date"));
       item.setDatetime(data.get("datetime") != null ? System.currentTimeMillis() : null);
 
-      Long inputTokens = ((Number) data.get("inputTokens")).longValue();
-      Long outputTokens = ((Number) data.get("outputTokens")).longValue();
-      Long tokens = ((Number) data.get("totalTokens")).longValue();
-      Long cost = ((Number) data.get("cost")).longValue();
+      long inputTokens = ((Number) data.get("inputTokens")).longValue();
+      long outputTokens = ((Number) data.get("outputTokens")).longValue();
+      long tokens = ((Number) data.get("totalTokens")).longValue();
+      long cost = ((Number) data.get("cost")).longValue();
 
       item.setInputTokens(inputTokens);
       item.setOutputTokens(outputTokens);
@@ -219,7 +228,8 @@ public class AnalyticsConverter {
   /**
    * 转换模型分布数据
    */
-  public static ModelDistributionVo toModelDistributionVo(List<Map<String, Object>> distributionData) {
+  public static ModelDistributionVo toModelDistributionVo(
+      List<Map<String, Object>> distributionData) {
     ModelDistributionVo vo = new ModelDistributionVo();
     List<ModelDistributionVo.DistributionItemVo> items = new ArrayList<>();
 
@@ -300,7 +310,8 @@ public class AnalyticsConverter {
 
     // 按状态码统计
     @SuppressWarnings("unchecked")
-    List<Map<String, Object>> byStatusCodeData = (List<Map<String, Object>>) analysisData.get("byStatusCode");
+    List<Map<String, Object>> byStatusCodeData = (List<Map<String, Object>>) analysisData.get(
+        "byStatusCode");
     List<ErrorAnalysisVo.ErrorByStatusCodeVo> byStatusCode = new ArrayList<>();
 
     for (Map<String, Object> data : byStatusCodeData) {
@@ -324,58 +335,6 @@ public class AnalyticsConverter {
     vo.setSummary(summary);
 
     return vo;
-  }
-
-  // ==================== 辅助方法 ====================
-
-  /**
-   * 格式化数字(千位分隔)
-   */
-  private static String formatNumber(Long number) {
-    return NUMBER_FORMAT.format(number);
-  }
-
-  /**
-   * 格式化大数字(使用K、M简化)
-   */
-  private static String formatLargeNumber(Long number) {
-    if (number >= 1_000_000) {
-      return PERCENTAGE_FORMAT.format(number / 1_000_000.0) + "M";
-    } else if (number >= 1_000) {
-      return PERCENTAGE_FORMAT.format(number / 1_000.0) + "K";
-    }
-    return NUMBER_FORMAT.format(number);
-  }
-
-  /**
-   * 格式化百分比
-   */
-  private static String formatPercentage(Double percentage) {
-    if (percentage == null) {
-      return "0%";
-    }
-    String sign = percentage >= 0 ? "+" : "";
-    return sign + PERCENTAGE_FORMAT.format(percentage) + "%";
-  }
-
-  /**
-   * 格式化响应时间
-   */
-  private static String formatResponseTime(Double ms) {
-    if (ms >= 1000) {
-      return PERCENTAGE_FORMAT.format(ms / 1000.0) + "s";
-    }
-    return Math.round(ms) + "ms";
-  }
-
-  /**
-   * 获取趋势方向
-   */
-  private static String getTrend(Double change) {
-    if (change == null || change == 0) {
-      return "up";
-    }
-    return change > 0 ? "up" : "down";
   }
 
 }

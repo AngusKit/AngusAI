@@ -1,12 +1,16 @@
 package cloud.xcan.angus.core.ai.application.query.analytics.impl;
 
+import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.calculateChangePercentage;
+import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.calculatePercentile;
+import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatDateByGranularity;
+import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.getStatusErrorName;
+
 import cloud.xcan.angus.core.ai.application.query.analytics.AnalyticsQuery;
 import cloud.xcan.angus.core.ai.domain.analytics.ApiUsageLog;
 import cloud.xcan.angus.core.ai.domain.analytics.ApiUsageLogRepo;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -101,15 +105,14 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
           dataPoint.put("totalCalls", totalCalls);
           dataPoint.put("successfulCalls", successfulCalls);
           dataPoint.put("failedCalls", failedCalls);
-          dataPoint.put("successRate", totalCalls > 0 ? (successfulCalls * 100.0 / totalCalls) : 0.0);
+          dataPoint.put("successRate",
+              totalCalls > 0 ? (successfulCalls * 100.0 / totalCalls) : 0.0);
 
           if (!groupLogs.isEmpty()) {
             dataPoint.put("datetime", groupLogs.get(0).getRequestTime().toString());
           }
-
           trend.add(dataPoint);
         }
-
         return trend;
       }
     }.execute();
@@ -154,10 +157,8 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
           if (!groupLogs.isEmpty()) {
             dataPoint.put("datetime", groupLogs.get(0).getRequestTime().toString());
           }
-
           trend.add(dataPoint);
         }
-
         return trend;
       }
     }.execute();
@@ -186,7 +187,8 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
                 .sorted()
                 .collect(Collectors.toList());
 
-            int avgTime = (int) responseTimes.stream().mapToInt(Integer::intValue).average().orElse(0);
+            int avgTime = (int) responseTimes.stream().mapToInt(Integer::intValue).average()
+                .orElse(0);
             int p50 = calculatePercentile(responseTimes, 50);
             int p95 = calculatePercentile(responseTimes, 95);
             int p99 = calculatePercentile(responseTimes, 99);
@@ -205,14 +207,14 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
             trend.add(dataPoint);
           }
         }
-
         return trend;
       }
     }.execute();
   }
 
   @Override
-  public List<Map<String, Object>> getAppDistribution(LocalDateTime start, LocalDateTime end, Integer limit) {
+  public List<Map<String, Object>> getAppDistribution(LocalDateTime start, LocalDateTime end,
+      Integer limit) {
     return new BizTemplate<List<Map<String, Object>>>() {
       @Override
       protected List<Map<String, Object>> process() {
@@ -232,12 +234,12 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
           item.put("calls", result[1]);
           item.put("tokens", result[2]);
           item.put("avgResponseTime", result[3]);
-          item.put("percentage", total > 0 ? (((Number) result[1]).doubleValue() / total * 100) : 0.0);
+          item.put("percentage",
+              total > 0 ? (((Number) result[1]).doubleValue() / total * 100) : 0.0);
 
           distribution.add(item);
           count++;
         }
-
         return distribution;
       }
     }.execute();
@@ -259,11 +261,11 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
           item.put("modelName", result[1]);
           item.put("calls", result[2]);
           item.put("tokens", result[3]);
-          item.put("percentage", total > 0 ? (((Number) result[2]).doubleValue() / total * 100) : 0.0);
+          item.put("percentage",
+              total > 0 ? (((Number) result[2]).doubleValue() / total * 100) : 0.0);
 
           distribution.add(item);
         }
-
         return distribution;
       }
     }.execute();
@@ -300,7 +302,6 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
           endpoints.add(item);
           count++;
         }
-
         return endpoints;
       }
     }.execute();
@@ -324,10 +325,10 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
         for (Object[] result : statusCodeResults) {
           Map<String, Object> item = new HashMap<>();
           Integer statusCode = (Integer) result[0];
-          Long count = ((Number) result[1]).longValue();
+          long count = ((Number) result[1]).longValue();
 
           item.put("statusCode", statusCode);
-          item.put("name", getErrorName(statusCode));
+          item.put("name", getStatusErrorName(statusCode));
           item.put("count", count);
           item.put("percentage", totalErrors > 0 ? (count * 100.0 / totalErrors) : 0.0);
 
@@ -344,145 +345,48 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
 
   @Override
   public List<ApiUsageLog> getRecentCalls(Integer limit) {
-    return new BizTemplate<List<ApiUsageLog>>() {
-      @Override
-      protected List<ApiUsageLog> process() {
-        return apiUsageLogRepo.findRecentCalls(PageRequest.of(0, limit != null ? limit : 10));
-      }
-    }.execute();
+    return apiUsageLogRepo.findRecentCalls(PageRequest.of(0, limit != null ? limit : 10));
   }
 
   @Override
   public Long countTotalCalls(LocalDateTime start, LocalDateTime end, Long appId) {
-    return new BizTemplate<Long>() {
-      @Override
-      protected Long process() {
-        return appId != null
-            ? apiUsageLogRepo.countByAppIdAndTimeRange(appId, start, end)
-            : apiUsageLogRepo.countByTimeRange(start, end);
-      }
-    }.execute();
+    return appId != null
+        ? apiUsageLogRepo.countByAppIdAndTimeRange(appId, start, end)
+        : apiUsageLogRepo.countByTimeRange(start, end);
   }
 
   @Override
   public Long countSuccessfulCalls(LocalDateTime start, LocalDateTime end, Long appId) {
-    return new BizTemplate<Long>() {
-      @Override
-      protected Long process() {
-        return apiUsageLogRepo.countSuccessfulByTimeRange(start, end);
-      }
-    }.execute();
+    return apiUsageLogRepo.countSuccessfulByTimeRange(start, end);
   }
 
   @Override
   public Long countActiveUsers(LocalDateTime start, LocalDateTime end, Long appId) {
-    return new BizTemplate<Long>() {
-      @Override
-      protected Long process() {
-        return apiUsageLogRepo.countDistinctUsersByTimeRange(start, end);
-      }
-    }.execute();
+    return apiUsageLogRepo.countDistinctUsersByTimeRange(start, end);
   }
 
   @Override
   public Long sumTotalTokens(LocalDateTime start, LocalDateTime end, Long appId) {
-    return new BizTemplate<Long>() {
-      @Override
-      protected Long process() {
-        return apiUsageLogRepo.sumTokensByTimeRange(start, end);
-      }
-    }.execute();
+    return apiUsageLogRepo.sumTokensByTimeRange(start, end);
   }
 
   @Override
   public Double calculateAvgResponseTime(LocalDateTime start, LocalDateTime end, Long appId) {
-    return new BizTemplate<Double>() {
-      @Override
-      protected Double process() {
-        return apiUsageLogRepo.avgResponseTimeByTimeRange(start, end);
-      }
-    }.execute();
+    return apiUsageLogRepo.avgResponseTimeByTimeRange(start, end);
   }
-
-  // ==================== 辅助方法 ====================
 
   /**
    * 按时间粒度分组日志
    */
-  private Map<String, List<ApiUsageLog>> groupByGranularity(List<ApiUsageLog> logs, String granularity) {
+  private Map<String, List<ApiUsageLog>> groupByGranularity(List<ApiUsageLog> logs,
+      String granularity) {
     Map<String, List<ApiUsageLog>> grouped = new HashMap<>();
 
     for (ApiUsageLog log : logs) {
       String key = formatDateByGranularity(log.getRequestTime(), granularity);
       grouped.computeIfAbsent(key, k -> new ArrayList<>()).add(log);
     }
-
     return grouped;
-  }
-
-  /**
-   * 根据粒度格式化日期
-   */
-  private String formatDateByGranularity(LocalDateTime dateTime, String granularity) {
-    if ("hour".equals(granularity)) {
-      return dateTime.format(DateTimeFormatter.ofPattern("MM/dd HH:00"));
-    } else if ("week".equals(granularity)) {
-      return dateTime.format(DateTimeFormatter.ofPattern("yyyy-'W'ww"));
-    } else {
-      return dateTime.format(DateTimeFormatter.ofPattern("MM/dd"));
-    }
-  }
-
-  /**
-   * 计算百分位数
-   */
-  private int calculatePercentile(List<Integer> sortedValues, int percentile) {
-    if (sortedValues.isEmpty()) {
-      return 0;
-    }
-    int index = (int) Math.ceil(sortedValues.size() * percentile / 100.0) - 1;
-    return sortedValues.get(Math.max(0, Math.min(index, sortedValues.size() - 1)));
-  }
-
-  /**
-   * 计算变化百分比
-   */
-  private double calculateChangePercentage(Long current, Long previous) {
-    if (previous == null || previous == 0) {
-      return 0.0;
-    }
-    return ((current - previous) * 100.0 / previous);
-  }
-
-  /**
-   * 获取错误名称
-   */
-  private String getErrorName(Integer statusCode) {
-    if (statusCode == null) {
-      return "Unknown";
-    }
-    switch (statusCode) {
-      case 400:
-        return "Bad Request";
-      case 401:
-        return "Unauthorized";
-      case 403:
-        return "Forbidden";
-      case 404:
-        return "Not Found";
-      case 429:
-        return "Rate Limit";
-      case 500:
-        return "Internal Error";
-      case 502:
-        return "Bad Gateway";
-      case 503:
-        return "Service Unavailable";
-      case 504:
-        return "Gateway Timeout";
-      default:
-        return "Error " + statusCode;
-    }
   }
 
 }
