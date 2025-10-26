@@ -52,6 +52,20 @@ public class SettingsRest {
   @Resource
   private SettingsFacade settingsFacade;
 
+  // ==================== 数据导出 ====================
+
+  @Operation(operationId = "requestDataExport", summary = "请求数据导出", description = "请求导出用户数据")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "202", description = "请求已提交")
+  })
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  @PostMapping("/data-export")
+  public ApiLocaleResult<DataExportVo> requestDataExport(
+      @Valid @RequestBody DataExportRequestDto dto) {
+    Long userId = 1L;
+    return ApiLocaleResult.success(settingsFacade.requestDataExport(userId, dto));
+  }
+
   // ==================== 用户设置 ====================
 
   @Operation(operationId = "getUserSettings", summary = "获取用户设置", description = "获取当前用户的个人设置")
@@ -85,17 +99,6 @@ public class SettingsRest {
       @Parameter(description = "头像文件") @RequestParam("avatar") MultipartFile file) {
     Long userId = 1L;
     return ApiLocaleResult.success(settingsFacade.uploadAvatar(userId, file));
-  }
-
-  @Operation(operationId = "deleteAvatar", summary = "删除头像", description = "删除用户头像")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "204", description = "删除成功")
-  })
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  @DeleteMapping("/avatar")
-  public void deleteAvatar() {
-    Long userId = 1L;
-    settingsFacade.deleteAvatar(userId);
   }
 
   // ==================== 通知设置 ====================
@@ -203,31 +206,29 @@ public class SettingsRest {
     settingsFacade.revokeAllSessions(userId, currentSessionId);
   }
 
-  // ==================== 数据导出 ====================
-
-  @Operation(operationId = "getDataExports", summary = "获取数据导出记录", description = "获取用户的数据导出记录")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "获取成功")
-  })
-  @GetMapping("/data-export")
-  public ApiLocaleResult<List<DataExportVo>> getDataExports() {
-    Long userId = 1L;
-    return ApiLocaleResult.success(settingsFacade.getDataExports(userId));
-  }
-
-  @Operation(operationId = "requestDataExport", summary = "请求数据导出", description = "请求导出用户数据")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "202", description = "请求已提交")
-  })
-  @ResponseStatus(HttpStatus.ACCEPTED)
-  @PostMapping("/data-export")
-  public ApiLocaleResult<DataExportVo> requestDataExport(
-      @Valid @RequestBody DataExportRequestDto dto) {
-    Long userId = 1L;
-    return ApiLocaleResult.success(settingsFacade.requestDataExport(userId, dto));
-  }
-
   // ==================== 账户管理 ====================
+
+  @Operation(operationId = "cancelDeleteAccount", summary = "取消删除账户", description = "取消账户删除请求")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "204", description = "取消成功")
+  })
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @PostMapping("/cancel-delete-account")
+  public void cancelDeleteAccount() {
+    Long userId = 1L;
+    settingsFacade.cancelDeleteAccount(userId);
+  }
+
+  @Operation(operationId = "deleteAvatar", summary = "删除头像", description = "删除用户头像")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "204", description = "删除成功")
+  })
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @DeleteMapping("/avatar")
+  public void deleteAvatar() {
+    Long userId = 1L;
+    settingsFacade.deleteAvatar(userId);
+  }
 
   @Operation(operationId = "deleteAccount", summary = "删除账户", description = "请求删除用户账户")
   @ApiResponses(value = {
@@ -240,14 +241,13 @@ public class SettingsRest {
     return ApiLocaleResult.success(settingsFacade.deleteAccount(userId, dto));
   }
 
-  @Operation(operationId = "cancelDeleteAccount", summary = "取消删除账户", description = "取消账户删除请求")
+  @Operation(operationId = "getDataExports", summary = "获取数据导出记录", description = "获取用户的数据导出记录")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "204", description = "取消成功")
+      @ApiResponse(responseCode = "200", description = "获取成功")
   })
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  @PostMapping("/cancel-delete-account")
-  public void cancelDeleteAccount() {
+  @GetMapping("/data-export")
+  public ApiLocaleResult<List<DataExportVo>> getDataExports() {
     Long userId = 1L;
-    settingsFacade.cancelDeleteAccount(userId);
+    return ApiLocaleResult.success(settingsFacade.getDataExports(userId));
   }
 }

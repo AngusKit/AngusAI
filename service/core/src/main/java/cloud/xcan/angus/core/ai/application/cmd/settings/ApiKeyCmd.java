@@ -30,14 +30,6 @@ public interface ApiKeyCmd {
   ApiKey update(Long id, ApiKeyUpdateDto dto, Long userId);
 
   /**
-   * 删除API密钥
-   *
-   * @param id     密钥ID
-   * @param userId 用户ID
-   */
-  void delete(Long id, Long userId);
-
-  /**
    * 切换密钥状态（启用/禁用）
    *
    * @param id     密钥ID
@@ -63,4 +55,12 @@ public interface ApiKeyCmd {
    * @return 刷新后的API密钥实体（keyPrefix字段包含新密钥）
    */
   ApiKey refresh(Long id, Long userId);
+
+  /**
+   * 删除API密钥
+   *
+   * @param id     密钥ID
+   * @param userId 用户ID
+   */
+  void delete(Long id, Long userId);
 }

@@ -26,21 +26,6 @@ public interface ApiKeyFacade {
   ApiKeyDetailVo update(Long id, ApiKeyUpdateDto dto, Long userId);
 
   /**
-   * 删除API密钥
-   */
-  void delete(Long id, Long userId);
-
-  /**
-   * 获取API密钥详情
-   */
-  ApiKeyDetailVo getDetail(Long id, Long userId);
-
-  /**
-   * 获取API密钥列表
-   */
-  Page<ApiKeyListVo> list(ApiKeyFindDto dto, Long userId);
-
-  /**
    * 切换密钥状态
    */
   ApiKeyDetailVo toggleStatus(Long id, Long userId);
@@ -54,6 +39,21 @@ public interface ApiKeyFacade {
    * 刷新密钥
    */
   ApiKeyDetailVo refresh(Long id, Long userId);
+
+  /**
+   * 删除API密钥
+   */
+  void delete(Long id, Long userId);
+
+  /**
+   * 获取API密钥详情
+   */
+  ApiKeyDetailVo getDetail(Long id, Long userId);
+
+  /**
+   * 获取API密钥列表
+   */
+  Page<ApiKeyListVo> list(ApiKeyFindDto dto, Long userId);
 
   /**
    * 验证密钥

@@ -33,14 +33,6 @@ public interface ResourceSharingCmd {
   ResourceSharing update(Long id, ResourceSharingUpdateDto dto, Long userId);
 
   /**
-   * 删除资源共享
-   *
-   * @param id     共享ID
-   * @param userId 用户ID
-   */
-  void delete(Long id, Long userId);
-
-  /**
    * 添加成员
    *
    * @param sharingId 共享ID
@@ -67,6 +59,14 @@ public interface ResourceSharingCmd {
    * @param userId    用户ID
    */
   void recordAccess(Long sharingId, ResourceSharingAccessDto dto, Long userId);
+
+  /**
+   * 删除资源共享
+   *
+   * @param id     共享ID
+   * @param userId 用户ID
+   */
+  void delete(Long id, Long userId);
 
   /**
    * 取消资源共享(根据资源)

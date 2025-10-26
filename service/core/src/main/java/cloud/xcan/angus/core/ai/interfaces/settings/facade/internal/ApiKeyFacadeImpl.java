@@ -56,35 +56,6 @@ public class ApiKeyFacadeImpl implements ApiKeyFacade {
   }
 
   @Override
-  public void delete(Long id, Long userId) {
-    apiKeyCmd.delete(id, userId);
-  }
-
-  @Override
-  public ApiKeyDetailVo getDetail(Long id, Long userId) {
-    // 查询密钥详情
-    ApiKey apiKey = apiKeyQuery.getDetail(id, userId);
-
-    // 获取授权资源
-    List<ApiKeyResource> resources = apiKeyQuery.getResources(apiKey.getId());
-
-    // 转换为VO
-    return ApiKeyConverter.toDetailVo(apiKey, resources);
-  }
-
-  @Override
-  public Page<ApiKeyListVo> list(ApiKeyFindDto dto, Long userId) {
-    // 查询列表
-    Page<ApiKey> page = apiKeyQuery.list(dto, userId);
-
-    // 转换为VO
-    return page.map(apiKey -> {
-      List<ApiKeyResource> resources = apiKeyQuery.getResources(apiKey.getId());
-      return ApiKeyConverter.toListVo(apiKey, resources);
-    });
-  }
-
-  @Override
   public ApiKeyDetailVo toggleStatus(Long id, Long userId) {
     // 执行切换状态命令
     ApiKey apiKey = apiKeyCmd.toggleStatus(id, userId);
@@ -111,6 +82,35 @@ public class ApiKeyFacadeImpl implements ApiKeyFacade {
 
     // 转换为VO
     return ApiKeyConverter.toDetailVo(apiKey, resources);
+  }
+
+  @Override
+  public void delete(Long id, Long userId) {
+    apiKeyCmd.delete(id, userId);
+  }
+
+  @Override
+  public ApiKeyDetailVo getDetail(Long id, Long userId) {
+    // 查询密钥详情
+    ApiKey apiKey = apiKeyQuery.getDetail(id, userId);
+
+    // 获取授权资源
+    List<ApiKeyResource> resources = apiKeyQuery.getResources(apiKey.getId());
+
+    // 转换为VO
+    return ApiKeyConverter.toDetailVo(apiKey, resources);
+  }
+
+  @Override
+  public Page<ApiKeyListVo> list(ApiKeyFindDto dto, Long userId) {
+    // 查询列表
+    Page<ApiKey> page = apiKeyQuery.list(dto, userId);
+
+    // 转换为VO
+    return page.map(apiKey -> {
+      List<ApiKeyResource> resources = apiKeyQuery.getResources(apiKey.getId());
+      return ApiKeyConverter.toListVo(apiKey, resources);
+    });
   }
 
   @Override

@@ -191,41 +191,6 @@ public class ResourceSharingCmdImpl extends CommCmd<ResourceSharing, Long> imple
 
   @Override
   @Transactional
-  public void delete(Long id, Long userId) {
-    new BizTemplate<Void>() {
-      ResourceSharing entity;
-
-      @Override
-      protected void checkParams() {
-        entity = resourceSharingQuery.findById(id);
-        if (entity == null) {
-          throw ResourceNotFound.of("共享不存在", new Object[]{});
-        }
-
-        // 权限检查：只有所有者可以删除
-        if (!entity.getOwnerId().equals(userId)) {
-          throw new IllegalStateException("无权限操作此共享");
-        }
-      }
-
-      @Override
-      protected Void process() {
-        // 删除成员记录
-        resourceSharingMemberRepo.deleteBySharingId(id);
-
-        // 删除共享记录
-        resourceSharingRepo.deleteById(id);
-
-        // TODO: 发送通知
-        // notificationService.notifyResourceSharingCancelled(entity);
-
-        return null;
-      }
-    }.execute();
-  }
-
-  @Override
-  @Transactional
   public List<ResourceSharingMember> addMembers(Long sharingId, List<Long> memberIds,
       Long userId) {
     return new BizTemplate<List<ResourceSharingMember>>() {
@@ -387,6 +352,41 @@ public class ResourceSharingCmdImpl extends CommCmd<ResourceSharing, Long> imple
           entity.setUniqueVisitors(uniqueVisitors);
           resourceSharingRepo.save(entity);
         }
+
+        return null;
+      }
+    }.execute();
+  }
+
+  @Override
+  @Transactional
+  public void delete(Long id, Long userId) {
+    new BizTemplate<Void>() {
+      ResourceSharing entity;
+
+      @Override
+      protected void checkParams() {
+        entity = resourceSharingQuery.findById(id);
+        if (entity == null) {
+          throw ResourceNotFound.of("共享不存在", new Object[]{});
+        }
+
+        // 权限检查：只有所有者可以删除
+        if (!entity.getOwnerId().equals(userId)) {
+          throw new IllegalStateException("无权限操作此共享");
+        }
+      }
+
+      @Override
+      protected Void process() {
+        // 删除成员记录
+        resourceSharingMemberRepo.deleteBySharingId(id);
+
+        // 删除共享记录
+        resourceSharingRepo.deleteById(id);
+
+        // TODO: 发送通知
+        // notificationService.notifyResourceSharingCancelled(entity);
 
         return null;
       }

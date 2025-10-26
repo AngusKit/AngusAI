@@ -63,44 +63,6 @@ public class ApiKeyRest {
     return ApiLocaleResult.success(apiKeyFacade.update(id, dto, userId));
   }
 
-  @Operation(operationId = "deleteApiKey", summary = "删除API密钥", description = "删除指定的API密钥，删除后密钥将失效且无法恢复")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "204", description = "删除成功"),
-      @ApiResponse(responseCode = "404", description = "API密钥不存在"),
-      @ApiResponse(responseCode = "403", description = "无权限操作此密钥")
-  })
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  @DeleteMapping("/{id}")
-  public void delete(@Parameter(description = "API密钥ID") @PathVariable Long id) {
-    Long userId = 1L;
-    apiKeyFacade.delete(id, userId);
-  }
-
-  @Operation(operationId = "getApiKeyDetail", summary = "获取API密钥详情", description = "获取指定API密钥的详细信息")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "获取成功"),
-      @ApiResponse(responseCode = "404", description = "API密钥不存在"),
-      @ApiResponse(responseCode = "403", description = "无权限访问此密钥")
-  })
-  @ResponseStatus(HttpStatus.OK)
-  @GetMapping("/{id}")
-  public ApiLocaleResult<ApiKeyDetailVo> getDetail(
-      @Parameter(description = "API密钥ID") @PathVariable Long id) {
-    Long userId = 1L;
-    return ApiLocaleResult.success(apiKeyFacade.getDetail(id, userId));
-  }
-
-  @Operation(operationId = "listApiKeys", summary = "获取API密钥列表", description = "获取当前用户的API密钥列表，支持分页、搜索和筛选")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "获取成功")
-  })
-  @ResponseStatus(HttpStatus.OK)
-  @GetMapping
-  public ApiLocaleResult<Page<ApiKeyListVo>> list(@Valid @ParameterObject ApiKeyFindDto dto) {
-    Long userId = 1L;
-    return ApiLocaleResult.success(apiKeyFacade.list(dto, userId));
-  }
-
   @Operation(operationId = "toggleApiKeyStatus", summary = "切换API密钥状态", description = "在启用和禁用之间切换API密钥状态")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "状态切换成功"),
@@ -143,6 +105,44 @@ public class ApiKeyRest {
       @Parameter(description = "API密钥ID") @PathVariable Long id) {
     Long userId = 1L;
     return ApiLocaleResult.success(apiKeyFacade.refresh(id, userId));
+  }
+
+  @Operation(operationId = "deleteApiKey", summary = "删除API密钥", description = "删除指定的API密钥，删除后密钥将失效且无法恢复")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "204", description = "删除成功"),
+      @ApiResponse(responseCode = "404", description = "API密钥不存在"),
+      @ApiResponse(responseCode = "403", description = "无权限操作此密钥")
+  })
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @DeleteMapping("/{id}")
+  public void delete(@Parameter(description = "API密钥ID") @PathVariable Long id) {
+    Long userId = 1L;
+    apiKeyFacade.delete(id, userId);
+  }
+
+  @Operation(operationId = "getApiKeyDetail", summary = "获取API密钥详情", description = "获取指定API密钥的详细信息")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "获取成功"),
+      @ApiResponse(responseCode = "404", description = "API密钥不存在"),
+      @ApiResponse(responseCode = "403", description = "无权限访问此密钥")
+  })
+  @ResponseStatus(HttpStatus.OK)
+  @GetMapping("/{id}")
+  public ApiLocaleResult<ApiKeyDetailVo> getDetail(
+      @Parameter(description = "API密钥ID") @PathVariable Long id) {
+    Long userId = 1L;
+    return ApiLocaleResult.success(apiKeyFacade.getDetail(id, userId));
+  }
+
+  @Operation(operationId = "listApiKeys", summary = "获取API密钥列表", description = "获取当前用户的API密钥列表，支持分页、搜索和筛选")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "获取成功")
+  })
+  @ResponseStatus(HttpStatus.OK)
+  @GetMapping
+  public ApiLocaleResult<Page<ApiKeyListVo>> list(@Valid @ParameterObject ApiKeyFindDto dto) {
+    Long userId = 1L;
+    return ApiLocaleResult.success(apiKeyFacade.list(dto, userId));
   }
 
   @Operation(operationId = "validateApiKey", summary = "验证API密钥", description = "验证API密钥的有效性，返回密钥权限和限制信息")

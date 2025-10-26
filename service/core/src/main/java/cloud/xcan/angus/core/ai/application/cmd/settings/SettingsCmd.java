@@ -22,6 +22,11 @@ public interface SettingsCmd {
   UserSettings initUserSettings(Long userId, String email);
 
   /**
+   * 请求数据导出
+   */
+  DataExport requestDataExport(Long userId, DataExportRequestDto request);
+
+  /**
    * 更新用户个人资料
    */
   UserSettings updateProfile(Long userId, Map<String, Object> profile);
@@ -40,11 +45,6 @@ public interface SettingsCmd {
    * 上传头像
    */
   UserSettings uploadAvatar(Long userId, String avatarUrl);
-
-  /**
-   * 删除头像
-   */
-  UserSettings deleteAvatar(Long userId);
 
   /**
    * 更新通知设置
@@ -82,17 +82,17 @@ public interface SettingsCmd {
   int revokeAllOtherSessions(Long userId, String currentSessionId);
 
   /**
-   * 请求数据导出
+   * 取消删除账户
    */
-  DataExport requestDataExport(Long userId, DataExportRequestDto request);
+  void cancelDeleteAccount(Long userId);
+
+  /**
+   * 删除头像
+   */
+  UserSettings deleteAvatar(Long userId);
 
   /**
    * 请求删除账户
    */
   LocalDateTime requestDeleteAccount(Long userId, String password, String reason, String feedback);
-
-  /**
-   * 取消删除账户
-   */
-  void cancelDeleteAccount(Long userId);
 }

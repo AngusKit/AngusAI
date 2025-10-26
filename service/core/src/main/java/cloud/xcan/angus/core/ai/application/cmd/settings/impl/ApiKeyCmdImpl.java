@@ -167,34 +167,6 @@ public class ApiKeyCmdImpl extends CommCmd<ApiKey, Long> implements ApiKeyCmd {
 
   @Override
   @Transactional
-  public void delete(Long id, Long userId) {
-    new BizTemplate<Void>() {
-      ApiKey entity;
-
-      @Override
-      protected void checkParams() {
-        entity = findById(id).orElseThrow(() ->
-            ResourceNotFound.of("API密钥不存在", new Object[]{}));
-
-        if (!entity.getCreatedBy().equals(userId)) {
-          throw new IllegalStateException("无权限操作此API密钥");
-        }
-      }
-
-      @Override
-      protected Void process() {
-        // 删除授权资源
-        apiKeyResourceRepo.deleteByApiKeyId(id);
-
-        // 删除密钥
-        deleteById(id);
-        return null;
-      }
-    }.execute();
-  }
-
-  @Override
-  @Transactional
   public ApiKey toggleStatus(Long id, Long userId) {
     return new BizTemplate<ApiKey>() {
       ApiKey entity;
@@ -277,6 +249,34 @@ public class ApiKeyCmdImpl extends CommCmd<ApiKey, Long> implements ApiKeyCmd {
         entity.setRefreshedAt(LocalDateTime.now());
 
         return update0(entity);
+      }
+    }.execute();
+  }
+
+  @Override
+  @Transactional
+  public void delete(Long id, Long userId) {
+    new BizTemplate<Void>() {
+      ApiKey entity;
+
+      @Override
+      protected void checkParams() {
+        entity = findById(id).orElseThrow(() ->
+            ResourceNotFound.of("API密钥不存在", new Object[]{}));
+
+        if (!entity.getCreatedBy().equals(userId)) {
+          throw new IllegalStateException("无权限操作此API密钥");
+        }
+      }
+
+      @Override
+      protected Void process() {
+        // 删除授权资源
+        apiKeyResourceRepo.deleteByApiKeyId(id);
+
+        // 删除密钥
+        deleteById(id);
+        return null;
       }
     }.execute();
   }

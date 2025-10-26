@@ -90,6 +90,47 @@ public class SettingsCmdImpl extends CommCmd<UserSettings, Long> implements Sett
 
   @Override
   @Transactional
+  public DataExport requestDataExport(Long userId, DataExportRequestDto request) {
+    return new BizTemplate<DataExport>() {
+      @Override
+      protected void checkParams() {
+        // 检查今天的导出次数
+        int todayCount = settingsQuery.countTodayExportsByUserId(userId);
+        if (todayCount >= 3) {
+          throw new IllegalArgumentException("每天最多只能导出3次");
+        }
+      }
+
+      @Override
+      protected DataExport process() {
+        String scopeJson = null;
+        if (request.getScope() != null) {
+          try {
+            scopeJson = objectMapper.writeValueAsString(request.getScope());
+          } catch (JsonProcessingException e) {
+            // ignore
+          }
+        }
+
+        DataExport export = new DataExport()
+            .setUserId(userId)
+            .setType(request.getType())
+            .setFormat(request.getFormat())
+            .setStatus(ExportStatus.PROCESSING)
+            .setScope(scopeJson)
+            .setRequestedAt(LocalDateTime.now());
+
+        export = dataExportRepo.save(export);
+
+        // TODO: 异步处理导出任务
+
+        return export;
+      }
+    }.execute();
+  }
+
+  @Override
+  @Transactional
   public UserSettings updateProfile(Long userId, Map<String, Object> profile) {
     return new BizTemplate<UserSettings>() {
       UserSettings settings;
@@ -226,28 +267,6 @@ public class SettingsCmdImpl extends CommCmd<UserSettings, Long> implements Sett
       @Override
       protected UserSettings process() {
         settings.setAvatar(avatarUrl);
-        return userSettingsRepo.save(settings);
-      }
-    }.execute();
-  }
-
-  @Override
-  @Transactional
-  public UserSettings deleteAvatar(Long userId) {
-    return new BizTemplate<UserSettings>() {
-      UserSettings settings;
-
-      @Override
-      protected void checkParams() {
-        settings = settingsQuery.findUserSettingsByUserId(userId);
-        if (settings == null) {
-          throw ResourceNotFound.of("用户设置不存在", new Object[]{});
-        }
-      }
-
-      @Override
-      protected UserSettings process() {
-        settings.setAvatar(null);
         return userSettingsRepo.save(settings);
       }
     }.execute();
@@ -428,41 +447,42 @@ public class SettingsCmdImpl extends CommCmd<UserSettings, Long> implements Sett
 
   @Override
   @Transactional
-  public DataExport requestDataExport(Long userId, DataExportRequestDto request) {
-    return new BizTemplate<DataExport>() {
+  public void cancelDeleteAccount(Long userId) {
+    new BizTemplate<Void>() {
+      @Override
+      protected Void process() {
+        UserSettings settings = settingsQuery.findUserSettingsByUserId(userId);
+        if (settings == null) {
+          throw ResourceNotFound.of("用户设置不存在", new Object[]{});
+        }
+
+        settings.setDeletionScheduledAt(null)
+            .setDeletionReason(null);
+
+        userSettingsRepo.save(settings);
+        return null;
+      }
+    }.execute();
+  }
+
+  @Override
+  @Transactional
+  public UserSettings deleteAvatar(Long userId) {
+    return new BizTemplate<UserSettings>() {
+      UserSettings settings;
+
       @Override
       protected void checkParams() {
-        // 检查今天的导出次数
-        int todayCount = settingsQuery.countTodayExportsByUserId(userId);
-        if (todayCount >= 3) {
-          throw new IllegalArgumentException("每天最多只能导出3次");
+        settings = settingsQuery.findUserSettingsByUserId(userId);
+        if (settings == null) {
+          throw ResourceNotFound.of("用户设置不存在", new Object[]{});
         }
       }
 
       @Override
-      protected DataExport process() {
-        String scopeJson = null;
-        if (request.getScope() != null) {
-          try {
-            scopeJson = objectMapper.writeValueAsString(request.getScope());
-          } catch (JsonProcessingException e) {
-            // ignore
-          }
-        }
-
-        DataExport export = new DataExport()
-            .setUserId(userId)
-            .setType(request.getType())
-            .setFormat(request.getFormat())
-            .setStatus(ExportStatus.PROCESSING)
-            .setScope(scopeJson)
-            .setRequestedAt(LocalDateTime.now());
-
-        export = dataExportRepo.save(export);
-
-        // TODO: 异步处理导出任务
-
-        return export;
+      protected UserSettings process() {
+        settings.setAvatar(null);
+        return userSettingsRepo.save(settings);
       }
     }.execute();
   }
@@ -493,26 +513,6 @@ public class SettingsCmdImpl extends CommCmd<UserSettings, Long> implements Sett
         // TODO: 发送确认邮件
 
         return scheduledAt;
-      }
-    }.execute();
-  }
-
-  @Override
-  @Transactional
-  public void cancelDeleteAccount(Long userId) {
-    new BizTemplate<Void>() {
-      @Override
-      protected Void process() {
-        UserSettings settings = settingsQuery.findUserSettingsByUserId(userId);
-        if (settings == null) {
-          throw ResourceNotFound.of("用户设置不存在", new Object[]{});
-        }
-
-        settings.setDeletionScheduledAt(null)
-            .setDeletionReason(null);
-
-        userSettingsRepo.save(settings);
-        return null;
       }
     }.execute();
   }

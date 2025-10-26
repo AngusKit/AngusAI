@@ -46,6 +46,12 @@ public class SettingsFacadeImpl implements SettingsFacade {
   private SettingsCmd settingsCmd;
 
   @Override
+  public DataExportVo requestDataExport(Long userId, DataExportRequestDto dto) {
+    DataExport export = settingsCmd.requestDataExport(userId, dto);
+    return SettingsAssembler.toDataExportVo(export);
+  }
+
+  @Override
   public UserSettingsVo getUserSettings(Long userId) {
     UserSettings settings = settingsQuery.findUserSettingsByUserId(userId);
     if (settings == null) {
@@ -132,11 +138,6 @@ public class SettingsFacadeImpl implements SettingsFacade {
     vo.setAvatarUrl(avatarUrl);
     vo.setUploadedAt(System.currentTimeMillis());
     return vo;
-  }
-
-  @Override
-  public void deleteAvatar(Long userId) {
-    settingsCmd.deleteAvatar(userId);
   }
 
   @Override
@@ -233,17 +234,13 @@ public class SettingsFacadeImpl implements SettingsFacade {
   }
 
   @Override
-  public List<DataExportVo> getDataExports(Long userId) {
-    List<DataExport> exports = settingsQuery.findDataExportsByUserId(userId);
-    return exports.stream()
-        .map(SettingsAssembler::toDataExportVo)
-        .collect(Collectors.toList());
+  public void cancelDeleteAccount(Long userId) {
+    settingsCmd.cancelDeleteAccount(userId);
   }
 
   @Override
-  public DataExportVo requestDataExport(Long userId, DataExportRequestDto dto) {
-    DataExport export = settingsCmd.requestDataExport(userId, dto);
-    return SettingsAssembler.toDataExportVo(export);
+  public void deleteAvatar(Long userId) {
+    settingsCmd.deleteAvatar(userId);
   }
 
   @Override
@@ -258,7 +255,10 @@ public class SettingsFacadeImpl implements SettingsFacade {
   }
 
   @Override
-  public void cancelDeleteAccount(Long userId) {
-    settingsCmd.cancelDeleteAccount(userId);
+  public List<DataExportVo> getDataExports(Long userId) {
+    List<DataExport> exports = settingsQuery.findDataExportsByUserId(userId);
+    return exports.stream()
+        .map(SettingsAssembler::toDataExportVo)
+        .collect(Collectors.toList());
   }
 }

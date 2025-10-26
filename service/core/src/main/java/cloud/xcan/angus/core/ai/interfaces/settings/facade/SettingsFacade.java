@@ -24,6 +24,11 @@ import org.springframework.web.multipart.MultipartFile;
 public interface SettingsFacade {
 
   /**
+   * 请求数据导出
+   */
+  DataExportVo requestDataExport(Long userId, DataExportRequestDto dto);
+
+  /**
    * 获取用户设置
    */
   UserSettingsVo getUserSettings(Long userId);
@@ -37,11 +42,6 @@ public interface SettingsFacade {
    * 上传头像
    */
   UploadAvatarVo uploadAvatar(Long userId, MultipartFile file);
-
-  /**
-   * 删除头像
-   */
-  void deleteAvatar(Long userId);
 
   /**
    * 获取通知设置
@@ -89,14 +89,14 @@ public interface SettingsFacade {
   void revokeAllSessions(Long userId, String currentSessionId);
 
   /**
-   * 获取数据导出列表
+   * 取消删除账户
    */
-  List<DataExportVo> getDataExports(Long userId);
+  void cancelDeleteAccount(Long userId);
 
   /**
-   * 请求数据导出
+   * 删除头像
    */
-  DataExportVo requestDataExport(Long userId, DataExportRequestDto dto);
+  void deleteAvatar(Long userId);
 
   /**
    * 删除账户
@@ -104,7 +104,7 @@ public interface SettingsFacade {
   DeleteAccountVo deleteAccount(Long userId, DeleteAccountDto dto);
 
   /**
-   * 取消删除账户
+   * 获取数据导出列表
    */
-  void cancelDeleteAccount(Long userId);
+  List<DataExportVo> getDataExports(Long userId);
 }

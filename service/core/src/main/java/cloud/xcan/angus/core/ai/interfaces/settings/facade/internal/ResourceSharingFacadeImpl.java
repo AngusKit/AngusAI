@@ -53,39 +53,6 @@ public class ResourceSharingFacadeImpl implements ResourceSharingFacade {
   }
 
   @Override
-  public PageResult<ResourceSharingListVo> list(ResourceSharingFindDto dto) {
-    // TODO: 从当前登录用户获取userId
-    Long userId = 1L;
-
-    // 查询列表
-    Page<ResourceSharing> page = resourceSharingQuery.list(dto, userId);
-
-    // 转换为VO
-    Page<ResourceSharingListVo> voPage = page.map(sharing -> {
-      Long memberCount = resourceSharingQuery.getMemberCount(sharing.getId());
-      return ResourceSharingConverter.toListVo(sharing, memberCount);
-    });
-
-    // 转换为PageResult
-    return PageResult.of(voPage);
-  }
-
-  @Override
-  public ResourceSharingDetailVo getDetail(Long id) {
-    // TODO: 从当前登录用户获取userId
-    Long userId = 1L;
-
-    // 查询详情
-    ResourceSharing sharing = resourceSharingQuery.getDetail(id, userId);
-
-    // 获取成员列表
-    List<ResourceSharingMember> members = resourceSharingQuery.getMembers(id);
-
-    // 转换为VO
-    return ResourceSharingConverter.toDetailVo(sharing, members);
-  }
-
-  @Override
   public ResourceSharingDetailVo update(Long id, ResourceSharingUpdateDto dto) {
     // TODO: 从当前登录用户获取userId
     Long userId = 1L;
@@ -98,20 +65,6 @@ public class ResourceSharingFacadeImpl implements ResourceSharingFacade {
 
     // 转换为VO
     return ResourceSharingConverter.toDetailVo(sharing, members);
-  }
-
-  @Override
-  public void delete(Long id, Boolean notifyMembers) {
-    // TODO: 从当前登录用户获取userId
-    Long userId = 1L;
-
-    // 执行删除命令
-    resourceSharingCmd.delete(id, userId);
-
-    // TODO: 如果需要通知成员，发送通知
-    // if (Boolean.TRUE.equals(notifyMembers)) {
-    //   notificationService.notifyResourceSharingCancelled(id);
-    // }
   }
 
   @Override
@@ -159,6 +112,62 @@ public class ResourceSharingFacadeImpl implements ResourceSharingFacade {
   }
 
   @Override
+  public void recordAccess(Long id, ResourceSharingAccessDto dto) {
+    // TODO: 从当前登录用户获取userId
+    Long userId = 1L;
+
+    // 记录访问
+    resourceSharingCmd.recordAccess(id, dto, userId);
+  }
+
+  @Override
+  public void delete(Long id, Boolean notifyMembers) {
+    // TODO: 从当前登录用户获取userId
+    Long userId = 1L;
+
+    // 执行删除命令
+    resourceSharingCmd.delete(id, userId);
+
+    // TODO: 如果需要通知成员，发送通知
+    // if (Boolean.TRUE.equals(notifyMembers)) {
+    //   notificationService.notifyResourceSharingCancelled(id);
+    // }
+  }
+
+  @Override
+  public ResourceSharingDetailVo getDetail(Long id) {
+    // TODO: 从当前登录用户获取userId
+    Long userId = 1L;
+
+    // 查询详情
+    ResourceSharing sharing = resourceSharingQuery.getDetail(id, userId);
+
+    // 获取成员列表
+    List<ResourceSharingMember> members = resourceSharingQuery.getMembers(id);
+
+    // 转换为VO
+    return ResourceSharingConverter.toDetailVo(sharing, members);
+  }
+
+  @Override
+  public PageResult<ResourceSharingListVo> list(ResourceSharingFindDto dto) {
+    // TODO: 从当前登录用户获取userId
+    Long userId = 1L;
+
+    // 查询列表
+    Page<ResourceSharing> page = resourceSharingQuery.list(dto, userId);
+
+    // 转换为VO
+    Page<ResourceSharingListVo> voPage = page.map(sharing -> {
+      Long memberCount = resourceSharingQuery.getMemberCount(sharing.getId());
+      return ResourceSharingConverter.toListVo(sharing, memberCount);
+    });
+
+    // 转换为PageResult
+    return PageResult.of(voPage);
+  }
+
+  @Override
   public ResourceAccessCheckVo checkAccess(Long resourceId, ResourceType resourceType) {
     // TODO: 从当前登录用户获取userId
     Long userId = 1L;
@@ -183,15 +192,6 @@ public class ResourceSharingFacadeImpl implements ResourceSharingFacade {
     // vo.setSharedAt(...);
 
     return vo;
-  }
-
-  @Override
-  public void recordAccess(Long id, ResourceSharingAccessDto dto) {
-    // TODO: 从当前登录用户获取userId
-    Long userId = 1L;
-
-    // 记录访问
-    resourceSharingCmd.recordAccess(id, dto, userId);
   }
 
   @Override

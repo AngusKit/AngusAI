@@ -56,27 +56,6 @@ public class ResourceSharingRest {
     return ApiLocaleResult.success(result);
   }
 
-  @Operation(operationId = "getResourceSharingList", summary = "获取共享资源列表", description = "获取当前用户可访问的共享资源列表")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "列表获取成功")
-  })
-  @GetMapping("/resources")
-  public ApiLocaleResult<PageResult<ResourceSharingListVo>> list(
-      @Valid @ParameterObject ResourceSharingFindDto dto) {
-    return ApiLocaleResult.success(resourceSharingFacade.list(dto));
-  }
-
-  @Operation(operationId = "getResourceSharingDetail", summary = "获取共享详情", description = "获取资源共享的详细信息")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "详情获取成功"),
-      @ApiResponse(responseCode = "404", description = "共享不存在")
-  })
-  @GetMapping("/resources/{id}")
-  public ApiLocaleResult<ResourceSharingDetailVo> getDetail(
-      @Parameter(description = "共享ID") @PathVariable Long id) {
-    return ApiLocaleResult.success(resourceSharingFacade.getDetail(id));
-  }
-
   @Operation(operationId = "updateResourceSharing", summary = "更新共享权限", description = "更新资源共享配置")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "更新成功")
@@ -86,18 +65,6 @@ public class ResourceSharingRest {
       @Parameter(description = "共享ID") @PathVariable Long id,
       @Valid @RequestBody ResourceSharingUpdateDto dto) {
     return ApiLocaleResult.success(resourceSharingFacade.update(id, dto));
-  }
-
-  @Operation(operationId = "deleteResourceSharing", summary = "取消资源共享", description = "取消资源共享")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "204", description = "取消成功")
-  })
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  @DeleteMapping("/resources/{id}")
-  public void delete(
-      @Parameter(description = "共享ID") @PathVariable Long id,
-      @Parameter(description = "是否通知成员") @RequestParam(required = false, defaultValue = "true") Boolean notifyMembers) {
-    resourceSharingFacade.delete(id, notifyMembers);
   }
 
   @Operation(operationId = "addSharingMembers", summary = "批量添加成员", description = "批量添加共享成员")
@@ -123,6 +90,52 @@ public class ResourceSharingRest {
     resourceSharingFacade.removeMember(id, userId);
   }
 
+  @Operation(operationId = "recordResourceAccess", summary = "记录访问日志", description = "记录资源访问（自动调用）")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "已记录")
+  })
+  @PostMapping("/resources/{id}/access")
+  @SuppressWarnings("unchecked")
+  public ApiLocaleResult<Void> recordAccess(
+      @Parameter(description = "共享ID") @PathVariable Long id,
+      @Valid @RequestBody ResourceSharingAccessDto dto) {
+    resourceSharingFacade.recordAccess(id, dto);
+    return (ApiLocaleResult<Void>) ApiLocaleResult.success(null);
+  }
+
+  @Operation(operationId = "deleteResourceSharing", summary = "取消资源共享", description = "取消资源共享")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "204", description = "取消成功")
+  })
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @DeleteMapping("/resources/{id}")
+  public void delete(
+      @Parameter(description = "共享ID") @PathVariable Long id,
+      @Parameter(description = "是否通知成员") @RequestParam(required = false, defaultValue = "true") Boolean notifyMembers) {
+    resourceSharingFacade.delete(id, notifyMembers);
+  }
+
+  @Operation(operationId = "getResourceSharingDetail", summary = "获取共享详情", description = "获取资源共享的详细信息")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "详情获取成功"),
+      @ApiResponse(responseCode = "404", description = "共享不存在")
+  })
+  @GetMapping("/resources/{id}")
+  public ApiLocaleResult<ResourceSharingDetailVo> getDetail(
+      @Parameter(description = "共享ID") @PathVariable Long id) {
+    return ApiLocaleResult.success(resourceSharingFacade.getDetail(id));
+  }
+
+  @Operation(operationId = "getResourceSharingList", summary = "获取共享资源列表", description = "获取当前用户可访问的共享资源列表")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "列表获取成功")
+  })
+  @GetMapping("/resources")
+  public ApiLocaleResult<PageResult<ResourceSharingListVo>> list(
+      @Valid @ParameterObject ResourceSharingFindDto dto) {
+    return ApiLocaleResult.success(resourceSharingFacade.list(dto));
+  }
+
   @Operation(operationId = "checkResourceAccess", summary = "检查资源访问权限", description = "检查当前用户对资源的访问权限")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "检查成功")
@@ -132,18 +145,6 @@ public class ResourceSharingRest {
       @Parameter(description = "资源ID") @RequestParam Long resourceId,
       @Parameter(description = "资源类型") @RequestParam ResourceType resourceType) {
     return ApiLocaleResult.success(resourceSharingFacade.checkAccess(resourceId, resourceType));
-  }
-
-  @Operation(operationId = "recordResourceAccess", summary = "记录访问日志", description = "记录资源访问（自动调用）")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "已记录")
-  })
-  @PostMapping("/resources/{id}/access")
-  public ApiLocaleResult<Void> recordAccess(
-      @Parameter(description = "共享ID") @PathVariable Long id,
-      @Valid @RequestBody ResourceSharingAccessDto dto) {
-    resourceSharingFacade.recordAccess(id, dto);
-    return ApiLocaleResult.success(null);
   }
 
   @Operation(operationId = "getResourceSharingStatistics", summary = "获取共享访问统计", description = "获取资源共享的访问统计")

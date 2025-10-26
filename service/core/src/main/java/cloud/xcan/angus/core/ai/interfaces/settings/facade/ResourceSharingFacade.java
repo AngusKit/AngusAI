@@ -24,24 +24,9 @@ public interface ResourceSharingFacade {
   ResourceSharingDetailVo create(ResourceSharingCreateDto dto);
 
   /**
-   * 获取共享列表
-   */
-  PageResult<ResourceSharingListVo> list(ResourceSharingFindDto dto);
-
-  /**
-   * 获取共享详情
-   */
-  ResourceSharingDetailVo getDetail(Long id);
-
-  /**
    * 更新共享
    */
   ResourceSharingDetailVo update(Long id, ResourceSharingUpdateDto dto);
-
-  /**
-   * 删除共享
-   */
-  void delete(Long id, Boolean notifyMembers);
 
   /**
    * 添加成员
@@ -54,14 +39,29 @@ public interface ResourceSharingFacade {
   void removeMember(Long id, Long userId);
 
   /**
-   * 检查访问权限
-   */
-  ResourceAccessCheckVo checkAccess(Long resourceId, ResourceType resourceType);
-
-  /**
    * 记录访问
    */
   void recordAccess(Long id, ResourceSharingAccessDto dto);
+
+  /**
+   * 删除共享
+   */
+  void delete(Long id, Boolean notifyMembers);
+
+  /**
+   * 获取共享详情
+   */
+  ResourceSharingDetailVo getDetail(Long id);
+
+  /**
+   * 获取共享列表
+   */
+  PageResult<ResourceSharingListVo> list(ResourceSharingFindDto dto);
+
+  /**
+   * 检查访问权限
+   */
+  ResourceAccessCheckVo checkAccess(Long resourceId, ResourceType resourceType);
 
   /**
    * 获取统计数据
