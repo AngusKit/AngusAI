@@ -16,7 +16,7 @@ public interface MessageCmd {
   /**
    * 创建带附件的消息
    */
-  Long createWithAttachments(Long sessionId, MessageRole role, String content, 
+  Long createWithAttachments(Long sessionId, MessageRole role, String content,
                              java.util.List<cloud.xcan.angus.core.ai.domain.chat.MessageAttachment> attachments);
 
   /**
@@ -59,13 +59,4 @@ public interface MessageCmd {
    */
   void deleteBySessionId(Long sessionId);
 
-  /**
-   * 统计所有消息数量
-   */
-  Long countAll();
-
-  /**
-   * 统计今日消息数量
-   */
-  Long countToday();
 }

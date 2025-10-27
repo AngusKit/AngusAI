@@ -1,6 +1,8 @@
 package cloud.xcan.angus.core.ai.application.query.chat;
 
 import cloud.xcan.angus.core.ai.domain.chat.Session;
+import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.ChatStatisticsVo.TopApp;
+import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.ChatStatisticsVo.TopModel;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import java.util.List;
 import org.springframework.data.domain.Page;
@@ -80,11 +82,20 @@ public interface SessionQuery {
   /**
    * 获取Top应用
    */
-  List<cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.ChatStatisticsVo.TopApp> getTopApps(int limit);
+  List<TopApp> getTopApps(int limit);
 
   /**
    * 获取Top模型
    */
-  List<cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.ChatStatisticsVo.TopModel> getTopModels(int limit);
+  List<TopModel> getTopModels(int limit);
 
+  /**
+   * 统计总会话
+   */
+  Long countAll();
+
+  /**
+   * 统计今日会话
+   */
+  Long countToday();
 }

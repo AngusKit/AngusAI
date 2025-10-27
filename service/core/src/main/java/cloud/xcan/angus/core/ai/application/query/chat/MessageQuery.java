@@ -1,6 +1,7 @@
 package cloud.xcan.angus.core.ai.application.query.chat;
 
 import cloud.xcan.angus.core.ai.domain.chat.Message;
+import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.ChatStatisticsVo.UsageTrend;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -75,7 +76,7 @@ public interface MessageQuery {
   /**
    * 获取使用趋势
    */
-  List<cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.ChatStatisticsVo.UsageTrend> getUsageTrend(int days);
+  List<UsageTrend> getUsageTrend(int days);
 
   /**
    * 统计所有消息数量

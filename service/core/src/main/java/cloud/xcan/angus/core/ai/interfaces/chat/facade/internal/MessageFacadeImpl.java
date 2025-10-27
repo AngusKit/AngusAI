@@ -3,6 +3,8 @@ package cloud.xcan.angus.core.ai.interfaces.chat.facade.internal;
 import cloud.xcan.angus.core.ai.application.cmd.chat.MessageCmd;
 import cloud.xcan.angus.core.ai.application.cmd.chat.SessionCmd;
 import cloud.xcan.angus.core.ai.application.query.chat.MessageQuery;
+import cloud.xcan.angus.core.ai.application.query.chat.SessionQuery;
+import cloud.xcan.angus.core.ai.application.query.chat.impl.SessionQueryImpl;
 import cloud.xcan.angus.core.ai.domain.chat.Message;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRole;
 import cloud.xcan.angus.core.ai.infra.ai.model.ChatService;
@@ -20,6 +22,7 @@ import cloud.xcan.angus.remote.PageResult;
 import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
@@ -42,10 +45,15 @@ public class MessageFacadeImpl implements MessageFacade {
   private MessageQuery messageQuery;
 
   @Resource
+  private SessionQuery sessionQuery;
+
+  @Resource
   private ChatService aiService;
 
   @Resource
   private FileStorageService fileStorageService;
+  @Autowired
+  private SessionQueryImpl sessionQueryImpl;
 
   @Override
   public MessageSendVo sendMessage(Long sessionId, MessageSendDto dto) {
@@ -108,23 +116,22 @@ public class MessageFacadeImpl implements MessageFacade {
     vo.setSize(attachment.getSize());
     vo.setUrl(attachment.getUrl());
     vo.setUploadedAt(attachment.getUploadedAt());
-
     return vo;
   }
 
   @Override
   public MessageVo regenerateMessage(Long sessionId, Long messageId) {
     // 1. 获取原消息
-    Message originalMessage = messageQuery.findAndCheck(messageId);
+    //Message originalMessage = messageQuery.findAndCheck(messageId);
 
     // 2. 重新调用AI生成
-    String newContent = callAIService(sessionId, originalMessage.getContent(), null);
+    //String newContent = callAIService(sessionId, originalMessage.getContent(), null);
 
     // 3. 重新生成消息
-    Long newMessageId = messageCmd.regenerateMessage(messageId, newContent);
+    //Long newMessageId = messageCmd.regenerateMessage(messageId, newContent);
 
     // 4. 返回新消息
-    Message newMessage = messageQuery.findById(newMessageId);
+    Message newMessage = messageQuery.findById(/*newMessageId*/-1L);
     return MessageAssembler.toMessageVo(newMessage);
   }
 
@@ -187,13 +194,13 @@ public class MessageFacadeImpl implements MessageFacade {
     ChatStatisticsVo vo = new ChatStatisticsVo();
 
     // 1. 基础统计
-    vo.setTotalSessions(sessionCmd.countAll());
-    vo.setTotalMessages(messageCmd.countAll());
+    vo.setTotalSessions(sessionQuery.countAll());
+    vo.setTotalMessages(messageQuery.countAll());
 
     // 2. 今日统计
     ChatStatisticsVo.TodayStats todayStats = new ChatStatisticsVo.TodayStats();
-    todayStats.setSessions(sessionCmd.countToday());
-    todayStats.setMessages(messageCmd.countToday());
+    todayStats.setSessions(sessionQuery.countToday());
+    todayStats.setMessages(messageQuery.countToday());
     vo.setTodayStats(todayStats);
 
     // 3. 使用趋势（最近7天）
@@ -207,7 +214,6 @@ public class MessageFacadeImpl implements MessageFacade {
     // 5. Top模型
     List<ChatStatisticsVo.TopModel> topModels = sessionQuery.getTopModels(5);
     vo.setTopModels(topModels);
-
     return vo;
   }
 }
