@@ -10,6 +10,7 @@ import cloud.xcan.angus.core.ai.application.query.dataset.DatasetQuery;
 import cloud.xcan.angus.core.ai.domain.dataset.Dataset;
 import cloud.xcan.angus.core.ai.domain.dataset.DatasetData;
 import cloud.xcan.angus.core.ai.domain.dataset.DatasetStatistics;
+import cloud.xcan.angus.core.ai.domain.dataset.DatasetVisibility;
 import cloud.xcan.angus.core.ai.domain.dataset.SyncDataResult;
 import cloud.xcan.angus.core.ai.infra.util.DatasourceUtils.ConnectionTestResult;
 import cloud.xcan.angus.core.ai.infra.util.DatasourceUtils.TableDataResult;
@@ -98,6 +99,12 @@ public class DatasetFacadeImpl implements DatasetFacade {
   @Override
   public void batchDeleteData(Long id, DatasetDataBatchDeleteDto dto) {
     datasetDataCmd.batchDeleteData(id, dto.getNames());
+  }
+
+  @Override
+  public DatasetDetailVo modifyVisibility(Long id, DatasetVisibility visibility) {
+    Dataset saved = datasetCmd.modifyVisibility(id, visibility);
+    return DatasetAssembler.toDetailVo(saved);
   }
 
   @Override

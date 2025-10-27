@@ -1,5 +1,6 @@
 package cloud.xcan.angus.core.ai.application.cmd.dataset;
 
+import cloud.xcan.angus.core.ai.domain.dataset.DatasetVisibility;
 import cloud.xcan.angus.core.ai.infra.util.DatasourceUtils.ConnectionTestResult;
 import cloud.xcan.angus.core.ai.domain.dataset.Dataset;
 import cloud.xcan.angus.core.ai.domain.dataset.DatasourceConfig;
@@ -15,6 +16,11 @@ public interface DatasetCmd {
    * 更新数据集基本信息
    */
   Dataset update(Dataset dataset);
+
+  /**
+   * 修改数据集可见性
+   */
+  Dataset modifyVisibility(Long id, DatasetVisibility visibility);
 
   /**
    * 更新数据集数据源配置
