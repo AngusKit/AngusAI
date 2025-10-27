@@ -58,4 +58,14 @@ public interface SessionCmd {
    * 批量删除会话
    */
   Integer batchDelete(java.util.List<Long> sessionIds);
+
+  /**
+   * 统计所有会话数量
+   */
+  Long countAll();
+
+  /**
+   * 统计今日会话数量
+   */
+  Long countToday();
 }

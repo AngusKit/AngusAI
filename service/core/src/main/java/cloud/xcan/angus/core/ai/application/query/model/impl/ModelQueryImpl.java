@@ -2,11 +2,11 @@ package cloud.xcan.angus.core.ai.application.query.model.impl;
 
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.domain.model.Model;
-import cloud.xcan.angus.core.ai.domain.model.ModelProvider;
+import cloud.xcan.angus.core.ai.infra.ai.model.ModelProvider;
 import cloud.xcan.angus.core.ai.domain.model.ModelRepo;
 import cloud.xcan.angus.core.ai.domain.model.ModelSearchRepo;
 import cloud.xcan.angus.core.ai.domain.model.ModelStatus;
-import cloud.xcan.angus.core.ai.domain.model.ModelType;
+import cloud.xcan.angus.core.ai.infra.ai.model.ModelType;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
@@ -23,6 +23,16 @@ public class ModelQueryImpl implements ModelQuery {
 
   @Resource
   private ModelSearchRepo modelSearchRepo;
+
+  @Override
+  public Model findById(Long id) {
+    return new BizTemplate<Model>() {
+      @Override
+      protected Model process() {
+        return modelRepo.findById(id).orElse(null);
+      }
+    }.execute();
+  }
 
   @Override
   public Model findAndCheck(Long id) {

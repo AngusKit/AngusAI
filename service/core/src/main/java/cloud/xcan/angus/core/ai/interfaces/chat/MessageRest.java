@@ -127,7 +127,12 @@ public class MessageRest {
       @Parameter(description = "音频文件") @RequestParam("audio") MultipartFile audio,
       @Parameter(description = "语言代码") @RequestParam(required = false) String language) {
     // TODO: 实现语音识别逻辑
-    return null;
+    // 1. 验证音频文件格式
+    // 2. 调用语音识别服务（如 Whisper API）
+    // 3. 返回识别结果
+    
+    // 模拟实现
+    return ApiLocaleResult.success("这是语音识别的模拟结果");
   }
 
   @Operation(operationId = "getChatStatistics", summary = "获取对话统计", description = "获取对话模块统计数据")

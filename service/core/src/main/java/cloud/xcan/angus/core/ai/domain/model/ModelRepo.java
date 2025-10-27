@@ -1,6 +1,7 @@
 package cloud.xcan.angus.core.ai.domain.model;
 
-import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
+import cloud.xcan.angus.core.ai.infra.ai.model.ModelProvider;
+import cloud.xcan.angus.core.ai.infra.ai.model.ModelType;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

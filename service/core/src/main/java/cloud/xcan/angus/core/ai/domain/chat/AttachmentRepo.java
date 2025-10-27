@@ -1,27 +1,55 @@
 package cloud.xcan.angus.core.ai.domain.chat;
 
-import cloud.xcan.angus.infra.jpa.common.BaseRepository;
-import org.springframework.stereotype.Repository;
+import cloud.xcan.angus.core.jpa.repository.BaseRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.NoRepositoryBean;
 
 import java.util.List;
 
 /**
  * 附件仓储接口
  */
-@Repository
+@NoRepositoryBean
 public interface AttachmentRepo extends BaseRepository<Attachment, Long> {
 
-  // ==================== 查询方法 ====================
-  
-  /**
-   * 根据会话ID查询附件列表
-   */
-  List<Attachment> findBySessionId(Long sessionId);
+    /**
+     * 根据路径包含内容查询附件
+     */
+    List<Attachment> findByPathContaining(String path);
 
-  // ==================== 删除方法 ====================
-  
-  /**
-   * 删除会话的所有附件
-   */
-  void deleteBySessionId(Long sessionId);
+    /**
+     * 根据会话ID查询附件列表
+     */
+    List<Attachment> findBySessionId(Long sessionId);
+
+    /**
+     * 根据会话ID分页查询附件
+     */
+    Page<Attachment> findBySessionId(Long sessionId, Pageable pageable);
+
+    /**
+     * 根据文件名查询附件
+     */
+    List<Attachment> findByName(String name);
+
+    /**
+     * 根据文件类型查询附件
+     */
+    List<Attachment> findByType(String type);
+
+    /**
+     * 查询最近上传的附件
+     */
+    Page<Attachment> findRecentAttachments(Pageable pageable);
+
+    /**
+     * 统计会话的附件数量
+     */
+    long countBySessionId(Long sessionId);
+
+    /**
+     * 删除会话的所有附件
+     */
+    void deleteBySessionId(Long sessionId);
 }

@@ -27,6 +27,16 @@ public class SessionQueryImpl implements SessionQuery {
   private SessionSearchRepo sessionSearchRepo;
 
   @Override
+  public Session findById(Long id) {
+    return new BizTemplate<Session>() {
+      @Override
+      protected Session process() {
+        return sessionRepo.findById(id).orElse(null);
+      }
+    }.execute();
+  }
+
+  @Override
   public Session findAndCheck(Long id) {
     return new BizTemplate<Session>() {
       @Override

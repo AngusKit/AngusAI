@@ -1,17 +1,17 @@
 package cloud.xcan.angus.core.ai.domain.model;
 
+import cloud.xcan.angus.core.ai.infra.ai.model.ModelConfig;
+import cloud.xcan.angus.core.ai.infra.ai.model.ModelProvider;
+import cloud.xcan.angus.core.ai.infra.ai.model.ModelType;
 import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
-import cloud.xcan.angus.core.jpa.multitenancy.TenantListener;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -63,19 +63,23 @@ public class Model extends TenantAuditingEntity<Model, Long> {
   @Column(name = "status_color")
   private String statusColor;
 
-  @Column(name = "api_endpoint")
-  private String apiEndpoint;
-
-  @Column(name = "api_key")
-  private String apiKey;
-
-  @Column(name = "api_key_masked")
-  private String apiKeyMasked;
+  // 模型元信息
+  @Type(JsonType.class)
+  @Column(columnDefinition = "json", name = "default_options")
+  private Object defaultOptions;
 
   // 配置信息（JSON格式存储）
   @Type(JsonType.class)
   @Column(columnDefinition = "json", name = "config")
   private ModelConfig config;
+
+  // TODO 确认需求
+  private Object parameters;
+  private Object deployment;
+  private Object limits;
+  private Object performance;
+  private Object monitoring;
+  private Object security;
 
   // 性能指标
   @Column(name = "latency")
@@ -150,7 +154,14 @@ public class Model extends TenantAuditingEntity<Model, Long> {
   @Column(name = "last_call_at")
   private Long lastCallAt;
 
-  // 限制配置
+  // 错误信息
+  @Column(name = "error_message")
+  private String errorMessage;
+
+  @Column(name = "error_count")
+  private Long errorCount = 0L;
+
+  // 限制配置 TODO 定义成JSON
   @Column(name = "rate_limit")
   private Integer rateLimit;
 
@@ -160,7 +171,7 @@ public class Model extends TenantAuditingEntity<Model, Long> {
   @Column(name = "max_concurrent")
   private Integer maxConcurrent;
 
-  // 部署配置
+  // 部署配置 TODO 定义成JSON
   @Column(name = "region")
   private String region;
 
@@ -178,13 +189,6 @@ public class Model extends TenantAuditingEntity<Model, Long> {
 
   @Column(name = "max_replicas")
   private Integer maxReplicas;
-
-  // 错误信息
-  @Column(name = "error_message")
-  private String errorMessage;
-
-  @Column(name = "error_count")
-  private Long errorCount = 0L;
 
   @Transient
   private boolean configValidated;

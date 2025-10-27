@@ -61,4 +61,29 @@ public interface MessageQuery {
    * 根据父消息ID查询子消息
    */
   List<Message> findByParentMessageId(Long parentMessageId);
+
+  /**
+   * 查询最近的消息历史（用于AI上下文）
+   */
+  List<Message> findRecentBySessionId(Long sessionId, int limit);
+
+  /**
+   * 更新消息内容
+   */
+  void updateContent(Long messageId, String content);
+
+  /**
+   * 获取使用趋势
+   */
+  List<cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.ChatStatisticsVo.UsageTrend> getUsageTrend(int days);
+
+  /**
+   * 统计所有消息数量
+   */
+  Long countAll();
+
+  /**
+   * 统计今日消息数量
+   */
+  Long countToday();
 }

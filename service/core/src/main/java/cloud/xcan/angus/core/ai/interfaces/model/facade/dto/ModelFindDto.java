@@ -1,8 +1,8 @@
 package cloud.xcan.angus.core.ai.interfaces.model.facade.dto;
 
-import cloud.xcan.angus.core.ai.domain.model.ModelProvider;
+import cloud.xcan.angus.core.ai.infra.ai.model.ModelProvider;
 import cloud.xcan.angus.core.ai.domain.model.ModelStatus;
-import cloud.xcan.angus.core.ai.domain.model.ModelType;
+import cloud.xcan.angus.core.ai.infra.ai.model.ModelType;
 import cloud.xcan.angus.core.jpa.criteria.SearchCriteria;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

@@ -1,7 +1,7 @@
 package cloud.xcan.angus.core.ai.interfaces.model.facade.dto;
 
-import cloud.xcan.angus.core.ai.domain.model.ModelProvider;
-import cloud.xcan.angus.core.ai.domain.model.ModelType;
+import cloud.xcan.angus.core.ai.infra.ai.model.ModelProvider;
+import cloud.xcan.angus.core.ai.infra.ai.model.ModelType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

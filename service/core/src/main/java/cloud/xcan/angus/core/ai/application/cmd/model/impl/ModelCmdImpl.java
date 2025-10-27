@@ -3,7 +3,7 @@ package cloud.xcan.angus.core.ai.application.cmd.model.impl;
 import cloud.xcan.angus.core.ai.application.cmd.model.ModelCmd;
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.domain.model.Model;
-import cloud.xcan.angus.core.ai.domain.model.ModelConfig;
+import cloud.xcan.angus.core.ai.infra.ai.model.ModelConfig;
 import cloud.xcan.angus.core.ai.domain.model.ModelRepo;
 import cloud.xcan.angus.core.ai.domain.model.ModelStatus;
 import cloud.xcan.angus.core.biz.Biz;

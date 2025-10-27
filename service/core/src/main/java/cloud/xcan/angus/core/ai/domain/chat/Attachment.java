@@ -1,9 +1,10 @@
 package cloud.xcan.angus.core.ai.domain.chat;
 
-import cloud.xcan.angus.infra.jpa.common.TenantAuditingEntity;
+import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +17,10 @@ import lombok.Setter;
 @Entity
 @Table(name = "chat_attachment")
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Attachment extends TenantAuditingEntity<Long> {
+public class Attachment extends TenantAuditingEntity<Attachment, Long> {
+
+  @Id
+  private Long id;
 
   /**
    * 关联会话ID（可选）
@@ -59,4 +63,9 @@ public class Attachment extends TenantAuditingEntity<Long> {
    */
   @Column(nullable = false)
   private Long uploadedAt;
+
+  @Override
+  public Long identity() {
+    return id;
+  }
 }

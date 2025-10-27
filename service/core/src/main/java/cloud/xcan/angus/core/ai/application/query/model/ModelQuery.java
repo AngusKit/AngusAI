@@ -1,14 +1,19 @@
 package cloud.xcan.angus.core.ai.application.query.model;
 
 import cloud.xcan.angus.core.ai.domain.model.Model;
-import cloud.xcan.angus.core.ai.domain.model.ModelProvider;
+import cloud.xcan.angus.core.ai.infra.ai.model.ModelProvider;
 import cloud.xcan.angus.core.ai.domain.model.ModelStatus;
-import cloud.xcan.angus.core.ai.domain.model.ModelType;
+import cloud.xcan.angus.core.ai.infra.ai.model.ModelType;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 public interface ModelQuery {
+
+  /**
+   * 根据ID查找模型
+   */
+  Model findById(Long id);
 
   /**
    * 查询模型并检查是否存在

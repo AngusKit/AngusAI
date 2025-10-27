@@ -58,4 +58,14 @@ public interface MessageCmd {
    * 删除会话的所有消息
    */
   void deleteBySessionId(Long sessionId);
+
+  /**
+   * 统计所有消息数量
+   */
+  Long countAll();
+
+  /**
+   * 统计今日消息数量
+   */
+  Long countToday();
 }

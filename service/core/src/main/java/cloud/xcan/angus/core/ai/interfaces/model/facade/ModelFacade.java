@@ -1,6 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.model.facade;
 
-import cloud.xcan.angus.core.ai.domain.model.ModelConfig;
+import cloud.xcan.angus.core.ai.infra.ai.model.ModelConfig;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelFindDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelTestDto;

@@ -123,4 +123,29 @@ public class MessageQueryImpl implements MessageQuery {
       }
     }.execute();
   }
+
+  @Override
+  public List<Message> findRecentBySessionId(Long sessionId, int limit) {
+    return new BizTemplate<List<Message>>() {
+      @Override
+      protected List<Message> process() {
+        return messageRepo.findBySessionIdOrderByCreatedDateDesc(sessionId, 
+            PageRequest.of(0, limit)).getContent();
+      }
+    }.execute();
+  }
+
+  @Override
+  public void updateContent(Long messageId, String content) {
+    new BizTemplate<Void>() {
+      @Override
+      protected Void process() {
+        Message message = messageRepo.findById(messageId)
+            .orElseThrow(() -> ResourceNotFound.of("消息不存在", new Object[]{}));
+        message.setContent(content);
+        messageRepo.save(message);
+        return null;
+      }
+    }.execute();
+  }
 }

@@ -12,6 +12,11 @@ import org.springframework.data.domain.PageRequest;
 public interface SessionQuery {
 
   /**
+   * 根据ID查找会话
+   */
+  Session findById(Long id);
+
+  /**
    * 查找并检查会话是否存在
    */
   Session findAndCheck(Long id);
@@ -71,5 +76,15 @@ public interface SessionQuery {
    * 统计模型的使用次数
    */
   long countByModelId(Long modelId);
+
+  /**
+   * 获取Top应用
+   */
+  List<cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.ChatStatisticsVo.TopApp> getTopApps(int limit);
+
+  /**
+   * 获取Top模型
+   */
+  List<cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.ChatStatisticsVo.TopModel> getTopModels(int limit);
 
 }

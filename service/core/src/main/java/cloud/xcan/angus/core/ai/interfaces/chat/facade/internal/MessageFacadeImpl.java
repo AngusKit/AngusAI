@@ -5,6 +5,8 @@ import cloud.xcan.angus.core.ai.application.cmd.chat.SessionCmd;
 import cloud.xcan.angus.core.ai.application.query.chat.MessageQuery;
 import cloud.xcan.angus.core.ai.domain.chat.Message;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRole;
+import cloud.xcan.angus.core.ai.infra.ai.model.ChatService;
+import cloud.xcan.angus.core.ai.infra.storage.FileStorageService;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.MessageFacade;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.MessageFeedbackDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.MessageFindDto;
@@ -39,6 +41,12 @@ public class MessageFacadeImpl implements MessageFacade {
   @Resource
   private MessageQuery messageQuery;
 
+  @Resource
+  private ChatService aiService;
+
+  @Resource
+  private FileStorageService fileStorageService;
+
   @Override
   public MessageSendVo sendMessage(Long sessionId, MessageSendDto dto) {
     // 1. 创建用户消息
@@ -49,8 +57,8 @@ public class MessageFacadeImpl implements MessageFacade {
         dto.getAttachments()
     );
 
-    // 2. 调用AI服务获取响应（这里需要集成AI服务）
-    String aiResponse = callAIService(sessionId, dto.getContent(), dto.getOverrideConfig());
+    // 2. 调用AI服务获取响应
+    String aiResponse = aiService.sendMessage(sessionId, dto.getContent(), dto.getOverrideConfig());
 
     // 3. 创建助手消息
     Long assistantMessageId = messageCmd.create(sessionId, MessageRole.ASSISTANT, aiResponse);
@@ -66,7 +74,6 @@ public class MessageFacadeImpl implements MessageFacade {
 
   @Override
   public SseEmitter sendMessageStream(Long sessionId, MessageSendDto dto) {
-    // TODO: 实现流式消息发送
     // 1. 创建用户消息
     messageCmd.createWithAttachments(
         sessionId,
@@ -79,25 +86,29 @@ public class MessageFacadeImpl implements MessageFacade {
     Long assistantMessageId = messageCmd.create(sessionId, MessageRole.ASSISTANT, "");
     messageCmd.setStreaming(assistantMessageId, true);
 
-    // 3. 异步流式调用AI服务
-    // TODO: 实现具体的流式响应逻辑
-    // 这里应该启动异步任务来处理流式响应
-
-    return null; // TODO: 返回实际的流式响应对象
+    // 3. 调用AI服务进行流式响应
+    return aiService.sendMessageStream(sessionId, dto.getContent(), dto.getOverrideConfig(), assistantMessageId);
   }
 
   @Override
   public AttachmentUploadVo uploadAttachment(MultipartFile file, Long sessionId) {
-    // TODO: 实现附件上传
-    // 1. 验证文件类型和大小
-    // 2. 上传文件到OSS/S3
-    // 3. 创建附件记录
-    // 4. 返回附件信息
+    // 1. 验证文件类型
+    if (!fileStorageService.isValidFileType(file.getContentType())) {
+      throw new IllegalArgumentException("不支持的文件类型: " + file.getContentType());
+    }
+
+    // 2. 上传文件
+    cloud.xcan.angus.core.ai.domain.chat.Attachment attachment = fileStorageService.uploadFile(file, sessionId);
+
+    // 3. 构建返回结果
     AttachmentUploadVo vo = new AttachmentUploadVo();
-    vo.setName(file.getOriginalFilename());
-    vo.setSize(file.getSize());
-    vo.setType(file.getContentType());
-    // TODO: 实现实际的上传逻辑
+    vo.setId(attachment.getId());
+    vo.setName(attachment.getName());
+    vo.setType(attachment.getType());
+    vo.setSize(attachment.getSize());
+    vo.setUrl(attachment.getUrl());
+    vo.setUploadedAt(attachment.getUploadedAt());
+
     return vo;
   }
 
@@ -134,10 +145,14 @@ public class MessageFacadeImpl implements MessageFacade {
 
     if (!streamingMessages.isEmpty()) {
       Message message = streamingMessages.get(0);
-      // 2. 停止流式生成
+
+      // 2. 停止AI服务流式生成
+      aiService.stopGeneration(message.getId());
+
+      // 3. 停止流式生成
       messageCmd.setStreaming(message.getId(), false);
 
-      // 3. 返回当前消息状态
+      // 4. 返回当前消息状态
       return MessageAssembler.toMessageVo(message);
     }
 
@@ -151,10 +166,8 @@ public class MessageFacadeImpl implements MessageFacade {
 
   @Override
   public void deleteAttachment(Long id) {
-    // TODO: 实现附件删除
-    // 1. 查询附件记录
-    // 2. 删除OSS/S3文件
-    // 3. 删除数据库记录
+    // 删除附件
+    fileStorageService.deleteFile(id);
   }
 
   @Override
@@ -171,30 +184,30 @@ public class MessageFacadeImpl implements MessageFacade {
 
   @Override
   public ChatStatisticsVo getChatStatistics(String period) {
-    // TODO: 实现统计逻辑
-    // 1. 查询会话统计数据
-    // 2. 查询消息统计数据
-    // 3. 聚合并返回
     ChatStatisticsVo vo = new ChatStatisticsVo();
 
-    // TODO: 实现具体统计逻辑
-    // - 今日会话数/消息数
-    // - 使用趋势
-    // - 热门应用
-    // - 热门模型
+    // 1. 基础统计
+    vo.setTotalSessions(sessionCmd.countAll());
+    vo.setTotalMessages(messageCmd.countAll());
+
+    // 2. 今日统计
+    ChatStatisticsVo.TodayStats todayStats = new ChatStatisticsVo.TodayStats();
+    todayStats.setSessions(sessionCmd.countToday());
+    todayStats.setMessages(messageCmd.countToday());
+    vo.setTodayStats(todayStats);
+
+    // 3. 使用趋势（最近7天）
+    List<ChatStatisticsVo.UsageTrend> trends = messageQuery.getUsageTrend(7);
+    vo.setUsageTrend(trends);
+
+    // 4. Top应用
+    List<ChatStatisticsVo.TopApp> topApps = sessionQuery.getTopApps(5);
+    vo.setTopApps(topApps);
+
+    // 5. Top模型
+    List<ChatStatisticsVo.TopModel> topModels = sessionQuery.getTopModels(5);
+    vo.setTopModels(topModels);
 
     return vo;
-  }
-
-  /**
-   * 调用AI服务（模拟实现）
-   */
-  private String callAIService(Long sessionId, String content, Object config) {
-    // TODO: 集成实际的AI服务
-    // 这里应该调用AI服务API，传入会话ID、消息内容、配置等参数
-    // 返回AI生成的响应内容
-
-    // 模拟AI响应
-    return "这是AI的模拟响应：" + content;
   }
 }

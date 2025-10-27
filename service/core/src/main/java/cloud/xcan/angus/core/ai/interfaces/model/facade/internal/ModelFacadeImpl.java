@@ -5,7 +5,7 @@ import static cloud.xcan.angus.core.utils.CoreUtils.buildVoPageResult;
 import cloud.xcan.angus.core.ai.application.cmd.model.ModelCmd;
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.domain.model.Model;
-import cloud.xcan.angus.core.ai.domain.model.ModelConfig;
+import cloud.xcan.angus.core.ai.infra.ai.model.ModelConfig;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.ModelFacade;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelFindDto;
