@@ -117,6 +117,7 @@
 
     <xcan-infra.bom.version>1.0.0</xcan-infra.bom.version>
     <xcan-plugin.bom.version>1.0.0</xcan-plugin.bom.version>
+    <spring-ai-bom.version>1.0.3</spring-ai-bom.version>
 
     <xcan-angusgm.api.version>1.0.0</xcan-angusgm.api.version>
     <xcan-angusstorage.api.version>1.0.0</xcan-angusstorage.api.version>
@@ -145,7 +146,7 @@
       <dependency>
         <groupId>org.springframework.ai</groupId>
         <artifactId>spring-ai-bom</artifactId>
-        <version>1.0.3</version>
+        <version>${spring-ai-bom.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
