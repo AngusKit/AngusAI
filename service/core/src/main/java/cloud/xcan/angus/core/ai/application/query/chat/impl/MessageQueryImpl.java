@@ -4,6 +4,7 @@ import cloud.xcan.angus.core.ai.application.query.chat.MessageQuery;
 import cloud.xcan.angus.core.ai.domain.chat.Message;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRepo;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRole;
+import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.ChatStatisticsVo.UsageTrend;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
@@ -129,7 +130,7 @@ public class MessageQueryImpl implements MessageQuery {
     return new BizTemplate<List<Message>>() {
       @Override
       protected List<Message> process() {
-        return messageRepo.findBySessionIdOrderByCreatedDateDesc(sessionId, 
+        return messageRepo.findBySessionIdOrderByCreatedDateDesc(sessionId,
             PageRequest.of(0, limit)).getContent();
       }
     }.execute();
@@ -147,5 +148,20 @@ public class MessageQueryImpl implements MessageQuery {
         return null;
       }
     }.execute();
+  }
+
+  @Override
+  public List<UsageTrend> getUsageTrend(int days) {
+    return List.of();
+  }
+
+  @Override
+  public Long countAll() {
+    return 0L;
+  }
+
+  @Override
+  public Long countToday() {
+    return 0:;
   }
 }

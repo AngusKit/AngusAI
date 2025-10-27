@@ -4,6 +4,8 @@ import cloud.xcan.angus.core.ai.application.query.chat.SessionQuery;
 import cloud.xcan.angus.core.ai.domain.chat.Session;
 import cloud.xcan.angus.core.ai.domain.chat.SessionRepo;
 import cloud.xcan.angus.core.ai.domain.chat.SessionSearchRepo;
+import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.ChatStatisticsVo.TopApp;
+import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.ChatStatisticsVo.TopModel;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
@@ -110,5 +112,25 @@ public class SessionQueryImpl implements SessionQuery {
   @Override
   public long countByModelId(Long modelId) {
     return sessionRepo.countByModelId(modelId);
+  }
+
+  @Override
+  public List<TopApp> getTopApps(int limit) {
+    return List.of();
+  }
+
+  @Override
+  public List<TopModel> getTopModels(int limit) {
+    return List.of();
+  }
+
+  @Override
+  public Long countAll() {
+    return 0;
+  }
+
+  @Override
+  public Long countToday() {
+    return 0;
   }
 }

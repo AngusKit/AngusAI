@@ -58,7 +58,7 @@ public class MessageRest {
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "SSE流式响应")
   })
-  @PostMapping(value = "/sessions/{sessionId}/messages/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+  @PostMapping(value = "/{sessionId}/messages/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
   public SseEmitter sendMessageStream(
       @PathVariable @Parameter(description = "会话ID") Long sessionId,
       @Valid @RequestBody MessageSendDto dto) {
@@ -130,9 +130,8 @@ public class MessageRest {
     // 1. 验证音频文件格式
     // 2. 调用语音识别服务（如 Whisper API）
     // 3. 返回识别结果
-    
     // 模拟实现
-    return ApiLocaleResult.success("这是语音识别的模拟结果");
+    return ApiLocaleResult.successData("这是语音识别的模拟结果");
   }
 
   @Operation(operationId = "getChatStatistics", summary = "获取对话统计", description = "获取对话模块统计数据")
