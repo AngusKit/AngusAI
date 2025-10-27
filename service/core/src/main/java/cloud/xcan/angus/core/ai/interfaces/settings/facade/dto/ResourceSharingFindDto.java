@@ -13,9 +13,6 @@ import lombok.EqualsAndHashCode;
 @Schema(description = "资源共享查询参数")
 public class ResourceSharingFindDto extends PageQuery {
 
-  @Schema(description = "关键词搜索（资源名称）")
-  private String keyword;
-
   @Schema(description = "资源类型筛选")
   private ResourceType type;
 

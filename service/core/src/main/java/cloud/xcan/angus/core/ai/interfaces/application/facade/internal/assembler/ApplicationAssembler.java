@@ -93,14 +93,16 @@ public class ApplicationAssembler {
     Objects.requireNonNull(SpringContextHolder.getBean(JoinSupplier.class))
         .execute(() -> joinResourceName(configVo));
     vo.setConfig(configVo);
+
     // 设置分享信息
     vo.setShare(CoreUtils.copyProperties(application.getShare(), new ApplicationShareVo()));
+
+    // 设置统计信息
     ApplicationStatsVo statsVo = new ApplicationStatsVo();
     statsVo.setTotalApiCalls(application.getApiCalls());
     statsVo.setTotalTokens(application.getTotalTokens());
     statsVo.setAvgResponseTime(application.getAvgResponseTime());
     statsVo.setSuccessRate(application.getSuccessRate());
-    // 设置统计信息
     vo.setStats(statsVo);
     return vo;
   }

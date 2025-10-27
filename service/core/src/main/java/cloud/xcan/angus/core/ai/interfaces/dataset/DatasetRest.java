@@ -1,17 +1,21 @@
 package cloud.xcan.angus.core.ai.interfaces.dataset;
 
-import cloud.xcan.angus.core.ai.domain.dataset.DatasetConfig;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.DatasetFacade;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DataSourceUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetCreateDto;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetDataBatchDeleteDto;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetDataFindDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetFindDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetUpdateDto;
-import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DataUploadDto;
-import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.BatchDeleteDto;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasourceConnectionTestDto;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetDataListVo;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetListVo;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetStatisticsVo;
-import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DataPreviewVo;
-import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.UploadResultVo;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasourceConfigVo;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasourceConnectionTestVo;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasourceTableDataPreviewVo;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.SyncDataVo;
 import cloud.xcan.angus.remote.ApiLocaleResult;
 import cloud.xcan.angus.remote.PageResult;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,6 +25,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import java.util.List;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -43,7 +48,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class DatasetRest {
 
   @Resource
- private DatasetFacade datasetFacade;
+  private DatasetFacade datasetFacade;
 
   @Operation(operationId = "createDataset", summary = "创建数据集", description = "创建新数据集")
   @ApiResponses(value = {
@@ -69,39 +74,59 @@ public class DatasetRest {
     return ApiLocaleResult.success(datasetFacade.update(id, dto));
   }
 
-  @Operation(operationId = "updateDatasetConfig", summary = "更新数据集配置", description = "更新数据集的详细配置")
+  @Operation(operationId = "syncDatasetData", summary = "同步数据集数据", description = "手动触发同步文件数据到数据库或同步表信息")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "配置更新成功")
+      @ApiResponse(responseCode = "200", description = "同步已启动")
+  })
+  @PostMapping("/{id}/dataset/sync")
+  public ApiLocaleResult<List<SyncDataVo>> syncDatasetData(
+      @Parameter(description = "数据集ID") @PathVariable Long id,
+      @Parameter(description = "同步文件或表名") @RequestParam(required = false) List<String> names) {
+    return ApiLocaleResult.success(datasetFacade.syncDatasetData(id, names));
+  }
+
+  @Operation(operationId = "modifyDataSource", summary = "修改数据源", description = "修改数据源配置")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "201", description = "数据源添加成功")
   })
   @ResponseStatus(HttpStatus.OK)
-  @PutMapping("/{id}/config")
-  public ApiLocaleResult<DatasetDetailVo> updateConfig(
+  @PutMapping("/{id}/datasource")
+  public ApiLocaleResult<DatasourceConfigVo> modifyDataSource(
       @Parameter(description = "数据集ID") @PathVariable Long id,
-      @Valid @RequestBody DatasetConfig dto) {
-    return ApiLocaleResult.success(datasetFacade.updateConfig(id, dto));
+      @Valid @RequestBody DataSourceUpdateDto dto) {
+    return ApiLocaleResult.success(datasetFacade.modifyDataSource(id, dto));
   }
 
-  @Operation(operationId = "uploadData", summary = "上传数据", description = "上传数据到数据集")
+  @Operation(operationId = "testDataSourceConnection", summary = "测试数据源连接", description = "测试数据源连接是否可用")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "201", description = "上传成功，开始处理")
+      @ApiResponse(responseCode = "200", description = "连接测试完成")
   })
-  @ResponseStatus(HttpStatus.CREATED)
-  @PostMapping("/{id}/upload")
-  public ApiLocaleResult<UploadResultVo> uploadData(
-      @Parameter(description = "数据集ID") @PathVariable Long id,
-      @Valid @RequestBody DataUploadDto dto) {
-    return ApiLocaleResult.success(datasetFacade.uploadData(id, dto));
+  @PostMapping("/datasource/test")
+  public ApiLocaleResult<DatasourceConnectionTestVo> testDatasourceConnection(
+      @Valid @RequestBody DatasourceConnectionTestDto dto) {
+    return ApiLocaleResult.success(datasetFacade.testDatasourceConnection(dto));
   }
 
-  @Operation(operationId = "batchDeleteData", summary = "批量删除数据", description = "批量删除数据记录")
+  @Operation(operationId = "deleteDataSource", summary = "删除数据源", description = "删除数据源配置")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "204", description = "删除成功")
+  })
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @DeleteMapping("/{id}/datasource")
+  public void deleteDataSource(
+      @Parameter(description = "数据集ID") @PathVariable Long id) {
+    datasetFacade.deleteDataSource(id);
+  }
+
+  @Operation(operationId = "batchDeleteData", summary = "批量删除数据", description = "批量删除文件或表")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "批量删除成功")
   })
-  @PostMapping("/{id}/batch-delete")
-  public ApiLocaleResult<DatasetStatisticsVo> batchDeleteData(
+  @DeleteMapping("/{id}/batch-delete")
+  public void batchDeleteData(
       @Parameter(description = "数据集ID") @PathVariable Long id,
-      @Valid @RequestBody BatchDeleteDto dto) {
-    return ApiLocaleResult.success(datasetFacade.batchDeleteData(id, dto));
+      @Valid @RequestBody DatasetDataBatchDeleteDto dto) {
+    datasetFacade.batchDeleteData(id, dto);
   }
 
   @Operation(operationId = "deleteDataset", summary = "删除数据集", description = "删除指定数据集")
@@ -127,7 +152,7 @@ public class DatasetRest {
     return ApiLocaleResult.success(datasetFacade.getDetail(id));
   }
 
-  @Operation(operationId = "getDatasetList", summary = "获取数据集列表", description = "获取当前用户的数据集列表，支持分页、搜索和筛选")
+  @Operation(operationId = "getDatasetList", summary = "获取数据集列表", description = "获取当前用户的数据集列表")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "数据集列表获取成功")
   })
@@ -138,31 +163,30 @@ public class DatasetRest {
     return ApiLocaleResult.success(datasetFacade.list(dto));
   }
 
-  @Operation(operationId = "previewData", summary = "数据预览", description = "预览数据集数据")
+  @Operation(operationId = "getDatasetDataList", summary = "获取数据集数据列表", description = "获取数据集数据列表")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "数据集数据列表获取成功")
+  })
+  @ResponseStatus(HttpStatus.OK)
+  @GetMapping("/{id}")
+  public ApiLocaleResult<PageResult<DatasetDataListVo>> listData(
+      @Parameter(description = "数据集ID") @PathVariable Long id,
+      @Valid @ParameterObject DatasetDataFindDto dto) {
+    return ApiLocaleResult.success(datasetFacade.listData(id, dto));
+  }
+
+  @Operation(operationId = "previewDatasourceData", summary = "数据源数据预览", description = "预览数据集数据源数据")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "数据预览成功")
   })
-  @GetMapping("/{id}/preview")
-  public ApiLocaleResult<DataPreviewVo> previewData(
+  @GetMapping("/{id}/datasource/data/preview")
+  public ApiLocaleResult<DatasourceTableDataPreviewVo> previewDatasourceData(
       @Parameter(description = "数据集ID") @PathVariable Long id,
+      @Parameter(description = "预览表名称") @RequestParam String tableName,
       @Parameter(description = "页码") @RequestParam(required = false, defaultValue = "1") Integer pageNo,
-      @Parameter(description = "每页数量") @RequestParam(required = false, defaultValue = "20") Integer pageSize,
-      @Parameter(description = "数据源ID") @RequestParam(required = false) Long sourceId) {
-    return ApiLocaleResult.success(datasetFacade.previewData(id, pageNo, pageSize, sourceId));
-  }
-
-  @Operation(operationId = "exportData", summary = "数据导出", description = "导出数据集数据")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "导出成功")
-  })
-  @GetMapping("/{id}/export")
-  @SuppressWarnings("unchecked")
-  public ApiLocaleResult<String> exportData(
-      @Parameter(description = "数据集ID") @PathVariable Long id,
-      @Parameter(description = "导出格式") @RequestParam(required = false, defaultValue = "csv") String format,
-      @Parameter(description = "数据源ID") @RequestParam(required = false) Long sourceId) {
-    String result = datasetFacade.exportData(id, format, sourceId);
-    return (ApiLocaleResult<String>) ApiLocaleResult.success(result);
+      @Parameter(description = "每页数量") @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
+    return ApiLocaleResult.success(
+        datasetFacade.previewDatasourceData(id, tableName, pageNo, pageSize));
   }
 
   @Operation(operationId = "getDatasetStatistics", summary = "获取数据集统计", description = "获取数据集模块的统计数据")
@@ -170,8 +194,9 @@ public class DatasetRest {
       @ApiResponse(responseCode = "200", description = "统计数据获取成功")
   })
   @GetMapping("/statistics")
-  public ApiLocaleResult<DatasetStatisticsVo> getStatistics() {
-    return ApiLocaleResult.success(datasetFacade.getStatistics());
+  public ApiLocaleResult<DatasetStatisticsVo> getStatistics(
+      @Parameter(description = "数据集ID") @RequestParam(required = false) Long id) {
+    return ApiLocaleResult.success(datasetFacade.getStatistics(id));
   }
 
 }

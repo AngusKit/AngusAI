@@ -19,9 +19,6 @@ public class WorkflowExecutionLogFindDto extends SearchCriteria {
   @Schema(description = "状态筛选")
   private String status;
 
-  @Schema(description = "搜索关键词")
-  private String keyword;
-
   @Schema(description = "开始日期")
   private Long startDate;
 

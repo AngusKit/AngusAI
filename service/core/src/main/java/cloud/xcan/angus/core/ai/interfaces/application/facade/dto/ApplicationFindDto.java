@@ -13,9 +13,6 @@ import lombok.EqualsAndHashCode;
 @Schema(description = "应用查询参数")
 public class ApplicationFindDto extends PageQuery {
 
-  @Schema(description = "关键词搜索（名称、描述）")
-  private String keyword;
-
   @Schema(description = "分类筛选")
   private ApplicationCategory category;
 
@@ -34,27 +31,8 @@ public class ApplicationFindDto extends PageQuery {
   @Schema(description = "是否模板")
   private Boolean isTemplate;
 
-  @Schema(description = "所属租户ID", example = "1")
-  private Long tenantId;
-
-  @Schema(description = "创建人ID", example = "1")
-  private Long createdBy;
-
-  @Schema(description = "创建时间", example = "2024-10-12 00:00:00")
-  private LocalDateTime createdDate;
-
-  @Schema(description = "最后修改人ID", example = "1")
-  private Long lastModifiedBy;
-
-  @Schema(description = "最后修改时间", example = "2024-10-12 00:00:00")
-  private LocalDateTime lastModifiedDate;
-
   @Schema(description = "排序字段", example = "lastModifiedDate", allowableValues = {"createdDate",
       "lastModifiedDate", "status", "category", "name"})
   private String orderBy = "lastModifiedDate";
 
-  @Override
-  public String getDefaultOrderBy() {
-    return "lastModifiedDate";
-  }
 }

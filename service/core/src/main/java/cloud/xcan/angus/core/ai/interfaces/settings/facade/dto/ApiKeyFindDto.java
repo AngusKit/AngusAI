@@ -14,9 +14,6 @@ import lombok.EqualsAndHashCode;
 @Schema(description = "查询API密钥请求")
 public class ApiKeyFindDto extends PageQuery {
 
-  @Schema(description = "搜索关键词（密钥名称）")
-  private String keyword;
-
   @Schema(description = "状态筛选")
   private ApiKeyStatus status;
 

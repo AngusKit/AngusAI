@@ -2,30 +2,60 @@ package cloud.xcan.angus.core.ai.application.query.dataset.impl;
 
 import cloud.xcan.angus.core.ai.application.query.dataset.DatasetQuery;
 import cloud.xcan.angus.core.ai.domain.dataset.Dataset;
+import cloud.xcan.angus.core.ai.domain.dataset.DatasetRepo;
+import cloud.xcan.angus.core.ai.domain.dataset.DatasetSearchRepo;
+import cloud.xcan.angus.core.ai.domain.dataset.DatasetStatistics;
 import cloud.xcan.angus.core.ai.domain.dataset.DatasetStatus;
-import cloud.xcan.angus.core.ai.domain.dataset.DatasetType;
-import cloud.xcan.angus.core.ai.domain.dataset.Visibility;
+import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
+import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import jakarta.annotation.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 @Component
 public class DatasetQueryImpl implements DatasetQuery {
 
   @Resource
-  private cloud.xcan.angus.core.ai.domain.dataset.DatasetRepo datasetRepo;
+  private DatasetRepo datasetRepo;
+
+  @Resource
+  private DatasetSearchRepo datasetSearchRepo;
+
+  @Override
+  public Dataset findAndCheck(Long id) {
+    return new BizTemplate<Dataset>() {
+      @Override
+      protected Dataset process() {
+        return datasetRepo.findById(id)
+            .orElseThrow(() -> ResourceNotFound.of("数据集不存在", new Object[]{}));
+      }
+    }.execute();
+  }
 
   @Override
   public Page<Dataset> find(GenericSpecification<Dataset> spec, PageRequest pageable,
       boolean fullTextSearch, String[] match) {
-    return datasetRepo.find(spec, pageable, fullTextSearch, match);
+    return new BizTemplate<Page<Dataset>>() {
+      @Override
+      protected Page<Dataset> process() {
+        return fullTextSearch
+            ? datasetSearchRepo.find(spec.getCriteria(), pageable, Dataset.class, match)
+            : datasetRepo.findAll(spec, pageable);
+      }
+    }.execute();
   }
 
   @Override
-  public Dataset findById(Long id) {
-    return datasetRepo.findById(id);
+  public DatasetStatistics getStatistics(@Nullable Long id) {
+    return new BizTemplate<DatasetStatistics>() {
+      @Override
+      protected DatasetStatistics process() {
+        return null;
+      }
+    }.execute();
   }
 
   @Override
@@ -38,108 +68,4 @@ public class DatasetQueryImpl implements DatasetQuery {
     return datasetRepo.existsByNameAndIdNot(name, id);
   }
 
-  @Override
-  public long countByCreatedBy(Long createdBy) {
-    return datasetRepo.countByCreatedBy(createdBy);
-  }
-
-  @Override
-  public long countByStatus(DatasetStatus status) {
-    return datasetRepo.countByStatus(status);
-  }
-
-  @Override
-  public long countByType(DatasetType type) {
-    return datasetRepo.countByType(type);
-  }
-
-  @Override
-  public long countByVisibility(Visibility visibility) {
-    return datasetRepo.countByVisibility(visibility);
-  }
-
-  @Override
-  public Page<Dataset> findActiveDatasets(PageRequest pageable) {
-    return datasetRepo.findByStatus(DatasetStatus.ACTIVE, pageable);
-  }
-
-  @Override
-  public Page<Dataset> findPreparingDatasets(PageRequest pageable) {
-    return datasetRepo.findByStatus(DatasetStatus.PREPARING, pageable);
-  }
-
-  @Override
-  public Page<Dataset> findInactiveDatasets(PageRequest pageable) {
-    return datasetRepo.findByStatus(DatasetStatus.INACTIVE, pageable);
-  }
-
-  @Override
-  public Page<Dataset> findByType(DatasetType type, PageRequest pageable) {
-    return datasetRepo.findByType(type, pageable);
-  }
-
-  @Override
-  public Page<Dataset> findByVisibility(Visibility visibility, PageRequest pageable) {
-    return datasetRepo.findByVisibility(visibility, pageable);
-  }
-
-  @Override
-  public Page<Dataset> findRecentDatasets(PageRequest pageable) {
-    return datasetRepo.findRecentDatasets(pageable);
-  }
-
-  @Override
-  public Page<Dataset> findLargestDatasets(PageRequest pageable) {
-    return datasetRepo.findLargestDatasets(pageable);
-  }
-
-  @Override
-  public Page<Dataset> findRecentlyUpdatedDatasets(PageRequest pageable) {
-    return datasetRepo.findRecentlyUpdatedDatasets(pageable);
-  }
-
-  @Override
-  public Page<Dataset> findByTags(String[] tags, PageRequest pageable) {
-    return datasetRepo.findByTags(tags, pageable);
-  }
-
-  @Override
-  public Page<Dataset> findPublicDatasets(PageRequest pageable) {
-    return datasetRepo.findPublicDatasets(pageable);
-  }
-
-  @Override
-  public Page<Dataset> findTeamDatasets(PageRequest pageable) {
-    return datasetRepo.findTeamDatasets(pageable);
-  }
-
-  @Override
-  public Page<Dataset> findPrivateDatasets(PageRequest pageable) {
-    return datasetRepo.findPrivateDatasets(pageable);
-  }
-
-  @Override
-  public Page<Dataset> findDatasetsNeedingCleanup(PageRequest pageable) {
-    return datasetRepo.findDatasetsNeedingCleanup(pageable);
-  }
-
-  @Override
-  public Page<Dataset> findDatasetsByStorageUsage(PageRequest pageable) {
-    return datasetRepo.findDatasetsByStorageUsage(pageable);
-  }
-
-  @Override
-  public Page<Dataset> findFailedDatasets(PageRequest pageable) {
-    return datasetRepo.findFailedDatasets(pageable);
-  }
-
-  @Override
-  public Page<Dataset> findByCreatedBy(Long createdBy, PageRequest pageable) {
-    return datasetRepo.findByCreatedBy(createdBy, pageable);
-  }
-
-  @Override
-  public Page<Dataset> findDatasetsNeedingBackup(PageRequest pageable) {
-    return datasetRepo.findDatasetsNeedingBackup(pageable);
-  }
 }

@@ -16,9 +16,6 @@ public class SessionFindDto {
   @Schema(description = "每页大小", example = "20")
   private Integer pageSize = 20;
 
-  @Schema(description = "搜索关键词（标题或内容）")
-  private String keyword;
-
   @Schema(description = "筛选指定应用")
   private Long appId;
 

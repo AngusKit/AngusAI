@@ -1,17 +1,22 @@
 package cloud.xcan.angus.core.ai.interfaces.dataset.facade;
 
-import cloud.xcan.angus.core.ai.domain.dataset.DatasetConfig;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasourceConnectionTestDto;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DataSourceUpdateDto;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetDataBatchDeleteDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetCreateDto;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetDataFindDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetFindDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetUpdateDto;
-import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DataUploadDto;
-import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.BatchDeleteDto;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasourceConnectionTestVo;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasourceConfigVo;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasourceTableDataPreviewVo;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetDataListVo;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetListVo;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetStatisticsVo;
-import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DataPreviewVo;
-import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.UploadResultVo;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.SyncDataVo;
 import cloud.xcan.angus.remote.PageResult;
+import java.util.List;
 
 public interface DatasetFacade {
 
@@ -26,19 +31,29 @@ public interface DatasetFacade {
   DatasetDetailVo update(Long id, DatasetUpdateDto dto);
 
   /**
-   * 更新数据集配置
+   * 同步文件数据到关系数据库或同步表信息
    */
-  DatasetDetailVo updateConfig(Long id, DatasetConfig config);
+  List<SyncDataVo> syncDatasetData(Long id, List<String> names);
 
   /**
-   * 上传数据
+   * 添加数据源
    */
-  UploadResultVo uploadData(Long id, DataUploadDto dto);
+  DatasourceConfigVo modifyDataSource(Long id, DataSourceUpdateDto dto);
 
   /**
-   * 批量删除数据
+   * 测试数据源连接
    */
-  DatasetStatisticsVo batchDeleteData(Long id, BatchDeleteDto dto);
+  DatasourceConnectionTestVo testDatasourceConnection(DatasourceConnectionTestDto dto);
+
+  /**
+   * 删除数据源
+   */
+  void deleteDataSource(Long id);
+
+  /**
+   * 批量删除文件或表
+   */
+  void batchDeleteData(Long id, DatasetDataBatchDeleteDto dto);
 
   /**
    * 删除数据集
@@ -56,18 +71,18 @@ public interface DatasetFacade {
   PageResult<DatasetListVo> list(DatasetFindDto dto);
 
   /**
-   * 数据预览
+   * 获取数据集数据列表
    */
-  DataPreviewVo previewData(Long id, Integer pageNo, Integer pageSize, Long sourceId);
+  PageResult<DatasetDataListVo> listData(Long id, DatasetDataFindDto dto);
 
   /**
-   * 数据导出
+   * 数据源数据预览
    */
-  String exportData(Long id, String format, Long sourceId);
+  DatasourceTableDataPreviewVo previewDatasourceData(Long id, String tableName, Integer pageNo, Integer pageSize);
 
   /**
    * 获取数据集统计
    */
-  DatasetStatisticsVo getStatistics();
+  DatasetStatisticsVo getStatistics(Long id);
 
 }

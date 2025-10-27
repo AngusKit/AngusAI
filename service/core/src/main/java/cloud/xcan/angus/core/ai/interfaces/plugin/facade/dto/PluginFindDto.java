@@ -15,9 +15,6 @@ import lombok.EqualsAndHashCode;
 @Schema(description = "插件查询参数")
 public class PluginFindDto extends PageQuery {
 
-  @Schema(description = "关键词搜索（名称、描述）")
-  private String keyword;
-
   @Schema(description = "分类筛选")
   private PluginCategory category;
 

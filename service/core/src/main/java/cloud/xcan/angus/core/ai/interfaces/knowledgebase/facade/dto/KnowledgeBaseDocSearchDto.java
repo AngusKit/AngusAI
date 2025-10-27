@@ -11,10 +11,6 @@ import lombok.Data;
 @Schema(description = "文档检索请求参数")
 public class KnowledgeBaseDocSearchDto {
 
-  @NotBlank
-  @Schema(description = "检索查询", example = "产品功能介绍", requiredMode = Schema.RequiredMode.REQUIRED)
-  private String keyword;
-
   @Min(value = Constants.SEARCH_LIMIT_MIN_VALUE)
   @Max(value = Constants.SEARCH_LIMIT_MAX_VALUE)
   @Schema(description = "返回数量", example = "5")

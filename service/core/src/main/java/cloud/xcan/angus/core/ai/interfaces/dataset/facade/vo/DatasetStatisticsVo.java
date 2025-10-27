@@ -8,17 +8,27 @@ import lombok.Data;
 public class DatasetStatisticsVo {
 
   @Schema(description = "总数据集数")
-  private Object totalDatasets;
+  private long totalDatasets;
+
+  @Schema(description = "活跃（被引用）数据集数")
+  private long activeDatasets;
+
+  @Schema(description = "总文件或表数")
+  private long totalFilesOrTables;
 
   @Schema(description = "总记录数")
-  private Object totalRecords;
+  private long totalRecords;
 
-  @Schema(description = "活跃数据集数")
-  private Object activeDatasets;
+  @Schema(description = "记录总大小")
+  private long totalRecordsSize;
 
-  @Schema(description = "存储使用情况")
-  private Object storageUsage;
+  @Schema(description = "已使用存储空间大小")
+  private String usedStoreSize;
 
-  @Schema(description = "批量删除结果")
-  private Object batchDeleteResult;
+  @Schema(description = "授权的存储空间大小，自定义数据源返回空")
+  private String totalStoreSize;
+
+  @Schema(description = "已使用存储空间占比，自定义数据源返回空")
+  private String usedStoreRate;
+
 }

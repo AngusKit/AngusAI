@@ -4,6 +4,7 @@ import cloud.xcan.angus.core.ai.infra.ai.model.ModelProvider;
 import cloud.xcan.angus.core.ai.domain.model.ModelStatus;
 import cloud.xcan.angus.core.ai.infra.ai.model.ModelType;
 import cloud.xcan.angus.core.jpa.criteria.SearchCriteria;
+import cloud.xcan.angus.remote.PageQuery;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -11,10 +12,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Schema(description = "查询模型请求参数")
-public class ModelFindDto extends SearchCriteria {
-
-  @Schema(description = "搜索关键词")
-  private String keyword;
+public class ModelFindDto extends PageQuery {
 
   @Schema(description = "模型类型筛选")
   private ModelType type;

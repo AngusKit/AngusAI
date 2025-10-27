@@ -13,9 +13,6 @@ import lombok.EqualsAndHashCode;
 @Schema(description = "文档查询请求参数")
 public class KnowledgeBaseDocFindDto extends PageQuery {
 
-  @Schema(description = "搜索关键词")
-  private String keyword;
-
   @Schema(description = "文档类型筛选")
   private DocumentType type;
 

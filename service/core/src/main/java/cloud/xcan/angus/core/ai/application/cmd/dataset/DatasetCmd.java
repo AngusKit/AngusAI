@@ -1,9 +1,8 @@
 package cloud.xcan.angus.core.ai.application.cmd.dataset;
 
+import cloud.xcan.angus.core.ai.infra.util.DatasourceUtils.ConnectionTestResult;
 import cloud.xcan.angus.core.ai.domain.dataset.Dataset;
-import cloud.xcan.angus.core.ai.domain.dataset.DatasetConfig;
-import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DataUploadDto;
-import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.BatchDeleteDto;
+import cloud.xcan.angus.core.ai.domain.dataset.DatasourceConfig;
 
 public interface DatasetCmd {
 
@@ -18,69 +17,19 @@ public interface DatasetCmd {
   Dataset update(Dataset dataset);
 
   /**
-   * 更新数据集配置
+   * 更新数据集数据源配置
    */
-  Dataset updateConfig(Long id, DatasetConfig config);
+  Dataset modifyDataSource(Long id, DatasourceConfig config);
 
   /**
-   * 更新数据集状态
+   * 测试数据源连接是否可用
    */
-  Dataset updateStatus(Long id, String status);
+  ConnectionTestResult testDatasourceConnection(Long id, DatasourceConfig config);
 
   /**
-   * 批量删除数据
+   *  删除数据源配置
    */
-  Dataset batchDeleteData(Long id, BatchDeleteDto dto);
-
-  /**
-   * 上传数据
-   */
-  Dataset uploadData(Long id, DataUploadDto dto);
-
-  /**
-   * 备份数据集
-   */
-  Dataset backupDataset(Long id);
-
-  /**
-   * 恢复数据集
-   */
-  Dataset restoreDataset(Long id, String backupId);
-
-  /**
-   * 复制数据集
-   */
-  Dataset duplicateDataset(Long id, String name);
-
-  /**
-   * 归档数据集
-   */
-  Dataset archiveDataset(Long id);
-
-  /**
-   * 取消归档数据集
-   */
-  Dataset unarchiveDataset(Long id);
-
-  /**
-   * 记录数据集访问
-   */
-  void recordAccess(Long id);
-
-  /**
-   * 更新数据集统计
-   */
-  void updateStatistics(Long id, Long recordCount, Long totalSize);
-
-  /**
-   * 清理数据集资源
-   */
-  void cleanupResources(Long id);
-
-  /**
-   * 批量操作数据集
-   */
-  void batchOperation(Long[] ids, String operation);
+  void deleteDataSource(Long id);
 
   /**
    * 删除数据集
@@ -88,18 +37,7 @@ public interface DatasetCmd {
   void delete(Long id);
 
   /**
-   * 导出数据
+   * 记录数据集访问
    */
-  String exportData(Long id, String format, Long sourceId);
-
-  /**
-   * 验证数据集配置
-   */
-  boolean validateConfig(DatasetConfig config);
-
-  /**
-   * 检查数据集依赖
-   */
-  boolean checkDependencies(Long id);
-
+  void recordAccess(Long id);
 }

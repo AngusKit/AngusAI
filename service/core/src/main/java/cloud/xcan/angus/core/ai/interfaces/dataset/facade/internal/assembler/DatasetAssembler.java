@@ -1,24 +1,39 @@
 package cloud.xcan.angus.core.ai.interfaces.dataset.facade.internal.assembler;
 
+import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatFileSize;
+
 import cloud.xcan.angus.core.ai.domain.dataset.Dataset;
-import cloud.xcan.angus.core.ai.domain.dataset.DatasetConfig;
+import cloud.xcan.angus.core.ai.domain.dataset.DatasetData;
+import cloud.xcan.angus.core.ai.domain.dataset.DatasetStatistics;
 import cloud.xcan.angus.core.ai.domain.dataset.DatasetStatus;
-import cloud.xcan.angus.core.ai.domain.dataset.DatasetType;
-import cloud.xcan.angus.core.ai.domain.dataset.Visibility;
+import cloud.xcan.angus.core.ai.domain.dataset.DatasourceConfig;
+import cloud.xcan.angus.core.ai.domain.dataset.SyncDataResult;
+import cloud.xcan.angus.core.ai.infra.util.DatasourceUtils.ConnectionTestResult;
+import cloud.xcan.angus.core.ai.infra.util.DatasourceUtils.TableDataResult;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DataSourceUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetCreateDto;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetDataFindDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetFindDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetUpdateDto;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasourceConnectionTestDto;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetDataListVo;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetDataStatisticsVo;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetListVo;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetStatisticsVo;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasourceConfigVo;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasourceConnectionTestVo;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasourceTableDataPreviewVo;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.SyncDataVo;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
+import cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder;
+import cloud.xcan.angus.remote.search.SearchCriteria;
+import java.util.Set;
 import org.springframework.stereotype.Component;
 
 @Component
 public class DatasetAssembler {
 
-  /**
-   * 创建DTO转领域对象
-   */
   public static Dataset toDomain(DatasetCreateDto dto) {
     Dataset dataset = new Dataset();
     dataset.setName(dto.getName());
@@ -26,185 +41,207 @@ public class DatasetAssembler {
     dataset.setType(dto.getType());
     dataset.setVisibility(dto.getVisibility());
     dataset.setTags(dto.getTags());
-    
+
     // 设置默认图标和颜色
-    dataset.setIcon(getDefaultIcon(dto.getType()));
-    dataset.setIconBg(getDefaultIconBg(dto.getType()));
-    
+    dataset.setIcon(dto.getIcon());
+    dataset.setIconBg(dto.getIconBg());
+
     // 设置默认状态
     dataset.setStatus(DatasetStatus.PREPARING);
-    
-    // 创建配置对象
-    DatasetConfig config = new DatasetConfig();
-    config.setTextConfig(dto.getConfig());
-    config.setTableConfig(dto.getConfig());
-    config.setDataSourceConfig(dto.getConfig());
-    dataset.setConfig(config);
-    
     return dataset;
   }
 
-  /**
-   * 更新DTO转领域对象
-   */
   public static Dataset updateDomain(Long id, DatasetUpdateDto dto) {
     Dataset dataset = new Dataset();
     dataset.setId(id);
     dataset.setName(dto.getName());
     dataset.setDescription(dto.getDescription());
-    dataset.setIcon(dto.getIcon());
-    dataset.setIconBg(dto.getIconBg());
     dataset.setVisibility(dto.getVisibility());
     dataset.setTags(dto.getTags());
-    
+
+    // 设置默认图标和颜色
+    dataset.setIcon(dto.getIcon());
+    dataset.setIconBg(dto.getIconBg());
     return dataset;
   }
 
-  /**
-   * 领域对象转详情VO
-   */
+  public static SyncDataVo toSyncDataVo(SyncDataResult syncFileResult) {
+    SyncDataVo vo = new SyncDataVo();
+    vo.setName(vo.getName());
+    vo.setStatus(syncFileResult.getStatus());
+    vo.setFailedReason(syncFileResult.getFailedReason());
+    return vo;
+  }
+
+  public static DatasourceConfig toDatasourceConfig(DataSourceUpdateDto vo) {
+    DatasourceConfig config = new DatasourceConfig();
+    config.setDatabaseType(vo.getDatabaseType());
+    config.setDatabase(vo.getDatabase());
+    config.setJdbcUrl(vo.getJdbcUrl());
+    config.setHost(vo.getHost());
+    config.setPort(vo.getPort());
+    config.setUsername(vo.getUsername());
+    config.setPassword(vo.getPassword());
+    return config;
+  }
+
+  public static DatasourceConfigVo toDatasourceConfigVo(DatasourceConfig config) {
+    DatasourceConfigVo vo = new DatasourceConfigVo();
+    vo.setName(config.getName());
+    vo.setDatabaseType(config.getDatabaseType());
+    vo.setDatabase(config.getDatabase());
+    vo.setJdbcUrl(config.getJdbcUrl());
+    vo.setHost(config.getHost());
+    vo.setPort(config.getPort());
+    vo.setUsername(config.getUsername());
+    // vo.setPassword(config.getPassword()); // 脱敏
+    return vo;
+  }
+
+  public static DatasourceConfig toDatasourceConfig(DatasourceConnectionTestDto vo) {
+    DatasourceConfig config = new DatasourceConfig();
+    config.setDatabaseType(vo.getDatabaseType());
+    config.setDatabase(vo.getDatabase());
+    config.setJdbcUrl(vo.getJdbcUrl());
+    config.setHost(vo.getHost());
+    config.setPort(vo.getPort());
+    config.setUsername(vo.getUsername());
+    config.setPassword(vo.getPassword());
+    return config;
+  }
+
+  public static DatasourceConnectionTestVo toConnectionTestResultVo(ConnectionTestResult result) {
+    DatasourceConnectionTestVo vo = new DatasourceConnectionTestVo();
+    vo.setSuccess(result.isSuccess());
+    vo.setMessage(result.getMessage());
+    vo.setDetails(result.getDetails());
+    return vo;
+  }
+
   public static DatasetDetailVo toDetailVo(Dataset dataset) {
     DatasetDetailVo vo = new DatasetDetailVo();
     vo.setId(dataset.getId());
     vo.setName(dataset.getName());
     vo.setDescription(dataset.getDescription());
+    vo.setType(dataset.getType());
+    vo.setStatus(dataset.getStatus());
+    vo.setVisibility(dataset.getVisibility());
     vo.setIcon(dataset.getIcon());
     vo.setIconBg(dataset.getIconBg());
-    vo.setType(dataset.getType());
-    vo.setDataCount(dataset.getDataCount());
-    vo.setSize(dataset.getSize());
-    vo.setStatus(dataset.getStatus().name());
-    vo.setStatusColor(getStatusColor(dataset.getStatus()));
-    vo.setVisibility(dataset.getVisibility());
-    vo.setCreatedDate(dataset.getCreatedDate());
-    vo.setLastModifiedDate(dataset.getLastModifiedDate());
-    vo.setCreatedBy(dataset.getCreatedBy());
     vo.setTags(dataset.getTags());
-    vo.setConfig(dataset.getConfig());
-    
+
+    // 设置数据源配置
+    vo.setDatasourceConfig(toDatasourceConfigVo(dataset.getConfig()));
+
     // 设置统计信息
-    vo.setStats(buildStats(dataset));
-    
+    vo.setDataStatistics(toDatasetDataStatisticsVo(dataset));
+
+    // 设置审计信息
+    vo.setTenantId(dataset.getTenantId());
+    vo.setCreatedBy(dataset.getCreatedBy());
+    vo.setCreatedDate(dataset.getCreatedDate());
+    vo.setLastModifiedBy(dataset.getLastModifiedBy());
+    vo.setLastModifiedDate(dataset.getLastModifiedDate());
     return vo;
   }
 
-  /**
-   * 领域对象转列表VO
-   */
   public static DatasetListVo toListVo(Dataset dataset) {
     DatasetListVo vo = new DatasetListVo();
     vo.setId(dataset.getId());
     vo.setName(dataset.getName());
     vo.setDescription(dataset.getDescription());
+    vo.setType(dataset.getType());
+    vo.setStatus(dataset.getStatus());
+    vo.setVisibility(dataset.getVisibility());
     vo.setIcon(dataset.getIcon());
     vo.setIconBg(dataset.getIconBg());
-    vo.setType(dataset.getType());
-    vo.setDataCount(dataset.getDataCount());
-    vo.setSize(dataset.getSize());
-    vo.setStatus(dataset.getStatus().name());
-    vo.setStatusColor(getStatusColor(dataset.getStatus()));
-    vo.setVisibility(dataset.getVisibility());
-    vo.setCreatedDate(dataset.getCreatedDate());
-    vo.setLastModifiedDate(dataset.getLastModifiedDate());
-    vo.setUpdateTime(formatUpdateTime(dataset.getLastModifiedDate()));
-    vo.setCreatedBy(dataset.getCreatedBy());
     vo.setTags(dataset.getTags());
-    
+
     // 设置统计信息
-    vo.setStats(buildStats(dataset));
-    
+    vo.setDataStatistics(toDatasetDataStatisticsVo(dataset));
+
+    // 设置审计信息
+    vo.setTenantId(dataset.getTenantId());
+    vo.setCreatedBy(dataset.getCreatedBy());
+    vo.setCreatedDate(dataset.getCreatedDate());
+    vo.setLastModifiedBy(dataset.getLastModifiedBy());
+    vo.setLastModifiedDate(dataset.getLastModifiedDate());
     return vo;
   }
 
-  /**
-   * 构建查询条件
-   */
+  public static DatasetDataListVo toDataListVo(DatasetData data) {
+    DatasetDataListVo vo = new DatasetDataListVo();
+    vo.setId(data.getId());
+    vo.setName(data.getName());
+    vo.setType(data.getType());
+    vo.setStatus(data.getStatus());
+
+    // 设置统计信息
+    vo.setDataCount(data.getDataCount());
+    vo.setDataSize(formatFileSize(data.getDataSize()));
+
+    // 设置审计信息
+    vo.setTenantId(data.getTenantId());
+    vo.setCreatedBy(data.getCreatedBy());
+    vo.setCreatedDate(data.getCreatedDate());
+    vo.setLastModifiedBy(data.getLastModifiedBy());
+    vo.setLastModifiedDate(data.getLastModifiedDate());
+    return vo;
+  }
+
+  public static DatasetStatisticsVo toDatasetStatisticsVo(DatasetStatistics stats) {
+    DatasetStatisticsVo vo = new DatasetStatisticsVo();
+    vo.setTotalDatasets(stats.getTotalDatasets());
+    vo.setActiveDatasets(stats.getActiveDatasets());
+    vo.setTotalFilesOrTables(stats.getTotalFilesOrTables());
+    vo.setTotalRecords(stats.getTotalRecords());
+    vo.setTotalRecordsSize(stats.getTotalRecordsSize());
+    vo.setUsedStoreSize(formatFileSize(stats.getUsedStoreSize()));
+    vo.setTotalStoreSize(formatFileSize(stats.getTotalStoreSize()));
+    vo.setUsedStoreRate(stats.getUsedStoreRate());
+    return vo;
+  }
+
+  public static DatasetDataStatisticsVo toDatasetDataStatisticsVo(Dataset dataset) {
+    DatasetDataStatisticsVo vo = new DatasetDataStatisticsVo();
+    vo.setTotalFilesOrTables(dataset.getTotalFilesOrTables());
+    vo.setTotalRecords(dataset.getTotalRecords());
+    vo.setTotalRecordsSize(formatFileSize(dataset.getTotalRecordsSize()));
+    vo.setUsedStoreSize(formatFileSize(dataset.getUsedStoreSize()));
+    return vo;
+  }
+
+  public static DatasourceTableDataPreviewVo toTableDataPreviewVo(TableDataResult result) {
+    DatasourceTableDataPreviewVo vo = new DatasourceTableDataPreviewVo();
+    vo.setSuccess(result.isSuccess());
+    vo.setMessage(result.getMessage());
+    vo.setDetails(result.getDetails());
+    vo.setColumns(result.getColumns());
+    vo.setData(result.getData());
+    vo.setTotal(result.getTotal());
+    return vo;
+  }
+
   public static GenericSpecification<Dataset> getSpecification(DatasetFindDto dto) {
-    GenericSpecification<Dataset> spec = new GenericSpecification<>();
-    
-    if (dto.getType() != null) {
-      spec.addEqual("type", DatasetType.valueOf(dto.getType()));
-    }
-    
-    if (dto.getStatus() != null) {
-      spec.addEqual("status", DatasetStatus.valueOf(dto.getStatus()));
-    }
-    
-    if (dto.getVisibility() != null) {
-      spec.addEqual("visibility", dto.getVisibility());
-    }
-    
-    return spec;
+    // Build the final filters
+    Set<SearchCriteria> filters = new SearchCriteriaBuilder<>(dto)
+        .rangeSearchFields("id", "createdDate", "lastModifiedDate")
+        .orderByFields("id", "name", "type", "status", "createdDate", "lastModifiedDate")
+        .matchSearchFields("name", "description")
+        .inAndNotFields("type", "status", "createdBy")
+        .build();
+    return new GenericSpecification<>(filters);
   }
 
-  /**
-   * 获取默认图标
-   */
-  private static String getDefaultIcon(DatasetType type) {
-    switch (type) {
-      case TEXT:
-        return "📄";
-      case TABLE:
-        return "📊";
-      case DATASOURCE:
-        return "🔗";
-      default:
-        return "📁";
-    }
+  public static GenericSpecification<DatasetData> getSpecification(DatasetDataFindDto dto) {
+    // Build the final filters
+    Set<SearchCriteria> filters = new SearchCriteriaBuilder<>(dto)
+        .rangeSearchFields("id", "createdDate", "lastModifiedDate")
+        .orderByFields("id", "name", "type", "size", "createdDate", "lastModifiedDate")
+        .matchSearchFields("name", "description")
+        .inAndNotFields("type", "status", "createdBy")
+        .build();
+    return new GenericSpecification<>(filters);
   }
 
-  /**
-   * 获取默认图标背景色
-   */
-  private static String getDefaultIconBg(DatasetType type) {
-    switch (type) {
-      case TEXT:
-        return "bg-green-500";
-      case TABLE:
-        return "bg-blue-500";
-      case DATASOURCE:
-        return "bg-purple-500";
-      default:
-        return "bg-gray-500";
-    }
-  }
-
-  /**
-   * 获取状态颜色
-   */
-  private static String getStatusColor(DatasetStatus status) {
-    switch (status) {
-      case ACTIVE:
-        return "text-green-600";
-      case INACTIVE:
-        return "text-gray-600";
-      case PREPARING:
-        return "text-yellow-600";
-      default:
-        return "text-gray-600";
-    }
-  }
-
-  /**
-   * 构建统计信息
-   */
-  private static Object buildStats(Dataset dataset) {
-    return new Object() {
-      public Long totalRecords = dataset.getTotalRecords();
-      public Integer columns = dataset.getColumns();
-      public Integer dataSources = dataset.getDataSources();
-      public Long totalSize = dataset.getTotalSize();
-      public Long lastUpdateTime = dataset.getLastUpdateTime();
-    };
-  }
-
-  /**
-   * 格式化更新时间
-   */
-  private static String formatUpdateTime(java.time.LocalDateTime dateTime) {
-    if (dateTime == null) {
-      return "";
-    }
-    return dateTime.toLocalDate().toString();
-  }
 }

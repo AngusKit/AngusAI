@@ -1,6 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto;
 
-import cloud.xcan.angus.core.ai.domain.dataset.Visibility;
+import cloud.xcan.angus.core.ai.domain.dataset.DatasetVisibility;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
@@ -15,7 +15,7 @@ public class DatasetUpdateDto {
   @Schema(description = "数据集名称", example = "用户行为数据")
   private String name;
 
-  @Length(max = 500)
+  @Length(max = 400)
   @Schema(description = "数据集描述", example = "用户行为分析数据集")
   private String description;
 
@@ -26,7 +26,7 @@ public class DatasetUpdateDto {
   private String iconBg;
 
   @Schema(description = "可见性")
-  private Visibility visibility;
+  private DatasetVisibility visibility;
 
   @Schema(description = "标签，最多5个")
   private List<String> tags;

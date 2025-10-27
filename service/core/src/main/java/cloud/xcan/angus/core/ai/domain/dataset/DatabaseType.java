@@ -1,13 +1,15 @@
 package cloud.xcan.angus.core.ai.domain.dataset;
 
 import cloud.xcan.angus.spec.experimental.EndpointRegister;
-import cloud.xcan.angus.spec.locale.EnumMessage;
+import cloud.xcan.angus.spec.locale.EnumValueMessage;
 
 @EndpointRegister
-public enum Visibility implements EnumMessage<String> {
-  PRIVATE,      // 私有
-  TEAM,         // 团队
-  PUBLIC;       // 公开
+public enum DatabaseType implements EnumValueMessage<String> {
+  MySQL,
+  SQLServer,
+  DB2,
+  PostgreSQL,
+  Oracle;
 
   public String getValue() {
     return this.name();

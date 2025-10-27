@@ -5,14 +5,15 @@ import lombok.Data;
 
 @Data
 @Schema(description = "连接测试响应")
-public class ConnectionTestVo {
+public class DatasourceConnectionTestVo {
 
   @Schema(description = "状态")
-  private String status;
+  private boolean success;
 
   @Schema(description = "消息")
   private String message;
 
   @Schema(description = "详细信息")
-  private Object details;
+  private String details;
+
 }
