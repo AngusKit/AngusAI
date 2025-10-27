@@ -75,8 +75,8 @@ public class DatasetCmdImpl extends CommCmd<Dataset, Long> implements DatasetCmd
 
       @Override
       protected Dataset process() {
-        CoreUtils.copyPropertiesIgnoreNull(dataset, datasetDb);
-        return datasetRepo.save(datasetDb);
+        update(dataset, datasetDb);
+        return datasetDb;
       }
     }.execute();
   }

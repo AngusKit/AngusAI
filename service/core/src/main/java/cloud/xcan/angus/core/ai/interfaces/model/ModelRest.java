@@ -12,6 +12,7 @@ import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelMetricsVo;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelStatisticsVo;
 import cloud.xcan.angus.remote.ApiLocaleResult;
 import cloud.xcan.angus.remote.PageResult;
+import cloud.xcan.angus.spec.annotations.DoInFuture;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -123,16 +124,6 @@ public class ModelRest {
       @Parameter(description = "模型ID") @PathVariable Long id,
       @Valid @RequestBody ModelTestDto dto) {
     return ApiLocaleResult.success(modelFacade.test(id, dto));
-  }
-
-  @Operation(operationId = "batchOperationModels", summary = "批量操作模型", description = "批量启动/停止模型")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "批量操作成功")
-  })
-  @PostMapping("/batch")
-  public ApiLocaleResult<ModelStatisticsVo> batchOperation(
-      @Valid @RequestBody ModelStatisticsVo dto) {
-    return ApiLocaleResult.success(modelFacade.batchOperation(dto));
   }
 
   @Operation(operationId = "importModelConfig", summary = "导入模型配置", description = "导入模型配置")

@@ -103,11 +103,11 @@ public class ApplicationCmdImpl extends CommCmd<Application, Long> implements Ap
 
       @Override
       protected Application process() {
-        // 更新修改字段
-        CoreUtils.copyPropertiesIgnoreNull(application, applicationDb);
         // 设置关联资源ID（冗余字段）
         updateAssociatedIds(application.getConfig(), applicationDb);
-        return applicationRepo.save(applicationDb);
+
+        update(application, applicationDb);
+        return applicationDb;
       }
     }.execute();
   }

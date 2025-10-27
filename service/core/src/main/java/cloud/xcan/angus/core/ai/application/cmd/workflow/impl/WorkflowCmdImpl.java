@@ -11,6 +11,7 @@ import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowStopDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowToggleDto;
 import cloud.xcan.angus.core.biz.Biz;
 import cloud.xcan.angus.core.biz.BizTemplate;
+import cloud.xcan.angus.core.biz.cmd.CommCmd;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
 import cloud.xcan.angus.core.utils.CoreUtils;
 import cloud.xcan.angus.remote.message.http.ResourceExisted;
@@ -24,13 +25,18 @@ import org.springframework.transaction.annotation.Transactional;
 @DoInFuture("添加权限校验")
 @Component
 @Biz
-public class WorkflowCmdImpl implements WorkflowCmd {
+public class WorkflowCmdImpl extends CommCmd<Workflow, Long> implements WorkflowCmd {
 
   @Resource
   private WorkflowRepo workflowRepo;
 
   @Resource
   private WorkflowQuery workflowQuery;
+
+  @Override
+  protected BaseRepository<Workflow, Long> getRepository() {
+    return workflowRepo;
+  }
 
   // 添加一个通用的插入方法
   private void insert0(Workflow workflow) {
@@ -74,7 +80,7 @@ public class WorkflowCmdImpl implements WorkflowCmd {
         } catch (Exception e) {
           throw new RuntimeException("无法获取工作流ID", e);
         }
-        
+
         workflowDb = workflowQuery.findById(workflowId);
         if (workflowDb == null) {
           throw ResourceNotFound.of("工作流不存在", new Object[]{});
@@ -90,7 +96,7 @@ public class WorkflowCmdImpl implements WorkflowCmd {
           } catch (Exception e) {
             throw new RuntimeException("无法获取工作流ID", e);
           }
-          
+
           if (workflowQuery.existsByNameAndIdNot(workflow.getName(), workflowDbId)) {
             throw ResourceExisted.of("工作流名称「{0}」已存在", new Object[]{workflow.getName()});
           }
@@ -99,8 +105,8 @@ public class WorkflowCmdImpl implements WorkflowCmd {
 
       @Override
       protected Workflow process() {
-        CoreUtils.copyPropertiesIgnoreNull(workflow, workflowDb);
-        return workflowRepo.save(workflowDb);
+        update(workflow, workflowDb);
+        return workflowDb;
       }
     }.execute();
   }
@@ -494,7 +500,7 @@ public class WorkflowCmdImpl implements WorkflowCmd {
         workflowDb.setTotalExecutions(workflowDb.getTotalExecutions() + 1);
         workflowDb.setLastExecutionTime(System.currentTimeMillis());
         workflowDb.setLastExecutionStatus(status);
-        
+
         if ("success".equals(status)) {
           workflowDb.setSuccessfulExecutions(workflowDb.getSuccessfulExecutions() + 1);
           workflowDb.setConsecutiveFailures(0);
@@ -502,13 +508,13 @@ public class WorkflowCmdImpl implements WorkflowCmd {
           workflowDb.setFailedExecutions(workflowDb.getFailedExecutions() + 1);
           workflowDb.setConsecutiveFailures(workflowDb.getConsecutiveFailures() + 1);
         }
-        
+
         // 更新平均执行时间
         if (executionTime != null) {
           Long totalTime = workflowDb.getTotalExecutions() * workflowDb.getAvgExecutionTime().longValue();
           workflowDb.setAvgExecutionTime((double) (totalTime + executionTime) / workflowDb.getTotalExecutions());
         }
-        
+
         workflowRepo.save(workflowDb);
         return null;
       }
@@ -516,7 +522,7 @@ public class WorkflowCmdImpl implements WorkflowCmd {
   }
 
   @Override
-  public void updateStatistics(Long id, Long totalExecutions, Long successfulExecutions, 
+  public void updateStatistics(Long id, Long totalExecutions, Long successfulExecutions,
       Long failedExecutions, Double avgExecutionTime) {
     new BizTemplate<Void>() {
       Workflow workflowDb;

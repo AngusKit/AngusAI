@@ -103,9 +103,8 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
 
       @Override
       protected Session process() {
-        CoreUtils.copyPropertiesIgnoreNull(session, sessionDb);
-        sessionRepo.save(sessionDb);
-        return null;
+        update(session, sessionDb);
+        return sessionDb;
       }
     }.execute();
   }

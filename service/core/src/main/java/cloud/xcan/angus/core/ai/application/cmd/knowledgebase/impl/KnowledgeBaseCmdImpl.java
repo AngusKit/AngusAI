@@ -69,8 +69,8 @@ public class KnowledgeBaseCmdImpl extends CommCmd<KnowledgeBase, Long> implement
 
       @Override
       protected KnowledgeBase process() {
-        CoreUtils.copyPropertiesIgnoreNull(knowledgeBase, knowledgeBaseDb);
-        return knowledgeBaseRepo.save(knowledgeBaseDb);
+        update(knowledgeBase, knowledgeBaseDb);
+        return knowledgeBaseDb;
       }
     }.execute();
   }

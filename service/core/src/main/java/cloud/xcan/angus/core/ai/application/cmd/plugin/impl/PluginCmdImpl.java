@@ -91,8 +91,8 @@ public class PluginCmdImpl extends CommCmd<Plugin, Long> implements PluginCmd {
 
       @Override
       protected Plugin process() {
-        CoreUtils.copyPropertiesIgnoreNull(plugin, pluginDb);
-        return pluginRepo.save(pluginDb);
+        update(plugin, pluginDb);
+        return pluginDb;
       }
     }.execute();
   }

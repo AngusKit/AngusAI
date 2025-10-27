@@ -7,6 +7,8 @@ import cloud.xcan.angus.core.ai.domain.prompt.Prompt;
 import cloud.xcan.angus.core.ai.domain.prompt.PromptRepo;
 import cloud.xcan.angus.core.biz.Biz;
 import cloud.xcan.angus.core.biz.BizTemplate;
+import cloud.xcan.angus.core.biz.cmd.CommCmd;
+import cloud.xcan.angus.core.jpa.repository.BaseRepository;
 import cloud.xcan.angus.core.utils.CoreUtils;
 import cloud.xcan.angus.remote.message.http.ResourceExisted;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
@@ -19,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 @DoInFuture("添加权限校验")
 @Component
 @Biz
-public class PromptCmdImpl implements PromptCmd {
+public class PromptCmdImpl extends CommCmd<Prompt, Long> implements PromptCmd {
 
   @Resource
   private PromptRepo promptRepo;
@@ -87,8 +89,8 @@ public class PromptCmdImpl implements PromptCmd {
 
       @Override
       protected Prompt process() {
-        CoreUtils.copyPropertiesIgnoreNull(prompt, promptDb);
-        return promptRepo.save(promptDb);
+        update(prompt, promptDb);
+        return promptDb;
       }
     }.execute();
   }
@@ -239,4 +241,8 @@ public class PromptCmdImpl implements PromptCmd {
     }.execute();
   }
 
+  @Override
+  protected BaseRepository<Prompt, Long> getRepository() {
+    return this.promptRepo;
+  }
 }

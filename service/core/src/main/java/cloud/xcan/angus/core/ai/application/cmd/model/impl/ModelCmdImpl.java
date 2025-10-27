@@ -73,8 +73,8 @@ public class ModelCmdImpl extends CommCmd<Model, Long> implements ModelCmd {
 
       @Override
       protected Model process() {
-        CoreUtils.copyPropertiesIgnoreNull(model, modelDb);
-        return modelRepo.save(modelDb);
+        update(model, modelDb);
+        return modelDb;
       }
     }.execute();
   }
