@@ -29,13 +29,15 @@ public class KnowledgeBaseAssembler {
     knowledgeBase.setDescription(dto.getDescription());
     knowledgeBase.setVisibility(nullSafe(dto.getVisibility(), DocumentVisibility.PRIVATE));
     knowledgeBase.setTags(dto.getTags());
-    knowledgeBase.setConfig(toConfig(dto.getConfig()));
 
     // 设置默认值
     knowledgeBase.setEnabled(true);
     knowledgeBase.setDocumentsCount(0);
     knowledgeBase.setTotalSize(0L);
     knowledgeBase.setTotalChunks(0);
+
+    // 设置向量化配置
+    knowledgeBase.setConfig(toConfig(dto.getConfig()));
     return knowledgeBase;
   }
 
@@ -48,6 +50,8 @@ public class KnowledgeBaseAssembler {
     knowledgeBase.setDescription(dto.getDescription());
     knowledgeBase.setVisibility(dto.getVisibility());
     knowledgeBase.setTags(dto.getTags());
+
+    // 设置向量化配置
     knowledgeBase.setConfig(toConfig(dto.getConfig()));
     return knowledgeBase;
   }

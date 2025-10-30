@@ -22,4 +22,5 @@ public class KnowledgeBaseConfigDto {
 
   @Schema(description = "向量化模型", example = "text-embedding-ada-002")
   private String embeddingModel;
+
 }

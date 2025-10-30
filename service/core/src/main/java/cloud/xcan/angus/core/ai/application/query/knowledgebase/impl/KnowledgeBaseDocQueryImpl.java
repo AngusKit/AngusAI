@@ -49,8 +49,8 @@ public class KnowledgeBaseDocQueryImpl implements KnowledgeBaseDocQuery {
   }
 
   @Override
-  public List<KnowledgeBaseDocSearchResult> searchDocuments(Long knowledgeBaseId, String keyword,
-      Integer limit, Double threshold) {
+  public List<KnowledgeBaseDocSearchResult> searchDocuments(
+      Long knowledgeBaseId, String keyword, Integer limit, Double threshold) {
     return new BizTemplate<List<KnowledgeBaseDocSearchResult>>() {
       @Override
       protected List<KnowledgeBaseDocSearchResult> process() {

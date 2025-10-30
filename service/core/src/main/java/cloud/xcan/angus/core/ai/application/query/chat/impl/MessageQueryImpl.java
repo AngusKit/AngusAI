@@ -162,6 +162,6 @@ public class MessageQueryImpl implements MessageQuery {
 
   @Override
   public Long countToday() {
-    return 0:;
+    return 0L;
   }
 }

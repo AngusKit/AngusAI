@@ -61,7 +61,6 @@ public class PromptCategoryQueryImpl implements PromptCategoryQuery {
         current = null;
       }
     }
-
     return path;
   }
 

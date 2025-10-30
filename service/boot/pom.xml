@@ -27,11 +27,6 @@
 
     <dependency>
       <groupId>cloud.xcan.angus</groupId>
-      <artifactId>xcan-infra.validator-starter</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>cloud.xcan.angus</groupId>
       <artifactId>xcan-infra.oas3-starter</artifactId>
     </dependency>
 

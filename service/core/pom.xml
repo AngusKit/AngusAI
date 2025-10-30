@@ -35,11 +35,6 @@
       <artifactId>xcan-infra.l2cache-core</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>cloud.xcan.angus</groupId>
-      <artifactId>xcan-plugin.spring</artifactId>
-    </dependency>
-
     <!-- Note: Cannot move to the front, which will cause OAS failure in Angus -->
     <dependency>
       <groupId>cloud.xcan.angus</groupId>

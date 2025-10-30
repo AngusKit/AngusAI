@@ -44,7 +44,7 @@ public class KnowledgeBaseDocCmdImpl implements KnowledgeBaseDocCmd {
         // 1. 验证文件类型和大小
         // 2. 保存文件到存储
         // 3. 创建文档记录
-        // 4. 启动异步处理任务
+        // 4. 启动异步处理任务（包括分段记录-KnowledgeBaseDocChunkRepo和向量化）
 
         // 暂时返回空列表
         return List.of();
@@ -103,9 +103,12 @@ public class KnowledgeBaseDocCmdImpl implements KnowledgeBaseDocCmd {
 
       @Override
       protected KnowledgeBaseDocListVo process() {
+        // TODO 如果切换成禁用，更新向量数据库状态或删除；如果切换成启用，更新向量数据库状态或插入
+
         // 更新启用状态
         documentDb.setEnabled(enabled);
         knowledgeBaseDocRepo.save(documentDb);
+
         return KnowledgeBaseDocAssembler.toDocumentListVo(documentDb);
       }
     }.execute();
@@ -130,6 +133,8 @@ public class KnowledgeBaseDocCmdImpl implements KnowledgeBaseDocCmd {
 
       @Override
       protected Void process() {
+        // TODO 删除向量数据库数据
+
         // 删除文档
         knowledgeBaseDocRepo.delete(documentDb);
         return null;
@@ -143,6 +148,8 @@ public class KnowledgeBaseDocCmdImpl implements KnowledgeBaseDocCmd {
     new BizTemplate<Void>() {
       @Override
       protected Void process() {
+        // TODO 删除向量数据库数据
+
         // 批量删除文档
         knowledgeBaseDocRepo.deleteByKnowledgeBaseIdAndIdIn(knowledgeBaseId, documentIds);
         return null;
