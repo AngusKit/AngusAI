@@ -84,8 +84,8 @@ public class KnowledgeBaseAssembler {
     vo.setTenantId(knowledgeBase.getTenantId());
     vo.setCreatedBy(knowledgeBase.getCreatedBy());
     vo.setCreatedDate(knowledgeBase.getCreatedDate());
-    vo.setLastModifiedBy(knowledgeBase.getLastModifiedBy());
-    vo.setLastModifiedDate(knowledgeBase.getLastModifiedDate());
+    vo.setModifiedBy(knowledgeBase.getModifiedBy());
+    vo.setModifiedDate(knowledgeBase.getModifiedDate());
 
     // 设置统计信息
     KnowledgeBaseStatsVo stats = new KnowledgeBaseStatsVo();
@@ -123,16 +123,16 @@ public class KnowledgeBaseAssembler {
     vo.setTenantId(knowledgeBase.getTenantId());
     vo.setCreatedBy(knowledgeBase.getCreatedBy());
     vo.setCreatedDate(knowledgeBase.getCreatedDate());
-    vo.setLastModifiedBy(knowledgeBase.getLastModifiedBy());
-    vo.setLastModifiedDate(knowledgeBase.getLastModifiedDate());
+    vo.setModifiedBy(knowledgeBase.getModifiedBy());
+    vo.setModifiedDate(knowledgeBase.getModifiedDate());
     return vo;
   }
 
   public static GenericSpecification<KnowledgeBase> getSpecification(KnowledgeBaseFindDto dto) {
     // Build the final filters
     Set<SearchCriteria> filters = new SearchCriteriaBuilder<>(dto)
-        .rangeSearchFields("id", "createdDate", "lastModifiedDate")
-        .orderByFields("id", "createdDate", "lastModifiedDate", "name")
+        .rangeSearchFields("id", "createdDate", "modifiedDate")
+        .orderByFields("id", "createdDate", "modifiedDate", "name")
         .matchSearchFields("name", "description")
         .inAndNotFields("visibility", "enabled")
         .build();

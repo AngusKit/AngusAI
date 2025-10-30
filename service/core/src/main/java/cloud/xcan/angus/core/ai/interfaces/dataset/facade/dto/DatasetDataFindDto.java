@@ -30,8 +30,8 @@ public class DatasetDataFindDto extends PageQuery {
   @Schema(description = "所属租户ID", example = "1")
   private Long tenantId;
 
-  @Schema(description = "排序字段", example = "lastModifiedDate", allowableValues = {"name", "type",
-      "size", "createdDate", "lastModifiedDate"})
-  private String orderBy = "lastModifiedDate";
+  @Schema(description = "排序字段", example = "modifiedDate", allowableValues = {"name", "type",
+      "size", "createdDate", "modifiedDate"})
+  private String orderBy = "modifiedDate";
 
 }

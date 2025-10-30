@@ -153,8 +153,8 @@ public class PluginAssembler {
     vo.setTenantId(plugin.getTenantId());
     vo.setCreatedBy(plugin.getCreatedBy());
     vo.setCreatedDate(plugin.getCreatedDate());
-    vo.setLastModifiedBy(plugin.getLastModifiedBy());
-    vo.setLastModifiedDate(plugin.getLastModifiedDate());
+    vo.setModifiedBy(plugin.getModifiedBy());
+    vo.setModifiedDate(plugin.getModifiedDate());
     vo.setPublishedDate(plugin.getPublishedDate());
 
     // 统计数据
@@ -196,8 +196,8 @@ public class PluginAssembler {
     vo.setTenantId(plugin.getTenantId());
     vo.setCreatedBy(plugin.getCreatedBy());
     vo.setCreatedDate(plugin.getCreatedDate());
-    vo.setLastModifiedBy(plugin.getLastModifiedBy());
-    vo.setLastModifiedDate(plugin.getLastModifiedDate());
+    vo.setModifiedBy(plugin.getModifiedBy());
+    vo.setModifiedDate(plugin.getModifiedDate());
     vo.setPublishedDate(plugin.getPublishedDate());
     return vo;
   }
@@ -254,12 +254,12 @@ public class PluginAssembler {
       builder.add(SearchCriteria.lessThanOrEqual("createdDate", dto.getCreatedDateEnd()));
     }
 
-    if (dto.getLastModifiedBy() != null) {
-      builder.add(SearchCriteria.equal("lastModifiedBy", dto.getLastModifiedBy()));
+    if (dto.getModifiedBy() != null) {
+      builder.add(SearchCriteria.equal("modifiedBy", dto.getModifiedBy()));
     }
 
-    if (dto.getLastModifiedDate() != null) {
-      builder.add(SearchCriteria.equal("lastModifiedDate", dto.getLastModifiedDate()));
+    if (dto.getModifiedDate() != null) {
+      builder.add(SearchCriteria.equal("modifiedDate", dto.getModifiedDate()));
     }
 
     // TODO: 标签搜索需要特殊处理JSON字段

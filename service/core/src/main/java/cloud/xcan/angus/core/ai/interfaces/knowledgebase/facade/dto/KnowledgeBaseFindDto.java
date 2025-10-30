@@ -38,17 +38,17 @@ public class KnowledgeBaseFindDto extends PageQuery {
   private LocalDateTime createdDate;
 
   @Schema(description = "最后修改人ID", example = "1")
-  private Long lastModifiedBy;
+  private Long modifiedBy;
 
   @Schema(description = "最后修改时间", example = "2024-10-12 00:00:00")
-  private LocalDateTime lastModifiedDate;
+  private LocalDateTime modifiedDate;
 
-  @Schema(description = "排序字段", example = "lastModifiedDate", allowableValues = {"createdDate",
-      "lastModifiedDate", "documentsCount", "name"})
-  private String orderBy = "lastModifiedDate";
+  @Schema(description = "排序字段", example = "modifiedDate", allowableValues = {"createdDate",
+      "modifiedDate", "documentsCount", "name"})
+  private String orderBy = "modifiedDate";
 
   @Override
   public String getDefaultOrderBy() {
-    return "lastModifiedDate";
+    return "modifiedDate";
   }
 }

@@ -107,7 +107,7 @@ public class ModelAssembler {
     vo.setDeployedAt(model.getDeployedAt());
     vo.setLastCallAt(model.getLastCallAt());
     vo.setCreatedDate(model.getCreatedDate());
-    vo.setLastModifiedDate(model.getLastModifiedDate());
+    vo.setModifiedDate(model.getModifiedDate());
 
     return vo;
   }
@@ -141,7 +141,7 @@ public class ModelAssembler {
     vo.setDeployed(model.getDeployed());
     vo.setDeployedAt(model.getDeployedAt());
     vo.setCreatedDate(model.getCreatedDate());
-    vo.setLastModifiedDate(model.getLastModifiedDate());
+    vo.setModifiedDate(model.getModifiedDate());
 
     return vo;
   }

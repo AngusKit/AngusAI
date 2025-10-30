@@ -23,7 +23,7 @@ public class SessionFindDto {
   private Long modelId;
 
   @Schema(description = "排序字段", example = "createdDate")
-  private String orderBy = "lastModifiedDate";
+  private String orderBy = "modifiedDate";
 
   @Schema(description = "排序方式", example = "desc")
   private String orderSort = "desc";

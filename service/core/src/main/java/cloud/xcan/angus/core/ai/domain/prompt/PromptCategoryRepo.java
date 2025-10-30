@@ -1,14 +1,11 @@
 package cloud.xcan.angus.core.ai.domain.prompt;
 
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
-
 import java.util.List;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.NoRepositoryBean;
 
-@Repository
+@NoRepositoryBean
 public interface PromptCategoryRepo extends BaseRepository<PromptCategory, Long> {
 
   List<PromptCategory> findByParentIdOrderByOrderNum(Long parentId);

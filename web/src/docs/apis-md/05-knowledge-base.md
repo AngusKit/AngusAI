@@ -36,7 +36,7 @@ Authorization: Bearer <JWT_TOKEN>
   pageNo?: number;
   pageSize?: number;
   keyword?: string;          // 搜索关键词
-  orderBy?: 'createdDate' | 'lastModifiedDate' | 'documentsCount' | 'name';
+  orderBy?: 'createdDate' | 'modifiedDate' | 'documentsCount' | 'name';
   orderSort?: 'asc' | 'desc';
   tags?: string[];           // 标签筛选
 }
@@ -64,7 +64,7 @@ Authorization: Bearer <JWT_TOKEN>
         totalSize: string;       // 总大小，如"2.5 MB"
         enabled: boolean;        // 是否启用
         createdDate: Date
-        lastModifiedDate: Date;
+        modifiedDate: Date;
         tags: string[];
         visibility: Visibility;  // 可见性
       }
@@ -122,7 +122,7 @@ Authorization: Bearer <JWT_TOKEN>
     totalSize: string;
     enabled: boolean;
     createdDate: Date
-    lastModifiedDate: Date;
+    modifiedDate: Date;
     tags: string[];
     visibility: Visibility;
 

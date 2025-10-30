@@ -37,7 +37,7 @@ Authorization: Bearer <JWT_TOKEN>
   keyword?: string;           // 关键词搜索（名称、描述）
   category?: ApplicationCategory;  // 分类筛选
   status?: ApplicationStatus;      // 状态筛选
-  orderBy?: 'createdDate' | 'lastModifiedDate' | 'apiCalls' | 'name';
+  orderBy?: 'createdDate' | 'modifiedDate' | 'apiCalls' | 'name';
   orderSort?: 'asc' | 'desc';
 }
 ```
@@ -65,7 +65,7 @@ Authorization: Bearer <JWT_TOKEN>
         category: ApplicationCategory;
         status: ApplicationStatus;
         createdDate: Date
-        lastModifiedDate: Date;
+        modifiedDate: Date;
         lastModified: string;    // "2小时前"
         apiCalls: number;
         createdBy: number;
@@ -127,7 +127,7 @@ Authorization: Bearer <JWT_TOKEN>
     category: ApplicationCategory;
     status: ApplicationStatus;
     createdDate: Date
-    lastModifiedDate: Date;
+    modifiedDate: Date;
     createdBy: number;
 
     // 详细配置

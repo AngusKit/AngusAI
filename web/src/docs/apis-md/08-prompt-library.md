@@ -38,7 +38,7 @@ Authorization: Bearer <JWT_TOKEN>
   category?: string;          // 分类ID筛选
   isFavorite?: boolean;       // 仅收藏
   tags?: string[];            // 标签筛选
-  orderBy?: 'createdDate' | 'lastModifiedDate' | 'usageCount' | 'title';
+  orderBy?: 'createdDate' | 'modifiedDate' | 'usageCount' | 'title';
   orderSort?: 'asc' | 'desc';
   isPublic?: boolean;         // 是否公开
 }
@@ -74,7 +74,7 @@ Authorization: Bearer <JWT_TOKEN>
         isSystem: boolean;     // 是否为系统模板
         isPublic: boolean;     // 是否公开
         createdDate: Date
-        lastModifiedDate: Date;
+        modifiedDate: Date;
         createdBy: number;
         createdByName: string;
       }
@@ -153,7 +153,7 @@ Authorization: Bearer <JWT_TOKEN>
 
     // 创建者信息
     createdDate: Date
-    lastModifiedDate: Date;
+    modifiedDate: Date;
     createdBy: number;
     createdByName: string;
 

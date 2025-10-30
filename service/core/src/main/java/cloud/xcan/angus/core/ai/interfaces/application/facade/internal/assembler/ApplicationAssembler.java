@@ -84,8 +84,8 @@ public class ApplicationAssembler {
     vo.setTenantId(application.getTenantId());
     vo.setCreatedBy(application.getCreatedBy());
     vo.setCreatedDate(application.getCreatedDate());
-    vo.setLastModifiedBy(application.getLastModifiedBy());
-    vo.setLastModifiedDate(application.getLastModifiedDate());
+    vo.setModifiedBy(application.getModifiedBy());
+    vo.setModifiedDate(application.getModifiedDate());
 
     // 设置配置信息
     ApplicationConfigVo configVo = new ApplicationConfigVo();
@@ -130,16 +130,16 @@ public class ApplicationAssembler {
     vo.setTenantId(application.getTenantId());
     vo.setCreatedBy(application.getCreatedBy());
     vo.setCreatedDate(application.getCreatedDate());
-    vo.setLastModifiedBy(application.getLastModifiedBy());
-    vo.setLastModifiedDate(application.getLastModifiedDate());
+    vo.setModifiedBy(application.getModifiedBy());
+    vo.setModifiedDate(application.getModifiedDate());
     return vo;
   }
 
   public static GenericSpecification<Application> getSpecification(ApplicationFindDto dto) {
     // Build the final filters
     Set<SearchCriteria> filters = new SearchCriteriaBuilder<>(dto)
-        .rangeSearchFields("id", "createdDate", "lastModifiedDate")
-        .orderByFields("id", "createdDate", "lastModifiedDate", "apiCalls", "category", "status",
+        .rangeSearchFields("id", "createdDate", "modifiedDate")
+        .orderByFields("id", "createdDate", "modifiedDate", "apiCalls", "category", "status",
             "name")
         .matchSearchFields("name", "description")
         .inAndNotFields("category", "status", "createdBy")

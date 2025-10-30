@@ -50,7 +50,7 @@ Authorization: Bearer <JWT_TOKEN>
   keyword?: string;           // 搜索会话标题或内容
   appId?: number;             // 筛选指定应用
   modelId?: number;           // 筛选使用的模型
-  orderBy?: 'createdDate' | 'lastModifiedDate' | 'messageCount';
+  orderBy?: 'createdDate' | 'modifiedDate' | 'messageCount';
   orderSort?: 'asc' | 'desc';
   isArchived?: boolean;       // 是否已归档
   isStarred?: boolean;        // 是否已收藏（星标）
@@ -92,7 +92,7 @@ Authorization: Bearer <JWT_TOKEN>
         isStarred: boolean;      // 是否收藏（前端使用星标功能）
 
         createdDate: Date
-        lastModifiedDate: Date;
+        modifiedDate: Date;
         createdBy: number;
       }
     ],
@@ -163,7 +163,7 @@ Authorization: Bearer <JWT_TOKEN>
     isStarred: boolean;      // 是否收藏
 
     createdDate: Date
-    lastModifiedDate: Date;
+    modifiedDate: Date;
     createdBy: number;
   },
   datetime: 1706889600000

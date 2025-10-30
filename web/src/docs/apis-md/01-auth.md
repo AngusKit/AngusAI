@@ -305,7 +305,7 @@ Authorization: Bearer <JWT_TOKEN>
       timezone: string;     // 时区
     };
     createdDate: Date
-    lastModifiedDate: Date;
+    modifiedDate: Date;
   },
   datetime: 1706889600000
 }

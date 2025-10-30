@@ -55,6 +55,8 @@ public class PromptCategoryCmdImpl extends CommCmd<PromptCategory, Long>
           promptCategoryRepo.findById(category.getParentId())
               .orElseThrow(() -> ResourceNotFound.of("父分类不存在", new Object[]{}));
         }
+
+        // TODO 限制每个用户总共最多500个分组
       }
 
       @Override

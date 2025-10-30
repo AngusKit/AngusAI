@@ -40,7 +40,7 @@ Authorization: Bearer <JWT_TOKEN>
   keyword?: string;           // 搜索关键词（名称、描述）
   type?: WorkflowType;        // 工作流类型筛选
   status?: WorkflowStatus;    // 状态筛选
-  orderBy?: 'createdDate' | 'lastModifiedDate' | 'calls' | 'name';
+  orderBy?: 'createdDate' | 'modifiedDate' | 'calls' | 'name';
   orderSort?: 'asc' | 'desc';
 }
 ```
@@ -73,7 +73,7 @@ Authorization: Bearer <JWT_TOKEN>
         nodesCount: number;      // 节点数量
         version: string;         // 版本号
         createdDate: Date
-        lastModifiedDate: Date;
+        modifiedDate: Date;
 
         // 统计信息
         stats: {
@@ -140,7 +140,7 @@ Authorization: Bearer <JWT_TOKEN>
     enabled: boolean;
     version: string;
     createdDate: Date
-    lastModifiedDate: Date;
+    modifiedDate: Date;
     createdBy: number;
 
     // 工作流配置
@@ -365,7 +365,7 @@ Authorization: Bearer <JWT_TOKEN>
   data: {
     id: number;
     version: string;        // 版本号自动递增
-    lastModifiedDate: Date;
+    modifiedDate: Date;
   },
   datetime: 1706889600000
 }

@@ -30,16 +30,6 @@ public interface PromptCmd {
   Prompt use(Long id);
 
   /**
-   * 归档提示词
-   */
-  Prompt archive(Long id);
-
-  /**
-   * 取消归档
-   */
-  Prompt unarchive(Long id);
-
-  /**
    * 删除提示词
    */
   void delete(Long id);

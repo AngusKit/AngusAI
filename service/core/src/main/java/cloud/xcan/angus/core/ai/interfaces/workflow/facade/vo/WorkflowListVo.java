@@ -48,7 +48,7 @@ public class WorkflowListVo {
   private LocalDateTime createdDate;
 
   @Schema(description = "最后修改时间")
-  private LocalDateTime lastModifiedDate;
+  private LocalDateTime modifiedDate;
 
   @Schema(description = "统计信息")
   private Object stats;

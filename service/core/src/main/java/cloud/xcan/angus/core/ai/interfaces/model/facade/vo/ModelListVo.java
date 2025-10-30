@@ -70,5 +70,5 @@ public class ModelListVo {
   private LocalDateTime createdDate;
 
   @Schema(description = "最后修改时间")
-  private LocalDateTime lastModifiedDate;
+  private LocalDateTime modifiedDate;
 }

@@ -6,15 +6,12 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import java.util.Objects;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-@NoArgsConstructor
-@AllArgsConstructor
+@Setter
+@Getter
 @Entity
 @Table(name = "ai_prompt_category")
 public class PromptCategory extends TenantAuditingEntity<PromptCategory, Long> {
@@ -46,5 +43,27 @@ public class PromptCategory extends TenantAuditingEntity<PromptCategory, Long> {
   @Override
   public Long identity() {
     return id;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof PromptCategory category)) {
+      return false;
+    }
+    return Objects.equals(id, category.id)
+        && Objects.equals(name, category.name)
+        && Objects.equals(icon, category.icon)
+        && Objects.equals(color, category.color)
+        && Objects.equals(parentId, category.parentId)
+        && Objects.equals(isSystem, category.isSystem)
+        && Objects.equals(orderNum, category.orderNum);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, name, icon, color, parentId, isSystem, orderNum);
   }
 }

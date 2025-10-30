@@ -15,7 +15,7 @@ interface User {
   nickname?: string;
   role: UserRole;
   createdDate: Date
-  lastModifiedDate: Date;
+  modifiedDate: Date;
 }
 ```
 
@@ -62,7 +62,7 @@ interface Application {
   category: ApplicationCategory;
   status: ApplicationStatus;
   createdDate: Date
-  lastModifiedDate: Date;
+  modifiedDate: Date;
   createdBy: number; // 创建人ID
   apiCalls: number; // API调用次数
   lastModified: string; // 最后修改时间描述
@@ -106,7 +106,7 @@ interface KnowledgeBase {
   totalSize: string; // 如 "2.5 MB"
   enabled: boolean;
   createdDate: Date
-  lastModifiedDate: Date;
+  modifiedDate: Date;
   tags?: string[];
 }
 ```
@@ -166,7 +166,7 @@ interface Dataset {
   dataCount: string; // 如 "12.5K 条"
   totalSize: string; // 如 "5.2 MB"
   createdDate: Date
-  lastModifiedDate: Date;
+  modifiedDate: Date;
   tags?: string[];
 }
 ```
@@ -207,7 +207,7 @@ interface Workflow {
   status: WorkflowStatus;
   enabled: boolean;
   createdDate: Date
-  lastModifiedDate: Date;
+  modifiedDate: Date;
   version: string; // 版本号
 }
 ```
@@ -346,7 +346,7 @@ interface Prompt {
   uses: number;
   isPublic: boolean;
   createdDate: Date
-  lastModifiedDate: Date;
+  modifiedDate: Date;
   createdBy: number;
 }
 ```
@@ -383,7 +383,7 @@ interface Plugin {
   price: number; // 价格，0表示免费
   isInstalled: boolean;
   createdDate: Date
-  lastModifiedDate: Date;
+  modifiedDate: Date;
 }
 ```
 

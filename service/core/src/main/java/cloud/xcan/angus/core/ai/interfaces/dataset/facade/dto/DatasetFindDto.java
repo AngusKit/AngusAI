@@ -27,8 +27,8 @@ public class DatasetFindDto extends PageQuery {
   @Schema(description = "标签筛选")
   private String tags;
 
-  @Schema(description = "排序字段", example = "lastModifiedDate", allowableValues = {"name", "type",
-      "status", "createdDate", "lastModifiedDate"})
-  private String orderBy = "lastModifiedDate";
+  @Schema(description = "排序字段", example = "modifiedDate", allowableValues = {"name", "type",
+      "status", "createdDate", "modifiedDate"})
+  private String orderBy = "modifiedDate";
 
 }

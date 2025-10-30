@@ -1,13 +1,16 @@
 package cloud.xcan.angus.core.ai.interfaces.prompt.facade.vo;
 
-import cloud.xcan.angus.core.ai.domain.prompt.PromptStatus;
-import com.fasterxml.jackson.databind.JsonNode;
+import cloud.xcan.angus.remote.NameJoinField;
+import cloud.xcan.angus.remote.vo.TenantAuditingVo;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Schema(description = "提示词详情")
-public class PromptDetailVo {
+public class PromptDetailVo extends TenantAuditingVo {
 
   @Schema(description = "ID")
   private Long id;
@@ -25,43 +28,17 @@ public class PromptDetailVo {
   private Long categoryId;
 
   @Schema(description = "分类名称")
+  @NameJoinField(id = "categoryId", repository = "promptCategoryRepo")
   private String categoryName;
 
   @Schema(description = "标签")
-  private JsonNode tags;
+  private List<String> tags;
 
   @Schema(description = "是否收藏")
   private Boolean isFavorite;
 
-  @Schema(description = "使用次数")
-  private Long usageCount;
-
   @Schema(description = "是否为系统模板")
   private Boolean isSystem;
-
-  @Schema(description = "是否公开")
-  private Boolean isPublic;
-
-  @Schema(description = "变量定义")
-  private JsonNode variables;
-
-  @Schema(description = "使用示例")
-  private JsonNode examples;
-
-  @Schema(description = "状态")
-  private PromptStatus status;
-
-  @Schema(description = "创建时间")
-  private Long createdDate;
-
-  @Schema(description = "最后修改时间")
-  private Long lastModifiedDate;
-
-  @Schema(description = "创建者ID")
-  private Long createdBy;
-
-  @Schema(description = "创建者名称")
-  private String createdByName;
 
   @Schema(description = "统计信息")
   private PromptStatsVo stats;

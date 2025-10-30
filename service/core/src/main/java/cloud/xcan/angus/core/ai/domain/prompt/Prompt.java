@@ -1,24 +1,20 @@
 package cloud.xcan.angus.core.ai.domain.prompt;
 
 import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
-import com.fasterxml.jackson.databind.JsonNode;
+import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
+import jakarta.persistence.Transient;
+import java.util.List;
+import java.util.Objects;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.Type;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-@NoArgsConstructor
-@AllArgsConstructor
+@Setter
+@Getter
 @Entity
 @Table(name = "ai_prompt")
 public class Prompt extends TenantAuditingEntity<Prompt, Long> {
@@ -38,42 +34,46 @@ public class Prompt extends TenantAuditingEntity<Prompt, Long> {
   @Column(name = "category_id", nullable = false)
   private Long categoryId;
 
-  @JdbcTypeCode(SqlTypes.JSON)
+  @Type(JsonType.class)
   @Column(name = "tags", columnDefinition = "json")
-  private JsonNode tags;
-
-  @Column(name = "is_favorite", nullable = false)
-  private Boolean isFavorite = false;
+  private List<String> tags;
 
   @Column(name = "usage_count", nullable = false)
   private Long usageCount = 0L;
 
-  @Column(name = "is_system", nullable = false)
-  private Boolean isSystem = false;
-
-  @Column(name = "is_public", nullable = false)
-  private Boolean isPublic = false;
-
-  @JdbcTypeCode(SqlTypes.JSON)
-  @Column(name = "variables", columnDefinition = "json")
-  private JsonNode variables;
-
-  @JdbcTypeCode(SqlTypes.JSON)
-  @Column(name = "examples", columnDefinition = "json")
-  private JsonNode examples;
-
-  @Enumerated(EnumType.STRING)
-  @Column(name = "status", nullable = false, length = 20)
-  private PromptStatus status = PromptStatus.ACTIVE;
-
-  @Column(name = "archived", nullable = false)
-  private Boolean archived = false;
-
-  @Column(name = "archived_at")
-  private Long archivedAt;
+  @Transient
+  private Boolean isFavorite;
+  @Transient
+  private Boolean isSystem;
+  @Transient
+  private Long totalUses;
+  @Transient
+  private Long favorites;
 
   @Override
   public Long identity() {
     return id;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof Prompt prompt)) {
+      return false;
+    }
+    return Objects.equals(id, prompt.id)
+        && Objects.equals(title, prompt.title)
+        && Objects.equals(content, prompt.content)
+        && Objects.equals(description, prompt.description)
+        && Objects.equals(categoryId, prompt.categoryId)
+        && Objects.equals(tags, prompt.tags)
+        && Objects.equals(usageCount, prompt.usageCount);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, title, content, description, categoryId, tags, usageCount);
   }
 }

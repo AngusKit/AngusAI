@@ -30,6 +30,6 @@ public class ResourceSharingFindDto extends PageQuery {
 
   @Override
   public String getDefaultOrderBy() {
-    return "lastModifiedDate";
+    return "modifiedDate";
   }
 }

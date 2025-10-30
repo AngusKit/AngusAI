@@ -50,7 +50,7 @@ public class SessionListVo {
   private Date createdDate;
 
   @Schema(description = "最后修改时间")
-  private Date lastModifiedDate;
+  private Date modifiedDate;
 
   @Schema(description = "创建人ID")
   private Long createdBy;

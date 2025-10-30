@@ -31,8 +31,8 @@ public class KnowledgeBaseDocAssembler {
     vo.setTenantId(document.getTenantId());
     vo.setCreatedBy(document.getCreatedBy());
     vo.setCreatedDate(document.getCreatedDate());
-    vo.setLastModifiedBy(document.getLastModifiedBy());
-    vo.setLastModifiedDate(document.getLastModifiedDate());
+    vo.setModifiedBy(document.getModifiedBy());
+    vo.setModifiedDate(document.getModifiedDate());
     return vo;
   }
 

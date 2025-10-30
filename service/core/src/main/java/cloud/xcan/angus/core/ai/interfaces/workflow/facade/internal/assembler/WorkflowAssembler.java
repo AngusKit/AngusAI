@@ -27,19 +27,19 @@ public class WorkflowAssembler {
     workflow.setIcon(dto.getIcon());
     workflow.setIconBg(dto.getIconBg());
     workflow.setIconColor(dto.getIconColor());
-    
+
     // 设置默认状态
     workflow.setStatus(WorkflowStatus.DRAFT);
     workflow.setEnabled(true);
     workflow.setVersion("1.0.0");
-    
+
     // 创建配置对象
     if (dto.getConfig() != null) {
       WorkflowConfig config = new WorkflowConfig();
       // TODO: 根据dto.getConfig()设置配置
       workflow.setConfig(config);
     }
-    
+
     return workflow;
   }
 
@@ -55,7 +55,7 @@ public class WorkflowAssembler {
     workflow.setIconBg(dto.getIconBg());
     workflow.setIconColor(dto.getIconColor());
     workflow.setType(dto.getType());
-    
+
     return workflow;
   }
 
@@ -84,13 +84,13 @@ public class WorkflowAssembler {
     vo.setEnabled(workflow.getEnabled());
     vo.setVersion(workflow.getVersion());
     vo.setCreatedDate(workflow.getCreatedDate());
-    vo.setLastModifiedDate(workflow.getLastModifiedDate());
+    vo.setModifiedDate(workflow.getModifiedDate());
     vo.setCreatedBy(workflow.getCreatedBy());
     vo.setConfig(workflow.getConfig());
-    
+
     // 设置统计信息
     vo.setStats(buildStats(workflow));
-    
+
     return vo;
   }
 
@@ -111,11 +111,11 @@ public class WorkflowAssembler {
     vo.setNodesCount(workflow.getNodesCount());
     vo.setVersion(workflow.getVersion());
     vo.setCreatedDate(workflow.getCreatedDate());
-    vo.setLastModifiedDate(workflow.getLastModifiedDate());
-    
+    vo.setModifiedDate(workflow.getModifiedDate());
+
     // 设置统计信息
     vo.setStats(buildStats(workflow));
-    
+
     return vo;
   }
 
@@ -124,15 +124,15 @@ public class WorkflowAssembler {
    */
   public static GenericSpecification<Workflow> getSpecification(WorkflowFindDto dto) {
     GenericSpecification<Workflow> spec = new GenericSpecification<>();
-    
+
     if (dto.getType() != null) {
       spec.addEqual("type", WorkflowType.valueOf(dto.getType()));
     }
-    
+
     if (dto.getStatus() != null) {
       spec.addEqual("status", WorkflowStatus.valueOf(dto.getStatus()));
     }
-    
+
     return spec;
   }
 

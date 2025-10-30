@@ -91,13 +91,13 @@ public class PluginListVo {
   private LocalDateTime createdDate;
 
   @Schema(description = "最后修改人ID")
-  protected Long lastModifiedBy;
+  protected Long modifiedBy;
 
-  @NameJoinField(id = "lastModifiedBy", repository = "commonUserBaseRepo")
+  @NameJoinField(id = "modifiedBy", repository = "commonUserBaseRepo")
   private String lastModifiedByName;
 
   @Schema(description = "最后修改时间")
-  private LocalDateTime lastModifiedDate;
+  private LocalDateTime modifiedDate;
 
   @Schema(description = "发布时间")
   private LocalDateTime publishedDate;

@@ -62,7 +62,7 @@ public class ResourceSharingDetailVo {
   private LocalDateTime createdDate;
 
   @Schema(description = "最后修改时间")
-  private LocalDateTime lastModifiedDate;
+  private LocalDateTime modifiedDate;
 
   @Data
   @Schema(description = "所有者信息")

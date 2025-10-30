@@ -52,13 +52,13 @@ public class PluginFindDto extends PageQuery {
   private LocalDateTime createdDateEnd;
 
   @Schema(description = "最后修改人ID")
-  protected Long lastModifiedBy;
+  protected Long modifiedBy;
 
   @Schema(description = "最后修改时间")
-  private LocalDateTime lastModifiedDate;
+  private LocalDateTime modifiedDate;
 
   @Override
   public String getDefaultOrderBy() {
-    return "lastModifiedDate";
+    return "modifiedDate";
   }
 }

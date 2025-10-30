@@ -39,8 +39,8 @@ public class DatasetDataAssembler {
     vo.setTenantId(data.getTenantId());
     vo.setCreatedBy(data.getCreatedBy());
     vo.setCreatedDate(data.getCreatedDate());
-    vo.setLastModifiedBy(data.getLastModifiedBy());
-    vo.setLastModifiedDate(data.getLastModifiedDate());
+    vo.setModifiedBy(data.getModifiedBy());
+    vo.setModifiedDate(data.getModifiedDate());
     return vo;
   }
 
@@ -58,8 +58,8 @@ public class DatasetDataAssembler {
   public static GenericSpecification<DatasetData> getSpecification(DatasetDataFindDto dto) {
     // Build the final filters
     Set<SearchCriteria> filters = new SearchCriteriaBuilder<>(dto)
-        .rangeSearchFields("id", "createdDate", "lastModifiedDate")
-        .orderByFields("id", "name", "type", "size", "createdDate", "lastModifiedDate")
+        .rangeSearchFields("id", "createdDate", "modifiedDate")
+        .orderByFields("id", "name", "type", "size", "createdDate", "modifiedDate")
         .matchSearchFields("name", "description")
         .inAndNotFields("type", "status", "createdBy")
         .build();

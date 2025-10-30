@@ -45,7 +45,7 @@ public class WorkflowDetailVo {
   private LocalDateTime createdDate;
 
   @Schema(description = "最后修改时间")
-  private LocalDateTime lastModifiedDate;
+  private LocalDateTime modifiedDate;
 
   @Schema(description = "创建者ID")
   private Long createdBy;
