@@ -7,6 +7,7 @@ import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasourceTableData
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.SyncDataVo;
 import cloud.xcan.angus.remote.PageResult;
 import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface DatasetDataFacade {
 
@@ -14,6 +15,11 @@ public interface DatasetDataFacade {
    * 同步文件数据到关系数据库或同步表信息
    */
   List<SyncDataVo> syncDatasetData(Long id, List<String> names);
+
+  /**
+   * 上传数据文件到数据集
+   */
+  List<DatasetDataListVo> uploadDatasetData(Long datasetId, MultipartFile[] files);
 
   /**
    * 批量删除文件或表

@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 @Component
 public class DatasetDataFacadeImpl implements DatasetDataFacade {
@@ -37,6 +38,13 @@ public class DatasetDataFacadeImpl implements DatasetDataFacade {
   public List<SyncDataVo> syncDatasetData(Long id, List<String> names) {
     List<SyncDataResult> results = datasetDataCmd.syncDatasetData(id, names);
     return results.stream().map(DatasetDataAssembler::toSyncDataVo)
+        .collect(Collectors.toList());
+  }
+
+  @Override
+  public List<DatasetDataListVo> uploadDatasetData(Long datasetId, MultipartFile[] files) {
+    List<DatasetData> data = datasetDataCmd.uploadDatasetData(datasetId, files);
+    return data.stream().map(DatasetDataAssembler::toDataListVo)
         .collect(Collectors.toList());
   }
 

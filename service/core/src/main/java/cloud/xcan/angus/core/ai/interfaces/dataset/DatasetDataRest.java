@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "Dataset", description = "数据集管理 - 数据集的创建、管理、数据导入、数据源连接等功能")
 @Validated
@@ -47,6 +48,18 @@ public class DatasetDataRest {
       @Parameter(description = "数据集ID") @PathVariable Long id,
       @Parameter(description = "同步文件或表名") @RequestParam(required = false) List<String> names) {
     return ApiLocaleResult.success(datasetDataFacade.syncDatasetData(id, names));
+  }
+
+  @Operation(operationId = "uploadDatasetFiles", summary = "上传数据集文件", description = "上传数据文件到指定数据集")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "201", description = "文件上传成功")
+  })
+  @ResponseStatus(HttpStatus.CREATED)
+  @PostMapping("/{id}/data/upload")
+  public ApiLocaleResult<List<DatasetDataListVo>> uploadDatasetFiles(
+      @Parameter(description = "数据集ID") @PathVariable Long id,
+      @Parameter(description = "文件列表") @RequestParam("files") MultipartFile[] files) {
+    return ApiLocaleResult.success(datasetDataFacade.uploadDatasetData(id, files));
   }
 
   @Operation(operationId = "batchDeleteData", summary = "批量删除数据", description = "批量删除文件或表")

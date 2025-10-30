@@ -1,11 +1,15 @@
 package cloud.xcan.angus.core.ai.application.cmd.dataset.impl;
 
+import static cloud.xcan.angus.core.ai.application.converter.DatasetDataConverter.toDatasetData;
+
 import cloud.xcan.angus.core.ai.application.cmd.dataset.DatasetDataCmd;
 import cloud.xcan.angus.core.ai.application.query.dataset.DatasetQuery;
 import cloud.xcan.angus.core.ai.domain.dataset.Dataset;
 import cloud.xcan.angus.core.ai.domain.dataset.DatasetData;
 import cloud.xcan.angus.core.ai.domain.dataset.DatasetDataRepo;
 import cloud.xcan.angus.core.ai.domain.dataset.SyncDataResult;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.internal.assembler.DatasetDataAssembler;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetDataListVo;
 import cloud.xcan.angus.core.biz.Biz;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;
@@ -14,10 +18,12 @@ import cloud.xcan.angus.remote.message.BizException;
 import cloud.xcan.angus.spec.annotations.DoInFuture;
 import cloud.xcan.angus.spec.utils.ObjectUtils;
 import jakarta.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @DoInFuture("添加权限校验")
 @Component
@@ -57,6 +63,40 @@ public class DatasetDataCmdImpl extends CommCmd<DatasetData, Long> implements Da
           // TODO 执行文件数据到数据库同步
         }
         return List.of();
+      }
+    }.execute();
+  }
+
+  @Override
+  @Transactional
+  public List<DatasetData> uploadDatasetData(Long datasetId, MultipartFile[] files) {
+    return new BizTemplate<List<DatasetData>>() {
+      Dataset datasetDb;
+
+      @Override
+      protected void checkParams() {
+        // 检查数据集是否存在
+        datasetDb = datasetQuery.findAndCheck(datasetId);
+
+        if (files == null || files.length == 0) {
+          throw BizException.of("上传文件不能为空");
+        }
+      }
+
+      @Override
+      protected List<DatasetData> process() {
+        List<DatasetData> toSave = new ArrayList<>();
+        for (MultipartFile file : files) {
+          String original = file.getOriginalFilename();
+          if (original.isBlank()) {
+            continue;
+          }
+          DatasetData data = toDatasetData(datasetId, file, original);
+          toSave.add(data);
+
+          // TODO: Save file bytes to storage and enqueue processing task
+        }
+        return datasetDataRepo.saveAll(toSave);
       }
     }.execute();
   }
