@@ -91,12 +91,16 @@ public class DatasetCmdImpl extends CommCmd<Dataset, Long> implements DatasetCmd
       protected void checkParams() {
         // 获取数据集并检查是否存在
         datasetDb = datasetQuery.findAndCheck(id);
+
+        // TODO 检查数据源配置有效性
       }
 
       @Override
       protected Dataset process() {
         // 更新配置
         datasetDb.setConfig(config);
+
+        // TODO 拉去表信息到DatasetData表
 
         return datasetRepo.save(datasetDb);
       }
@@ -147,6 +151,8 @@ public class DatasetCmdImpl extends CommCmd<Dataset, Long> implements DatasetCmd
           protected Void process() {
             // 更新配置
             datasetDb.setConfig(null);
+
+            // TODO 删除数据源DatasetData记录
 
             datasetRepo.save(datasetDb);
             return null;
