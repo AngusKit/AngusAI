@@ -3,25 +3,22 @@ package cloud.xcan.angus.core.ai.application.cmd.model.impl;
 import cloud.xcan.angus.core.ai.application.cmd.model.ModelCmd;
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.domain.model.Model;
-import cloud.xcan.angus.core.ai.infra.ai.model.ModelConfig;
 import cloud.xcan.angus.core.ai.domain.model.ModelRepo;
 import cloud.xcan.angus.core.ai.domain.model.ModelStatus;
-import cloud.xcan.angus.core.biz.Biz;
+import cloud.xcan.angus.core.ai.infra.ai.model.ModelConfig;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
-import cloud.xcan.angus.core.utils.CoreUtils;
 import cloud.xcan.angus.remote.message.http.ResourceExisted;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import cloud.xcan.angus.spec.annotations.DoInFuture;
 import cloud.xcan.angus.spec.utils.ObjectUtils;
 import jakarta.annotation.Resource;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @DoInFuture("添加权限校验")
-@Component
-@Biz
+@Service
 public class ModelCmdImpl extends CommCmd<Model, Long> implements ModelCmd {
 
   @Resource

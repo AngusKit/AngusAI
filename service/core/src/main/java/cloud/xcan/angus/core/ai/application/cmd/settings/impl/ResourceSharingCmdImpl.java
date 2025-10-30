@@ -23,13 +23,13 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 资源共享命令服务实现
  */
-@Component
-@Biz
+@Service
 public class ResourceSharingCmdImpl extends CommCmd<ResourceSharing, Long> implements
     ResourceSharingCmd {
 

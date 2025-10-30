@@ -8,7 +8,6 @@ import cloud.xcan.angus.core.ai.application.query.prompt.PromptCategoryQuery;
 import cloud.xcan.angus.core.ai.domain.prompt.PromptCategory;
 import cloud.xcan.angus.core.ai.domain.prompt.PromptCategoryRepo;
 import cloud.xcan.angus.core.ai.domain.prompt.PromptRepo;
-import cloud.xcan.angus.core.biz.Biz;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
@@ -19,13 +18,12 @@ import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 /**
  * 提示词分类命令服务实现
  */
-@Component
-@Biz
+@Service
 public class PromptCategoryCmdImpl extends CommCmd<PromptCategory, Long>
     implements PromptCategoryCmd {
 

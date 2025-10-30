@@ -19,6 +19,7 @@ import jakarta.annotation.Resource;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
 
 /**
  * Implementation of activity query operations for activity management and reporting.
@@ -41,7 +42,7 @@ import org.springframework.data.domain.PageRequest;
  *
  * @author XiaoLong Liu
  */
-@Biz
+@Service
 @SummaryQueryRegister(name = "Activity", table = "activity", groupByColumns = {"opt_date",
     "target_type"})
 public class ActivityQueryImpl implements ActivityQuery {

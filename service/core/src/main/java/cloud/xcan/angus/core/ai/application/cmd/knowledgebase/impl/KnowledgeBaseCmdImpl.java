@@ -5,18 +5,15 @@ import cloud.xcan.angus.core.ai.application.query.knowledgebase.KnowledgeBaseQue
 import cloud.xcan.angus.core.ai.domain.knowledgebase.DocumentVisibility;
 import cloud.xcan.angus.core.ai.domain.knowledgebase.KnowledgeBase;
 import cloud.xcan.angus.core.ai.domain.knowledgebase.KnowledgeBaseRepo;
-import cloud.xcan.angus.core.biz.Biz;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
-import cloud.xcan.angus.core.utils.CoreUtils;
 import cloud.xcan.angus.remote.message.http.ResourceExisted;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Biz
 public class KnowledgeBaseCmdImpl extends CommCmd<KnowledgeBase, Long> implements KnowledgeBaseCmd {
 
   @Resource

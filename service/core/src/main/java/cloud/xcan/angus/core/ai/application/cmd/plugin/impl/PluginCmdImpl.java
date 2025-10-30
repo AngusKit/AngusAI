@@ -6,11 +6,9 @@ import cloud.xcan.angus.core.ai.domain.plugin.Plugin;
 import cloud.xcan.angus.core.ai.domain.plugin.PluginConfig;
 import cloud.xcan.angus.core.ai.domain.plugin.PluginRepo;
 import cloud.xcan.angus.core.ai.domain.plugin.PluginStatus;
-import cloud.xcan.angus.core.biz.Biz;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
-import cloud.xcan.angus.core.utils.CoreUtils;
 import cloud.xcan.angus.remote.message.http.ResourceExisted;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import cloud.xcan.angus.spec.annotations.DoInFuture;
@@ -18,12 +16,11 @@ import cloud.xcan.angus.spec.utils.ObjectUtils;
 import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @DoInFuture("添加权限校验")
-@Component
-@Biz
+@Service
 public class PluginCmdImpl extends CommCmd<Plugin, Long> implements PluginCmd {
 
   @Resource

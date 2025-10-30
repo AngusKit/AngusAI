@@ -17,6 +17,7 @@ import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import jakarta.annotation.Resource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
@@ -27,8 +28,7 @@ import java.util.Base64;
 /**
  * API密钥命令实现
  */
-@Component
-@Biz
+@Service
 public class ApiKeyCmdImpl extends CommCmd<ApiKey, Long> implements ApiKeyCmd {
 
   @Resource

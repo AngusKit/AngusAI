@@ -28,13 +28,13 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 设置命令服务实现
  */
-@Component
-@Biz
+@Service
 public class SettingsCmdImpl extends CommCmd<UserSettings, Long> implements SettingsCmd {
 
   @Resource

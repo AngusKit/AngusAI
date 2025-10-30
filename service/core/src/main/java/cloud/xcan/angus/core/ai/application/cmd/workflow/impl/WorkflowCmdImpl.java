@@ -20,11 +20,11 @@ import cloud.xcan.angus.spec.annotations.DoInFuture;
 import cloud.xcan.angus.spec.utils.ObjectUtils;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @DoInFuture("添加权限校验")
-@Component
-@Biz
+@Service
 public class WorkflowCmdImpl extends CommCmd<Workflow, Long> implements WorkflowCmd {
 
   @Resource

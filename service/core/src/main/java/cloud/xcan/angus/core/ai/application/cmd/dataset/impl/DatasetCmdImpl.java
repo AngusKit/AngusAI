@@ -10,7 +10,6 @@ import cloud.xcan.angus.core.ai.domain.dataset.DatasetRepo;
 import cloud.xcan.angus.core.ai.domain.dataset.DatasourceConfig;
 import cloud.xcan.angus.core.ai.infra.util.DatasourceUtils;
 import cloud.xcan.angus.core.ai.infra.util.DatasourceUtils.ConnectionTestResult;
-import cloud.xcan.angus.core.biz.Biz;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
@@ -21,12 +20,11 @@ import cloud.xcan.angus.spec.utils.ObjectUtils;
 import jakarta.annotation.Resource;
 import java.util.Optional;
 import org.springframework.lang.Nullable;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @DoInFuture("添加权限校验")
-@Component
-@Biz
+@Service
 public class DatasetCmdImpl extends CommCmd<Dataset, Long> implements DatasetCmd {
 
   @Resource
