@@ -2,10 +2,9 @@ package cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto;
 
 import cloud.xcan.angus.core.ai.domain.dataset.DatasetVisibility;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
-
-import java.util.List;
 
 @Data
 @Schema(description = "更新数据集请求参数")
