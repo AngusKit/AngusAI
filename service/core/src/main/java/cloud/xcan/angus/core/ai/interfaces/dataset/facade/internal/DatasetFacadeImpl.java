@@ -38,14 +38,14 @@ public class DatasetFacadeImpl implements DatasetFacade {
 
   @Override
   public DatasetDetailVo create(DatasetCreateDto dto) {
-    Dataset dataset = DatasetAssembler.toDomain(dto);
+    Dataset dataset = DatasetAssembler.toCreateDomain(dto);
     Dataset saved = datasetCmd.create(dataset);
     return DatasetAssembler.toDetailVo(saved);
   }
 
   @Override
   public DatasetDetailVo update(Long id, DatasetUpdateDto dto) {
-    Dataset dataset = DatasetAssembler.updateDomain(id, dto);
+    Dataset dataset = DatasetAssembler.toUpdateDomain(id, dto);
     Dataset saved = datasetCmd.update(dataset);
     return DatasetAssembler.toDetailVo(saved);
   }

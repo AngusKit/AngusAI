@@ -5,13 +5,14 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -23,12 +24,6 @@ public class PromptCategory extends TenantAuditingEntity<PromptCategory, Long> {
 
   @Column(name = "name", nullable = false, length = 20)
   private String name;
-
-  @Column(name = "name_en", length = 30)
-  private String nameEn;
-
-  @Column(name = "description", length = 200)
-  private String description;
 
   @Column(name = "icon", length = 50)
   private String icon;
@@ -42,11 +37,11 @@ public class PromptCategory extends TenantAuditingEntity<PromptCategory, Long> {
   @Column(name = "is_system", nullable = false)
   private Boolean isSystem = false;
 
-  @Column(name = "prompt_count", nullable = false)
-  private Long promptCount = 0L;
-
   @Column(name = "order_num", nullable = false)
   private Integer orderNum = 0;
+
+  @Transient
+  private Long promptCount = 0L;
 
   @Override
   public Long identity() {

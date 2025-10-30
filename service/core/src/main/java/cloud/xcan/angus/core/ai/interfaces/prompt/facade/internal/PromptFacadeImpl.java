@@ -35,14 +35,14 @@ public class PromptFacadeImpl implements PromptFacade {
 
   @Override
   public PromptDetailVo create(PromptCreateDto dto) {
-    Prompt prompt = promptAssembler.toEntity(dto);
+    Prompt prompt = promptAssembler.toCreateDomain(dto);
     prompt = promptCmd.create(prompt);
     return promptAssembler.toDetailVo(prompt);
   }
 
   @Override
   public PromptDetailVo update(Long id, PromptUpdateDto dto) {
-    Prompt prompt = promptAssembler.toEntity(dto);
+    Prompt prompt = promptAssembler.toUpdateDomain(dto);
     prompt = promptCmd.update(prompt);
     return promptAssembler.toDetailVo(prompt);
   }
@@ -83,7 +83,7 @@ public class PromptFacadeImpl implements PromptFacade {
   public PageResult<PromptListVo> list(PromptFindDto dto) {
     // 使用固定分页参数
     PageRequest pageRequest = PageRequest.of(0, 20);
-    
+
     // 根据条件选择不同的查询方法
     Page<Prompt> page;
     if (dto.getIsFavorite() != null && dto.getIsFavorite()) {
@@ -93,7 +93,7 @@ public class PromptFacadeImpl implements PromptFacade {
       // 查询最近的提示词
       page = promptQuery.findRecentPrompts(pageRequest);
     }
-    
+
     return CoreUtils.buildVoPageResult(page, promptAssembler::toListVo);
   }
 

@@ -25,7 +25,7 @@ import java.util.Set;
 
 public class DatasetAssembler {
 
-  public static Dataset toDomain(DatasetCreateDto dto) {
+  public static Dataset toCreateDomain(DatasetCreateDto dto) {
     Dataset dataset = new Dataset();
     dataset.setName(dto.getName());
     dataset.setDescription(dto.getDescription());
@@ -42,7 +42,7 @@ public class DatasetAssembler {
     return dataset;
   }
 
-  public static Dataset updateDomain(Long id, DatasetUpdateDto dto) {
+  public static Dataset toUpdateDomain(Long id, DatasetUpdateDto dto) {
     Dataset dataset = new Dataset();
     dataset.setId(id);
     dataset.setName(dto.getName());

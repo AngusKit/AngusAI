@@ -10,10 +10,9 @@ import cloud.xcan.angus.core.ai.interfaces.prompt.facade.vo.PromptDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.prompt.facade.vo.PromptListVo;
 import cloud.xcan.angus.spec.utils.ObjectUtils;
 import jakarta.annotation.Resource;
-import org.springframework.stereotype.Component;
-
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import org.springframework.stereotype.Component;
 
 /**
  * 提示词组装器
@@ -27,7 +26,7 @@ public class PromptAssembler {
   /**
    * CreateDTO 转换为领域对象
    */
-  public Prompt toEntity(PromptCreateDto dto) {
+  public Prompt toCreateDomain(PromptCreateDto dto) {
     if (dto == null) {
       return null;
     }
@@ -53,7 +52,7 @@ public class PromptAssembler {
   /**
    * UpdateDTO 转换为领域对象
    */
-  public Prompt toEntity(PromptUpdateDto dto) {
+  public Prompt toUpdateDomain(PromptUpdateDto dto) {
     if (dto == null) {
       return null;
     }
@@ -109,13 +108,10 @@ public class PromptAssembler {
     vo.setIsSystem(prompt.getIsSystem());
     vo.setIsFavorite(prompt.getIsFavorite());
     vo.setUsageCount(prompt.getUsageCount());
-    vo.setCreatedDate(toTimestamp(prompt.getCreatedAt()));
-    vo.setLastModifiedDate(toTimestamp(prompt.getUpdatedAt()));
-    vo.setCreatedBy(prompt.getCreatedBy());
 
     // 获取分类名称
     if (prompt.getCategoryId() != null) {
-      PromptCategory category = promptCategoryQuery.findById(prompt.getCategoryId());
+      PromptCategory category = promptCategoryQuery.findAndCheck(prompt.getCategoryId());
       if (category != null) {
         vo.setCategoryName(category.getName());
       }
@@ -143,13 +139,13 @@ public class PromptAssembler {
     vo.setIsSystem(prompt.getIsSystem());
     vo.setIsFavorite(prompt.getIsFavorite());
     vo.setUsageCount(prompt.getUsageCount());
-    vo.setCreatedDate(toTimestamp(prompt.getCreatedAt()));
-    vo.setLastModifiedDate(toTimestamp(prompt.getUpdatedAt()));
+    vo.setCreatedDate(toTimestamp(prompt.getCreatedDate()));
+    vo.setLastModifiedDate(toTimestamp(prompt.getLastModifiedDate()));
     vo.setCreatedBy(prompt.getCreatedBy());
 
     // 获取分类名称
     if (prompt.getCategoryId() != null) {
-      PromptCategory category = promptCategoryQuery.findById(prompt.getCategoryId());
+      PromptCategory category = promptCategoryQuery.findAndCheck(prompt.getCategoryId());
       if (category != null) {
         vo.setCategoryName(category.getName());
       }

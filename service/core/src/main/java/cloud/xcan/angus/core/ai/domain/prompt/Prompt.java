@@ -1,5 +1,6 @@
 package cloud.xcan.angus.core.ai.domain.prompt;
 
+import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,7 +21,7 @@ import org.hibernate.type.SqlTypes;
 @AllArgsConstructor
 @Entity
 @Table(name = "ai_prompt")
-public class Prompt extends BaseEntity {
+public class Prompt extends TenantAuditingEntity<Prompt, Long> {
 
   @Id
   private Long id;
@@ -71,4 +72,8 @@ public class Prompt extends BaseEntity {
   @Column(name = "archived_at")
   private Long archivedAt;
 
+  @Override
+  public Long identity() {
+    return id;
+  }
 }

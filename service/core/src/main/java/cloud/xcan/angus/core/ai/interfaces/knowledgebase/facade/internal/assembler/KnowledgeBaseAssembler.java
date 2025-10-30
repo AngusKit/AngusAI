@@ -21,7 +21,7 @@ import java.util.Set;
 
 public class KnowledgeBaseAssembler {
 
-  public static KnowledgeBase toDomain(KnowledgeBaseCreateDto dto) {
+  public static KnowledgeBase toCreateDomain(KnowledgeBaseCreateDto dto) {
     KnowledgeBase knowledgeBase = new KnowledgeBase();
     knowledgeBase.setName(dto.getName());
     knowledgeBase.setIcon(dto.getIcon());
@@ -41,7 +41,7 @@ public class KnowledgeBaseAssembler {
     return knowledgeBase;
   }
 
-  public static KnowledgeBase updateDomain(Long id, KnowledgeBaseUpdateDto dto) {
+  public static KnowledgeBase toUpdateDomain(Long id, KnowledgeBaseUpdateDto dto) {
     KnowledgeBase knowledgeBase = new KnowledgeBase();
     knowledgeBase.setId(id);
     knowledgeBase.setName(dto.getName());

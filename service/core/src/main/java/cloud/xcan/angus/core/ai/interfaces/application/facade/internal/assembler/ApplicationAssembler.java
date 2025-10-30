@@ -25,7 +25,7 @@ import java.util.Set;
 
 public class ApplicationAssembler {
 
-  public static Application toDomain(ApplicationCreateDto dto) {
+  public static Application toCreateDomain(ApplicationCreateDto dto) {
     Application application = new Application()
         .setName(dto.getName())
         .setIcon(dto.getIcon())
@@ -45,7 +45,7 @@ public class ApplicationAssembler {
     return application;
   }
 
-  public static Application updateDomain(Long id, ApplicationUpdateDto dto) {
+  public static Application toUpdateDomain(Long id, ApplicationUpdateDto dto) {
     Application application = new Application();
     application.setId(id);
     application.setName(dto.getName());

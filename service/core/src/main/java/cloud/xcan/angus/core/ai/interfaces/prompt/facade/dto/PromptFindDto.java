@@ -1,7 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.prompt.facade.dto;
 
 import cloud.xcan.angus.core.ai.domain.prompt.PromptStatus;
-import cloud.xcan.angus.core.jpa.criteria.SearchCriteria;
 import cloud.xcan.angus.remote.PageQuery;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

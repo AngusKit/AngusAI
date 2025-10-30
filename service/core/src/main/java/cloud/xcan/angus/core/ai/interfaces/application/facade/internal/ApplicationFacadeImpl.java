@@ -36,7 +36,7 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
 
   @Override
   public ApplicationDetailVo create(ApplicationCreateDto dto) {
-    Application application = ApplicationAssembler.toDomain(dto);
+    Application application = ApplicationAssembler.toCreateDomain(dto);
     Application saved = applicationCmd.create(application);
     return ApplicationAssembler.toDetailVo(saved);
   }
@@ -49,7 +49,7 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
 
   @Override
   public ApplicationDetailVo update(Long id, ApplicationUpdateDto dto) {
-    Application application = ApplicationAssembler.updateDomain(id, dto);
+    Application application = ApplicationAssembler.toUpdateDomain(id, dto);
     Application saved = applicationCmd.update(application);
     return ApplicationAssembler.toDetailVo(saved);
   }
