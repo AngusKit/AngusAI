@@ -2,17 +2,23 @@ package cloud.xcan.angus.core.ai.domain.plugin;
 
 import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.Type;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 插件实体
@@ -57,7 +63,7 @@ public class Plugin extends TenantAuditingEntity<Plugin, Long> {
   // 标签
   @Type(JsonType.class)
   @Column(columnDefinition = "json", name = "tags")
-  private java.util.List<String> tags;
+  private List<String> tags;
 
   // 统计数据
   @Column(name = "install_count")
@@ -71,10 +77,6 @@ public class Plugin extends TenantAuditingEntity<Plugin, Long> {
 
   @Column(name = "review_count")
   private Long reviewCount = 0L;
-
-  // 是否收藏（由用户级别控制，这里作为快捷标记）
-  @Column(name = "is_favorite")
-  private Boolean isFavorite = false;
 
   // 是否为系统插件
   @Column(name = "is_system")
@@ -123,6 +125,11 @@ public class Plugin extends TenantAuditingEntity<Plugin, Long> {
   // 货币单位
   @Column(name = "currency", length = 10)
   private String currency = "CNY";
+
+  @Transient
+  private Boolean isFavorite = false;
+  @Transient
+  private MultipartFile file;
 
   @Override
   public Long identity() {

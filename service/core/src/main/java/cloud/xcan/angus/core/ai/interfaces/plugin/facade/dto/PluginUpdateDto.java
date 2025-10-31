@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @Schema(description = "更新插件请求参数")
@@ -69,6 +70,9 @@ public class PluginUpdateDto {
   @Length(max = 50)
   @Schema(description = "许可证")
   private String license;
+
+  @Schema(type = "string", format = "binary", description = "插件规范文件，最大支持200MB")
+  private MultipartFile file;
 
   @Schema(description = "价格")
   private Double price;

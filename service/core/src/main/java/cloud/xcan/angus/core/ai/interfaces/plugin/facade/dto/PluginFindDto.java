@@ -15,6 +15,12 @@ import lombok.EqualsAndHashCode;
 @Schema(description = "插件查询参数")
 public class PluginFindDto extends PageQuery {
 
+  @Schema(description = "插件ID")
+  private Long id;
+
+  @Schema(description = "插件名称")
+  private String name;
+
   @Schema(description = "分类筛选")
   private PluginCategory category;
 
@@ -39,26 +45,36 @@ public class PluginFindDto extends PageQuery {
   @Schema(description = "标签筛选")
   private List<String> tags;
 
+  @Schema(description = "安装次数")
+  private Long installCount;
+
+  @Schema(description = "使用次数")
+  private Long usageCount;
+
+  @Schema(description = "评价数量")
+  private Long reviewCount;
+
+  @Schema(description = "评分")
+  private Double rating;
+
   @Schema(description = "最小评分")
   private Double minRating;
 
-  @Schema(description = "创建者ID")
+  @Schema(description = "所属租户ID", example = "1")
+  private Long tenantId;
+
+  @Schema(description = "创建人ID", example = "1")
   private Long createdBy;
 
-  @Schema(description = "创建时间开始")
-  private LocalDateTime createdDateStart;
+  @Schema(description = "创建时间", example = "2024-10-12 00:00:00")
+  private LocalDateTime createdDate;
 
-  @Schema(description = "创建时间结束")
-  private LocalDateTime createdDateEnd;
-
-  @Schema(description = "最后修改人ID")
-  protected Long modifiedBy;
-
-  @Schema(description = "最后修改时间")
-  private LocalDateTime modifiedDate;
+  @Schema(description = "排序字段", allowableValues = {"id", "createdDate", "name", "category",
+      "status", "type", "installCount", "usageCount", "reviewCount", "rating", "minRating"})
+  private String orderBy = "createdDate";
 
   @Override
   public String getDefaultOrderBy() {
-    return "modifiedDate";
+    return "createdDate";
   }
 }

@@ -1,10 +1,11 @@
 package cloud.xcan.angus.core.ai.interfaces.plugin.facade;
 
 import cloud.xcan.angus.core.ai.domain.plugin.PluginStatus;
+import cloud.xcan.angus.core.ai.domain.plugin.StatisticsPeriod;
 import cloud.xcan.angus.core.ai.interfaces.plugin.facade.dto.PluginCreateDto;
-import cloud.xcan.angus.core.ai.interfaces.plugin.facade.dto.PluginFavoriteDto;
 import cloud.xcan.angus.core.ai.interfaces.plugin.facade.dto.PluginFindDto;
 import cloud.xcan.angus.core.ai.interfaces.plugin.facade.dto.PluginUpdateDto;
+import cloud.xcan.angus.core.ai.interfaces.plugin.facade.dto.PluginVerifyDto;
 import cloud.xcan.angus.core.ai.interfaces.plugin.facade.vo.PluginDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.plugin.facade.vo.PluginListVo;
 import cloud.xcan.angus.core.ai.interfaces.plugin.facade.vo.PluginStatisticsVo;
@@ -28,11 +29,6 @@ public interface PluginFacade {
   PluginDetailVo modifyStatus(Long id, PluginStatus status);
 
   /**
-   * 收藏/取消收藏插件
-   */
-  PluginDetailVo favorite(Long id, PluginFavoriteDto dto);
-
-  /**
    * 安装插件
    */
   PluginDetailVo install(Long id);
@@ -40,7 +36,7 @@ public interface PluginFacade {
   /**
    * 卸载插件
    */
-  void uninstall(Long id);
+  PluginDetailVo uninstall(Long id);
 
   /**
    * 使用插件（增加使用次数）
@@ -55,7 +51,7 @@ public interface PluginFacade {
   /**
    * 验证插件
    */
-  PluginDetailVo verify(Long id, Boolean verified);
+  PluginDetailVo verify(PluginVerifyDto dto);
 
   /**
    * 删除插件
@@ -73,12 +69,7 @@ public interface PluginFacade {
   PageResult<PluginListVo> list(PluginFindDto dto);
 
   /**
-   * 获取热门插件
-   */
-  PageResult<PluginListVo> getTrendingPlugins(Integer limit);
-
-  /**
    * 获取插件统计
    */
-  PluginStatisticsVo getStatistics(String period);
+  PluginStatisticsVo getStatistics(StatisticsPeriod period);
 }

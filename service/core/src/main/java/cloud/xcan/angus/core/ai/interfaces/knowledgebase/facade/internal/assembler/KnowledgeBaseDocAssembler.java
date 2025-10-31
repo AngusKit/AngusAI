@@ -46,13 +46,6 @@ public class KnowledgeBaseDocAssembler {
     return vo;
   }
 
-  public static KnowledgeBaseDocSearchResultVo toDocumentSearchResultVo(
-      KnowledgeBaseDocSearchResult searchResult) {
-    KnowledgeBaseDocSearchResultVo vo = new KnowledgeBaseDocSearchResultVo();
-    // TODO
-    return vo;
-  }
-
   public static GenericSpecification<KnowledgeBaseDoc> getSpecification(
       KnowledgeBaseDocFindDto dto) {
     // Build the final filters
@@ -63,5 +56,12 @@ public class KnowledgeBaseDocAssembler {
         .inAndNotFields("type", "status", "enabled")
         .build();
     return new GenericSpecification<>(filters);
+  }
+
+  public static KnowledgeBaseDocSearchResultVo toDocumentSearchResultVo(
+      KnowledgeBaseDocSearchResult searchResult) {
+    KnowledgeBaseDocSearchResultVo vo = new KnowledgeBaseDocSearchResultVo();
+    // TODO
+    return vo;
   }
 }

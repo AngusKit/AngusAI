@@ -1,11 +1,12 @@
 package cloud.xcan.angus.core.ai.interfaces.plugin;
 
 import cloud.xcan.angus.core.ai.domain.plugin.PluginStatus;
+import cloud.xcan.angus.core.ai.domain.plugin.StatisticsPeriod;
 import cloud.xcan.angus.core.ai.interfaces.plugin.facade.PluginFacade;
 import cloud.xcan.angus.core.ai.interfaces.plugin.facade.dto.PluginCreateDto;
-import cloud.xcan.angus.core.ai.interfaces.plugin.facade.dto.PluginFavoriteDto;
 import cloud.xcan.angus.core.ai.interfaces.plugin.facade.dto.PluginFindDto;
 import cloud.xcan.angus.core.ai.interfaces.plugin.facade.dto.PluginUpdateDto;
+import cloud.xcan.angus.core.ai.interfaces.plugin.facade.dto.PluginVerifyDto;
 import cloud.xcan.angus.core.ai.interfaces.plugin.facade.vo.PluginDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.plugin.facade.vo.PluginListVo;
 import cloud.xcan.angus.core.ai.interfaces.plugin.facade.vo.PluginStatisticsVo;
@@ -13,6 +14,8 @@ import cloud.xcan.angus.remote.ApiLocaleResult;
 import cloud.xcan.angus.remote.PageResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,6 +23,7 @@ import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,15 +46,14 @@ public class PluginRest {
   @Resource
   private PluginFacade pluginFacade;
 
-  // TODO 缺少插件文件字段
   @Operation(operationId = "createPlugin", summary = "创建插件", description = "创建新插件")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "201", description = "插件创建成功")
   })
   @ResponseStatus(HttpStatus.CREATED)
-  @PostMapping
+  @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ApiLocaleResult<PluginDetailVo> create(
-      @Valid @RequestBody PluginCreateDto dto) {
+      @Parameter(content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE), schema = @Schema(type = "object")) @Valid PluginCreateDto dto) {
     PluginDetailVo result = pluginFacade.create(dto);
     return ApiLocaleResult.success(result);
   }
@@ -79,18 +82,6 @@ public class PluginRest {
     return ApiLocaleResult.success(pluginFacade.modifyStatus(id, status));
   }
 
-  @Operation(operationId = "favoritePlugin", summary = "收藏/取消收藏插件", description = "收藏或取消收藏插件")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "操作成功")
-  })
-  @ResponseStatus(HttpStatus.OK)
-  @PostMapping("/{id}/favorite")
-  public ApiLocaleResult<PluginDetailVo> favorite(
-      @Parameter(description = "插件ID") @PathVariable Long id,
-      @Valid @RequestBody PluginFavoriteDto dto) {
-    return ApiLocaleResult.success(pluginFacade.favorite(id, dto));
-  }
-
   @Operation(operationId = "installPlugin", summary = "安装插件", description = "安装指定插件")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "安装成功")
@@ -102,15 +93,15 @@ public class PluginRest {
     return ApiLocaleResult.success(pluginFacade.install(id));
   }
 
-  @Operation(operationId = "uninstallPlugin", summary = "卸载插件", description = "卸载指定插件")
+  @Operation(operationId = "uninstallPlugin", summary = "卸载插件", description = "卸载指定插件（只删除运行时，保留安装包）")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "204", description = "卸载成功")
   })
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @PostMapping("/{id}/uninstall")
-  public void uninstall(
+  public ApiLocaleResult<PluginDetailVo> uninstall(
       @Parameter(description = "插件ID") @PathVariable Long id) {
-    pluginFacade.uninstall(id);
+    return ApiLocaleResult.success(pluginFacade.uninstall(id));
   }
 
   @Operation(operationId = "usePlugin", summary = "使用插件", description = "标记插件使用，增加使用计数")
@@ -135,19 +126,18 @@ public class PluginRest {
     return ApiLocaleResult.success(pluginFacade.publish(id));
   }
 
-  @Operation(operationId = "verifyPlugin", summary = "验证插件", description = "管理员验证插件（需要管理员权限）")
+  @Operation(operationId = "verifyPlugin", summary = "验证插件有效性", description = "管理员验证插件（需要管理员权限）")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "验证成功")
   })
   @ResponseStatus(HttpStatus.OK)
-  @PutMapping("/{id}/verify")
+  @PostMapping(value = "/verify", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ApiLocaleResult<PluginDetailVo> verify(
-      @Parameter(description = "插件ID") @PathVariable Long id,
-      @Parameter(description = "是否验证通过") @RequestParam Boolean verified) {
-    return ApiLocaleResult.success(pluginFacade.verify(id, verified));
+      @Parameter(content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE), schema = @Schema(type = "object")) @Valid PluginVerifyDto dto) {
+    return ApiLocaleResult.success(pluginFacade.verify(dto));
   }
 
-  @Operation(operationId = "deletePlugin", summary = "删除插件", description = "删除指定插件")
+  @Operation(operationId = "deletePlugin", summary = "删除插件", description = "删除指定插件（先卸载插件，再删除所有插件信息）")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "204", description = "删除成功")
   })
@@ -181,23 +171,13 @@ public class PluginRest {
     return ApiLocaleResult.success(pluginFacade.list(dto));
   }
 
-  @Operation(operationId = "getTrendingPlugins", summary = "获取热门插件", description = "获取热门/推荐插件")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "获取成功")
-  })
-  @GetMapping("/trending")
-  public ApiLocaleResult<PageResult<PluginListVo>> getTrendingPlugins(
-      @Parameter(description = "返回数量，默认10") @RequestParam(required = false) Integer limit) {
-    return ApiLocaleResult.success(pluginFacade.getTrendingPlugins(limit));
-  }
-
   @Operation(operationId = "getPluginStatistics", summary = "获取插件统计", description = "获取插件的详细统计数据")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "统计数据获取成功")
   })
   @GetMapping("/statistics")
   public ApiLocaleResult<PluginStatisticsVo> getStatistics(
-      @Parameter(description = "统计周期") @RequestParam(required = false) String period) {
+      @Parameter(description = "统计周期") @RequestParam(required = false) StatisticsPeriod period) {
     return ApiLocaleResult.success(pluginFacade.getStatistics(period));
   }
 }

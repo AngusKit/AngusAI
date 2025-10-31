@@ -4,6 +4,7 @@ import static cloud.xcan.angus.core.ai.application.converter.PromptConverter.toD
 import static cloud.xcan.angus.spec.principal.PrincipalContext.getUserId;
 
 import cloud.xcan.angus.core.ai.application.cmd.prompt.PromptCmd;
+import cloud.xcan.angus.core.ai.application.cmd.prompt.PromptFavoritesCmd;
 import cloud.xcan.angus.core.ai.application.query.prompt.PromptCategoryQuery;
 import cloud.xcan.angus.core.ai.application.query.prompt.PromptQuery;
 import cloud.xcan.angus.core.ai.domain.prompt.Prompt;
@@ -30,7 +31,7 @@ public class PromptCmdImpl extends CommCmd<Prompt, Long> implements PromptCmd {
   private PromptRepo promptRepo;
 
   @Resource
-  private PromptFavoritesRepo promptFavoritesRepo;
+  private PromptFavoritesCmd promptFavoritesCmd;
 
   @Resource
   private PromptQuery promptQuery;
@@ -118,9 +119,9 @@ public class PromptCmdImpl extends CommCmd<Prompt, Long> implements PromptCmd {
         if (isFavorite) {
           PromptFavorites favorites = new PromptFavorites();
           favorites.setPromptId(id);
-          promptFavoritesRepo.save(favorites);
+          promptFavoritesCmd.addFavorites(favorites);
         } else {
-          promptFavoritesRepo.deleteByPromptIdAndCreatedBy(id, getUserId());
+          promptFavoritesCmd.deleteByPromptIdAndCreatedBy(id, getUserId());
         }
 
         promptDb.setIsFavorite(isFavorite);
@@ -190,7 +191,7 @@ public class PromptCmdImpl extends CommCmd<Prompt, Long> implements PromptCmd {
       @Override
       protected Void process() {
         promptRepo.deleteById(id);
-        promptFavoritesRepo.deleteByPromptId(id);
+        promptFavoritesCmd.deleteByPromptId(id);
         return null;
       }
     }.execute();
