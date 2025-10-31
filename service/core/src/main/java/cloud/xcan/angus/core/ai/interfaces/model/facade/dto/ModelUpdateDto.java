@@ -24,7 +24,7 @@ public class ModelUpdateDto {
   @Schema(description = "模型提供商")
   private ModelProvider provider;
 
-  @Length(max = 20)
+  @Length(max = 40)
   @Schema(description = "版本号", example = "gpt-4-1106-preview")
   private String version;
 
@@ -34,12 +34,9 @@ public class ModelUpdateDto {
   @Schema(description = "API密钥")
   private String apiKey;
 
-  @Schema(description = "模型参数配置")
-  private Object parameters;
+  @Schema(description = "温度参数")
+  private Double temperature = 0.7;
 
-  @Schema(description = "部署配置")
-  private Object deployment;
-
-  @Schema(description = "限制配置")
-  private Object limits;
+  @Schema(description = "最大token数")
+  private Integer maxTokens;
 }

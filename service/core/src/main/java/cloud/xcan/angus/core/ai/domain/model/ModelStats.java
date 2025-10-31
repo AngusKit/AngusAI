@@ -1,13 +1,11 @@
-package cloud.xcan.angus.core.ai.interfaces.model.facade.vo;
+package cloud.xcan.angus.core.ai.domain.model;
 
-import cloud.xcan.angus.core.ai.domain.model.LastMonthGrowthTrend;
-import cloud.xcan.angus.core.ai.domain.model.TodayGrowthTrend;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
-@Schema(description = "模型统计响应")
-public class ModelStatisticsVo {
+@Schema(description = "模型调用统计汇总")
+public class ModelStats {
 
   @Schema(description = "总模型数")
   private Long totalModels;
@@ -44,6 +42,5 @@ public class ModelStatisticsVo {
 
   @Schema(description = "今天增长趋势")
   private TodayGrowthTrend todayGrowthTrend;
-
 
 }

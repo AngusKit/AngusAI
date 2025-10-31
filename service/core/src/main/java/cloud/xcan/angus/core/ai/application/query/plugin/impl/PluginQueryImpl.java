@@ -1,5 +1,8 @@
 package cloud.xcan.angus.core.ai.application.query.plugin.impl;
 
+import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.buildPeriodFilters;
+import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.getPeriodRange;
+
 import cloud.xcan.angus.core.ai.application.query.plugin.PluginQuery;
 import cloud.xcan.angus.core.ai.domain.plugin.CategoryCountView;
 import cloud.xcan.angus.core.ai.domain.plugin.LongTotalView;
@@ -11,7 +14,7 @@ import cloud.xcan.angus.core.ai.domain.plugin.PluginReviewRepo;
 import cloud.xcan.angus.core.ai.domain.plugin.PluginSearchRepo;
 import cloud.xcan.angus.core.ai.domain.plugin.PluginStatistics;
 import cloud.xcan.angus.core.ai.domain.plugin.PluginStatus;
-import cloud.xcan.angus.core.ai.domain.plugin.StatisticsPeriod;
+import cloud.xcan.angus.core.ai.domain.StatisticsPeriod;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
@@ -113,7 +116,7 @@ public class PluginQueryImpl implements PluginQuery {
         stats.setTotalRatings(pluginReviewRepo.count());
 
         // Download and visit totals from PluginRecord
-        LocalDateTime[] periodRange = getRange(period);
+        LocalDateTime[] periodRange = getPeriodRange(period);
         if (periodRange == null) {
           Long downloads = pluginRecordRepo.countByType(PluginRecordType.DOWNLOAD);
           Long visits = pluginRecordRepo.countByType(PluginRecordType.VISIT);
@@ -190,46 +193,7 @@ public class PluginQueryImpl implements PluginQuery {
           trending.add(tp);
         });
         stats.setTrendingPlugins(trending);
-
         return stats;
-      }
-
-      private Set<SearchCriteria> buildPeriodFilters(StatisticsPeriod period) {
-        var base = SearchCriteria.criteria();
-        if (period == null) {
-          return base;
-        }
-        LocalDateTime start;
-        LocalDateTime end = LocalDateTime.now();
-        switch (period) {
-          case TODAY -> start = LocalDate.now().atStartOfDay();
-          case LAST_7_DAYS -> start = LocalDate.now().minusDays(6).atStartOfDay();
-          case LAST_30_DAYS -> start = LocalDate.now().minusDays(29).atStartOfDay();
-          default -> start = null;
-        }
-        if (start != null) {
-          base = SearchCriteria.merge(base,
-              SearchCriteria.greaterThanEqual("createdDate", start),
-              SearchCriteria.lessThanEqual("createdDate", end));
-        }
-        return base;
-      }
-
-      private LocalDateTime[] getRange(StatisticsPeriod period) {
-        if (period == null) {
-          return null;
-        }
-        LocalDateTime end = LocalDateTime.now();
-        LocalDateTime start;
-        switch (period) {
-          case TODAY -> start = LocalDate.now().atStartOfDay();
-          case LAST_7_DAYS -> start = LocalDate.now().minusDays(6).atStartOfDay();
-          case LAST_30_DAYS -> start = LocalDate.now().minusDays(29).atStartOfDay();
-          default -> {
-            return null;
-          }
-        }
-        return new LocalDateTime[]{start, end};
       }
     }.execute();
   }

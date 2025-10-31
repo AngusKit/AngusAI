@@ -1,5 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.model;
 
+import cloud.xcan.angus.core.ai.domain.StatisticsPeriod;
 import cloud.xcan.angus.core.ai.infra.ai.model.ModelConfig;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.ModelFacade;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelCreateDto;
@@ -8,7 +9,6 @@ import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelTestDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelListVo;
-import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelMetricsVo;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelStatisticsVo;
 import cloud.xcan.angus.remote.ApiLocaleResult;
 import cloud.xcan.angus.remote.PageResult;
@@ -125,17 +125,6 @@ public class ModelRest {
     return ApiLocaleResult.success(modelFacade.test(id, dto));
   }
 
-  @Operation(operationId = "importModelConfig", summary = "导入模型配置", description = "导入模型配置")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "201", description = "导入成功")
-  })
-  @ResponseStatus(HttpStatus.CREATED)
-  @PostMapping("/import")
-  public ApiLocaleResult<ModelStatisticsVo> importConfig(
-      @Valid @RequestBody ModelStatisticsVo dto) {
-    return ApiLocaleResult.success(modelFacade.importConfig(dto));
-  }
-
   @Operation(operationId = "deleteModel", summary = "删除模型", description = "删除指定模型")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "204", description = "删除成功")
@@ -170,60 +159,16 @@ public class ModelRest {
     return ApiLocaleResult.success(modelFacade.list(dto));
   }
 
-  @Operation(operationId = "getModelProviders", summary = "获取可用模型提供商", description = "获取支持的模型提供商列表")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "提供商列表获取成功")
-  })
-  @GetMapping("/providers")
-  public ApiLocaleResult<ModelStatisticsVo> getProviders() {
-    return ApiLocaleResult.success(modelFacade.getProviders());
-  }
-
-  @Operation(operationId = "exportModelConfig", summary = "导出模型配置", description = "导出模型配置")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "导出成功")
-  })
-  @GetMapping("/{id}/export")
-  public ApiLocaleResult<ModelDetailVo> export(
-      @Parameter(description = "模型ID") @PathVariable Long id) {
-    return ApiLocaleResult.success(modelFacade.export(id));
-  }
-
-  @Operation(operationId = "getModelMetrics", summary = "获取模型性能监控", description = "获取模型性能监控数据")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "监控数据获取成功"),
-      @ApiResponse(responseCode = "404", description = "模型不存在")
-  })
-  @GetMapping("/{id}/metrics")
-  public ApiLocaleResult<ModelMetricsVo> getMetrics(
-      @Parameter(description = "模型ID") @PathVariable Long id,
-      @Parameter(description = "统计周期") @RequestParam(required = false) String period,
-      @Parameter(description = "开始时间") @RequestParam(required = false) Long startTime,
-      @Parameter(description = "结束时间") @RequestParam(required = false) Long endTime,
-      @Parameter(description = "指定指标") @RequestParam(required = false) String[] metrics) {
-    return ApiLocaleResult.success(modelFacade.getMetrics(id, period, startTime, endTime, metrics));
-  }
-
   @Operation(operationId = "getModelStatistics", summary = "获取模型调用统计", description = "获取模型调用统计数据")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "统计数据获取成功"),
       @ApiResponse(responseCode = "404", description = "模型不存在")
   })
-  @GetMapping("/{id}/statistics")
-  public ApiLocaleResult<ModelStatisticsVo> getStatistics(
-      @Parameter(description = "模型ID") @PathVariable Long id,
-      @Parameter(description = "统计周期") @RequestParam(required = false) String period,
-      @Parameter(description = "分组方式") @RequestParam(required = false) String groupBy) {
-    return ApiLocaleResult.success(modelFacade.getStatistics(id, period, groupBy));
-  }
-
-  @Operation(operationId = "getModelListStatistics", summary = "获取模型列表统计", description = "获取模型管理模块的统计数据")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "统计数据获取成功")
-  })
   @GetMapping("/statistics")
-  public ApiLocaleResult<ModelStatisticsVo> getListStatistics() {
-    return ApiLocaleResult.success(modelFacade.getListStatistics());
+  public ApiLocaleResult<ModelStatisticsVo> getStatistics(
+      @Parameter(description = "模型ID") @RequestParam(required = false) Long id,
+      @Parameter(description = "统计周期") @RequestParam(required = false) StatisticsPeriod period) {
+    return ApiLocaleResult.success(modelFacade.getStatistics(id, period));
   }
 
 }

@@ -1,14 +1,19 @@
 package cloud.xcan.angus.core.ai.application.cmd.model.impl;
 
+import static cloud.xcan.angus.spec.utils.ObjectUtils.emptySafe;
+import static cloud.xcan.angus.spec.utils.ObjectUtils.nullSafe;
+
 import cloud.xcan.angus.core.ai.application.cmd.model.ModelCmd;
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.domain.model.Model;
 import cloud.xcan.angus.core.ai.domain.model.ModelRepo;
 import cloud.xcan.angus.core.ai.domain.model.ModelStatus;
 import cloud.xcan.angus.core.ai.infra.ai.model.ModelConfig;
+import cloud.xcan.angus.core.ai.infra.ai.model.ModelProvider;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
+import cloud.xcan.angus.remote.message.SysException;
 import cloud.xcan.angus.remote.message.http.ResourceExisted;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import cloud.xcan.angus.spec.annotations.DoInFuture;
@@ -16,6 +21,8 @@ import cloud.xcan.angus.spec.utils.ObjectUtils;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import cloud.xcan.angus.core.ai.infra.ai.model.LocalModelManager;
 
 @DoInFuture("添加权限校验")
 @Service
@@ -27,6 +34,9 @@ public class ModelCmdImpl extends CommCmd<Model, Long> implements ModelCmd {
   @Resource
   private ModelQuery modelQuery;
 
+  @Resource
+  private LocalModelManager localModelManager;
+
   @Override
   @Transactional
   public Model create(Model model) {
@@ -34,8 +44,9 @@ public class ModelCmdImpl extends CommCmd<Model, Long> implements ModelCmd {
       @Override
       protected void checkParams() {
         // 检查名称是否已存在
-        if (modelQuery.existsByName(model.getName())) {
-          throw ResourceExisted.of("模型名称「{0}」已存在", new Object[]{model.getName()});
+        if (modelQuery.existsByNameAndVersion(model.getName(), model.getVersion())) {
+          throw ResourceExisted.of("模型「{0} {1}」已存在",
+              new Object[]{model.getName(), model.getVersion()});
         }
       }
 
@@ -57,14 +68,15 @@ public class ModelCmdImpl extends CommCmd<Model, Long> implements ModelCmd {
       protected void checkParams() {
         // 获取模型并验证是否存在
         modelDb = modelQuery.findAndCheck(model.getId());
-        if (modelDb == null) {
-          throw ResourceNotFound.of("模型不存在", new Object[]{});
-        }
 
         // 检查名称是否已存在（排除当前模型）
+        String actualName = nullSafe(model.getName(), modelDb.getName());
+        String actualVersion = nullSafe(model.getVersion(), modelDb.getVersion());
         if (ObjectUtils.isNotEmpty(model.getName())
-            && modelQuery.existsByNameAndIdNot(model.getName(), modelDb.getId())) {
-          throw ResourceExisted.of("模型名称「{0}」已存在", new Object[]{model.getName()});
+            && modelQuery.existsByNameAndVersionAndIdNot(actualName, actualVersion,
+            modelDb.getId())) {
+          throw ResourceExisted.of("模型「{0} {1}」已存在",
+              new Object[]{actualName, actualVersion});
         }
       }
 
@@ -86,13 +98,23 @@ public class ModelCmdImpl extends CommCmd<Model, Long> implements ModelCmd {
       protected void checkParams() {
         // 获取模型并验证是否存在
         modelDb = modelQuery.findAndCheck(id);
-        if (modelDb == null) {
-          throw ResourceNotFound.of("模型不存在", new Object[]{});
+
+        // 检查名称是否已存在（排除当前模型）
+        if (ObjectUtils.isNotEmpty(config.getModelName())
+            && modelQuery.existsByNameAndVersionAndIdNot(config.getModelName(),
+            config.getVersion(), modelDb.getId())) {
+          throw ResourceExisted.of("模型「{0} {1}」已存在",
+              new Object[]{config.getModelName(), config.getVersion()});
         }
       }
 
       @Override
       protected Model process() {
+        modelDb.setName(config.getModelName());
+        modelDb.setDescription(emptySafe(config.getDescription(), modelDb.getDescription()));
+        modelDb.setType(config.getModelType());
+        modelDb.setProvider(config.getProvider());
+        modelDb.setVersion(config.getVersion());
         modelDb.setConfig(config);
         return modelRepo.save(modelDb);
       }
@@ -108,14 +130,18 @@ public class ModelCmdImpl extends CommCmd<Model, Long> implements ModelCmd {
       protected void checkParams() {
         // 获取模型并验证是否存在
         modelDb = modelQuery.findAndCheck(id);
-        if (modelDb == null) {
-          throw ResourceNotFound.of("模型不存在", new Object[]{});
-        }
       }
 
       @Override
       protected Model process() {
-        modelDb.setStatus(ModelStatus.DEPLOYING);
+        if (modelDb.getProvider().equals(ModelProvider.LOCAL)) {
+          try {
+            localModelManager.startLocalModel(modelDb.getId(), modelDb.getConfig());
+          } catch (Exception e) {
+            throw new SysException("启动本地模型失败: " + e.getMessage(), e);
+          }
+        }
+        modelDb.setStatus(ModelStatus.RUNNING);
         return modelRepo.save(modelDb);
       }
     }.execute();
@@ -130,13 +156,17 @@ public class ModelCmdImpl extends CommCmd<Model, Long> implements ModelCmd {
       protected void checkParams() {
         // 获取模型并验证是否存在
         modelDb = modelQuery.findAndCheck(id);
-        if (modelDb == null) {
-          throw ResourceNotFound.of("模型不存在", new Object[]{});
-        }
       }
 
       @Override
       protected Model process() {
+        if (modelDb.getProvider().equals(ModelProvider.LOCAL)) {
+          try {
+            localModelManager.stopLocalModel(modelDb.getId(), Boolean.TRUE.equals(graceful));
+          } catch (Exception e) {
+            throw new SysException("停止本地模型失败: " + e.getMessage(), e);
+          }
+        }
         modelDb.setStatus(ModelStatus.STOPPED);
         return modelRepo.save(modelDb);
       }
@@ -152,14 +182,18 @@ public class ModelCmdImpl extends CommCmd<Model, Long> implements ModelCmd {
       protected void checkParams() {
         // 获取模型并验证是否存在
         modelDb = modelQuery.findAndCheck(id);
-        if (modelDb == null) {
-          throw ResourceNotFound.of("模型不存在", new Object[]{});
-        }
       }
 
       @Override
       protected Model process() {
-        modelDb.setStatus(ModelStatus.DEPLOYING);
+        if (modelDb.getProvider().equals(ModelProvider.LOCAL)) {
+          try {
+            localModelManager.restartLocalModel(modelDb.getId(), modelDb.getConfig());
+          } catch (Exception e) {
+            throw new RuntimeException("重启本地模型失败: " + e.getMessage(), e);
+          }
+        }
+        modelDb.setStatus(ModelStatus.RUNNING);
         return modelRepo.save(modelDb);
       }
     }.execute();
@@ -188,118 +222,6 @@ public class ModelCmdImpl extends CommCmd<Model, Long> implements ModelCmd {
   }
 
   @Override
-  public Model updateStatus(Long id, String status) {
-    return new BizTemplate<Model>() {
-      Model modelDb;
-
-      @Override
-      protected void checkParams() {
-        // 获取模型并验证是否存在
-        modelDb = modelQuery.findAndCheck(id);
-        if (modelDb == null) {
-          throw ResourceNotFound.of("模型不存在", new Object[]{});
-        }
-      }
-
-      @Override
-      protected Model process() {
-        modelDb.setStatus(ModelStatus.valueOf(status));
-        return modelRepo.save(modelDb);
-      }
-    }.execute();
-  }
-
-  @Override
-  public void recordCall(Long id, Long tokens, Double cost, Long responseTime) {
-    new BizTemplate<Void>() {
-      Model modelDb;
-
-      @Override
-      protected void checkParams() {
-        // 获取模型并验证是否存在
-        modelDb = modelQuery.findAndCheck(id);
-        if (modelDb == null) {
-          throw ResourceNotFound.of("模型不存在", new Object[]{});
-        }
-      }
-
-      @Override
-      protected Void process() {
-        modelDb.setTotalCalls(modelDb.getTotalCalls() + 1);
-        modelDb.setTotalTokens(modelDb.getTotalTokens() + tokens);
-        modelDb.setTotalCost(modelDb.getTotalCost() + cost);
-        modelDb.setAvgResponseTime((modelDb.getAvgResponseTime() + responseTime) / 2);
-        modelRepo.save(modelDb);
-        return null;
-      }
-    }.execute();
-  }
-
-  @Override
-  public void updateMetrics(Long id, Double latency, Double throughput, Double accuracy) {
-    new BizTemplate<Void>() {
-      Model modelDb;
-
-      @Override
-      protected void checkParams() {
-        // 获取模型并验证是否存在
-        modelDb = modelQuery.findAndCheck(id);
-        if (modelDb == null) {
-          throw ResourceNotFound.of("模型不存在", new Object[]{});
-        }
-      }
-
-      @Override
-      protected Void process() {
-        modelDb.setLatencyMs(latency);
-        modelDb.setThroughputRaw(throughput);
-        modelDb.setAccuracyPercent(accuracy);
-        modelRepo.save(modelDb);
-        return null;
-      }
-    }.execute();
-  }
-
-  @Override
-  public void batchStart(Long[] ids) {
-    for (Long id : ids) {
-      start(id);
-    }
-  }
-
-  @Override
-  public void batchStop(Long[] ids, Boolean graceful) {
-    for (Long id : ids) {
-      stop(id, graceful);
-    }
-  }
-
-  @Override
-  public void batchRestart(Long[] ids) {
-    for (Long id : ids) {
-      restart(id);
-    }
-  }
-
-  @Override
-  public void batchDelete(Long[] ids) {
-    for (Long id : ids) {
-      delete(id);
-    }
-  }
-
-  @Override
-  public Model importConfig(String configJson) {
-    // TODO: 实现导入逻辑
-    return new Model();
-  }
-
-  @Override
-  public void cleanupResources(Long id) {
-    // TODO: 实现资源清理逻辑
-  }
-
-  @Override
   @Transactional
   public void delete(Long id) {
     new BizTemplate<Void>() {
@@ -309,28 +231,6 @@ public class ModelCmdImpl extends CommCmd<Model, Long> implements ModelCmd {
         return null;
       }
     }.execute();
-  }
-
-  @Override
-  public String exportConfig(Long id) {
-    Model model = modelRepo.findById(id);
-    if (model != null) {
-      // TODO: 实现导出逻辑
-      return "{}";
-    }
-    return null;
-  }
-
-  @Override
-  public boolean validateConfig(ModelConfig config) {
-    // TODO: 实现配置验证逻辑
-    return true;
-  }
-
-  @Override
-  public boolean checkDependencies(Long id) {
-    // TODO: 实现依赖检查逻辑
-    return true;
   }
 
   @Override

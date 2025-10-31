@@ -6,7 +6,6 @@ import cloud.xcan.angus.spec.locale.EnumMessage;
 @EndpointRegister
 public enum ModelStatus implements EnumMessage<String> {
   STOPPED,       // 已停止
-  DEPLOYING,     // 部署中
   RUNNING,       // 运行中
   ERROR;         // 错误
 

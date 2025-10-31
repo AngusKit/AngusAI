@@ -50,7 +50,7 @@ public class PluginCmdImpl extends CommCmd<Plugin, Long> implements PluginCmd {
       protected void checkParams() {
         // 检查名称和版本是否重复
         if (pluginQuery.existsByNameAndVersion(plugin.getName(), plugin.getVersion())) {
-          throw ResourceExisted.of("插件「{0}」「{1}」已存在",
+          throw ResourceExisted.of("插件「{0} {1}」已存在",
               new Object[]{plugin.getName(), plugin.getVersion()});
         }
       }
@@ -90,7 +90,7 @@ public class PluginCmdImpl extends CommCmd<Plugin, Long> implements PluginCmd {
         if ((isNotEmpty(plugin.getName()) || isNotEmpty(plugin.getVersion()))
             && pluginQuery.existsByNameAndVersionAndIdNot(actualName,
             actualVersion, pluginDb.getId())) {
-          throw ResourceExisted.of("插件「{0}「{1}」已存在", new Object[]{actualName, actualVersion});
+          throw ResourceExisted.of("插件「{0} {1}」已存在", new Object[]{actualName, actualVersion});
         }
       }
 

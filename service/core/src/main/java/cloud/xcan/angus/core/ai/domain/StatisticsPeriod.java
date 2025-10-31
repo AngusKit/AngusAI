@@ -1,4 +1,4 @@
-package cloud.xcan.angus.core.ai.domain.plugin;
+package cloud.xcan.angus.core.ai.domain;
 
 /**
  * 统计周期

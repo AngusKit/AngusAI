@@ -30,7 +30,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Setter
 @Getter
 @Accessors(chain = true)
-@Schema(description = "插件事件记录（安装/下载/访问）")
 public class PluginRecord extends EntitySupport<PluginRecord, Long> {
 
   @Id
