@@ -3,6 +3,7 @@ package cloud.xcan.angus.core.ai.domain.plugin;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.NoRepositoryBean;
 
@@ -21,4 +22,7 @@ public interface PluginRecordRepo extends BaseRepository<PluginRecord, Long> {
 
   @Query("select count(r) from PluginRecord r where r.pluginId = ?1 and r.type = ?2")
   Long countByPluginIdAndType(Long pluginId, PluginRecordType type);
+
+  @Modifying
+  void deleteByPluginId(Long id);
 }

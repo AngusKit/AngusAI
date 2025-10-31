@@ -3,6 +3,7 @@ package cloud.xcan.angus.core.ai.domain.plugin;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.NoRepositoryBean;
 
@@ -19,4 +20,7 @@ public interface PluginReviewRepo extends BaseRepository<PluginReview, Long> {
 
   @Query("select count(r) from PluginReview r where r.createdDate between ?1 and ?2")
   Long countByCreatedDateBetween(LocalDateTime start, LocalDateTime end);
+
+  @Modifying
+  void deleteByPluginId(Long id);
 }

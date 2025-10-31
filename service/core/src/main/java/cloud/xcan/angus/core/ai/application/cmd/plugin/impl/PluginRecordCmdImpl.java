@@ -28,6 +28,10 @@ public class PluginRecordCmdImpl extends CommCmd<PluginRecord, Long> implements 
     }
   }
 
+  @Override
+  public void deleteByPluginId(Long id) {
+    pluginRecordRepo.deleteByPluginId(id);
+  }
 
   @Override
   protected BaseRepository<PluginRecord, Long> getRepository() {

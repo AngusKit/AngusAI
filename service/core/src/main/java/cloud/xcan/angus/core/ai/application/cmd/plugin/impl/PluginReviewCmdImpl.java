@@ -4,13 +4,11 @@ import cloud.xcan.angus.core.ai.application.cmd.plugin.PluginCmd;
 import cloud.xcan.angus.core.ai.application.cmd.plugin.PluginReviewCmd;
 import cloud.xcan.angus.core.ai.application.query.plugin.PluginQuery;
 import cloud.xcan.angus.core.ai.domain.plugin.Plugin;
-import cloud.xcan.angus.core.ai.domain.plugin.PluginRepo;
 import cloud.xcan.angus.core.ai.domain.plugin.PluginReview;
 import cloud.xcan.angus.core.ai.domain.plugin.PluginReviewRepo;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
-import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,6 +50,11 @@ public class PluginReviewCmdImpl extends CommCmd<PluginReview, Long> implements 
         return review;
       }
     }.execute();
+  }
+
+  @Override
+  public void deleteByPluginId(Long id) {
+    pluginReviewRepo.deleteByPluginId(id);
   }
 
   @Override

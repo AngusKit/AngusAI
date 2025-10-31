@@ -6,4 +6,6 @@ public interface PluginRecordCmd {
 
   // Helper to persist plugin event record
   void recordPluginEvent(Long pluginId, PluginRecordType type);
+
+  void deleteByPluginId(Long id);
 }

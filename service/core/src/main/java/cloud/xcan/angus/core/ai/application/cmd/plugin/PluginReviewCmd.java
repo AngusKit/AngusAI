@@ -5,4 +5,6 @@ import cloud.xcan.angus.core.ai.domain.plugin.PluginReview;
 public interface PluginReviewCmd {
 
   PluginReview create(PluginReview review);
+
+  void deleteByPluginId(Long id);
 }

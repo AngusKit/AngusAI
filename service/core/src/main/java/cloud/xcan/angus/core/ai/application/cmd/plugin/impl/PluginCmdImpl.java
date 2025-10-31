@@ -5,10 +5,10 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 import cloud.xcan.angus.core.ai.application.cmd.plugin.PluginCmd;
 import cloud.xcan.angus.core.ai.application.cmd.plugin.PluginRecordCmd;
+import cloud.xcan.angus.core.ai.application.cmd.plugin.PluginReviewCmd;
 import cloud.xcan.angus.core.ai.application.query.plugin.PluginQuery;
 import cloud.xcan.angus.core.ai.domain.plugin.Plugin;
 import cloud.xcan.angus.core.ai.domain.plugin.PluginCategory;
-import cloud.xcan.angus.core.ai.domain.plugin.PluginFavoritesRepo;
 import cloud.xcan.angus.core.ai.domain.plugin.PluginRecordType;
 import cloud.xcan.angus.core.ai.domain.plugin.PluginRepo;
 import cloud.xcan.angus.core.ai.domain.plugin.PluginStatus;
@@ -35,6 +35,9 @@ public class PluginCmdImpl extends CommCmd<Plugin, Long> implements PluginCmd {
 
   @Resource
   private PluginRecordCmd pluginRecordCmd;
+
+  @Resource
+  private PluginReviewCmd pluginReviewCmd;
 
   @Resource
   private PluginQuery pluginQuery;
@@ -287,7 +290,8 @@ public class PluginCmdImpl extends CommCmd<Plugin, Long> implements PluginCmd {
 
         // 删除插件记录
         pluginRepo.deleteById(id);
-        pluginFavoritesRepo.deleteByPluginId(id);
+        pluginRecordCmd.deleteByPluginId(id);
+        pluginReviewCmd.deleteByPluginId(id);
         return null;
       }
     }.execute();
