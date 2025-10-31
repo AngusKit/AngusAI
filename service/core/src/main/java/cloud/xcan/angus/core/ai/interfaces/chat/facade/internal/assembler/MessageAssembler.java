@@ -6,11 +6,8 @@ import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.MessageFindDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.MessageSendDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.MessageVo;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
-import cloud.xcan.angus.core.utils.CoreUtils;
 import cloud.xcan.angus.remote.search.SearchCriteria;
 import org.springframework.util.StringUtils;
-
-import java.util.stream.Collectors;
 
 /**
  * Message转换器
@@ -26,11 +23,11 @@ public class MessageAssembler {
     message.setRole(MessageRole.USER);
     message.setContent(dto.getContent());
     message.setIsStreaming(false);
-    
+
     if (dto.getAttachments() != null && !dto.getAttachments().isEmpty()) {
       message.setAttachments(dto.getAttachments());
     }
-    
+
     return message;
   }
 
@@ -53,7 +50,7 @@ public class MessageAssembler {
     if (message == null) {
       return null;
     }
-    
+
     MessageVo vo = new MessageVo();
     vo.setId(message.identity());
     vo.setSessionId(message.getSessionId());
@@ -62,11 +59,11 @@ public class MessageAssembler {
     vo.setAttachments(message.getAttachments());
     vo.setUsage(message.getUsage());
     vo.setIsStreaming(message.getIsStreaming());
-    
+
     if (message.getCreatedDate() != null) {
       vo.setDatetime(message.getCreatedDate().getTime());
     }
-    
+
     return vo;
   }
 
@@ -75,13 +72,13 @@ public class MessageAssembler {
    */
   public static GenericSpecification<Message> getSpecification(MessageFindDto dto, Long sessionId) {
     GenericSpecification<Message> spec = new GenericSpecification<>();
-    
+
     spec.add(new SearchCriteria("sessionId", ":", sessionId));
-    
+
     if (StringUtils.hasText(dto.getKeyword())) {
       spec.add(new SearchCriteria("content", "~", dto.getKeyword()));
     }
-    
+
     return spec;
   }
 }

@@ -6,11 +6,6 @@ import cloud.xcan.angus.core.ai.domain.chat.MessageAttachment;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import jakarta.annotation.Resource;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,6 +14,10 @@ import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 文件存储服务
@@ -140,7 +139,7 @@ public class FileStorageService {
                 if (filename.contains("/")) {
                     actualFilename = filename.substring(filename.lastIndexOf("/") + 1);
                 }
-                
+
                 return attachmentRepo.findByPathContaining(actualFilename)
                     .stream()
                     .findFirst()

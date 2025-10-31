@@ -11,7 +11,6 @@ import cloud.xcan.angus.core.ai.domain.activity.ActivityListRepo;
 import cloud.xcan.angus.core.ai.domain.activity.ActivityRepo;
 import cloud.xcan.angus.core.ai.domain.activity.ActivitySearchRepo;
 import cloud.xcan.angus.core.ai.domain.activity.ActivitySummary;
-import cloud.xcan.angus.core.biz.Biz;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.core.jpa.repository.summary.SummaryQueryRegister;

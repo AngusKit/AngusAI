@@ -1,10 +1,8 @@
 package cloud.xcan.angus.core.ai.domain.settings.apikey;
 
 import cloud.xcan.angus.core.jpa.multitenancy.TenantEntity;
-import cloud.xcan.angus.core.jpa.multitenancy.TenantListener;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;

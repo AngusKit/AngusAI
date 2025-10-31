@@ -1,7 +1,6 @@
 package cloud.xcan.angus.core.ai.application.cmd.plugin;
 
 import cloud.xcan.angus.core.ai.domain.plugin.Plugin;
-import cloud.xcan.angus.core.ai.domain.plugin.PluginConfig;
 import cloud.xcan.angus.core.ai.domain.plugin.PluginStatus;
 
 public interface PluginCmd {
@@ -17,19 +16,9 @@ public interface PluginCmd {
   Plugin update(Plugin plugin);
 
   /**
-   * 更新插件配置
-   */
-  Plugin updateConfig(Long id, PluginConfig config);
-
-  /**
    * 修改插件状态
    */
   Plugin modifyStatus(Long id, PluginStatus status);
-
-  /**
-   * 复制插件
-   */
-  Plugin duplicate(Long sourceId, String name, Boolean copyConfig, Boolean copyPermissions, Boolean copyTags);
 
   /**
    * 收藏/取消收藏插件

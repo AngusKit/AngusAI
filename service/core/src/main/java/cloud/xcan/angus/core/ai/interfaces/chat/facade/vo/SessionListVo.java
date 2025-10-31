@@ -2,9 +2,8 @@ package cloud.xcan.angus.core.ai.interfaces.chat.facade.vo;
 
 import cloud.xcan.angus.core.ai.domain.chat.MessageRole;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-
 import java.util.Date;
+import lombok.Data;
 
 /**
  * 会话列表VO

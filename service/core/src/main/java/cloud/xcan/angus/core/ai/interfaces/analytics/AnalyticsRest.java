@@ -2,7 +2,14 @@ package cloud.xcan.angus.core.ai.interfaces.analytics;
 
 import cloud.xcan.angus.core.ai.interfaces.analytics.facade.AnalyticsFacade;
 import cloud.xcan.angus.core.ai.interfaces.analytics.facade.dto.AnalyticsQueryDto;
-import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.*;
+import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.AnalyticsOverviewVo;
+import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.ApiCallsTrendVo;
+import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.AppDistributionVo;
+import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.ErrorAnalysisVo;
+import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.ModelDistributionVo;
+import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.ResponseTimeAnalysisVo;
+import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.TokenUsageTrendVo;
+import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.TopEndpointsVo;
 import cloud.xcan.angus.remote.ApiLocaleResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

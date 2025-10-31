@@ -4,9 +4,8 @@ import cloud.xcan.angus.core.ai.domain.chat.MessageAttachment;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRole;
 import cloud.xcan.angus.core.ai.domain.chat.MessageUsage;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-
 import java.util.List;
+import lombok.Data;
 
 /**
  * 消息VO

@@ -1,11 +1,9 @@
 package cloud.xcan.angus.core.ai.domain.plugin;
 
 import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
-import cloud.xcan.angus.core.jpa.multitenancy.TenantListener;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
@@ -32,9 +30,6 @@ public class Plugin extends TenantAuditingEntity<Plugin, Long> {
   @Column(name = "name", nullable = false, length = 100)
   private String name;
 
-  @Column(name = "name_en", length = 100)
-  private String nameEn;
-
   @Column(name = "icon")
   private String icon;
 
@@ -59,20 +54,10 @@ public class Plugin extends TenantAuditingEntity<Plugin, Long> {
   @Column(name = "type", nullable = false)
   private PluginType type;
 
-  // 插件详细配置（JSON格式存储）
-  @Type(JsonType.class)
-  @Column(columnDefinition = "json", name = "config")
-  private PluginConfig config;
-
-  // 权限配置（JSON格式存储）
-  @Type(JsonType.class)
-  @Column(columnDefinition = "json", name = "permissions")
-  private PluginPermissions permissions;
-
   // 标签
   @Type(JsonType.class)
   @Column(columnDefinition = "json", name = "tags")
-  private java.util.List<PluginTag> tags;
+  private java.util.List<String> tags;
 
   // 统计数据
   @Column(name = "install_count")
@@ -140,7 +125,7 @@ public class Plugin extends TenantAuditingEntity<Plugin, Long> {
   private String currency = "CNY";
 
   @Override
-  public Long fetchId() {
+  public Long identity() {
     return id;
   }
 }

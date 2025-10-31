@@ -1,7 +1,6 @@
 package cloud.xcan.angus.core.ai.application.query.settings.impl;
 
 import cloud.xcan.angus.core.ai.application.query.settings.ResourceSharingQuery;
-import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.SharePermission;
 import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.ResourceSharing;
 import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.ResourceSharingAccessLog;
 import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.ResourceSharingAccessLogRepo;
@@ -10,6 +9,7 @@ import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.ResourceSharingM
 import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.ResourceSharingRepo;
 import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.ResourceType;
 import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.ShareAction;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.SharePermission;
 import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.SharedWith;
 import cloud.xcan.angus.core.ai.interfaces.settings.facade.dto.ResourceSharingFindDto;
 import jakarta.annotation.Resource;

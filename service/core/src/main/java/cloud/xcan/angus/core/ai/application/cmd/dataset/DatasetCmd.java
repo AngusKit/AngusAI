@@ -1,8 +1,8 @@
 package cloud.xcan.angus.core.ai.application.cmd.dataset;
 
-import cloud.xcan.angus.core.ai.infra.util.DatasourceUtils.ConnectionTestResult;
 import cloud.xcan.angus.core.ai.domain.dataset.Dataset;
 import cloud.xcan.angus.core.ai.domain.dataset.DatasourceConfig;
+import cloud.xcan.angus.core.ai.infra.util.DatasourceUtils.ConnectionTestResult;
 
 public interface DatasetCmd {
 

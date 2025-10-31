@@ -1,11 +1,9 @@
 package cloud.xcan.angus.core.ai.interfaces.plugin.facade.dto;
 
 import cloud.xcan.angus.core.ai.domain.plugin.PluginCategory;
-import cloud.xcan.angus.core.ai.domain.plugin.PluginConfig;
-import cloud.xcan.angus.core.ai.domain.plugin.PluginPermissions;
-import cloud.xcan.angus.core.ai.domain.plugin.PluginTag;
 import cloud.xcan.angus.core.ai.domain.plugin.PluginType;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
@@ -16,14 +14,10 @@ import org.hibernate.validator.constraints.Length;
 @Schema(description = "创建插件请求参数")
 public class PluginCreateDto {
 
-  @NotBlank(message = "插件名称不能为空")
+  @NotBlank
   @Length(max = 100)
-  @Schema(description = "插件名称", example = "天气查询插件", required = true)
+  @Schema(description = "插件名称", example = "天气查询插件", requiredMode = RequiredMode.REQUIRED)
   private String name;
-
-  @Length(max = 100)
-  @Schema(description = "插件英文名称", example = "Weather Plugin")
-  private String nameEn;
 
   @Schema(description = "插件图标", example = "🌤️")
   private String icon;
@@ -36,27 +30,21 @@ public class PluginCreateDto {
   @Schema(description = "作者", example = "XCan")
   private String author;
 
-  @NotBlank(message = "版本号不能为空")
+  @NotBlank
   @Length(max = 20)
-  @Schema(description = "版本号", example = "1.0.0", required = true)
+  @Schema(description = "版本号", example = "1.0.0", requiredMode = RequiredMode.REQUIRED)
   private String version;
 
   @NotNull(message = "插件分类不能为空")
-  @Schema(description = "插件分类", required = true)
+  @Schema(description = "插件分类", requiredMode = RequiredMode.REQUIRED)
   private PluginCategory category;
 
   @NotNull(message = "插件类型不能为空")
-  @Schema(description = "插件类型", required = true)
+  @Schema(description = "插件类型", requiredMode = RequiredMode.REQUIRED)
   private PluginType type;
 
-  @Schema(description = "插件配置")
-  private PluginConfig config;
-
-  @Schema(description = "权限配置")
-  private PluginPermissions permissions;
-
   @Schema(description = "标签列表")
-  private List<PluginTag> tags;
+  private List<String> tags;
 
   @Schema(description = "是否公开", example = "false")
   private Boolean isPublic = false;

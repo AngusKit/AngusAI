@@ -6,14 +6,11 @@ import static cloud.xcan.angus.core.utils.CoreUtils.buildVoPageResult;
 import cloud.xcan.angus.core.ai.application.cmd.plugin.PluginCmd;
 import cloud.xcan.angus.core.ai.application.query.plugin.PluginQuery;
 import cloud.xcan.angus.core.ai.domain.plugin.Plugin;
-import cloud.xcan.angus.core.ai.domain.plugin.PluginConfig;
 import cloud.xcan.angus.core.ai.domain.plugin.PluginStatus;
 import cloud.xcan.angus.core.ai.interfaces.plugin.facade.PluginFacade;
 import cloud.xcan.angus.core.ai.interfaces.plugin.facade.dto.PluginCreateDto;
-import cloud.xcan.angus.core.ai.interfaces.plugin.facade.dto.PluginDuplicateDto;
 import cloud.xcan.angus.core.ai.interfaces.plugin.facade.dto.PluginFavoriteDto;
 import cloud.xcan.angus.core.ai.interfaces.plugin.facade.dto.PluginFindDto;
-import cloud.xcan.angus.core.ai.interfaces.plugin.facade.dto.PluginInstallDto;
 import cloud.xcan.angus.core.ai.interfaces.plugin.facade.dto.PluginUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.plugin.facade.internal.assembler.PluginAssembler;
 import cloud.xcan.angus.core.ai.interfaces.plugin.facade.vo.PluginDetailVo;
@@ -51,21 +48,8 @@ public class PluginFacadeImpl implements PluginFacade {
   }
 
   @Override
-  public PluginDetailVo updateConfig(Long id, PluginConfig config) {
-    Plugin saved = pluginCmd.updateConfig(id, config);
-    return PluginAssembler.toDetailVo(saved);
-  }
-
-  @Override
   public PluginDetailVo modifyStatus(Long id, PluginStatus status) {
     Plugin saved = pluginCmd.modifyStatus(id, status);
-    return PluginAssembler.toDetailVo(saved);
-  }
-
-  @Override
-  public PluginDetailVo duplicate(Long id, PluginDuplicateDto dto) {
-    Plugin saved = pluginCmd.duplicate(id, dto.getName(), dto.getCopyConfig(), 
-        dto.getCopyPermissions(), dto.getCopyTags());
     return PluginAssembler.toDetailVo(saved);
   }
 
@@ -76,8 +60,7 @@ public class PluginFacadeImpl implements PluginFacade {
   }
 
   @Override
-  public PluginDetailVo install(Long id, PluginInstallDto dto) {
-    // TODO: 处理安装配置
+  public PluginDetailVo install(Long id) {
     Plugin saved = pluginCmd.install(id);
     return PluginAssembler.toDetailVo(saved);
   }
@@ -124,13 +107,6 @@ public class PluginFacadeImpl implements PluginFacade {
     Page<Plugin> page = pluginQuery.find(spec, dto.tranPage(),
         dto.fullTextSearch, getMatchSearchFields(dto.getClass()));
     return buildVoPageResult(page, PluginAssembler::toListVo);
-  }
-
-  @NameJoin
-  @Override
-  public PageResult<PluginListVo> search(String keyword, PluginFindDto dto) {
-    dto.setKeyword(keyword);
-    return list(dto);
   }
 
   @NameJoin

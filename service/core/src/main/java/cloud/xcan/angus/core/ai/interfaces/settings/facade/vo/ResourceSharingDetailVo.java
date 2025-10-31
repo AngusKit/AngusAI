@@ -1,7 +1,7 @@
 package cloud.xcan.angus.core.ai.interfaces.settings.facade.vo;
 
-import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.SharePermission;
 import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.ResourceType;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.SharePermission;
 import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.SharedWith;
 import cloud.xcan.angus.remote.NameJoinField;
 import io.swagger.v3.oas.annotations.media.Schema;

@@ -12,7 +12,6 @@ import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelMetricsVo;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelStatisticsVo;
 import cloud.xcan.angus.remote.ApiLocaleResult;
 import cloud.xcan.angus.remote.PageResult;
-import cloud.xcan.angus.spec.annotations.DoInFuture;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

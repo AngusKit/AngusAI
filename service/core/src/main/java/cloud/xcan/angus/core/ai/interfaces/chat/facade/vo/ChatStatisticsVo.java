@@ -1,10 +1,9 @@
 package cloud.xcan.angus.core.ai.interfaces.chat.facade.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-
 import java.math.BigDecimal;
 import java.util.List;
+import lombok.Data;
 
 /**
  * 对话统计VO

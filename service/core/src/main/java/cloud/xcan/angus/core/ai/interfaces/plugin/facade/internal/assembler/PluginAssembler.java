@@ -9,9 +9,6 @@ import cloud.xcan.angus.core.ai.interfaces.plugin.facade.vo.PluginDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.plugin.facade.vo.PluginDetailVo.PluginStatsVo;
 import cloud.xcan.angus.core.ai.interfaces.plugin.facade.vo.PluginListVo;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
-import cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder;
-import cloud.xcan.angus.core.utils.CoreUtils;
-import cloud.xcan.angus.remote.search.SearchCriteria;
 import org.springframework.util.StringUtils;
 
 public class PluginAssembler {
@@ -19,7 +16,6 @@ public class PluginAssembler {
   public static Plugin toDomain(PluginCreateDto dto) {
     return new Plugin()
         .setName(dto.getName())
-        .setNameEn(dto.getNameEn())
         .setIcon(dto.getIcon())
         .setDescription(dto.getDescription())
         .setAuthor(dto.getAuthor())
@@ -27,8 +23,6 @@ public class PluginAssembler {
         .setCategory(dto.getCategory())
         .setType(dto.getType())
         .setStatus(PluginStatus.INACTIVE)
-        .setConfig(dto.getConfig())
-        .setPermissions(dto.getPermissions())
         .setTags(dto.getTags())
         .setIsPublic(dto.getIsPublic())
         .setMinVersion(dto.getMinVersion())
@@ -51,12 +45,9 @@ public class PluginAssembler {
   public static Plugin updateDomain(Long id, PluginUpdateDto dto) {
     Plugin plugin = new Plugin();
     plugin.setId(id);
-    
+
     if (StringUtils.hasText(dto.getName())) {
       plugin.setName(dto.getName());
-    }
-    if (StringUtils.hasText(dto.getNameEn())) {
-      plugin.setNameEn(dto.getNameEn());
     }
     if (StringUtils.hasText(dto.getIcon())) {
       plugin.setIcon(dto.getIcon());
@@ -78,12 +69,6 @@ public class PluginAssembler {
     }
     if (dto.getType() != null) {
       plugin.setType(dto.getType());
-    }
-    if (dto.getConfig() != null) {
-      plugin.setConfig(dto.getConfig());
-    }
-    if (dto.getPermissions() != null) {
-      plugin.setPermissions(dto.getPermissions());
     }
     if (dto.getTags() != null) {
       plugin.setTags(dto.getTags());
@@ -115,7 +100,7 @@ public class PluginAssembler {
     if (StringUtils.hasText(dto.getCurrency())) {
       plugin.setCurrency(dto.getCurrency());
     }
-    
+
     return plugin;
   }
 
@@ -123,7 +108,6 @@ public class PluginAssembler {
     PluginDetailVo vo = new PluginDetailVo();
     vo.setId(plugin.getId());
     vo.setName(plugin.getName());
-    vo.setNameEn(plugin.getNameEn());
     vo.setIcon(plugin.getIcon());
     vo.setDescription(plugin.getDescription());
     vo.setAuthor(plugin.getAuthor());
@@ -131,8 +115,6 @@ public class PluginAssembler {
     vo.setCategory(plugin.getCategory());
     vo.setStatus(plugin.getStatus());
     vo.setType(plugin.getType());
-    vo.setConfig(plugin.getConfig());
-    vo.setPermissions(plugin.getPermissions());
     vo.setTags(plugin.getTags());
     vo.setInstallCount(plugin.getInstallCount());
     vo.setUsageCount(plugin.getUsageCount());
@@ -174,7 +156,6 @@ public class PluginAssembler {
     PluginListVo vo = new PluginListVo();
     vo.setId(plugin.getId());
     vo.setName(plugin.getName());
-    vo.setNameEn(plugin.getNameEn());
     vo.setIcon(plugin.getIcon());
     vo.setDescription(plugin.getDescription());
     vo.setAuthor(plugin.getAuthor());
@@ -203,67 +184,9 @@ public class PluginAssembler {
   }
 
   public static GenericSpecification<Plugin> getSpecification(PluginFindDto dto) {
-    SearchCriteriaBuilder<Plugin> builder = new SearchCriteriaBuilder<>();
-
-    if (StringUtils.hasText(dto.getKeyword())) {
-      builder.addOr(SearchCriteria.like("name", dto.getKeyword()));
-      builder.addOr(SearchCriteria.like("description", dto.getKeyword()));
-    }
-
-    if (dto.getCategory() != null) {
-      builder.add(SearchCriteria.equal("category", dto.getCategory()));
-    }
-
-    if (dto.getStatus() != null) {
-      builder.add(SearchCriteria.equal("status", dto.getStatus()));
-    }
-
-    if (dto.getType() != null) {
-      builder.add(SearchCriteria.equal("type", dto.getType()));
-    }
-
-    if (dto.getIsPublic() != null) {
-      builder.add(SearchCriteria.equal("isPublic", dto.getIsPublic()));
-    }
-
-    if (dto.getIsSystem() != null) {
-      builder.add(SearchCriteria.equal("isSystem", dto.getIsSystem()));
-    }
-
-    if (dto.getIsVerified() != null) {
-      builder.add(SearchCriteria.equal("isVerified", dto.getIsVerified()));
-    }
-
-    if (dto.getIsFavorite() != null) {
-      builder.add(SearchCriteria.equal("isFavorite", dto.getIsFavorite()));
-    }
-
-    if (dto.getMinRating() != null) {
-      builder.add(SearchCriteria.greaterThanOrEqual("rating", dto.getMinRating()));
-    }
-
-    if (dto.getCreatedBy() != null) {
-      builder.add(SearchCriteria.equal("createdBy", dto.getCreatedBy()));
-    }
-
-    if (dto.getCreatedDateStart() != null) {
-      builder.add(SearchCriteria.greaterThanOrEqual("createdDate", dto.getCreatedDateStart()));
-    }
-
-    if (dto.getCreatedDateEnd() != null) {
-      builder.add(SearchCriteria.lessThanOrEqual("createdDate", dto.getCreatedDateEnd()));
-    }
-
-    if (dto.getModifiedBy() != null) {
-      builder.add(SearchCriteria.equal("modifiedBy", dto.getModifiedBy()));
-    }
-
-    if (dto.getModifiedDate() != null) {
-      builder.add(SearchCriteria.equal("modifiedDate", dto.getModifiedDate()));
-    }
 
     // TODO: 标签搜索需要特殊处理JSON字段
 
-    return builder.build();
+    return null;
   }
 }

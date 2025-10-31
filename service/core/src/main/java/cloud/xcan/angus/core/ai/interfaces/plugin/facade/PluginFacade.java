@@ -1,12 +1,9 @@
 package cloud.xcan.angus.core.ai.interfaces.plugin.facade;
 
-import cloud.xcan.angus.core.ai.domain.plugin.PluginConfig;
 import cloud.xcan.angus.core.ai.domain.plugin.PluginStatus;
 import cloud.xcan.angus.core.ai.interfaces.plugin.facade.dto.PluginCreateDto;
-import cloud.xcan.angus.core.ai.interfaces.plugin.facade.dto.PluginDuplicateDto;
 import cloud.xcan.angus.core.ai.interfaces.plugin.facade.dto.PluginFavoriteDto;
 import cloud.xcan.angus.core.ai.interfaces.plugin.facade.dto.PluginFindDto;
-import cloud.xcan.angus.core.ai.interfaces.plugin.facade.dto.PluginInstallDto;
 import cloud.xcan.angus.core.ai.interfaces.plugin.facade.dto.PluginUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.plugin.facade.vo.PluginDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.plugin.facade.vo.PluginListVo;
@@ -26,19 +23,9 @@ public interface PluginFacade {
   PluginDetailVo update(Long id, PluginUpdateDto dto);
 
   /**
-   * 更新插件配置
-   */
-  PluginDetailVo updateConfig(Long id, PluginConfig config);
-
-  /**
    * 修改插件状态
    */
   PluginDetailVo modifyStatus(Long id, PluginStatus status);
-
-  /**
-   * 复制插件
-   */
-  PluginDetailVo duplicate(Long id, PluginDuplicateDto dto);
 
   /**
    * 收藏/取消收藏插件
@@ -48,7 +35,7 @@ public interface PluginFacade {
   /**
    * 安装插件
    */
-  PluginDetailVo install(Long id, PluginInstallDto dto);
+  PluginDetailVo install(Long id);
 
   /**
    * 卸载插件
@@ -84,11 +71,6 @@ public interface PluginFacade {
    * 获取插件列表
    */
   PageResult<PluginListVo> list(PluginFindDto dto);
-
-  /**
-   * 搜索插件
-   */
-  PageResult<PluginListVo> search(String keyword, PluginFindDto dto);
 
   /**
    * 获取热门插件

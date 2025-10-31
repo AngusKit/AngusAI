@@ -1,9 +1,8 @@
 package cloud.xcan.angus.core.ai.interfaces.chat.facade.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-
 import java.util.List;
+import lombok.Data;
 
 /**
  * 批量删除DTO

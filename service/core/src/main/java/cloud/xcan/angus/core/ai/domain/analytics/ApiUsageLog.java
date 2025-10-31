@@ -1,10 +1,8 @@
 package cloud.xcan.angus.core.ai.domain.analytics;
 
 import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
-import cloud.xcan.angus.core.jpa.multitenancy.TenantListener;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;

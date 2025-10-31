@@ -1,13 +1,10 @@
 package cloud.xcan.angus.core.ai.interfaces.plugin;
 
-import cloud.xcan.angus.core.ai.domain.plugin.PluginConfig;
 import cloud.xcan.angus.core.ai.domain.plugin.PluginStatus;
 import cloud.xcan.angus.core.ai.interfaces.plugin.facade.PluginFacade;
 import cloud.xcan.angus.core.ai.interfaces.plugin.facade.dto.PluginCreateDto;
-import cloud.xcan.angus.core.ai.interfaces.plugin.facade.dto.PluginDuplicateDto;
 import cloud.xcan.angus.core.ai.interfaces.plugin.facade.dto.PluginFavoriteDto;
 import cloud.xcan.angus.core.ai.interfaces.plugin.facade.dto.PluginFindDto;
-import cloud.xcan.angus.core.ai.interfaces.plugin.facade.dto.PluginInstallDto;
 import cloud.xcan.angus.core.ai.interfaces.plugin.facade.dto.PluginUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.plugin.facade.vo.PluginDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.plugin.facade.vo.PluginListVo;
@@ -45,6 +42,7 @@ public class PluginRest {
   @Resource
   private PluginFacade pluginFacade;
 
+  // TODO 缺少插件文件字段
   @Operation(operationId = "createPlugin", summary = "创建插件", description = "创建新插件")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "201", description = "插件创建成功")
@@ -69,18 +67,6 @@ public class PluginRest {
     return ApiLocaleResult.success(pluginFacade.update(id, dto));
   }
 
-  @Operation(operationId = "updatePluginConfig", summary = "更新插件配置", description = "更新插件的详细配置")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "配置更新成功")
-  })
-  @ResponseStatus(HttpStatus.OK)
-  @PutMapping("/{id}/config")
-  public ApiLocaleResult<PluginDetailVo> updateConfig(
-      @Parameter(description = "插件ID") @PathVariable Long id,
-      @Valid @RequestBody PluginConfig config) {
-    return ApiLocaleResult.success(pluginFacade.updateConfig(id, config));
-  }
-
   @Operation(operationId = "modifyPluginStatus", summary = "修改插件状态", description = "修改插件状态")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "修改状态成功")
@@ -91,19 +77,6 @@ public class PluginRest {
       @Parameter(description = "插件ID") @PathVariable Long id,
       @Parameter(description = "插件状态") @RequestParam PluginStatus status) {
     return ApiLocaleResult.success(pluginFacade.modifyStatus(id, status));
-  }
-
-  @Operation(operationId = "duplicatePlugin", summary = "复制插件", description = "复制插件，包含配置")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "201", description = "复制成功")
-  })
-  @ResponseStatus(HttpStatus.CREATED)
-  @PostMapping("/{id}/duplicate")
-  public ApiLocaleResult<PluginDetailVo> duplicate(
-      @Parameter(description = "源插件ID") @PathVariable Long id,
-      @Valid @RequestBody PluginDuplicateDto dto) {
-    PluginDetailVo result = pluginFacade.duplicate(id, dto);
-    return ApiLocaleResult.success(result);
   }
 
   @Operation(operationId = "favoritePlugin", summary = "收藏/取消收藏插件", description = "收藏或取消收藏插件")
@@ -125,12 +98,8 @@ public class PluginRest {
   @ResponseStatus(HttpStatus.OK)
   @PostMapping("/{id}/install")
   public ApiLocaleResult<PluginDetailVo> install(
-      @Parameter(description = "插件ID") @PathVariable Long id,
-      @Valid @RequestBody(required = false) PluginInstallDto dto) {
-    if (dto == null) {
-      dto = new PluginInstallDto();
-    }
-    return ApiLocaleResult.success(pluginFacade.install(id, dto));
+      @Parameter(description = "插件ID") @PathVariable Long id) {
+    return ApiLocaleResult.success(pluginFacade.install(id));
   }
 
   @Operation(operationId = "uninstallPlugin", summary = "卸载插件", description = "卸载指定插件")
@@ -210,17 +179,6 @@ public class PluginRest {
   public ApiLocaleResult<PageResult<PluginListVo>> list(
       @Valid @ParameterObject PluginFindDto dto) {
     return ApiLocaleResult.success(pluginFacade.list(dto));
-  }
-
-  @Operation(operationId = "searchPlugins", summary = "搜索插件", description = "根据关键词搜索插件")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "搜索成功")
-  })
-  @GetMapping("/search")
-  public ApiLocaleResult<PageResult<PluginListVo>> search(
-      @Parameter(description = "搜索关键词") @RequestParam String keyword,
-      @Valid @ParameterObject PluginFindDto dto) {
-    return ApiLocaleResult.success(pluginFacade.search(keyword, dto));
   }
 
   @Operation(operationId = "getTrendingPlugins", summary = "获取热门插件", description = "获取热门/推荐插件")

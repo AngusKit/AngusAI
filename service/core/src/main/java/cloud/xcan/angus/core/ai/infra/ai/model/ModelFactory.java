@@ -4,7 +4,6 @@ import com.azure.ai.openai.OpenAIClient;
 import com.azure.ai.openai.OpenAIClientBuilder;
 import com.google.cloud.vertexai.VertexAI;
 import jakarta.annotation.Resource;
-import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

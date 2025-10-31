@@ -1,9 +1,9 @@
 package cloud.xcan.angus.core.ai.application.converter;
 
-import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.SharePermission;
 import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.ResourceSharing;
 import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.ResourceSharingMember;
 import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.ResourceType;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.SharePermission;
 import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.SharedWith;
 import cloud.xcan.angus.core.ai.interfaces.settings.facade.vo.ResourceSharingDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.settings.facade.vo.ResourceSharingListVo;

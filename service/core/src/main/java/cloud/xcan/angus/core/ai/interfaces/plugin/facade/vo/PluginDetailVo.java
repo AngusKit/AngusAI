@@ -1,29 +1,25 @@
 package cloud.xcan.angus.core.ai.interfaces.plugin.facade.vo;
 
 import cloud.xcan.angus.core.ai.domain.plugin.PluginCategory;
-import cloud.xcan.angus.core.ai.domain.plugin.PluginConfig;
-import cloud.xcan.angus.core.ai.domain.plugin.PluginPermissions;
 import cloud.xcan.angus.core.ai.domain.plugin.PluginStatus;
-import cloud.xcan.angus.core.ai.domain.plugin.PluginTag;
 import cloud.xcan.angus.core.ai.domain.plugin.PluginType;
-import cloud.xcan.angus.remote.NameJoinField;
+import cloud.xcan.angus.remote.vo.TenantAuditingVo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Schema(description = "插件详情")
-public class PluginDetailVo {
+public class PluginDetailVo extends TenantAuditingVo {
 
   @Schema(description = "插件ID")
   private Long id;
 
   @Schema(description = "插件名称")
   private String name;
-
-  @Schema(description = "插件英文名称")
-  private String nameEn;
 
   @Schema(description = "插件图标")
   private String icon;
@@ -46,14 +42,8 @@ public class PluginDetailVo {
   @Schema(description = "插件类型")
   private PluginType type;
 
-  @Schema(description = "插件配置")
-  private PluginConfig config;
-
-  @Schema(description = "权限配置")
-  private PluginPermissions permissions;
-
   @Schema(description = "标签列表")
-  private List<PluginTag> tags;
+  private List<String> tags;
 
   @Schema(description = "安装次数")
   private Long installCount;
@@ -102,28 +92,6 @@ public class PluginDetailVo {
 
   @Schema(description = "货币单位")
   private String currency;
-
-  @Schema(description = "租户ID")
-  private Long tenantId;
-
-  @Schema(description = "创建者ID")
-  private Long createdBy;
-
-  @Schema(description = "创建者姓名")
-  @NameJoinField(id = "createdBy", repository = "commonUserBaseRepo")
-  private String createdByName;
-
-  @Schema(description = "创建时间")
-  private LocalDateTime createdDate;
-
-  @Schema(description = "最后修改人ID")
-  protected Long modifiedBy;
-
-  @NameJoinField(id = "modifiedBy", repository = "commonUserBaseRepo")
-  private String lastModifiedByName;
-
-  @Schema(description = "最后修改时间")
-  private LocalDateTime modifiedDate;
 
   @Schema(description = "发布时间")
   private LocalDateTime publishedDate;

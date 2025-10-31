@@ -1,11 +1,10 @@
 package cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo;
 
-import cloud.xcan.angus.core.ai.domain.workflow.WorkflowType;
 import cloud.xcan.angus.core.ai.domain.workflow.WorkflowStatus;
+import cloud.xcan.angus.core.ai.domain.workflow.WorkflowType;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-
 import java.time.LocalDateTime;
+import lombok.Data;
 
 @Data
 @Schema(description = "工作流详情响应")

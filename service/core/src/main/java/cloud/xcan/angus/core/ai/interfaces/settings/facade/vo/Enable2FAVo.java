@@ -1,8 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.settings.facade.vo;
 
-import cloud.xcan.angus.core.ai.domain.settings.TwoFactorMethod;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Data;
 

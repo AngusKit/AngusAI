@@ -1,9 +1,8 @@
 package cloud.xcan.angus.core.ai.domain.chat;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
-
 import java.io.Serializable;
+import lombok.Data;
 
 /**
  * 消息附件
