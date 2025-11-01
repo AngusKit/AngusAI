@@ -73,8 +73,8 @@ public class ModelConfig {
    * 温度参数
    */
   @Builder.Default
-  @Schema(description = "温度，控制创造性，通常0.0-1.0")
-  private Double temperature = 0.7;
+  @Schema(description = "温度，控制创造性，通常0.0-2.0")
+  private Double temperature = 0.5;
 
   /**
    * 最大token数

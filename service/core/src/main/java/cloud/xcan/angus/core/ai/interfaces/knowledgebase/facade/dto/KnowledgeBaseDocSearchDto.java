@@ -22,7 +22,7 @@ public class KnowledgeBaseDocSearchDto {
 
   @Min(value = (int) Constants.SIMILARITY_THRESHOLD_MIN_VALUE)
   @Max(value = (int) Constants.SIMILARITY_THRESHOLD_MAX_VALUE)
-  @Schema(description = "相似度阈值", example = "0.7")
-  private Double threshold = 0.7;
+  @Schema(description = "相似度阈值", example = "0.5")
+  private Double threshold = 0.5;
 
 }

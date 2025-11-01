@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.Range;
 
 @Data
 @Schema(description = "创建模型请求参数")
@@ -37,13 +38,16 @@ public class ModelCreateDto {
   private String version;
 
   @Schema(description = "API端点", example = "https://api.openai.com/v1/chat/completions")
+  @Length(max = 400)
   private String apiEndpoint;
 
+  @Length(max = 4096)
   @Schema(description = "API密钥")
   private String apiKey;
 
   @Schema(description = "温度参数")
-  private Double temperature = 0.7;
+  @Range(min = 0, max = 2)
+  private Double temperature = 0.5;
 
   @Schema(description = "最大token数")
   private Integer maxTokens;

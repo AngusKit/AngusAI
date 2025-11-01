@@ -54,7 +54,7 @@ public class ApplicationConfig {
 
     @Min(value = 0, message = "温度值不能小于0")
     @Max(value = 2, message = "温度值不能大于2")
-    @Schema(description = "温度", example = "0.7")
+    @Schema(description = "温度", example = "0.5")
     private Double temperature;
 
     @Min(value = 1, message = "最大token数不能小于1")
