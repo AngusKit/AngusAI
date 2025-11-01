@@ -100,8 +100,8 @@ public class ModelFacadeImpl implements ModelFacade {
   }
 
   @Override
-  public ModelStatisticsVo getStatistics(Long id, StatisticsPeriod period) {
-    ModelStats stats = modelQuery.getStatistics(id, period);
+  public ModelStatisticsVo getStatistics(StatisticsPeriod period) {
+    ModelStats stats = modelQuery.getStatistics(period);
     return ModelAssembler.ToStatistics(stats);
   }
 

@@ -166,9 +166,8 @@ public class ModelRest {
   })
   @GetMapping("/statistics")
   public ApiLocaleResult<ModelStatisticsVo> getStatistics(
-      @Parameter(description = "模型ID") @RequestParam(required = false) Long id,
       @Parameter(description = "统计周期") @RequestParam(required = false) StatisticsPeriod period) {
-    return ApiLocaleResult.success(modelFacade.getStatistics(id, period));
+    return ApiLocaleResult.success(modelFacade.getStatistics(period));
   }
 
 }

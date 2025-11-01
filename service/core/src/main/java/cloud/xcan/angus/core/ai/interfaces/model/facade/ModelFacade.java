@@ -66,6 +66,6 @@ public interface ModelFacade {
   /**
    * 获取模型调用统计
    */
-  ModelStatisticsVo getStatistics(Long id, StatisticsPeriod period);
+  ModelStatisticsVo getStatistics(StatisticsPeriod period);
 
 }
