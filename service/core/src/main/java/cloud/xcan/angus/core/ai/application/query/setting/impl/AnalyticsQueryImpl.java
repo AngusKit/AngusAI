@@ -6,8 +6,8 @@ import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatDateByGranul
 import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.getStatusErrorName;
 
 import cloud.xcan.angus.core.ai.application.query.setting.AnalyticsQuery;
-import cloud.xcan.angus.core.ai.setting.analytics.analytics.ApiUsageLog;
-import cloud.xcan.angus.core.ai.setting.analytics.analytics.ApiUsageLogRepo;
+import cloud.xcan.angus.core.ai.domain.setting.analytics.ApiUsageLog;
+import cloud.xcan.angus.core.ai.domain.setting.analytics.ApiUsageLogRepo;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import jakarta.annotation.Resource;
 import java.time.LocalDateTime;

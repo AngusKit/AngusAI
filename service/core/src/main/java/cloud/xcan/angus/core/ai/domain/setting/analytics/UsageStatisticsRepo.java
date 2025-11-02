@@ -1,4 +1,4 @@
-package cloud.xcan.angus.core.ai.setting.analytics.analytics;
+package cloud.xcan.angus.core.ai.domain.setting.analytics;
 
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
 import java.time.LocalDate;

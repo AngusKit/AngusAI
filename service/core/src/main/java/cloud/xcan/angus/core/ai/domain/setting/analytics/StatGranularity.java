@@ -1,4 +1,4 @@
-package cloud.xcan.angus.core.ai.setting.analytics.analytics;
+package cloud.xcan.angus.core.ai.domain.setting.analytics;
 
 /**
  * 统计粒度枚举

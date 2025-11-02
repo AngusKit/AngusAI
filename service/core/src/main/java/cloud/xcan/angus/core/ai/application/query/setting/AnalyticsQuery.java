@@ -1,6 +1,6 @@
 package cloud.xcan.angus.core.ai.application.query.setting;
 
-import cloud.xcan.angus.core.ai.setting.analytics.analytics.ApiUsageLog;
+import cloud.xcan.angus.core.ai.domain.setting.analytics.ApiUsageLog;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
