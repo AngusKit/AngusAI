@@ -7,7 +7,6 @@ import cloud.xcan.angus.core.ai.application.query.chat.SessionQuery;
 import cloud.xcan.angus.core.ai.domain.chat.Message;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRole;
 import cloud.xcan.angus.core.ai.infra.ai.model.ChatService;
-import cloud.xcan.angus.core.ai.infra.storage.FileStorageService;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.MessageFacade;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.MessageFeedbackDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.MessageFindDto;
@@ -47,9 +46,6 @@ public class MessageFacadeImpl implements MessageFacade {
 
   @Resource
   private ChatService aiService;
-
-  @Resource
-  private FileStorageService fileStorageService;
 
   @Override
   public MessageSendVo sendMessage(Long sessionId, MessageSendDto dto) {
@@ -97,24 +93,24 @@ public class MessageFacadeImpl implements MessageFacade {
 
   @Override
   public AttachmentUploadVo uploadAttachment(MultipartFile file, Long sessionId) {
-    // 1. 验证文件类型
-    if (!fileStorageService.isValidFileType(file.getContentType())) {
-      throw new IllegalArgumentException("不支持的文件类型: " + file.getContentType());
-    }
-
-    // 2. 上传文件
-    cloud.xcan.angus.core.ai.domain.chat.Attachment attachment = fileStorageService.uploadFile(file,
-        sessionId);
-
-    // 3. 构建返回结果
-    AttachmentUploadVo vo = new AttachmentUploadVo();
-    vo.setId(attachment.getId());
-    vo.setName(attachment.getName());
-    vo.setType(attachment.getType());
-    vo.setSize(attachment.getSize());
-    vo.setUrl(attachment.getUrl());
+//    // 1. 验证文件类型
+//    if (!fileStorageService.isValidFileType(file.getContentType())) {
+//      throw new IllegalArgumentException("不支持的文件类型: " + file.getContentType());
+//    }
+//
+//    // 2. 上传文件
+//    cloud.xcan.angus.core.ai.domain.chat.Attachment attachment = fileStorageService.uploadFile(file,
+//        sessionId);
+//
+//    // 3. 构建返回结果
+//    AttachmentUploadVo vo = new AttachmentUploadVo();
+//    vo.setId(attachment.getId());
+//    vo.setName(attachment.getName());
+//    vo.setType(attachment.getType());
+//    vo.setSize(attachment.getSize());
+//    vo.setUrl(attachment.getUrl());
     //vo.setUploadedAt(attachment.getUploadedAt());
-    return vo;
+    return null;
   }
 
   @Override
@@ -172,7 +168,7 @@ public class MessageFacadeImpl implements MessageFacade {
   @Override
   public void deleteAttachment(Long id) {
     // 删除附件
-    fileStorageService.deleteFile(id);
+    // fileStorageService.deleteFile(id);
   }
 
   @Override
