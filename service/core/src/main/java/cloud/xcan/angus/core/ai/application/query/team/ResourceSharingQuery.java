@@ -1,9 +1,9 @@
 package cloud.xcan.angus.core.ai.application.query.team;
 
+import cloud.xcan.angus.core.ai.domain.ResourceType;
 import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceSharing;
 import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceSharingAccessLog;
 import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceSharingMember;
-import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceType;
 import cloud.xcan.angus.core.ai.interfaces.team.facade.dto.ResourceSharingFindDto;
 import java.time.LocalDateTime;
 import java.util.List;

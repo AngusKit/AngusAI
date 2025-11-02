@@ -1,6 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.team;
 
-import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceType;
+import cloud.xcan.angus.core.ai.domain.ResourceType;
 import cloud.xcan.angus.core.ai.interfaces.team.facade.ResourceSharingFacade;
 import cloud.xcan.angus.core.ai.interfaces.team.facade.dto.ResourceSharingAccessDto;
 import cloud.xcan.angus.core.ai.interfaces.team.facade.dto.ResourceSharingAddMembersDto;
@@ -90,17 +90,15 @@ public class ResourceSharingRest {
     resourceSharingFacade.removeMember(id, userId);
   }
 
-  @Operation(operationId = "recordResourceAccess", summary = "记录访问日志", description = "记录资源访问（自动调用）")
+  @Operation(operationId = "stopResourceSharing", summary = "停止资源共享", description = "停止资源共享")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "已记录")
   })
-  @PostMapping("/resources/{id}/access")
-  @SuppressWarnings("unchecked")
-  public ApiLocaleResult<Void> recordAccess(
-      @Parameter(description = "共享ID") @PathVariable Long id,
-      @Valid @RequestBody ResourceSharingAccessDto dto) {
-    resourceSharingFacade.recordAccess(id, dto);
-    return (ApiLocaleResult<Void>) ApiLocaleResult.success(null);
+  @PostMapping("/resources/{id}/stop")
+  public ApiLocaleResult<?> stopSharing(
+      @Parameter(description = "共享ID") @PathVariable Long id) {
+    resourceSharingFacade.stopSharing(id);
+    return ApiLocaleResult.success();
   }
 
   @Operation(operationId = "deleteResourceSharing", summary = "取消资源共享", description = "取消资源共享")
@@ -158,12 +156,4 @@ public class ResourceSharingRest {
     return ApiLocaleResult.success(resourceSharingFacade.getStatistics(id, period));
   }
 
-  @Operation(operationId = "getMyShareStatistics", summary = "获取我的共享统计", description = "获取当前用户的共享统计概览")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "统计数据获取成功")
-  })
-  @GetMapping("/my-statistics")
-  public ApiLocaleResult<ResourceSharingStatisticsVo> getMyStatistics() {
-    return ApiLocaleResult.success(resourceSharingFacade.getMyStatistics());
-  }
 }

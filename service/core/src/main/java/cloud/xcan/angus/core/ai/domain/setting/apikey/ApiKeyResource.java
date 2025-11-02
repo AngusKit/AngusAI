@@ -1,6 +1,6 @@
 package cloud.xcan.angus.core.ai.domain.setting.apikey;
 
-import cloud.xcan.angus.core.jpa.multitenancy.TenantEntity;
+import cloud.xcan.angus.core.ai.domain.ResourceType;
 import cloud.xcan.angus.spec.experimental.EntitySupport;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

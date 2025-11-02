@@ -19,6 +19,4 @@ public class ResourceSharingUpdateDto {
   @Schema(description = "成员ID列表")
   private List<Long> memberIds;
 
-  @Schema(description = "是否通知成员", defaultValue = "true")
-  private Boolean notifyMembers = true;
 }

@@ -3,6 +3,7 @@ package cloud.xcan.angus.core.ai.interfaces.team.facade.internal;
 import cloud.xcan.angus.core.ai.application.cmd.team.ResourceSharingCmd;
 import cloud.xcan.angus.core.ai.application.converter.ResourceSharingConverter;
 import cloud.xcan.angus.core.ai.application.query.team.ResourceSharingQuery;
+import cloud.xcan.angus.core.ai.domain.ResourceType;
 import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceSharing;
 import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceSharingMember;
 import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceType;
@@ -112,6 +113,11 @@ public class ResourceSharingFacadeImpl implements ResourceSharingFacade {
   }
 
   @Override
+  public void stopSharing(Long id) {
+
+  }
+
+  @Override
   public void recordAccess(Long id, ResourceSharingAccessDto dto) {
     // TODO: 从当前登录用户获取userId
     Long userId = 1L;
@@ -165,6 +171,11 @@ public class ResourceSharingFacadeImpl implements ResourceSharingFacade {
 
     // 转换为PageResult
     return PageResult.of(voPage);
+  }
+
+  @Override
+  public ResourceAccessCheckVo checkAccess(Long resourceId, ResourceType resourceType) {
+    return null;
   }
 
   @Override

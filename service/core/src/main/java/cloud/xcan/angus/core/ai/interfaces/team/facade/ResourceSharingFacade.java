@@ -1,6 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.team.facade;
 
-import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceType;
+import cloud.xcan.angus.core.ai.domain.ResourceType;
 import cloud.xcan.angus.core.ai.interfaces.team.facade.dto.ResourceSharingAccessDto;
 import cloud.xcan.angus.core.ai.interfaces.team.facade.dto.ResourceSharingAddMembersDto;
 import cloud.xcan.angus.core.ai.interfaces.team.facade.dto.ResourceSharingCreateDto;
@@ -39,9 +39,9 @@ public interface ResourceSharingFacade {
   void removeMember(Long id, Long userId);
 
   /**
-   * 记录访问
+   * 停止资源共享
    */
-  void recordAccess(Long id, ResourceSharingAccessDto dto);
+  void stopSharing(Long id);
 
   /**
    * 删除共享
@@ -72,4 +72,5 @@ public interface ResourceSharingFacade {
    * 获取我的统计
    */
   ResourceSharingStatisticsVo getMyStatistics();
+
 }

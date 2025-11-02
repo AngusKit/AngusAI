@@ -2,7 +2,7 @@ package cloud.xcan.angus.core.ai.interfaces.prompt.facade.internal.assembler;
 
 import cloud.xcan.angus.core.ai.domain.setting.apikey.ApiKey;
 import cloud.xcan.angus.core.ai.domain.setting.apikey.ApiKeyResource;
-import cloud.xcan.angus.core.ai.domain.setting.apikey.ResourceType;
+import cloud.xcan.angus.core.ai.domain.ResourceType;
 import cloud.xcan.angus.core.ai.interfaces.setting.facade.dto.ApiKeyCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.setting.facade.vo.ApiKeyDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.setting.facade.vo.ApiKeyListVo;

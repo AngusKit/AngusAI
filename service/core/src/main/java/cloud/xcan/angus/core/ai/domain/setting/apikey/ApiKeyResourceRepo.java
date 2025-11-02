@@ -1,5 +1,6 @@
 package cloud.xcan.angus.core.ai.domain.setting.apikey;
 
+import cloud.xcan.angus.core.ai.domain.ResourceType;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
 import java.util.List;
 import org.springframework.data.repository.NoRepositoryBean;

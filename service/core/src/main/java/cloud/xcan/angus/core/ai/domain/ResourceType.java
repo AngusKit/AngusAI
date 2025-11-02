@@ -1,4 +1,4 @@
-package cloud.xcan.angus.core.ai.domain.setting.apikey;
+package cloud.xcan.angus.core.ai.domain;
 
 /**
  * 资源类型枚举

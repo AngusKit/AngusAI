@@ -2,7 +2,6 @@ package cloud.xcan.angus.core.ai.interfaces.setting.facade.dto;
 
 import cloud.xcan.angus.core.ai.domain.setting.apikey.ApiKeyPermission;
 import cloud.xcan.angus.core.ai.domain.setting.apikey.AuthorizedResource;
-import cloud.xcan.angus.core.ai.domain.setting.apikey.ResourceType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;

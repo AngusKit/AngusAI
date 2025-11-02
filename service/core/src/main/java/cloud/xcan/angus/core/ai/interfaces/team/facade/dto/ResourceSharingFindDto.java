@@ -1,6 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.team.facade.dto;
 
-import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceType;
+import cloud.xcan.angus.core.ai.domain.ResourceType;
 import cloud.xcan.angus.core.ai.domain.team.resourcesharing.SharePermission;
 import cloud.xcan.angus.core.ai.domain.team.resourcesharing.SharedWith;
 import cloud.xcan.angus.remote.PageQuery;
@@ -21,12 +21,6 @@ public class ResourceSharingFindDto extends PageQuery {
 
   @Schema(description = "共享范围筛选")
   private SharedWith sharedWith;
-
-  @Schema(description = "是否只显示我创建的")
-  private Boolean ownedByMe;
-
-  @Schema(description = "是否只显示共享给我的")
-  private Boolean sharedToMe;
 
   @Override
   public String getDefaultOrderBy() {

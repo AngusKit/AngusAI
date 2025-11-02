@@ -1,5 +1,6 @@
 package cloud.xcan.angus.core.ai.domain.team.resourcesharing;
 
+import cloud.xcan.angus.core.ai.domain.ResourceType;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
 import java.util.List;
 import java.util.Optional;
@@ -9,8 +10,6 @@ import org.springframework.data.repository.query.Param;
 
 @NoRepositoryBean
 public interface ResourceSharingRepo extends BaseRepository<ResourceSharing, Long> {
-
-  // ==================== 查询方法 ====================
 
   /**
    * 根据资源ID和资源类型查询共享

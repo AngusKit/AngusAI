@@ -2,10 +2,9 @@ package cloud.xcan.angus.core.ai.interfaces.setting.facade.vo;
 
 import cloud.xcan.angus.core.ai.domain.setting.apikey.ApiKeyPermission;
 import cloud.xcan.angus.core.ai.domain.setting.apikey.ApiKeyStatus;
-import cloud.xcan.angus.core.ai.domain.setting.apikey.ResourceType;
+import cloud.xcan.angus.core.ai.domain.ResourceType;
 import cloud.xcan.angus.remote.vo.TenantAuditingVo;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.Column;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Data;

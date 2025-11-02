@@ -1,13 +1,13 @@
 package cloud.xcan.angus.core.ai.application.query.team.impl;
 
 import cloud.xcan.angus.core.ai.application.query.team.ResourceSharingQuery;
+import cloud.xcan.angus.core.ai.domain.ResourceType;
 import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceSharing;
 import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceSharingAccessLog;
 import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceSharingAccessLogRepo;
 import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceSharingMember;
 import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceSharingMemberRepo;
 import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceSharingRepo;
-import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceType;
 import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ShareAction;
 import cloud.xcan.angus.core.ai.domain.team.resourcesharing.SharePermission;
 import cloud.xcan.angus.core.ai.domain.team.resourcesharing.SharedWith;

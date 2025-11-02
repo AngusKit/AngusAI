@@ -2,6 +2,7 @@ package cloud.xcan.angus.core.ai.interfaces.team.facade.dto;
 
 import cloud.xcan.angus.core.ai.domain.team.resourcesharing.SharePermission;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import jakarta.validation.constraints.NotEmpty;
 import java.util.List;
 import lombok.Data;
@@ -10,8 +11,8 @@ import lombok.Data;
 @Schema(description = "批量添加成员参数")
 public class ResourceSharingAddMembersDto {
 
-  @NotEmpty(message = "成员ID列表不能为空")
-  @Schema(description = "成员ID列表", required = true)
+  @NotEmpty
+  @Schema(description = "成员ID列表", requiredMode = RequiredMode.REQUIRED)
   private List<Long> memberIds;
 
   @Schema(description = "权限（默认继承共享设置）")

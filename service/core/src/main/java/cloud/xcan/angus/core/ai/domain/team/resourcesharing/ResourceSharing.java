@@ -1,5 +1,6 @@
 package cloud.xcan.angus.core.ai.domain.team.resourcesharing;
 
+import cloud.xcan.angus.core.ai.domain.ResourceType;
 import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -1,6 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.team.facade.vo;
 
-import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceType;
+import cloud.xcan.angus.core.ai.domain.ResourceType;
 import cloud.xcan.angus.core.ai.domain.team.resourcesharing.SharePermission;
 import cloud.xcan.angus.core.ai.domain.team.resourcesharing.SharedWith;
 import cloud.xcan.angus.remote.NameJoinField;
