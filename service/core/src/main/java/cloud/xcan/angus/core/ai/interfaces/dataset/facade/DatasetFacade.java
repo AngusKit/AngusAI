@@ -12,7 +12,9 @@ import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetListVo;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetStatisticsVo;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasourceConfigVo;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasourceConnectionTestVo;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.SyncDataVo;
 import cloud.xcan.angus.remote.PageResult;
+import java.util.List;
 
 public interface DatasetFacade {
 
@@ -25,11 +27,6 @@ public interface DatasetFacade {
    * 更新数据集基本信息
    */
   DatasetDetailVo update(Long id, DatasetUpdateDto dto);
-
-  /**
-   * 同步文件数据到关系数据库或同步表信息
-   */
-  List<SyncDataVo> syncDatasetData(Long id, List<String> names);
 
   /**
    * 修改数据集可见性

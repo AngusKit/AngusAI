@@ -81,17 +81,6 @@ public class DatasetRest {
     return ApiLocaleResult.success(datasetFacade.modifyVisibility(id, visibility));
   }
 
-  @Operation(operationId = "syncDatasetData", summary = "同步数据集数据", description = "手动触发同步文件数据到数据库或同步表信息")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "同步已启动")
-  })
-  @PostMapping("/{id}/dataset/sync")
-  public ApiLocaleResult<List<SyncDataVo>> syncDatasetData(
-      @Parameter(description = "数据集ID") @PathVariable Long id,
-      @Parameter(description = "同步文件或表名") @RequestParam(required = false) List<String> names) {
-    return ApiLocaleResult.success(datasetFacade.syncDatasetData(id, names));
-  }
-
   @Operation(operationId = "modifyDataSource", summary = "修改数据源", description = "修改数据源配置")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "201", description = "数据源添加成功")
