@@ -3,17 +3,21 @@ package cloud.xcan.angus.core.ai.interfaces.setting.facade.vo;
 import cloud.xcan.angus.core.ai.domain.setting.apikey.ApiKeyPermission;
 import cloud.xcan.angus.core.ai.domain.setting.apikey.ApiKeyStatus;
 import cloud.xcan.angus.core.ai.domain.setting.apikey.ResourceType;
+import cloud.xcan.angus.remote.vo.TenantAuditingVo;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.Column;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * API密钥详情VO
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Schema(description = "API密钥详情")
-public class ApiKeyDetailVo {
+public class ApiKeyDetailVo extends TenantAuditingVo {
 
   @Schema(description = "密钥ID")
   private Long id;
@@ -21,8 +25,8 @@ public class ApiKeyDetailVo {
   @Schema(description = "密钥名称")
   private String name;
 
-  @Schema(description = "密钥描述")
-  private String description;
+  @Schema(description = "密钥前缀（用于部分显示）sk-abc123")
+  private String keyPrefix;
 
   @Schema(description = "完整密钥（仅创建时返回）")
   private String key;
@@ -43,10 +47,7 @@ public class ApiKeyDetailVo {
   private List<AuthorizedResourceVo> authorizedResources;
 
   @Schema(description = "速率限制")
-  private String rateLimit;
-
-  @Schema(description = "速率限制原始值")
-  private Integer rateLimitRaw;
+  private Integer rateLimit;
 
   @Schema(description = "每日限额")
   private Integer dailyLimit;
@@ -58,31 +59,22 @@ public class ApiKeyDetailVo {
   private Long usageCount;
 
   @Schema(description = "最后使用时间（格式化）")
-  private String lastUsed;
-
-  @Schema(description = "最后使用时间戳")
-  private Long lastUsedAt;
-
-  @Schema(description = "创建时间")
-  private LocalDateTime createdDate;
-
-  @Schema(description = "创建时间（格式化）")
-  private String created;
+  private LocalDateTime lastUsedAt;
 
   @Schema(description = "过期时间戳")
-  private Long expiresAt;
-
-  @Schema(description = "过期时间（格式化）")
-  private String expires;
+  private LocalDateTime expiresAt;
 
   @Schema(description = "撤销时间戳")
-  private Long revokedAt;
+  private LocalDateTime revokedAt;
 
   @Schema(description = "撤销原因")
   private String revokeReason;
 
   @Schema(description = "警告信息")
   private String warning;
+
+  @Schema(description = "使用统计")
+  private UsageStatsVo usageStats;
 
   /**
    * 授权资源VO

@@ -1,6 +1,6 @@
 package cloud.xcan.angus.core.ai.domain.setting.apikey;
 
-import cloud.xcan.angus.core.jpa.multitenancy.TenantEntity;
+import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -11,6 +11,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +27,7 @@ import lombok.experimental.Accessors;
 @Setter
 @Getter
 @Accessors(chain = true)
-public class ApiKey extends TenantEntity<ApiKey, Long> {
+public class ApiKey extends TenantAuditingEntity<ApiKey, Long> {
 
   @Id
   private Long id;
@@ -36,12 +37,6 @@ public class ApiKey extends TenantEntity<ApiKey, Long> {
    */
   @Column(name = "name", nullable = false, length = 100)
   private String name;
-
-  /**
-   * 密钥描述
-   */
-  @Column(name = "description", length = 500)
-  private String description;
 
   /**
    * API密钥（加密存储）
@@ -119,11 +114,8 @@ public class ApiKey extends TenantEntity<ApiKey, Long> {
   @Column(name = "revoke_reason", length = 500)
   private String revokeReason;
 
-  /**
-   * 刷新时间
-   */
-  @Column(name = "refreshed_at")
-  private LocalDateTime refreshedAt;
+  @Transient
+  private List<AuthorizedResource> authorizedResources;
 
   /**
    * 是否已过期

@@ -1,21 +1,20 @@
 package cloud.xcan.angus.core.ai.interfaces.setting.facade.internal;
 
 import cloud.xcan.angus.core.ai.application.cmd.setting.ApiKeyCmd;
-import cloud.xcan.angus.core.ai.application.converter.ApiKeyConverter;
 import cloud.xcan.angus.core.ai.application.query.setting.ApiKeyQuery;
+import cloud.xcan.angus.core.ai.application.query.setting.ApiKeyResourceQuery;
 import cloud.xcan.angus.core.ai.domain.setting.apikey.ApiKey;
 import cloud.xcan.angus.core.ai.domain.setting.apikey.ApiKeyResource;
+import cloud.xcan.angus.core.ai.interfaces.prompt.facade.internal.assembler.ApiKeyAssembler;
 import cloud.xcan.angus.core.ai.interfaces.setting.facade.ApiKeyFacade;
 import cloud.xcan.angus.core.ai.interfaces.setting.facade.dto.ApiKeyCreateDto;
-import cloud.xcan.angus.core.ai.interfaces.setting.facade.dto.ApiKeyFindDto;
 import cloud.xcan.angus.core.ai.interfaces.setting.facade.dto.ApiKeyRevokeDto;
-import cloud.xcan.angus.core.ai.interfaces.setting.facade.dto.ApiKeyUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.setting.facade.vo.ApiKeyDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.setting.facade.vo.ApiKeyListVo;
+import cloud.xcan.angus.core.biz.NameJoin;
 import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Map;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 /**
@@ -30,90 +29,48 @@ public class ApiKeyFacadeImpl implements ApiKeyFacade {
   @Resource
   private ApiKeyQuery apiKeyQuery;
 
+  @Resource
+  private ApiKeyResourceQuery apiKeyResourceQuery;
+
+  @NameJoin
   @Override
-  public ApiKeyDetailVo create(ApiKeyCreateDto dto, Long userId) {
-    // 执行创建命令
-    ApiKey apiKey = apiKeyCmd.create(dto, userId);
-
-    // 获取授权资源
-    List<ApiKeyResource> resources = apiKeyQuery.getResources(apiKey.getId());
-
-    // 转换为VO
-    return ApiKeyConverter.toDetailVo(apiKey, resources);
+  public ApiKeyDetailVo create(ApiKeyCreateDto dto) {
+    ApiKey apiKey = apiKeyCmd.create(ApiKeyAssembler.toDomain(dto));
+    List<ApiKeyResource> resources = apiKeyResourceQuery.getResources(apiKey.getId());
+    return ApiKeyAssembler.toDetailVo(apiKey, resources);
   }
 
   @Override
-  public ApiKeyDetailVo update(Long id, ApiKeyUpdateDto dto, Long userId) {
-    // 执行更新命令
-    ApiKey apiKey = apiKeyCmd.update(id, dto, userId);
-
-    // 获取授权资源
-    List<ApiKeyResource> resources = apiKeyQuery.getResources(apiKey.getId());
-
-    // 转换为VO
-    return ApiKeyConverter.toDetailVo(apiKey, resources);
+  public void revoke(Long id, ApiKeyRevokeDto dto) {
+    apiKeyCmd.revoke(id, dto.getReason());
   }
 
   @Override
-  public ApiKeyDetailVo toggleStatus(Long id, Long userId) {
-    // 执行切换状态命令
-    ApiKey apiKey = apiKeyCmd.toggleStatus(id, userId);
-
-    // 获取授权资源
-    List<ApiKeyResource> resources = apiKeyQuery.getResources(apiKey.getId());
-
-    // 转换为VO
-    return ApiKeyConverter.toDetailVo(apiKey, resources);
+  public void delete(Long id) {
+    apiKeyCmd.delete(id);
   }
 
+  @NameJoin
   @Override
-  public void revoke(Long id, ApiKeyRevokeDto dto, Long userId) {
-    apiKeyCmd.revoke(id, dto, userId);
-  }
-
-  @Override
-  public ApiKeyDetailVo refresh(Long id, Long userId) {
-    // 执行刷新命令
-    ApiKey apiKey = apiKeyCmd.refresh(id, userId);
-
-    // 获取授权资源
-    List<ApiKeyResource> resources = apiKeyQuery.getResources(apiKey.getId());
-
-    // 转换为VO
-    return ApiKeyConverter.toDetailVo(apiKey, resources);
-  }
-
-  @Override
-  public void delete(Long id, Long userId) {
-    apiKeyCmd.delete(id, userId);
-  }
-
-  @Override
-  public ApiKeyDetailVo getDetail(Long id, Long userId) {
+  public ApiKeyDetailVo getDetail(Long id) {
     // 查询密钥详情
-    ApiKey apiKey = apiKeyQuery.getDetail(id, userId);
-
+    ApiKey apiKey = apiKeyQuery.findAndCheck(id);
     // 获取授权资源
-    List<ApiKeyResource> resources = apiKeyQuery.getResources(apiKey.getId());
-
+    List<ApiKeyResource> resources = apiKeyResourceQuery.getResources(apiKey.getId());
     // 转换为VO
-    return ApiKeyConverter.toDetailVo(apiKey, resources);
+    return ApiKeyAssembler.toDetailVo(apiKey, resources);
   }
 
+  @NameJoin
   @Override
-  public Page<ApiKeyListVo> list(ApiKeyFindDto dto, Long userId) {
+  public List<ApiKeyListVo> list() {
     // 查询列表
-    Page<ApiKey> page = apiKeyQuery.list(dto, userId);
-
+    List<ApiKey> apiKeys = apiKeyQuery.list();
     // 转换为VO
-    return page.map(apiKey -> {
-      List<ApiKeyResource> resources = apiKeyQuery.getResources(apiKey.getId());
-      return ApiKeyConverter.toListVo(apiKey, resources);
-    });
-  }
-
-  @Override
-  public Map<String, Object> validate(String apiKey) {
-    return apiKeyQuery.validate(apiKey);
+    Map<Long, List<ApiKeyResource>> resourceMap = apiKeyResourceQuery.getResourceMap();
+    return apiKeys.stream().map(apiKey -> {
+      List<ApiKeyResource> resources = resourceMap.get(apiKey.getId());
+      return ApiKeyAssembler.toListVo(apiKey, resources);
+    }).toList();
   }
 }

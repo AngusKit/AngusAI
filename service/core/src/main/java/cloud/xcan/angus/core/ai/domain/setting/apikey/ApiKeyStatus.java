@@ -10,9 +10,9 @@ public enum ApiKeyStatus {
   ACTIVE,
 
   /**
-   * 未激活状态
+   * 已撤销
    */
-  INACTIVE,
+  REVOKED,
 
   /**
    * 已过期

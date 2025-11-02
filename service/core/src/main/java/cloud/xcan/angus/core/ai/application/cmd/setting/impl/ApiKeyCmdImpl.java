@@ -1,14 +1,12 @@
 package cloud.xcan.angus.core.ai.application.cmd.setting.impl;
 
 import cloud.xcan.angus.core.ai.application.cmd.setting.ApiKeyCmd;
+import cloud.xcan.angus.core.ai.application.cmd.setting.ApiKeyResourceCmd;
+import cloud.xcan.angus.core.ai.application.query.setting.ApiKeyQuery;
 import cloud.xcan.angus.core.ai.domain.setting.apikey.ApiKey;
 import cloud.xcan.angus.core.ai.domain.setting.apikey.ApiKeyRepo;
-import cloud.xcan.angus.core.ai.domain.setting.apikey.ApiKeyResource;
 import cloud.xcan.angus.core.ai.domain.setting.apikey.ApiKeyResourceRepo;
 import cloud.xcan.angus.core.ai.domain.setting.apikey.ApiKeyStatus;
-import cloud.xcan.angus.core.ai.interfaces.setting.apikey.dto.ApiKeyCreateDto;
-import cloud.xcan.angus.core.ai.interfaces.setting.apikey.dto.ApiKeyRevokeDto;
-import cloud.xcan.angus.core.ai.interfaces.setting.apikey.dto.ApiKeyUpdateDto;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
@@ -16,7 +14,6 @@ import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import jakarta.annotation.Resource;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Base64;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -35,6 +32,12 @@ public class ApiKeyCmdImpl extends CommCmd<ApiKey, Long> implements ApiKeyCmd {
   private ApiKeyResourceRepo apiKeyResourceRepo;
 
   @Resource
+  private ApiKeyResourceCmd apiKeyResourceCmd;
+
+  @Resource
+  private ApiKeyQuery apiKeyQuery;
+
+  @Resource
   private PasswordEncoder passwordEncoder;
 
   @Override
@@ -44,15 +47,11 @@ public class ApiKeyCmdImpl extends CommCmd<ApiKey, Long> implements ApiKeyCmd {
 
   @Override
   @Transactional
-  public ApiKey create(ApiKeyCreateDto dto, Long userId) {
+  public ApiKey create(ApiKey apiKey) {
     return new BizTemplate<ApiKey>() {
       @Override
       protected void checkParams() {
-        // 检查密钥数量限制
-        long count = apiKeyRepo.countByCreatedBy(userId);
-        if (count >= 50) {
-          throw new IllegalStateException("API密钥数量已达上限（50个）");
-        }
+        // TODO 检查密钥配额不超过200个
       }
 
       @Override
@@ -61,159 +60,38 @@ public class ApiKeyCmdImpl extends CommCmd<ApiKey, Long> implements ApiKeyCmd {
         String rawKey = generateApiKey();
         String keyHash = passwordEncoder.encode(rawKey);
         String keyPrefix = rawKey.substring(0, Math.min(15, rawKey.length()));
-
-        // 创建实体
-        ApiKey entity = new ApiKey();
-        entity.setName(dto.getName());
-        entity.setDescription(dto.getDescription());
-        entity.setKeyHash(keyHash);
-        entity.setKeyPrefix(keyPrefix);
-        entity.setStatus(ApiKeyStatus.ACTIVE);
-        entity.setPermissions(
-            dto.getPermissions() != null ? dto.getPermissions() : new ArrayList<>());
-        entity.setRateLimit(dto.getRateLimit() != null ? dto.getRateLimit() : 60);
-        entity.setUsageCount(0L);
-
-        // 设置过期时间
-        if (dto.getExpiresInDays() != null && dto.getExpiresInDays() > 0) {
-          entity.setExpiresAt(LocalDateTime.now().plusDays(dto.getExpiresInDays()));
-        }
+        apiKey.setKeyHash(keyHash);
+        apiKey.setKeyPrefix(keyPrefix);
+        apiKey.setStatus(ApiKeyStatus.ACTIVE);
 
         // 保存密钥
-        ApiKey saved = insert0(entity);
+        insert0(apiKey);
 
         // 保存授权资源
-        if (dto.getAuthorizedResources() != null) {
-          for (ApiKeyCreateDto.AuthorizedResourceDto resource : dto.getAuthorizedResources()) {
-            if (resource.getIds() == null || resource.getIds().isEmpty()) {
-              // 空数组表示全部资源
-              ApiKeyResource keyResource = new ApiKeyResource();
-              keyResource.setApiKeyId(saved.getId());
-              keyResource.setResourceType(resource.getType());
-              keyResource.setResourceId(0L);
-              apiKeyResourceRepo.save(keyResource);
-            } else {
-              // 保存指定资源
-              for (Long resourceId : resource.getIds()) {
-                ApiKeyResource keyResource = new ApiKeyResource();
-                keyResource.setApiKeyId(saved.getId());
-                keyResource.setResourceType(resource.getType());
-                keyResource.setResourceId(resourceId);
-                apiKeyResourceRepo.save(keyResource);
-              }
-            }
-          }
-        }
-
-        return saved;
+        apiKeyResourceCmd.addAuthorizedResources(apiKey);
+        return apiKey;
       }
     }.execute();
   }
 
   @Override
   @Transactional
-  public ApiKey update(Long id, ApiKeyUpdateDto dto, Long userId) {
-    return new BizTemplate<ApiKey>() {
-      ApiKey entity;
-
-      @Override
-      protected void checkParams() {
-        entity = findById(id).orElseThrow(() ->
-            ResourceNotFound.of("API密钥不存在", new Object[]{}));
-
-        // 权限检查
-        if (!entity.getCreatedBy().equals(userId)) {
-          throw new IllegalStateException("无权限操作此API密钥");
-        }
-      }
-
-      @Override
-      protected ApiKey process() {
-        // 更新基本信息
-        entity.setName(dto.getName());
-        entity.setDescription(dto.getDescription());
-        entity.setPermissions(dto.getPermissions());
-        entity.setRateLimit(dto.getRateLimit());
-
-        // 更新授权资源
-        if (dto.getAuthorizedResources() != null) {
-          apiKeyResourceRepo.deleteByApiKeyId(id);
-
-          for (ApiKeyUpdateDto.AuthorizedResourceDto resource : dto.getAuthorizedResources()) {
-            if (resource.getIds() == null || resource.getIds().isEmpty()) {
-              ApiKeyResource keyResource = new ApiKeyResource();
-              keyResource.setApiKeyId(id);
-              keyResource.setResourceType(resource.getType());
-              keyResource.setResourceId(0L);
-              apiKeyResourceRepo.save(keyResource);
-            } else {
-              for (Long resourceId : resource.getIds()) {
-                ApiKeyResource keyResource = new ApiKeyResource();
-                keyResource.setApiKeyId(id);
-                keyResource.setResourceType(resource.getType());
-                keyResource.setResourceId(resourceId);
-                apiKeyResourceRepo.save(keyResource);
-              }
-            }
-          }
-        }
-
-        return update0(entity);
-      }
-    }.execute();
-  }
-
-  @Override
-  @Transactional
-  public ApiKey toggleStatus(Long id, Long userId) {
-    return new BizTemplate<ApiKey>() {
-      ApiKey entity;
-
-      @Override
-      protected void checkParams() {
-        entity = findById(id).orElseThrow(() ->
-            ResourceNotFound.of("API密钥不存在", new Object[]{}));
-
-        if (!entity.getCreatedBy().equals(userId)) {
-          throw new IllegalStateException("无权限操作此API密钥");
-        }
-      }
-
-      @Override
-      protected ApiKey process() {
-        ApiKeyStatus newStatus = entity.getStatus() == ApiKeyStatus.ACTIVE
-            ? ApiKeyStatus.INACTIVE
-            : ApiKeyStatus.ACTIVE;
-        entity.setStatus(newStatus);
-
-        return update0(entity);
-      }
-    }.execute();
-  }
-
-  @Override
-  @Transactional
-  public void revoke(Long id, ApiKeyRevokeDto dto, Long userId) {
+  public void revoke(Long id, String reason) {
     new BizTemplate<Void>() {
-      ApiKey entity;
+      ApiKey apiKeyDb;
 
       @Override
       protected void checkParams() {
-        entity = findById(id).orElseThrow(() ->
-            ResourceNotFound.of("API密钥不存在", new Object[]{}));
-
-        if (!entity.getCreatedBy().equals(userId)) {
-          throw new IllegalStateException("无权限操作此API密钥");
-        }
+        // 查询密钥并检查是否存在
+        apiKeyDb = apiKeyQuery.findAndCheck(id);
       }
 
       @Override
       protected Void process() {
-        entity.setStatus(ApiKeyStatus.REVOKED);
-        entity.setRevokedAt(LocalDateTime.now());
-        entity.setRevokeReason(dto.getReason());
-
-        update0(entity);
+        apiKeyDb.setStatus(ApiKeyStatus.REVOKED);
+        apiKeyDb.setRevokedAt(LocalDateTime.now());
+        apiKeyDb.setRevokeReason(reason);
+        apiKeyRepo.save(apiKeyDb);
         return null;
       }
     }.execute();
@@ -221,59 +99,14 @@ public class ApiKeyCmdImpl extends CommCmd<ApiKey, Long> implements ApiKeyCmd {
 
   @Override
   @Transactional
-  public ApiKey refresh(Long id, Long userId) {
-    return new BizTemplate<ApiKey>() {
-      ApiKey entity;
-
-      @Override
-      protected void checkParams() {
-        entity = findById(id).orElseThrow(() ->
-            ResourceNotFound.of("API密钥不存在", new Object[]{}));
-
-        if (!entity.getCreatedBy().equals(userId)) {
-          throw new IllegalStateException("无权限操作此API密钥");
-        }
-      }
-
-      @Override
-      protected ApiKey process() {
-        // 生成新密钥
-        String rawKey = generateApiKey();
-        String keyHash = passwordEncoder.encode(rawKey);
-        String keyPrefix = rawKey.substring(0, Math.min(15, rawKey.length()));
-
-        entity.setKeyHash(keyHash);
-        entity.setKeyPrefix(keyPrefix);
-        entity.setRefreshedAt(LocalDateTime.now());
-
-        return update0(entity);
-      }
-    }.execute();
-  }
-
-  @Override
-  @Transactional
-  public void delete(Long id, Long userId) {
+  public void delete(Long id) {
     new BizTemplate<Void>() {
-      ApiKey entity;
-
-      @Override
-      protected void checkParams() {
-        entity = findById(id).orElseThrow(() ->
-            ResourceNotFound.of("API密钥不存在", new Object[]{}));
-
-        if (!entity.getCreatedBy().equals(userId)) {
-          throw new IllegalStateException("无权限操作此API密钥");
-        }
-      }
-
       @Override
       protected Void process() {
         // 删除授权资源
         apiKeyResourceRepo.deleteByApiKeyId(id);
-
         // 删除密钥
-        deleteById(id);
+        apiKeyRepo.deleteById(id);
         return null;
       }
     }.execute();

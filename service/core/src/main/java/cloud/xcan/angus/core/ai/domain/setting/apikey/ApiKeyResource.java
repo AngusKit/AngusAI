@@ -1,6 +1,7 @@
 package cloud.xcan.angus.core.ai.domain.setting.apikey;
 
 import cloud.xcan.angus.core.jpa.multitenancy.TenantEntity;
+import cloud.xcan.angus.spec.experimental.EntitySupport;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -19,7 +20,7 @@ import lombok.experimental.Accessors;
 @Setter
 @Getter
 @Accessors(chain = true)
-public class ApiKeyResource extends TenantEntity<ApiKeyResource, Long> {
+public class ApiKeyResource extends EntitySupport<ApiKeyResource, Long> {
 
   @Id
   private Long id;
