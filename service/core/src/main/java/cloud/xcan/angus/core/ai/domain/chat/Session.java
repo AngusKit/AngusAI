@@ -40,6 +40,9 @@ public class Session extends TenantAuditingEntity<Session, Long> {
   @Column(name = "config", columnDefinition = "json", length = 2000)
   private SessionConfig config;
 
+  @Column(name = "is_starred", nullable = false)
+  private Boolean isStarred = false;
+
   @Column(name = "message_count", nullable = false)
   private Integer messageCount = 0;
 
@@ -61,12 +64,6 @@ public class Session extends TenantAuditingEntity<Session, Long> {
    */
   @Column(name = "last_message_time")
   private Long lastMessageTime;
-
-  /**
-   * 是否收藏（星标）
-   */
-  @Transient
-  private Boolean isStarred = false;
 
   @Override
   public Long identity() {

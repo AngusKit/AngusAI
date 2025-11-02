@@ -176,7 +176,6 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
 
       @Override
       protected Void process() {
-        // TODO 一对多，需建立子表
         session.setIsStarred(isStarred);
         sessionRepo.save(session);
         return null;
