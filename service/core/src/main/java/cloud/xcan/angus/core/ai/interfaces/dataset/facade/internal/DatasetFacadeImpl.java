@@ -7,6 +7,8 @@ import cloud.xcan.angus.core.ai.application.cmd.dataset.DatasetCmd;
 import cloud.xcan.angus.core.ai.application.query.dataset.DatasetQuery;
 import cloud.xcan.angus.core.ai.domain.dataset.Dataset;
 import cloud.xcan.angus.core.ai.domain.dataset.DatasetStatistics;
+import cloud.xcan.angus.core.ai.domain.dataset.DatasetVisibility;
+import cloud.xcan.angus.core.ai.domain.dataset.SyncDataResult;
 import cloud.xcan.angus.core.ai.infra.util.DatasourceUtils.ConnectionTestResult;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.DatasetFacade;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DataSourceUpdateDto;

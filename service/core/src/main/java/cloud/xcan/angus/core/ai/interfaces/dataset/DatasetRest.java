@@ -1,5 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.dataset;
 
+import cloud.xcan.angus.core.ai.domain.dataset.DatasetVisibility;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.DatasetFacade;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DataSourceUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetCreateDto;
@@ -66,6 +67,29 @@ public class DatasetRest {
       @Parameter(description = "数据集ID") @PathVariable Long id,
       @Valid @RequestBody DatasetUpdateDto dto) {
     return ApiLocaleResult.success(datasetFacade.update(id, dto));
+  }
+
+  @Operation(operationId = "modifyDatasetVisibility", summary = "修改数据集可见性", description = "修改数据集可见性")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "可见性修改成功")
+  })
+  @ResponseStatus(HttpStatus.OK)
+  @PutMapping("/{id}/visibility")
+  public ApiLocaleResult<DatasetDetailVo> modifyVisibility(
+      @Parameter(description = "数据集ID") @PathVariable Long id,
+      @Parameter(description = "可见性") @RequestParam DatasetVisibility visibility) {
+    return ApiLocaleResult.success(datasetFacade.modifyVisibility(id, visibility));
+  }
+
+  @Operation(operationId = "syncDatasetData", summary = "同步数据集数据", description = "手动触发同步文件数据到数据库或同步表信息")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "同步已启动")
+  })
+  @PostMapping("/{id}/dataset/sync")
+  public ApiLocaleResult<List<SyncDataVo>> syncDatasetData(
+      @Parameter(description = "数据集ID") @PathVariable Long id,
+      @Parameter(description = "同步文件或表名") @RequestParam(required = false) List<String> names) {
+    return ApiLocaleResult.success(datasetFacade.syncDatasetData(id, names));
   }
 
   @Operation(operationId = "modifyDataSource", summary = "修改数据源", description = "修改数据源配置")

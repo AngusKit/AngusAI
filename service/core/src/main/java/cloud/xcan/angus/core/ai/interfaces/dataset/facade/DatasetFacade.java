@@ -1,5 +1,7 @@
 package cloud.xcan.angus.core.ai.interfaces.dataset.facade;
 
+import cloud.xcan.angus.core.ai.domain.dataset.DatasetVisibility;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasourceConnectionTestDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DataSourceUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetFindDto;
@@ -23,6 +25,16 @@ public interface DatasetFacade {
    * 更新数据集基本信息
    */
   DatasetDetailVo update(Long id, DatasetUpdateDto dto);
+
+  /**
+   * 同步文件数据到关系数据库或同步表信息
+   */
+  List<SyncDataVo> syncDatasetData(Long id, List<String> names);
+
+  /**
+   * 修改数据集可见性
+   */
+  DatasetDetailVo modifyVisibility(Long id, DatasetVisibility visibility);
 
   /**
    * 添加数据源
