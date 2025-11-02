@@ -16,21 +16,7 @@ public class SessionUpdateDto {
   @Size(max = 200, message = "标题长度不能超过200字符")
   private String title;
 
-  @Schema(description = "关联的应用ID")
-  private Long appId;
-
-  @Schema(description = "使用的模型ID")
-  private Long modelId;
-
   @Schema(description = "会话配置")
   private SessionConfig config;
 
-  @Schema(description = "是否置顶")
-  private Boolean isPinned;
-
-  @Schema(description = "是否收藏")
-  private Boolean isStarred;
-
-  @Schema(description = "是否归档")
-  private Boolean isArchived;
 }

@@ -52,6 +52,7 @@ public class MessageFacadeImpl implements MessageFacade {
 
   @Resource
   private FileStorageService fileStorageService;
+
   @Autowired
   private SessionQueryImpl sessionQueryImpl;
 

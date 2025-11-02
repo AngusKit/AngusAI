@@ -9,6 +9,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
@@ -26,73 +27,46 @@ public class Session extends TenantAuditingEntity<Session, Long> {
   @Id
   private Long id;
 
-  /**
-   * 会话标题
-   */
   @Column(nullable = false, length = 200)
   private String title;
 
-  /**
-   * 关联的应用ID
-   */
-  @Column(nullable = false)
+  @Column(name = "app_id", nullable = false)
   private Long appId;
 
-  /**
-   * 使用的模型ID
-   */
-  @Column(nullable = false)
+  @Column(name = "model_id", nullable = false)
   private Long modelId;
 
-  /**
-   * 会话配置
-   */
   @Type(JsonType.class)
-  @Column(columnDefinition = "json", length = 2000)
+  @Column(name = "config", columnDefinition = "json", length = 2000)
   private SessionConfig config;
 
-  /**
-   * 消息总数
-   */
-  @Column(nullable = false)
+  @Column(name = "message_count", nullable = false)
   private Integer messageCount = 0;
-
-  /**
-   * 是否已归档
-   */
-  @Column(nullable = false)
-  private Boolean isArchived = false;
-
-  /**
-   * 是否置顶
-   */
-  @Column(nullable = false)
-  private Boolean isPinned = false;
-
-  /**
-   * 是否收藏（星标） TODO 一对多，需建立子表
-   */
-  @Column(nullable = false)
-  private Boolean isStarred = false;
 
   /**
    * 最后一条消息内容摘要
    */
-  @Column(length = 60000, columnDefinition = "MEDIUMTEXT")
+  @Column(name = "last_message_content", length = 60000, columnDefinition = "MEDIUMTEXT")
   private String lastMessageContent;
 
   /**
    * 最后一条消息角色
    */
   @Enumerated(EnumType.STRING)
-  @Column(length = 20)
+  @Column(name = "last_message_role", length = 20)
   private MessageRole lastMessageRole;
 
   /**
    * 最后消息时间
    */
-  @Column
+  @Column(name = "last_message_time")
   private Long lastMessageTime;
+
+  /**
+   * 是否收藏（星标）
+   */
+  @Transient
+  private Boolean isStarred = false;
 
   @Override
   public Long identity() {

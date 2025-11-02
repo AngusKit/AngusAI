@@ -4,6 +4,7 @@ import cloud.xcan.angus.core.jpa.repository.BaseRepository;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.repository.NoRepositoryBean;
 
 /**
@@ -50,11 +51,13 @@ public interface MessageRepo extends BaseRepository<Message, Long> {
   /**
    * 删除会话的所有消息
    */
-  void deleteBySessionId(Long sessionId);
+  @Modifying
+  int deleteBySessionId(Long sessionId);
 
   /**
    * 批量删除会话的所有消息
    */
+  @Modifying
   int deleteBySessionIdIn(List<Long> ids);
 
 }

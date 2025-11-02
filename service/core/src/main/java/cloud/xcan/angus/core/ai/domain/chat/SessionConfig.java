@@ -19,9 +19,9 @@ public class SessionConfig implements Serializable {
   /**
    * 温度参数 0-2
    */
-  @Schema(description = "温度参数，范围 0-2，用于控制生成文本的随机性，越大越随机。默认 0.5。", example = "0.5")
+  @Schema(description = "温度参数，范围 0-2，用于控制生成文本的随机性，越大越随机。", example = "0.5")
   @Range(min = 0, max = 2)
-  private Double temperature = 0.5;
+  private Double temperature;
 
   /**
    * 最大令牌数

@@ -26,8 +26,6 @@ public class SessionAssembler {
 
     // 初始化计数和标志
     session.setMessageCount(0);
-    session.setIsArchived(false);
-    session.setIsPinned(false);
     session.setIsStarred(false);
     return session;
   }
@@ -36,10 +34,6 @@ public class SessionAssembler {
     Session session = new Session();
     session.setId(id);
     session.setTitle(dto.getTitle());
-    session.setAppId(dto.getAppId());
-    session.setModelId(dto.getModelId());
-    session.setIsPinned(dto.getIsPinned());
-    session.setIsArchived(dto.getIsArchived());
     session.setConfig(dto.getConfig());
     return session;
   }
