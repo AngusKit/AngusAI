@@ -1,12 +1,12 @@
 package cloud.xcan.angus.core.ai.application.converter;
 
-import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.ResourceSharing;
-import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.ResourceSharingMember;
-import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.ResourceType;
-import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.SharePermission;
-import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.SharedWith;
-import cloud.xcan.angus.core.ai.interfaces.settings.facade.vo.ResourceSharingDetailVo;
-import cloud.xcan.angus.core.ai.interfaces.settings.facade.vo.ResourceSharingListVo;
+import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceSharing;
+import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceSharingMember;
+import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceType;
+import cloud.xcan.angus.core.ai.domain.team.resourcesharing.SharePermission;
+import cloud.xcan.angus.core.ai.domain.team.resourcesharing.SharedWith;
+import cloud.xcan.angus.core.ai.interfaces.team.facade.vo.ResourceSharingDetailVo;
+import cloud.xcan.angus.core.ai.interfaces.team.facade.vo.ResourceSharingListVo;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;

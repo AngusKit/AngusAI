@@ -5,8 +5,8 @@ import static cloud.xcan.angus.core.jpa.criteria.CriteriaUtils.findValueAndRemov
 import static cloud.xcan.angus.spec.utils.ObjectUtils.isEmpty;
 
 import cloud.xcan.angus.api.commonlink.CombinedTargetType;
-import cloud.xcan.angus.core.ai.domain.activity.Activity;
-import cloud.xcan.angus.core.ai.domain.activity.ActivityListRepo;
+import cloud.xcan.angus.core.ai.domain.team.activity.Activity;
+import cloud.xcan.angus.core.ai.domain.team.activity.ActivityListRepo;
 import cloud.xcan.angus.core.jpa.repository.AbstractSearchRepository;
 import cloud.xcan.angus.core.jpa.repository.SearchMode;
 import cloud.xcan.angus.remote.search.SearchCriteria;

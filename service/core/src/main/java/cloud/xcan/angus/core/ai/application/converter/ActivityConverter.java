@@ -9,11 +9,11 @@ import static cloud.xcan.angus.spec.utils.ObjectUtils.nullSafe;
 import static java.util.Objects.nonNull;
 
 import cloud.xcan.angus.api.commonlink.CombinedTargetType;
-import cloud.xcan.angus.core.ai.domain.activity.Activity;
-import cloud.xcan.angus.core.ai.domain.activity.ActivityResource;
-import cloud.xcan.angus.core.ai.domain.activity.ActivitySummary;
-import cloud.xcan.angus.core.ai.domain.activity.ActivityType;
-import cloud.xcan.angus.core.ai.domain.activity.MainTargetActivityResource;
+import cloud.xcan.angus.core.ai.domain.team.activity.Activity;
+import cloud.xcan.angus.core.ai.domain.team.activity.ActivityResource;
+import cloud.xcan.angus.core.ai.domain.team.activity.ActivitySummary;
+import cloud.xcan.angus.core.ai.domain.team.activity.ActivityType;
+import cloud.xcan.angus.core.ai.domain.team.activity.MainTargetActivityResource;
 import cloud.xcan.angus.spec.locale.EnumValueMessage;
 import cloud.xcan.angus.spec.principal.Principal;
 import cloud.xcan.angus.spec.principal.PrincipalContext;
