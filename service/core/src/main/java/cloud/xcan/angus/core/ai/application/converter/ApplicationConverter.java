@@ -4,7 +4,6 @@ import cloud.xcan.angus.core.ai.domain.application.Application;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationConfig;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationShare;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
-import cloud.xcan.angus.core.utils.CoreUtils;
 import java.util.UUID;
 
 public class ApplicationConverter {

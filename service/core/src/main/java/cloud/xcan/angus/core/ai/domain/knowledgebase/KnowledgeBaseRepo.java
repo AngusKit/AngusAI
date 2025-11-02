@@ -5,13 +5,10 @@ import java.util.List;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 @NoRepositoryBean
 public interface KnowledgeBaseRepo extends BaseRepository<KnowledgeBase, Long> {
 
-  // ==================== 查询方法 ====================
-  
   /**
    * 根据名称查找知识库
    */
@@ -39,8 +36,6 @@ public interface KnowledgeBaseRepo extends BaseRepository<KnowledgeBase, Long> {
   @Query("SELECT kb FROM KnowledgeBase kb WHERE JSON_CONTAINS(kb.tags, :tag)")
   List<KnowledgeBase> findByTag(@Param("tag") String tag);
 
-  // ==================== 统计方法 ====================
-  
   /**
    * 统计知识库数量
    */

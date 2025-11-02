@@ -2,21 +2,20 @@ package cloud.xcan.angus.core.ai.application.cmd.settings.impl;
 
 import cloud.xcan.angus.core.ai.application.cmd.settings.SettingsCmd;
 import cloud.xcan.angus.core.ai.application.query.settings.SettingsQuery;
-import cloud.xcan.angus.core.ai.domain.settings.dataexport.DataExport;
-import cloud.xcan.angus.core.ai.domain.settings.dataexport.DataExportRepo;
-import cloud.xcan.angus.core.ai.domain.settings.dataexport.ExportStatus;
 import cloud.xcan.angus.core.ai.domain.settings.NotificationSettings;
 import cloud.xcan.angus.core.ai.domain.settings.PrivacySettings;
-import cloud.xcan.angus.core.ai.domain.settings.securitysettings.SecuritySettings;
-import cloud.xcan.angus.core.ai.domain.settings.securitysettings.SecuritySettingsRepo;
 import cloud.xcan.angus.core.ai.domain.settings.TwoFactorMethod;
 import cloud.xcan.angus.core.ai.domain.settings.UserPreferences;
 import cloud.xcan.angus.core.ai.domain.settings.UserSession;
 import cloud.xcan.angus.core.ai.domain.settings.UserSessionRepo;
 import cloud.xcan.angus.core.ai.domain.settings.UserSettings;
 import cloud.xcan.angus.core.ai.domain.settings.UserSettingsRepo;
+import cloud.xcan.angus.core.ai.domain.settings.dataexport.DataExport;
+import cloud.xcan.angus.core.ai.domain.settings.dataexport.DataExportRepo;
+import cloud.xcan.angus.core.ai.domain.settings.dataexport.ExportStatus;
+import cloud.xcan.angus.core.ai.domain.settings.securitysettings.SecuritySettings;
+import cloud.xcan.angus.core.ai.domain.settings.securitysettings.SecuritySettingsRepo;
 import cloud.xcan.angus.core.ai.interfaces.settings.facade.dto.DataExportRequestDto;
-import cloud.xcan.angus.core.biz.Biz;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
@@ -27,14 +26,13 @@ import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Map;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 设置命令服务实现
  */
-@Component
-@Biz
+@Service
 public class SettingsCmdImpl extends CommCmd<UserSettings, Long> implements SettingsCmd {
 
   @Resource

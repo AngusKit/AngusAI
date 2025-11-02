@@ -5,18 +5,15 @@ import cloud.xcan.angus.core.ai.application.query.knowledgebase.KnowledgeBaseQue
 import cloud.xcan.angus.core.ai.domain.knowledgebase.DocumentVisibility;
 import cloud.xcan.angus.core.ai.domain.knowledgebase.KnowledgeBase;
 import cloud.xcan.angus.core.ai.domain.knowledgebase.KnowledgeBaseRepo;
-import cloud.xcan.angus.core.biz.Biz;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
-import cloud.xcan.angus.core.utils.CoreUtils;
 import cloud.xcan.angus.remote.message.http.ResourceExisted;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Biz
 public class KnowledgeBaseCmdImpl extends CommCmd<KnowledgeBase, Long> implements KnowledgeBaseCmd {
 
   @Resource
@@ -69,6 +66,8 @@ public class KnowledgeBaseCmdImpl extends CommCmd<KnowledgeBase, Long> implement
 
       @Override
       protected KnowledgeBase process() {
+        // TODO 检查如果修改了向量化配置参数，需要重新对知识库中文档分段和向量化
+
         update(knowledgeBase, knowledgeBaseDb);
         return knowledgeBaseDb;
       }
@@ -89,6 +88,8 @@ public class KnowledgeBaseCmdImpl extends CommCmd<KnowledgeBase, Long> implement
 
       @Override
       protected KnowledgeBase process() {
+        // TODO 如果禁用，其他人引用知识库已被禁用
+
         knowledgeBaseDb.setEnabled(enabled);
         return knowledgeBaseRepo.save(knowledgeBaseDb);
       }
@@ -109,6 +110,8 @@ public class KnowledgeBaseCmdImpl extends CommCmd<KnowledgeBase, Long> implement
 
       @Override
       protected KnowledgeBase process() {
+        // TODO 如果设置成私有，其他人引用知识库在使用时提示：知识库被设置成了私有权限或不可用需要共享授权
+
         knowledgeBaseDb.setVisibility(visibility);
         return knowledgeBaseRepo.save(knowledgeBaseDb);
       }
@@ -122,6 +125,8 @@ public class KnowledgeBaseCmdImpl extends CommCmd<KnowledgeBase, Long> implement
       @Override
       protected Void process() {
         knowledgeBaseRepo.deleteById(id);
+
+        // TODO 删除文档、分段、向量存储
         return null;
       }
     }.execute();

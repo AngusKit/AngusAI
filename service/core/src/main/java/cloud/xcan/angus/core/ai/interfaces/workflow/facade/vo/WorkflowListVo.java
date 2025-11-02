@@ -1,11 +1,10 @@
 package cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo;
 
-import cloud.xcan.angus.core.ai.domain.workflow.WorkflowType;
 import cloud.xcan.angus.core.ai.domain.workflow.WorkflowStatus;
+import cloud.xcan.angus.core.ai.domain.workflow.WorkflowType;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-
 import java.time.LocalDateTime;
+import lombok.Data;
 
 @Data
 @Schema(description = "工作流列表项响应")
@@ -48,7 +47,7 @@ public class WorkflowListVo {
   private LocalDateTime createdDate;
 
   @Schema(description = "最后修改时间")
-  private LocalDateTime lastModifiedDate;
+  private LocalDateTime modifiedDate;
 
   @Schema(description = "统计信息")
   private Object stats;

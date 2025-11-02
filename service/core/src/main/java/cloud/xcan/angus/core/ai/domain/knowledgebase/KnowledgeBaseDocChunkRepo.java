@@ -5,13 +5,10 @@ import java.util.List;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 @NoRepositoryBean
 public interface KnowledgeBaseDocChunkRepo extends BaseRepository<KnowledgeBaseDocChunk, Long> {
 
-  // ==================== 查询方法 ====================
-  
   /**
    * 根据文档ID查找分段
    */
@@ -28,8 +25,6 @@ public interface KnowledgeBaseDocChunkRepo extends BaseRepository<KnowledgeBaseD
   @Query("SELECT dc FROM KnowledgeBaseDocChunk dc JOIN KnowledgeBaseDoc d ON dc.documentId = d.id WHERE d.knowledgeBaseId = :knowledgeBaseId")
   List<KnowledgeBaseDocChunk> findByKnowledgeBaseId(@Param("knowledgeBaseId") Long knowledgeBaseId);
 
-  // ==================== 统计方法 ====================
-  
   /**
    * 统计文档的分段数量
    */
@@ -42,8 +37,6 @@ public interface KnowledgeBaseDocChunkRepo extends BaseRepository<KnowledgeBaseD
   @Query("SELECT COUNT(dc) FROM KnowledgeBaseDocChunk dc JOIN KnowledgeBaseDoc d ON dc.documentId = d.id WHERE d.knowledgeBaseId = :knowledgeBaseId")
   Long countByKnowledgeBaseId(@Param("knowledgeBaseId") Long knowledgeBaseId);
 
-  // ==================== 删除方法 ====================
-  
   /**
    * 根据文档ID删除分段
    */

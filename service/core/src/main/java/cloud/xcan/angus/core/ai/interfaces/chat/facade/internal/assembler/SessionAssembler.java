@@ -71,9 +71,9 @@ public class SessionAssembler {
       vo.setCreatedDate(
           Date.from(session.getCreatedDate().atZone(ZoneId.systemDefault()).toInstant()));
     }
-    if (session.getLastModifiedDate() != null) {
-      vo.setLastModifiedDate(
-          Date.from(session.getLastModifiedDate().atZone(ZoneId.systemDefault()).toInstant()));
+    if (session.getModifiedDate() != null) {
+      vo.setModifiedDate(
+          Date.from(session.getModifiedDate().atZone(ZoneId.systemDefault()).toInstant()));
     }
 
     // 转换配置
@@ -105,9 +105,9 @@ public class SessionAssembler {
       vo.setCreatedDate(
           Date.from(session.getCreatedDate().atZone(ZoneId.systemDefault()).toInstant()));
     }
-    if (session.getLastModifiedDate() != null) {
-      vo.setLastModifiedDate(
-          Date.from(session.getLastModifiedDate().atZone(ZoneId.systemDefault()).toInstant()));
+    if (session.getModifiedDate() != null) {
+      vo.setModifiedDate(
+          Date.from(session.getModifiedDate().atZone(ZoneId.systemDefault()).toInstant()));
     }
 
     // 最后一条消息

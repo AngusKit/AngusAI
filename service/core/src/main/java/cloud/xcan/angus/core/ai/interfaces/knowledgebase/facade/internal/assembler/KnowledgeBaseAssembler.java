@@ -21,7 +21,7 @@ import java.util.Set;
 
 public class KnowledgeBaseAssembler {
 
-  public static KnowledgeBase toDomain(KnowledgeBaseCreateDto dto) {
+  public static KnowledgeBase toCreateDomain(KnowledgeBaseCreateDto dto) {
     KnowledgeBase knowledgeBase = new KnowledgeBase();
     knowledgeBase.setName(dto.getName());
     knowledgeBase.setIcon(dto.getIcon());
@@ -29,17 +29,19 @@ public class KnowledgeBaseAssembler {
     knowledgeBase.setDescription(dto.getDescription());
     knowledgeBase.setVisibility(nullSafe(dto.getVisibility(), DocumentVisibility.PRIVATE));
     knowledgeBase.setTags(dto.getTags());
-    knowledgeBase.setConfig(toConfig(dto.getConfig()));
 
     // 设置默认值
     knowledgeBase.setEnabled(true);
     knowledgeBase.setDocumentsCount(0);
     knowledgeBase.setTotalSize(0L);
     knowledgeBase.setTotalChunks(0);
+
+    // 设置向量化配置
+    knowledgeBase.setConfig(toConfig(dto.getConfig()));
     return knowledgeBase;
   }
 
-  public static KnowledgeBase updateDomain(Long id, KnowledgeBaseUpdateDto dto) {
+  public static KnowledgeBase toUpdateDomain(Long id, KnowledgeBaseUpdateDto dto) {
     KnowledgeBase knowledgeBase = new KnowledgeBase();
     knowledgeBase.setId(id);
     knowledgeBase.setName(dto.getName());
@@ -48,6 +50,8 @@ public class KnowledgeBaseAssembler {
     knowledgeBase.setDescription(dto.getDescription());
     knowledgeBase.setVisibility(dto.getVisibility());
     knowledgeBase.setTags(dto.getTags());
+
+    // 设置向量化配置
     knowledgeBase.setConfig(toConfig(dto.getConfig()));
     return knowledgeBase;
   }
@@ -80,8 +84,8 @@ public class KnowledgeBaseAssembler {
     vo.setTenantId(knowledgeBase.getTenantId());
     vo.setCreatedBy(knowledgeBase.getCreatedBy());
     vo.setCreatedDate(knowledgeBase.getCreatedDate());
-    vo.setLastModifiedBy(knowledgeBase.getLastModifiedBy());
-    vo.setLastModifiedDate(knowledgeBase.getLastModifiedDate());
+    vo.setModifiedBy(knowledgeBase.getModifiedBy());
+    vo.setModifiedDate(knowledgeBase.getModifiedDate());
 
     // 设置统计信息
     KnowledgeBaseStatsVo stats = new KnowledgeBaseStatsVo();
@@ -119,16 +123,16 @@ public class KnowledgeBaseAssembler {
     vo.setTenantId(knowledgeBase.getTenantId());
     vo.setCreatedBy(knowledgeBase.getCreatedBy());
     vo.setCreatedDate(knowledgeBase.getCreatedDate());
-    vo.setLastModifiedBy(knowledgeBase.getLastModifiedBy());
-    vo.setLastModifiedDate(knowledgeBase.getLastModifiedDate());
+    vo.setModifiedBy(knowledgeBase.getModifiedBy());
+    vo.setModifiedDate(knowledgeBase.getModifiedDate());
     return vo;
   }
 
   public static GenericSpecification<KnowledgeBase> getSpecification(KnowledgeBaseFindDto dto) {
     // Build the final filters
     Set<SearchCriteria> filters = new SearchCriteriaBuilder<>(dto)
-        .rangeSearchFields("id", "createdDate", "lastModifiedDate")
-        .orderByFields("id", "createdDate", "lastModifiedDate", "name")
+        .rangeSearchFields("id", "createdDate", "modifiedDate")
+        .orderByFields("id", "createdDate", "modifiedDate", "name")
         .matchSearchFields("name", "description")
         .inAndNotFields("visibility", "enabled")
         .build();

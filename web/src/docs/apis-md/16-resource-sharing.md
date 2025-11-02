@@ -216,7 +216,7 @@ Authorization: Bearer <JWT_TOKEN>
     }>;
 
     createdDate: Date
-    lastModifiedDate: Date;
+    modifiedDate: Date;
   },
   datetime: 1706889600000
 }
@@ -353,7 +353,7 @@ Authorization: Bearer <JWT_TOKEN>
   data: {
     id: number;
     updatedFields: string[];
-    lastModifiedDate: Date;
+    modifiedDate: Date;
   },
   datetime: 1706889600000
 }

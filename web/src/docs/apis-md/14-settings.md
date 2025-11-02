@@ -1002,7 +1002,7 @@ Authorization: Bearer <JWT_TOKEN>
   data: {
     key: string;
     value: any;
-    lastModifiedDate: Date;
+    modifiedDate: Date;
   },
   datetime: 1706889600000
 }
@@ -1046,7 +1046,7 @@ Authorization: Bearer <JWT_TOKEN>
   data: {
     key: string;
     value: any;
-    lastModifiedDate: Date;
+    modifiedDate: Date;
   },
   datetime: 1706889600000
 }

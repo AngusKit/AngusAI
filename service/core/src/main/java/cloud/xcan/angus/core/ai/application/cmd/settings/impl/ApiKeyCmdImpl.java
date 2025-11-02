@@ -9,26 +9,23 @@ import cloud.xcan.angus.core.ai.domain.settings.apikey.ApiKeyStatus;
 import cloud.xcan.angus.core.ai.interfaces.settings.apikey.dto.ApiKeyCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.settings.apikey.dto.ApiKeyRevokeDto;
 import cloud.xcan.angus.core.ai.interfaces.settings.apikey.dto.ApiKeyUpdateDto;
-import cloud.xcan.angus.core.biz.Biz;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import jakarta.annotation.Resource;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Base64;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * API密钥命令实现
  */
-@Component
-@Biz
+@Service
 public class ApiKeyCmdImpl extends CommCmd<ApiKey, Long> implements ApiKeyCmd {
 
   @Resource

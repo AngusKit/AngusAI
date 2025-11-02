@@ -1,9 +1,9 @@
 package cloud.xcan.angus.core.ai.application.converter;
 
-import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.SharePermission;
 import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.ResourceSharing;
 import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.ResourceSharingMember;
 import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.ResourceType;
+import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.SharePermission;
 import cloud.xcan.angus.core.ai.domain.settings.resourcesharing.SharedWith;
 import cloud.xcan.angus.core.ai.interfaces.settings.facade.vo.ResourceSharingDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.settings.facade.vo.ResourceSharingListVo;
@@ -36,8 +36,8 @@ public class ResourceSharingConverter {
     vo.setPermissionLabel(getPermissionLabel(entity.getPermission()));
     vo.setViews(entity.getTotalViews());
     vo.setEdits(entity.getTotalEdits());
-    vo.setLastShared(formatTimeAgo(entity.getLastModifiedDate()));
-    vo.setLastSharedAt(entity.getLastModifiedDate());
+    vo.setLastShared(formatTimeAgo(entity.getModifiedDate()));
+    vo.setLastSharedAt(entity.getModifiedDate());
     vo.setCreatedDate(entity.getCreatedDate());
     return vo;
   }
@@ -94,7 +94,7 @@ public class ResourceSharingConverter {
     vo.setStatistics(statistics);
     vo.setEnabled(entity.getEnabled());
     vo.setCreatedDate(entity.getCreatedDate());
-    vo.setLastModifiedDate(entity.getLastModifiedDate());
+    vo.setModifiedDate(entity.getModifiedDate());
 
     return vo;
   }

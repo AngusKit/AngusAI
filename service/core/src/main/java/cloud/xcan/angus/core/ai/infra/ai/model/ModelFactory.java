@@ -4,7 +4,6 @@ import com.azure.ai.openai.OpenAIClient;
 import com.azure.ai.openai.OpenAIClientBuilder;
 import com.google.cloud.vertexai.VertexAI;
 import jakarta.annotation.Resource;
-import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -252,7 +251,7 @@ public class ModelFactory {
   private ChatModel createOpenAIChatModel(ModelConfig config) {
     OpenAiApi openAiApi = OpenAiApi.builder()
         .apiKey(config.getApiKey())
-        .baseUrl(config.getBaseUrl())
+        .baseUrl(config.getApiEndpoint())
         .build();
 
     var options = OpenAiChatOptions.builder()
@@ -267,7 +266,7 @@ public class ModelFactory {
   private ChatModel createAnthropicChatModel(ModelConfig config) {
     AnthropicApi anthropicApi = AnthropicApi.builder()
         .apiKey(config.getApiKey())
-        .baseUrl(config.getBaseUrl())
+        .baseUrl(config.getApiEndpoint())
         .build();
 
     var options = AnthropicChatOptions.builder()
@@ -308,7 +307,7 @@ public class ModelFactory {
 
   private ChatModel createOllamaChatModel(ModelConfig config) {
     OllamaApi ollamaApi = OllamaApi.builder()
-        .baseUrl(config.getBaseUrl())
+        .baseUrl(config.getApiEndpoint())
         .build();
 
     var options = OllamaOptions.builder()
@@ -321,7 +320,7 @@ public class ModelFactory {
   }
 
   private ChatModel createMistralAIChatModel(ModelConfig config) {
-    MistralAiApi mistralAiApi = new MistralAiApi(config.getBaseUrl(), config.getApiKey());
+    MistralAiApi mistralAiApi = new MistralAiApi(config.getApiEndpoint(), config.getApiKey());
 
     var options = MistralAiChatOptions.builder()
         .model(config.getModelName())
@@ -335,7 +334,7 @@ public class ModelFactory {
   private ChatModel createDeepSeekChatModel(ModelConfig config) {
     DeepSeekApi deepSeekApi = DeepSeekApi.builder()
         .apiKey(config.getApiKey())
-        .baseUrl(config.getBaseUrl())
+        .baseUrl(config.getApiEndpoint())
         .build();
 
     var options = DeepSeekChatOptions.builder()
@@ -348,7 +347,7 @@ public class ModelFactory {
   }
 
   private ChatModel createZhipuAIChatModel(ModelConfig config) {
-    ZhiPuAiApi zhiPuAiApi = new ZhiPuAiApi(config.getBaseUrl(), config.getApiKey());
+    ZhiPuAiApi zhiPuAiApi = new ZhiPuAiApi(config.getApiEndpoint(), config.getApiKey());
 
     var options = ZhiPuAiChatOptions.builder()
         .model(config.getModelName())
@@ -360,7 +359,7 @@ public class ModelFactory {
   }
 
   private ChatModel createMiniMaxChatModel(ModelConfig config) {
-    MiniMaxApi miniMaxApi = new MiniMaxApi(config.getBaseUrl(), config.getMaxTokens().toString());
+    MiniMaxApi miniMaxApi = new MiniMaxApi(config.getApiEndpoint(), config.getMaxTokens().toString());
 
     var options = MiniMaxChatOptions.builder()
         .model(config.getModelName())
@@ -372,7 +371,7 @@ public class ModelFactory {
   }
 
   private ChatModel createHuggingFaceChatModel(ModelConfig config) {
-    return new HuggingfaceChatModel(config.getApiKey(), config.getBaseUrl());
+    return new HuggingfaceChatModel(config.getApiKey(), config.getApiEndpoint());
   }
 
   // 以下提供商使用OpenAI兼容接口
@@ -408,7 +407,7 @@ public class ModelFactory {
   private ChatModel createOpenAICompatibleChatModel(ModelConfig config, String providerName) {
     OpenAiApi openAiApi = OpenAiApi.builder()
         .apiKey(config.getApiKey())
-        .baseUrl(config.getBaseUrl())
+        .baseUrl(config.getApiEndpoint())
         .build();
 
     var options = OpenAiChatOptions.builder()
@@ -450,7 +449,7 @@ public class ModelFactory {
   private EmbeddingModel createOpenAIEmbeddingModel(ModelConfig config) {
     OpenAiApi openAiApi = OpenAiApi.builder()
         .apiKey(config.getApiKey())
-        .baseUrl(config.getBaseUrl())
+        .baseUrl(config.getApiEndpoint())
         .build();
 
     return new OpenAiEmbeddingModel(openAiApi);
@@ -475,7 +474,7 @@ public class ModelFactory {
 
   private EmbeddingModel createOllamaEmbeddingModel(ModelConfig config) {
     OllamaApi ollamaApi = OllamaApi.builder()
-        .baseUrl(config.getBaseUrl())
+        .baseUrl(config.getApiEndpoint())
         .build();
     var options = OllamaOptions.builder()
         .model(config.getModelName())
@@ -514,7 +513,7 @@ public class ModelFactory {
       String providerName) {
     OpenAiApi openAiApi = OpenAiApi.builder()
         .apiKey(config.getApiKey())
-        .baseUrl(config.getBaseUrl())
+        .baseUrl(config.getApiEndpoint())
         .build();
 
     log.info("创建 {} EmbeddingModel (OpenAI兼容): {}", providerName, config.getModelName());

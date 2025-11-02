@@ -2,9 +2,8 @@ package cloud.xcan.angus.core.ai.interfaces.chat.facade.vo;
 
 import cloud.xcan.angus.core.ai.domain.chat.SessionConfig;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-
 import java.util.Date;
+import lombok.Data;
 
 /**
  * 会话详情VO
@@ -50,7 +49,7 @@ public class SessionDetailVo {
   private Date createdDate;
 
   @Schema(description = "最后修改时间")
-  private Date lastModifiedDate;
+  private Date modifiedDate;
 
   @Schema(description = "创建人ID")
   private Long createdBy;

@@ -1,11 +1,10 @@
 package cloud.xcan.angus.core.ai.domain.chat;
 
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.NoRepositoryBean;
-
-import java.util.List;
 
 /**
  * 附件仓储接口

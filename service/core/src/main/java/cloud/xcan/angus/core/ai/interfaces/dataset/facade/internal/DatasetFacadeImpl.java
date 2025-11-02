@@ -4,40 +4,28 @@ import static cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder.getMatchS
 import static cloud.xcan.angus.core.utils.CoreUtils.buildVoPageResult;
 
 import cloud.xcan.angus.core.ai.application.cmd.dataset.DatasetCmd;
-import cloud.xcan.angus.core.ai.application.cmd.dataset.DatasetDataCmd;
-import cloud.xcan.angus.core.ai.application.query.dataset.DatasetDataQuery;
 import cloud.xcan.angus.core.ai.application.query.dataset.DatasetQuery;
 import cloud.xcan.angus.core.ai.domain.dataset.Dataset;
-import cloud.xcan.angus.core.ai.domain.dataset.DatasetData;
 import cloud.xcan.angus.core.ai.domain.dataset.DatasetStatistics;
 import cloud.xcan.angus.core.ai.domain.dataset.DatasetVisibility;
 import cloud.xcan.angus.core.ai.domain.dataset.SyncDataResult;
 import cloud.xcan.angus.core.ai.infra.util.DatasourceUtils.ConnectionTestResult;
-import cloud.xcan.angus.core.ai.infra.util.DatasourceUtils.TableDataResult;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.DatasetFacade;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DataSourceUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetCreateDto;
-import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetDataBatchDeleteDto;
-import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetDataFindDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetFindDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasourceConnectionTestDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.internal.assembler.DatasetAssembler;
-import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetDataListVo;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetListVo;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetStatisticsVo;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasourceConfigVo;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasourceConnectionTestVo;
-import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasourceTableDataPreviewVo;
-import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.SyncDataVo;
 import cloud.xcan.angus.core.biz.NameJoin;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.PageResult;
-import cloud.xcan.angus.remote.search.SearchCriteria;
 import jakarta.annotation.Resource;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
@@ -50,31 +38,18 @@ public class DatasetFacadeImpl implements DatasetFacade {
   @Resource
   private DatasetCmd datasetCmd;
 
-  @Resource
-  private DatasetDataQuery datasetDataQuery;
-
-  @Resource
-  private DatasetDataCmd datasetDataCmd;
-
   @Override
   public DatasetDetailVo create(DatasetCreateDto dto) {
-    Dataset dataset = DatasetAssembler.toDomain(dto);
+    Dataset dataset = DatasetAssembler.toCreateDomain(dto);
     Dataset saved = datasetCmd.create(dataset);
     return DatasetAssembler.toDetailVo(saved);
   }
 
   @Override
   public DatasetDetailVo update(Long id, DatasetUpdateDto dto) {
-    Dataset dataset = DatasetAssembler.updateDomain(id, dto);
+    Dataset dataset = DatasetAssembler.toUpdateDomain(id, dto);
     Dataset saved = datasetCmd.update(dataset);
     return DatasetAssembler.toDetailVo(saved);
-  }
-
-  @Override
-  public List<SyncDataVo> syncDatasetData(Long id, List<String> names) {
-    List<SyncDataResult> results = datasetDataCmd.syncDatasetData(id, names);
-    return results.stream().map(DatasetAssembler::toSyncDataVo)
-        .collect(Collectors.toList());
   }
 
   @Override
@@ -94,17 +69,6 @@ public class DatasetFacadeImpl implements DatasetFacade {
   @Override
   public void deleteDataSource(Long id) {
     datasetCmd.deleteDataSource(id);
-  }
-
-  @Override
-  public void batchDeleteData(Long id, DatasetDataBatchDeleteDto dto) {
-    datasetDataCmd.batchDeleteData(id, dto.getNames());
-  }
-
-  @Override
-  public DatasetDetailVo modifyVisibility(Long id, DatasetVisibility visibility) {
-    Dataset saved = datasetCmd.modifyVisibility(id, visibility);
-    return DatasetAssembler.toDetailVo(saved);
   }
 
   @Override
@@ -132,22 +96,5 @@ public class DatasetFacadeImpl implements DatasetFacade {
   public DatasetStatisticsVo getStatistics(Long id) {
     DatasetStatistics stats = datasetQuery.getStatistics(id);
     return DatasetAssembler.toDatasetStatisticsVo(stats);
-  }
-
-  @Override
-  public PageResult<DatasetDataListVo> listData(Long id, DatasetDataFindDto dto) {
-    GenericSpecification<DatasetData> spec = DatasetAssembler.getSpecification(dto);
-    spec.getCriteria().add(SearchCriteria.equal("datasetId", id));
-    Page<DatasetData> page = datasetDataQuery.find(spec, dto.tranPage(),
-        dto.fullTextSearch, getMatchSearchFields(dto.getClass()));
-    return buildVoPageResult(page, DatasetAssembler::toDataListVo);
-  }
-
-  @Override
-  public DatasourceTableDataPreviewVo previewDatasourceData(Long id, String tableName,
-      Integer pageNo, Integer pageSize) {
-    TableDataResult result = datasetDataQuery.previewDatasourceData(
-        id, tableName, pageNo, pageSize);
-    return DatasetAssembler.toTableDataPreviewVo(result);
   }
 }

@@ -11,7 +11,6 @@ import cloud.xcan.angus.core.ai.domain.dataset.DatasetVisibility;
 import cloud.xcan.angus.core.ai.domain.dataset.DatasourceConfig;
 import cloud.xcan.angus.core.ai.infra.util.DatasourceUtils;
 import cloud.xcan.angus.core.ai.infra.util.DatasourceUtils.ConnectionTestResult;
-import cloud.xcan.angus.core.biz.Biz;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
@@ -22,12 +21,11 @@ import cloud.xcan.angus.spec.utils.ObjectUtils;
 import jakarta.annotation.Resource;
 import java.util.Optional;
 import org.springframework.lang.Nullable;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @DoInFuture("添加权限校验")
-@Component
-@Biz
+@Service
 public class DatasetCmdImpl extends CommCmd<Dataset, Long> implements DatasetCmd {
 
   @Resource
@@ -113,12 +111,16 @@ public class DatasetCmdImpl extends CommCmd<Dataset, Long> implements DatasetCmd
       protected void checkParams() {
         // 获取数据集并检查是否存在
         datasetDb = datasetQuery.findAndCheck(id);
+
+        // TODO 检查数据源配置有效性
       }
 
       @Override
       protected Dataset process() {
         // 更新配置
         datasetDb.setConfig(config);
+
+        // TODO 拉去表信息到DatasetData表
 
         return datasetRepo.save(datasetDb);
       }
@@ -169,6 +171,8 @@ public class DatasetCmdImpl extends CommCmd<Dataset, Long> implements DatasetCmd
           protected Void process() {
             // 更新配置
             datasetDb.setConfig(null);
+
+            // TODO 删除数据源DatasetData记录
 
             datasetRepo.save(datasetDb);
             return null;

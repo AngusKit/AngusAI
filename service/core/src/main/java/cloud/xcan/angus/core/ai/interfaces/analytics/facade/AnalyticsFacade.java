@@ -1,7 +1,14 @@
 package cloud.xcan.angus.core.ai.interfaces.analytics.facade;
 
 import cloud.xcan.angus.core.ai.interfaces.analytics.facade.dto.AnalyticsQueryDto;
-import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.*;
+import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.AnalyticsOverviewVo;
+import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.ApiCallsTrendVo;
+import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.AppDistributionVo;
+import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.ErrorAnalysisVo;
+import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.ModelDistributionVo;
+import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.ResponseTimeAnalysisVo;
+import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.TokenUsageTrendVo;
+import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.TopEndpointsVo;
 
 public interface AnalyticsFacade {
 

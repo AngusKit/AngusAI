@@ -13,7 +13,4 @@ public class PromptStatsVo {
   @Schema(description = "收藏次数")
   private Long favorites;
 
-  @Schema(description = "分享次数")
-  private Long shares;
-
 }

@@ -3,21 +3,16 @@ package cloud.xcan.angus.core.ai.interfaces.dataset.facade;
 import cloud.xcan.angus.core.ai.domain.dataset.DatasetVisibility;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasourceConnectionTestDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DataSourceUpdateDto;
-import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetDataBatchDeleteDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetCreateDto;
-import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetDataFindDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetFindDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetUpdateDto;
-import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasourceConnectionTestVo;
-import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasourceConfigVo;
-import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasourceTableDataPreviewVo;
-import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetDataListVo;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasourceConnectionTestDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetListVo;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetStatisticsVo;
-import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.SyncDataVo;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasourceConfigVo;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasourceConnectionTestVo;
 import cloud.xcan.angus.remote.PageResult;
-import java.util.List;
 
 public interface DatasetFacade {
 
@@ -57,11 +52,6 @@ public interface DatasetFacade {
   void deleteDataSource(Long id);
 
   /**
-   * 批量删除文件或表
-   */
-  void batchDeleteData(Long id, DatasetDataBatchDeleteDto dto);
-
-  /**
    * 删除数据集
    */
   void delete(Long id);
@@ -75,16 +65,6 @@ public interface DatasetFacade {
    * 获取数据集列表
    */
   PageResult<DatasetListVo> list(DatasetFindDto dto);
-
-  /**
-   * 获取数据集数据列表
-   */
-  PageResult<DatasetDataListVo> listData(Long id, DatasetDataFindDto dto);
-
-  /**
-   * 数据源数据预览
-   */
-  DatasourceTableDataPreviewVo previewDatasourceData(Long id, String tableName, Integer pageNo, Integer pageSize);
 
   /**
    * 获取数据集统计

@@ -1,6 +1,5 @@
 package cloud.xcan.angus.core.ai.interfaces.workflow.facade.internal;
 
-import static cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder.getMatchSearchFields;
 import static cloud.xcan.angus.core.utils.CoreUtils.buildVoPageResult;
 
 import cloud.xcan.angus.core.ai.application.cmd.workflow.WorkflowCmd;
@@ -8,26 +7,26 @@ import cloud.xcan.angus.core.ai.application.query.workflow.WorkflowQuery;
 import cloud.xcan.angus.core.ai.domain.workflow.Workflow;
 import cloud.xcan.angus.core.ai.domain.workflow.WorkflowConfig;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.WorkflowFacade;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowCreateDto;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowFindDto;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowConfigUpdateDto;
+import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowCreateDto;
+import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowDuplicateDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowExecuteDto;
+import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowExecutionLogFindDto;
+import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowFindDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowStopDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowToggleDto;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowExecutionLogFindDto;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowDuplicateDto;
+import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.internal.assembler.WorkflowAssembler;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowDetailVo;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowListVo;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowStatisticsVo;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.ExecutionLogVo;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.ExecutionDetailVo;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowVersionVo;
+import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.ExecutionLogVo;
+import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowExecuteResultVo;
+import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowListVo;
+import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowRestoreResultVo;
+import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowStatisticsVo;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowStopResultVo;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowToggleResultVo;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowRestoreResultVo;
+import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowVersionVo;
 import cloud.xcan.angus.core.biz.NameJoin;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.PageResult;
@@ -125,9 +124,9 @@ public class WorkflowFacadeImpl implements WorkflowFacade {
   public PageResult<WorkflowListVo> list(WorkflowFindDto dto) {
     GenericSpecification<Workflow> spec = WorkflowAssembler.getSpecification(dto);
     // 使用默认分页参数，因为WorkflowFindDto继承的是SearchCriteria而不是PageQuery
-    Page<Workflow> page = workflowQuery.find(spec, 
-        PageRequest.of(0, 20), 
-        false, 
+    Page<Workflow> page = workflowQuery.find(spec,
+        PageRequest.of(0, 20),
+        false,
         null);
     return buildVoPageResult(page, WorkflowAssembler::toListVo);
   }

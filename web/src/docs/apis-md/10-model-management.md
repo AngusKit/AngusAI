@@ -94,7 +94,7 @@ Authorization: Bearer <JWT_TOKEN>
         deployedAt: number;
 
         createdDate: Date
-        lastModifiedDate: Date;
+        modifiedDate: Date;
       }
     ],
     pagination: {
@@ -226,7 +226,7 @@ Authorization: Bearer <JWT_TOKEN>
     deployedAt: number;
     lastCallAt?: number;
     createdDate: Date
-    lastModifiedDate: Date;
+    modifiedDate: Date;
   },
   datetime: 1706889600000
 }

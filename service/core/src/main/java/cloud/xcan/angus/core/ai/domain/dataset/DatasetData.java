@@ -1,20 +1,15 @@
 package cloud.xcan.angus.core.ai.domain.dataset;
 
 import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
-import io.hypersistence.utils.hibernate.type.json.JsonType;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
-import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import org.hibernate.annotations.Type;
 
 /**
  * 数据集实体

@@ -32,14 +32,14 @@ public class KnowledgeBaseFacadeImpl implements KnowledgeBaseFacade {
 
   @Override
   public KnowledgeBaseDetailVo create(KnowledgeBaseCreateDto dto) {
-    KnowledgeBase knowledgeBase = KnowledgeBaseAssembler.toDomain(dto);
+    KnowledgeBase knowledgeBase = KnowledgeBaseAssembler.toCreateDomain(dto);
     KnowledgeBase saved = knowledgeBaseCmd.create(knowledgeBase);
     return KnowledgeBaseAssembler.toDetailVo(saved);
   }
 
   @Override
   public KnowledgeBaseDetailVo update(Long id, KnowledgeBaseUpdateDto dto) {
-    KnowledgeBase knowledgeBase = KnowledgeBaseAssembler.updateDomain(id, dto);
+    KnowledgeBase knowledgeBase = KnowledgeBaseAssembler.toUpdateDomain(id, dto);
     KnowledgeBase saved = knowledgeBaseCmd.update(knowledgeBase);
     return KnowledgeBaseAssembler.toDetailVo(saved);
   }

@@ -3,10 +3,9 @@ package cloud.xcan.angus.core.ai.application.query.chat;
 import cloud.xcan.angus.core.ai.domain.chat.Message;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.ChatStatisticsVo.UsageTrend;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-
-import java.util.List;
 
 /**
  * 消息查询接口

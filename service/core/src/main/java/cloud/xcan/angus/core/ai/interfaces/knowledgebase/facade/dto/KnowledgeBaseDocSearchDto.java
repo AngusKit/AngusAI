@@ -4,12 +4,16 @@ import cloud.xcan.angus.core.ai.domain.Constants;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+import org.hibernate.validator.constraints.Length;
 
 @Data
 @Schema(description = "文档检索请求参数")
 public class KnowledgeBaseDocSearchDto {
+
+  @Length(max = 256)
+  @Schema(description = "搜索关键字")
+  private String keyword;
 
   @Min(value = Constants.SEARCH_LIMIT_MIN_VALUE)
   @Max(value = Constants.SEARCH_LIMIT_MAX_VALUE)

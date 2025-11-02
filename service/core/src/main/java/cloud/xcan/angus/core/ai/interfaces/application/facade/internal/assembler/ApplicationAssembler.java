@@ -25,7 +25,7 @@ import java.util.Set;
 
 public class ApplicationAssembler {
 
-  public static Application toDomain(ApplicationCreateDto dto) {
+  public static Application toCreateDomain(ApplicationCreateDto dto) {
     Application application = new Application()
         .setName(dto.getName())
         .setIcon(dto.getIcon())
@@ -45,7 +45,7 @@ public class ApplicationAssembler {
     return application;
   }
 
-  public static Application updateDomain(Long id, ApplicationUpdateDto dto) {
+  public static Application toUpdateDomain(Long id, ApplicationUpdateDto dto) {
     Application application = new Application();
     application.setId(id);
     application.setName(dto.getName());
@@ -84,8 +84,8 @@ public class ApplicationAssembler {
     vo.setTenantId(application.getTenantId());
     vo.setCreatedBy(application.getCreatedBy());
     vo.setCreatedDate(application.getCreatedDate());
-    vo.setLastModifiedBy(application.getLastModifiedBy());
-    vo.setLastModifiedDate(application.getLastModifiedDate());
+    vo.setModifiedBy(application.getModifiedBy());
+    vo.setModifiedDate(application.getModifiedDate());
 
     // 设置配置信息
     ApplicationConfigVo configVo = new ApplicationConfigVo();
@@ -130,16 +130,16 @@ public class ApplicationAssembler {
     vo.setTenantId(application.getTenantId());
     vo.setCreatedBy(application.getCreatedBy());
     vo.setCreatedDate(application.getCreatedDate());
-    vo.setLastModifiedBy(application.getLastModifiedBy());
-    vo.setLastModifiedDate(application.getLastModifiedDate());
+    vo.setModifiedBy(application.getModifiedBy());
+    vo.setModifiedDate(application.getModifiedDate());
     return vo;
   }
 
   public static GenericSpecification<Application> getSpecification(ApplicationFindDto dto) {
     // Build the final filters
     Set<SearchCriteria> filters = new SearchCriteriaBuilder<>(dto)
-        .rangeSearchFields("id", "createdDate", "lastModifiedDate")
-        .orderByFields("id", "createdDate", "lastModifiedDate", "apiCalls", "category", "status",
+        .rangeSearchFields("id", "createdDate", "modifiedDate")
+        .orderByFields("id", "createdDate", "modifiedDate", "apiCalls", "category", "status",
             "name")
         .matchSearchFields("name", "description")
         .inAndNotFields("category", "status", "createdBy")

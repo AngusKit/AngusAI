@@ -1,5 +1,7 @@
 package cloud.xcan.angus.core.ai.interfaces.model.facade.vo;
 
+import cloud.xcan.angus.core.ai.domain.model.LastMonthGrowthTrend;
+import cloud.xcan.angus.core.ai.domain.model.TodayGrowthTrend;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -7,33 +9,41 @@ import lombok.Data;
 @Schema(description = "模型统计响应")
 public class ModelStatisticsVo {
 
-  @Schema(description = "总览统计")
-  private Object overview;
+  @Schema(description = "总模型数")
+  private Long totalModels;
 
-  @Schema(description = "调用趋势")
-  private Object callsTrend;
+  @Schema(description = "运行中的模型数")
+  private Long runningModels;
 
-  @Schema(description = "Token使用")
-  private Object tokenUsage;
+  @Schema(description = "总调用次数")
+  private Long totalCalls = 0L;
 
-  @Schema(description = "成本趋势")
-  private Object costTrend;
+  @Schema(description = "成功调用次数")
+  private Long successfulCalls = 0L;
 
-  @Schema(description = "Top调用应用")
-  private Object topApplications;
+  @Schema(description = "失败调用次数")
+  private Long failedCalls = 0L;
 
-  @Schema(description = "错误分析")
-  private Object errorAnalysis;
+  @Schema(description = "总Token消耗数")
+  private Long totalTokens = 0L;
 
-  @Schema(description = "模型列表统计")
-  private Object listStatistics;
+  @Schema(description = "总成本（货币单位由业务侧定义）")
+  private Double totalCost = 0.0;
 
-  @Schema(description = "提供商列表")
-  private Object providers;
+  @Schema(description = "成功率（0-100%），可由 successfulCalls/totalCalls 计算")
+  private Double successRate = 0.0;
 
-  @Schema(description = "批量操作结果")
-  private Object batchResult;
+  @Schema(description = "累计消耗的 tokens 数量")
+  private Long totalTokensConsumed;
 
-  @Schema(description = "导入结果")
-  private Object importResult;
+  @Schema(description = "平均延迟（毫秒）")
+  private Double averageLatencyMs;
+
+  @Schema(description = "近一月增长趋势")
+  private LastMonthGrowthTrend lastMonthGrowthTrend;
+
+  @Schema(description = "今天增长趋势")
+  private TodayGrowthTrend todayGrowthTrend;
+
+
 }

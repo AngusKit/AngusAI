@@ -4,9 +4,8 @@ import cloud.xcan.angus.core.ai.domain.settings.apikey.ApiKeyPermission;
 import cloud.xcan.angus.core.ai.domain.settings.apikey.ResourceType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
-
 import java.util.List;
+import lombok.Data;
 
 /**
  * 更新API密钥DTO

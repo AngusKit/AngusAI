@@ -1,12 +1,11 @@
 package cloud.xcan.angus.core.ai.domain.settings.apikey;
 
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.NoRepositoryBean;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.NoRepositoryBean;
 
 /**
  * API密钥仓储接口
@@ -15,7 +14,7 @@ import java.util.Optional;
 public interface ApiKeyRepo extends BaseRepository<ApiKey, Long> {
 
   // ==================== 查询方法 ====================
-  
+
   /**
    * 根据密钥哈希查找
    */
@@ -38,14 +37,14 @@ public interface ApiKeyRepo extends BaseRepository<ApiKey, Long> {
   List<ApiKey> findByCreatedByOrderByCreatedAtDesc(Long userId);
 
   // ==================== 统计方法 ====================
-  
+
   /**
    * 统计用户的密钥数量
    */
   long countByCreatedBy(Long userId);
 
   // ==================== 修改方法 ====================
-  
+
   /**
    * 更新使用统计
    */

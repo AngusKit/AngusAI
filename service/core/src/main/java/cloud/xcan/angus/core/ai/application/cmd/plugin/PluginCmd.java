@@ -1,8 +1,10 @@
 package cloud.xcan.angus.core.ai.application.cmd.plugin;
 
 import cloud.xcan.angus.core.ai.domain.plugin.Plugin;
-import cloud.xcan.angus.core.ai.domain.plugin.PluginConfig;
+import cloud.xcan.angus.core.ai.domain.plugin.PluginCategory;
 import cloud.xcan.angus.core.ai.domain.plugin.PluginStatus;
+import cloud.xcan.angus.core.ai.domain.plugin.PluginType;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface PluginCmd {
 
@@ -17,24 +19,14 @@ public interface PluginCmd {
   Plugin update(Plugin plugin);
 
   /**
-   * 更新插件配置
+   * 更新插件基本信息-不做任何校验
    */
-  Plugin updateConfig(Long id, PluginConfig config);
+  void update0(Plugin pluginDb);
 
   /**
    * 修改插件状态
    */
   Plugin modifyStatus(Long id, PluginStatus status);
-
-  /**
-   * 复制插件
-   */
-  Plugin duplicate(Long sourceId, String name, Boolean copyConfig, Boolean copyPermissions, Boolean copyTags);
-
-  /**
-   * 收藏/取消收藏插件
-   */
-  Plugin favorite(Long id, Boolean isFavorite);
 
   /**
    * 安装插件
@@ -44,7 +36,7 @@ public interface PluginCmd {
   /**
    * 卸载插件
    */
-  void uninstall(Long id);
+  Plugin uninstall(Long id);
 
   /**
    * 使用插件（增加使用次数）
@@ -57,12 +49,14 @@ public interface PluginCmd {
   Plugin publish(Long id);
 
   /**
-   * 验证插件
+   * 验证插件包
    */
-  Plugin verify(Long id, Boolean verified);
+  Plugin verify(String name, String version, PluginCategory category, PluginType type,
+      MultipartFile file);
 
   /**
    * 删除插件
    */
   void delete(Long id);
+
 }

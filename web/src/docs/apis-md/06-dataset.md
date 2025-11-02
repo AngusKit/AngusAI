@@ -38,7 +38,7 @@ Authorization: Bearer <JWT_TOKEN>
   type?: DataType;            // 数据类型筛选：text | table | datasource
   status?: 'active' | 'inactive' | 'preparing';
   visibility?: Visibility;    // 可见性筛选
-  orderBy?: 'createdDate' | 'lastModifiedDate' | 'dataCount' | 'name';
+  orderBy?: 'createdDate' | 'modifiedDate' | 'dataCount' | 'name';
   orderSort?: 'asc' | 'desc';
   tags?: string[];            // 标签筛选
 }
@@ -72,7 +72,7 @@ Authorization: Bearer <JWT_TOKEN>
         statusColor: string;     // 状态颜色类名
         visibility: Visibility;
         createdDate: Date
-        lastModifiedDate: Date;
+        modifiedDate: Date;
         updateTime: string;      // "2023-10-12"
         createdByName: string;
         createdBy: number;
@@ -142,7 +142,7 @@ Authorization: Bearer <JWT_TOKEN>
     statusColor: string;
     visibility: Visibility;
     createdDate: Date
-    lastModifiedDate: Date;
+    modifiedDate: Date;
     createdByName: string;
     createdBy: number;
     tags: string[];

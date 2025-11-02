@@ -1,21 +1,25 @@
 package cloud.xcan.angus.core.ai.domain.workflow;
 
-import cloud.xcan.angus.core.ai.domain.BaseEntity;
-import cloud.xcan.angus.core.jpa.type.JsonType;
+import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
+import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.persistence.Type;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.annotations.Type;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "workflow")
-public class Workflow extends BaseEntity {
+public class Workflow extends TenantAuditingEntity<Workflow, Long> {
+
+  @Id
+  private Long id;
 
   @Column(name = "name", nullable = false, length = 50)
   private String name;
@@ -236,4 +240,8 @@ public class Workflow extends BaseEntity {
   @Column(name = "extensions", columnDefinition = "json")
   private Object extensions;
 
+  @Override
+  public Long identity() {
+    return id;
+  }
 }
