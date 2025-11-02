@@ -1,7 +1,7 @@
 package cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto;
 
+import cloud.xcan.angus.core.ai.domain.Visibility;
 import cloud.xcan.angus.core.ai.domain.dataset.DatasetType;
-import cloud.xcan.angus.core.ai.domain.dataset.DatasetVisibility;
 import cloud.xcan.angus.remote.PageQuery;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -22,7 +22,7 @@ public class DatasetFindDto extends PageQuery {
   private DatasetType type;
 
   @Schema(description = "可见性")
-  private DatasetVisibility visibility;
+  private Visibility visibility;
 
   @Schema(description = "标签筛选")
   private String tags;

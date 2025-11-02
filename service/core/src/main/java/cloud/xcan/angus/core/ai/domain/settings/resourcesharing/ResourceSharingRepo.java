@@ -11,11 +11,12 @@ import org.springframework.data.repository.query.Param;
 public interface ResourceSharingRepo extends BaseRepository<ResourceSharing, Long> {
 
   // ==================== 查询方法 ====================
-  
+
   /**
    * 根据资源ID和资源类型查询共享
    */
-  Optional<ResourceSharing> findByResourceIdAndResourceType(Long resourceId, ResourceType resourceType);
+  Optional<ResourceSharing> findByResourceIdAndResourceType(Long resourceId,
+      ResourceType resourceType);
 
   /**
    * 根据所有者ID查询共享列表
@@ -28,7 +29,7 @@ public interface ResourceSharingRepo extends BaseRepository<ResourceSharing, Lon
   List<ResourceSharing> findByResourceTypeOrderByLastModifiedDateDesc(ResourceType resourceType);
 
   // ==================== 统计方法 ====================
-  
+
   /**
    * 统计用户创建的共享数量
    */
@@ -39,17 +40,18 @@ public interface ResourceSharingRepo extends BaseRepository<ResourceSharing, Lon
    * 根据资源类型统计共享数量
    */
   @Query("SELECT COUNT(s) FROM ResourceSharing s WHERE s.ownerId = :ownerId AND s.resourceType = :resourceType")
-  Long countByOwnerIdAndResourceType(@Param("ownerId") Long ownerId, @Param("resourceType") ResourceType resourceType);
+  Long countByOwnerIdAndResourceType(@Param("ownerId") Long ownerId,
+      @Param("resourceType") ResourceType resourceType);
 
   // ==================== 修改方法 ====================
-  
+
   /**
    * 检查资源是否已共享
    */
   boolean existsByResourceIdAndResourceType(Long resourceId, ResourceType resourceType);
 
   // ==================== 删除方法 ====================
-  
+
   /**
    * 根据资源ID和资源类型删除共享
    */

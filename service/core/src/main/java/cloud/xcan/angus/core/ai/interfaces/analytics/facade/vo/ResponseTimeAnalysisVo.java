@@ -17,6 +17,7 @@ public class ResponseTimeAnalysisVo {
   @Data
   @Schema(description = "趋势数据点")
   public static class TrendItemVo {
+
     @Schema(description = "时间戳")
     private Long datetime;
 
@@ -45,6 +46,7 @@ public class ResponseTimeAnalysisVo {
   @Data
   @Schema(description = "汇总统计")
   public static class SummaryVo {
+
     @Schema(description = "总体平均响应时间")
     private Double overallAvg;
 
@@ -61,6 +63,7 @@ public class ResponseTimeAnalysisVo {
   @Data
   @Schema(description = "最慢接口")
   public static class SlowestEndpointVo {
+
     @Schema(description = "接口路径")
     private String endpoint;
 

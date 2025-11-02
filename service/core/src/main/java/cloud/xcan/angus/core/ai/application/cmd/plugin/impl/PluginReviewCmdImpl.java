@@ -30,6 +30,7 @@ public class PluginReviewCmdImpl extends CommCmd<PluginReview, Long> implements 
   public PluginReview create(PluginReview review) {
     return new BizTemplate<PluginReview>() {
       Plugin pluginDb;
+
       @Override
       protected void checkParams() {
         // Ensure plugin exists

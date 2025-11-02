@@ -4,5 +4,7 @@ import cloud.xcan.angus.core.ai.domain.plugin.PluginRecordRepo;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface PluginRecordRepoPostgres extends PluginRecordRepo { }
+public interface PluginRecordRepoPostgres extends PluginRecordRepo {
+
+}
 

@@ -1,9 +1,9 @@
 package cloud.xcan.angus.core.ai.application.cmd.dataset;
 
-import cloud.xcan.angus.core.ai.domain.dataset.DatasetVisibility;
-import cloud.xcan.angus.core.ai.infra.util.DatasourceUtils.ConnectionTestResult;
+import cloud.xcan.angus.core.ai.domain.Visibility;
 import cloud.xcan.angus.core.ai.domain.dataset.Dataset;
 import cloud.xcan.angus.core.ai.domain.dataset.DatasourceConfig;
+import cloud.xcan.angus.core.ai.infra.util.DatasourceUtils.ConnectionTestResult;
 
 public interface DatasetCmd {
 
@@ -20,7 +20,7 @@ public interface DatasetCmd {
   /**
    * 修改数据集可见性
    */
-  Dataset modifyVisibility(Long id, DatasetVisibility visibility);
+  Dataset modifyVisibility(Long id, Visibility visibility);
 
   /**
    * 更新数据集数据源配置
@@ -33,7 +33,7 @@ public interface DatasetCmd {
   ConnectionTestResult testDatasourceConnection(Long id, DatasourceConfig config);
 
   /**
-   *  删除数据源配置
+   * 删除数据源配置
    */
   void deleteDataSource(Long id);
 

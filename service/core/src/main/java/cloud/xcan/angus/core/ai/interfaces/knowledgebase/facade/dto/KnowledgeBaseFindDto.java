@@ -1,6 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto;
 
-import cloud.xcan.angus.core.ai.domain.knowledgebase.DocumentVisibility;
+import cloud.xcan.angus.core.ai.domain.Visibility;
 import cloud.xcan.angus.remote.PageQuery;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
@@ -20,7 +20,7 @@ public class KnowledgeBaseFindDto extends PageQuery {
   private List<String> tags;
 
   @Schema(description = "可见性筛选", example = "PRIVATE")
-  private DocumentVisibility visibility;
+  private Visibility visibility;
 
   @Schema(description = "启用状态筛选", example = "true")
   private Boolean enabled;

@@ -1,7 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.dataset.facade;
 
-import cloud.xcan.angus.core.ai.domain.dataset.DatasetVisibility;
-import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasourceConnectionTestDto;
+import cloud.xcan.angus.core.ai.domain.Visibility;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DataSourceUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetFindDto;
@@ -12,9 +11,7 @@ import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetListVo;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetStatisticsVo;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasourceConfigVo;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasourceConnectionTestVo;
-import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.SyncDataVo;
 import cloud.xcan.angus.remote.PageResult;
-import java.util.List;
 
 public interface DatasetFacade {
 
@@ -31,7 +28,7 @@ public interface DatasetFacade {
   /**
    * 修改数据集可见性
    */
-  DatasetDetailVo modifyVisibility(Long id, DatasetVisibility visibility);
+  DatasetDetailVo modifyVisibility(Long id, Visibility visibility);
 
   /**
    * 添加数据源

@@ -2,7 +2,7 @@ package cloud.xcan.angus.core.ai.application.cmd.knowledgebase.impl;
 
 import cloud.xcan.angus.core.ai.application.cmd.knowledgebase.KnowledgeBaseCmd;
 import cloud.xcan.angus.core.ai.application.query.knowledgebase.KnowledgeBaseQuery;
-import cloud.xcan.angus.core.ai.domain.knowledgebase.DocumentVisibility;
+import cloud.xcan.angus.core.ai.domain.Visibility;
 import cloud.xcan.angus.core.ai.domain.knowledgebase.KnowledgeBase;
 import cloud.xcan.angus.core.ai.domain.knowledgebase.KnowledgeBaseRepo;
 import cloud.xcan.angus.core.biz.BizTemplate;
@@ -98,7 +98,7 @@ public class KnowledgeBaseCmdImpl extends CommCmd<KnowledgeBase, Long> implement
 
   @Override
   @Transactional
-  public KnowledgeBase modifyVisibility(Long id, DocumentVisibility visibility) {
+  public KnowledgeBase modifyVisibility(Long id, Visibility visibility) {
     return new BizTemplate<KnowledgeBase>() {
       KnowledgeBase knowledgeBaseDb;
 

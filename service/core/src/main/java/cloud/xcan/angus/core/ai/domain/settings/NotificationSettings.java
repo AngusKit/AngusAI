@@ -33,6 +33,7 @@ public class NotificationSettings {
   @Data
   @Accessors(chain = true)
   public static class EmailNotification {
+
     private Boolean enabled = true;
     private String frequency = "immediately"; // immediately, daily, weekly
 
@@ -43,6 +44,7 @@ public class NotificationSettings {
   @Data
   @Accessors(chain = true)
   public static class BrowserNotification {
+
     private Boolean enabled = true;
     private BrowserNotificationTypes notifications = new BrowserNotificationTypes();
   }
@@ -50,6 +52,7 @@ public class NotificationSettings {
   @Data
   @Accessors(chain = true)
   public static class InAppNotification {
+
     private Boolean enabled = true;
     private Boolean showBadge = true;
     private Boolean playSound = true;
@@ -58,6 +61,7 @@ public class NotificationSettings {
   @Data
   @Accessors(chain = true)
   public static class MobileNotification {
+
     private Boolean enabled = false;
     private QuietHours quietHours = new QuietHours();
   }
@@ -65,6 +69,7 @@ public class NotificationSettings {
   @Data
   @Accessors(chain = true)
   public static class NotificationTypes {
+
     private Boolean systemUpdates = true;
     private Boolean securityAlerts = true;
     private Boolean usageAlerts = true;
@@ -78,6 +83,7 @@ public class NotificationSettings {
   @Data
   @Accessors(chain = true)
   public static class BrowserNotificationTypes {
+
     private Boolean chatMessages = true;
     private Boolean workflowComplete = true;
     private Boolean errorAlerts = true;
@@ -86,6 +92,7 @@ public class NotificationSettings {
   @Data
   @Accessors(chain = true)
   public static class QuietHours {
+
     private Boolean enabled = false;
     private String start = "22:00";
     private String end = "08:00";

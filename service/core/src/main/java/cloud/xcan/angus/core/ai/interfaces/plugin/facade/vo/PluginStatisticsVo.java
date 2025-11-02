@@ -1,8 +1,8 @@
 package cloud.xcan.angus.core.ai.interfaces.plugin.facade.vo;
 
 import cloud.xcan.angus.core.ai.domain.plugin.PluginStatistics.CategoryStats;
-import cloud.xcan.angus.core.ai.domain.plugin.PluginStatistics.TrendingPlugin;
 import cloud.xcan.angus.core.ai.domain.plugin.PluginStatistics.LastMonthGrowthTrend;
+import cloud.xcan.angus.core.ai.domain.plugin.PluginStatistics.TrendingPlugin;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.Data;

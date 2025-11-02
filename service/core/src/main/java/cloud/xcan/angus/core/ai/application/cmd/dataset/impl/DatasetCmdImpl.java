@@ -5,9 +5,9 @@ import static java.util.Objects.nonNull;
 
 import cloud.xcan.angus.core.ai.application.cmd.dataset.DatasetCmd;
 import cloud.xcan.angus.core.ai.application.query.dataset.DatasetQuery;
+import cloud.xcan.angus.core.ai.domain.Visibility;
 import cloud.xcan.angus.core.ai.domain.dataset.Dataset;
 import cloud.xcan.angus.core.ai.domain.dataset.DatasetRepo;
-import cloud.xcan.angus.core.ai.domain.dataset.DatasetVisibility;
 import cloud.xcan.angus.core.ai.domain.dataset.DatasourceConfig;
 import cloud.xcan.angus.core.ai.infra.util.DatasourceUtils;
 import cloud.xcan.angus.core.ai.infra.util.DatasourceUtils.ConnectionTestResult;
@@ -82,7 +82,7 @@ public class DatasetCmdImpl extends CommCmd<Dataset, Long> implements DatasetCmd
 
   @Override
   @Transactional
-  public Dataset modifyVisibility(Long id, DatasetVisibility visibility) {
+  public Dataset modifyVisibility(Long id, Visibility visibility) {
     return new BizTemplate<Dataset>() {
       Dataset datasetDb;
 

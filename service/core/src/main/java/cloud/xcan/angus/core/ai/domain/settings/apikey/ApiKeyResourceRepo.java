@@ -27,7 +27,8 @@ public interface ApiKeyResourceRepo extends BaseRepository<ApiKeyResource, Long>
   /**
    * 检查是否有权限访问特定资源
    */
-  boolean existsByApiKeyIdAndResourceTypeAndResourceIdIn(Long apiKeyId, ResourceType resourceType, List<Long> resourceIds);
+  boolean existsByApiKeyIdAndResourceTypeAndResourceIdIn(Long apiKeyId, ResourceType resourceType,
+      List<Long> resourceIds);
 
   // ==================== 删除方法 ====================
 

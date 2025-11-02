@@ -4,6 +4,7 @@ import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.buildPeriodFilt
 import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.getPeriodRange;
 
 import cloud.xcan.angus.core.ai.application.query.plugin.PluginQuery;
+import cloud.xcan.angus.core.ai.domain.StatisticsPeriod;
 import cloud.xcan.angus.core.ai.domain.plugin.CategoryCountView;
 import cloud.xcan.angus.core.ai.domain.plugin.LongTotalView;
 import cloud.xcan.angus.core.ai.domain.plugin.Plugin;
@@ -14,18 +15,15 @@ import cloud.xcan.angus.core.ai.domain.plugin.PluginReviewRepo;
 import cloud.xcan.angus.core.ai.domain.plugin.PluginSearchRepo;
 import cloud.xcan.angus.core.ai.domain.plugin.PluginStatistics;
 import cloud.xcan.angus.core.ai.domain.plugin.PluginStatus;
-import cloud.xcan.angus.core.ai.domain.StatisticsPeriod;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import cloud.xcan.angus.remote.search.SearchCriteria;
 import cloud.xcan.angus.spec.principal.PrincipalContext;
 import jakarta.annotation.Resource;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;

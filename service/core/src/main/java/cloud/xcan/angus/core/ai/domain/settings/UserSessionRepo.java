@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 public interface UserSessionRepo extends BaseRepository<UserSession, Long> {
 
   // ==================== 查询方法 ====================
-  
+
   /**
    * 根据用户ID查询所有会话
    */
@@ -27,7 +27,7 @@ public interface UserSessionRepo extends BaseRepository<UserSession, Long> {
   UserSession findBySessionId(String sessionId);
 
   // ==================== 统计方法 ====================
-  
+
   /**
    * 根据用户ID统计活跃会话数
    */
@@ -35,7 +35,7 @@ public interface UserSessionRepo extends BaseRepository<UserSession, Long> {
   int countActiveSessionsByUserId(Long userId, LocalDateTime now);
 
   // ==================== 删除方法 ====================
-  
+
   /**
    * 删除用户的所有会话（除了当前会话）
    */

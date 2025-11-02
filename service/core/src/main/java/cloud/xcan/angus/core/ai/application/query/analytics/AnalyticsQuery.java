@@ -15,22 +15,26 @@ public interface AnalyticsQuery {
   /**
    * 获取API调用趋势数据
    */
-  List<Map<String, Object>> getApiCallsTrend(LocalDateTime start, LocalDateTime end, Long appId, String granularity);
+  List<Map<String, Object>> getApiCallsTrend(LocalDateTime start, LocalDateTime end, Long appId,
+      String granularity);
 
   /**
    * 获取Token使用趋势
    */
-  List<Map<String, Object>> getTokenUsageTrend(LocalDateTime start, LocalDateTime end, Long appId, String granularity);
+  List<Map<String, Object>> getTokenUsageTrend(LocalDateTime start, LocalDateTime end, Long appId,
+      String granularity);
 
   /**
    * 获取响应时间分析
    */
-  List<Map<String, Object>> getResponseTimeAnalysis(LocalDateTime start, LocalDateTime end, Long appId, String granularity);
+  List<Map<String, Object>> getResponseTimeAnalysis(LocalDateTime start, LocalDateTime end,
+      Long appId, String granularity);
 
   /**
    * 获取应用使用分布
    */
-  List<Map<String, Object>> getAppDistribution(LocalDateTime start, LocalDateTime end, Integer limit);
+  List<Map<String, Object>> getAppDistribution(LocalDateTime start, LocalDateTime end,
+      Integer limit);
 
   /**
    * 获取模型使用分布
@@ -40,7 +44,8 @@ public interface AnalyticsQuery {
   /**
    * 获取Top接口统计
    */
-  List<Map<String, Object>> getTopEndpoints(LocalDateTime start, LocalDateTime end, Integer limit, String orderBy);
+  List<Map<String, Object>> getTopEndpoints(LocalDateTime start, LocalDateTime end, Integer limit,
+      String orderBy);
 
   /**
    * 获取错误分析

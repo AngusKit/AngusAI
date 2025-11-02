@@ -8,12 +8,12 @@ public enum MessageRole {
    * 用户
    */
   USER,
-  
+
   /**
    * AI助手
    */
   ASSISTANT,
-  
+
   /**
    * 系统
    */

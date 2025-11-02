@@ -17,6 +17,7 @@ public class ResourceSharingStatisticsVo {
   @Data
   @Schema(description = "我创建的共享统计")
   public static class SharedByMeVo {
+
     @Schema(description = "总数")
     private Long total;
 
@@ -33,6 +34,7 @@ public class ResourceSharingStatisticsVo {
   @Data
   @Schema(description = "共享给我的统计")
   public static class SharedToMeVo {
+
     @Schema(description = "总数")
     private Long total;
 

@@ -1,8 +1,8 @@
 package cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo;
 
+import cloud.xcan.angus.core.ai.domain.Visibility;
 import cloud.xcan.angus.core.ai.domain.dataset.DatasetStatus;
 import cloud.xcan.angus.core.ai.domain.dataset.DatasetType;
-import cloud.xcan.angus.core.ai.domain.dataset.DatasetVisibility;
 import cloud.xcan.angus.remote.vo.TenantAuditingVo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
@@ -30,7 +30,7 @@ public class DatasetDetailVo extends TenantAuditingVo {
   private DatasetStatus status;
 
   @Schema(description = "可见性")
-  private DatasetVisibility visibility;
+  private Visibility visibility;
 
   @Schema(description = "图标emoji")
   private String icon;

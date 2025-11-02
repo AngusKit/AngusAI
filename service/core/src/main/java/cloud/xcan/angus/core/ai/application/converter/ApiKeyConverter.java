@@ -16,7 +16,8 @@ import java.util.stream.Collectors;
  */
 public class ApiKeyConverter {
 
-  private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+  private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(
+      "yyyy-MM-dd HH:mm:ss");
 
   /**
    * 转换为详情VO
@@ -67,7 +68,8 @@ public class ApiKeyConverter {
     // 使用统计
     ApiKeyDetailVo.UsageStatsVo usageStats = new ApiKeyDetailVo.UsageStatsVo();
     usageStats.setUsageCount(entity.getUsageCount() != null ? entity.getUsageCount() : 0L);
-    usageStats.setLastUsedAt(entity.getLastUsedAt() != null ? entity.getLastUsedAt().format(FORMATTER) : null);
+    usageStats.setLastUsedAt(
+        entity.getLastUsedAt() != null ? entity.getLastUsedAt().format(FORMATTER) : null);
     vo.setUsageStats(usageStats);
 
     // 时间信息
@@ -75,7 +77,8 @@ public class ApiKeyConverter {
     vo.setUpdatedAt(entity.getUpdatedAt() != null ? entity.getUpdatedAt().format(FORMATTER) : null);
     vo.setExpiresAt(entity.getExpiresAt() != null ? entity.getExpiresAt().format(FORMATTER) : null);
     vo.setRevokedAt(entity.getRevokedAt() != null ? entity.getRevokedAt().format(FORMATTER) : null);
-    vo.setRefreshedAt(entity.getRefreshedAt() != null ? entity.getRefreshedAt().format(FORMATTER) : null);
+    vo.setRefreshedAt(
+        entity.getRefreshedAt() != null ? entity.getRefreshedAt().format(FORMATTER) : null);
 
     return vo;
   }
@@ -120,7 +123,8 @@ public class ApiKeyConverter {
       vo.setAuthorizedResources(new ArrayList<>());
     }
 
-    vo.setLastUsedAt(entity.getLastUsedAt() != null ? entity.getLastUsedAt().format(FORMATTER) : null);
+    vo.setLastUsedAt(
+        entity.getLastUsedAt() != null ? entity.getLastUsedAt().format(FORMATTER) : null);
     vo.setCreatedAt(entity.getCreatedAt() != null ? entity.getCreatedAt().format(FORMATTER) : null);
     vo.setExpiresAt(entity.getExpiresAt() != null ? entity.getExpiresAt().format(FORMATTER) : null);
 

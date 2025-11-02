@@ -23,6 +23,7 @@ public class ErrorAnalysisVo {
   @Data
   @Schema(description = "按状态码统计")
   public static class ErrorByStatusCodeVo {
+
     @Schema(description = "HTTP状态码", example = "429")
     private Integer statusCode;
 
@@ -48,6 +49,7 @@ public class ErrorAnalysisVo {
   @Data
   @Schema(description = "按接口统计错误")
   public static class ErrorByEndpointVo {
+
     @Schema(description = "接口路径")
     private String endpoint;
 
@@ -64,6 +66,7 @@ public class ErrorAnalysisVo {
   @Data
   @Schema(description = "错误趋势数据点")
   public static class ErrorTrendItemVo {
+
     @Schema(description = "时间戳")
     private Long datetime;
 
@@ -83,6 +86,7 @@ public class ErrorAnalysisVo {
   @Data
   @Schema(description = "汇总统计")
   public static class SummaryVo {
+
     @Schema(description = "总错误次数")
     private Long totalErrors;
 
@@ -96,6 +100,7 @@ public class ErrorAnalysisVo {
   @Data
   @Schema(description = "最常见错误")
   public static class MostCommonErrorVo {
+
     @Schema(description = "状态码")
     private Integer code;
 

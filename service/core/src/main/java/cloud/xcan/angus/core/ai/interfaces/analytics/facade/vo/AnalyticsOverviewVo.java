@@ -22,6 +22,7 @@ public class AnalyticsOverviewVo {
   @Data
   @Schema(description = "统计周期")
   public static class PeriodVo {
+
     @Schema(description = "开始时间戳")
     private Long start;
 
@@ -32,6 +33,7 @@ public class AnalyticsOverviewVo {
   @Data
   @Schema(description = "核心统计指标")
   public static class StatsVo {
+
     @Schema(description = "API总调用")
     private MetricVo totalApiCalls;
 
@@ -48,6 +50,7 @@ public class AnalyticsOverviewVo {
   @Data
   @Schema(description = "指标详情")
   public static class MetricVo {
+
     @Schema(description = "数值")
     private Long value;
 
@@ -67,6 +70,7 @@ public class AnalyticsOverviewVo {
   @Data
   @Schema(description = "成功率统计")
   public static class SuccessRateVo {
+
     @Schema(description = "成功率百分比")
     private Double value;
 

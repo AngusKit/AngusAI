@@ -8,12 +8,12 @@ public enum ApiKeyPermission {
    * 读取权限
    */
   READ,
-  
+
   /**
    * 写入权限
    */
   WRITE,
-  
+
   /**
    * 删除权限
    */

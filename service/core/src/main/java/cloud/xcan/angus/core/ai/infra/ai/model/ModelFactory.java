@@ -135,9 +135,10 @@ public class ModelFactory {
   }
 
   // 公共方法保持不变...
-  public ChatModel getChatModel(ModelConfig config) {
-    String cacheKey = cacheKeyStrategy.generateCacheKey(ModelType.CHAT, config);
-    return chatModelCache.computeIfAbsent(cacheKey, k -> createChatModel(config));
+  public ChatModel getChatModel(ModelConfig modelConfig) {
+    String cacheKey = cacheKeyStrategy.generateCacheKey(ModelType.CHAT, modelConfig);
+    return chatModelCache.computeIfAbsent(cacheKey,
+        k -> createChatModel(modelConfig));
   }
 
   public ChatModel getChatModel(ModelType modelType, List<ModelConfig> configs) {
@@ -197,8 +198,8 @@ public class ModelFactory {
         .orElseThrow(() -> new IllegalArgumentException("未找到模型类型: " + modelType));
   }
 
-  public ChatClient getChatClient(ModelConfig config) {
-    ChatModel chatModel = getChatModel(config);
+  public ChatClient getChatClient(ModelConfig modelConfig) {
+    ChatModel chatModel = getChatModel(modelConfig);
     return ChatClient.builder(chatModel).build();
   }
 
@@ -215,49 +216,52 @@ public class ModelFactory {
 
   // ==================== 各提供商ChatModel具体实现 ====================
 
-  private ChatModel createChatModel(ModelConfig config) {
-    log.info("创建ChatModel: {} (提供商: {})", config.getModelName(), config.getProvider());
+  private ChatModel createChatModel(ModelConfig modelConfig) {
+    log.info("创建ChatModel: {} (提供商: {})", modelConfig.getModelName(),
+        modelConfig.getProvider());
 
-    if (!config.isAvailable()) {
-      throw new IllegalArgumentException("模型配置不可用: " + config.getSummary());
+    if (!modelConfig.isAvailable()) {
+      throw new IllegalArgumentException("模型配置不可用: " + modelConfig.getSummary());
     }
 
-    return switch (config.getProvider()) {
-      case OPENAI -> createOpenAIChatModel(config);
-      case ANTHROPIC -> createAnthropicChatModel(config);
-      case AZURE_OPENAI -> createAzureOpenAIChatModel(config);
-      case GOOGLE_VERTEXAI -> createGoogleVertexAIChatModel(config);
+    // TODO 覆盖sessionConfig配置选项
+    return switch (modelConfig.getProvider()) {
+      case OPENAI -> createOpenAIChatModel(modelConfig);
+      case ANTHROPIC -> createAnthropicChatModel(modelConfig);
+      case AZURE_OPENAI -> createAzureOpenAIChatModel(modelConfig);
+      case GOOGLE_VERTEXAI -> createGoogleVertexAIChatModel(modelConfig);
       //case AMAZON_BEDROCK -> createAmazonBedrockChatModel(config);
-      case OLLAMA -> createOllamaChatModel(config);
-      case MISTRAL_AI -> createMistralAIChatModel(config);
-      case DEEPSEEK -> createDeepSeekChatModel(config);
-      case MOONSHOT_AI -> createMoonshotAIChatModel(config);
-      case ZHIPU_AI -> createZhipuAIChatModel(config);
-      case MINIMAX -> createMiniMaxChatModel(config);
+      case OLLAMA -> createOllamaChatModel(modelConfig);
+      case MISTRAL_AI -> createMistralAIChatModel(modelConfig);
+      case DEEPSEEK -> createDeepSeekChatModel(modelConfig);
+      case MOONSHOT_AI -> createMoonshotAIChatModel(modelConfig);
+      case ZHIPU_AI -> createZhipuAIChatModel(modelConfig);
+      case MINIMAX -> createMiniMaxChatModel(modelConfig);
       //case GROQ -> createGroqChatModel(config);
-      case NVIDIA -> createNvidiaChatModel(config);
-      case PERPLEXITY -> createPerplexityChatModel(config);
-      case QIANFAN -> createQianFanChatModel(config);
-      case HUGGINGFACE -> createHuggingFaceChatModel(config);
+      case NVIDIA -> createNvidiaChatModel(modelConfig);
+      case PERPLEXITY -> createPerplexityChatModel(modelConfig);
+      case QIANFAN -> createQianFanChatModel(modelConfig);
+      case HUGGINGFACE -> createHuggingFaceChatModel(modelConfig);
       // ONNX Transformers ChatModel 需要本地模型文件，暂使用模拟实现
       //case ONNX_TRANSFORMERS -> createONNXTransformersChatModel(config);
-      case POSTGRESML -> createPostgresMLChatModel(config);
-      case LOCAL -> createLocalChatModel(config);
-      case CUSTOM -> createCustomChatModel(config);
-      default -> throw new IllegalArgumentException("不支持的模型提供商: " + config.getProvider());
+      case POSTGRESML -> createPostgresMLChatModel(modelConfig);
+      case LOCAL -> createLocalChatModel(modelConfig);
+      case CUSTOM -> createCustomChatModel(modelConfig);
+      default ->
+          throw new IllegalArgumentException("不支持的模型提供商: " + modelConfig.getProvider());
     };
   }
 
-  private ChatModel createOpenAIChatModel(ModelConfig config) {
+  private ChatModel createOpenAIChatModel(ModelConfig modelConfig) {
     OpenAiApi openAiApi = OpenAiApi.builder()
-        .apiKey(config.getApiKey())
-        .baseUrl(config.getApiEndpoint())
+        .apiKey(modelConfig.getApiKey())
+        .baseUrl(modelConfig.getApiEndpoint())
         .build();
 
     var options = OpenAiChatOptions.builder()
-        .model(config.getModelName())
-        .temperature(config.getTemperature())
-        .maxTokens(config.getMaxTokens())
+        .model(modelConfig.getModelName())
+        .temperature(modelConfig.getTemperature())
+        .maxTokens(modelConfig.getMaxTokens())
         .build();
 
     return new OpenAiChatModel(openAiApi, options, null, null, null);
@@ -359,7 +363,8 @@ public class ModelFactory {
   }
 
   private ChatModel createMiniMaxChatModel(ModelConfig config) {
-    MiniMaxApi miniMaxApi = new MiniMaxApi(config.getApiEndpoint(), config.getMaxTokens().toString());
+    MiniMaxApi miniMaxApi = new MiniMaxApi(config.getApiEndpoint(),
+        config.getMaxTokens().toString());
 
     var options = MiniMaxChatOptions.builder()
         .model(config.getModelName())

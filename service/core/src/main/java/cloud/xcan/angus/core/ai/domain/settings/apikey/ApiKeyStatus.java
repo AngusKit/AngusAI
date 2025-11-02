@@ -8,12 +8,12 @@ public enum ApiKeyStatus {
    * 激活状态
    */
   ACTIVE,
-  
+
   /**
    * 未激活状态
    */
   INACTIVE,
-  
+
   /**
    * 已过期
    */

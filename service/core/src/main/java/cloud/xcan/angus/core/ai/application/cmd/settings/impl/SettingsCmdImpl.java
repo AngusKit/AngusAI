@@ -272,7 +272,8 @@ public class SettingsCmdImpl extends CommCmd<UserSettings, Long> implements Sett
 
   @Override
   @Transactional
-  public UserSettings updateNotificationSettings(Long userId, NotificationSettings notificationSettings) {
+  public UserSettings updateNotificationSettings(Long userId,
+      NotificationSettings notificationSettings) {
     return new BizTemplate<UserSettings>() {
       UserSettings settings;
 
@@ -487,7 +488,8 @@ public class SettingsCmdImpl extends CommCmd<UserSettings, Long> implements Sett
 
   @Override
   @Transactional
-  public LocalDateTime requestDeleteAccount(Long userId, String password, String reason, String feedback) {
+  public LocalDateTime requestDeleteAccount(Long userId, String password, String reason,
+      String feedback) {
     return new BizTemplate<LocalDateTime>() {
       @Override
       protected void checkParams() {

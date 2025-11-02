@@ -5,7 +5,7 @@ import static cloud.xcan.angus.core.utils.CoreUtils.buildVoPageResult;
 
 import cloud.xcan.angus.core.ai.application.cmd.knowledgebase.KnowledgeBaseCmd;
 import cloud.xcan.angus.core.ai.application.query.knowledgebase.KnowledgeBaseQuery;
-import cloud.xcan.angus.core.ai.domain.knowledgebase.DocumentVisibility;
+import cloud.xcan.angus.core.ai.domain.Visibility;
 import cloud.xcan.angus.core.ai.domain.knowledgebase.KnowledgeBase;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.KnowledgeBaseFacade;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBaseCreateDto;
@@ -51,7 +51,7 @@ public class KnowledgeBaseFacadeImpl implements KnowledgeBaseFacade {
   }
 
   @Override
-  public KnowledgeBaseDetailVo modifyVisibility(Long id, DocumentVisibility visibility) {
+  public KnowledgeBaseDetailVo modifyVisibility(Long id, Visibility visibility) {
     KnowledgeBase knowledgeBase = knowledgeBaseCmd.modifyVisibility(id, visibility);
     return KnowledgeBaseAssembler.toDetailVo(knowledgeBase);
   }

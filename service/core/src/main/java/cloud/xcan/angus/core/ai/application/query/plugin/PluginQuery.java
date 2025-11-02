@@ -1,8 +1,8 @@
 package cloud.xcan.angus.core.ai.application.query.plugin;
 
+import cloud.xcan.angus.core.ai.domain.StatisticsPeriod;
 import cloud.xcan.angus.core.ai.domain.plugin.Plugin;
 import cloud.xcan.angus.core.ai.domain.plugin.PluginStatistics;
-import cloud.xcan.angus.core.ai.domain.StatisticsPeriod;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

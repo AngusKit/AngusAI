@@ -80,7 +80,8 @@ public class TimeRangeUtils {
    * 时间范围内部类
    */
   public static class TimeRange {
-   public final LocalDateTime start;
+
+    public final LocalDateTime start;
     public final LocalDateTime end;
 
     TimeRange(LocalDateTime start, LocalDateTime end) {

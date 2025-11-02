@@ -18,7 +18,8 @@ public interface ApiUsageLogRepo extends BaseRepository<ApiUsageLog, Long> {
   /**
    * 查询应用的日志
    */
-  List<ApiUsageLog> findByAppIdAndRequestTimeBetween(Long appId, LocalDateTime start, LocalDateTime end);
+  List<ApiUsageLog> findByAppIdAndRequestTimeBetween(Long appId, LocalDateTime start,
+      LocalDateTime end);
 
   /**
    * 查询最近的调用记录
@@ -36,19 +37,22 @@ public interface ApiUsageLogRepo extends BaseRepository<ApiUsageLog, Long> {
    * 统计成功调用次数
    */
   @Query("SELECT COUNT(l) FROM ApiUsageLog l WHERE l.requestTime BETWEEN :start AND :end AND l.isSuccessful = true")
-  Long countSuccessfulByTimeRange(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+  Long countSuccessfulByTimeRange(@Param("start") LocalDateTime start,
+      @Param("end") LocalDateTime end);
 
   /**
    * 统计应用调用次数
    */
   @Query("SELECT COUNT(l) FROM ApiUsageLog l WHERE l.appId = :appId AND l.requestTime BETWEEN :start AND :end")
-  Long countByAppIdAndTimeRange(@Param("appId") Long appId, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+  Long countByAppIdAndTimeRange(@Param("appId") Long appId, @Param("start") LocalDateTime start,
+      @Param("end") LocalDateTime end);
 
   /**
    * 统计活跃用户数
    */
   @Query("SELECT COUNT(DISTINCT l.userId) FROM ApiUsageLog l WHERE l.requestTime BETWEEN :start AND :end")
-  Long countDistinctUsersByTimeRange(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+  Long countDistinctUsersByTimeRange(@Param("start") LocalDateTime start,
+      @Param("end") LocalDateTime end);
 
   /**
    * 统计Token使用量
@@ -60,7 +64,8 @@ public interface ApiUsageLogRepo extends BaseRepository<ApiUsageLog, Long> {
    * 统计平均响应时间
    */
   @Query("SELECT AVG(l.responseTimeMs) FROM ApiUsageLog l WHERE l.requestTime BETWEEN :start AND :end")
-  Double avgResponseTimeByTimeRange(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+  Double avgResponseTimeByTimeRange(@Param("start") LocalDateTime start,
+      @Param("end") LocalDateTime end);
 
   /**
    * 按应用分组统计
@@ -82,7 +87,8 @@ public interface ApiUsageLogRepo extends BaseRepository<ApiUsageLog, Long> {
   @Query("SELECT l.endpoint, l.method, COUNT(l), AVG(l.responseTimeMs), " +
       "SUM(CASE WHEN l.isSuccessful = true THEN 1 ELSE 0 END), SUM(l.totalTokens) " +
       "FROM ApiUsageLog l WHERE l.requestTime BETWEEN :start AND :end GROUP BY l.endpoint, l.method ORDER BY COUNT(l) DESC")
-  List<Object[]> groupByEndpoint(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+  List<Object[]> groupByEndpoint(@Param("start") LocalDateTime start,
+      @Param("end") LocalDateTime end);
 
   /**
    * 按状态码分组统计错误
@@ -90,6 +96,7 @@ public interface ApiUsageLogRepo extends BaseRepository<ApiUsageLog, Long> {
   @Query("SELECT l.statusCode, COUNT(l) FROM ApiUsageLog l " +
       "WHERE l.requestTime BETWEEN :start AND :end AND l.isSuccessful = false " +
       "GROUP BY l.statusCode ORDER BY COUNT(l) DESC")
-  List<Object[]> groupByStatusCode(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+  List<Object[]> groupByStatusCode(@Param("start") LocalDateTime start,
+      @Param("end") LocalDateTime end);
 
 }

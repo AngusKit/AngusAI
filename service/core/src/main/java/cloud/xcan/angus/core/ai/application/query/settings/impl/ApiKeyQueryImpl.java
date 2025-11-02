@@ -122,7 +122,8 @@ public class ApiKeyQueryImpl implements ApiKeyQuery {
   @Override
   @Transactional(readOnly = true)
   public boolean hasResourceAccess(Long apiKeyId, String resourceType, Long resourceId) {
-    List<ApiKeyResource> resources = apiKeyResourceRepo.findByApiKeyIdAndResourceType(apiKeyId, resourceType);
+    List<ApiKeyResource> resources = apiKeyResourceRepo.findByApiKeyIdAndResourceType(apiKeyId,
+        resourceType);
 
     if (resources.isEmpty()) {
       // 没有配置授权资源，默认无权限

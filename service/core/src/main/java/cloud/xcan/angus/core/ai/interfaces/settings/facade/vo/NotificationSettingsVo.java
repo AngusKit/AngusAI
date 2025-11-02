@@ -75,6 +75,7 @@ public class NotificationSettingsVo {
   @Data
   @Schema(description = "通知类型")
   public static class NotificationTypesVo {
+
     private Boolean systemUpdates;
     private Boolean securityAlerts;
     private Boolean usageAlerts;
@@ -88,6 +89,7 @@ public class NotificationSettingsVo {
   @Data
   @Schema(description = "浏览器通知类型")
   public static class BrowserNotificationTypesVo {
+
     private Boolean chatMessages;
     private Boolean workflowComplete;
     private Boolean errorAlerts;
@@ -96,6 +98,7 @@ public class NotificationSettingsVo {
   @Data
   @Schema(description = "免打扰时间")
   public static class QuietHoursVo {
+
     private Boolean enabled;
     private String start;
     private String end;

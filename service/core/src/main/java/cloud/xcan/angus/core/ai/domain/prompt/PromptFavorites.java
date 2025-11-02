@@ -2,7 +2,6 @@ package cloud.xcan.angus.core.ai.domain.prompt;
 
 import static cloud.xcan.angus.spec.SpecConstant.DateFormat.DATE_FMT;
 
-import cloud.xcan.angus.core.ai.domain.plugin.PluginReview;
 import cloud.xcan.angus.spec.experimental.EntitySupport;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,7 +22,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 @EntityListeners(AuditingEntityListener.class)
 @Entity
 @Table(name = "ai_prompt_favorites")
-public class PromptFavorites extends EntitySupport<PromptFavorites, Long>{
+public class PromptFavorites extends EntitySupport<PromptFavorites, Long> {
 
   @Id
   private Long id;

@@ -1,6 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.dataset;
 
-import cloud.xcan.angus.core.ai.domain.dataset.DatasetVisibility;
+import cloud.xcan.angus.core.ai.domain.Visibility;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.DatasetFacade;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DataSourceUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetCreateDto;
@@ -77,7 +77,7 @@ public class DatasetRest {
   @PutMapping("/{id}/visibility")
   public ApiLocaleResult<DatasetDetailVo> modifyVisibility(
       @Parameter(description = "数据集ID") @PathVariable Long id,
-      @Parameter(description = "可见性") @RequestParam DatasetVisibility visibility) {
+      @Parameter(description = "可见性") @RequestParam Visibility visibility) {
     return ApiLocaleResult.success(datasetFacade.modifyVisibility(id, visibility));
   }
 

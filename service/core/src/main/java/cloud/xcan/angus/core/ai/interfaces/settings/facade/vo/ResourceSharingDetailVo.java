@@ -67,6 +67,7 @@ public class ResourceSharingDetailVo {
   @Data
   @Schema(description = "所有者信息")
   public static class OwnerVo {
+
     @Schema(description = "用户ID")
     private Long userId;
 
@@ -84,6 +85,7 @@ public class ResourceSharingDetailVo {
   @Data
   @Schema(description = "成员信息")
   public static class MemberVo {
+
     @Schema(description = "用户ID")
     private Long userId;
 
@@ -116,6 +118,7 @@ public class ResourceSharingDetailVo {
   @Data
   @Schema(description = "统计信息")
   public static class StatisticsVo {
+
     @Schema(description = "总访问次数")
     private Long totalViews;
 
@@ -134,6 +137,7 @@ public class ResourceSharingDetailVo {
     @Data
     @Schema(description = "访问趋势")
     public static class ViewTrendVo {
+
       @Schema(description = "日期")
       private String date;
 
@@ -148,6 +152,7 @@ public class ResourceSharingDetailVo {
   @Data
   @Schema(description = "最近活动")
   public static class RecentActivityVo {
+
     @Schema(description = "用户ID")
     private Long userId;
 

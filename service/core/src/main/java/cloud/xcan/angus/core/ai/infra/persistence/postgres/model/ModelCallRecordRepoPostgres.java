@@ -4,5 +4,7 @@ import cloud.xcan.angus.core.ai.domain.model.ModelCallRecordRepo;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ModelCallRecordRepoPostgres extends ModelCallRecordRepo { }
+public interface ModelCallRecordRepoPostgres extends ModelCallRecordRepo {
+
+}
 

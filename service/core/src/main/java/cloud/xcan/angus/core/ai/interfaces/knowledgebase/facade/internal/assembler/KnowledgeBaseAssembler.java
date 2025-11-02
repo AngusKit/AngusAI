@@ -3,7 +3,7 @@ package cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.internal.assemb
 import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatFileSize;
 import static cloud.xcan.angus.spec.utils.ObjectUtils.nullSafe;
 
-import cloud.xcan.angus.core.ai.domain.knowledgebase.DocumentVisibility;
+import cloud.xcan.angus.core.ai.domain.Visibility;
 import cloud.xcan.angus.core.ai.domain.knowledgebase.KnowledgeBase;
 import cloud.xcan.angus.core.ai.domain.knowledgebase.KnowledgeBaseConfig;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBaseConfigDto;
@@ -27,7 +27,7 @@ public class KnowledgeBaseAssembler {
     knowledgeBase.setIcon(dto.getIcon());
     knowledgeBase.setIconBg(dto.getIconBg());
     knowledgeBase.setDescription(dto.getDescription());
-    knowledgeBase.setVisibility(nullSafe(dto.getVisibility(), DocumentVisibility.PRIVATE));
+    knowledgeBase.setVisibility(nullSafe(dto.getVisibility(), Visibility.PRIVATE));
     knowledgeBase.setTags(dto.getTags());
 
     // 设置默认值

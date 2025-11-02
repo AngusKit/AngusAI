@@ -1,25 +1,20 @@
 package cloud.xcan.angus.core.ai.interfaces.workflow;
 
+import cloud.xcan.angus.core.ai.domain.Visibility;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.WorkflowFacade;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowConfigUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowCreateDto;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowDuplicateDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowExecuteDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowExecutionLogFindDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowFindDto;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowStopDto;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowToggleDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.ExecutionDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.ExecutionLogVo;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowExecuteResultVo;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowListVo;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowRestoreResultVo;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowStatisticsVo;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowStopResultVo;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowToggleResultVo;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowVersionVo;
 import cloud.xcan.angus.remote.ApiLocaleResult;
 import cloud.xcan.angus.remote.PageResult;
 import io.swagger.v3.oas.annotations.Operation;
@@ -89,18 +84,19 @@ public class WorkflowRest {
     return ApiLocaleResult.success(workflowFacade.updateConfig(id, dto));
   }
 
-  @Operation(operationId = "toggleWorkflow", summary = "启用/禁用工作流", description = "切换工作流的启用状态")
+  @Operation(operationId = "modifyWorkflowVisibility", summary = "修改工作流可见性", description = "修改工作流可见性")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "状态已更新")
+      @ApiResponse(responseCode = "200", description = "可见性修改成功")
   })
-  @PatchMapping("/{id}/toggle")
-  public ApiLocaleResult<WorkflowToggleResultVo> toggle(
-      @Parameter(description = "工作流ID") @PathVariable Long id,
-      @Valid @RequestBody WorkflowToggleDto dto) {
-    return ApiLocaleResult.success(workflowFacade.toggle(id, dto));
+  @ResponseStatus(HttpStatus.OK)
+  @PutMapping("/{id}/visibility")
+  public ApiLocaleResult<WorkflowDetailVo> modifyVisibility(
+      @Parameter(description = "数据集ID") @PathVariable Long id,
+      @Parameter(description = "可见性") @RequestParam Visibility visibility) {
+    return ApiLocaleResult.success(workflowFacade.modifyVisibility(id, visibility));
   }
 
-  @Operation(operationId = "executeWorkflow", summary = "执行工作流", description = "手动执行工作流")
+  @Operation(operationId = "executeWorkflow", summary = "执行工作流", description = "手动执行或调试工作流")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "执行成功"),
       @ApiResponse(responseCode = "202", description = "执行已启动")
@@ -112,26 +108,24 @@ public class WorkflowRest {
     return ApiLocaleResult.success(workflowFacade.execute(id, dto));
   }
 
-  @Operation(operationId = "stopWorkflow", summary = "停止工作流执行", description = "停止正在运行的工作流")
+  @Operation(operationId = "startWorkflow", summary = "运行工作流", description = "运行工作流")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "已停止")
+  })
+  @PostMapping("/{id}/start")
+  public ApiLocaleResult<WorkflowDetailVo> start(
+      @Parameter(description = "工作流ID") @PathVariable Long id) {
+    return ApiLocaleResult.success(workflowFacade.start(id));
+  }
+
+  @Operation(operationId = "stopWorkflow", summary = "停止工作流运行", description = "停止工作流运行")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "已停止")
   })
   @PostMapping("/{id}/stop")
-  public ApiLocaleResult<WorkflowStopResultVo> stop(
-      @Parameter(description = "工作流ID") @PathVariable Long id,
-      @Valid @RequestBody WorkflowStopDto dto) {
-    return ApiLocaleResult.success(workflowFacade.stop(id, dto));
-  }
-
-  @Operation(operationId = "restoreWorkflowVersion", summary = "恢复到特定版本", description = "恢复工作流到特定版本")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "已恢复到指定版本")
-  })
-  @PostMapping("/{id}/versions/{versionId}/restore")
-  public ApiLocaleResult<WorkflowRestoreResultVo> restoreVersion(
-      @Parameter(description = "工作流ID") @PathVariable Long id,
-      @Parameter(description = "版本ID") @PathVariable Long versionId) {
-    return ApiLocaleResult.success(workflowFacade.restoreVersion(id, versionId));
+  public ApiLocaleResult<WorkflowDetailVo> stop(
+      @Parameter(description = "工作流ID") @PathVariable Long id) {
+    return ApiLocaleResult.success(workflowFacade.stop(id));
   }
 
   @Operation(operationId = "deleteWorkflow", summary = "删除工作流", description = "删除指定工作流")
@@ -143,18 +137,6 @@ public class WorkflowRest {
   public void delete(
       @Parameter(description = "工作流ID") @PathVariable Long id) {
     workflowFacade.delete(id);
-  }
-
-  @Operation(operationId = "duplicateWorkflow", summary = "复制工作流", description = "复制工作流")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "201", description = "复制成功")
-  })
-  @ResponseStatus(HttpStatus.CREATED)
-  @PostMapping("/{id}/duplicate")
-  public ApiLocaleResult<WorkflowDetailVo> duplicate(
-      @Parameter(description = "源工作流ID") @PathVariable Long id,
-      @Valid @RequestBody WorkflowDuplicateDto dto) {
-    return ApiLocaleResult.success(workflowFacade.duplicate(id, dto));
   }
 
   @Operation(operationId = "getWorkflowDetail", summary = "获取工作流详情", description = "获取指定工作流的详细信息")
@@ -208,29 +190,6 @@ public class WorkflowRest {
   public ApiLocaleResult<ExecutionDetailVo> getExecutionDetail(
       @Parameter(description = "执行ID") @PathVariable String executionId) {
     return ApiLocaleResult.success(workflowFacade.getExecutionDetail(executionId));
-  }
-
-  @Operation(operationId = "getWorkflowVersions", summary = "获取工作流版本列表", description = "获取工作流的所有版本")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "版本列表获取成功")
-  })
-  @GetMapping("/{id}/versions")
-  public ApiLocaleResult<PageResult<WorkflowVersionVo>> getVersions(
-      @Parameter(description = "工作流ID") @PathVariable Long id,
-      @Parameter(description = "页码") @RequestParam(required = false, defaultValue = "1") Integer pageNo,
-      @Parameter(description = "每页数量") @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
-    return ApiLocaleResult.success(workflowFacade.getVersions(id, pageNo, pageSize));
-  }
-
-  @Operation(operationId = "getWorkflowVersion", summary = "获取特定版本", description = "获取工作流的特定版本详情")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "版本详情获取成功")
-  })
-  @GetMapping("/{id}/versions/{versionId}")
-  public ApiLocaleResult<WorkflowVersionVo> getVersion(
-      @Parameter(description = "工作流ID") @PathVariable Long id,
-      @Parameter(description = "版本ID") @PathVariable Long versionId) {
-    return ApiLocaleResult.success(workflowFacade.getVersion(id, versionId));
   }
 
 }

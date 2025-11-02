@@ -7,7 +7,8 @@ import lombok.Data;
 @Schema(description = "分析查询参数基类")
 public class AnalyticsQueryDto {
 
-  @Schema(description = "时间范围", example = "7days", allowableValues = {"24hours", "7days", "30days", "90days"})
+  @Schema(description = "时间范围", example = "7days", allowableValues = {"24hours", "7days",
+      "30days", "90days"})
   private String timeRange = "7days";
 
   @Schema(description = "应用ID筛选")

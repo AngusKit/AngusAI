@@ -23,9 +23,6 @@ public class WorkflowUpdateDto {
   @Schema(description = "背景色", example = "bg-blue-500")
   private String iconBg;
 
-  @Schema(description = "图标颜色", example = "text-white")
-  private String iconColor;
-
   @Schema(description = "工作流类型")
   private WorkflowType type;
 }

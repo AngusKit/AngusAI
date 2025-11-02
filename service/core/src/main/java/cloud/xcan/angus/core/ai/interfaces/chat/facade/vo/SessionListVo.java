@@ -60,6 +60,7 @@ public class SessionListVo {
   @Data
   @Schema(description = "最后一条消息")
   public static class LastMessage {
+
     @Schema(description = "消息角色")
     private MessageRole role;
 

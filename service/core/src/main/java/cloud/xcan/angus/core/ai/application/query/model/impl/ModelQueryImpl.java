@@ -109,13 +109,15 @@ public class ModelQueryImpl implements ModelQuery {
         // Tokens sum
         LongTotalView tokensView = modelCallRecordRepo.sumByFilters(
             ModelCallRecord.class, LongTotalView.class, callFilters, "tokens");
-        long totalTokens = (tokensView == null || tokensView.getTotal() == null) ? 0L : tokensView.getTotal();
+        long totalTokens =
+            (tokensView == null || tokensView.getTotal() == null) ? 0L : tokensView.getTotal();
         stats.setTotalTokens(totalTokens);
 
         // Cost sum (double) - use a small internal projection
         DoubleTotalView costView = modelCallRecordRepo.sumByFilters(
             ModelCallRecord.class, DoubleTotalView.class, callFilters, "cost");
-        double totalCost = (costView == null || costView.getTotal() == null) ? 0.0 : costView.getTotal();
+        double totalCost =
+            (costView == null || costView.getTotal() == null) ? 0.0 : costView.getTotal();
         stats.setTotalCost(totalCost);
 
         // Success rate
@@ -151,9 +153,11 @@ public class ModelQueryImpl implements ModelQuery {
             ModelCallRecord.class, DoubleTotalView.class, last30CallFilters, "cost");
         LongTotalView tokensLast30View = modelCallRecordRepo.sumByFilters(
             ModelCallRecord.class, LongTotalView.class, last30CallFilters, "tokens");
-        long tokensLast30 = (tokensLast30View == null || tokensLast30View.getTotal() == null) ? 0L : tokensLast30View.getTotal();
+        long tokensLast30 = (tokensLast30View == null || tokensLast30View.getTotal() == null) ? 0L
+            : tokensLast30View.getTotal();
         lm.setAddedCalls(callsLast30);
-        lm.setAddedCost(costLast30 == null || costLast30.getTotal() == null ? 0.0 : costLast30.getTotal());
+        lm.setAddedCost(
+            costLast30 == null || costLast30.getTotal() == null ? 0.0 : costLast30.getTotal());
         lm.setAddedTokens(tokensLast30);
 
         // Today totals（合并 base callFilters，当 period 非空 时，baseFilters 会限制结果）
@@ -165,9 +169,11 @@ public class ModelQueryImpl implements ModelQuery {
             ModelCallRecord.class, DoubleTotalView.class, todayCallFilters, "cost");
         LongTotalView tokensTodayView = modelCallRecordRepo.sumByFilters(
             ModelCallRecord.class, LongTotalView.class, todayCallFilters, "tokens");
-        long tokensToday = (tokensTodayView == null || tokensTodayView.getTotal() == null) ? 0L : tokensTodayView.getTotal();
+        long tokensToday = (tokensTodayView == null || tokensTodayView.getTotal() == null) ? 0L
+            : tokensTodayView.getTotal();
         today.setAddedCalls(callsToday);
-        today.setAddedCost(costToday == null || costToday.getTotal() == null ? 0.0 : costToday.getTotal());
+        today.setAddedCost(
+            costToday == null || costToday.getTotal() == null ? 0.0 : costToday.getTotal());
         today.setAddedTokens(tokensToday);
 
         stats.setLastMonthGrowthTrend(lm);
@@ -179,7 +185,9 @@ public class ModelQueryImpl implements ModelQuery {
       // Simple projection for double sums
       @Getter
       public static class DoubleTotalView {
+
         private final Double total;
+
         public DoubleTotalView(Double total) {
           this.total = total;
         }

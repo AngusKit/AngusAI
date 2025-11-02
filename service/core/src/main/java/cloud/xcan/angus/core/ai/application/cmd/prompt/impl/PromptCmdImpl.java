@@ -9,7 +9,6 @@ import cloud.xcan.angus.core.ai.application.query.prompt.PromptCategoryQuery;
 import cloud.xcan.angus.core.ai.application.query.prompt.PromptQuery;
 import cloud.xcan.angus.core.ai.domain.prompt.Prompt;
 import cloud.xcan.angus.core.ai.domain.prompt.PromptFavorites;
-import cloud.xcan.angus.core.ai.domain.prompt.PromptFavoritesRepo;
 import cloud.xcan.angus.core.ai.domain.prompt.PromptRepo;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;

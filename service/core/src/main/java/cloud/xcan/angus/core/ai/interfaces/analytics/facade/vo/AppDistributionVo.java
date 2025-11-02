@@ -17,6 +17,7 @@ public class AppDistributionVo {
   @Data
   @Schema(description = "分布项")
   public static class DistributionItemVo {
+
     @Schema(description = "应用ID")
     private Long appId;
 
@@ -42,6 +43,7 @@ public class AppDistributionVo {
   @Data
   @Schema(description = "总计")
   public static class TotalVo {
+
     @Schema(description = "应用总数")
     private Integer apps;
 

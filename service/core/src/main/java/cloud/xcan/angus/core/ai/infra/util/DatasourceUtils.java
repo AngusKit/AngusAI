@@ -205,10 +205,10 @@ public class DatasourceUtils {
   /**
    * 查询表数据（支持分页）
    *
-   * @param config   数据源配置
+   * @param config    数据源配置
    * @param tableName 表名
-   * @param pageNo   页码（从1开始）
-   * @param pageSize 每页大小
+   * @param pageNo    页码（从1开始）
+   * @param pageSize  每页大小
    * @return 查询结果
    */
   public static TableDataResult queryTableData(DatasourceConfig config, String tableName,

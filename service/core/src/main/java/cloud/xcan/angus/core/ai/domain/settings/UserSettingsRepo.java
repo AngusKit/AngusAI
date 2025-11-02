@@ -11,21 +11,21 @@ import org.springframework.data.repository.NoRepositoryBean;
 public interface UserSettingsRepo extends BaseRepository<UserSettings, Long> {
 
   // ==================== 查询方法 ====================
-  
+
   /**
    * 根据用户ID查询设置
    */
   Optional<UserSettings> findByUserId(Long userId);
 
   // ==================== 修改方法 ====================
-  
+
   /**
    * 检查用户设置是否存在
    */
   boolean existsByUserId(Long userId);
 
   // ==================== 删除方法 ====================
-  
+
   /**
    * 根据用户ID删除设置
    */

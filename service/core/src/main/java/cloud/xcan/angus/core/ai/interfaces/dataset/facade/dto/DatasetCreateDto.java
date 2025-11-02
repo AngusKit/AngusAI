@@ -1,7 +1,7 @@
 package cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto;
 
+import cloud.xcan.angus.core.ai.domain.Visibility;
 import cloud.xcan.angus.core.ai.domain.dataset.DatasetType;
-import cloud.xcan.angus.core.ai.domain.dataset.DatasetVisibility;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import jakarta.validation.constraints.NotBlank;
@@ -31,7 +31,7 @@ public class DatasetCreateDto {
 
   @NotNull
   @Schema(description = "可见性", requiredMode = RequiredMode.REQUIRED)
-  private DatasetVisibility visibility;
+  private Visibility visibility;
 
   @Schema(description = "图标emoji", example = "📊")
   private String icon;

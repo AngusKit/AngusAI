@@ -1,7 +1,7 @@
 package cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto;
 
 import cloud.xcan.angus.core.ai.domain.Constants;
-import cloud.xcan.angus.core.ai.domain.knowledgebase.DocumentVisibility;
+import cloud.xcan.angus.core.ai.domain.Visibility;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
@@ -27,7 +27,7 @@ public class KnowledgeBaseUpdateDto {
   private String description;
 
   @Schema(description = "可见性", example = "PRIVATE")
-  private DocumentVisibility visibility;
+  private Visibility visibility;
 
   @Size(max = Constants.KNOWLEDGE_BASE_TAGS_MAX_COUNT)
   @Schema(description = "标签", example = "[\"产品\", \"文档\"]")

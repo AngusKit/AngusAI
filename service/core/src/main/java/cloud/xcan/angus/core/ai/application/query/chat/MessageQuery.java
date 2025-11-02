@@ -50,7 +50,8 @@ public interface MessageQuery {
   /**
    * 根据会话ID和角色查询消息
    */
-  List<Message> findBySessionIdAndRole(Long sessionId, cloud.xcan.angus.core.ai.domain.chat.MessageRole role);
+  List<Message> findBySessionIdAndRole(Long sessionId,
+      cloud.xcan.angus.core.ai.domain.chat.MessageRole role);
 
   /**
    * 查询正在流式生成的消息

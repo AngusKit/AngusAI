@@ -1,24 +1,18 @@
 package cloud.xcan.angus.core.ai.interfaces.workflow.facade;
 
+import cloud.xcan.angus.core.ai.domain.Visibility;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowConfigUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowCreateDto;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowDuplicateDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowExecuteDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowExecutionLogFindDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowFindDto;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowStopDto;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowToggleDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.ExecutionDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.ExecutionLogVo;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowExecuteResultVo;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowListVo;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowRestoreResultVo;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowStatisticsVo;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowStopResultVo;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowToggleResultVo;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowVersionVo;
 import cloud.xcan.angus.remote.PageResult;
 
 public interface WorkflowFacade {
@@ -39,9 +33,9 @@ public interface WorkflowFacade {
   WorkflowDetailVo updateConfig(Long id, WorkflowConfigUpdateDto dto);
 
   /**
-   * 启用/禁用工作流
+   * 修改工作流可见性
    */
-  WorkflowToggleResultVo toggle(Long id, WorkflowToggleDto dto);
+  WorkflowDetailVo modifyVisibility(Long id, Visibility visibility);
 
   /**
    * 执行工作流
@@ -49,24 +43,19 @@ public interface WorkflowFacade {
   WorkflowExecuteResultVo execute(Long id, WorkflowExecuteDto dto);
 
   /**
-   * 停止工作流执行
+   * 启动工作流运行
    */
-  WorkflowStopResultVo stop(Long id, WorkflowStopDto dto);
+  WorkflowDetailVo start(Long id);
 
   /**
-   * 恢复到特定版本
+   * 停止工作流运行
    */
-  WorkflowRestoreResultVo restoreVersion(Long id, Long versionId);
+  WorkflowDetailVo stop(Long id);
 
   /**
    * 删除工作流
    */
   void delete(Long id);
-
-  /**
-   * 复制工作流
-   */
-  WorkflowDetailVo duplicate(Long id, WorkflowDuplicateDto dto);
 
   /**
    * 获取工作流详情
@@ -92,15 +81,5 @@ public interface WorkflowFacade {
    * 获取执行详情
    */
   ExecutionDetailVo getExecutionDetail(String executionId);
-
-  /**
-   * 获取工作流版本列表
-   */
-  PageResult<WorkflowVersionVo> getVersions(Long id, Integer pageNo, Integer pageSize);
-
-  /**
-   * 获取特定版本
-   */
-  WorkflowVersionVo getVersion(Long id, Long versionId);
 
 }

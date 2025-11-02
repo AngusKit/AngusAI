@@ -13,7 +13,7 @@ import org.springframework.data.repository.NoRepositoryBean;
 public interface DataExportRepo extends BaseRepository<DataExport, Long> {
 
   // ==================== 查询方法 ====================
-  
+
   /**
    * 查询用户的所有导出记录
    */
@@ -25,7 +25,7 @@ public interface DataExportRepo extends BaseRepository<DataExport, Long> {
   List<DataExport> findByStatusOrderByRequestedAtAsc(ExportStatus status);
 
   // ==================== 统计方法 ====================
-  
+
   /**
    * 查询用户今天的导出次数
    */
@@ -33,7 +33,7 @@ public interface DataExportRepo extends BaseRepository<DataExport, Long> {
   int countTodayExportsByUserId(Long userId, LocalDateTime startOfDay);
 
   // ==================== 删除方法 ====================
-  
+
   /**
    * 根据用户ID删除导出记录
    */

@@ -69,7 +69,8 @@ public class ApiKeyCmdImpl extends CommCmd<ApiKey, Long> implements ApiKeyCmd {
         entity.setKeyHash(keyHash);
         entity.setKeyPrefix(keyPrefix);
         entity.setStatus(ApiKeyStatus.ACTIVE);
-        entity.setPermissions(dto.getPermissions() != null ? dto.getPermissions() : new ArrayList<>());
+        entity.setPermissions(
+            dto.getPermissions() != null ? dto.getPermissions() : new ArrayList<>());
         entity.setRateLimit(dto.getRateLimit() != null ? dto.getRateLimit() : 60);
         entity.setUsageCount(0L);
 

@@ -2,7 +2,6 @@ package cloud.xcan.angus.core.ai.application.cmd.chat;
 
 import cloud.xcan.angus.core.ai.domain.chat.MessageAttachment;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRole;
-import cloud.xcan.angus.core.ai.domain.chat.MessageUsage;
 import java.util.List;
 
 /**
@@ -19,7 +18,7 @@ public interface MessageCmd {
    * 创建带附件的消息
    */
   Long createWithAttachments(Long sessionId, MessageRole role, String content,
-    List<MessageAttachment> attachments);
+      List<MessageAttachment> attachments);
 
   /**
    * 设置消息流式生成状态

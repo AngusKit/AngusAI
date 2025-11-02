@@ -4,5 +4,7 @@ import cloud.xcan.angus.core.ai.domain.model.ModelRepo;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ModelRepoMysql extends ModelRepo { }
+public interface ModelRepoMysql extends ModelRepo {
+
+}
 

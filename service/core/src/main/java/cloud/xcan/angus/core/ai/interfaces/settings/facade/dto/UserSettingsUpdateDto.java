@@ -73,7 +73,8 @@ public class UserSettingsUpdateDto {
   @Schema(description = "隐私设置")
   public static class PrivacyDto {
 
-    @Schema(description = "个人资料可见性", example = "team", allowableValues = {"public", "team", "private"})
+    @Schema(description = "个人资料可见性", example = "team", allowableValues = {"public", "team",
+        "private"})
     private String profileVisibility;
 
     @Schema(description = "是否显示邮箱", example = "false")

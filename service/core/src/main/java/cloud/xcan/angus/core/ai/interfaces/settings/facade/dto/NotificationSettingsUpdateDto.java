@@ -29,7 +29,8 @@ public class NotificationSettingsUpdateDto {
     @Schema(description = "是否启用", example = "true")
     private Boolean enabled;
 
-    @Schema(description = "频率", example = "immediately", allowableValues = {"immediately", "daily", "weekly"})
+    @Schema(description = "频率", example = "immediately", allowableValues = {"immediately",
+        "daily", "weekly"})
     private String frequency;
 
     @Schema(description = "通知类型")

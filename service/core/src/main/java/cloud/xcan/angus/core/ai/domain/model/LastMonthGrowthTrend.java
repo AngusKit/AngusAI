@@ -1,7 +1,6 @@
 package cloud.xcan.angus.core.ai.domain.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.math.BigDecimal;
 import lombok.Data;
 
 @Data

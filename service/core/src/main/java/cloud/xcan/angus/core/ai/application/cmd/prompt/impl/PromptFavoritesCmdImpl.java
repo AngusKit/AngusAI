@@ -16,7 +16,7 @@ public class PromptFavoritesCmdImpl extends CommCmd<PromptFavorites, Long> imple
   private PromptFavoritesRepo promptFavoritesRepo;
 
   @Override
-  public void addFavorites(PromptFavorites favorites){
+  public void addFavorites(PromptFavorites favorites) {
     insert(favorites);
   }
 

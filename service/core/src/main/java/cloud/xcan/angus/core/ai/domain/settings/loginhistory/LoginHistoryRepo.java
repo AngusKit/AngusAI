@@ -15,7 +15,7 @@ import org.springframework.data.repository.NoRepositoryBean;
 public interface LoginHistoryRepo extends BaseRepository<LoginHistory, Long> {
 
   // ==================== 查询方法 ====================
-  
+
   /**
    * 分页查询用户登录历史
    */
@@ -25,7 +25,8 @@ public interface LoginHistoryRepo extends BaseRepository<LoginHistory, Long> {
    * 查询指定时间范围内的登录历史
    */
   @Query("SELECT lh FROM LoginHistory lh WHERE lh.userId = ?1 AND lh.loginDatetime BETWEEN ?2 AND ?3 ORDER BY lh.loginDatetime DESC")
-  List<LoginHistory> findByUserIdAndDateRange(Long userId, LocalDateTime startDate, LocalDateTime endDate);
+  List<LoginHistory> findByUserIdAndDateRange(Long userId, LocalDateTime startDate,
+      LocalDateTime endDate);
 
   /**
    * 查询最近N条登录记录
@@ -33,7 +34,7 @@ public interface LoginHistoryRepo extends BaseRepository<LoginHistory, Long> {
   List<LoginHistory> findTop10ByUserIdOrderByLoginDatetimeDesc(Long userId);
 
   // ==================== 删除方法 ====================
-  
+
   /**
    * 根据用户ID删除登录历史
    */

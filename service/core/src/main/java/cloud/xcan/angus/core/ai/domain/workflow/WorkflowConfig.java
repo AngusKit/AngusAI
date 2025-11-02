@@ -45,6 +45,7 @@ public class WorkflowConfig {
 
   @Data
   public static class WorkflowNode {
+
     private String id;
     private String type;
     private NodePosition position;
@@ -54,18 +55,21 @@ public class WorkflowConfig {
 
   @Data
   public static class NodePosition {
+
     private Double x;
     private Double y;
   }
 
   @Data
   public static class NodeData {
+
     private String label;
     private Map<String, Object> config;
   }
 
   @Data
   public static class NodeStyle {
+
     private String background;
     private String color;
     private String border;
@@ -75,6 +79,7 @@ public class WorkflowConfig {
 
   @Data
   public static class WorkflowEdge {
+
     private String id;
     private String source;
     private String target;
@@ -88,18 +93,21 @@ public class WorkflowConfig {
 
   @Data
   public static class EdgeStyle {
+
     private String stroke;
     private Integer strokeWidth;
   }
 
   @Data
   public static class TriggerConfig {
+
     private String type; // manual, schedule, webhook, event
     private Map<String, Object> config;
   }
 
   @Data
   public static class VariableConfig {
+
     private String name;
     private String type; // string, number, boolean, object, array
     private Object defaultValue;
@@ -109,6 +117,7 @@ public class WorkflowConfig {
 
   @Data
   public static class ExecutionConfig {
+
     private String mode; // sync, async
     private Integer timeout = 300;
     private Boolean parallel = false;
@@ -117,6 +126,7 @@ public class WorkflowConfig {
 
   @Data
   public static class MonitoringConfig {
+
     private Boolean enabled = true;
     private List<String> metrics;
     private Map<String, Object> alerts;
@@ -124,6 +134,7 @@ public class WorkflowConfig {
 
   @Data
   public static class SecurityConfig {
+
     private String accessControl = "private";
     private List<String> permissions;
     private Map<String, Object> encryption;
@@ -131,6 +142,7 @@ public class WorkflowConfig {
 
   @Data
   public static class ResourceConfig {
+
     private Long memoryLimit;
     private Long cpuLimit;
     private Long storageLimit;
@@ -139,6 +151,7 @@ public class WorkflowConfig {
 
   @Data
   public static class ErrorHandlingConfig {
+
     private String strategy; // stop, continue, retry
     private Integer maxRetries = 3;
     private List<String> retryableErrors;
@@ -147,6 +160,7 @@ public class WorkflowConfig {
 
   @Data
   public static class LoggingConfig {
+
     private Boolean enabled = true;
     private String level = "INFO";
     private List<String> loggers;
@@ -155,6 +169,7 @@ public class WorkflowConfig {
 
   @Data
   public static class NotificationConfig {
+
     private Boolean enabled = false;
     private List<String> channels;
     private Map<String, Object> templates;

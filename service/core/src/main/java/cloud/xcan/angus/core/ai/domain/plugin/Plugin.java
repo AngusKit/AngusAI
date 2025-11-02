@@ -2,8 +2,6 @@ package cloud.xcan.angus.core.ai.domain.plugin;
 
 import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -11,7 +9,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Getter;

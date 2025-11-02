@@ -1,14 +1,17 @@
 package cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo;
 
+import cloud.xcan.angus.core.ai.domain.workflow.ExecutionStats;
 import cloud.xcan.angus.core.ai.domain.workflow.WorkflowStatus;
 import cloud.xcan.angus.core.ai.domain.workflow.WorkflowType;
+import cloud.xcan.angus.remote.vo.TenantAuditingVo;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDateTime;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Schema(description = "工作流详情响应")
-public class WorkflowDetailVo {
+public class WorkflowDetailVo extends TenantAuditingVo {
 
   @Schema(description = "工作流ID")
   private Long id;
@@ -25,9 +28,6 @@ public class WorkflowDetailVo {
   @Schema(description = "背景色")
   private String iconBg;
 
-  @Schema(description = "图标颜色")
-  private String iconColor;
-
   @Schema(description = "工作流类型")
   private WorkflowType type;
 
@@ -40,18 +40,9 @@ public class WorkflowDetailVo {
   @Schema(description = "版本号")
   private String version;
 
-  @Schema(description = "创建时间")
-  private LocalDateTime createdDate;
-
-  @Schema(description = "最后修改时间")
-  private LocalDateTime modifiedDate;
-
-  @Schema(description = "创建者ID")
-  private Long createdBy;
-
   @Schema(description = "工作流配置")
   private Object config;
 
   @Schema(description = "统计数据")
-  private Object stats;
+  private ExecutionStats executionStats;
 }

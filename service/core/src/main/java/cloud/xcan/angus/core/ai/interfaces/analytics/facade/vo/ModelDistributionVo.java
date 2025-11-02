@@ -17,6 +17,7 @@ public class ModelDistributionVo {
   @Data
   @Schema(description = "分布项")
   public static class DistributionItemVo {
+
     @Schema(description = "模型ID")
     private Long modelId;
 
@@ -45,6 +46,7 @@ public class ModelDistributionVo {
   @Data
   @Schema(description = "总计")
   public static class TotalVo {
+
     @Schema(description = "模型总数")
     private Integer models;
 

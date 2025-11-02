@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 public interface ResourceSharingMemberRepo extends BaseRepository<ResourceSharingMember, Long> {
 
   // ==================== 查询方法 ====================
-  
+
   /**
    * 根据共享ID查询成员列表
    */
@@ -28,7 +28,7 @@ public interface ResourceSharingMemberRepo extends BaseRepository<ResourceSharin
   List<ResourceSharingMember> findByUserIdOrderByLastAccessedDesc(Long userId);
 
   // ==================== 统计方法 ====================
-  
+
   /**
    * 统计共享的成员数量
    */
@@ -42,14 +42,14 @@ public interface ResourceSharingMemberRepo extends BaseRepository<ResourceSharin
   Long countUniqueVisitorsBySharingId(@Param("sharingId") Long sharingId);
 
   // ==================== 修改方法 ====================
-  
+
   /**
    * 检查成员是否存在
    */
   boolean existsBySharingIdAndUserId(Long sharingId, Long userId);
 
   // ==================== 删除方法 ====================
-  
+
   /**
    * 删除共享成员
    */

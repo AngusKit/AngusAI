@@ -11,21 +11,21 @@ import org.springframework.data.repository.NoRepositoryBean;
 public interface SecuritySettingsRepo extends BaseRepository<SecuritySettings, Long> {
 
   // ==================== 查询方法 ====================
-  
+
   /**
    * 根据用户ID查询安全设置
    */
   Optional<SecuritySettings> findByUserId(Long userId);
 
   // ==================== 修改方法 ====================
-  
+
   /**
    * 检查用户安全设置是否存在
    */
   boolean existsByUserId(Long userId);
 
   // ==================== 删除方法 ====================
-  
+
   /**
    * 根据用户ID删除安全设置
    */

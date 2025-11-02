@@ -14,6 +14,7 @@ public class TopEndpointsVo {
   @Data
   @Schema(description = "接口项")
   public static class EndpointItemVo {
+
     @Schema(description = "接口路径", example = "/v1/chat/completions")
     private String endpoint;
 

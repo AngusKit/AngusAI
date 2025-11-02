@@ -8,6 +8,7 @@ import lombok.Data;
 @Data
 @Schema(description = "插件评级记录")
 public class PluginReviewVo {
+
   private Long id;
   private Long pluginId;
   private Integer rating;

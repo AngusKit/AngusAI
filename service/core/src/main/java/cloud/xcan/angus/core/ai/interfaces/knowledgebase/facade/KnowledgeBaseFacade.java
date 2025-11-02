@@ -1,6 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade;
 
-import cloud.xcan.angus.core.ai.domain.knowledgebase.DocumentVisibility;
+import cloud.xcan.angus.core.ai.domain.Visibility;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBaseCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBaseFindDto;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBaseToggleDto;
@@ -29,7 +29,7 @@ public interface KnowledgeBaseFacade {
   /**
    * 修改知识库可见性
    */
-  KnowledgeBaseDetailVo modifyVisibility(Long id, DocumentVisibility visibility);
+  KnowledgeBaseDetailVo modifyVisibility(Long id, Visibility visibility);
 
   /**
    * 删除知识库

@@ -1,6 +1,7 @@
 package cloud.xcan.angus.core.ai.domain.knowledgebase;
 
 import cloud.xcan.angus.core.ai.domain.Constants;
+import cloud.xcan.angus.core.ai.domain.Visibility;
 import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.Column;
@@ -43,7 +44,7 @@ public class KnowledgeBase extends TenantAuditingEntity<KnowledgeBase, Long> {
 
   @Enumerated(EnumType.STRING)
   @Column(name = "visibility", nullable = false)
-  private DocumentVisibility visibility;
+  private Visibility visibility;
 
   @Column(name = "enabled", nullable = false)
   private Boolean enabled = true;

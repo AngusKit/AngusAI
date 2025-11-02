@@ -17,6 +17,7 @@ public class ApiCallsTrendVo {
   @Data
   @Schema(description = "趋势数据点")
   public static class TrendItemVo {
+
     @Schema(description = "时间戳")
     private Long datetime;
 
@@ -39,6 +40,7 @@ public class ApiCallsTrendVo {
   @Data
   @Schema(description = "汇总统计")
   public static class SummaryVo {
+
     @Schema(description = "总调用次数")
     private Long totalCalls;
 

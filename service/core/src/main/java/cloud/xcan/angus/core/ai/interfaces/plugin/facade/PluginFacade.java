@@ -1,7 +1,7 @@
 package cloud.xcan.angus.core.ai.interfaces.plugin.facade;
 
-import cloud.xcan.angus.core.ai.domain.plugin.PluginStatus;
 import cloud.xcan.angus.core.ai.domain.StatisticsPeriod;
+import cloud.xcan.angus.core.ai.domain.plugin.PluginStatus;
 import cloud.xcan.angus.core.ai.interfaces.plugin.facade.dto.PluginCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.plugin.facade.dto.PluginFindDto;
 import cloud.xcan.angus.core.ai.interfaces.plugin.facade.dto.PluginUpdateDto;
