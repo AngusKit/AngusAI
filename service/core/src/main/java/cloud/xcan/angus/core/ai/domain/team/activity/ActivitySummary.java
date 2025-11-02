@@ -18,24 +18,20 @@ public class ActivitySummary {
 
   private Long id;
 
-  private Long projectId;
-
   private Long userId;
 
-  private String fullName;
+  private String userName;
 
-  private String avatar;
+  private String userAvatar;
 
   private Long targetId;
-
-  private Long parentTargetId;
 
   private CombinedTargetType targetType;
 
   private String targetName;
 
   @JsonFormat(pattern = DEFAULT_DATE_TIME_FORMAT)
-  private LocalDateTime optDate;
+  private LocalDateTime activityDate;
 
   private String description;
 

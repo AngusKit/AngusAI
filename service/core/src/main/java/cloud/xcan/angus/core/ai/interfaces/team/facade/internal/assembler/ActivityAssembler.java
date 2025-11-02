@@ -11,15 +11,15 @@ import java.util.Set;
 public class ActivityAssembler {
 
   public static ActivityDetailVo toDetailVo(Activity activity) {
-    return new ActivityDetailVo().setId(activity.getId())
-        .setProjectId(activity.getProjectId())
-        .setProjectName(activity.getProjectName())
+    return new ActivityDetailVo()
+        .setId(activity.getId())
         .setUserId(activity.getUserId())
-        .setFullName(activity.getFullName()).setAvatar(activity.getAvatar())
-        .setTargetId(activity.getTargetId()).setTargetType(activity.getTargetType())
+        .setUserName(activity.getUserName())
+        .setUserAvatar(activity.getUserAvatar())
+        .setTargetId(activity.getTargetId())
+        .setTargetType(activity.getTargetType())
         .setTargetName(activity.getTargetName())
-        .setParentTargetId(activity.getParentTargetId())
-        .setOptDate(activity.getOptDate())
+        .setActivityDate(activity.getActivityDate())
         .setDescription(activity.getDescription())
         .setDetail(activity.getDetail());
   }
@@ -27,10 +27,10 @@ public class ActivityAssembler {
   public static GenericSpecification<Activity> getSpecification(ActivityFindDto dto) {
     // Build the final filters
     Set<SearchCriteria> filters = new SearchCriteriaBuilder<>(dto)
-        .rangeSearchFields("id", "optDate")
-        .orderByFields("id", "optDate")
+        .rangeSearchFields("id", "activityDate")
+        .orderByFields("id", "activityDate")
         .matchSearchFields("targetName", "detail")
-        .inAndNotFields("mainTargetId", "parentTargetId", "targetId", "targetType")
+        .inAndNotFields("targetId", "targetType")
         .build();
     return new GenericSpecification<>(filters);
   }

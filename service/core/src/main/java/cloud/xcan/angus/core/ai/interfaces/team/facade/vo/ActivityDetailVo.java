@@ -15,25 +15,19 @@ public class ActivityDetailVo {
 
   private Long id;
 
-  private Long projectId;
-
-  private String projectName;
-
   private Long userId;
 
-  private String fullName;
+  private String userName;
 
-  private String avatar;
+  private String userAvatar;
 
   private Long targetId;
-
-  private Long parentTargetId;
 
   private CombinedTargetType targetType;
 
   private String targetName;
 
-  private LocalDateTime optDate;
+  private LocalDateTime activityDate;
 
   private String description;
 

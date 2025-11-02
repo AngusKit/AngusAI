@@ -32,14 +32,8 @@ public class Activity extends TenantEntity<Activity, Long> {
   @Id
   private Long id;
 
-  @Column(name = "project_id")
-  private Long projectId;
-
   @Column(name = "target_id")
   private Long targetId;
-
-  @Column(name = "parent_target_id")
-  private Long parentTargetId;
 
   @Column(name = "target_type")
   @Enumerated(EnumType.STRING)
@@ -48,9 +42,6 @@ public class Activity extends TenantEntity<Activity, Long> {
   @Column(name = "target_name")
   private String targetName;
 
-  @Column(name = "main_target_id")
-  private Long mainTargetId;
-
   @Column(name = "user_id")
   private Long userId;
 
@@ -58,19 +49,17 @@ public class Activity extends TenantEntity<Activity, Long> {
   @Column(name = "type")
   private ActivityType type;
 
-  @Column(name = "opt_date")
-  private LocalDateTime optDate;
+  @Column(name = "activity_date")
+  private LocalDateTime activityDate;
 
   private String description;
 
   private String detail;
 
   @Transient
-  private String projectName;
+  private String userName;
   @Transient
-  private String fullName;
-  @Transient
-  private String avatar;
+  private String userAvatar;
 
   @Override
   public Long identity() {

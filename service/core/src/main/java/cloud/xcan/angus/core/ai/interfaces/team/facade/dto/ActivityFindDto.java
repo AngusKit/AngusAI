@@ -21,14 +21,8 @@ public class ActivityFindDto extends PageQuery {
   @Schema(description = "Activity record identifier")
   private Long id;
 
-  @Schema(description = "Project identifier for activity filtering")
-  private Long projectId;
-
   @Schema(description = "Target resource identifier")
   private Long targetId;
-
-  @Schema(description = "Parent target resource identifier")
-  private Long parentTargetId;
 
   @Schema(description = "Target resource type for activity categorization")
   private CombinedTargetType targetType;
@@ -36,19 +30,16 @@ public class ActivityFindDto extends PageQuery {
   @Schema(description = "User identifier who performed the operation")
   private Long userId;
 
-  @Schema(description = "Main target resource identifier for activity grouping")
-  private Long mainTargetId;
-
   @Length(max = MAX_NAME_LENGTH_X2)
   @Schema(description = "Activity detail content for full-text search")
   private String detail;
 
   @DateTimeFormat(pattern = DATE_FMT)
-  @Schema(description = "Activity operation timestamp")
-  private LocalDateTime optDate;
+  @Schema(description = "Activity date")
+  private LocalDateTime activityDate;
 
   @Override
   public String getDefaultOrderBy() {
-    return "optDate";
+    return "activityDate";
   }
 }
