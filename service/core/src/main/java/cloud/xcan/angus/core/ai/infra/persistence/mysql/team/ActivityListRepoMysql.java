@@ -1,4 +1,4 @@
-package cloud.xcan.angus.core.ai.infra.persistence.mysql.activity;
+package cloud.xcan.angus.core.ai.infra.persistence.mysql.team;
 
 import static cloud.xcan.angus.core.jpa.criteria.CriteriaUtils.findFirstValue;
 import static cloud.xcan.angus.core.jpa.criteria.CriteriaUtils.findValueAndRemove;

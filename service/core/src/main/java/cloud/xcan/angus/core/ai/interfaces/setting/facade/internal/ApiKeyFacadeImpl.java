@@ -5,7 +5,7 @@ import cloud.xcan.angus.core.ai.application.query.setting.ApiKeyQuery;
 import cloud.xcan.angus.core.ai.application.query.setting.ApiKeyResourceQuery;
 import cloud.xcan.angus.core.ai.domain.setting.apikey.ApiKey;
 import cloud.xcan.angus.core.ai.domain.setting.apikey.ApiKeyResource;
-import cloud.xcan.angus.core.ai.interfaces.prompt.facade.internal.assembler.ApiKeyAssembler;
+import cloud.xcan.angus.core.ai.interfaces.setting.facade.internal.assembler.ApiKeyAssembler;
 import cloud.xcan.angus.core.ai.interfaces.setting.facade.ApiKeyFacade;
 import cloud.xcan.angus.core.ai.interfaces.setting.facade.dto.ApiKeyCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.setting.facade.dto.ApiKeyRevokeDto;

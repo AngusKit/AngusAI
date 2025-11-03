@@ -1,4 +1,4 @@
-package cloud.xcan.angus.core.ai.interfaces.prompt.facade.internal.assembler;
+package cloud.xcan.angus.core.ai.interfaces.setting.facade.internal.assembler;
 
 import cloud.xcan.angus.core.ai.domain.setting.apikey.ApiKey;
 import cloud.xcan.angus.core.ai.domain.setting.apikey.ApiKeyResource;

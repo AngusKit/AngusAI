@@ -1,10 +1,10 @@
-package cloud.xcan.angus.core.ai.infra.persistence.postgres.activity;
+package cloud.xcan.angus.core.ai.infra.persistence.mysql.team;
 
 import cloud.xcan.angus.core.ai.domain.team.activity.ActivityRepo;
 import org.springframework.stereotype.Repository;
 
 @Repository("activityRepo")
-public interface ActivityRepoPostgres extends ActivityRepo {
+public interface ActivityRepoMysql extends ActivityRepo {
 
 
 }
