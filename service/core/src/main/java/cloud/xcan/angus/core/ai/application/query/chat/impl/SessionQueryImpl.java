@@ -73,21 +73,6 @@ public class SessionQueryImpl implements SessionQuery {
   }
 
   @Override
-  public List<Session> findPinnedSessions(Long userId) {
-    return sessionRepo.findByCreatedByAndIsPinnedTrueOrderByLastModifiedDateDesc(userId);
-  }
-
-  @Override
-  public List<Session> findStarredSessions(Long userId) {
-    return sessionRepo.findByCreatedByAndIsPinnedTrueOrderByLastModifiedDateDesc(userId);
-  }
-
-  @Override
-  public List<Session> findArchivedSessions(Long userId) {
-    return sessionRepo.findByCreatedByAndIsPinnedTrueOrderByLastModifiedDateDesc(userId);
-  }
-
-  @Override
   public List<Session> findRecentSessions(Long userId, int limit) {
     Pageable pageable = PageRequest.of(0, limit);
     return sessionRepo.findByCreatedByOrderByCreatedDateDesc(userId, pageable).getContent();
@@ -96,7 +81,7 @@ public class SessionQueryImpl implements SessionQuery {
   @Override
   public List<Session> findRecentActiveSessions(Long userId, int limit) {
     Pageable pageable = PageRequest.of(0, limit);
-    return sessionRepo.findByCreatedByOrderByLastModifiedDateDesc(userId, pageable).getContent();
+    return sessionRepo.findByCreatedByOrderByModifiedDateDesc(userId, pageable).getContent();
   }
 
   @Override

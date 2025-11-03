@@ -4,6 +4,6 @@ import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceSharingMembe
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ResourceSharingMemberPostgres extends ResourceSharingMemberRepo {
+public interface ResourceSharingMemberRepoPostgres extends ResourceSharingMemberRepo {
 
 }

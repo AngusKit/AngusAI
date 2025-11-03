@@ -23,21 +23,6 @@ public interface SessionRepo extends BaseRepository<Session, Long> {
   List<Session> findByModelId(Long modelId);
 
   /**
-   * 查询用户的置顶会话
-   */
-  List<Session> findByCreatedByAndIsPinnedTrueOrderByLastModifiedDateDesc(Long userId);
-
-  /**
-   * 查询用户的收藏会话
-   */
-  List<Session> findByCreatedByAndIsStarredTrueOrderByLastModifiedDateDesc(Long userId);
-
-  /**
-   * 查询用户的归档会话
-   */
-  List<Session> findByCreatedByAndIsArchivedTrueOrderByLastModifiedDateDesc(Long userId);
-
-  /**
    * 查询用户最近创建的会话
    */
   Page<Session> findByCreatedByOrderByCreatedDateDesc(Long userId, Pageable pageable);
@@ -45,7 +30,7 @@ public interface SessionRepo extends BaseRepository<Session, Long> {
   /**
    * 查询用户最近活跃的会话
    */
-  Page<Session> findByCreatedByOrderByLastModifiedDateDesc(Long userId, Pageable pageable);
+  Page<Session> findByCreatedByOrderByModifiedDateDesc(Long userId, Pageable pageable);
 
   /**
    * 统计用户的会话数量

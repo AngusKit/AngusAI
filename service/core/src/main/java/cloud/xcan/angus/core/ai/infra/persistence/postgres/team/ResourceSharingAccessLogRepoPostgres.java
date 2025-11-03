@@ -4,6 +4,6 @@ import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceSharingAcces
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ResourceSharingAccessLogPostgres extends ResourceSharingAccessLogRepo {
+public interface ResourceSharingAccessLogRepoPostgres extends ResourceSharingAccessLogRepo {
 
 }

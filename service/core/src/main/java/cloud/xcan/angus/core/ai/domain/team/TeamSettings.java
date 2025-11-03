@@ -27,13 +27,13 @@ public class TeamSettings extends TenantAuditingEntity<TeamSettings, Long> {
   @Column(name = "team_avatar", length = 400)
   private String teamAvatar;
 
-  @Column(name = "team_avatar", length = 50)
+  @Column(name = "team_name", length = 50)
   private String teamName;
 
-  @Column(name = "team_avatar", length = 100)
+  @Column(name = "team_email", length = 100)
   private String teamEmail;
 
-  @Column(name = "team_avatar", length = 200)
+  @Column(name = "team_description", length = 200)
   private String teamDescription;
 
   @Enumerated(EnumType.STRING)

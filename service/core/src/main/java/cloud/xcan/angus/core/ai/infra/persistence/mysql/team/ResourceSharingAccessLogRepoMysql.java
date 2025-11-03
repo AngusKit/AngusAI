@@ -4,6 +4,6 @@ import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceSharingAcces
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ResourceSharingAccessLogMysql extends ResourceSharingAccessLogRepo {
+public interface ResourceSharingAccessLogRepoMysql extends ResourceSharingAccessLogRepo {
 
 }

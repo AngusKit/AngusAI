@@ -39,12 +39,12 @@ public class ActivityClearJob {
   public void execute() {
     jobTemplate.execute(LOCK_KEY, 6, TimeUnit.MINUTES, () -> {
       long reservedNum = getReservedNum();
-      List<Long> targetIds = activityRepo.getTargetIdsHavingCount(reservedNum, COUNT);
+      List<Long> targetIds = activityRepo.getResourceIdsHavingCount(reservedNum, COUNT);
       if (isNotEmpty(targetIds)) {
         for (Long targetId : targetIds) {
           try {
             // Submitted transaction by repo
-            activityRepo.deleteByTargetIdAndCount(targetId, reservedNum);
+            activityRepo.deleteByResourceIdAndCount(targetId, reservedNum);
           } catch (Exception e) {
             log.error("ActivityClearJob#inner execute fail:{}", e.getMessage());
           }

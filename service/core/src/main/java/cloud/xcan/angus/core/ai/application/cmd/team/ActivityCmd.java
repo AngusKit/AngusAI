@@ -13,8 +13,6 @@ public interface ActivityCmd {
 
   void deleteByTarget(FullResourceType targetType, List<Long> targetIds);
 
-  void deleteByTaskIds(List<Long> taskIds);
-
 }
 
 

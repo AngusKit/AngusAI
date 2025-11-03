@@ -63,18 +63,7 @@ public class ActivityCmdImpl extends CommCmd<Activity, Long> implements Activity
   @Transactional(rollbackFor = Exception.class)
   @Override
   public void deleteByTarget(FullResourceType targetType, List<Long> targetIds) {
-    activityRepo.deleteByTargetIdAndTargetType(targetIds, targetType.getValue());
-  }
-
-  /**
-   * Delete activities by task IDs.
-   *
-   * @param taskIds the list of task IDs
-   */
-  @Transactional(rollbackFor = Exception.class)
-  @Override
-  public void deleteByTaskIds(List<Long> taskIds) {
-    activityRepo.deleteByTaskId(taskIds);
+    activityRepo.deleteByResourceIdAndResourceType(targetIds, targetType.getValue());
   }
 
   /**

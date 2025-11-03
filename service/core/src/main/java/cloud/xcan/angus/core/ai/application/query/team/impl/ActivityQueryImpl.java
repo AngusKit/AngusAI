@@ -109,7 +109,7 @@ public class ActivityQueryImpl implements ActivityQuery {
   @Override
   public List<ActivitySummary> findSummaryByTarget(FullResourceType targetType, Long targetId) {
     // Retrieve all activities for the specified target
-    List<Activity> activities = activityRepo.findByTargetTypeAndTargetId(targetType, targetId);
+    List<Activity> activities = activityRepo.findByResourceTypeAndResourceId(targetType, targetId);
     if (isEmpty(activities)) {
       return null;
     }
@@ -120,21 +120,6 @@ public class ActivityQueryImpl implements ActivityQuery {
     // Convert activities to summary format
     return activities.stream().map(ActivityConverter::toActivitySummary)
         .toList();
-  }
-
-  /**
-   * Gets the total number of activities for a main target.
-   *
-   * <p>This method counts all activities associated with a main target,
-   * providing statistics for activity volume analysis.</p>
-   *
-   * @param id the main target ID
-   * @return the total number of activities for the main target
-   */
-  @Override
-  public int getActivityNumByMainTarget(Long id) {
-    // Count all activities associated with the main target
-    return activityRepo.countAllByMainTargetId(id);
   }
 
 }

@@ -40,21 +40,6 @@ public interface SessionQuery {
   List<Session> findByModelId(Long modelId);
 
   /**
-   * 查询用户的置顶会话
-   */
-  List<Session> findPinnedSessions(Long userId);
-
-  /**
-   * 查询用户的收藏会话
-   */
-  List<Session> findStarredSessions(Long userId);
-
-  /**
-   * 查询用户的归档会话
-   */
-  List<Session> findArchivedSessions(Long userId);
-
-  /**
    * 查询最近创建的会话
    */
   List<Session> findRecentSessions(Long userId, int limit);

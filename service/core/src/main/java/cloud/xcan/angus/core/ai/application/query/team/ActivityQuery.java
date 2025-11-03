@@ -15,8 +15,6 @@ public interface ActivityQuery {
 
   List<ActivitySummary> findSummaryByTarget(FullResourceType targetType, Long targetId);
 
-  int getActivityNumByMainTarget(Long id);
-
 }
 
 
