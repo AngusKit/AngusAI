@@ -194,7 +194,7 @@
       <groupId>org.springframework.ai</groupId>
       <artifactId>spring-ai-deepseek</artifactId>
     </dependency>
-    <dependency>
+   <!-- <dependency>
       <groupId>org.springframework.ai</groupId>
       <artifactId>spring-ai-azure-cosmos-db-store</artifactId>
     </dependency>
@@ -277,7 +277,7 @@
     <dependency>
       <groupId>org.springframework.ai</groupId>
       <artifactId>spring-ai-couchbase-store</artifactId>
-    </dependency>
+    </dependency>-->
 
     <!-- JDBC Type 4 driver for MySQL -->
     <dependency>
