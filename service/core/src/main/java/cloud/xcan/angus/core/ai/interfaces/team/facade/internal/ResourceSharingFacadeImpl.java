@@ -104,7 +104,7 @@ public class ResourceSharingFacadeImpl implements ResourceSharingFacade {
 
   @Override
   public ResourceSharingStatisticsVo getStatistics(Long id, @Nullable StatisticsPeriod period) {
-    return null;
+    return null; // TODO
   }
 
   private ResourceSharingDetailVo assembleResourceSharingDetailVo(Long id,
