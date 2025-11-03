@@ -3,10 +3,9 @@ package cloud.xcan.angus.core.ai.application.query.chat;
 import cloud.xcan.angus.core.ai.domain.chat.Message;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.ChatStatisticsVo.UsageTrend;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-
-import java.util.List;
 
 /**
  * 消息查询接口
@@ -51,7 +50,8 @@ public interface MessageQuery {
   /**
    * 根据会话ID和角色查询消息
    */
-  List<Message> findBySessionIdAndRole(Long sessionId, cloud.xcan.angus.core.ai.domain.chat.MessageRole role);
+  List<Message> findBySessionIdAndRole(Long sessionId,
+      cloud.xcan.angus.core.ai.domain.chat.MessageRole role);
 
   /**
    * 查询正在流式生成的消息

@@ -1,11 +1,11 @@
 package cloud.xcan.angus.core.ai.domain.knowledgebase;
 
+import cloud.xcan.angus.core.ai.domain.Visibility;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
 import java.util.List;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 @NoRepositoryBean
 public interface KnowledgeBaseRepo extends BaseRepository<KnowledgeBase, Long> {
@@ -18,7 +18,7 @@ public interface KnowledgeBaseRepo extends BaseRepository<KnowledgeBase, Long> {
   /**
    * 根据可见性查找知识库
    */
-  List<KnowledgeBase> findByVisibility(DocumentVisibility visibility);
+  List<KnowledgeBase> findByVisibility(Visibility visibility);
 
   /**
    * 根据启用状态查找知识库

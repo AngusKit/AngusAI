@@ -1,5 +1,8 @@
 package cloud.xcan.angus.core.ai.infra.ai.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -21,258 +24,182 @@ public class ModelConfig {
   /**
    * 模型名称
    */
+  @NotEmpty
+  @Schema(description = "模型名称，例如 gpt-4o-mini")
   private String modelName;
 
   /**
    * 模型类型
    */
+  @NotNull
+  @Schema(description = "模型类型，如：CHAT, EMBEDDING, VISION 等")
   private ModelType modelType;
 
   /**
    * 模型提供商
    */
+  @NotNull
+  @Schema(description = "模型提供商，如：OPENAI、ANTHROPIC、OLLAMA 等")
   private ModelProvider provider;
 
   /**
    * 模型版本
    */
+  @NotNull
+  @Schema(description = "模型版本标识")
   private String version;
 
   /**
    * 模型描述
    */
+  @Schema(description = "模型用途或能力描述")
   private String description;
 
   /**
    * API密钥
    */
+  @NotEmpty
+  @Schema(description = "访问模型所需的API密钥")
   private String apiKey;
 
   /**
    * API基础URL
    */
-  private String baseUrl;
+  @NotEmpty
+  @Schema(description = "模型服务的基础URL")
+  private String apiEndpoint;
 
   /**
    * 温度参数
    */
   @Builder.Default
-  private Double temperature = 0.7;
+  @Schema(description = "温度，控制创造性，通常0.0-2.0")
+  private Double temperature = 0.5;
 
   /**
    * 最大token数
    */
   @Builder.Default
+  @Schema(description = "最大生成token数")
   private Integer maxTokens = 2000;
 
   /**
    * 上下文窗口大小
    */
+  @Schema(description = "上下文窗口大小，模型最大可处理的上下文长度")
   private Integer contextWindow;
 
   /**
    * 超时时间（毫秒）
    */
   @Builder.Default
+  @Schema(description = "请求超时时间（毫秒）")
   private Long timeout = 30000L;
 
   /**
    * 重试次数
    */
   @Builder.Default
+  @Schema(description = "失败重试次数")
   private Integer retryCount = 3;
 
   /**
    * 是否启用流式响应
    */
   @Builder.Default
+  @Schema(description = "是否启用流式响应")
   private Boolean streaming = false;
 
   /**
    * 优先级（数字越小优先级越高）
    */
   @Builder.Default
+  @Schema(description = "优先级（越小越高）")
   private Integer priority = 100;
 
   /**
    * 是否启用
    */
   @Builder.Default
+  @Schema(description = "是否启用该模型配置")
   private Boolean enabled = true;
 
   /**
    * 是否本地部署
    */
   @Builder.Default
+  @Schema(description = "是否本地部署模型")
   private Boolean isLocal = false;
 
   /**
    * 是否OpenAI API兼容
    */
   @Builder.Default
+  @Schema(description = "是否兼容OpenAI API接口")
   private Boolean openaiCompatible = false;
 
   /**
    * 成本等级（1-5，1最便宜，5最贵）
    */
   @Builder.Default
+  @Schema(description = "成本等级（1-5）")
   private Integer costLevel = 3;
 
   /**
    * 性能等级（1-5，1最慢，5最快）
    */
   @Builder.Default
+  @Schema(description = "性能等级（1-5）")
   private Integer performanceLevel = 3;
 
   /**
    * 模型特性
    */
   @Builder.Default
+  @Schema(description = "模型支持的特性枚举集合")
   private Set<ModelFeature> features = new HashSet<>();
 
   /**
    * 多模态支持类型
    */
   @Builder.Default
+  @Schema(description = "支持的多模态类型，例如：image, audio")
   private Set<String> multimodalityTypes = new HashSet<>();
 
   /**
    * 默认参数
    */
   @Builder.Default
+  @Schema(description = "默认请求参数键值对")
   private Map<String, Object> defaultParams = new HashMap<>();
 
   /**
    * 支持的输入格式
    */
   @Builder.Default
+  @Schema(description = "支持的输入格式集合")
   private Set<String> inputFormats = new HashSet<>();
 
   /**
    * 支持的输出格式
    */
   @Builder.Default
+  @Schema(description = "支持的输出格式集合")
   private Set<String> outputFormats = new HashSet<>();
 
   /**
    * 业务场景标签
    */
   @Builder.Default
+  @Schema(description = "业务场景标签集合")
   private Set<String> businessScenarios = new HashSet<>();
 
   /**
    * 自定义参数（兼容旧版本）
    */
   @Builder.Default
+  @Schema(description = "自定义参数（兼容旧版配置）")
   private Map<String, Object> customParams = new HashMap<>();
-
-  /**
-   * 创建OpenAI配置
-   */
-  public static ModelConfig createOpenAI(String apiKey, String modelName) {
-    return ModelConfig.builder()
-        .provider(ModelProvider.OPENAI)
-        .modelName(modelName)
-        .modelType(ModelType.CHAT)
-        .apiKey(apiKey)
-        .baseUrl("https://api.openai.com")
-        .priority(10) // 高优先级
-        .enabled(true)
-        .description("OpenAI " + modelName + " 模型")
-        .openaiCompatible(true)
-        .costLevel(4)
-        .performanceLevel(5)
-        .build();
-  }
-
-  /**
-   * 创建OpenAI配置（带优先级）
-   */
-  public static ModelConfig createOpenAI(String apiKey, String modelName, Integer priority) {
-    return ModelConfig.builder()
-        .provider(ModelProvider.OPENAI)
-        .modelName(modelName)
-        .modelType(ModelType.CHAT)
-        .apiKey(apiKey)
-        .baseUrl("https://api.openai.com")
-        .priority(priority)
-        .enabled(true)
-        .description("OpenAI " + modelName + " 模型")
-        .openaiCompatible(true)
-        .costLevel(4)
-        .performanceLevel(5)
-        .build();
-  }
-
-  /**
-   * 创建Anthropic配置
-   */
-  public static ModelConfig createAnthropic(String apiKey, String modelName) {
-    return ModelConfig.builder()
-        .provider(ModelProvider.ANTHROPIC)
-        .modelName(modelName)
-        .modelType(ModelType.CHAT)
-        .apiKey(apiKey)
-        .priority(20) // 高优先级
-        .enabled(true)
-        .description("Anthropic " + modelName + " 模型")
-        .costLevel(4)
-        .performanceLevel(4)
-        .build();
-  }
-
-  /**
-   * 创建Ollama配置
-   */
-  public static ModelConfig createOllama(String baseUrl, String modelName) {
-    return ModelConfig.builder()
-        .provider(ModelProvider.OLLAMA)
-        .modelName(modelName)
-        .modelType(ModelType.CHAT)
-        .baseUrl(baseUrl)
-        .priority(50) // 中优先级
-        .enabled(true)
-        .description("Ollama " + modelName + " 模型")
-        .isLocal(true)
-        .costLevel(1)
-        .performanceLevel(3)
-        .build();
-  }
-
-  /**
-   * 创建DeepSeek配置
-   */
-  public static ModelConfig createDeepseek(String apiKey, String modelName) {
-    return ModelConfig.builder()
-        .provider(ModelProvider.DEEPSEEK)
-        .modelName(modelName)
-        .apiKey(apiKey)
-        .baseUrl("https://api.deepseek.com")
-        .build();
-  }
-
-  /**
-   * 创建本地配置
-   */
-  public static ModelConfig createLocal(String baseUrl, String modelName) {
-    return ModelConfig.builder()
-        .provider(ModelProvider.LOCAL)
-        .modelName(modelName)
-        .baseUrl(baseUrl)
-        .build();
-  }
-
-  /**
-   * 创建自定义配置
-   */
-  public static ModelConfig createCustom(String apiKey, String baseUrl, String modelName) {
-    return ModelConfig.builder()
-        .provider(ModelProvider.CUSTOM)
-        .modelName(modelName)
-        .apiKey(apiKey)
-        .baseUrl(baseUrl)
-        .build();
-  }
 
   /**
    * 添加自定义参数
@@ -532,7 +459,7 @@ public class ModelConfig {
       case OPENAI, ANTHROPIC, AZURE_OPENAI, GOOGLE_VERTEXAI, AMAZON_BEDROCK, MISTRAL_AI, DEEPSEEK,
            MOONSHOT_AI, ZHIPU_AI, MINIMAX, GROQ, NVIDIA, PERPLEXITY, QIANFAN, HUGGINGFACE,
            ONNX_TRANSFORMERS, POSTGRESML, CUSTOM -> apiKey != null && !apiKey.trim().isEmpty();
-      case OLLAMA, LOCAL -> baseUrl != null && !baseUrl.trim().isEmpty();
+      case OLLAMA, LOCAL -> apiEndpoint != null && !apiEndpoint.trim().isEmpty();
       default -> false;
     };
   }
@@ -550,7 +477,7 @@ public class ModelConfig {
   public String getSummary() {
     return String.format(
         "ModelConfig{provider=%s, model=%s, type=%s, baseUrl=%s, temperature=%.2f, maxTokens=%d, priority=%d, enabled=%s, costLevel=%d, performanceLevel=%d}",
-        provider, modelName, modelType, baseUrl, temperature, maxTokens, priority, enabled,
+        provider, modelName, modelType, apiEndpoint, temperature, maxTokens, priority, enabled,
         costLevel, performanceLevel);
   }
 }

@@ -1,13 +1,20 @@
 package cloud.xcan.angus.core.ai.domain.chat;
 
-import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import static cloud.xcan.angus.spec.SpecConstant.DateFormat.DATE_FMT;
+
+import cloud.xcan.angus.spec.experimental.EntitySupport;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  * 附件实体
@@ -16,8 +23,8 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "chat_attachment")
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class Attachment extends TenantAuditingEntity<Attachment, Long> {
+@EntityListeners(AuditingEntityListener.class)
+public class Attachment extends EntitySupport<Attachment, Long> {
 
   @Id
   private Long id;
@@ -58,11 +65,15 @@ public class Attachment extends TenantAuditingEntity<Attachment, Long> {
   @Column(nullable = false, length = 500)
   private String url;
 
-  /**
-   * 上传时间戳
-   */
-  @Column(nullable = false)
-  private Long uploadedAt;
+  @CreatedDate
+  @DateTimeFormat(pattern = DATE_FMT)
+  //@Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "created_date", nullable = false, updatable = false, columnDefinition = "TIMESTAMP")
+  protected LocalDateTime createdDate;
+
+  @CreatedBy
+  @Column(name = "created_by", nullable = false, updatable = false)
+  protected Long createdBy;
 
   @Override
   public Long identity() {

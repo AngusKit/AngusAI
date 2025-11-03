@@ -7,7 +7,13 @@ import cloud.xcan.angus.core.jpa.repository.BaseRepository;
  */
 public interface WorkflowRepo extends BaseRepository<Workflow, Long> {
 
-  // 当前为空接口，继承BaseRepository的基础CRUD方法
-  // 后续可根据业务需求添加特定的查询、统计、修改、删除方法
+  /**
+   * 根据名称检查工作流是否存在
+   */
+  boolean existsByName(String name);
 
+  /**
+   * 根据名称检查工作流是否存在（排除指定ID）
+   */
+  boolean existsByNameAndIdNot(String name, Long id);
 }

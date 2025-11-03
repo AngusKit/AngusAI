@@ -5,6 +5,7 @@ import cloud.xcan.angus.core.ai.infra.ai.model.ModelType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.Range;
 
 @Data
 @Schema(description = "更新模型请求参数")
@@ -24,22 +25,22 @@ public class ModelUpdateDto {
   @Schema(description = "模型提供商")
   private ModelProvider provider;
 
-  @Length(max = 20)
+  @Length(max = 40)
   @Schema(description = "版本号", example = "gpt-4-1106-preview")
   private String version;
 
   @Schema(description = "API端点", example = "https://api.openai.com/v1/chat/completions")
+  @Length(max = 400)
   private String apiEndpoint;
 
+  @Length(max = 4096)
   @Schema(description = "API密钥")
   private String apiKey;
 
-  @Schema(description = "模型参数配置")
-  private Object parameters;
+  @Schema(description = "温度参数")
+  @Range(min = 0, max = 2)
+  private Double temperature = 0.5;
 
-  @Schema(description = "部署配置")
-  private Object deployment;
-
-  @Schema(description = "限制配置")
-  private Object limits;
+  @Schema(description = "最大token数")
+  private Integer maxTokens;
 }

@@ -1,5 +1,6 @@
 package cloud.xcan.angus.core.ai.domain.dataset;
 
+import cloud.xcan.angus.core.ai.domain.Visibility;
 import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -45,7 +46,7 @@ public class Dataset extends TenantAuditingEntity<Dataset, Long> {
 
   @Enumerated(EnumType.STRING)
   @Column(name = "visibility", nullable = false)
-  private DatasetVisibility visibility;
+  private Visibility visibility;
 
   @Column(name = "icon", nullable = false)
   private String icon;

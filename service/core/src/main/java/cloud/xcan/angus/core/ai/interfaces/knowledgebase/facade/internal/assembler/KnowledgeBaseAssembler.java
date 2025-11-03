@@ -3,7 +3,7 @@ package cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.internal.assemb
 import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatFileSize;
 import static cloud.xcan.angus.spec.utils.ObjectUtils.nullSafe;
 
-import cloud.xcan.angus.core.ai.domain.knowledgebase.DocumentVisibility;
+import cloud.xcan.angus.core.ai.domain.Visibility;
 import cloud.xcan.angus.core.ai.domain.knowledgebase.KnowledgeBase;
 import cloud.xcan.angus.core.ai.domain.knowledgebase.KnowledgeBaseConfig;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBaseConfigDto;
@@ -21,13 +21,13 @@ import java.util.Set;
 
 public class KnowledgeBaseAssembler {
 
-  public static KnowledgeBase toDomain(KnowledgeBaseCreateDto dto) {
+  public static KnowledgeBase toCreateDomain(KnowledgeBaseCreateDto dto) {
     KnowledgeBase knowledgeBase = new KnowledgeBase();
     knowledgeBase.setName(dto.getName());
     knowledgeBase.setIcon(dto.getIcon());
     knowledgeBase.setIconBg(dto.getIconBg());
     knowledgeBase.setDescription(dto.getDescription());
-    knowledgeBase.setVisibility(nullSafe(dto.getVisibility(), DocumentVisibility.PRIVATE));
+    knowledgeBase.setVisibility(nullSafe(dto.getVisibility(), Visibility.PRIVATE));
     knowledgeBase.setTags(dto.getTags());
 
     // 设置默认值
@@ -41,7 +41,7 @@ public class KnowledgeBaseAssembler {
     return knowledgeBase;
   }
 
-  public static KnowledgeBase updateDomain(Long id, KnowledgeBaseUpdateDto dto) {
+  public static KnowledgeBase toUpdateDomain(Long id, KnowledgeBaseUpdateDto dto) {
     KnowledgeBase knowledgeBase = new KnowledgeBase();
     knowledgeBase.setId(id);
     knowledgeBase.setName(dto.getName());
@@ -84,8 +84,8 @@ public class KnowledgeBaseAssembler {
     vo.setTenantId(knowledgeBase.getTenantId());
     vo.setCreatedBy(knowledgeBase.getCreatedBy());
     vo.setCreatedDate(knowledgeBase.getCreatedDate());
-    vo.setLastModifiedBy(knowledgeBase.getLastModifiedBy());
-    vo.setLastModifiedDate(knowledgeBase.getLastModifiedDate());
+    vo.setModifiedBy(knowledgeBase.getModifiedBy());
+    vo.setModifiedDate(knowledgeBase.getModifiedDate());
 
     // 设置统计信息
     KnowledgeBaseStatsVo stats = new KnowledgeBaseStatsVo();
@@ -123,16 +123,16 @@ public class KnowledgeBaseAssembler {
     vo.setTenantId(knowledgeBase.getTenantId());
     vo.setCreatedBy(knowledgeBase.getCreatedBy());
     vo.setCreatedDate(knowledgeBase.getCreatedDate());
-    vo.setLastModifiedBy(knowledgeBase.getLastModifiedBy());
-    vo.setLastModifiedDate(knowledgeBase.getLastModifiedDate());
+    vo.setModifiedBy(knowledgeBase.getModifiedBy());
+    vo.setModifiedDate(knowledgeBase.getModifiedDate());
     return vo;
   }
 
   public static GenericSpecification<KnowledgeBase> getSpecification(KnowledgeBaseFindDto dto) {
     // Build the final filters
     Set<SearchCriteria> filters = new SearchCriteriaBuilder<>(dto)
-        .rangeSearchFields("id", "createdDate", "lastModifiedDate")
-        .orderByFields("id", "createdDate", "lastModifiedDate", "name")
+        .rangeSearchFields("id", "createdDate", "modifiedDate")
+        .orderByFields("id", "createdDate", "modifiedDate", "name")
         .matchSearchFields("name", "description")
         .inAndNotFields("visibility", "enabled")
         .build();

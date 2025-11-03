@@ -1,6 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto;
 
-import cloud.xcan.angus.core.ai.domain.dataset.DatasetVisibility;
+import cloud.xcan.angus.core.ai.domain.Visibility;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.Data;
@@ -25,7 +25,7 @@ public class DatasetUpdateDto {
   private String iconBg;
 
   @Schema(description = "可见性")
-  private DatasetVisibility visibility;
+  private Visibility visibility;
 
   @Schema(description = "标签，最多5个")
   private List<String> tags;

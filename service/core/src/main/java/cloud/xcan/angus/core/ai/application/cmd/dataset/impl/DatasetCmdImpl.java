@@ -5,12 +5,12 @@ import static java.util.Objects.nonNull;
 
 import cloud.xcan.angus.core.ai.application.cmd.dataset.DatasetCmd;
 import cloud.xcan.angus.core.ai.application.query.dataset.DatasetQuery;
+import cloud.xcan.angus.core.ai.domain.Visibility;
 import cloud.xcan.angus.core.ai.domain.dataset.Dataset;
 import cloud.xcan.angus.core.ai.domain.dataset.DatasetRepo;
 import cloud.xcan.angus.core.ai.domain.dataset.DatasourceConfig;
 import cloud.xcan.angus.core.ai.infra.util.DatasourceUtils;
 import cloud.xcan.angus.core.ai.infra.util.DatasourceUtils.ConnectionTestResult;
-import cloud.xcan.angus.core.biz.Biz;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
@@ -21,12 +21,11 @@ import cloud.xcan.angus.spec.utils.ObjectUtils;
 import jakarta.annotation.Resource;
 import java.util.Optional;
 import org.springframework.lang.Nullable;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @DoInFuture("添加权限校验")
-@Component
-@Biz
+@Service
 public class DatasetCmdImpl extends CommCmd<Dataset, Long> implements DatasetCmd {
 
   @Resource
@@ -77,6 +76,27 @@ public class DatasetCmdImpl extends CommCmd<Dataset, Long> implements DatasetCmd
       protected Dataset process() {
         update(dataset, datasetDb);
         return datasetDb;
+      }
+    }.execute();
+  }
+
+  @Override
+  @Transactional
+  public Dataset modifyVisibility(Long id, Visibility visibility) {
+    return new BizTemplate<Dataset>() {
+      Dataset datasetDb;
+
+      @Override
+      protected void checkParams() {
+        // 获取数据集并检查是否存在
+        datasetDb = datasetQuery.findAndCheck(id);
+      }
+
+      @Override
+      protected Dataset process() {
+        // 更新可见性
+        datasetDb.setVisibility(visibility);
+        return datasetRepo.save(datasetDb);
       }
     }.execute();
   }

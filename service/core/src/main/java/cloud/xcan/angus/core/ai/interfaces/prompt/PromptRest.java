@@ -62,7 +62,7 @@ public class PromptRest {
     return ApiLocaleResult.success(promptFacade.update(id, dto));
   }
 
-  @Operation(operationId = "toggleFavorite", summary = "收藏/取消收藏", description = "收藏或取消收藏提示词")
+  @Operation(operationId = "toggleFavoritePrompt", summary = "收藏/取消收藏", description = "收藏或取消收藏提示词")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "操作成功")
   })

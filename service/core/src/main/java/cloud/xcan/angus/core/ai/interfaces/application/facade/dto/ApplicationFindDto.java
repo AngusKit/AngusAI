@@ -4,7 +4,6 @@ import cloud.xcan.angus.core.ai.domain.application.ApplicationCategory;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
 import cloud.xcan.angus.remote.PageQuery;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -31,8 +30,8 @@ public class ApplicationFindDto extends PageQuery {
   @Schema(description = "是否模板")
   private Boolean isTemplate;
 
-  @Schema(description = "排序字段", example = "lastModifiedDate", allowableValues = {"createdDate",
-      "lastModifiedDate", "status", "category", "name"})
-  private String orderBy = "lastModifiedDate";
+  @Schema(description = "排序字段", example = "modifiedDate", allowableValues = {"createdDate",
+      "modifiedDate", "status", "category", "name"})
+  private String orderBy = "modifiedDate";
 
 }

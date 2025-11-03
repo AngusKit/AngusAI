@@ -1,10 +1,10 @@
 package cloud.xcan.angus.core.ai.interfaces.prompt.facade.dto;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.util.List;
 import lombok.Data;
 
 @Data
@@ -30,15 +30,6 @@ public class PromptCreateDto {
   private Long categoryId;
 
   @Schema(description = "标签")
-  private JsonNode tags;
-
-  @Schema(description = "是否公开", defaultValue = "false")
-  private Boolean isPublic = false;
-
-  @Schema(description = "变量定义")
-  private JsonNode variables;
-
-  @Schema(description = "使用示例")
-  private JsonNode examples;
+  private List<String> tags;
 
 }

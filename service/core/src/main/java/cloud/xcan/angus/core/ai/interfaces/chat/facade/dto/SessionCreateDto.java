@@ -2,9 +2,10 @@ package cloud.xcan.angus.core.ai.interfaces.chat.facade.dto;
 
 import cloud.xcan.angus.core.ai.domain.chat.SessionConfig;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
+import org.hibernate.validator.constraints.Length;
 
 /**
  * 创建会话DTO
@@ -13,12 +14,12 @@ import lombok.Data;
 @Schema(description = "创建会话请求")
 public class SessionCreateDto {
 
+  @Length(max = 200)
   @Schema(description = "会话标题", example = "新对话")
-  @Size(max = 200, message = "标题长度不能超过200字符")
-  private String title = "新对话";
+  private String title;
 
-  @Schema(description = "关联的应用ID", required = true)
-  @NotNull(message = "应用ID不能为空")
+  @NotNull
+  @Schema(description = "关联的应用ID", requiredMode = RequiredMode.REQUIRED)
   private Long appId;
 
   @Schema(description = "使用的模型ID")

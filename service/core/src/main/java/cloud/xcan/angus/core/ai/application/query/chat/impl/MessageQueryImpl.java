@@ -9,11 +9,10 @@ import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import jakarta.annotation.Resource;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * 消息查询实现

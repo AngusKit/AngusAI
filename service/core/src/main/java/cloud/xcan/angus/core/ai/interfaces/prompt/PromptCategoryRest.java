@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,8 +25,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @Tag(name = "Prompt Category", description = "提示词分类管理 - 分类的创建、管理、排序等功能")
 @Validated
@@ -44,8 +43,7 @@ public class PromptCategoryRest {
   @PostMapping
   public ApiLocaleResult<PromptCategoryVo> create(
       @Valid @RequestBody PromptCategoryCreateDto dto) {
-    PromptCategoryVo result = promptCategoryFacade.create(dto);
-    return ApiLocaleResult.success(result);
+    return ApiLocaleResult.success(promptCategoryFacade.create(dto));
   }
 
   @Operation(operationId = "updatePromptCategory", summary = "更新分类", description = "更新提示词分类信息")

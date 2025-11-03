@@ -1,6 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo;
 
-import cloud.xcan.angus.core.ai.domain.knowledgebase.DocumentVisibility;
+import cloud.xcan.angus.core.ai.domain.Visibility;
 import cloud.xcan.angus.remote.vo.TenantAuditingVo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
@@ -40,7 +40,7 @@ public class KnowledgeBaseDetailVo extends TenantAuditingVo {
   private List<String> tags;
 
   @Schema(description = "可见性", example = "PRIVATE")
-  private DocumentVisibility visibility;
+  private Visibility visibility;
 
   @Schema(description = "统计信息")
   private KnowledgeBaseStatsVo stats;

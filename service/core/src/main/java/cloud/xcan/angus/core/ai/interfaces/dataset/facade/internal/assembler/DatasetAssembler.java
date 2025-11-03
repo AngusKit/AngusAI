@@ -25,7 +25,7 @@ import java.util.Set;
 
 public class DatasetAssembler {
 
-  public static Dataset toDomain(DatasetCreateDto dto) {
+  public static Dataset toCreateDomain(DatasetCreateDto dto) {
     Dataset dataset = new Dataset();
     dataset.setName(dto.getName());
     dataset.setDescription(dto.getDescription());
@@ -42,7 +42,7 @@ public class DatasetAssembler {
     return dataset;
   }
 
-  public static Dataset updateDomain(Long id, DatasetUpdateDto dto) {
+  public static Dataset toUpdateDomain(Long id, DatasetUpdateDto dto) {
     Dataset dataset = new Dataset();
     dataset.setId(id);
     dataset.setName(dto.getName());
@@ -123,8 +123,8 @@ public class DatasetAssembler {
     vo.setTenantId(dataset.getTenantId());
     vo.setCreatedBy(dataset.getCreatedBy());
     vo.setCreatedDate(dataset.getCreatedDate());
-    vo.setLastModifiedBy(dataset.getLastModifiedBy());
-    vo.setLastModifiedDate(dataset.getLastModifiedDate());
+    vo.setModifiedBy(dataset.getModifiedBy());
+    vo.setModifiedDate(dataset.getModifiedDate());
     return vo;
   }
 
@@ -147,8 +147,8 @@ public class DatasetAssembler {
     vo.setTenantId(dataset.getTenantId());
     vo.setCreatedBy(dataset.getCreatedBy());
     vo.setCreatedDate(dataset.getCreatedDate());
-    vo.setLastModifiedBy(dataset.getLastModifiedBy());
-    vo.setLastModifiedDate(dataset.getLastModifiedDate());
+    vo.setModifiedBy(dataset.getModifiedBy());
+    vo.setModifiedDate(dataset.getModifiedDate());
     return vo;
   }
 
@@ -177,8 +177,8 @@ public class DatasetAssembler {
   public static GenericSpecification<Dataset> getSpecification(DatasetFindDto dto) {
     // Build the final filters
     Set<SearchCriteria> filters = new SearchCriteriaBuilder<>(dto)
-        .rangeSearchFields("id", "createdDate", "lastModifiedDate")
-        .orderByFields("id", "name", "type", "status", "createdDate", "lastModifiedDate")
+        .rangeSearchFields("id", "createdDate", "modifiedDate")
+        .orderByFields("id", "name", "type", "status", "createdDate", "modifiedDate")
         .matchSearchFields("name", "description")
         .inAndNotFields("type", "status", "createdBy")
         .build();

@@ -16,7 +16,7 @@ public interface ApplicationQuery {
   /**
    * 查询应用并检查应用和模型是否存在
    */
-  Application findAndCheck(Long id, Long modelId);
+  Application findAndCheck(Long id, Long currentUseModelId);
 
   /**
    * 查询应用列表

@@ -12,7 +12,7 @@ public enum DatasetType implements EnumMessage<String> {
     return this.name();
   }
 
-  public boolean isDatasource(){
+  public boolean isDatasource() {
     return this.equals(DATASOURCE);
   }
 }

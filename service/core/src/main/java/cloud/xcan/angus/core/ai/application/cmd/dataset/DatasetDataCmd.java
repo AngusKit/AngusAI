@@ -2,7 +2,6 @@ package cloud.xcan.angus.core.ai.application.cmd.dataset;
 
 import cloud.xcan.angus.core.ai.domain.dataset.DatasetData;
 import cloud.xcan.angus.core.ai.domain.dataset.SyncDataResult;
-import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetDataListVo;
 import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 

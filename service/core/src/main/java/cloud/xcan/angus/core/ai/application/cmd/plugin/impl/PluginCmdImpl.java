@@ -1,33 +1,43 @@
 package cloud.xcan.angus.core.ai.application.cmd.plugin.impl;
 
+import static cloud.xcan.angus.spec.utils.ObjectUtils.nullSafe;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+
 import cloud.xcan.angus.core.ai.application.cmd.plugin.PluginCmd;
+import cloud.xcan.angus.core.ai.application.cmd.plugin.PluginRecordCmd;
+import cloud.xcan.angus.core.ai.application.cmd.plugin.PluginReviewCmd;
 import cloud.xcan.angus.core.ai.application.query.plugin.PluginQuery;
 import cloud.xcan.angus.core.ai.domain.plugin.Plugin;
-import cloud.xcan.angus.core.ai.domain.plugin.PluginConfig;
+import cloud.xcan.angus.core.ai.domain.plugin.PluginCategory;
+import cloud.xcan.angus.core.ai.domain.plugin.PluginRecordType;
 import cloud.xcan.angus.core.ai.domain.plugin.PluginRepo;
 import cloud.xcan.angus.core.ai.domain.plugin.PluginStatus;
-import cloud.xcan.angus.core.biz.Biz;
+import cloud.xcan.angus.core.ai.domain.plugin.PluginType;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
-import cloud.xcan.angus.core.utils.CoreUtils;
 import cloud.xcan.angus.remote.message.http.ResourceExisted;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import cloud.xcan.angus.spec.annotations.DoInFuture;
-import cloud.xcan.angus.spec.utils.ObjectUtils;
 import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.stereotype.Component;
+import java.util.Objects;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @DoInFuture("添加权限校验")
-@Component
-@Biz
+@Service
 public class PluginCmdImpl extends CommCmd<Plugin, Long> implements PluginCmd {
 
   @Resource
   private PluginRepo pluginRepo;
+
+  @Resource
+  private PluginRecordCmd pluginRecordCmd;
+
+  @Resource
+  private PluginReviewCmd pluginReviewCmd;
 
   @Resource
   private PluginQuery pluginQuery;
@@ -38,24 +48,19 @@ public class PluginCmdImpl extends CommCmd<Plugin, Long> implements PluginCmd {
     return new BizTemplate<Plugin>() {
       @Override
       protected void checkParams() {
-        // 检查名称是否重复
-        if (pluginQuery.existsByName(plugin.getName())) {
-          throw ResourceExisted.of("插件名称「{0}」已存在", new Object[]{plugin.getName()});
+        // 检查名称和版本是否重复
+        if (pluginQuery.existsByNameAndVersion(plugin.getName(), plugin.getVersion())) {
+          throw ResourceExisted.of("插件「{0} {1}」已存在",
+              new Object[]{plugin.getName(), plugin.getVersion()});
         }
       }
 
       @Override
       protected Plugin process() {
-        // 设置初始状态
-        if (plugin.getStatus() == null) {
-          plugin.setStatus(PluginStatus.INACTIVE);
-        }
+        // TODO 解析验证插件文件
+        plugin.setIsVerified(true);
 
-        // 初始化统计数据
-        plugin.setInstallCount(0L);
-        plugin.setUsageCount(0L);
-        plugin.setRating(0.0);
-        plugin.setReviewCount(0L);
+        // TODO 保存插件文件
 
         insert0(plugin);
         return plugin;
@@ -72,10 +77,7 @@ public class PluginCmdImpl extends CommCmd<Plugin, Long> implements PluginCmd {
       @Override
       protected void checkParams() {
         // 获取插件并验证是否存在
-        pluginDb = pluginQuery.findById(plugin.getId());
-        if (pluginDb == null) {
-          throw ResourceNotFound.of("插件不存在", new Object[]{});
-        }
+        pluginDb = pluginQuery.findAndCheck(plugin.getId());
 
         // 系统插件不能修改
         if (Boolean.TRUE.equals(pluginDb.getIsSystem())) {
@@ -83,14 +85,24 @@ public class PluginCmdImpl extends CommCmd<Plugin, Long> implements PluginCmd {
         }
 
         // 检查名称是否已存在（排除当前插件）
-        if (ObjectUtils.isNotEmpty(plugin.getName())
-            && pluginQuery.existsByNameAndIdNot(plugin.getName(), pluginDb.getId())) {
-          throw ResourceExisted.of("插件名称「{0}」已存在", new Object[]{plugin.getName()});
+        String actualName = nullSafe(plugin.getName(), pluginDb.getName());
+        String actualVersion = nullSafe(plugin.getVersion(), pluginDb.getVersion());
+        if ((isNotEmpty(plugin.getName()) || isNotEmpty(plugin.getVersion()))
+            && pluginQuery.existsByNameAndVersionAndIdNot(actualName,
+            actualVersion, pluginDb.getId())) {
+          throw ResourceExisted.of("插件「{0} {1}」已存在", new Object[]{actualName, actualVersion});
         }
       }
 
       @Override
       protected Plugin process() {
+        if (Objects.nonNull(plugin.getFile())) {
+          // TODO 解析验证插件文件
+          plugin.setIsVerified(true);
+
+          // TODO 保存插件文件
+        }
+
         update(plugin, pluginDb);
         return pluginDb;
       }
@@ -98,31 +110,8 @@ public class PluginCmdImpl extends CommCmd<Plugin, Long> implements PluginCmd {
   }
 
   @Override
-  @Transactional
-  public Plugin updateConfig(Long id, PluginConfig config) {
-    return new BizTemplate<Plugin>() {
-      Plugin pluginDb;
-
-      @Override
-      protected void checkParams() {
-        // 获取插件并验证是否存在
-        pluginDb = pluginQuery.findById(id);
-        if (pluginDb == null) {
-          throw ResourceNotFound.of("插件不存在", new Object[]{});
-        }
-
-        // 系统插件不能修改配置
-        if (Boolean.TRUE.equals(pluginDb.getIsSystem())) {
-          throw ResourceExisted.of("系统插件不能修改", new Object[]{});
-        }
-      }
-
-      @Override
-      protected Plugin process() {
-        pluginDb.setConfig(config);
-        return pluginRepo.save(pluginDb);
-      }
-    }.execute();
+  public void update0(Plugin pluginDb) {
+    pluginRepo.save(pluginDb);
   }
 
   @Override
@@ -134,107 +123,16 @@ public class PluginCmdImpl extends CommCmd<Plugin, Long> implements PluginCmd {
       @Override
       protected void checkParams() {
         // 获取插件并验证是否存在
-        pluginDb = pluginQuery.findById(id);
-        if (pluginDb == null) {
-          throw ResourceNotFound.of("插件不存在", new Object[]{});
-        }
+        pluginDb = pluginQuery.findAndCheck(id);
       }
 
       @Override
       protected Plugin process() {
+        if (PluginStatus.UNINSTALLED.equals(status)) {
+          return uninstall(id);
+        }
+
         pluginDb.setStatus(status);
-        return pluginRepo.save(pluginDb);
-      }
-    }.execute();
-  }
-
-  @Override
-  @Transactional
-  public Plugin duplicate(Long sourceId, String name, Boolean copyConfig, Boolean copyPermissions, Boolean copyTags) {
-    return new BizTemplate<Plugin>() {
-      Plugin sourcePlugin;
-
-      @Override
-      protected void checkParams() {
-        // 获取源插件并检查是否存在
-        sourcePlugin = pluginQuery.findById(sourceId);
-        if (sourcePlugin == null) {
-          throw ResourceNotFound.of("插件不存在，插件可能已被删除", new Object[]{});
-        }
-      }
-
-      @Override
-      protected Plugin process() {
-        // 检查新名称是否重复，如果重复则添加随机后缀
-        String newName = name;
-        if (pluginQuery.existsByName(newName)) {
-          newName = newName + "-" + RandomStringUtils.randomAlphabetic(5);
-        }
-
-        Plugin plugin = new Plugin();
-        plugin.setName(newName);
-        plugin.setNameEn(sourcePlugin.getNameEn() != null ? sourcePlugin.getNameEn() + " Copy" : null);
-        plugin.setIcon(sourcePlugin.getIcon());
-        plugin.setDescription(sourcePlugin.getDescription());
-        plugin.setAuthor(sourcePlugin.getAuthor());
-        plugin.setVersion(sourcePlugin.getVersion());
-        plugin.setCategory(sourcePlugin.getCategory());
-        plugin.setType(sourcePlugin.getType());
-        plugin.setStatus(PluginStatus.INACTIVE);
-
-        // 根据参数决定是否复制
-        if (Boolean.TRUE.equals(copyConfig)) {
-          plugin.setConfig(sourcePlugin.getConfig());
-        }
-        if (Boolean.TRUE.equals(copyPermissions)) {
-          plugin.setPermissions(sourcePlugin.getPermissions());
-        }
-        if (Boolean.TRUE.equals(copyTags)) {
-          plugin.setTags(sourcePlugin.getTags());
-        }
-
-        plugin.setMinVersion(sourcePlugin.getMinVersion());
-        plugin.setHomepageUrl(sourcePlugin.getHomepageUrl());
-        plugin.setDocumentationUrl(sourcePlugin.getDocumentationUrl());
-        plugin.setRepositoryUrl(sourcePlugin.getRepositoryUrl());
-        plugin.setSupportUrl(sourcePlugin.getSupportUrl());
-        plugin.setLicense(sourcePlugin.getLicense());
-        plugin.setPrice(sourcePlugin.getPrice());
-        plugin.setCurrency(sourcePlugin.getCurrency());
-
-        // 初始化统计数据
-        plugin.setInstallCount(0L);
-        plugin.setUsageCount(0L);
-        plugin.setRating(0.0);
-        plugin.setReviewCount(0L);
-        plugin.setIsFavorite(false);
-        plugin.setIsSystem(false);
-        plugin.setIsPublic(false);
-        plugin.setIsVerified(false);
-
-        return pluginRepo.save(plugin);
-      }
-    }.execute();
-  }
-
-  @Override
-  @Transactional
-  public Plugin favorite(Long id, Boolean isFavorite) {
-    return new BizTemplate<Plugin>() {
-      Plugin pluginDb;
-
-      @Override
-      protected void checkParams() {
-        // 获取插件并验证是否存在
-        pluginDb = pluginQuery.findById(id);
-        if (pluginDb == null) {
-          throw ResourceNotFound.of("插件不存在", new Object[]{});
-        }
-      }
-
-      @Override
-      protected Plugin process() {
-        pluginDb.setIsFavorite(isFavorite);
         return pluginRepo.save(pluginDb);
       }
     }.execute();
@@ -249,43 +147,46 @@ public class PluginCmdImpl extends CommCmd<Plugin, Long> implements PluginCmd {
       @Override
       protected void checkParams() {
         // 获取插件并验证是否存在
-        pluginDb = pluginQuery.findById(id);
-        if (pluginDb == null) {
-          throw ResourceNotFound.of("插件不存在", new Object[]{});
-        }
+        pluginDb = pluginQuery.findAndCheck(id);
       }
 
       @Override
       protected Plugin process() {
-        // 增加安装次数
-        pluginDb.setInstallCount(pluginDb.getInstallCount() + 1);
-
         // TODO: 实现实际的插件安装逻辑
 
-        return pluginRepo.save(pluginDb);
+        // 增加安装次数
+        pluginDb.setInstallCount(pluginDb.getInstallCount() + 1);
+        Plugin saved = pluginRepo.save(pluginDb);
+
+        // 记录安装事件
+        pluginRecordCmd.recordPluginEvent(saved.getId(), PluginRecordType.INSTALL);
+        return saved;
       }
     }.execute();
   }
 
   @Override
   @Transactional
-  public void uninstall(Long id) {
-    new BizTemplate<Void>() {
+  public Plugin uninstall(Long id) {
+    return new BizTemplate<Plugin>() {
       Plugin pluginDb;
 
       @Override
       protected void checkParams() {
         // 获取插件并验证是否存在
-        pluginDb = pluginQuery.findById(id);
-        if (pluginDb == null) {
-          throw ResourceNotFound.of("插件不存在", new Object[]{});
-        }
+        pluginDb = pluginQuery.findAndCheck(id);
       }
 
       @Override
-      protected Void process() {
-        // TODO: 实现实际的插件卸载逻辑
-        return null;
+      protected Plugin process() {
+        // TODO: 实现实际的插件卸载逻辑（卸载插件不删除数据库安装包记录）
+
+        pluginDb.setStatus(PluginStatus.UNINSTALLED);
+        pluginRepo.save(pluginDb);
+
+        // 记录卸载事件
+        pluginRecordCmd.recordPluginEvent(pluginDb.getId(), PluginRecordType.UNINSTALL);
+        return pluginDb;
       }
     }.execute();
   }
@@ -299,17 +200,18 @@ public class PluginCmdImpl extends CommCmd<Plugin, Long> implements PluginCmd {
       @Override
       protected void checkParams() {
         // 获取插件并验证是否存在
-        pluginDb = pluginQuery.findById(id);
-        if (pluginDb == null) {
-          throw ResourceNotFound.of("插件不存在", new Object[]{});
-        }
+        pluginDb = pluginQuery.findAndCheck(id);
       }
 
       @Override
       protected Plugin process() {
         // 增加使用次数
         pluginDb.setUsageCount(pluginDb.getUsageCount() + 1);
-        return pluginRepo.save(pluginDb);
+        Plugin saved = pluginRepo.save(pluginDb);
+
+        // 记录访问事件
+        pluginRecordCmd.recordPluginEvent(saved.getId(), PluginRecordType.VISIT);
+        return saved;
       }
     }.execute();
   }
@@ -323,10 +225,7 @@ public class PluginCmdImpl extends CommCmd<Plugin, Long> implements PluginCmd {
       @Override
       protected void checkParams() {
         // 获取插件并验证是否存在
-        pluginDb = pluginQuery.findById(id);
-        if (pluginDb == null) {
-          throw ResourceNotFound.of("插件不存在", new Object[]{});
-        }
+        pluginDb = pluginQuery.findAndCheck(id);
       }
 
       @Override
@@ -334,31 +233,30 @@ public class PluginCmdImpl extends CommCmd<Plugin, Long> implements PluginCmd {
         pluginDb.setIsPublic(true);
         pluginDb.setPublishedDate(LocalDateTime.now());
         pluginDb.setStatus(PluginStatus.ACTIVE);
-
         return pluginRepo.save(pluginDb);
       }
     }.execute();
   }
 
   @Override
-  @Transactional
-  public Plugin verify(Long id, Boolean verified) {
+  public Plugin verify(String name, String version, PluginCategory category,
+      PluginType type, MultipartFile file) {
     return new BizTemplate<Plugin>() {
-      Plugin pluginDb;
-
       @Override
       protected void checkParams() {
-        // 获取插件并验证是否存在
-        pluginDb = pluginQuery.findById(id);
-        if (pluginDb == null) {
-          throw ResourceNotFound.of("插件不存在", new Object[]{});
+        // 检查名称和版本是否重复
+        if (pluginQuery.existsByNameAndVersion(name, version)) {
+          throw ResourceExisted.of("插件「{0}」「{1}」已存在", new Object[]{name, version});
         }
       }
 
       @Override
       protected Plugin process() {
-        pluginDb.setIsVerified(verified);
-        return pluginRepo.save(pluginDb);
+        // TODO 解析验证插件文件
+        Plugin plugin = null;
+
+        plugin.setIsVerified(true);
+        return plugin;
       }
     }.execute();
   }
@@ -372,7 +270,7 @@ public class PluginCmdImpl extends CommCmd<Plugin, Long> implements PluginCmd {
       @Override
       protected void checkParams() {
         // 获取插件并验证是否存在
-        pluginDb = pluginQuery.findById(id);
+        pluginDb = pluginQuery.findAndCheck(id);
         if (pluginDb == null) {
           throw ResourceNotFound.of("插件不存在", new Object[]{});
         }
@@ -385,7 +283,15 @@ public class PluginCmdImpl extends CommCmd<Plugin, Long> implements PluginCmd {
 
       @Override
       protected Void process() {
+        // 先卸载插件运行时
+        uninstall(id);
+
+        // TODO 删除插件文件
+
+        // 删除插件记录
         pluginRepo.deleteById(id);
+        pluginRecordCmd.deleteByPluginId(id);
+        pluginReviewCmd.deleteByPluginId(id);
         return null;
       }
     }.execute();

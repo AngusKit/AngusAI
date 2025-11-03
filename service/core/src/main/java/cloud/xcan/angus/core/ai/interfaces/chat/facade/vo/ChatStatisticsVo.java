@@ -1,10 +1,9 @@
 package cloud.xcan.angus.core.ai.interfaces.chat.facade.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-
 import java.math.BigDecimal;
 import java.util.List;
+import lombok.Data;
 
 /**
  * 对话统计VO
@@ -40,6 +39,7 @@ public class ChatStatisticsVo {
   @Data
   @Schema(description = "今日统计")
   public static class TodayStats {
+
     @Schema(description = "会话数")
     private Long sessions;
 
@@ -56,6 +56,7 @@ public class ChatStatisticsVo {
   @Data
   @Schema(description = "使用趋势")
   public static class UsageTrend {
+
     @Schema(description = "日期")
     private String date;
 
@@ -72,6 +73,7 @@ public class ChatStatisticsVo {
   @Data
   @Schema(description = "Top应用")
   public static class TopApp {
+
     @Schema(description = "应用ID")
     private Long appId;
 
@@ -88,6 +90,7 @@ public class ChatStatisticsVo {
   @Data
   @Schema(description = "Top模型")
   public static class TopModel {
+
     @Schema(description = "模型ID")
     private Long modelId;
 

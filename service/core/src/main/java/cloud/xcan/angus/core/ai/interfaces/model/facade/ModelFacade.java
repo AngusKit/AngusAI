@@ -1,5 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.model.facade;
 
+import cloud.xcan.angus.core.ai.domain.StatisticsPeriod;
 import cloud.xcan.angus.core.ai.infra.ai.model.ModelConfig;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelFindDto;
@@ -7,7 +8,6 @@ import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelTestDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelListVo;
-import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelMetricsVo;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelStatisticsVo;
 import cloud.xcan.angus.remote.PageResult;
 
@@ -49,16 +49,6 @@ public interface ModelFacade {
   ModelDetailVo test(Long id, ModelTestDto dto);
 
   /**
-   * 批量操作模型
-   */
-  ModelStatisticsVo batchOperation(ModelStatisticsVo dto);
-
-  /**
-   * 导入模型配置
-   */
-  ModelStatisticsVo importConfig(ModelStatisticsVo dto);
-
-  /**
    * 删除模型
    */
   void delete(Long id);
@@ -74,28 +64,8 @@ public interface ModelFacade {
   PageResult<ModelListVo> list(ModelFindDto dto);
 
   /**
-   * 获取可用模型提供商
-   */
-  ModelStatisticsVo getProviders();
-
-  /**
-   * 导出模型配置
-   */
-  ModelDetailVo export(Long id);
-
-  /**
-   * 获取模型性能监控
-   */
-  ModelMetricsVo getMetrics(Long id, String period, Long startTime, Long endTime, String[] metrics);
-
-  /**
    * 获取模型调用统计
    */
-  ModelStatisticsVo getStatistics(Long id, String period, String groupBy);
-
-  /**
-   * 获取模型列表统计
-   */
-  ModelStatisticsVo getListStatistics();
+  ModelStatisticsVo getStatistics(StatisticsPeriod period);
 
 }

@@ -1,6 +1,6 @@
 package cloud.xcan.angus.core.ai.infra.persistence.mysql.settings;
 
-import cloud.xcan.angus.core.ai.domain.settings.apikey.ApiKeyRepo;
+import cloud.xcan.angus.core.ai.domain.setting.apikey.ApiKeyRepo;
 import org.springframework.stereotype.Repository;
 
 @Repository

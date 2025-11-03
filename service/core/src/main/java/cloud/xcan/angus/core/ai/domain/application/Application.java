@@ -112,9 +112,9 @@ public class Application extends TenantAuditingEntity<Application, Long> {
   @Transient
   private boolean shareAuthorizationRequired;
   @Transient
-  private Model appModel;
+  private Model appDefaultModel;
   @Transient
-  private Model currentTempModel;
+  private Model currentUseMode;
 
   @Override
   public Long identity() {

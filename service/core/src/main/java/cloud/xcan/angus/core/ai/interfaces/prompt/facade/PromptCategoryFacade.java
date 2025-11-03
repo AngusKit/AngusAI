@@ -3,7 +3,6 @@ package cloud.xcan.angus.core.ai.interfaces.prompt.facade;
 import cloud.xcan.angus.core.ai.interfaces.prompt.facade.dto.PromptCategoryCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.prompt.facade.dto.PromptCategoryUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.prompt.facade.vo.PromptCategoryVo;
-
 import java.util.List;
 
 /**

@@ -1,9 +1,50 @@
 package cloud.xcan.angus.core.ai.infra.util;
 
+import cloud.xcan.angus.core.ai.domain.StatisticsPeriod;
+import cloud.xcan.angus.remote.search.SearchCriteria;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 public class TimeRangeUtils {
 
+  public static Set<SearchCriteria> buildPeriodFilters(StatisticsPeriod period) {
+    var base = SearchCriteria.criteria();
+    if (period == null) {
+      return base;
+    }
+    LocalDateTime start;
+    LocalDateTime end = LocalDateTime.now();
+    switch (period) {
+      case TODAY -> start = LocalDate.now().atStartOfDay();
+      case LAST_7_DAYS -> start = LocalDate.now().minusDays(6).atStartOfDay();
+      case LAST_30_DAYS -> start = LocalDate.now().minusDays(29).atStartOfDay();
+      default -> start = null;
+    }
+    if (start != null) {
+      base = SearchCriteria.merge(base,
+          SearchCriteria.greaterThanEqual("createdDate", start),
+          SearchCriteria.lessThanEqual("createdDate", end));
+    }
+    return base;
+  }
+
+  public static LocalDateTime[] getPeriodRange(StatisticsPeriod period) {
+    if (period == null) {
+      return null;
+    }
+    LocalDateTime end = LocalDateTime.now();
+    LocalDateTime start;
+    switch (period) {
+      case TODAY -> start = LocalDate.now().atStartOfDay();
+      case LAST_7_DAYS -> start = LocalDate.now().minusDays(6).atStartOfDay();
+      case LAST_30_DAYS -> start = LocalDate.now().minusDays(29).atStartOfDay();
+      default -> {
+        return null;
+      }
+    }
+    return new LocalDateTime[]{start, end};
+  }
 
   /**
    * 解析时间范围
@@ -39,7 +80,8 @@ public class TimeRangeUtils {
    * 时间范围内部类
    */
   public static class TimeRange {
-   public final LocalDateTime start;
+
+    public final LocalDateTime start;
     public final LocalDateTime end;
 
     TimeRange(LocalDateTime start, LocalDateTime end) {

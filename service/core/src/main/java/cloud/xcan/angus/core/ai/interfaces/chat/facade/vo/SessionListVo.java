@@ -2,9 +2,8 @@ package cloud.xcan.angus.core.ai.interfaces.chat.facade.vo;
 
 import cloud.xcan.angus.core.ai.domain.chat.MessageRole;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-
 import java.util.Date;
+import lombok.Data;
 
 /**
  * 会话列表VO
@@ -50,7 +49,7 @@ public class SessionListVo {
   private Date createdDate;
 
   @Schema(description = "最后修改时间")
-  private Date lastModifiedDate;
+  private Date modifiedDate;
 
   @Schema(description = "创建人ID")
   private Long createdBy;
@@ -61,6 +60,7 @@ public class SessionListVo {
   @Data
   @Schema(description = "最后一条消息")
   public static class LastMessage {
+
     @Schema(description = "消息角色")
     private MessageRole role;
 

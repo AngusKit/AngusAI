@@ -5,6 +5,7 @@ import static cloud.xcan.angus.core.utils.CoreUtils.buildVoPageResult;
 
 import cloud.xcan.angus.core.ai.application.cmd.dataset.DatasetCmd;
 import cloud.xcan.angus.core.ai.application.query.dataset.DatasetQuery;
+import cloud.xcan.angus.core.ai.domain.Visibility;
 import cloud.xcan.angus.core.ai.domain.dataset.Dataset;
 import cloud.xcan.angus.core.ai.domain.dataset.DatasetStatistics;
 import cloud.xcan.angus.core.ai.infra.util.DatasourceUtils.ConnectionTestResult;
@@ -38,15 +39,21 @@ public class DatasetFacadeImpl implements DatasetFacade {
 
   @Override
   public DatasetDetailVo create(DatasetCreateDto dto) {
-    Dataset dataset = DatasetAssembler.toDomain(dto);
+    Dataset dataset = DatasetAssembler.toCreateDomain(dto);
     Dataset saved = datasetCmd.create(dataset);
     return DatasetAssembler.toDetailVo(saved);
   }
 
   @Override
   public DatasetDetailVo update(Long id, DatasetUpdateDto dto) {
-    Dataset dataset = DatasetAssembler.updateDomain(id, dto);
+    Dataset dataset = DatasetAssembler.toUpdateDomain(id, dto);
     Dataset saved = datasetCmd.update(dataset);
+    return DatasetAssembler.toDetailVo(saved);
+  }
+
+  @Override
+  public DatasetDetailVo modifyVisibility(Long id, Visibility visibility) {
+    Dataset saved = datasetCmd.modifyVisibility(id, visibility);
     return DatasetAssembler.toDetailVo(saved);
   }
 

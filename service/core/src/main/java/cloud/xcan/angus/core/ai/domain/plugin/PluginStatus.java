@@ -17,7 +17,7 @@ public enum PluginStatus {
   /**
    * 已禁用
    */
-  DISABLED,
+  UNINSTALLED,
 
   /**
    * 维护中

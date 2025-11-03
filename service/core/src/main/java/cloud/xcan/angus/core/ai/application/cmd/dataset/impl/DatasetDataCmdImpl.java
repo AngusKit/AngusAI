@@ -8,9 +8,6 @@ import cloud.xcan.angus.core.ai.domain.dataset.Dataset;
 import cloud.xcan.angus.core.ai.domain.dataset.DatasetData;
 import cloud.xcan.angus.core.ai.domain.dataset.DatasetDataRepo;
 import cloud.xcan.angus.core.ai.domain.dataset.SyncDataResult;
-import cloud.xcan.angus.core.ai.interfaces.dataset.facade.internal.assembler.DatasetDataAssembler;
-import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetDataListVo;
-import cloud.xcan.angus.core.biz.Biz;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
@@ -21,13 +18,12 @@ import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.lang.Nullable;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @DoInFuture("添加权限校验")
-@Component
-@Biz
+@Service
 public class DatasetDataCmdImpl extends CommCmd<DatasetData, Long> implements DatasetDataCmd {
 
   @Resource

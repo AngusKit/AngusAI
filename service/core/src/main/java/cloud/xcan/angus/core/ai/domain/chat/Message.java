@@ -1,7 +1,6 @@
 package cloud.xcan.angus.core.ai.domain.chat;
 
 import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,11 +8,10 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
-
-import java.util.List;
 
 /**
  * 对话消息实体
@@ -22,7 +20,6 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "chat_message")
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class Message extends TenantAuditingEntity<Message, Long> {
 
   @Id
@@ -31,8 +28,14 @@ public class Message extends TenantAuditingEntity<Message, Long> {
   /**
    * 所属会话ID
    */
-  @Column(nullable = false)
+  @Column(name = "session_id", nullable = false)
   private Long sessionId;
+
+  /**
+   * 父消息ID（用于重新生成）
+   */
+  @Column(name = "parent_message_id")
+  private Long parentMessageId;
 
   /**
    * 消息角色
@@ -51,7 +54,7 @@ public class Message extends TenantAuditingEntity<Message, Long> {
    * 附件列表
    */
   @Type(JsonType.class)
-  @Column(columnDefinition = "json")
+  @Column(name = "attachments", columnDefinition = "json")
   private List<MessageAttachment> attachments;
 
   /**
@@ -64,26 +67,20 @@ public class Message extends TenantAuditingEntity<Message, Long> {
   /**
    * 是否正在流式生成
    */
-  @Column
+  @Column(name = "is_streaming")
   private Boolean isStreaming = false;
 
   /**
    * 反馈类型：like/dislike
    */
-  @Column(length = 20)
+  @Column(name = "feedback_type", length = 20)
   private String feedbackType;
 
   /**
    * 反馈说明
    */
-  @Column(length = 500)
+  @Column(name = "feedback_comment", length = 500)
   private String feedbackComment;
-
-  /**
-   * 父消息ID（用于重新生成）
-   */
-  @Column
-  private Long parentMessageId;
 
   @Override
   public Long identity() {

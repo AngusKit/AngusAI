@@ -4,7 +4,6 @@ import cloud.xcan.angus.core.ai.domain.Constants;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
@@ -23,7 +22,7 @@ public class KnowledgeBaseDocSearchDto {
 
   @Min(value = (int) Constants.SIMILARITY_THRESHOLD_MIN_VALUE)
   @Max(value = (int) Constants.SIMILARITY_THRESHOLD_MAX_VALUE)
-  @Schema(description = "相似度阈值", example = "0.7")
-  private Double threshold = 0.7;
+  @Schema(description = "相似度阈值", example = "0.5")
+  private Double threshold = 0.5;
 
 }

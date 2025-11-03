@@ -4,11 +4,9 @@ import cloud.xcan.angus.core.ai.application.cmd.chat.MessageCmd;
 import cloud.xcan.angus.core.ai.application.cmd.chat.SessionCmd;
 import cloud.xcan.angus.core.ai.application.query.chat.MessageQuery;
 import cloud.xcan.angus.core.ai.application.query.chat.SessionQuery;
-import cloud.xcan.angus.core.ai.application.query.chat.impl.SessionQueryImpl;
 import cloud.xcan.angus.core.ai.domain.chat.Message;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRole;
 import cloud.xcan.angus.core.ai.infra.ai.model.ChatService;
-import cloud.xcan.angus.core.ai.infra.storage.FileStorageService;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.MessageFacade;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.MessageFeedbackDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.MessageFindDto;
@@ -22,7 +20,6 @@ import cloud.xcan.angus.remote.PageResult;
 import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
@@ -49,11 +46,6 @@ public class MessageFacadeImpl implements MessageFacade {
 
   @Resource
   private ChatService aiService;
-
-  @Resource
-  private FileStorageService fileStorageService;
-  @Autowired
-  private SessionQueryImpl sessionQueryImpl;
 
   @Override
   public MessageSendVo sendMessage(Long sessionId, MessageSendDto dto) {
@@ -95,28 +87,30 @@ public class MessageFacadeImpl implements MessageFacade {
     messageCmd.setStreaming(assistantMessageId, true);
 
     // 3. 调用AI服务进行流式响应
-    return aiService.sendMessageStream(sessionId, dto.getContent(), dto.getOverrideConfig(), assistantMessageId);
+    // aiService.sendMessageStream(sessionId, dto.getContent(), dto.getOverrideConfig(), assistantMessageId);
+    return null;
   }
 
   @Override
   public AttachmentUploadVo uploadAttachment(MultipartFile file, Long sessionId) {
-    // 1. 验证文件类型
-    if (!fileStorageService.isValidFileType(file.getContentType())) {
-      throw new IllegalArgumentException("不支持的文件类型: " + file.getContentType());
-    }
-
-    // 2. 上传文件
-    cloud.xcan.angus.core.ai.domain.chat.Attachment attachment = fileStorageService.uploadFile(file, sessionId);
-
-    // 3. 构建返回结果
-    AttachmentUploadVo vo = new AttachmentUploadVo();
-    vo.setId(attachment.getId());
-    vo.setName(attachment.getName());
-    vo.setType(attachment.getType());
-    vo.setSize(attachment.getSize());
-    vo.setUrl(attachment.getUrl());
-    vo.setUploadedAt(attachment.getUploadedAt());
-    return vo;
+//    // 1. 验证文件类型
+//    if (!fileStorageService.isValidFileType(file.getContentType())) {
+//      throw new IllegalArgumentException("不支持的文件类型: " + file.getContentType());
+//    }
+//
+//    // 2. 上传文件
+//    cloud.xcan.angus.core.ai.domain.chat.Attachment attachment = fileStorageService.uploadFile(file,
+//        sessionId);
+//
+//    // 3. 构建返回结果
+//    AttachmentUploadVo vo = new AttachmentUploadVo();
+//    vo.setId(attachment.getId());
+//    vo.setName(attachment.getName());
+//    vo.setType(attachment.getType());
+//    vo.setSize(attachment.getSize());
+//    vo.setUrl(attachment.getUrl());
+    //vo.setUploadedAt(attachment.getUploadedAt());
+    return null;
   }
 
   @Override
@@ -154,7 +148,7 @@ public class MessageFacadeImpl implements MessageFacade {
       Message message = streamingMessages.get(0);
 
       // 2. 停止AI服务流式生成
-      aiService.stopGeneration(message.getId());
+      // aiService.stopGeneration(message.getId());
 
       // 3. 停止流式生成
       messageCmd.setStreaming(message.getId(), false);
@@ -174,7 +168,7 @@ public class MessageFacadeImpl implements MessageFacade {
   @Override
   public void deleteAttachment(Long id) {
     // 删除附件
-    fileStorageService.deleteFile(id);
+    // fileStorageService.deleteFile(id);
   }
 
   @Override

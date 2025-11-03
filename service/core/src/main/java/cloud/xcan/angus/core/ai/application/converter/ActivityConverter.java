@@ -1,19 +1,16 @@
 package cloud.xcan.angus.core.ai.application.converter;
 
 import static cloud.xcan.angus.spec.experimental.Assert.assertTrue;
-import static cloud.xcan.angus.spec.experimental.BizConstant.DEFAULT_ROOT_PID;
 import static cloud.xcan.angus.spec.locale.MessageHolder.message;
 import static cloud.xcan.angus.spec.principal.PrincipalContext.getDefaultLanguage;
 import static cloud.xcan.angus.spec.utils.ObjectUtils.isEmpty;
-import static cloud.xcan.angus.spec.utils.ObjectUtils.nullSafe;
 import static java.util.Objects.nonNull;
 
 import cloud.xcan.angus.api.commonlink.CombinedTargetType;
-import cloud.xcan.angus.core.ai.domain.activity.Activity;
-import cloud.xcan.angus.core.ai.domain.activity.ActivityResource;
-import cloud.xcan.angus.core.ai.domain.activity.ActivitySummary;
-import cloud.xcan.angus.core.ai.domain.activity.ActivityType;
-import cloud.xcan.angus.core.ai.domain.activity.MainTargetActivityResource;
+import cloud.xcan.angus.core.ai.domain.team.activity.Activity;
+import cloud.xcan.angus.core.ai.domain.team.activity.ActivityResource;
+import cloud.xcan.angus.core.ai.domain.team.activity.ActivitySummary;
+import cloud.xcan.angus.core.ai.domain.team.activity.ActivityType;
 import cloud.xcan.angus.spec.locale.EnumValueMessage;
 import cloud.xcan.angus.spec.principal.Principal;
 import cloud.xcan.angus.spec.principal.PrincipalContext;
@@ -66,18 +63,14 @@ public class ActivityConverter {
       ActivityType activityType, Principal principal, Object[] params) {
     Activity activity = new Activity().setType(activityType)
         .setTargetType(targetType)
-        .setUserId(principal.getUserId()).setOptDate(LocalDateTime.now())
+        .setUserId(principal.getUserId())
+        .setActivityDate(LocalDateTime.now())
         .setDescription(getDescription(targetType, activityType, params))
         .setDetail(getDetail(targetType, resource, activityType, params));
     activity.setTenantId(principal.getTenantId());
     if (nonNull(resource)) {
-      activity.setProjectId(resource.getProjectId())
-          .setTargetId(resource.getId())
-          .setParentTargetId(nullSafe(resource.getParentId(), DEFAULT_ROOT_PID))
+      activity.setTargetId(resource.getId())
           .setTargetName(resource.getName());
-      if (resource instanceof MainTargetActivityResource) {
-        activity.setMainTargetId(((MainTargetActivityResource) resource).getMainTargetId());
-      }
     }
     return activity;
   }
@@ -148,13 +141,13 @@ public class ActivityConverter {
 
   public static ActivitySummary toActivitySummary(Activity activity) {
     return new ActivitySummary().setId(activity.getId())
-        .setProjectId(activity.getProjectId())
         .setUserId(activity.getUserId())
-        .setFullName(activity.getFullName()).setAvatar(activity.getAvatar())
-        .setTargetId(activity.getTargetId()).setTargetType(activity.getTargetType())
+        .setUserName(activity.getUserName())
+        .setUserAvatar(activity.getUserAvatar())
+        .setTargetId(activity.getTargetId())
+        .setTargetType(activity.getTargetType())
         .setTargetName(activity.getTargetName())
-        .setParentTargetId(activity.getParentTargetId())
-        .setOptDate(activity.getOptDate())
+        .setActivityDate(activity.getActivityDate())
         .setDescription(activity.getDescription())
         .setDetail(activity.getDetail());
   }

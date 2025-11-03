@@ -5,35 +5,28 @@ import static cloud.xcan.angus.core.utils.CoreUtils.buildVoPageResult;
 
 import cloud.xcan.angus.core.ai.application.cmd.workflow.WorkflowCmd;
 import cloud.xcan.angus.core.ai.application.query.workflow.WorkflowQuery;
+import cloud.xcan.angus.core.ai.domain.Visibility;
 import cloud.xcan.angus.core.ai.domain.workflow.Workflow;
 import cloud.xcan.angus.core.ai.domain.workflow.WorkflowConfig;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.WorkflowFacade;
+import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowConfigUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowCreateDto;
+import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowExecuteDto;
+import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowExecutionLogFindDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowFindDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowUpdateDto;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowConfigUpdateDto;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowExecuteDto;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowStopDto;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowToggleDto;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowExecutionLogFindDto;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowDuplicateDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.internal.assembler.WorkflowAssembler;
+import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.ExecutionDetailVo;
+import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.ExecutionLogVo;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowDetailVo;
+import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowExecuteResultVo;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowListVo;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowStatisticsVo;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.ExecutionLogVo;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.ExecutionDetailVo;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowVersionVo;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowExecuteResultVo;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowStopResultVo;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowToggleResultVo;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowRestoreResultVo;
 import cloud.xcan.angus.core.biz.NameJoin;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.PageResult;
 import jakarta.annotation.Resource;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -67,12 +60,9 @@ public class WorkflowFacadeImpl implements WorkflowFacade {
   }
 
   @Override
-  public WorkflowToggleResultVo toggle(Long id, WorkflowToggleDto dto) {
-    // 这里应该调用工作流状态切换服务
-    // 暂时返回模拟数据
-    WorkflowToggleResultVo result = new WorkflowToggleResultVo();
-    // TODO: 实现工作流状态切换逻辑
-    return result;
+  public WorkflowDetailVo modifyVisibility(Long id, Visibility visibility) {
+    Workflow saved = workflowCmd.modifyVisibility(id, visibility);
+    return WorkflowAssembler.toDetailVo(saved);
   }
 
   @Override
@@ -85,21 +75,15 @@ public class WorkflowFacadeImpl implements WorkflowFacade {
   }
 
   @Override
-  public WorkflowStopResultVo stop(Long id, WorkflowStopDto dto) {
-    // 这里应该调用工作流停止服务
-    // 暂时返回模拟数据
-    WorkflowStopResultVo result = new WorkflowStopResultVo();
-    // TODO: 实现工作流停止逻辑
-    return result;
+  public WorkflowDetailVo start(Long id) {
+    Workflow saved = workflowCmd.start(id);
+    return WorkflowAssembler.toDetailVo(saved);
   }
 
   @Override
-  public WorkflowRestoreResultVo restoreVersion(Long id, Long versionId) {
-    // 这里应该调用版本恢复服务
-    // 暂时返回模拟数据
-    WorkflowRestoreResultVo result = new WorkflowRestoreResultVo();
-    // TODO: 实现版本恢复逻辑
-    return result;
+  public WorkflowDetailVo stop(Long id) {
+    Workflow saved = workflowCmd.stop(id);
+    return WorkflowAssembler.toDetailVo(saved);
   }
 
   @Override
@@ -107,16 +91,10 @@ public class WorkflowFacadeImpl implements WorkflowFacade {
     workflowCmd.delete(id);
   }
 
-  @Override
-  public WorkflowDetailVo duplicate(Long id, WorkflowDuplicateDto dto) {
-    Workflow saved = workflowCmd.duplicate(id, dto.getName());
-    return WorkflowAssembler.toDetailVo(saved);
-  }
-
   @NameJoin
   @Override
   public WorkflowDetailVo getDetail(Long id) {
-    Workflow workflow = workflowQuery.findById(id);
+    Workflow workflow = workflowQuery.findAndCheck(id);
     return WorkflowAssembler.toDetailVo(workflow);
   }
 
@@ -124,11 +102,8 @@ public class WorkflowFacadeImpl implements WorkflowFacade {
   @Override
   public PageResult<WorkflowListVo> list(WorkflowFindDto dto) {
     GenericSpecification<Workflow> spec = WorkflowAssembler.getSpecification(dto);
-    // 使用默认分页参数，因为WorkflowFindDto继承的是SearchCriteria而不是PageQuery
-    Page<Workflow> page = workflowQuery.find(spec, 
-        PageRequest.of(0, 20), 
-        false, 
-        null);
+    Page<Workflow> page = workflowQuery.find(spec, dto.tranPage(),
+        dto.fullTextSearch, getMatchSearchFields(dto.getClass()));
     return buildVoPageResult(page, WorkflowAssembler::toListVo);
   }
 
@@ -156,24 +131,6 @@ public class WorkflowFacadeImpl implements WorkflowFacade {
     // 暂时返回模拟数据
     ExecutionDetailVo result = new ExecutionDetailVo();
     // TODO: 实现执行详情查询逻辑
-    return result;
-  }
-
-  @Override
-  public PageResult<WorkflowVersionVo> getVersions(Long id, Integer pageNo, Integer pageSize) {
-    // 这里应该调用版本查询服务
-    // 暂时返回模拟数据
-    PageResult<WorkflowVersionVo> result = new PageResult<>();
-    // TODO: 实现版本查询逻辑
-    return result;
-  }
-
-  @Override
-  public WorkflowVersionVo getVersion(Long id, Long versionId) {
-    // 这里应该调用版本详情查询服务
-    // 暂时返回模拟数据
-    WorkflowVersionVo result = new WorkflowVersionVo();
-    // TODO: 实现版本详情查询逻辑
     return result;
   }
 }

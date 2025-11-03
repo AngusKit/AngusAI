@@ -1,6 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.knowledgebase;
 
-import cloud.xcan.angus.core.ai.domain.knowledgebase.DocumentVisibility;
+import cloud.xcan.angus.core.ai.domain.Visibility;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.KnowledgeBaseFacade;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBaseCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBaseFindDto;
@@ -85,7 +85,7 @@ public class KnowledgeBaseRest {
   @PutMapping("/{id}/visibility")
   public ApiLocaleResult<KnowledgeBaseDetailVo> modifyVisibility(
       @Parameter(description = "知识库ID") @PathVariable Long id,
-      @Parameter(description = "可见性") @RequestParam DocumentVisibility visibility) {
+      @Parameter(description = "可见性") @RequestParam Visibility visibility) {
     return ApiLocaleResult.success(knowledgeBaseFacade.modifyVisibility(id, visibility));
   }
 

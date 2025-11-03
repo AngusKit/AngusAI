@@ -1,6 +1,6 @@
 package cloud.xcan.angus.core.ai.application.cmd.knowledgebase;
 
-import cloud.xcan.angus.core.ai.domain.knowledgebase.DocumentVisibility;
+import cloud.xcan.angus.core.ai.domain.Visibility;
 import cloud.xcan.angus.core.ai.domain.knowledgebase.KnowledgeBase;
 
 public interface KnowledgeBaseCmd {
@@ -23,7 +23,7 @@ public interface KnowledgeBaseCmd {
   /**
    * 修改知识库可见性
    */
-  KnowledgeBase modifyVisibility(Long id, DocumentVisibility visibility);
+  KnowledgeBase modifyVisibility(Long id, Visibility visibility);
 
   /**
    * 删除知识库

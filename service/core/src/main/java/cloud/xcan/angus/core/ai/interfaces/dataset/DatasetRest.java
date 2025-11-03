@@ -1,5 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.dataset;
 
+import cloud.xcan.angus.core.ai.domain.Visibility;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.DatasetFacade;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DataSourceUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetCreateDto;
@@ -11,7 +12,6 @@ import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetListVo;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetStatisticsVo;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasourceConfigVo;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasourceConnectionTestVo;
-import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.SyncDataVo;
 import cloud.xcan.angus.remote.ApiLocaleResult;
 import cloud.xcan.angus.remote.PageResult;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,7 +21,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
-import java.util.List;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -68,6 +67,18 @@ public class DatasetRest {
       @Parameter(description = "数据集ID") @PathVariable Long id,
       @Valid @RequestBody DatasetUpdateDto dto) {
     return ApiLocaleResult.success(datasetFacade.update(id, dto));
+  }
+
+  @Operation(operationId = "modifyDatasetVisibility", summary = "修改数据集可见性", description = "修改数据集可见性")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "可见性修改成功")
+  })
+  @ResponseStatus(HttpStatus.OK)
+  @PutMapping("/{id}/visibility")
+  public ApiLocaleResult<DatasetDetailVo> modifyVisibility(
+      @Parameter(description = "数据集ID") @PathVariable Long id,
+      @Parameter(description = "可见性") @RequestParam Visibility visibility) {
+    return ApiLocaleResult.success(datasetFacade.modifyVisibility(id, visibility));
   }
 
   @Operation(operationId = "modifyDataSource", summary = "修改数据源", description = "修改数据源配置")

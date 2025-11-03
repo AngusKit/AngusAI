@@ -26,8 +26,6 @@ public class SessionAssembler {
 
     // 初始化计数和标志
     session.setMessageCount(0);
-    session.setIsArchived(false);
-    session.setIsPinned(false);
     session.setIsStarred(false);
     return session;
   }
@@ -36,10 +34,6 @@ public class SessionAssembler {
     Session session = new Session();
     session.setId(id);
     session.setTitle(dto.getTitle());
-    session.setAppId(dto.getAppId());
-    session.setModelId(dto.getModelId());
-    session.setIsPinned(dto.getIsPinned());
-    session.setIsArchived(dto.getIsArchived());
     session.setConfig(dto.getConfig());
     return session;
   }
@@ -71,9 +65,9 @@ public class SessionAssembler {
       vo.setCreatedDate(
           Date.from(session.getCreatedDate().atZone(ZoneId.systemDefault()).toInstant()));
     }
-    if (session.getLastModifiedDate() != null) {
-      vo.setLastModifiedDate(
-          Date.from(session.getLastModifiedDate().atZone(ZoneId.systemDefault()).toInstant()));
+    if (session.getModifiedDate() != null) {
+      vo.setModifiedDate(
+          Date.from(session.getModifiedDate().atZone(ZoneId.systemDefault()).toInstant()));
     }
 
     // 转换配置
@@ -105,9 +99,9 @@ public class SessionAssembler {
       vo.setCreatedDate(
           Date.from(session.getCreatedDate().atZone(ZoneId.systemDefault()).toInstant()));
     }
-    if (session.getLastModifiedDate() != null) {
-      vo.setLastModifiedDate(
-          Date.from(session.getLastModifiedDate().atZone(ZoneId.systemDefault()).toInstant()));
+    if (session.getModifiedDate() != null) {
+      vo.setModifiedDate(
+          Date.from(session.getModifiedDate().atZone(ZoneId.systemDefault()).toInstant()));
     }
 
     // 最后一条消息

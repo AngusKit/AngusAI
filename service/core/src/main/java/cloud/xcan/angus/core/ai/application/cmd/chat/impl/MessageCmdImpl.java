@@ -6,7 +6,6 @@ import cloud.xcan.angus.core.ai.domain.chat.Message;
 import cloud.xcan.angus.core.ai.domain.chat.MessageAttachment;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRepo;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRole;
-import cloud.xcan.angus.core.ai.domain.chat.MessageUsage;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
@@ -104,52 +103,6 @@ public class MessageCmdImpl extends CommCmd<Message, Long> implements MessageCmd
 
   @Override
   @Transactional
-  public void updateContent(Long id, String content) {
-    new BizTemplate<Void>() {
-      Message message;
-
-      @Override
-      protected void checkParams() {
-        message = messageRepo.findById(id)
-            .orElseThrow(() -> ResourceNotFound.of("消息不存在", new Object[]{}));
-      }
-
-      @Override
-      protected Void process() {
-        message.setContent(content);
-        messageRepo.save(message);
-
-        // 更新会话的最后消息
-        sessionCmd.updateLastMessage(message.getSessionId(), content, message.getRole());
-
-        return null;
-      }
-    }.execute();
-  }
-
-  @Override
-  @Transactional
-  public void updateUsage(Long id, MessageUsage usage) {
-    new BizTemplate<Void>() {
-      Message message;
-
-      @Override
-      protected void checkParams() {
-        message = messageRepo.findById(id)
-            .orElseThrow(() -> ResourceNotFound.of("消息不存在", new Object[]{}));
-      }
-
-      @Override
-      protected Void process() {
-        message.setUsage(usage);
-        messageRepo.save(message);
-        return null;
-      }
-    }.execute();
-  }
-
-  @Override
-  @Transactional
   public void setStreaming(Long id, Boolean isStreaming) {
     new BizTemplate<Void>() {
       Message message;
@@ -193,43 +146,6 @@ public class MessageCmdImpl extends CommCmd<Message, Long> implements MessageCmd
 
   @Override
   @Transactional
-  public Long regenerateMessage(Long originalMessageId, String newContent) {
-    return new BizTemplate<Long>() {
-      Message originalMessage;
-
-      @Override
-      protected void checkParams() {
-        originalMessage = messageRepo.findById(originalMessageId)
-            .orElseThrow(() -> ResourceNotFound.of("原消息不存在", new Object[]{}));
-      }
-
-      @Override
-      protected Long process() {
-        // 删除原消息
-        messageRepo.deleteById(originalMessageId);
-
-        // 创建新消息
-        Message newMessage = new Message();
-        newMessage.setSessionId(originalMessage.getSessionId());
-        newMessage.setRole(originalMessage.getRole());
-        newMessage.setContent(newContent);
-        newMessage.setAttachments(originalMessage.getAttachments());
-        newMessage.setIsStreaming(false);
-        newMessage.setParentMessageId(originalMessageId);
-
-        Message savedMessage = messageRepo.save(newMessage);
-
-        // 更新会话的最后消息
-        sessionCmd.updateLastMessage(originalMessage.getSessionId(), newContent,
-            originalMessage.getRole());
-
-        return savedMessage.getId();
-      }
-    }.execute();
-  }
-
-  @Override
-  @Transactional
   public void delete(Long id) {
     new BizTemplate<Void>() {
       @Override
@@ -241,38 +157,6 @@ public class MessageCmdImpl extends CommCmd<Message, Long> implements MessageCmd
       @Override
       protected Void process() {
         messageRepo.deleteById(id);
-        return null;
-      }
-    }.execute();
-  }
-
-  @Override
-  @Transactional
-  public Integer batchDelete(List<Long> messageIds) {
-    return new BizTemplate<Integer>() {
-      @Override
-      protected Integer process() {
-        int count = 0;
-        for (Long id : messageIds) {
-          try {
-            delete(id);
-            count++;
-          } catch (Exception e) {
-            // 记录日志，继续删除其他消息
-          }
-        }
-        return count;
-      }
-    }.execute();
-  }
-
-  @Override
-  @Transactional
-  public void deleteBySessionId(Long sessionId) {
-    new BizTemplate<Void>() {
-      @Override
-      protected Void process() {
-        messageRepo.deleteBySessionId(sessionId);
         return null;
       }
     }.execute();

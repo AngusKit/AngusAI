@@ -5,15 +5,13 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.Transient;
+import java.util.Objects;
+import lombok.Getter;
+import lombok.Setter;
 
-@EqualsAndHashCode(callSuper = true)
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Setter
+@Getter
 @Entity
 @Table(name = "ai_prompt_category")
 public class PromptCategory extends TenantAuditingEntity<PromptCategory, Long> {
@@ -23,12 +21,6 @@ public class PromptCategory extends TenantAuditingEntity<PromptCategory, Long> {
 
   @Column(name = "name", nullable = false, length = 20)
   private String name;
-
-  @Column(name = "name_en", length = 30)
-  private String nameEn;
-
-  @Column(name = "description", length = 200)
-  private String description;
 
   @Column(name = "icon", length = 50)
   private String icon;
@@ -42,14 +34,36 @@ public class PromptCategory extends TenantAuditingEntity<PromptCategory, Long> {
   @Column(name = "is_system", nullable = false)
   private Boolean isSystem = false;
 
-  @Column(name = "prompt_count", nullable = false)
-  private Long promptCount = 0L;
-
   @Column(name = "order_num", nullable = false)
   private Integer orderNum = 0;
+
+  @Transient
+  private Long promptCount = 0L;
 
   @Override
   public Long identity() {
     return id;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof PromptCategory category)) {
+      return false;
+    }
+    return Objects.equals(id, category.id)
+        && Objects.equals(name, category.name)
+        && Objects.equals(icon, category.icon)
+        && Objects.equals(color, category.color)
+        && Objects.equals(parentId, category.parentId)
+        && Objects.equals(isSystem, category.isSystem)
+        && Objects.equals(orderNum, category.orderNum);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, name, icon, color, parentId, isSystem, orderNum);
   }
 }
