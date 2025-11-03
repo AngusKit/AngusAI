@@ -1,11 +1,11 @@
-import { Brain, Check, ChevronDown, Cpu, Sparkles, Zap } from 'lucide-react';
+import { Check, ChevronDown, Zap, Brain, Sparkles, Cpu } from 'lucide-react';
 import { Button } from '../ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from '../ui/dropdown-menu';
 import { Badge } from '../ui/badge';
 import { cn } from '../ui/utils';
@@ -27,10 +27,7 @@ interface ModelSwitcherProps {
   onModelChange: (modelId: string) => void;
 }
 
-export function ModelSwitcher({
-  currentModelId,
-  onModelChange,
-}: ModelSwitcherProps) {
+export function ModelSwitcher({ currentModelId, onModelChange }: ModelSwitcherProps) {
   const models: Model[] = [
     {
       id: 'gpt-4',
@@ -78,8 +75,7 @@ export function ModelSwitcher({
     },
   ];
 
-  const currentModel =
-    models.find(model => model.id === currentModelId) || models[0];
+  const currentModel = models.find(model => model.id === currentModelId) || models[0];
   const CurrentIcon = currentModel.icon;
 
   const getSpeedLabel = (speed: string) => {
@@ -137,26 +133,21 @@ export function ModelSwitcher({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant='ghost' className='gap-2 h-9'>
-          <CurrentIcon className='w-4 h-4 text-purple-500' />
-          <span className='dark:text-white'>{currentModel.name}</span>
-          <Badge variant='secondary' className='text-xs'>
+        <Button variant="ghost" className="gap-2 h-9">
+          <CurrentIcon className="w-4 h-4 text-purple-500" />
+          <span className="dark:text-white">{currentModel.name}</span>
+          <Badge variant="secondary" className="text-xs">
             {currentModel.contextLength}
           </Badge>
-          <ChevronDown className='w-4 h-4 text-gray-400' />
+          <ChevronDown className="w-4 h-4 text-gray-400" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent
-        align='start'
-        className='w-96 dark:bg-gray-800 dark:border-gray-700'
-      >
-        <div className='px-2 py-1.5'>
-          <p className='text-xs text-gray-500 dark:text-gray-400 mb-2'>
-            选择模型
-          </p>
+      <DropdownMenuContent align="start" className="w-96 dark:bg-gray-800 dark:border-gray-700">
+        <div className="px-2 py-1.5">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">选择模型</p>
         </div>
-        <DropdownMenuSeparator className='dark:bg-gray-700' />
-        <div className='max-h-96 overflow-y-auto'>
+        <DropdownMenuSeparator className="dark:bg-gray-700" />
+        <div className="max-h-96 overflow-y-auto">
           {models.map(model => {
             const Icon = model.icon;
             return (
@@ -165,57 +156,49 @@ export function ModelSwitcher({
                 onClick={() => onModelChange(model.id)}
                 className={cn(
                   'flex items-start gap-3 p-3 cursor-pointer',
-                  currentModelId === model.id &&
-                    'bg-purple-50 dark:bg-purple-900/20'
+                  currentModelId === model.id && 'bg-purple-50 dark:bg-purple-900/20'
                 )}
               >
-                <div className='w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center flex-shrink-0'>
-                  <Icon className='w-5 h-5 text-purple-600 dark:text-purple-400' />
+                <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Icon className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                 </div>
-                <div className='flex-1 min-w-0'>
-                  <div className='flex items-center gap-2 mb-1'>
-                    <span className='dark:text-white'>{model.name}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="dark:text-white">{model.name}</span>
                     {currentModelId === model.id && (
-                      <Check className='w-4 h-4 text-purple-600 dark:text-purple-400 flex-shrink-0' />
+                      <Check className="w-4 h-4 text-purple-600 dark:text-purple-400 flex-shrink-0" />
                     )}
                   </div>
-                  <div className='flex items-center gap-2 mb-1'>
-                    <span className='text-xs text-gray-500 dark:text-gray-400'>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
                       {model.provider}
                     </span>
-                    <span className='text-xs text-gray-400'>•</span>
-                    <span className='text-xs text-gray-500 dark:text-gray-400'>
+                    <span className="text-xs text-gray-400">•</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
                       上下文 {model.contextLength}
                     </span>
                   </div>
-                  <p className='text-xs text-gray-500 dark:text-gray-400 mb-2'>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
                     {model.description}
                   </p>
-                  <div className='flex items-center gap-2 mb-2'>
+                  <div className="flex items-center gap-2 mb-2">
                     {model.capabilities.map((cap, index) => (
-                      <Badge key={index} variant='outline' className='text-xs'>
+                      <Badge key={index} variant="outline" className="text-xs">
                         {cap}
                       </Badge>
                     ))}
                   </div>
-                  <div className='flex items-center gap-3 text-xs'>
-                    <div className='flex items-center gap-1'>
-                      <span className='text-gray-500 dark:text-gray-400'>
-                        速度:
-                      </span>
+                  <div className="flex items-center gap-3 text-xs">
+                    <div className="flex items-center gap-1">
+                      <span className="text-gray-500 dark:text-gray-400">速度:</span>
                       <span className={getSpeedColor(model.speed)}>
                         {getSpeedLabel(model.speed)}
                       </span>
                     </div>
-                    <span className='text-gray-400'>•</span>
-                    <div className='flex items-center gap-1'>
-                      <span className='text-gray-500 dark:text-gray-400'>
-                        成本:
-                      </span>
-                      <Badge
-                        variant='secondary'
-                        className={cn('text-xs', getCostColor(model.cost))}
-                      >
+                    <span className="text-gray-400">•</span>
+                    <div className="flex items-center gap-1">
+                      <span className="text-gray-500 dark:text-gray-400">成本:</span>
+                      <Badge variant="secondary" className={cn('text-xs', getCostColor(model.cost))}>
                         {getCostLabel(model.cost)}
                       </Badge>
                     </div>
@@ -225,8 +208,8 @@ export function ModelSwitcher({
             );
           })}
         </div>
-        <DropdownMenuSeparator className='dark:bg-gray-700' />
-        <DropdownMenuItem className='text-purple-600 dark:text-purple-400 justify-center cursor-pointer'>
+        <DropdownMenuSeparator className="dark:bg-gray-700" />
+        <DropdownMenuItem className="text-purple-600 dark:text-purple-400 justify-center cursor-pointer">
           模型设置
         </DropdownMenuItem>
       </DropdownMenuContent>

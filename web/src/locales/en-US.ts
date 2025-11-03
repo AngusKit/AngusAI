@@ -41,7 +41,9 @@ export const enUS: TranslationKeys = {
     workflow: 'Workflow',
     knowledge: 'Knowledge Base',
     dataset: 'Dataset',
+    apiCollection: 'API Collection',
     models: 'Model Management',
+    vectorStore: 'Vector Store',
     prompts: 'Prompt Library',
     team: 'Team Collaboration',
     members: 'Member Management',
@@ -111,6 +113,12 @@ export const enUS: TranslationKeys = {
     viewAll: 'View All',
   },
 
+  // Recent Apps
+  recentApps: {
+    title: 'Recent Applications',
+    viewAll: 'View All',
+  },
+
   // Quick Actions
   quickActions: {
     title: 'Quick Actions',
@@ -160,11 +168,9 @@ export const enUS: TranslationKeys = {
     previewComplete: 'Preview & Complete',
     previewCompleteDesc: 'Test and finish',
     chatbot: 'Chatbot',
-    chatbotDesc:
-      'Create an intelligent conversational assistant with multi-turn dialogue',
+    chatbotDesc: 'Create an intelligent conversational assistant with multi-turn dialogue',
     textGen: 'Text Generation',
-    textGenDesc:
-      'Generate various text content like articles, summaries, translations',
+    textGenDesc: 'Generate various text content like articles, summaries, translations',
     knowledgeBot: 'Knowledge Q&A',
     knowledgeBotDesc: 'Professional Q&A system based on knowledge base',
     agent: 'AI Agent',
@@ -381,10 +387,20 @@ export const enUS: TranslationKeys = {
     featured: 'Featured',
     allCategories: 'All Categories',
     downloads: 'Downloads',
-    score: 'Rating',
+    rating: 'Rating',
     install: 'Install',
     installed: 'Installed',
     viewDetails: 'View Details',
+  },
+
+  // Analytics
+  analytics: {
+    title: 'Usage Analytics',
+    overview: 'Overview',
+    apiCalls: 'API Calls',
+    performance: 'Performance',
+    costs: 'Cost Analysis',
+    trends: 'Trend Analysis',
   },
 
   // Knowledge Base File Upload
@@ -471,15 +487,12 @@ export const enUS: TranslationKeys = {
     tagName: 'Tag Name',
     tagColor: 'Tag Color',
     addTag: 'Add Tag',
-    confirmDelete:
-      'Are you sure you want to delete this prompt? This action cannot be undone.',
+    confirmDelete: 'Are you sure you want to delete this prompt? This action cannot be undone.',
     systemTemplate: 'System Template',
-    cannotEditSystem:
-      'System templates cannot be edited, please duplicate and modify',
+    cannotEditSystem: 'System templates cannot be edited, please duplicate and modify',
     cannotDeleteSystem: 'System templates cannot be deleted',
     deleteCategory: 'Delete Category',
-    confirmDeleteCategory:
-      'Are you sure you want to delete this category? Prompts in this category will be moved to "Coding" category. This action cannot be undone.',
+    confirmDeleteCategory: 'Are you sure you want to delete this category? Prompts in this category will be moved to "Coding" category. This action cannot be undone.',
     cannotDeleteSystemCategory: 'System categories cannot be deleted',
     categoryDeleted: 'Category deleted',
   },

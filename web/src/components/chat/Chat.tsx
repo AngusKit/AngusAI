@@ -1,29 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
-import {
-  ArrowLeft,
-  BookmarkPlus,
-  Check,
-  Download,
-  Maximize2,
-  Mic,
-  MoreVertical,
-  Palette,
-  Paperclip,
-  Send,
-  Settings,
-  Share2,
-  Sparkles,
-  StopCircle,
-} from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Send, Paperclip, Mic, StopCircle, MoreVertical, Sparkles, BookmarkPlus, Settings, Maximize2, ArrowLeft, Download, Share2, Palette, Check } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
-import { useLanguage } from '../layout/LanguageProvider';
+import { useLanguage } from '../ui/LanguageProvider';
 import { toast } from 'sonner';
 import { ChatSidebar } from './ChatSidebar';
 import { ChatMessage } from './ChatMessage';
-import { PromptLibrary } from '../prompt';
-import { AppSwitcher } from '../layout';
-import { ModelSwitcher } from '../models';
+import { PromptLibrary } from './PromptLibrary';
+import { AppSwitcher } from './AppSwitcher';
+import { ModelSwitcher } from './ModelSwitcher';
 import { AttachmentPreview } from './AttachmentPreview';
 import {
   Dialog,
@@ -33,6 +18,7 @@ import {
   DialogTitle,
 } from '../ui/dialog';
 import { Label } from '../ui/label';
+import { Input } from '../ui/input';
 import { Slider } from '../ui/slider';
 import { Switch } from '../ui/switch';
 import {
@@ -44,11 +30,7 @@ import {
 } from '../ui/dropdown-menu';
 import { cn } from '../ui/utils';
 
-type TemplateType =
-  | 'modern-blue'
-  | 'minimal-gray'
-  | 'elegant-purple'
-  | 'warm-orange';
+type TemplateType = 'modern-blue' | 'minimal-gray' | 'elegant-purple' | 'warm-orange';
 
 interface Message {
   id: string;
@@ -101,8 +83,7 @@ export function Chat({ onBack }: ChatProps) {
   const [showThemeDialog, setShowThemeDialog] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] =
-    useState<TemplateType>('modern-blue');
+  const [selectedTemplate, setSelectedTemplate] = useState<TemplateType>('modern-blue');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -158,8 +139,7 @@ export function Chat({ onBack }: ChatProps) {
     },
   ];
 
-  const selectedTemplateObj =
-    templates.find(t => t.id === selectedTemplate) || templates[0];
+  const selectedTemplateObj = templates.find(t => t.id === selectedTemplate) || templates[0];
 
   const currentSession = sessions.find(s => s.id === currentSessionId);
 
@@ -172,8 +152,7 @@ export function Chat({ onBack }: ChatProps) {
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height =
-        textareaRef.current.scrollHeight + 'px';
+      textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px';
     }
   }, [input]);
 
@@ -198,11 +177,7 @@ export function Chat({ onBack }: ChatProps) {
     setSessions(prev =>
       prev.map(s =>
         s.id === currentSessionId
-          ? {
-              ...s,
-              messages: [...s.messages, newMessage],
-              updatedAt: new Date(),
-            }
+          ? { ...s, messages: [...s.messages, newMessage], updatedAt: new Date() }
           : s
       )
     );
@@ -215,8 +190,7 @@ export function Chat({ onBack }: ChatProps) {
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content:
-          '这是一个模拟的AI响应。在实际应用中，这里会调用真实的AI API。\n\n你可以使用 **Markdown** 格式化文本，包括：\n- 列表项\n- **粗体**和*斜体*\n- [链接](https://example.com)\n- `代码块`\n\n```javascript\nconst greeting = "Hello, World!";\nconsole.log(greeting);\n```',
+        content: '这是一个模拟的AI响应。在实际应用中，这里会调用真实的AI API。\n\n你可以使用 **Markdown** 格式化文本，包括：\n- 列表项\n- **粗体**和*斜体*\n- [链接](https://example.com)\n- `代码块`\n\n```javascript\nconst greeting = "Hello, World!";\nconsole.log(greeting);\n```',
         timestamp: new Date(),
         isStreaming: false,
       };
@@ -224,11 +198,7 @@ export function Chat({ onBack }: ChatProps) {
       setSessions(prev =>
         prev.map(s =>
           s.id === currentSessionId
-            ? {
-                ...s,
-                messages: [...s.messages, aiMessage],
-                updatedAt: new Date(),
-              }
+            ? { ...s, messages: [...s.messages, aiMessage], updatedAt: new Date() }
             : s
         )
       );
@@ -313,9 +283,7 @@ export function Chat({ onBack }: ChatProps) {
   const renameSession = (sessionId: string, newTitle: string) => {
     setSessions(prev =>
       prev.map(s =>
-        s.id === sessionId
-          ? { ...s, title: newTitle, updatedAt: new Date() }
-          : s
+        s.id === sessionId ? { ...s, title: newTitle, updatedAt: new Date() } : s
       )
     );
     toast.success('对话已重命名');
@@ -324,9 +292,7 @@ export function Chat({ onBack }: ChatProps) {
   const toggleSessionStar = (sessionId: string) => {
     setSessions(prev =>
       prev.map(s =>
-        s.id === sessionId
-          ? { ...s, isStarred: !s.isStarred, updatedAt: new Date() }
-          : s
+        s.id === sessionId ? { ...s, isStarred: !s.isStarred, updatedAt: new Date() } : s
       )
     );
   };
@@ -352,9 +318,7 @@ export function Chat({ onBack }: ChatProps) {
   const clearCurrentChat = () => {
     setSessions(prev =>
       prev.map(s =>
-        s.id === currentSessionId
-          ? { ...s, messages: [], updatedAt: new Date() }
-          : s
+        s.id === currentSessionId ? { ...s, messages: [], updatedAt: new Date() } : s
       )
     );
     toast.success('对话已清空');
@@ -372,7 +336,7 @@ export function Chat({ onBack }: ChatProps) {
   };
 
   return (
-    <div className='flex h-screen bg-gray-50 dark:bg-gray-900'>
+    <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
       {/* Chat Sidebar */}
       <ChatSidebar
         sessions={sessions}
@@ -387,81 +351,85 @@ export function Chat({ onBack }: ChatProps) {
       />
 
       {/* Main Chat Area */}
-      <div className='flex-1 flex flex-col'>
+      <div className="flex-1 flex flex-col">
         {/* Top Bar */}
-        <div className='h-14 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 flex items-center justify-between'>
-          <div className='flex items-center gap-3'>
+        <div className="h-14 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
             {onBack && (
               <>
                 <Button
-                  variant='ghost'
-                  size='icon'
+                  variant="ghost"
+                  size="icon"
                   onClick={onBack}
-                  className='hover:bg-gray-100 dark:hover:bg-gray-700'
+                  className="hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
-                  <ArrowLeft className='w-5 h-5' />
+                  <ArrowLeft className="w-5 h-5" />
                 </Button>
-                <div className='w-px h-6 bg-gray-200 dark:bg-gray-700' />
+                <div className="w-px h-6 bg-gray-200 dark:bg-gray-700" />
               </>
             )}
             <AppSwitcher
               currentAppId={currentSession?.appId || 'app-1'}
               onAppChange={updateSessionApp}
             />
-            <div className='w-px h-6 bg-gray-200 dark:bg-gray-700' />
+            <div className="w-px h-6 bg-gray-200 dark:bg-gray-700" />
             <ModelSwitcher
               currentModelId={currentSession?.modelId || 'gpt-4'}
               onModelChange={updateSessionModel}
             />
           </div>
 
-          <div className='flex items-center gap-2'>
+          <div className="flex items-center gap-2">
             <Button
-              variant='ghost'
-              size='sm'
+              variant="ghost"
+              size="sm"
               onClick={() => setShowPromptLibrary(true)}
-              className='gap-2'
+              className="gap-2"
             >
-              <BookmarkPlus className='w-4 h-4' />
+              <BookmarkPlus className="w-4 h-4" />
               提示词库
             </Button>
             <Button
-              variant='ghost'
-              size='icon'
+              variant="ghost"
+              size="icon"
               onClick={() => setShowThemeDialog(true)}
-              title='外观设置'
+              title="外观设置"
             >
-              <Palette className='w-4 h-4' />
+              <Palette className="w-4 h-4" />
             </Button>
             <Button
-              variant='ghost'
-              size='icon'
+              variant="ghost"
+              size="icon"
               onClick={() => setShowSettings(true)}
             >
-              <Settings className='w-4 h-4' />
+              <Settings className="w-4 h-4" />
             </Button>
-            <Button variant='ghost' size='icon' onClick={toggleFullscreen}>
-              <Maximize2 className='w-4 h-4' />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleFullscreen}
+            >
+              <Maximize2 className="w-4 h-4" />
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant='ghost' size='icon'>
-                  <MoreVertical className='w-4 h-4' />
+                <Button variant="ghost" size="icon">
+                  <MoreVertical className="w-4 h-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align='end' className='w-48'>
+              <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem onClick={exportChat}>
-                  <Download className='w-4 h-4 mr-2' />
+                  <Download className="w-4 h-4 mr-2" />
                   导出对话
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={shareChat}>
-                  <Share2 className='w-4 h-4 mr-2' />
+                  <Share2 className="w-4 h-4 mr-2" />
                   分享对话
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={clearCurrentChat}
-                  className='text-red-600 dark:text-red-400'
+                  className="text-red-600 dark:text-red-400"
                 >
                   清空当前对话
                 </DropdownMenuItem>
@@ -471,40 +439,17 @@ export function Chat({ onBack }: ChatProps) {
         </div>
 
         {/* Messages Area */}
-        <div className='flex-1 overflow-y-auto px-4 py-6'>
-          <div className='max-w-4xl mx-auto space-y-6'>
+        <div className="flex-1 overflow-y-auto px-4 py-6">
+          <div className="max-w-4xl mx-auto space-y-6">
             {currentSession?.messages.length === 0 ? (
-              <div className='flex flex-col items-center justify-center h-full text-center py-20'>
-                <div
-                  className={cn(
-                    'w-20 h-20 rounded-full flex items-center justify-center mb-4',
-                    selectedTemplateObj.secondaryColor
-                  )}
-                >
-                  <Sparkles
-                    className={cn(
-                      'w-10 h-10',
-                      selectedTemplateObj.primaryColor.replace('bg-', 'text-')
-                    )}
-                  />
+              <div className="flex flex-col items-center justify-center h-full text-center py-20">
+                <div className={cn("w-20 h-20 rounded-full flex items-center justify-center mb-4", selectedTemplateObj.secondaryColor)}>
+                  <Sparkles className={cn("w-10 h-10", selectedTemplateObj.primaryColor.replace('bg-', 'text-'))} />
                 </div>
-                <h3 className='text-xl mb-2 dark:text-white'>开始新对话</h3>
-                <p className='text-gray-500 dark:text-gray-400 mb-6'>
+                <h3 className="text-xl mb-2 dark:text-white">开始新对话</h3>
+                <p className="text-gray-500 dark:text-gray-400 mb-6">
                   输入你的问题，或使用提示词库快速开始
                 </p>
-                <div className='flex gap-2'>
-                  <Button
-                    onClick={() => setShowPromptLibrary(true)}
-                    className={cn(
-                      'gap-2',
-                      selectedTemplateObj.primaryColor,
-                      'text-white'
-                    )}
-                  >
-                    <BookmarkPlus className='w-4 h-4' />
-                    浏览提示词
-                  </Button>
-                </div>
               </div>
             ) : (
               <>
@@ -518,11 +463,11 @@ export function Chat({ onBack }: ChatProps) {
         </div>
 
         {/* Input Area */}
-        <div className='bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4'>
-          <div className='max-w-4xl mx-auto'>
+        <div className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4">
+          <div className="max-w-4xl mx-auto">
             {/* Attachments Preview */}
             {attachments.length > 0 && (
-              <div className='mb-3 flex flex-wrap gap-2'>
+              <div className="mb-3 flex flex-wrap gap-2">
                 {attachments.map((file, index) => (
                   <AttachmentPreview
                     key={index}
@@ -534,58 +479,56 @@ export function Chat({ onBack }: ChatProps) {
             )}
 
             {/* Input Box */}
-            <div className='flex-1 relative'>
+            <div className="flex-1 relative">
               <Textarea
                 ref={textareaRef}
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder='输入消息... (Shift + Enter 换行)'
-                className='min-h-[80px] max-h-[240px] resize-none pr-32 py-4 px-4 dark:bg-gray-750 dark:border-gray-600 scrollbar-hide'
+                placeholder="输入消息... (Shift + Enter 换行)"
+                className="min-h-[80px] max-h-[240px] resize-none pr-32 py-4 px-4 dark:bg-gray-750 dark:border-gray-600 scrollbar-hide"
                 rows={1}
               />
-              <div className='absolute right-3 bottom-3 flex items-center gap-1'>
+              <div className="absolute right-3 bottom-3 flex items-center gap-1">
                 <input
                   ref={fileInputRef}
-                  type='file'
+                  type="file"
                   multiple
-                  className='hidden'
+                  className="hidden"
                   onChange={handleFileSelect}
                 />
                 <Button
-                  variant='ghost'
-                  size='icon'
-                  className='h-9 w-9'
+                  variant="ghost"
+                  size="icon"
+                  className="h-9 w-9"
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  <Paperclip className='w-4 h-4' />
+                  <Paperclip className="w-4 h-4" />
                 </Button>
                 <Button
-                  variant='ghost'
-                  size='icon'
-                  className='h-9 w-9'
+                  variant="ghost"
+                  size="icon"
+                  className="h-9 w-9"
                   onClick={handleVoiceRecord}
                 >
                   {isRecording ? (
-                    <StopCircle className='w-4 h-4 text-red-500' />
+                    <StopCircle className="w-4 h-4 text-red-500" />
                   ) : (
-                    <Mic className='w-4 h-4' />
+                    <Mic className="w-4 h-4" />
                   )}
                 </Button>
                 <Button
-                  size='icon'
+                  size="icon"
                   onClick={handleSendMessage}
                   disabled={!input.trim() && attachments.length === 0}
-                  className={cn(
-                    'h-9 w-9',
-                    selectedTemplateObj.primaryColor,
-                    'text-white'
-                  )}
+                  className={cn("h-9 w-9", selectedTemplateObj.primaryColor, "text-white")}
                 >
-                  <Send className='w-4 h-4' />
+                  <Send className="w-4 h-4" />
                 </Button>
               </div>
             </div>
+
+
           </div>
         </div>
       </div>
@@ -600,20 +543,20 @@ export function Chat({ onBack }: ChatProps) {
 
       {/* Settings Dialog */}
       <Dialog open={showSettings} onOpenChange={setShowSettings}>
-        <DialogContent className='max-w-2xl max-h-[80vh] overflow-y-auto'>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>对话设置</DialogTitle>
-            <DialogDescription>调整AI对话的参数配置</DialogDescription>
+            <DialogDescription>
+              调整AI对话的参数配置
+            </DialogDescription>
           </DialogHeader>
-
-          <div className='space-y-6 py-4'>
+          
+          <div className="space-y-6 py-4">
             {/* Temperature */}
-            <div className='space-y-2'>
-              <div className='flex items-center justify-between'>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
                 <Label>温度 (Temperature)</Label>
-                <span className='text-sm text-gray-500'>
-                  {settings.temperature}
-                </span>
+                <span className="text-sm text-gray-500">{settings.temperature}</span>
               </div>
               <Slider
                 value={[settings.temperature]}
@@ -623,20 +566,18 @@ export function Chat({ onBack }: ChatProps) {
                 min={0}
                 max={2}
                 step={0.1}
-                className='w-full'
+                className="w-full"
               />
-              <p className='text-xs text-gray-500'>
+              <p className="text-xs text-gray-500">
                 控制输出的随机性。较高的值使输出更随机，较低的值使输出更集中和确定。
               </p>
             </div>
 
             {/* Max Tokens */}
-            <div className='space-y-2'>
-              <div className='flex items-center justify-between'>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
                 <Label>最大令牌数 (Max Tokens)</Label>
-                <span className='text-sm text-gray-500'>
-                  {settings.maxTokens}
-                </span>
+                <span className="text-sm text-gray-500">{settings.maxTokens}</span>
               </div>
               <Slider
                 value={[settings.maxTokens]}
@@ -646,16 +587,18 @@ export function Chat({ onBack }: ChatProps) {
                 min={100}
                 max={4000}
                 step={100}
-                className='w-full'
+                className="w-full"
               />
-              <p className='text-xs text-gray-500'>限制生成响应的最大长度。</p>
+              <p className="text-xs text-gray-500">
+                限制生成响应的最大长度。
+              </p>
             </div>
 
             {/* Top P */}
-            <div className='space-y-2'>
-              <div className='flex items-center justify-between'>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
                 <Label>Top P</Label>
-                <span className='text-sm text-gray-500'>{settings.topP}</span>
+                <span className="text-sm text-gray-500">{settings.topP}</span>
               </div>
               <Slider
                 value={[settings.topP]}
@@ -665,20 +608,18 @@ export function Chat({ onBack }: ChatProps) {
                 min={0}
                 max={1}
                 step={0.05}
-                className='w-full'
+                className="w-full"
               />
-              <p className='text-xs text-gray-500'>
+              <p className="text-xs text-gray-500">
                 核心采样：考虑累积概率为 top_p 的标记结果。
               </p>
             </div>
 
             {/* Frequency Penalty */}
-            <div className='space-y-2'>
-              <div className='flex items-center justify-between'>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
                 <Label>频率惩罚 (Frequency Penalty)</Label>
-                <span className='text-sm text-gray-500'>
-                  {settings.frequencyPenalty}
-                </span>
+                <span className="text-sm text-gray-500">{settings.frequencyPenalty}</span>
               </div>
               <Slider
                 value={[settings.frequencyPenalty]}
@@ -688,20 +629,18 @@ export function Chat({ onBack }: ChatProps) {
                 min={0}
                 max={2}
                 step={0.1}
-                className='w-full'
+                className="w-full"
               />
-              <p className='text-xs text-gray-500'>
+              <p className="text-xs text-gray-500">
                 降低模型重复相同内容的可能性。
               </p>
             </div>
 
             {/* Presence Penalty */}
-            <div className='space-y-2'>
-              <div className='flex items-center justify-between'>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
                 <Label>存在惩罚 (Presence Penalty)</Label>
-                <span className='text-sm text-gray-500'>
-                  {settings.presencePenalty}
-                </span>
+                <span className="text-sm text-gray-500">{settings.presencePenalty}</span>
               </div>
               <Slider
                 value={[settings.presencePenalty]}
@@ -711,46 +650,51 @@ export function Chat({ onBack }: ChatProps) {
                 min={0}
                 max={2}
                 step={0.1}
-                className='w-full'
+                className="w-full"
               />
-              <p className='text-xs text-gray-500'>
+              <p className="text-xs text-gray-500">
                 增加模型谈论新话题的可能性。
               </p>
             </div>
 
             {/* Stream Response */}
-            <div className='flex items-center justify-between'>
-              <div className='space-y-0.5'>
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
                 <Label>流式响应</Label>
-                <p className='text-xs text-gray-500'>
+                <p className="text-xs text-gray-500">
                   启用后将实时显示AI的回复内容
                 </p>
               </div>
               <Switch
                 checked={settings.streamResponse}
-                onCheckedChange={checked =>
+                onCheckedChange={(checked) =>
                   setSettings(prev => ({ ...prev, streamResponse: checked }))
                 }
               />
             </div>
 
             {/* Save History */}
-            <div className='flex items-center justify-between'>
-              <div className='space-y-0.5'>
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
                 <Label>保存历史记录</Label>
-                <p className='text-xs text-gray-500'>自动保存对话历史</p>
+                <p className="text-xs text-gray-500">
+                  自动保存对话历史
+                </p>
               </div>
               <Switch
                 checked={settings.saveHistory}
-                onCheckedChange={checked =>
+                onCheckedChange={(checked) =>
                   setSettings(prev => ({ ...prev, saveHistory: checked }))
                 }
               />
             </div>
           </div>
 
-          <div className='flex justify-end gap-2'>
-            <Button variant='outline' onClick={() => setShowSettings(false)}>
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowSettings(false)}
+            >
               取消
             </Button>
             <Button
@@ -767,17 +711,19 @@ export function Chat({ onBack }: ChatProps) {
 
       {/* Theme Dialog */}
       <Dialog open={showThemeDialog} onOpenChange={setShowThemeDialog}>
-        <DialogContent className='max-w-lg'>
+        <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle className='flex items-center gap-2'>
-              <Palette className='w-5 h-5' />
+            <DialogTitle className="flex items-center gap-2">
+              <Palette className="w-5 h-5" />
               外观主题设置
             </DialogTitle>
-            <DialogDescription>选择你喜欢的对话界面外观主题</DialogDescription>
+            <DialogDescription>
+              选择你喜欢的对话界面外观主题
+            </DialogDescription>
           </DialogHeader>
-
-          <div className='space-y-2 py-2'>
-            {templates.map(template => (
+          
+          <div className="space-y-2 py-2">
+            {templates.map((template) => (
               <div
                 key={template.id}
                 onClick={() => {
@@ -791,45 +737,31 @@ export function Chat({ onBack }: ChatProps) {
                     : 'border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-700'
                 )}
               >
-                <div className='flex items-center justify-between mb-2'>
+                <div className="flex items-center justify-between mb-2">
                   <div>
-                    <div className='dark:text-white'>{template.name}</div>
-                    <div className='text-xs text-gray-500 dark:text-gray-400'>
+                    <div className="dark:text-white">{template.name}</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
                       {template.description}
                     </div>
                   </div>
                   {selectedTemplate === template.id && (
-                    <Check className='w-4 h-4 text-blue-500' />
+                    <Check className="w-4 h-4 text-blue-500" />
                   )}
                 </div>
-                <div className='flex gap-1.5'>
-                  <div
-                    className={cn(
-                      'w-8 h-8 rounded border-2 border-white dark:border-gray-900',
-                      template.primaryColor
-                    )}
-                  ></div>
-                  <div
-                    className={cn(
-                      'w-8 h-8 rounded border',
-                      template.secondaryColor,
-                      template.accentColor
-                    )}
-                  ></div>
-                  <div
-                    className={cn(
-                      'w-8 h-8 rounded border',
-                      template.secondaryColor,
-                      template.accentColor
-                    )}
-                  ></div>
+                <div className="flex gap-1.5">
+                  <div className={cn('w-8 h-8 rounded border-2 border-white dark:border-gray-900', template.primaryColor)}></div>
+                  <div className={cn('w-8 h-8 rounded border', template.secondaryColor, template.accentColor)}></div>
+                  <div className={cn('w-8 h-8 rounded border', template.secondaryColor, template.accentColor)}></div>
                 </div>
               </div>
             ))}
           </div>
 
-          <div className='flex justify-end gap-2 pt-2'>
-            <Button variant='outline' onClick={() => setShowThemeDialog(false)}>
+          <div className="flex justify-end gap-2 pt-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowThemeDialog(false)}
+            >
               关闭
             </Button>
           </div>
