@@ -6,7 +6,7 @@ import static cloud.xcan.angus.spec.principal.PrincipalContext.getDefaultLanguag
 import static cloud.xcan.angus.spec.utils.ObjectUtils.isEmpty;
 import static java.util.Objects.nonNull;
 
-import cloud.xcan.angus.api.commonlink.CombinedTargetType;
+import cloud.xcan.angus.api.commonlink.FullResourceType;
 import cloud.xcan.angus.core.ai.domain.team.activity.Activity;
 import cloud.xcan.angus.core.ai.domain.team.activity.ActivityResource;
 import cloud.xcan.angus.core.ai.domain.team.activity.ActivitySummary;
@@ -21,12 +21,12 @@ import java.util.List;
 
 public class ActivityConverter {
 
-  public static <T extends ActivityResource> Activity toActivity(CombinedTargetType targetType,
+  public static <T extends ActivityResource> Activity toActivity(FullResourceType targetType,
       T resource, ActivityType activityType, Object... params) {
     return createActivity(targetType, resource, activityType, PrincipalContext.get(), params);
   }
 
-  public static List<Activity> toActivities(CombinedTargetType targetType,
+  public static List<Activity> toActivities(FullResourceType targetType,
       List<? extends ActivityResource> resources, ActivityType activityType,
       List<Object[]> params) {
     Principal principal = PrincipalContext.get();
@@ -41,7 +41,7 @@ public class ActivityConverter {
     return activities;
   }
 
-  public static List<Activity> toActivities(CombinedTargetType targetType,
+  public static List<Activity> toActivities(FullResourceType targetType,
       List<? extends ActivityResource> resources, ActivityType activityType, Object... params) {
     Principal principal = PrincipalContext.get();
     Long tenantId = nonNull(principal.getTenantId()) ? principal.getTenantId() : -1L;
@@ -59,18 +59,18 @@ public class ActivityConverter {
    *
    * @param params The last parameter is the resource name
    */
-  private static Activity createActivity(CombinedTargetType targetType, ActivityResource resource,
+  private static Activity createActivity(FullResourceType targetType, ActivityResource resource,
       ActivityType activityType, Principal principal, Object[] params) {
     Activity activity = new Activity().setType(activityType)
-        .setTargetType(targetType)
+        .setResourceType(targetType)
         .setUserId(principal.getUserId())
         .setActivityDate(LocalDateTime.now())
         .setDescription(getDescription(targetType, activityType, params))
         .setDetail(getDetail(targetType, resource, activityType, params));
     activity.setTenantId(principal.getTenantId());
     if (nonNull(resource)) {
-      activity.setTargetId(resource.getId())
-          .setTargetName(resource.getName());
+      activity.setResourceId(resource.getId())
+          .setResourceName(resource.getName());
     }
     return activity;
   }
@@ -78,7 +78,7 @@ public class ActivityConverter {
   /**
    * The resource name does not need to be displayed in the description activity.
    */
-  private static String getDescription(CombinedTargetType targetType, ActivityType activityType,
+  private static String getDescription(FullResourceType targetType, ActivityType activityType,
       Object[] params) {
     if (isEmpty(params)) {
       return message(activityType.getDescMessageKey(),
@@ -103,7 +103,7 @@ public class ActivityConverter {
    * <p>
    * Set the resource name to the second parameter position.
    */
-  private static String getDetail(CombinedTargetType targetType, ActivityResource resource,
+  private static String getDetail(FullResourceType targetType, ActivityResource resource,
       ActivityType activityType, Object[] params) {
     if (isEmpty(params)) {
       return message(activityType.getDetailMessageKey(),
@@ -144,9 +144,9 @@ public class ActivityConverter {
         .setUserId(activity.getUserId())
         .setUserName(activity.getUserName())
         .setUserAvatar(activity.getUserAvatar())
-        .setTargetId(activity.getTargetId())
-        .setTargetType(activity.getTargetType())
-        .setTargetName(activity.getTargetName())
+        .setTargetId(activity.getResourceId())
+        .setTargetType(activity.getResourceType())
+        .setTargetName(activity.getResourceName())
         .setActivityDate(activity.getActivityDate())
         .setDescription(activity.getDescription())
         .setDetail(activity.getDetail());

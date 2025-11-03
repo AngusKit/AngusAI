@@ -1,7 +1,7 @@
 package cloud.xcan.angus.core.ai.domain.team.activity;
 
 
-import cloud.xcan.angus.api.commonlink.CombinedTargetType;
+import cloud.xcan.angus.api.commonlink.FullResourceType;
 import cloud.xcan.angus.core.jpa.multitenancy.TenantEntity;
 import cloud.xcan.angus.core.jpa.multitenancy.TenantListener;
 import jakarta.persistence.Column;
@@ -32,15 +32,15 @@ public class Activity extends TenantEntity<Activity, Long> {
   @Id
   private Long id;
 
-  @Column(name = "target_id")
-  private Long targetId;
+  @Column(name = "resource_id")
+  private Long resourceId;
 
-  @Column(name = "target_type")
+  @Column(name = "resource_type")
   @Enumerated(EnumType.STRING)
-  private CombinedTargetType targetType;
+  private FullResourceType resourceType;
 
-  @Column(name = "target_name")
-  private String targetName;
+  @Column(name = "resource_name")
+  private String resourceName;
 
   @Column(name = "user_id")
   private Long userId;

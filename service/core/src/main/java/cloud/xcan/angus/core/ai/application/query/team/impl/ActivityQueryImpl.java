@@ -2,7 +2,7 @@ package cloud.xcan.angus.core.ai.application.query.team.impl;
 
 import static cloud.xcan.angus.spec.utils.ObjectUtils.isEmpty;
 
-import cloud.xcan.angus.api.commonlink.CombinedTargetType;
+import cloud.xcan.angus.api.commonlink.FullResourceType;
 import cloud.xcan.angus.api.manager.UserManager;
 import cloud.xcan.angus.core.ai.application.converter.ActivityConverter;
 import cloud.xcan.angus.core.ai.application.query.team.ActivityQuery;
@@ -107,7 +107,7 @@ public class ActivityQueryImpl implements ActivityQuery {
    * @return list of activity summaries or null if no activities found
    */
   @Override
-  public List<ActivitySummary> findSummaryByTarget(CombinedTargetType targetType, Long targetId) {
+  public List<ActivitySummary> findSummaryByTarget(FullResourceType targetType, Long targetId) {
     // Retrieve all activities for the specified target
     List<Activity> activities = activityRepo.findByTargetTypeAndTargetId(targetType, targetId);
     if (isEmpty(activities)) {

@@ -4,7 +4,7 @@ import static cloud.xcan.angus.core.jpa.criteria.CriteriaUtils.findFirstValue;
 import static cloud.xcan.angus.core.jpa.criteria.CriteriaUtils.findValueAndRemove;
 import static cloud.xcan.angus.spec.utils.ObjectUtils.isEmpty;
 
-import cloud.xcan.angus.api.commonlink.CombinedTargetType;
+import cloud.xcan.angus.api.commonlink.FullResourceType;
 import cloud.xcan.angus.core.ai.domain.team.activity.Activity;
 import cloud.xcan.angus.core.ai.domain.team.activity.ActivityListRepo;
 import cloud.xcan.angus.core.jpa.repository.AbstractSearchRepository;
@@ -30,7 +30,7 @@ public class ActivityListRepoMysql extends AbstractSearchRepository<Activity>
     String targetTypeValue = findFirstValue(criteria, "targetType");
     String targetIdValue = findFirstValue(criteria, "targetId");
     if (isEmpty(targetTypeValue) || targetTypeValue.contains(",") /* IN filter*/
-        || !CombinedTargetType.valueOf(targetTypeValue).isParent() || isEmpty(targetIdValue)) {
+        || !FullResourceType.valueOf(targetTypeValue).isParent() || isEmpty(targetIdValue)) {
       String mainAlis = "a";
 
       // Assemble mainClass table

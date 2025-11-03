@@ -1,11 +1,11 @@
 package cloud.xcan.angus.core.ai.interfaces.team;
 
 import cloud.xcan.angus.core.ai.domain.ResourceType;
+import cloud.xcan.angus.core.ai.domain.StatisticsPeriod;
 import cloud.xcan.angus.core.ai.interfaces.team.facade.ResourceSharingFacade;
-import cloud.xcan.angus.core.ai.interfaces.team.facade.dto.ResourceSharingAccessDto;
-import cloud.xcan.angus.core.ai.interfaces.team.facade.dto.ResourceSharingAddMembersDto;
 import cloud.xcan.angus.core.ai.interfaces.team.facade.dto.ResourceSharingCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.team.facade.dto.ResourceSharingFindDto;
+import cloud.xcan.angus.core.ai.interfaces.team.facade.dto.ResourceSharingToggleDto;
 import cloud.xcan.angus.core.ai.interfaces.team.facade.dto.ResourceSharingUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.team.facade.vo.ResourceAccessCheckVo;
 import cloud.xcan.angus.core.ai.interfaces.team.facade.vo.ResourceSharingDetailVo;
@@ -20,22 +20,21 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
-import java.util.Map;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "Resource Sharing", description = "资源共享管理 - 团队资源共享、权限控制、访问统计")
+@Tag(name = "Resource Sharing", description = "资源共享管理 - 团队资源共享、权限控制、访问统计。注意：资源可访问性由资源可见性和资源共享两种方式控制")
 @Validated
 @RestController
 @RequestMapping("/api/v1/sharing")
@@ -60,45 +59,23 @@ public class ResourceSharingRest {
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "更新成功")
   })
-  @PatchMapping("/resources/{id}")
+  @PutMapping("/resources/{id}")
   public ApiLocaleResult<ResourceSharingDetailVo> update(
       @Parameter(description = "共享ID") @PathVariable Long id,
       @Valid @RequestBody ResourceSharingUpdateDto dto) {
     return ApiLocaleResult.success(resourceSharingFacade.update(id, dto));
   }
 
-  @Operation(operationId = "addSharingMembers", summary = "批量添加成员", description = "批量添加共享成员")
+  @Operation(operationId = "toggleResourceSharingStatus", summary = "切换资源共享状态", description = "启用或停止资源共享")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "成员已添加")
+      @ApiResponse(responseCode = "200", description = "状态修改成功")
   })
-  @PostMapping("/resources/{id}/members")
-  public ApiLocaleResult<Map<String, Object>> addMembers(
-      @Parameter(description = "共享ID") @PathVariable Long id,
-      @Valid @RequestBody ResourceSharingAddMembersDto dto) {
-    return ApiLocaleResult.success(resourceSharingFacade.addMembers(id, dto));
-  }
-
-  @Operation(operationId = "removeSharingMember", summary = "移除共享成员", description = "从共享中移除特定成员")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "204", description = "成员已移除")
-  })
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  @DeleteMapping("/resources/{id}/members/{userId}")
-  public void removeMember(
-      @Parameter(description = "共享ID") @PathVariable Long id,
-      @Parameter(description = "成员用户ID") @PathVariable Long userId) {
-    resourceSharingFacade.removeMember(id, userId);
-  }
-
-  @Operation(operationId = "stopResourceSharing", summary = "停止资源共享", description = "停止资源共享")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "已记录")
-  })
-  @PostMapping("/resources/{id}/stop")
-  public ApiLocaleResult<?> stopSharing(
-      @Parameter(description = "共享ID") @PathVariable Long id) {
-    resourceSharingFacade.stopSharing(id);
-    return ApiLocaleResult.success();
+  @ResponseStatus(HttpStatus.OK)
+  @PutMapping("/{id}/toggle")
+  public ApiLocaleResult<ResourceSharingDetailVo> toggle(
+      @Parameter(description = "知识库ID") @PathVariable Long id,
+      @Valid @RequestBody ResourceSharingToggleDto dto) {
+    return ApiLocaleResult.success(resourceSharingFacade.toggle(id, dto));
   }
 
   @Operation(operationId = "deleteResourceSharing", summary = "取消资源共享", description = "取消资源共享")
@@ -108,9 +85,8 @@ public class ResourceSharingRest {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @DeleteMapping("/resources/{id}")
   public void delete(
-      @Parameter(description = "共享ID") @PathVariable Long id,
-      @Parameter(description = "是否通知成员") @RequestParam(required = false, defaultValue = "true") Boolean notifyMembers) {
-    resourceSharingFacade.delete(id, notifyMembers);
+      @Parameter(description = "共享ID") @PathVariable Long id) {
+    resourceSharingFacade.delete(id);
   }
 
   @Operation(operationId = "getResourceSharingDetail", summary = "获取共享详情", description = "获取资源共享的详细信息")
@@ -134,6 +110,8 @@ public class ResourceSharingRest {
     return ApiLocaleResult.success(resourceSharingFacade.list(dto));
   }
 
+  // TODO 获取当前用户所有资源访问权限
+
   @Operation(operationId = "checkResourceAccess", summary = "检查资源访问权限", description = "检查当前用户对资源的访问权限")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "检查成功")
@@ -150,9 +128,9 @@ public class ResourceSharingRest {
       @ApiResponse(responseCode = "200", description = "统计数据获取成功")
   })
   @GetMapping("/resources/{id}/statistics")
-  public ApiLocaleResult<Map<String, Object>> getStatistics(
+  public ApiLocaleResult<ResourceSharingStatisticsVo> getStatistics(
       @Parameter(description = "共享ID") @PathVariable Long id,
-      @Parameter(description = "统计周期") @RequestParam(required = false, defaultValue = "week") String period) {
+      @Parameter(description = "统计周期") @RequestParam(required = false) StatisticsPeriod period) {
     return ApiLocaleResult.success(resourceSharingFacade.getStatistics(id, period));
   }
 

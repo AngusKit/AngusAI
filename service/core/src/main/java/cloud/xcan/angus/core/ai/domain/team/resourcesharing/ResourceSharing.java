@@ -2,15 +2,19 @@ package cloud.xcan.angus.core.ai.domain.team.resourcesharing;
 
 import cloud.xcan.angus.core.ai.domain.ResourceType;
 import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
+import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.hibernate.annotations.Type;
 
 /**
  * 资源共享实体
@@ -39,7 +43,7 @@ public class ResourceSharing extends TenantAuditingEntity<ResourceSharing, Long>
   private ResourceType resourceType;
 
   /**
-   * 资源名称（冗余字段，方便查询）
+   * 资源名称（冗余字段，方便查询） TODO 共享资源名同步修改支持
    */
   @Column(name = "resource_name", length = 200)
   private String resourceName;
@@ -58,6 +62,13 @@ public class ResourceSharing extends TenantAuditingEntity<ResourceSharing, Long>
   private SharedWith sharedWith;
 
   /**
+   * 共享成员IDs
+   */
+  @Type(JsonType.class)
+  @Column(columnDefinition = "json", name = "member_ids")
+  private List<Long> memberIds;
+
+  /**
    * 默认权限
    */
   @Enumerated(EnumType.STRING)
@@ -65,46 +76,11 @@ public class ResourceSharing extends TenantAuditingEntity<ResourceSharing, Long>
   private SharePermission permission;
 
   /**
-   * 是否通知成员
-   */
-  @Column(name = "notify_members")
-  private Boolean notifyMembers = true;
-
-  /**
-   * 共享消息
-   */
-  @Column(name = "message", length = 500)
-  private String message;
-
-  /**
-   * 统计：总访问次数
-   */
-  @Column(name = "total_views")
-  private Long totalViews = 0L;
-
-  /**
-   * 统计：总编辑次数
-   */
-  @Column(name = "total_edits")
-  private Long totalEdits = 0L;
-
-  /**
-   * 统计：总下载次数
-   */
-  @Column(name = "total_downloads")
-  private Long totalDownloads = 0L;
-
-  /**
-   * 统计：独立访客数
-   */
-  @Column(name = "unique_visitors")
-  private Long uniqueVisitors = 0L;
-
-  /**
    * 是否启用
    */
   @Column(name = "enabled")
-  private Boolean enabled = true;
+  private Boolean enabled;
+
 
   @Override
   public Long identity() {

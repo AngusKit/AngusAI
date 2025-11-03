@@ -3,7 +3,7 @@ package cloud.xcan.angus.core.ai.domain.team.activity;
 
 import static cloud.xcan.angus.spec.SpecConstant.DateFormat.DEFAULT_DATE_TIME_FORMAT;
 
-import cloud.xcan.angus.api.commonlink.CombinedTargetType;
+import cloud.xcan.angus.api.commonlink.FullResourceType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;
 import lombok.Getter;
@@ -26,7 +26,7 @@ public class ActivitySummary {
 
   private Long targetId;
 
-  private CombinedTargetType targetType;
+  private FullResourceType targetType;
 
   private String targetName;
 

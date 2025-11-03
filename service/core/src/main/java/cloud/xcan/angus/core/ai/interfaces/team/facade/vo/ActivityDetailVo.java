@@ -1,7 +1,7 @@
 package cloud.xcan.angus.core.ai.interfaces.team.facade.vo;
 
 
-import cloud.xcan.angus.api.commonlink.CombinedTargetType;
+import cloud.xcan.angus.api.commonlink.FullResourceType;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,7 +23,7 @@ public class ActivityDetailVo {
 
   private Long targetId;
 
-  private CombinedTargetType targetType;
+  private FullResourceType targetType;
 
   private String targetName;
 

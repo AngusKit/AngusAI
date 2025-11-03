@@ -29,12 +29,6 @@ public class ResourceSharingAccessLog extends TenantAuditingEntity<ResourceShari
   private Long id;
 
   /**
-   * 共享ID
-   */
-  @Column(name = "sharing_id", nullable = false)
-  private Long sharingId;
-
-  /**
    * 资源ID
    */
   @Column(name = "resource_id", nullable = false)
@@ -57,8 +51,8 @@ public class ResourceSharingAccessLog extends TenantAuditingEntity<ResourceShari
    * 操作类型
    */
   @Enumerated(EnumType.STRING)
-  @Column(name = "action", nullable = false, length = 20)
-  private ShareAction action;
+  @Column(name = "access_action", nullable = false, length = 20)
+  private ShareAccessAction accessAction;
 
   /**
    * 元数据（JSON格式）

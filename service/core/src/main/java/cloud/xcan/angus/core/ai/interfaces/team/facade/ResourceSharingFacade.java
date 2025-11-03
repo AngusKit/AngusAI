@@ -1,10 +1,10 @@
 package cloud.xcan.angus.core.ai.interfaces.team.facade;
 
 import cloud.xcan.angus.core.ai.domain.ResourceType;
-import cloud.xcan.angus.core.ai.interfaces.team.facade.dto.ResourceSharingAccessDto;
-import cloud.xcan.angus.core.ai.interfaces.team.facade.dto.ResourceSharingAddMembersDto;
+import cloud.xcan.angus.core.ai.domain.StatisticsPeriod;
 import cloud.xcan.angus.core.ai.interfaces.team.facade.dto.ResourceSharingCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.team.facade.dto.ResourceSharingFindDto;
+import cloud.xcan.angus.core.ai.interfaces.team.facade.dto.ResourceSharingToggleDto;
 import cloud.xcan.angus.core.ai.interfaces.team.facade.dto.ResourceSharingUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.team.facade.vo.ResourceAccessCheckVo;
 import cloud.xcan.angus.core.ai.interfaces.team.facade.vo.ResourceSharingDetailVo;
@@ -29,24 +29,14 @@ public interface ResourceSharingFacade {
   ResourceSharingDetailVo update(Long id, ResourceSharingUpdateDto dto);
 
   /**
-   * 添加成员
+   * 切换资源启用或禁用状态
    */
-  Map<String, Object> addMembers(Long id, ResourceSharingAddMembersDto dto);
-
-  /**
-   * 移除成员
-   */
-  void removeMember(Long id, Long userId);
-
-  /**
-   * 停止资源共享
-   */
-  void stopSharing(Long id);
+  ResourceSharingDetailVo toggle(Long id, ResourceSharingToggleDto dto);
 
   /**
    * 删除共享
    */
-  void delete(Long id, Boolean notifyMembers);
+  void delete(Long id);
 
   /**
    * 获取共享详情
@@ -66,11 +56,6 @@ public interface ResourceSharingFacade {
   /**
    * 获取统计数据
    */
-  Map<String, Object> getStatistics(Long id, String period);
-
-  /**
-   * 获取我的统计
-   */
-  ResourceSharingStatisticsVo getMyStatistics();
+  ResourceSharingStatisticsVo getStatistics(Long id, StatisticsPeriod period);
 
 }

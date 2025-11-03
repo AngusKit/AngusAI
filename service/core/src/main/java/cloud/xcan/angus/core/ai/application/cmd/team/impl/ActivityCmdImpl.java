@@ -4,7 +4,7 @@ package cloud.xcan.angus.core.ai.application.cmd.team.impl;
 import static cloud.xcan.angus.core.utils.PrincipalContextUtils.isUserAction;
 import static cloud.xcan.angus.spec.utils.ObjectUtils.isEmpty;
 
-import cloud.xcan.angus.api.commonlink.CombinedTargetType;
+import cloud.xcan.angus.api.commonlink.FullResourceType;
 import cloud.xcan.angus.core.ai.application.cmd.team.ActivityCmd;
 import cloud.xcan.angus.core.ai.domain.team.activity.Activity;
 import cloud.xcan.angus.core.ai.domain.team.activity.ActivityRepo;
@@ -62,7 +62,7 @@ public class ActivityCmdImpl extends CommCmd<Activity, Long> implements Activity
    */
   @Transactional(rollbackFor = Exception.class)
   @Override
-  public void deleteByTarget(CombinedTargetType targetType, List<Long> targetIds) {
+  public void deleteByTarget(FullResourceType targetType, List<Long> targetIds) {
     activityRepo.deleteByTargetIdAndTargetType(targetIds, targetType.getValue());
   }
 

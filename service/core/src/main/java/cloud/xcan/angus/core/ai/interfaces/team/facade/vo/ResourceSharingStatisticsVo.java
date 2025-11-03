@@ -1,47 +1,28 @@
 package cloud.xcan.angus.core.ai.interfaces.team.facade.vo;
 
+import cloud.xcan.angus.core.ai.domain.team.resourcesharing.SharePermission;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.Map;
 import lombok.Data;
 
 @Data
 @Schema(description = "资源共享统计")
 public class ResourceSharingStatisticsVo {
 
-  @Schema(description = "我创建的共享")
-  private SharedByMeVo sharedByMe;
+  @Schema(description = "总共享数")
+  private Long totalSharing;
 
-  @Schema(description = "共享给我的")
-  private SharedToMeVo sharedToMe;
+  @Schema(description = "总共享资源数")
+  private Long totalResources;
 
-  @Data
-  @Schema(description = "我创建的共享统计")
-  public static class SharedByMeVo {
+  @Schema(description = "总访问次数")
+  private Long totalAccesses;
 
-    @Schema(description = "总数")
-    private Long total;
+  @Schema(description = "共享资源平均授权权限")
+  private SharePermission avgPermission;
 
-    @Schema(description = "按类型统计")
-    private Map<String, Long> byType;
+  @Schema(description = "共享资源访问统计")
+  private AccessStatisticsVo accessStats;
 
-    @Schema(description = "总访问次数")
-    private Long totalViews;
+  // TODO 近一月固定增长数和占比（所有前端页面统计数据实现应该保持一致）
 
-    @Schema(description = "总成员数")
-    private Long totalMembers;
-  }
-
-  @Data
-  @Schema(description = "共享给我的统计")
-  public static class SharedToMeVo {
-
-    @Schema(description = "总数")
-    private Long total;
-
-    @Schema(description = "按类型统计")
-    private Map<String, Long> byType;
-
-    @Schema(description = "最近访问数")
-    private Long recentlyAccessed;
-  }
 }

@@ -2,7 +2,7 @@ package cloud.xcan.angus.api.commonlink;
 
 import cloud.xcan.angus.spec.locale.EnumMessage;
 
-public enum CombinedTargetType implements EnumMessage<String> {
+public enum FullResourceType implements EnumMessage<String> {
   ;
 
   @Override

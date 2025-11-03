@@ -1,6 +1,6 @@
 package cloud.xcan.angus.core.ai.domain.team.resourcesharing;
 
-import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
+import cloud.xcan.angus.spec.experimental.EntitySupport;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -20,7 +20,7 @@ import lombok.experimental.Accessors;
 @Setter
 @Getter
 @Accessors(chain = true)
-public class ResourceSharingMember extends TenantAuditingEntity<ResourceSharingMember, Long> {
+public class ResourceSharingMember extends EntitySupport<ResourceSharingMember, Long> {
 
   @Id
   private Long id;
@@ -28,8 +28,10 @@ public class ResourceSharingMember extends TenantAuditingEntity<ResourceSharingM
   /**
    * 共享ID
    */
-  @Column(name = "sharing_id", nullable = false)
+  @Column(name = "sharing_id")
   private Long sharingId;
+
+  // TODO 成员和权限添加唯一索引
 
   /**
    * 用户ID
@@ -41,7 +43,7 @@ public class ResourceSharingMember extends TenantAuditingEntity<ResourceSharingM
    * 成员权限（可覆盖共享默认权限）
    */
   @Enumerated(EnumType.STRING)
-  @Column(name = "permission", length = 20)
+  @Column(name = "permission", length = 20, nullable = false)
   private SharePermission permission;
 
   /**

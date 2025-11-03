@@ -3,6 +3,7 @@ package cloud.xcan.angus.core.ai.interfaces.team.facade.dto;
 import cloud.xcan.angus.core.ai.domain.team.resourcesharing.SharePermission;
 import cloud.xcan.angus.core.ai.domain.team.resourcesharing.SharedWith;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.Data;
 
@@ -10,9 +11,11 @@ import lombok.Data;
 @Schema(description = "更新资源共享参数")
 public class ResourceSharingUpdateDto {
 
+  @NotNull
   @Schema(description = "共享范围")
   private SharedWith sharedWith;
 
+  @NotNull
   @Schema(description = "权限")
   private SharePermission permission;
 

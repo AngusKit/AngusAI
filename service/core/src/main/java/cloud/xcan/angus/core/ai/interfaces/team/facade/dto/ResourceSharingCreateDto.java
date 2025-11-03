@@ -32,9 +32,4 @@ public class ResourceSharingCreateDto {
   @Schema(description = "指定成员ID列表（sharedWith为specific时必填）")
   private List<Long> memberIds;
 
-  @Schema(description = "是否通知成员", defaultValue = "true")
-  private Boolean notifyMembers = true;
-
-  @Schema(description = "通知消息")
-  private String message;
 }

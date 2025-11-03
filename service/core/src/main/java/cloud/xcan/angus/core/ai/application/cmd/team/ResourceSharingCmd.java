@@ -1,10 +1,8 @@
 package cloud.xcan.angus.core.ai.application.cmd.team;
 
-import cloud.xcan.angus.core.ai.domain.ResourceType;
 import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceSharing;
-import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceSharingMember;
-import cloud.xcan.angus.core.ai.interfaces.team.facade.dto.ResourceSharingCreateDto;
-import cloud.xcan.angus.core.ai.interfaces.team.facade.dto.ResourceSharingUpdateDto;
+import cloud.xcan.angus.core.ai.domain.team.resourcesharing.SharePermission;
+import cloud.xcan.angus.core.ai.domain.team.resourcesharing.SharedWith;
 import java.util.List;
 
 /**
@@ -15,30 +13,22 @@ public interface ResourceSharingCmd {
   /**
    * 创建资源共享
    */
-  ResourceSharing create(ResourceSharingCreateDto dto, Long userId);
+  ResourceSharing create(ResourceSharing sharing);
 
   /**
    * 更新资源共享
    */
-  ResourceSharing update(Long id, ResourceSharingUpdateDto dto, Long userId);
+  ResourceSharing update(Long id, SharedWith sharedWith, SharePermission permission,
+      List<Long> memberIds);
 
   /**
-   * 添加成员
+   * 切换资源启用或禁用状态
    */
-  List<ResourceSharingMember> addMembers(Long sharingId, List<Long> memberIds, Long userId);
-
-  /**
-   * 移除成员
-   */
-  void removeMember(Long sharingId, Long memberId, Long userId);
+  ResourceSharing toggle(Long id, Boolean enabled);
 
   /**
    * 删除资源共享
    */
-  void delete(Long id, Long userId);
+  void delete(Long id);
 
-  /**
-   * 取消资源共享(根据资源)
-   */
-  void cancelByResource(Long resourceId, ResourceType resourceType, Long userId);
 }

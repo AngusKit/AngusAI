@@ -1,6 +1,6 @@
 package cloud.xcan.angus.core.ai.domain.team.activity;
 
-import cloud.xcan.angus.api.commonlink.CombinedTargetType;
+import cloud.xcan.angus.api.commonlink.FullResourceType;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -10,7 +10,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class SimpleActivityResource implements ActivityResource {
 
-  private CombinedTargetType targetType;
+  private FullResourceType targetType;
 
   private Long id;
 

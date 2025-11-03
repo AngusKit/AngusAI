@@ -53,20 +53,15 @@ public class ApiKeyFacadeImpl implements ApiKeyFacade {
   @NameJoin
   @Override
   public ApiKeyDetailVo getDetail(Long id) {
-    // 查询密钥详情
     ApiKey apiKey = apiKeyQuery.findAndCheck(id);
-    // 获取授权资源
     List<ApiKeyResource> resources = apiKeyResourceQuery.getResources(apiKey.getId());
-    // 转换为VO
     return ApiKeyAssembler.toDetailVo(apiKey, resources);
   }
 
   @NameJoin
   @Override
   public List<ApiKeyListVo> list() {
-    // 查询列表
     List<ApiKey> apiKeys = apiKeyQuery.list();
-    // 转换为VO
     Map<Long, List<ApiKeyResource>> resourceMap = apiKeyResourceQuery.getResourceMap();
     return apiKeys.stream().map(apiKey -> {
       List<ApiKeyResource> resources = resourceMap.get(apiKey.getId());

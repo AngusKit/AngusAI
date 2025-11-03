@@ -4,13 +4,15 @@ import cloud.xcan.angus.core.ai.domain.ResourceType;
 import cloud.xcan.angus.core.ai.domain.team.resourcesharing.SharePermission;
 import cloud.xcan.angus.core.ai.domain.team.resourcesharing.SharedWith;
 import cloud.xcan.angus.remote.NameJoinField;
+import cloud.xcan.angus.remote.vo.TenantAuditingVo;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDateTime;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Schema(description = "资源共享列表项")
-public class ResourceSharingListVo {
+public class ResourceSharingListVo extends TenantAuditingVo {
 
   @Schema(description = "共享ID")
   private Long id;
@@ -24,17 +26,8 @@ public class ResourceSharingListVo {
   @Schema(description = "资源类型")
   private ResourceType resourceType;
 
-  @Schema(description = "资源类型标签")
-  private String resourceTypeLabel;
-
-  @Schema(description = "资源图标")
-  private String icon;
-
-  @Schema(description = "图标背景色")
-  private String iconBg;
-
-  @Schema(description = "图标颜色")
-  private String iconColor;
+  @Schema(description = "是否启用")
+  private Boolean enabled;
 
   @Schema(description = "所有者ID")
   private Long ownerId;
@@ -52,17 +45,11 @@ public class ResourceSharingListVo {
   @Schema(description = "共享范围")
   private SharedWith sharedWith;
 
-  @Schema(description = "共享范围标签")
-  private String sharedWithLabel;
-
   @Schema(description = "成员数量")
-  private Long memberCount;
+  private Integer memberCount;
 
   @Schema(description = "权限")
   private SharePermission permission;
-
-  @Schema(description = "权限标签")
-  private String permissionLabel;
 
   @Schema(description = "访问次数")
   private Long views;
@@ -70,15 +57,4 @@ public class ResourceSharingListVo {
   @Schema(description = "编辑次数")
   private Long edits;
 
-  @Schema(description = "最后共享时间描述")
-  private String lastShared;
-
-  @Schema(description = "最后共享时间")
-  private LocalDateTime lastSharedAt;
-
-  @Schema(description = "创建时间")
-  private LocalDateTime createdDate;
-
-  @Schema(description = "最后修改时间")
-  private LocalDateTime modifiedDate;
 }

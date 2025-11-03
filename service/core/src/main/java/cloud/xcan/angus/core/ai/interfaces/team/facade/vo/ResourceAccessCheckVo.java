@@ -14,9 +14,6 @@ public class ResourceAccessCheckVo {
   @Schema(description = "权限")
   private SharePermission permission;
 
-  @Schema(description = "权限标签")
-  private String permissionLabel;
-
   @Schema(description = "是否所有者")
   private Boolean isOwner;
 
