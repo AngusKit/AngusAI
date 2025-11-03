@@ -9,7 +9,7 @@ export async function copyToClipboard(text: string): Promise<boolean> {
     try {
       await navigator.clipboard.writeText(text);
       return true;
-    } catch {
+    } catch (err) {
       // Fall through to fallback method
     }
   }
@@ -28,7 +28,7 @@ export async function copyToClipboard(text: string): Promise<boolean> {
     const successful = document.execCommand('copy');
     document.body.removeChild(textArea);
     return successful;
-  } catch {
+  } catch (err) {
     document.body.removeChild(textArea);
     return false;
   }

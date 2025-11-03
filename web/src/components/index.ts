@@ -15,7 +15,7 @@ export * from './workflow';
 // Knowledge
 export * from './knowledge';
 
-// Dataset
+// Dataset  
 export * from './dataset';
 
 // Models
@@ -31,7 +31,6 @@ export * from './settings';
 export * from './plugins';
 
 // Shared
-export * from './prompt';
+export * from './shared';
 
-// Chat
-export * from './chat';
+
