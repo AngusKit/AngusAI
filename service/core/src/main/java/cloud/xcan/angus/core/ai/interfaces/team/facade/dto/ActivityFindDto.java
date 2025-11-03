@@ -7,15 +7,13 @@ import cloud.xcan.angus.api.commonlink.FullResourceType;
 import cloud.xcan.angus.remote.PageQuery;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.format.annotation.DateTimeFormat;
 
-@Getter
-@Setter
-@Accessors(chain = true)
+@EqualsAndHashCode(callSuper = true)
+@Data
 public class ActivityFindDto extends PageQuery {
 
   @Schema(description = "Activity record identifier")

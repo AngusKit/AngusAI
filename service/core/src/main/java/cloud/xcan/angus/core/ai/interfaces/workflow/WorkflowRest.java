@@ -1,7 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.workflow;
 
 import cloud.xcan.angus.core.ai.domain.Visibility;
-import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.WorkflowFacade;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowConfigUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowCreateDto;

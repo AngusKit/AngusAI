@@ -6,8 +6,6 @@ import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.MessageFindDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.MessageSendDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.MessageVo;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
-import cloud.xcan.angus.remote.search.SearchCriteria;
-import org.springframework.util.StringUtils;
 
 /**
  * Message转换器
@@ -61,7 +59,7 @@ public class MessageAssembler {
     vo.setIsStreaming(message.getIsStreaming());
 
     if (message.getCreatedDate() != null) {
-      vo.setDatetime(message.getCreatedDate().getTime());
+      vo.setDatetime(message.getCreatedDate());
     }
 
     return vo;
@@ -72,13 +70,7 @@ public class MessageAssembler {
    */
   public static GenericSpecification<Message> getSpecification(MessageFindDto dto, Long sessionId) {
     GenericSpecification<Message> spec = new GenericSpecification<>();
-
-    spec.add(new SearchCriteria("sessionId", ":", sessionId));
-
-    if (StringUtils.hasText(dto.getKeyword())) {
-      spec.add(new SearchCriteria("content", "~", dto.getKeyword()));
-    }
-
+    // TODO
     return spec;
   }
 }

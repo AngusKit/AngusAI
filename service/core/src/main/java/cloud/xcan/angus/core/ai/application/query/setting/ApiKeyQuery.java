@@ -1,7 +1,6 @@
 package cloud.xcan.angus.core.ai.application.query.setting;
 
 import cloud.xcan.angus.core.ai.domain.setting.apikey.ApiKey;
-import cloud.xcan.angus.core.ai.domain.setting.apikey.ApiKeyResource;
 import java.util.List;
 
 /**

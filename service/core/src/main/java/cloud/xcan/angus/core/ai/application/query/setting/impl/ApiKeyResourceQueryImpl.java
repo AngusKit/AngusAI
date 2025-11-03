@@ -1,9 +1,9 @@
 package cloud.xcan.angus.core.ai.application.query.setting.impl;
 
 import cloud.xcan.angus.core.ai.application.query.setting.ApiKeyResourceQuery;
+import cloud.xcan.angus.core.ai.domain.ResourceType;
 import cloud.xcan.angus.core.ai.domain.setting.apikey.ApiKeyResource;
 import cloud.xcan.angus.core.ai.domain.setting.apikey.ApiKeyResourceRepo;
-import cloud.xcan.angus.core.ai.domain.ResourceType;
 import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Map;

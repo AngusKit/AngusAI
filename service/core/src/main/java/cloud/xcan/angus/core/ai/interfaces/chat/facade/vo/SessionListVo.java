@@ -36,12 +36,6 @@ public class SessionListVo {
   @Schema(description = "消息总数")
   private Integer messageCount;
 
-  @Schema(description = "是否归档")
-  private Boolean isArchived;
-
-  @Schema(description = "是否置顶")
-  private Boolean isPinned;
-
   @Schema(description = "是否收藏")
   private Boolean isStarred;
 

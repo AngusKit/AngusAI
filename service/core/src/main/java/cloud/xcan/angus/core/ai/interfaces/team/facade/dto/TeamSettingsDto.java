@@ -7,7 +7,7 @@ import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
 @Data
-public class TeamSettingsDto{
+public class TeamSettingsDto {
 
   @Length(max = 400)
   @Schema(description = "团队头像")

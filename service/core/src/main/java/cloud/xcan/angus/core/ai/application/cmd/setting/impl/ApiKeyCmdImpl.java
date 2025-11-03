@@ -10,7 +10,6 @@ import cloud.xcan.angus.core.ai.domain.setting.apikey.ApiKeyStatus;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
-import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import jakarta.annotation.Resource;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;

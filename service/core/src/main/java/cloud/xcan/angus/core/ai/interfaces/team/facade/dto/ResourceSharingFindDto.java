@@ -35,6 +35,7 @@ public class ResourceSharingFindDto extends PageQuery {
   @Schema(description = "创建时间", example = "2024-10-12 00:00:00")
   private LocalDateTime createdDate;
 
-  @Schema(description = "排序字段", allowableValues = {"id", "type", "permission", "sharedWith", "createdDate"})
+  @Schema(description = "排序字段", allowableValues = {"id", "type", "permission", "sharedWith",
+      "createdDate"})
   private String orderBy = "createdDate";
 }

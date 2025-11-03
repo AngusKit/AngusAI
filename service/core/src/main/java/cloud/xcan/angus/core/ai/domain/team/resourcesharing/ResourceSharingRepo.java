@@ -2,7 +2,6 @@ package cloud.xcan.angus.core.ai.domain.team.resourcesharing;
 
 import cloud.xcan.angus.core.ai.domain.ResourceType;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
-import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.NoRepositoryBean;

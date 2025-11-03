@@ -8,5 +8,6 @@ public interface ResourceSharingMemberQuery {
 
   List<ResourceSharingMember> findBySharingIdOrderByCreatedDateDesc(Long sharingId);
 
-  List<ResourceSharingMember> findByUserIdAndResourceIdAndResourceType(Long userId, Long resourceId, ResourceType resourceType);
+  List<ResourceSharingMember> findByUserIdAndResourceIdAndResourceType(Long userId, Long resourceId,
+      ResourceType resourceType);
 }

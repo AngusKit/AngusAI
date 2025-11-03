@@ -53,8 +53,6 @@ public class SessionAssembler {
     vo.setAppId(session.getAppId());
     vo.setModelId(session.getModelId());
     vo.setMessageCount(session.getMessageCount());
-    vo.setIsArchived(session.getIsArchived());
-    vo.setIsPinned(session.getIsPinned());
     vo.setIsStarred(session.getIsStarred());
 
     // 审计字段从TenantAuditingEntity继承
@@ -91,8 +89,6 @@ public class SessionAssembler {
     vo.setAppId(session.getAppId());
     vo.setModelId(session.getModelId());
     vo.setMessageCount(session.getMessageCount());
-    vo.setIsArchived(session.getIsArchived());
-    vo.setIsPinned(session.getIsPinned());
     vo.setIsStarred(session.getIsStarred());
 
     if (session.getCreatedDate() != null) {

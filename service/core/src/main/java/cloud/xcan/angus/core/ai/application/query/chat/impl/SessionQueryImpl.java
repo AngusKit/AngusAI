@@ -126,11 +126,11 @@ public class SessionQueryImpl implements SessionQuery {
 
   @Override
   public Long countAll() {
-    return 0;
+    return 0L;
   }
 
   @Override
   public Long countToday() {
-    return 0;
+    return 0L;
   }
 }

@@ -59,7 +59,8 @@ public interface ResourceSharingFacade {
   /**
    * 获取资源访问权限列表
    */
-  Map<ResourceInfo, List<SharePermission>> getResourcePermissions(Long resourceId, ResourceType resourceType);
+  Map<ResourceInfo, List<SharePermission>> getResourcePermissions(Long resourceId,
+      ResourceType resourceType);
 
   /**
    * 获取统计数据

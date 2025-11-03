@@ -41,6 +41,7 @@ public class ApiKeyResourceCmdImpl extends CommCmd<ApiKeyResource, Long> impleme
       }
     }
   }
+
   @Override
   protected BaseRepository<ApiKeyResource, Long> getRepository() {
     return apiKeyResourceRepo;

@@ -3,7 +3,6 @@ package cloud.xcan.angus.core.ai.interfaces.team.facade.vo;
 import cloud.xcan.angus.core.ai.domain.ResourceType;
 import cloud.xcan.angus.core.ai.domain.team.resourcesharing.SharePermission;
 import cloud.xcan.angus.core.ai.domain.team.resourcesharing.SharedWith;
-import cloud.xcan.angus.remote.NameJoinField;
 import cloud.xcan.angus.remote.vo.TenantAuditingVo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
@@ -14,7 +13,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Schema(description = "资源共享详情")
-public class ResourceSharingDetailVo extends TenantAuditingVo{
+public class ResourceSharingDetailVo extends TenantAuditingVo {
 
   @Schema(description = "共享ID")
   private Long id;

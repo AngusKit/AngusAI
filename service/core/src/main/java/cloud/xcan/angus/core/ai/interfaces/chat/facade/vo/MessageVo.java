@@ -4,6 +4,7 @@ import cloud.xcan.angus.core.ai.domain.chat.MessageAttachment;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRole;
 import cloud.xcan.angus.core.ai.domain.chat.MessageUsage;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Data;
 
@@ -33,7 +34,7 @@ public class MessageVo {
   private MessageUsage usage;
 
   @Schema(description = "消息时间")
-  private Long datetime;
+  private LocalDateTime datetime;
 
   @Schema(description = "是否正在流式生成")
   private Boolean isStreaming;
