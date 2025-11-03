@@ -1,19 +1,33 @@
-import { Sidebar, Header } from './components/layout';
-import { RecentApplications, WelcomeBanner, StatsCards, UsageDetails } from './components/dashboard';
-import { CreateApplication, MyApplications } from './components/applications';
-import { Workflow, WorkflowDesignPage } from './components/workflow';
-import { KnowledgeBase } from './components/knowledge/KnowledgeBase';
-import { Dataset } from './components/dataset';
-import { APICollection } from './components/APICollection/APICollection';
-import { PluginMarket } from './components/plugins';
-import { ModelManagement } from './components/models';
-import { VectorStore } from './components/VectorStore/VectorStore';
-import { TeamMembers, ResourceSharing, TeamSettings } from './components/team';
-import { AppSettingsPage, UsageAnalytics, APIKeys, BillingSubscription } from './components/settings';
-import { PromptLibraryPage } from './components/PromptLibraryPage';
+import {
+  Sidebar,
+  Header,
+  RecentApplications,
+  WelcomeBanner,
+  StatsCards,
+  UsageDetails,
+  CreateApplication,
+  MyApplications,
+  Workflow,
+  WorkflowDesignPage,
+  KnowledgeBase,
+  Dataset,
+  APICollection,
+  PluginMarket,
+  ModelManagement,
+  VectorStore,
+  TeamMembers,
+  ResourceSharing,
+  TeamSettings,
+  AppSettingsPage,
+  UsageAnalytics,
+  APIKeys,
+  BillingSubscription,
+  PromptLibraryPage,
+  Chat
+} from './components';
+
 import { ThemeProvider } from './components/ui/ThemeProvider';
 import { LanguageProvider } from './components/ui/LanguageProvider';
-import { Chat } from './components/chat';
 import { Toaster } from './components/ui/sonner';
 import { useState } from 'react';
 

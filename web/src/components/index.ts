@@ -33,4 +33,19 @@ export * from './plugins';
 // Shared
 export * from './shared';
 
+// APIColeection
+export * from './APICollection';
+
+// chat
+export * from './chat';
+
+// PromptLibraryPage
+export * from './PromptLibraryPage';
+
+// workflow
+export * from './workflow';
+
+// VerctorStore
+export * from './VectorStore';
+
 
