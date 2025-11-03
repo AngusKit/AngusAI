@@ -54,11 +54,7 @@ public class ResourceSharingDetailVo extends TenantAuditingVo{
     private Long userId;
 
     @Schema(description = "用户名")
-    @NameJoinField(id = "userId", repository = "commonUserBaseRepo")
     private String userName;
-
-    @Schema(description = "邮箱")
-    private String email;
 
     @Schema(description = "头像")
     private String avatar;
@@ -74,11 +70,8 @@ public class ResourceSharingDetailVo extends TenantAuditingVo{
     @Schema(description = "用户名")
     private String userName;
 
-    @Schema(description = "邮箱")
-    private String email;
-
     @Schema(description = "头像")
-    private String avatar;
+    private String userAvatar;
 
     @Schema(description = "权限")
     private SharePermission permission;

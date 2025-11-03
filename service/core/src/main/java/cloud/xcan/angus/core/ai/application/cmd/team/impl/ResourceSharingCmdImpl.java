@@ -34,11 +34,6 @@ public class ResourceSharingCmdImpl extends CommCmd<ResourceSharing, Long> imple
   private ResourceSharingQuery resourceSharingQuery;
 
   @Override
-  protected BaseRepository<ResourceSharing, Long> getRepository() {
-    return resourceSharingRepo;
-  }
-
-  @Override
   @Transactional
   public ResourceSharing create(ResourceSharing sharing) {
     return new BizTemplate<ResourceSharing>() {
@@ -181,4 +176,8 @@ public class ResourceSharingCmdImpl extends CommCmd<ResourceSharing, Long> imple
     }.execute();
   }
 
+  @Override
+  protected BaseRepository<ResourceSharing, Long> getRepository() {
+    return resourceSharingRepo;
+  }
 }

@@ -2,6 +2,8 @@ package cloud.xcan.angus.core.ai.interfaces.team;
 
 import cloud.xcan.angus.core.ai.domain.ResourceType;
 import cloud.xcan.angus.core.ai.domain.StatisticsPeriod;
+import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceInfo;
+import cloud.xcan.angus.core.ai.domain.team.resourcesharing.SharePermission;
 import cloud.xcan.angus.core.ai.interfaces.team.facade.ResourceSharingFacade;
 import cloud.xcan.angus.core.ai.interfaces.team.facade.dto.ResourceSharingCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.team.facade.dto.ResourceSharingFindDto;
@@ -20,6 +22,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import java.util.List;
+import java.util.Map;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -110,8 +114,6 @@ public class ResourceSharingRest {
     return ApiLocaleResult.success(resourceSharingFacade.list(dto));
   }
 
-  // TODO 获取当前用户所有资源访问权限
-
   @Operation(operationId = "checkResourceAccess", summary = "检查资源访问权限", description = "检查当前用户对资源的访问权限")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "检查成功")
@@ -121,6 +123,18 @@ public class ResourceSharingRest {
       @Parameter(description = "资源ID") @RequestParam Long resourceId,
       @Parameter(description = "资源类型") @RequestParam ResourceType resourceType) {
     return ApiLocaleResult.success(resourceSharingFacade.checkAccess(resourceId, resourceType));
+  }
+
+  @Operation(operationId = "getResourcePermissions", summary = "获取资源访问权限", description = "获取当前用户对资源的访问权限")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "查询成功")
+  })
+  @GetMapping("/access-permissions")
+  public ApiLocaleResult<Map<ResourceInfo, List<SharePermission>>> getResourcePermissions(
+      @Parameter(description = "资源ID") @RequestParam Long resourceId,
+      @Parameter(description = "资源类型") @RequestParam ResourceType resourceType) {
+    return ApiLocaleResult.success(
+        resourceSharingFacade.getResourcePermissions(resourceId, resourceType));
   }
 
   @Operation(operationId = "getResourceSharingStatistics", summary = "获取共享访问统计", description = "获取资源共享的访问统计")

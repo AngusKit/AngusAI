@@ -1,6 +1,6 @@
 package cloud.xcan.angus.core.ai.application.cmd.team.impl;
 
-import static cloud.xcan.angus.core.ai.application.converter.SharingStatConverter.toDomain;
+import static cloud.xcan.angus.core.ai.application.converter.ResourceSharingConverter.toStatDomain;
 
 import cloud.xcan.angus.core.ai.application.cmd.team.ResourceSharingStatCmd;
 import cloud.xcan.angus.core.ai.domain.ResourceType;
@@ -25,7 +25,7 @@ public class ResourceSharingStatCmdImpl extends CommCmd<ResourceSharingStat, Lon
   public void updateStats(ResourceType type, Long id, ShareAccessAction accessAction) {
     ResourceSharingStat stat = resourceSharingStatRepo.findByResourceTypeAndResourceId(type, id);
     if (stat == null) {
-      stat = toDomain(type, id, accessAction);
+      stat = toStatDomain(type, id, accessAction);
       insert(stat);
     } else {
       stat.setTotalAccesses(stat.getTotalAccesses() + 1);

@@ -1,13 +1,14 @@
 package cloud.xcan.angus.core.ai.application.cmd.team.impl;
 
-import static cloud.xcan.angus.spec.utils.ObjectUtils.nullSafe;
+import static cloud.xcan.angus.core.ai.application.converter.ResourceSharingConverter.toAccessStatsMember;
+import static cloud.xcan.angus.core.ai.application.converter.ResourceSharingConverter.toMemberDomain;
 
 import cloud.xcan.angus.core.ai.application.cmd.team.ResourceSharingMemberCmd;
+import cloud.xcan.angus.core.ai.domain.ResourceType;
 import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceSharing;
 import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceSharingMember;
 import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceSharingMemberRepo;
 import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ShareAccessAction;
-import cloud.xcan.angus.core.ai.domain.team.resourcesharing.SharePermission;
 import cloud.xcan.angus.core.ai.domain.team.resourcesharing.SharedWith;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
@@ -29,11 +30,7 @@ public class ResourceSharingMemberCmdImpl extends CommCmd<ResourceSharingMember,
       for (Long memberId : sharing.getMemberIds()) {
         // 不添加所有者自己
         if (!memberId.equals(resourceOwnerId)) {
-          ResourceSharingMember member = new ResourceSharingMember();
-          member.setSharingId(sharing.getId());
-          member.setUserId(memberId);
-          member.setPermission(nullSafe(sharing.getPermission(), SharePermission.VIEW));
-          member.setAccessCount(0L);
+          ResourceSharingMember member = toMemberDomain(sharing, memberId);
           resourceSharingMemberRepo.save(member);
         }
       }
@@ -41,16 +38,12 @@ public class ResourceSharingMemberCmdImpl extends CommCmd<ResourceSharingMember,
   }
 
   @Override
-  public void updateMemberAccessStats(Long userId, ShareAccessAction accessAction) {
+  public void updateMemberAccessStats(Long userId, ResourceType resourceType, Long resourceId,
+      ShareAccessAction accessAction) {
     ResourceSharingMember member = resourceSharingMemberRepo.findByUserIdAndPermission(
         userId, accessAction.toPermission());
     if (member == null) {
-      member = new ResourceSharingMember();
-      member.setSharingId(null);
-      member.setPermission(accessAction.toPermission());
-      member.setUserId(userId);
-      member.setLastAccessed(LocalDateTime.now());
-      member.setAccessCount(1L);
+      member = toAccessStatsMember(userId, resourceType, resourceId, accessAction);
       insert(member);
     } else {
       member.setLastAccessed(LocalDateTime.now());

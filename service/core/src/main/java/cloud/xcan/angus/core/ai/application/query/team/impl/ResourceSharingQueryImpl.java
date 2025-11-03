@@ -1,22 +1,26 @@
 package cloud.xcan.angus.core.ai.application.query.team.impl;
 
+import static cloud.xcan.angus.spec.principal.PrincipalContext.getUserId;
+import static cloud.xcan.angus.spec.utils.ObjectUtils.isNotEmpty;
+
+import cloud.xcan.angus.core.ai.application.query.team.ResourceSharingMemberQuery;
 import cloud.xcan.angus.core.ai.application.query.team.ResourceSharingQuery;
 import cloud.xcan.angus.core.ai.domain.ResourceType;
+import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceInfo;
 import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceSharing;
-import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceSharingAccessLogRepo;
 import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceSharingMember;
-import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceSharingMemberRepo;
 import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceSharingRepo;
-import cloud.xcan.angus.core.ai.domain.team.resourcesharing.SharedWith;
+import cloud.xcan.angus.core.ai.domain.team.resourcesharing.SharePermission;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import jakarta.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 资源共享查询服务实现
@@ -28,10 +32,7 @@ public class ResourceSharingQueryImpl implements ResourceSharingQuery {
   private ResourceSharingRepo resourceSharingRepo;
 
   @Resource
-  private ResourceSharingMemberRepo resourceSharingMemberRepo;
-
-  @Resource
-  private ResourceSharingAccessLogRepo resourceSharingAccessLogRepo;
+  private ResourceSharingMemberQuery resourceSharingMemberQuery;
 
   @Override
   public ResourceSharing findAndCheck(Long id) {
@@ -56,39 +57,43 @@ public class ResourceSharingQueryImpl implements ResourceSharingQuery {
   }
 
   @Override
-  @Transactional(readOnly = true)
+  public Map<ResourceInfo, List<SharePermission>> getResourcePermissions(
+      Long resourceId, ResourceType resourceType) {
+    return new BizTemplate<Map<ResourceInfo, List<SharePermission>>>() {
+      @Override
+      protected void checkParams() {
+        // TODO 查询并检查授权资源是否存在
+      }
+
+      @Override
+      protected Map<ResourceInfo, List<SharePermission>> process() {
+        // TODO 如果是资源拥有者返回所有权限
+
+        List<ResourceSharingMember> members
+            = resourceSharingMemberQuery.findByUserIdAndResourceIdAndResourceType(
+            getUserId(), resourceId, resourceType);
+        Map<ResourceInfo, List<SharePermission>> resourcePermissions = new HashMap<>();
+        if (isNotEmpty(members)) {
+          ResourceInfo resourceInfo = new ResourceInfo();
+          resourceInfo.setResourceId(resourceId);
+          resourceInfo.setResourceType(resourceType);
+          resourceInfo.setResourceName(null); // TODO 根据check参数设置
+          resourcePermissions.put(resourceInfo, members.stream().map(
+              ResourceSharingMember::getPermission).distinct().toList());
+        }
+        return resourcePermissions;
+      }
+    }.execute();
+  }
+
+  @Override
   public ResourceSharing findByResource(Long resourceId, ResourceType resourceType) {
     return resourceSharingRepo.findByResourceIdAndResourceType(resourceId, resourceType)
         .orElse(null);
   }
 
   @Override
-  @Transactional(readOnly = true)
   public List<ResourceSharingMember> getMembers(Long sharingId) {
-    return resourceSharingMemberRepo.findBySharingIdOrderByCreatedDateDesc(sharingId);
+    return resourceSharingMemberQuery.findBySharingIdOrderByCreatedDateDesc(sharingId);
   }
-
-  @Override
-  @Transactional(readOnly = true)
-  public boolean hasAccess(Long resourceId, ResourceType resourceType, Long userId) {
-    // 查找共享配置
-    ResourceSharing sharing = findByResource(resourceId, resourceType);
-    if (sharing == null || !sharing.getEnabled()) {
-      return false;
-    }
-
-    // 检查是否是所有者
-    if (sharing.getOwnerId().equals(userId)) {
-      return true;
-    }
-
-    // 如果是全体成员共享，直接允许
-    if (sharing.getSharedWith() == SharedWith.ALL) {
-      return true;
-    }
-
-    // 检查是否在成员列表中
-    return resourceSharingMemberRepo.existsBySharingIdAndUserId(sharing.getId(), userId);
-  }
-
 }

@@ -1,6 +1,6 @@
 package cloud.xcan.angus.core.ai.application.cmd.team.impl;
 
-import static cloud.xcan.angus.core.ai.application.converter.SharingAccessLogConverter.toDomain;
+import static cloud.xcan.angus.core.ai.application.converter.ResourceSharingConverter.toAccessLogDomain;
 
 import cloud.xcan.angus.core.ai.application.cmd.team.ResourceSharingAccessLogCmd;
 import cloud.xcan.angus.core.ai.application.cmd.team.ResourceSharingMemberCmd;
@@ -44,7 +44,7 @@ public class ResourceSharingAccessLogCmdImpl extends CommCmd<ResourceSharingAcce
       @Override
       protected Void process() {
         // 创建访问日志
-        ResourceSharingAccessLog log = toDomain(resourceId, resourceType,
+        ResourceSharingAccessLog log = toAccessLogDomain(resourceId, resourceType,
             userId, accessAction, metadata);
         insert0(log);
 
@@ -52,7 +52,8 @@ public class ResourceSharingAccessLogCmdImpl extends CommCmd<ResourceSharingAcce
         resourceSharingStatCmd.updateStats(resourceType, resourceId, accessAction);
 
         // 更新成员访问记录
-        resourceSharingMemberCmd.updateMemberAccessStats(userId, accessAction);
+        resourceSharingMemberCmd.updateMemberAccessStats(userId, resourceType,
+            resourceId, accessAction);
         return null;
       }
     }.execute();

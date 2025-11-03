@@ -1,10 +1,13 @@
 package cloud.xcan.angus.core.ai.application.query.team;
 
 import cloud.xcan.angus.core.ai.domain.ResourceType;
+import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceInfo;
 import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceSharing;
 import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceSharingMember;
+import cloud.xcan.angus.core.ai.domain.team.resourcesharing.SharePermission;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import java.util.List;
+import java.util.Map;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -34,8 +37,8 @@ public interface ResourceSharingQuery {
   List<ResourceSharingMember> getMembers(Long sharingId);
 
   /**
-   * 检查用户是否有访问权限
+   * 获取资源的访问权限列表
    */
-  boolean hasAccess(Long resourceId, ResourceType resourceType, Long userId);
-
+  Map<ResourceInfo, List<SharePermission>> getResourcePermissions(Long resourceId,
+      ResourceType resourceType);
 }

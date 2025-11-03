@@ -81,6 +81,10 @@ public class ResourceSharing extends TenantAuditingEntity<ResourceSharing, Long>
   @Column(name = "enabled")
   private Boolean enabled;
 
+  @Transient
+  private String ownerName;
+  @Transient
+  private String ownerAvatar;
 
   @Override
   public Long identity() {

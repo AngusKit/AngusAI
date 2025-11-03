@@ -1,17 +1,23 @@
 package cloud.xcan.angus.core.ai.interfaces.team.facade.internal.assembler;
 
+import static cloud.xcan.angus.spec.principal.PrincipalContext.getUserFullName;
+import static cloud.xcan.angus.spec.principal.PrincipalContext.getUserId;
+
+import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceInfo;
 import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceSharing;
 import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceSharingMember;
+import cloud.xcan.angus.core.ai.domain.team.resourcesharing.SharePermission;
 import cloud.xcan.angus.core.ai.interfaces.team.facade.dto.ResourceSharingCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.team.facade.dto.ResourceSharingFindDto;
+import cloud.xcan.angus.core.ai.interfaces.team.facade.vo.ResourceAccessCheckVo;
 import cloud.xcan.angus.core.ai.interfaces.team.facade.vo.ResourceSharingDetailVo;
-import cloud.xcan.angus.core.ai.interfaces.team.facade.vo.ResourceSharingDetailVo.AccessStatisticsVo;
 import cloud.xcan.angus.core.ai.interfaces.team.facade.vo.ResourceSharingListVo;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder;
 import cloud.xcan.angus.remote.search.SearchCriteria;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -27,9 +33,6 @@ public class ResourceSharingAssembler {
 
     // 设置默认值
     sharing.setEnabled(true);
-    sharing.setTotalViews(0L);
-    sharing.setTotalEdits(0L);
-    sharing.setUniqueVisitors(0L);
     return sharing;
   }
 
@@ -61,23 +64,6 @@ public class ResourceSharingAssembler {
       vo.setMembers(new ArrayList<>());
     }
 
-    // 统计信息
-    AccessStatisticsVo statistics = new AccessStatisticsVo();
-    statistics.setTotalViews(sharing.getTotalViews());
-    statistics.setTotalEdits(sharing.getTotalEdits());
-    statistics.setUniqueVisitors(sharing.getUniqueVisitors());
-
-    // 计算平均访问次数
-    if (sharing.getUniqueVisitors() != null && sharing.getUniqueVisitors() > 0) {
-      statistics.setAvgAccessesPerUser(
-          (double) sharing.getTotalViews() / sharing.getUniqueVisitors()
-      );
-    } else {
-      statistics.setAvgAccessesPerUser(0.0);
-    }
-
-    vo.setStatistics(statistics);
-
     // 设置审计信息
     vo.setTenantId(sharing.getTenantId());
     vo.setCreatedBy(sharing.getCreatedBy());
@@ -99,8 +85,6 @@ public class ResourceSharingAssembler {
     vo.setSharedWith(sharing.getSharedWith());
     vo.setMemberCount(sharing.getMemberIds().size());
     vo.setPermission(sharing.getPermission());
-    vo.setViews(sharing.getTotalViews());
-    vo.setEdits(sharing.getTotalEdits());
 
     // 设置审计信息
     vo.setTenantId(sharing.getTenantId());
@@ -111,9 +95,22 @@ public class ResourceSharingAssembler {
     return vo;
   }
 
+  public static ResourceAccessCheckVo toResourceAccessCheckVo(
+      Map<ResourceInfo, List<SharePermission>> resourcePermissions) {
+    ResourceAccessCheckVo vo = new ResourceAccessCheckVo();
+    vo.setHasAccess(!resourcePermissions.isEmpty());
+    vo.setResourcePermissions(
+        resourcePermissions.isEmpty() ? null : resourcePermissions.values().iterator().next());
+    vo.setUserId(getUserId());
+    vo.setUserName(getUserFullName());
+    return vo;
+  }
+
   private static ResourceSharingDetailVo.MemberVo toMemberVo(ResourceSharingMember member) {
     ResourceSharingDetailVo.MemberVo vo = new ResourceSharingDetailVo.MemberVo();
     vo.setUserId(member.getUserId());
+    vo.setUserName(member.getUserName());
+    vo.setUserAvatar(member.getUserAvatar());
     vo.setPermission(member.getPermission());
     vo.setSharedAt(member.getCreatedDate());
     vo.setLastAccessed(member.getLastAccessed());

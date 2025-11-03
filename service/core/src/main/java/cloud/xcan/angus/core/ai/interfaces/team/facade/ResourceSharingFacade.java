@@ -2,6 +2,8 @@ package cloud.xcan.angus.core.ai.interfaces.team.facade;
 
 import cloud.xcan.angus.core.ai.domain.ResourceType;
 import cloud.xcan.angus.core.ai.domain.StatisticsPeriod;
+import cloud.xcan.angus.core.ai.domain.team.resourcesharing.ResourceInfo;
+import cloud.xcan.angus.core.ai.domain.team.resourcesharing.SharePermission;
 import cloud.xcan.angus.core.ai.interfaces.team.facade.dto.ResourceSharingCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.team.facade.dto.ResourceSharingFindDto;
 import cloud.xcan.angus.core.ai.interfaces.team.facade.dto.ResourceSharingToggleDto;
@@ -11,6 +13,7 @@ import cloud.xcan.angus.core.ai.interfaces.team.facade.vo.ResourceSharingDetailV
 import cloud.xcan.angus.core.ai.interfaces.team.facade.vo.ResourceSharingListVo;
 import cloud.xcan.angus.core.ai.interfaces.team.facade.vo.ResourceSharingStatisticsVo;
 import cloud.xcan.angus.remote.PageResult;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -52,6 +55,11 @@ public interface ResourceSharingFacade {
    * 检查访问权限
    */
   ResourceAccessCheckVo checkAccess(Long resourceId, ResourceType resourceType);
+
+  /**
+   * 获取资源访问权限列表
+   */
+  Map<ResourceInfo, List<SharePermission>> getResourcePermissions(Long resourceId, ResourceType resourceType);
 
   /**
    * 获取统计数据
