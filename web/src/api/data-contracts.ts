@@ -6329,7 +6329,7 @@ export interface ActivityDetailVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultPageResultActivityDetailVo = ApiResult & {
+export type ApiPageResultActivityDetailVo = ApiResult & {
   /**
    * Business status code of the API response.
    * - 'S': Success
@@ -7302,12 +7302,6 @@ export enum GetWorkflowListParamsOrderSortEnum {
   DESC = "DESC",
 }
 
-/** Scope of information to query (BASIC or DETAIL). Interface performance optimization parameters, only valid for some interfaces */
-export enum GetWorkflowListParamsInfoScopeEnum {
-  BASIC = "BASIC",
-  DETAIL = "DETAIL",
-}
-
 /** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
 export enum GetWorkflowListParamsFilters0OpEnum {
   GREATER_THAN = "GREATER_THAN",
@@ -7382,12 +7376,6 @@ export enum GetResourceSharingListParamsOrderSortEnum {
   DESC = "DESC",
 }
 
-/** Scope of information to query (BASIC or DETAIL). Interface performance optimization parameters, only valid for some interfaces */
-export enum GetResourceSharingListParamsInfoScopeEnum {
-  BASIC = "BASIC",
-  DETAIL = "DETAIL",
-}
-
 /** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
 export enum GetResourceSharingListParamsFilters0OpEnum {
   GREATER_THAN = "GREATER_THAN",
@@ -7436,12 +7424,6 @@ export enum GetPromptListParamsOrderByEnum {
 export enum GetPromptListParamsOrderSortEnum {
   ASC = "ASC",
   DESC = "DESC",
-}
-
-/** Scope of information to query (BASIC or DETAIL). Interface performance optimization parameters, only valid for some interfaces */
-export enum GetPromptListParamsInfoScopeEnum {
-  BASIC = "BASIC",
-  DETAIL = "DETAIL",
 }
 
 /** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
@@ -7529,12 +7511,6 @@ export enum GetPluginListParamsOrderByEnum {
 export enum GetPluginListParamsOrderSortEnum {
   ASC = "ASC",
   DESC = "DESC",
-}
-
-/** Scope of information to query (BASIC or DETAIL). Interface performance optimization parameters, only valid for some interfaces */
-export enum GetPluginListParamsInfoScopeEnum {
-  BASIC = "BASIC",
-  DETAIL = "DETAIL",
 }
 
 /** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
@@ -7631,12 +7607,6 @@ export enum GetModelListParamsOrderSortEnum {
   DESC = "DESC",
 }
 
-/** Scope of information to query (BASIC or DETAIL). Interface performance optimization parameters, only valid for some interfaces */
-export enum GetModelListParamsInfoScopeEnum {
-  BASIC = "BASIC",
-  DETAIL = "DETAIL",
-}
-
 /** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
 export enum GetModelListParamsFilters0OpEnum {
   GREATER_THAN = "GREATER_THAN",
@@ -7698,12 +7668,6 @@ export enum GetKnowledgeBaseListParamsOrderByEnum {
 export enum GetKnowledgeBaseListParamsOrderSortEnum {
   ASC = "ASC",
   DESC = "DESC",
-}
-
-/** Scope of information to query (BASIC or DETAIL). Interface performance optimization parameters, only valid for some interfaces */
-export enum GetKnowledgeBaseListParamsInfoScopeEnum {
-  BASIC = "BASIC",
-  DETAIL = "DETAIL",
 }
 
 /** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
@@ -7773,12 +7737,6 @@ export enum GetDocumentListParamsOrderSortEnum {
   DESC = "DESC",
 }
 
-/** Scope of information to query (BASIC or DETAIL). Interface performance optimization parameters, only valid for some interfaces */
-export enum GetDocumentListParamsInfoScopeEnum {
-  BASIC = "BASIC",
-  DETAIL = "DETAIL",
-}
-
 /** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
 export enum GetDocumentListParamsFilters0OpEnum {
   GREATER_THAN = "GREATER_THAN",
@@ -7844,12 +7802,6 @@ export enum GetDatasetListParamsOrderByEnum {
 export enum GetDatasetListParamsOrderSortEnum {
   ASC = "ASC",
   DESC = "DESC",
-}
-
-/** Scope of information to query (BASIC or DETAIL). Interface performance optimization parameters, only valid for some interfaces */
-export enum GetDatasetListParamsInfoScopeEnum {
-  BASIC = "BASIC",
-  DETAIL = "DETAIL",
 }
 
 /** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
@@ -7921,12 +7873,6 @@ export enum GetApplicationListParamsOrderSortEnum {
   DESC = "DESC",
 }
 
-/** Scope of information to query (BASIC or DETAIL). Interface performance optimization parameters, only valid for some interfaces */
-export enum GetApplicationListParamsInfoScopeEnum {
-  BASIC = "BASIC",
-  DETAIL = "DETAIL",
-}
-
 /** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
 export enum GetApplicationListParamsFilters0OpEnum {
   GREATER_THAN = "GREATER_THAN",
@@ -7967,12 +7913,6 @@ export enum GetApplicationListParamsFilters1OpEnum {
 export enum GetExecutionLogsParamsOrderSortEnum {
   ASC = "ASC",
   DESC = "DESC",
-}
-
-/** Scope of information to query (BASIC or DETAIL). Interface performance optimization parameters, only valid for some interfaces */
-export enum GetExecutionLogsParamsInfoScopeEnum {
-  BASIC = "BASIC",
-  DETAIL = "DETAIL",
 }
 
 /** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
@@ -8083,12 +8023,6 @@ export enum GetDatasetDataListParamsOrderByEnum {
 export enum GetDatasetDataListParamsOrderSortEnum {
   ASC = "ASC",
   DESC = "DESC",
-}
-
-/** Scope of information to query (BASIC or DETAIL). Interface performance optimization parameters, only valid for some interfaces */
-export enum GetDatasetDataListParamsInfoScopeEnum {
-  BASIC = "BASIC",
-  DETAIL = "DETAIL",
 }
 
 /** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
@@ -8275,21 +8209,15 @@ export enum GetApiCallsTrendParamsGranularityEnum {
  * 排序字段
  * @example "activityDate"
  */
-export enum ActivityListParamsOrderByEnum {
+export enum ActivityListOrderByEnum {
   Id = "id",
   ActivityDate = "activityDate",
 }
 
 /** Specifies the direction of the sorting (ascending or descending) */
-export enum ActivityListParamsOrderSortEnum {
+export enum ActivityListOrderSortEnum {
   ASC = "ASC",
   DESC = "DESC",
-}
-
-/** Scope of information to query (BASIC or DETAIL). Interface performance optimization parameters, only valid for some interfaces */
-export enum ActivityListParamsInfoScopeEnum {
-  BASIC = "BASIC",
-  DETAIL = "DETAIL",
 }
 
 /** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
