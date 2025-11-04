@@ -24,11 +24,11 @@ import {
   BillingSubscription,
   PromptLibraryPage,
   Chat
-} from './components';
+} from './views';
 
-import { ThemeProvider } from './components/ui/ThemeProvider';
-import { LanguageProvider } from './components/ui/LanguageProvider';
-import { Toaster } from './components/ui/sonner';
+import { ThemeProvider } from '@/views/ui/ThemeProvider';
+import { LanguageProvider } from '@/views/ui/LanguageProvider';
+import { Toaster } from '@/views/ui/sonner';
 import { useState } from 'react';
 
 export default function App() {
