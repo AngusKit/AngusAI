@@ -3,7 +3,7 @@ module.exports = {
   testEnvironment: 'jsdom',
 
   // 设置文件
-  setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'],
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
 
   // 模块文件扩展名
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
@@ -24,7 +24,7 @@ module.exports = {
   },
 
   // 模块名称映射
-  moduleNameMapping: {
+  moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
     '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$':
@@ -52,7 +52,7 @@ module.exports = {
     '!src/**/*.stories.{ts,tsx}',
     '!src/**/*.test.{ts,tsx}',
     '!src/**/*.spec.{ts,tsx}',
-    '!src/setupTests.ts',
+    '!src/jest.setup.js',
     '!src/main.tsx',
     '!src/vite-env.d.ts',
   ],

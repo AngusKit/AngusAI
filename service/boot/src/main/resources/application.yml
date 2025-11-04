@@ -294,8 +294,15 @@ springdoc:
           }
           ```
     servers:
-      - url: "https://bj-c1-prod-apis.xcan.cloud/ai"
+      - url: "{env}.xcan.cloud/ai"
         description: "AngusAI Cloud Service API Endpoint"
+        variables:
+          env:
+            default: https://bj-c1-prod-apis
+            enum:
+              - http://dev-apis
+              - http://beta-apis
+              - https://bj-c1-prod-apis
 
 logging:
   config: classpath:spring-logback.xml
