@@ -2,8 +2,8 @@ import { PageQuery, ApiLocaleResult } from '@xcan-angus/infra';
 import {
     ActivityListOrderByEnum,
     ActivityDetailResult
-} from "./data-contracts.ts";
-import {HttpClient, RequestParams} from "./http-client.ts";
+} from "./DataContracts.ts";
+import {HttpClient, RequestParams} from "./HttpClient.ts";
 
 export class Activity<SecurityDataType = unknown> {
     http: HttpClient<SecurityDataType>;

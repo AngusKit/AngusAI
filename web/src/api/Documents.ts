@@ -8,8 +8,8 @@ import {
   KnowledgeBaseDocBatchDeleteDto,
   KnowledgeBaseDocSearchDto,
   KnowledgeBaseDocToggleDto,
-} from "./data-contracts.ts";
-import { ContentType, HttpClient, RequestParams } from "./http-client.ts";
+} from "./DataContracts.ts";
+import { ContentType, HttpClient, RequestParams } from "./HttpClient.ts";
 import {KnowledgeBaseDocStatusEnum, KnowledgeBaseDocTypeEnum} from "@/enums/enums.ts";
 
 export class Documents<SecurityDataType = unknown> {

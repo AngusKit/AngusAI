@@ -4,8 +4,8 @@ import {
   ApiKeyRevokeDto,
   ApiKeyDetailResult,
   ListApiKeyResult,
-} from "./data-contracts.ts";
-import { ContentType, HttpClient, RequestParams } from "./http-client.ts";
+} from "./DataContracts.ts";
+import { ContentType, HttpClient, RequestParams } from "./HttpClient.ts";
 
 export class Settings<SecurityDataType = unknown> {
   http: HttpClient<SecurityDataType>;

@@ -9,8 +9,8 @@ import {
   TokenUsageTrendResult,
   TopEndpointsResult,
 
-} from "./data-contracts.ts";
-import { HttpClient, RequestParams } from "./http-client.ts";
+} from "./DataContracts.ts";
+import { HttpClient, RequestParams } from "./HttpClient.ts";
 import {GranularityEnum, TimeRangeEnum} from "@/enums/enums.ts";
 
 export class Analytics<SecurityDataType = unknown> {

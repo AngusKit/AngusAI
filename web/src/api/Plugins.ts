@@ -9,8 +9,8 @@ import {
   PluginReviewCreateDto,
   PluginUpdateDto,
   PluginVerifyDto,
-} from "./data-contracts.ts";
-import { ContentType, HttpClient, RequestParams } from "./http-client.ts";
+} from "./DataContracts.ts";
+import { ContentType, HttpClient, RequestParams } from "./HttpClient.ts";
 import {PluginCategoryEnum, PluginStatusEnum, PluginTypeEnum, StatisticsPeriodEnum} from "@/enums/enums.ts";
 
 export class Plugins<SecurityDataType = unknown> {
