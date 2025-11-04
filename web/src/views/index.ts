@@ -34,18 +34,18 @@ export * from './plugins';
 export * from './shared';
 
 // APIColeection
-export * from './APICollection';
+export * from './apis';
 
 // chat
 export * from './chat';
 
 // PromptLibraryPage
-export * from './PromptLibraryPage';
+export * from './prompt';
 
 // workflow
 export * from './workflow';
 
 // VerctorStore
-export * from './VectorStore';
+export * from './vector';
 
 
