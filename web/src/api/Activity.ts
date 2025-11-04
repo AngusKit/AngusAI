@@ -1,8 +1,7 @@
-import { PageQuery } from '@xcan-angus/infra';
+import { PageQuery, ApiLocaleResult } from '@xcan-angus/infra';
 import {
     ActivityListOrderByEnum,
-    ApiPageResultActivityDetailVo,
-    ApiResultObject,
+    ApiPageResultActivityDetailVo
 } from "./data-contracts.ts";
 import {HttpClient, RequestParams} from "./http-client.ts";
 
@@ -57,7 +56,7 @@ export class Activity<SecurityDataType = unknown> {
     ) =>
         this.http.request<
             ApiPageResultActivityDetailVo,
-            ApiResultObject
+            ApiLocaleResult
         >({
             path: `/api/v1/activity`,
             method: "GET",

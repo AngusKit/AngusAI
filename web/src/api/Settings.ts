@@ -1,9 +1,9 @@
+import { PageQuery, ApiLocaleResult } from '@xcan-angus/infra';
 import {
   ApiKeyCreateDto,
   ApiKeyRevokeDto,
   ApiLocaleResultApiKeyDetailVo,
   ApiLocaleResultListApiKeyListVo,
-  ApiResultObject,
 } from "./data-contracts.ts";
 import { ContentType, HttpClient, RequestParams } from "./http-client.ts";
 
@@ -24,7 +24,7 @@ export class Settings<SecurityDataType = unknown> {
    * @secure
    */
   listApiKeys = (params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultListApiKeyListVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultListApiKeyListVo, ApiLocaleResult>({
       path: `/api/v1/settings/api-keys`,
       method: "GET",
       secure: true,
@@ -40,7 +40,7 @@ export class Settings<SecurityDataType = unknown> {
    * @secure
    */
   createApiKey = (data: ApiKeyCreateDto, params: RequestParams = {}) =>
-    this.http.request<ApiResultObject, ApiResultObject>({
+    this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `/api/v1/settings/api-keys`,
       method: "POST",
       body: data,
@@ -62,7 +62,7 @@ export class Settings<SecurityDataType = unknown> {
     data: ApiKeyRevokeDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiResultObject, ApiResultObject>({
+    this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `/api/v1/settings/api-keys/${id}/revoke`,
       method: "POST",
       body: data,
@@ -80,7 +80,7 @@ export class Settings<SecurityDataType = unknown> {
    * @secure
    */
   getApiKeyDetail = (id: number, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultApiKeyDetailVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultApiKeyDetailVo, ApiLocaleResult>({
       path: `/api/v1/settings/api-keys/${id}`,
       method: "GET",
       secure: true,
@@ -96,7 +96,7 @@ export class Settings<SecurityDataType = unknown> {
    * @secure
    */
   deleteApiKey = (id: number, params: RequestParams = {}) =>
-    this.http.request<ApiResultObject, ApiResultObject>({
+    this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `/api/v1/settings/api-keys/${id}`,
       method: "DELETE",
       secure: true,

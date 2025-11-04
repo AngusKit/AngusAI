@@ -1,8 +1,7 @@
-import { PageQuery } from '@xcan-angus/infra';
+import { PageQuery, ApiLocaleResult } from '@xcan-angus/infra';
 import {
   ApiLocaleResultKnowledgeBaseDetailVo,
   ApiLocaleResultPageResultKnowledgeBaseListVo,
-  ApiResultObject,
   GetKnowledgeBaseListOrderByEnum,
   GetKnowledgeBaseListParamsVisibilityEnum,
   KnowledgeBaseCreateDto,
@@ -36,7 +35,7 @@ export class KnowledgeBases<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultKnowledgeBaseDetailVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultKnowledgeBaseDetailVo, ApiLocaleResult>({
       path: `/api/v1/knowledge-bases/${id}/visibility`,
       method: "PUT",
       query: query,
@@ -57,7 +56,7 @@ export class KnowledgeBases<SecurityDataType = unknown> {
     data: KnowledgeBaseToggleDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultKnowledgeBaseDetailVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultKnowledgeBaseDetailVo, ApiLocaleResult>({
       path: `/api/v1/knowledge-bases/${id}/toggle`,
       method: "PUT",
       body: data,
@@ -112,7 +111,7 @@ export class KnowledgeBases<SecurityDataType = unknown> {
   ) =>
     this.http.request<
       ApiLocaleResultPageResultKnowledgeBaseListVo,
-      ApiResultObject
+      ApiLocaleResult
     >({
       path: `/api/v1/knowledge-bases`,
       method: "GET",
@@ -133,7 +132,7 @@ export class KnowledgeBases<SecurityDataType = unknown> {
     data: KnowledgeBaseCreateDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiResultObject, ApiResultObject>({
+    this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `/api/v1/knowledge-bases`,
       method: "POST",
       body: data,
@@ -151,7 +150,7 @@ export class KnowledgeBases<SecurityDataType = unknown> {
    * @secure
    */
   getKnowledgeBaseDetail = (id: number, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultKnowledgeBaseDetailVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultKnowledgeBaseDetailVo, ApiLocaleResult>({
       path: `/api/v1/knowledge-bases/${id}`,
       method: "GET",
       secure: true,
@@ -167,7 +166,7 @@ export class KnowledgeBases<SecurityDataType = unknown> {
    * @secure
    */
   deleteKnowledgeBase = (id: number, params: RequestParams = {}) =>
-    this.http.request<ApiResultObject, ApiResultObject>({
+    this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `/api/v1/knowledge-bases/${id}`,
       method: "DELETE",
       secure: true,
@@ -187,7 +186,7 @@ export class KnowledgeBases<SecurityDataType = unknown> {
     data: KnowledgeBaseUpdateDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultKnowledgeBaseDetailVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultKnowledgeBaseDetailVo, ApiLocaleResult>({
       path: `/api/v1/knowledge-bases/${id}`,
       method: "PATCH",
       body: data,

@@ -1,8 +1,7 @@
-import { PageQuery } from '@xcan-angus/infra';
+import { PageQuery, ApiLocaleResult } from '@xcan-angus/infra';
 import {
   ApiLocaleResultApplicationDetailVo,
   ApiLocaleResultApplicationStatisticsVo,
-  ApiResultObject,
   ApplicationConfig,
   ApplicationCreateDto,
   ApplicationDuplicateDto,
@@ -39,7 +38,7 @@ export class Applications<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultApplicationDetailVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultApplicationDetailVo, ApiLocaleResult>({
       path: `/api/v1/applications/${id}/status`,
       method: "PUT",
       query: query,
@@ -60,7 +59,7 @@ export class Applications<SecurityDataType = unknown> {
     data: ApplicationConfig,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultApplicationDetailVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultApplicationDetailVo, ApiLocaleResult>({
       path: `/api/v1/applications/${id}/config`,
       method: "PUT",
       body: data,
@@ -99,7 +98,7 @@ export class Applications<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiResultObject, ApiResultObject>({
+    this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `/api/v1/applications`,
       method: "GET",
       query: query,
@@ -119,7 +118,7 @@ export class Applications<SecurityDataType = unknown> {
     data: ApplicationCreateDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiResultObject, ApiResultObject>({
+    this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `/api/v1/applications`,
       method: "POST",
       body: data,
@@ -141,7 +140,7 @@ export class Applications<SecurityDataType = unknown> {
     data: ApplicationShareDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultApplicationDetailVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultApplicationDetailVo, ApiLocaleResult>({
       path: `/api/v1/applications/${id}/share`,
       method: "POST",
       body: data,
@@ -163,7 +162,7 @@ export class Applications<SecurityDataType = unknown> {
     data: ApplicationDuplicateDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiResultObject, ApiResultObject>({
+    this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `/api/v1/applications/${id}/duplicate`,
       method: "POST",
       body: data,
@@ -181,7 +180,7 @@ export class Applications<SecurityDataType = unknown> {
    * @secure
    */
   getApplicationDetail = (id: number, params: RequestParams = {}) =>
-    this.http.request<ApiResultObject, ApiResultObject>({
+    this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `/api/v1/applications/${id}`,
       method: "GET",
       secure: true,
@@ -197,7 +196,7 @@ export class Applications<SecurityDataType = unknown> {
    * @secure
    */
   deleteApplication = (id: number, params: RequestParams = {}) =>
-    this.http.request<ApiResultObject, ApiResultObject>({
+    this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `/api/v1/applications/${id}`,
       method: "DELETE",
       secure: true,
@@ -217,7 +216,7 @@ export class Applications<SecurityDataType = unknown> {
     data: ApplicationUpdateDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultApplicationDetailVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultApplicationDetailVo, ApiLocaleResult>({
       path: `/api/v1/applications/${id}`,
       method: "PATCH",
       body: data,
@@ -246,7 +245,7 @@ export class Applications<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultApplicationStatisticsVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultApplicationStatisticsVo, ApiLocaleResult>({
       path: `/api/v1/applications/${id}/statistics`,
       method: "GET",
       query: query,

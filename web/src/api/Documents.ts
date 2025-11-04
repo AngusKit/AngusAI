@@ -1,10 +1,9 @@
-import { PageQuery } from '@xcan-angus/infra';
+import { PageQuery, ApiLocaleResult } from '@xcan-angus/infra';
 import {
   ApiLocaleResultKnowledgeBaseDocListVo,
   ApiLocaleResultKnowledgeBaseDocStatusVo,
   ApiLocaleResultListKnowledgeBaseDocSearchResultVo,
   ApiLocaleResultPageResultKnowledgeBaseDocListVo,
-  ApiResultObject,
   GetDocumentListOrderByEnum,
   GetDocumentListParamsStatusEnum,
   GetDocumentListParamsTypeEnum,
@@ -36,7 +35,7 @@ export class Documents<SecurityDataType = unknown> {
     data: KnowledgeBaseDocToggleDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultKnowledgeBaseDocListVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultKnowledgeBaseDocListVo, ApiLocaleResult>({
       path: `/api/v1/documents/${documentId}/knowledge-bases/${knowledgeBaseId}/toggle`,
       method: "PUT",
       body: data,
@@ -58,7 +57,7 @@ export class Documents<SecurityDataType = unknown> {
     knowledgeBaseId: number,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultKnowledgeBaseDocStatusVo, ApiResultObject>(
+    this.http.request<ApiLocaleResultKnowledgeBaseDocStatusVo, ApiLocaleResult>(
       {
         path: `/api/v1/documents/${documentId}/knowledge-bases/${knowledgeBaseId}/reprocess`,
         method: "POST",
@@ -91,7 +90,7 @@ export class Documents<SecurityDataType = unknown> {
   ) =>
     this.http.request<
       ApiLocaleResultPageResultKnowledgeBaseDocListVo,
-      ApiResultObject
+      ApiLocaleResult
     >({
       path: `/api/v1/documents/knowledge-bases/${knowledgeBaseId}`,
       method: "GET",
@@ -116,7 +115,7 @@ export class Documents<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiResultObject, ApiResultObject>({
+    this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `/api/v1/documents/knowledge-bases/${knowledgeBaseId}`,
       method: "POST",
       query: query,
@@ -139,7 +138,7 @@ export class Documents<SecurityDataType = unknown> {
   ) =>
     this.http.request<
       ApiLocaleResultListKnowledgeBaseDocSearchResultVo,
-      ApiResultObject
+      ApiLocaleResult
     >({
       path: `/api/v1/documents/knowledge-bases/${knowledgeBaseId}/search`,
       method: "POST",
@@ -162,7 +161,7 @@ export class Documents<SecurityDataType = unknown> {
     data: KnowledgeBaseDocBatchDeleteDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<void, ApiResultObject>({
+    this.http.request<void, ApiLocaleResult>({
       path: `/api/v1/documents/knowledge-bases/${knowledgeBaseId}/batch-delete`,
       method: "POST",
       body: data,
@@ -184,7 +183,7 @@ export class Documents<SecurityDataType = unknown> {
     knowledgeBaseId: number,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiResultObject, ApiResultObject>({
+    this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `/api/v1/documents/${documentId}/knowledge-bases/${knowledgeBaseId}`,
       method: "DELETE",
       secure: true,

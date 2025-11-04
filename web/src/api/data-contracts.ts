@@ -1,115 +1,4 @@
-/* eslint-disable */
-/* tslint:disable */
-// @ts-nocheck
-/*
- * ---------------------------------------------------------------
- * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
- * ##                                                           ##
- * ## AUTHOR: acacode                                           ##
- * ## SOURCE: https://github.com/acacode/swagger-typescript-api ##
- * ---------------------------------------------------------------
- */
-
-/**
- * Represents a standard API response structure, providing status, message, data, timestamp, and extensible fields.
- *
- * Example usage:
- * ```ts
- * const result: ApiResult = {
- *   code: 'S',
- *   msg: 'Operation successful',
- *   data: { id: 1, name: 'test' },
- *   datetime: new Date(),
- *   ext: { traceId: 'abc123' }
- * };
- * ```
- */
-export interface ApiResultObject {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
-  /** Actual response data or error details. */
-  data?: object;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
-}
-
-/** The API response result of supporting international message. */
-export type ApiLocaleResultWorkflowDetailVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
-  /** Actual response data or error details. */
-  data?: WorkflowDetailVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
-};
-
-/**
- * Represents a standard API response structure, providing status, message, data, timestamp, and extensible fields.
- *
- * Example usage:
- * ```ts
- * const result: ApiResult = {
- *   code: 'S',
- *   msg: 'Operation successful',
- *   data: { id: 1, name: 'test' },
- *   datetime: new Date(),
- *   ext: { traceId: 'abc123' }
- * };
- * ```
- */
-export interface ApiResult {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
-  /** Actual response data or error details. */
-  data?: object;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
-}
+import { ApiLocaleResult, TenantAuditingVo } from '@xcan-angus/infra';
 
 export interface ExecutionStats {
   /** @format int64 */
@@ -125,36 +14,14 @@ export interface ExecutionStats {
   lastExecutionStatus?: string;
 }
 
+/** The API response result of supporting international message. */
+export type ApiResultWorkflowDetailVo = ApiLocaleResult & {
+  /** Actual response data or error details. */
+  data?: WorkflowDetailVo;
+};
+
 /** 工作流详情响应 */
-export interface WorkflowDetailVo {
-  /**
-   * 租户ID
-   * @format int64
-   */
-  tenantId?: number;
-  /**
-   * 创建者ID
-   * @format int64
-   */
-  createdBy?: number;
-  /** 创建者姓名 */
-  creator?: string;
-  /**
-   * 创建时间
-   * @format date-time
-   */
-  createdDate?: string;
-  /**
-   * 最后修改人ID
-   * @format int64
-   */
-  modifiedBy?: number;
-  modifier?: string;
-  /**
-   * 最后修改时间
-   * @format date-time
-   */
-  modifiedDate?: string;
+export interface WorkflowDetailVo extends TenantAuditingVo {
   /**
    * 工作流ID
    * @format int64
@@ -210,59 +77,12 @@ export interface TeamSettingsDto {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultTeamSettingsVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultTeamSettingsVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: TeamSettingsVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
-export interface TeamSettingsVo {
-  /**
-   * 租户ID
-   * @format int64
-   */
-  tenantId?: number;
-  /**
-   * 创建者ID
-   * @format int64
-   */
-  createdBy?: number;
-  /** 创建者姓名 */
-  creator?: string;
-  /**
-   * 创建时间
-   * @format date-time
-   */
-  createdDate?: string;
-  /**
-   * 最后修改人ID
-   * @format int64
-   */
-  modifiedBy?: number;
-  modifier?: string;
-  /**
-   * 最后修改时间
-   * @format date-time
-   */
-  modifiedDate?: string;
+export interface TeamSettingsVo extends TenantAuditingVo {
   /**
    * 团队ID
    * @format int64
@@ -292,28 +112,9 @@ export interface ResourceSharingToggleDto {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultResourceSharingDetailVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultResourceSharingDetailVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: ResourceSharingDetailVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 成员信息 */
@@ -360,35 +161,7 @@ export interface OwnerVo {
 }
 
 /** 资源共享详情 */
-export interface ResourceSharingDetailVo {
-  /**
-   * 租户ID
-   * @format int64
-   */
-  tenantId?: number;
-  /**
-   * 创建者ID
-   * @format int64
-   */
-  createdBy?: number;
-  /** 创建者姓名 */
-  creator?: string;
-  /**
-   * 创建时间
-   * @format date-time
-   */
-  createdDate?: string;
-  /**
-   * 最后修改人ID
-   * @format int64
-   */
-  modifiedBy?: number;
-  modifier?: string;
-  /**
-   * 最后修改时间
-   * @format date-time
-   */
-  modifiedDate?: string;
+export interface ResourceSharingDetailVo extends TenantAuditingVo {
   /**
    * 共享ID
    * @format int64
@@ -431,60 +204,13 @@ export interface ResourceSharingUpdateDto {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultPluginDetailVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultPluginDetailVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: PluginDetailVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 插件详情 */
-export interface PluginDetailVo {
-  /**
-   * 租户ID
-   * @format int64
-   */
-  tenantId?: number;
-  /**
-   * 创建者ID
-   * @format int64
-   */
-  createdBy?: number;
-  /** 创建者姓名 */
-  creator?: string;
-  /**
-   * 创建时间
-   * @format date-time
-   */
-  createdDate?: string;
-  /**
-   * 最后修改人ID
-   * @format int64
-   */
-  modifiedBy?: number;
-  modifier?: string;
-  /**
-   * 最后修改时间
-   * @format date-time
-   */
-  modifiedDate?: string;
+export interface PluginDetailVo extends TenantAuditingVo {
   /**
    * 插件ID
    * @format int64
@@ -691,28 +417,9 @@ export interface ModelConfig {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultModelDetailVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultModelDetailVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: ModelDetailVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 近一月增长趋势 */
@@ -769,35 +476,7 @@ export interface ModelAccessLimit {
 }
 
 /** 模型详情响应 */
-export interface ModelDetailVo {
-  /**
-   * 租户ID
-   * @format int64
-   */
-  tenantId?: number;
-  /**
-   * 创建者ID
-   * @format int64
-   */
-  createdBy?: number;
-  /** 创建者姓名 */
-  creator?: string;
-  /**
-   * 创建时间
-   * @format date-time
-   */
-  createdDate?: string;
-  /**
-   * 最后修改人ID
-   * @format int64
-   */
-  modifiedBy?: number;
-  modifier?: string;
-  /**
-   * 最后修改时间
-   * @format date-time
-   */
-  modifiedDate?: string;
+export interface ModelDetailVo extends TenantAuditingVo {
   /**
    * 模型ID
    * @format int64
@@ -943,28 +622,9 @@ export interface TodayGrowthTrend {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultKnowledgeBaseDetailVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultKnowledgeBaseDetailVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: KnowledgeBaseDetailVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 知识库配置信息 */
@@ -989,35 +649,7 @@ export interface KnowledgeBaseConfigVo {
 }
 
 /** 知识库详情视图对象 */
-export interface KnowledgeBaseDetailVo {
-  /**
-   * 租户ID
-   * @format int64
-   */
-  tenantId?: number;
-  /**
-   * 创建者ID
-   * @format int64
-   */
-  createdBy?: number;
-  /** 创建者姓名 */
-  creator?: string;
-  /**
-   * 创建时间
-   * @format date-time
-   */
-  createdDate?: string;
-  /**
-   * 最后修改人ID
-   * @format int64
-   */
-  modifiedBy?: number;
-  modifier?: string;
-  /**
-   * 最后修改时间
-   * @format date-time
-   */
-  modifiedDate?: string;
+export interface KnowledgeBaseDetailVo extends TenantAuditingVo {
   /**
    * 知识库ID
    * @format int64
@@ -1123,60 +755,13 @@ export interface KnowledgeBaseDocToggleDto {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultKnowledgeBaseDocListVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultKnowledgeBaseDocListVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: KnowledgeBaseDocListVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 文档列表视图对象 */
-export interface KnowledgeBaseDocListVo {
-  /**
-   * 租户ID
-   * @format int64
-   */
-  tenantId?: number;
-  /**
-   * 创建者ID
-   * @format int64
-   */
-  createdBy?: number;
-  /** 创建者姓名 */
-  creator?: string;
-  /**
-   * 创建时间
-   * @format date-time
-   */
-  createdDate?: string;
-  /**
-   * 最后修改人ID
-   * @format int64
-   */
-  modifiedBy?: number;
-  modifier?: string;
-  /**
-   * 最后修改时间
-   * @format date-time
-   */
-  modifiedDate?: string;
+export interface KnowledgeBaseDocListVo extends TenantAuditingVo {
   /**
    * 文档ID
    * @format int64
@@ -1225,28 +810,9 @@ export interface KnowledgeBaseDocListVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultDatasetDetailVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultDatasetDetailVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: DatasetDetailVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 数据集数据统计响应 */
@@ -1268,35 +834,7 @@ export interface DatasetDataStatisticsVo {
 }
 
 /** 数据集详情响应 */
-export interface DatasetDetailVo {
-  /**
-   * 租户ID
-   * @format int64
-   */
-  tenantId?: number;
-  /**
-   * 创建者ID
-   * @format int64
-   */
-  createdBy?: number;
-  /** 创建者姓名 */
-  creator?: string;
-  /**
-   * 创建时间
-   * @format date-time
-   */
-  createdDate?: string;
-  /**
-   * 最后修改人ID
-   * @format int64
-   */
-  modifiedBy?: number;
-  modifier?: string;
-  /**
-   * 最后修改时间
-   * @format date-time
-   */
-  modifiedDate?: string;
+export interface DatasetDetailVo extends TenantAuditingVo {
   /**
    * 数据集ID
    * @format int64
@@ -1377,53 +915,15 @@ export interface DataSourceUpdateDto {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultDatasourceConfigVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultDatasourceConfigVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: DatasourceConfigVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultApplicationDetailVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultApplicationDetailVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: ApplicationDetailVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 应用配置 */
@@ -1445,35 +945,7 @@ export interface ApplicationConfigVo {
 }
 
 /** 应用详情 */
-export interface ApplicationDetailVo {
-  /**
-   * 租户ID
-   * @format int64
-   */
-  tenantId?: number;
-  /**
-   * 创建者ID
-   * @format int64
-   */
-  createdBy?: number;
-  /** 创建者姓名 */
-  creator?: string;
-  /**
-   * 创建时间
-   * @format date-time
-   */
-  createdDate?: string;
-  /**
-   * 最后修改人ID
-   * @format int64
-   */
-  modifiedBy?: number;
-  modifier?: string;
-  /**
-   * 最后修改时间
-   * @format date-time
-   */
-  modifiedDate?: string;
+export interface ApplicationDetailVo extends TenantAuditingVo {
   /**
    * 应用ID
    * @format int64
@@ -1808,28 +1280,9 @@ export interface WorkflowExecuteDto {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultWorkflowExecuteResultVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultWorkflowExecuteResultVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: WorkflowExecuteResultVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 工作流执行结果响应 */
@@ -1930,35 +1383,7 @@ export interface AuthorizedResource {
 }
 
 /** API密钥详情 */
-export interface ApiKeyDetailVo {
-  /**
-   * 租户ID
-   * @format int64
-   */
-  tenantId?: number;
-  /**
-   * 创建者ID
-   * @format int64
-   */
-  createdBy?: number;
-  /** 创建者姓名 */
-  creator?: string;
-  /**
-   * 创建时间
-   * @format date-time
-   */
-  createdDate?: string;
-  /**
-   * 最后修改人ID
-   * @format int64
-   */
-  modifiedBy?: number;
-  modifier?: string;
-  /**
-   * 最后修改时间
-   * @format date-time
-   */
-  modifiedDate?: string;
+export interface ApiKeyDetailVo extends TenantAuditingVo {
   /**
    * 密钥ID
    * @format int64
@@ -2021,28 +1446,9 @@ export interface ApiKeyDetailVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultApiKeyDetailVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultApiKeyDetailVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: ApiKeyDetailVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 授权资源 */
@@ -2106,60 +1512,13 @@ export interface PromptCreateDto {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultPromptDetailVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultPromptDetailVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: PromptDetailVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 提示词详情 */
-export interface PromptDetailVo {
-  /**
-   * 租户ID
-   * @format int64
-   */
-  tenantId?: number;
-  /**
-   * 创建者ID
-   * @format int64
-   */
-  createdBy?: number;
-  /** 创建者姓名 */
-  creator?: string;
-  /**
-   * 创建时间
-   * @format date-time
-   */
-  createdDate?: string;
-  /**
-   * 最后修改人ID
-   * @format int64
-   */
-  modifiedBy?: number;
-  modifier?: string;
-  /**
-   * 最后修改时间
-   * @format date-time
-   */
-  modifiedDate?: string;
+export interface PromptDetailVo extends TenantAuditingVo {
   /**
    * ID
    * @format int64
@@ -2218,28 +1577,9 @@ export interface PromptCategoryCreateDto {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultPromptCategoryVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultPromptCategoryVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: PromptCategoryVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 分类详情 */
@@ -2362,28 +1702,9 @@ export interface PluginReviewCreateDto {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultPluginReviewVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultPluginReviewVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: PluginReviewVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 插件评级记录 */
@@ -2539,28 +1860,9 @@ export interface KnowledgeBaseCreateDto {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultKnowledgeBaseDocStatusVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultKnowledgeBaseDocStatusVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: KnowledgeBaseDocStatusVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 文档状态视图对象 */
@@ -2593,28 +1895,9 @@ export interface KnowledgeBaseDocStatusVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultListKnowledgeBaseDocListVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultListKnowledgeBaseDocListVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: KnowledgeBaseDocListVo[];
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 文档检索请求参数 */
@@ -2636,28 +1919,9 @@ export interface KnowledgeBaseDocSearchDto {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultListKnowledgeBaseDocSearchResultVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultListKnowledgeBaseDocSearchResultVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: KnowledgeBaseDocSearchResultVo[];
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 文档检索结果 */
@@ -2736,60 +2000,13 @@ export interface DatasetCreateDto {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultListDatasetDataListVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultListDatasetDataListVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: DatasetDataListVo[];
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 数据集数据列表项响应 */
-export interface DatasetDataListVo {
-  /**
-   * 租户ID
-   * @format int64
-   */
-  tenantId?: number;
-  /**
-   * 创建者ID
-   * @format int64
-   */
-  createdBy?: number;
-  /** 创建者姓名 */
-  creator?: string;
-  /**
-   * 创建时间
-   * @format date-time
-   */
-  createdDate?: string;
-  /**
-   * 最后修改人ID
-   * @format int64
-   */
-  modifiedBy?: number;
-  modifier?: string;
-  /**
-   * 最后修改时间
-   * @format date-time
-   */
-  modifiedDate?: string;
+export interface DatasetDataListVo extends TenantAuditingVo {
   /**
    * 数据ID
    * @format int64
@@ -2811,28 +2028,9 @@ export interface DatasetDataListVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultListSyncDataVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultListSyncDataVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: SyncDataVo[];
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 同步结果响应 */
@@ -2872,28 +2070,9 @@ export interface DatasourceConnectionTestDto {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultDatasourceConnectionTestVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultDatasourceConnectionTestVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: DatasourceConnectionTestVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 连接测试响应 */
@@ -2974,32 +2153,13 @@ export interface SessionCreateDto {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultSessionDetailVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultSessionDetailVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: SessionDetailVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 会话详情视图 */
-export interface SessionDetailVo {
+export interface SessionDetailVo extends TenantAuditingVo {
   /**
    * 会话ID
    * @format int64
@@ -3030,48 +2190,12 @@ export interface SessionDetailVo {
   messageCount?: number;
   /** 是否收藏 */
   isStarred?: boolean;
-  /**
-   * 创建时间
-   * @format date-time
-   */
-  createdDate?: string;
-  /**
-   * 最后修改时间
-   * @format date-time
-   */
-  modifiedDate?: string;
-  /**
-   * 创建人ID
-   * @format int64
-   */
-  createdBy?: number;
-  /** 创建人姓名 */
-  createdByName?: string;
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultMessageVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultMessageVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: MessageVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 export interface MessageAttachment {
@@ -3139,28 +2263,9 @@ export interface MessageSendDto {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultMessageSendVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultMessageSendVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: MessageSendVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 发送消息响应 */
@@ -3184,31 +2289,6 @@ export interface SseEmitter {
   timeout?: number;
 }
 
-/** The API response result of supporting international message. */
-export type ApiLocaleResultString = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
-  /** Actual response data or error details. */
-  data?: string;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
-};
-
 /** 批量删除会话请求 */
 export interface SessionBatchDeleteDto {
   /** 会话ID列表 */
@@ -3216,56 +2296,9 @@ export interface SessionBatchDeleteDto {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultInteger = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
-  /**
-   * Actual response data or error details.
-   * @format int32
-   */
-  data?: number;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
-};
-
-/** The API response result of supporting international message. */
-export type ApiLocaleResultAttachmentUploadVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultAttachmentUploadVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: AttachmentUploadVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 附件上传响应 */
@@ -3613,28 +2646,9 @@ export interface ApplicationUpdateDto {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultPageResultWorkflowListVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultPageResultWorkflowListVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: PageResultWorkflowListVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 export interface PageResultWorkflowListVo {
@@ -3649,35 +2663,7 @@ export interface PageResultWorkflowListVo {
 }
 
 /** 工作流列表项响应 */
-export interface WorkflowListVo {
-  /**
-   * 租户ID
-   * @format int64
-   */
-  tenantId?: number;
-  /**
-   * 创建者ID
-   * @format int64
-   */
-  createdBy?: number;
-  /** 创建者姓名 */
-  creator?: string;
-  /**
-   * 创建时间
-   * @format date-time
-   */
-  createdDate?: string;
-  /**
-   * 最后修改人ID
-   * @format int64
-   */
-  modifiedBy?: number;
-  modifier?: string;
-  /**
-   * 最后修改时间
-   * @format date-time
-   */
-  modifiedDate?: string;
+export interface WorkflowListVo extends TenantAuditingVo {
   /**
    * 工作流ID
    * @format int64
@@ -3709,28 +2695,9 @@ export interface WorkflowListVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultWorkflowStatisticsVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultWorkflowStatisticsVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: WorkflowStatisticsVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 工作流统计响应 */
@@ -3746,28 +2713,9 @@ export interface WorkflowStatisticsVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultExecutionDetailVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultExecutionDetailVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: ExecutionDetailVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 执行详情响应 */
@@ -3809,28 +2757,9 @@ export interface ExecutionDetailVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultPageResultExecutionLogVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultPageResultExecutionLogVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: PageResultExecutionLogVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 执行日志响应 */
@@ -3889,28 +2818,9 @@ export interface PageResultExecutionLogVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultPageResultResourceSharingListVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultPageResultResourceSharingListVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: PageResultResourceSharingListVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 export interface PageResultResourceSharingListVo {
@@ -3925,35 +2835,7 @@ export interface PageResultResourceSharingListVo {
 }
 
 /** 资源共享列表项 */
-export interface ResourceSharingListVo {
-  /**
-   * 租户ID
-   * @format int64
-   */
-  tenantId?: number;
-  /**
-   * 创建者ID
-   * @format int64
-   */
-  createdBy?: number;
-  /** 创建者姓名 */
-  creator?: string;
-  /**
-   * 创建时间
-   * @format date-time
-   */
-  createdDate?: string;
-  /**
-   * 最后修改人ID
-   * @format int64
-   */
-  modifiedBy?: number;
-  modifier?: string;
-  /**
-   * 最后修改时间
-   * @format date-time
-   */
-  modifiedDate?: string;
+export interface ResourceSharingListVo extends TenantAuditingVo {
   /**
    * 共享ID
    * @format int64
@@ -4029,28 +2911,9 @@ export interface AccessStatisticsVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultResourceSharingStatisticsVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultResourceSharingStatisticsVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: ResourceSharingStatisticsVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 资源共享统计 */
@@ -4093,28 +2956,9 @@ export interface ViewTrendVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultResourceAccessCheckVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultResourceAccessCheckVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: ResourceAccessCheckVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 访问权限检查结果 */
@@ -4133,63 +2977,15 @@ export interface ResourceAccessCheckVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultMapResourceInfoListSharePermission = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultMapResourceInfoListSharePermission = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: Record<
-    string,
-    ApiLocaleResultMapResourceInfoListSharePermissionDataEnum[]
+    string, ApiLocaleResultMapResourceInfoListSharePermissionDataEnum[]
   >;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** API密钥列表项 */
-export interface ApiKeyListVo {
-  /**
-   * 租户ID
-   * @format int64
-   */
-  tenantId?: number;
-  /**
-   * 创建者ID
-   * @format int64
-   */
-  createdBy?: number;
-  /** 创建者姓名 */
-  creator?: string;
-  /**
-   * 创建时间
-   * @format date-time
-   */
-  createdDate?: string;
-  /**
-   * 最后修改人ID
-   * @format int64
-   */
-  modifiedBy?: number;
-  modifier?: string;
-  /**
-   * 最后修改时间
-   * @format date-time
-   */
-  modifiedDate?: string;
+export interface ApiKeyListVo extends TenantAuditingVo {
   /**
    * 密钥ID
    * @format int64
@@ -4242,53 +3038,15 @@ export interface ApiKeyListVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultListApiKeyListVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultListApiKeyListVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: ApiKeyListVo[];
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultPageResultPromptListVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultPageResultPromptListVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: PageResultPromptListVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 export interface PageResultPromptListVo {
@@ -4303,35 +3061,7 @@ export interface PageResultPromptListVo {
 }
 
 /** 提示词列表项 */
-export interface PromptListVo {
-  /**
-   * 租户ID
-   * @format int64
-   */
-  tenantId?: number;
-  /**
-   * 创建者ID
-   * @format int64
-   */
-  createdBy?: number;
-  /** 创建者姓名 */
-  creator?: string;
-  /**
-   * 创建时间
-   * @format date-time
-   */
-  createdDate?: string;
-  /**
-   * 最后修改人ID
-   * @format int64
-   */
-  modifiedBy?: number;
-  modifier?: string;
-  /**
-   * 最后修改时间
-   * @format date-time
-   */
-  modifiedDate?: string;
+export interface PromptListVo extends TenantAuditingVo {
   /**
    * ID
    * @format int64
@@ -4357,53 +3087,15 @@ export interface PromptListVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultListPromptCategoryVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultListPromptCategoryVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: PromptCategoryVo[];
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultPageResultPluginListVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultPageResultPluginListVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: PageResultPluginListVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 export interface PageResultPluginListVo {
@@ -4418,35 +3110,7 @@ export interface PageResultPluginListVo {
 }
 
 /** 插件列表项 */
-export interface PluginListVo {
-  /**
-   * 租户ID
-   * @format int64
-   */
-  tenantId?: number;
-  /**
-   * 创建者ID
-   * @format int64
-   */
-  createdBy?: number;
-  /** 创建者姓名 */
-  creator?: string;
-  /**
-   * 创建时间
-   * @format date-time
-   */
-  createdDate?: string;
-  /**
-   * 最后修改人ID
-   * @format int64
-   */
-  modifiedBy?: number;
-  modifier?: string;
-  /**
-   * 最后修改时间
-   * @format date-time
-   */
-  modifiedDate?: string;
+export interface PluginListVo extends TenantAuditingVo {
   /**
    * 插件ID
    * @format int64
@@ -4513,53 +3177,15 @@ export interface PluginListVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultListPluginReviewVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultListPluginReviewVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: PluginReviewVo[];
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultPluginStatisticsVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultPluginStatisticsVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: PluginStatisticsVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 分类统计 */
@@ -4662,60 +3288,13 @@ export interface TrendingPlugin {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultPageResultModelListVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultPageResultModelListVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: PageResultModelListVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 模型列表项响应 */
-export interface ModelListVo {
-  /**
-   * 租户ID
-   * @format int64
-   */
-  tenantId?: number;
-  /**
-   * 创建者ID
-   * @format int64
-   */
-  createdBy?: number;
-  /** 创建者姓名 */
-  creator?: string;
-  /**
-   * 创建时间
-   * @format date-time
-   */
-  createdDate?: string;
-  /**
-   * 最后修改人ID
-   * @format int64
-   */
-  modifiedBy?: number;
-  modifier?: string;
-  /**
-   * 最后修改时间
-   * @format date-time
-   */
-  modifiedDate?: string;
+export interface ModelListVo extends TenantAuditingVo {
   /**
    * 模型ID
    * @format int64
@@ -4747,28 +3326,9 @@ export interface PageResultModelListVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultModelStatisticsVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultModelStatisticsVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: ModelStatisticsVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 模型统计响应 */
@@ -4830,60 +3390,13 @@ export interface ModelStatisticsVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultPageResultKnowledgeBaseListVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultPageResultKnowledgeBaseListVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: PageResultKnowledgeBaseListVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 知识库列表视图对象 */
-export interface KnowledgeBaseListVo {
-  /**
-   * 租户ID
-   * @format int64
-   */
-  tenantId?: number;
-  /**
-   * 创建者ID
-   * @format int64
-   */
-  createdBy?: number;
-  /** 创建者姓名 */
-  creator?: string;
-  /**
-   * 创建时间
-   * @format date-time
-   */
-  createdDate?: string;
-  /**
-   * 最后修改人ID
-   * @format int64
-   */
-  modifiedBy?: number;
-  modifier?: string;
-  /**
-   * 最后修改时间
-   * @format date-time
-   */
-  modifiedDate?: string;
+export interface KnowledgeBaseListVo extends TenantAuditingVo {
   /**
    * 知识库ID
    * @format int64
@@ -4950,28 +3463,9 @@ export interface PageResultKnowledgeBaseListVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultPageResultKnowledgeBaseDocListVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultPageResultKnowledgeBaseDocListVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: PageResultKnowledgeBaseDocListVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 export interface PageResultKnowledgeBaseDocListVo {
@@ -4986,60 +3480,13 @@ export interface PageResultKnowledgeBaseDocListVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultPageResultDatasetListVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultPageResultDatasetListVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: PageResultDatasetListVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 数据集列表项响应 */
-export interface DatasetListVo {
-  /**
-   * 租户ID
-   * @format int64
-   */
-  tenantId?: number;
-  /**
-   * 创建者ID
-   * @format int64
-   */
-  createdBy?: number;
-  /** 创建者姓名 */
-  creator?: string;
-  /**
-   * 创建时间
-   * @format date-time
-   */
-  createdDate?: string;
-  /**
-   * 最后修改人ID
-   * @format int64
-   */
-  modifiedBy?: number;
-  modifier?: string;
-  /**
-   * 最后修改时间
-   * @format date-time
-   */
-  modifiedDate?: string;
+export interface DatasetListVo extends TenantAuditingVo {
   /**
    * 数据集ID
    * @format int64
@@ -5079,28 +3526,9 @@ export interface PageResultDatasetListVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultDatasourceTableDataPreviewVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultDatasourceTableDataPreviewVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: DatasourceTableDataPreviewVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 表数据预览响应 */
@@ -5123,28 +3551,9 @@ export interface DatasourceTableDataPreviewVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultPageResultDatasetDataListVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultPageResultDatasetDataListVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: PageResultDatasetDataListVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 export interface PageResultDatasetDataListVo {
@@ -5159,28 +3568,9 @@ export interface PageResultDatasetDataListVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultDatasetStatisticsVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultDatasetStatisticsVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: DatasetStatisticsVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 数据集统计响应 */
@@ -5219,28 +3609,9 @@ export interface DatasetStatisticsVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultPageResultSessionListVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultPageResultSessionListVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: PageResultSessionListVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 最后一条消息 */
@@ -5268,7 +3639,7 @@ export interface PageResultSessionListVo {
 }
 
 /** 会话列表视图 */
-export interface SessionListVo {
+export interface SessionListVo extends TenantAuditingVo {
   /**
    * 会话ID
    * @format int64
@@ -5299,48 +3670,12 @@ export interface SessionListVo {
   messageCount?: number;
   /** 是否收藏 */
   isStarred?: boolean;
-  /**
-   * 创建时间
-   * @format date-time
-   */
-  createdDate?: string;
-  /**
-   * 最后修改时间
-   * @format date-time
-   */
-  modifiedDate?: string;
-  /**
-   * 创建人ID
-   * @format int64
-   */
-  createdBy?: number;
-  /** 创建人姓名 */
-  createdByName?: string;
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultPageResultMessageVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultPageResultMessageVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: PageResultMessageVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 export interface PageResultMessageVo {
@@ -5355,28 +3690,9 @@ export interface PageResultMessageVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultChatStatisticsVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultChatStatisticsVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: ChatStatisticsVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 对话统计数据 */
@@ -5493,60 +3809,13 @@ export interface UsageTrend {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultPageResultApplicationListVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultPageResultApplicationListVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: PageResultApplicationListVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 应用列表项 */
-export interface ApplicationListVo {
-  /**
-   * 租户ID
-   * @format int64
-   */
-  tenantId?: number;
-  /**
-   * 创建者ID
-   * @format int64
-   */
-  createdBy?: number;
-  /** 创建者姓名 */
-  creator?: string;
-  /**
-   * 创建时间
-   * @format date-time
-   */
-  createdDate?: string;
-  /**
-   * 最后修改人ID
-   * @format int64
-   */
-  modifiedBy?: number;
-  modifier?: string;
-  /**
-   * 最后修改时间
-   * @format date-time
-   */
-  modifiedDate?: string;
+export interface ApplicationListVo extends TenantAuditingVo {
   /**
    * 应用ID
    * @format int64
@@ -5604,28 +3873,9 @@ export interface PageResultApplicationListVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultApplicationStatisticsVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultApplicationStatisticsVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: ApplicationStatisticsVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 应用统计数据 */
@@ -5708,28 +3958,9 @@ export interface TrendsStatsVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultTopEndpointsVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultTopEndpointsVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: TopEndpointsVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 接口项 */
@@ -5788,28 +4019,9 @@ export interface TopEndpointsVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultTokenUsageTrendVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultTokenUsageTrendVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: TokenUsageTrendVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 汇总统计 */
@@ -5881,28 +4093,9 @@ export interface TrendItemVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultResponseTimeAnalysisVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultResponseTimeAnalysisVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: ResponseTimeAnalysisVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 响应时间分析 */
@@ -5926,28 +4119,9 @@ export interface AnalyticsOverviewVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultAnalyticsOverviewVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultAnalyticsOverviewVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: AnalyticsOverviewVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 指标详情 */
@@ -6027,28 +4201,9 @@ export interface SuccessRateVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultModelDistributionVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultModelDistributionVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: ModelDistributionVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 分布项 */
@@ -6125,28 +4280,9 @@ export interface TotalVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultErrorAnalysisVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultErrorAnalysisVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: ErrorAnalysisVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 /** 错误分析 */
@@ -6246,19 +4382,7 @@ export interface ErrorTrendItemVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultAppDistributionVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultAppDistributionVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: AppDistributionVo;
   /**
@@ -6287,28 +4411,9 @@ export interface ApiCallsTrendVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultApiCallsTrendVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiLocaleResultApiCallsTrendVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: ApiCallsTrendVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 export interface ActivityDetailVo {
@@ -6329,28 +4434,9 @@ export interface ActivityDetailVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiPageResultActivityDetailVo = ApiResult & {
-  /**
-   * Business status code of the API response.
-   * - 'S': Success
-   * - 'E0': Protocol error (bad request)
-   * - 'E1': Business error
-   * - 'E2': System error (server error)
-   * - 'E3': Quota error (unauthorized or insufficient quota)
-   * - 'XXX': Custom business codes (require further handling)
-   */
-  code?: string;
-  /** Message providing additional context, such as success or error details. */
-  message?: string;
+export type ApiPageResultActivityDetailVo = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: PageResultActivityDetailVo;
-  /**
-   * Server processing timestamp (date-time string).
-   * @format int64
-   */
-  timestamp?: number;
-  /** Extensible map for extra response information. */
-  extensions?: Record<string, object>;
 };
 
 export interface PageResultActivityDetailVo {

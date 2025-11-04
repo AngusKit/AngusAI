@@ -1,13 +1,10 @@
-import { PageQuery } from '@xcan-angus/infra';
+import { PageQuery, ApiLocaleResult } from '@xcan-angus/infra';
 import {
   ApiLocaleResultChatStatisticsVo,
-  ApiLocaleResultInteger,
   ApiLocaleResultMessageVo,
   ApiLocaleResultPageResultMessageVo,
   ApiLocaleResultPageResultSessionListVo,
   ApiLocaleResultSessionDetailVo,
-  ApiLocaleResultString,
-  ApiResultObject,
   MessageFeedbackDto,
   MessageSendDto,
   SessionBatchDeleteDto,
@@ -57,7 +54,7 @@ export class Chat<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultPageResultSessionListVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultPageResultSessionListVo, ApiLocaleResult>({
       path: `/api/v1/chat/sessions`,
       method: "GET",
       query: query,
@@ -74,7 +71,7 @@ export class Chat<SecurityDataType = unknown> {
    * @secure
    */
   createSession = (data: SessionCreateDto, params: RequestParams = {}) =>
-    this.http.request<ApiResultObject, ApiResultObject>({
+    this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `/api/v1/chat/sessions`,
       method: "POST",
       body: data,
@@ -92,7 +89,7 @@ export class Chat<SecurityDataType = unknown> {
    * @secure
    */
   stopGeneration = (sessionId: number, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultMessageVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultMessageVo, ApiLocaleResult>({
       path: `/api/v1/chat/sessions/${sessionId}/stop`,
       method: "POST",
       secure: true,
@@ -135,7 +132,7 @@ export class Chat<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultPageResultMessageVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultPageResultMessageVo, ApiLocaleResult>({
       path: `/api/v1/chat/sessions/${sessionId}/messages`,
       method: "GET",
       query: query,
@@ -156,7 +153,7 @@ export class Chat<SecurityDataType = unknown> {
     data: MessageSendDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiResultObject, ApiResultObject>({
+    this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `/api/v1/chat/sessions/${sessionId}/messages`,
       method: "POST",
       body: data,
@@ -174,7 +171,7 @@ export class Chat<SecurityDataType = unknown> {
    * @secure
    */
   clearMessages = (sessionId: number, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultInteger, ApiResultObject>({
+    this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `/api/v1/chat/sessions/${sessionId}/messages`,
       method: "DELETE",
       secure: true,
@@ -194,7 +191,7 @@ export class Chat<SecurityDataType = unknown> {
     messageId: number,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiResultObject, ApiResultObject>({
+    this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `/api/v1/chat/sessions/${sessionId}/messages/${messageId}/regenerate`,
       method: "POST",
       secure: true,
@@ -215,7 +212,7 @@ export class Chat<SecurityDataType = unknown> {
     data: MessageFeedbackDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultMessageVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultMessageVo, ApiLocaleResult>({
       path: `/api/v1/chat/sessions/${sessionId}/messages/${messageId}/feedback`,
       method: "POST",
       body: data,
@@ -237,7 +234,7 @@ export class Chat<SecurityDataType = unknown> {
     data: MessageSendDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<SseEmitter, ApiResultObject>({
+    this.http.request<SseEmitter, ApiLocaleResult>({
       path: `/api/v1/chat/sessions/${sessionId}/messages/stream`,
       method: "POST",
       body: data,
@@ -268,7 +265,7 @@ export class Chat<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultString, ApiResultObject>({
+    this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `/api/v1/chat/sessions/voice-to-text`,
       method: "POST",
       query: query,
@@ -290,7 +287,7 @@ export class Chat<SecurityDataType = unknown> {
     data: SessionBatchDeleteDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultInteger, ApiResultObject>({
+    this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `/api/v1/chat/sessions/batch-delete`,
       method: "POST",
       body: data,
@@ -324,7 +321,7 @@ export class Chat<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiResultObject, ApiResultObject>({
+    this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `/api/v1/chat/sessions/attachments`,
       method: "POST",
       query: query,
@@ -347,7 +344,7 @@ export class Chat<SecurityDataType = unknown> {
     data: SessionSwitchModelDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultSessionDetailVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultSessionDetailVo, ApiLocaleResult>({
       path: `/api/v1/chat/sessions/${sessionId}/switch-model`,
       method: "PATCH",
       body: data,
@@ -369,7 +366,7 @@ export class Chat<SecurityDataType = unknown> {
     data: SessionSwitchAppDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultSessionDetailVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultSessionDetailVo, ApiLocaleResult>({
       path: `/api/v1/chat/sessions/${sessionId}/switch-app`,
       method: "PATCH",
       body: data,
@@ -391,7 +388,7 @@ export class Chat<SecurityDataType = unknown> {
     data: SessionStarDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultSessionDetailVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultSessionDetailVo, ApiLocaleResult>({
       path: `/api/v1/chat/sessions/${sessionId}/star`,
       method: "PATCH",
       body: data,
@@ -409,7 +406,7 @@ export class Chat<SecurityDataType = unknown> {
    * @secure
    */
   getSessionDetail = (id: number, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultSessionDetailVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultSessionDetailVo, ApiLocaleResult>({
       path: `/api/v1/chat/sessions/${id}`,
       method: "GET",
       secure: true,
@@ -425,7 +422,7 @@ export class Chat<SecurityDataType = unknown> {
    * @secure
    */
   deleteSession = (id: number, params: RequestParams = {}) =>
-    this.http.request<ApiResultObject, ApiResultObject>({
+    this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `/api/v1/chat/sessions/${id}`,
       method: "DELETE",
       secure: true,
@@ -445,7 +442,7 @@ export class Chat<SecurityDataType = unknown> {
     data: SessionUpdateDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultSessionDetailVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultSessionDetailVo, ApiLocaleResult>({
       path: `/api/v1/chat/sessions/${id}`,
       method: "PATCH",
       body: data,
@@ -473,7 +470,7 @@ export class Chat<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<void, ApiResultObject>({
+    this.http.request<void, ApiLocaleResult>({
       path: `/api/v1/chat/sessions/${sessionId}/export`,
       method: "GET",
       query: query,
@@ -499,7 +496,7 @@ export class Chat<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultChatStatisticsVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultChatStatisticsVo, ApiLocaleResult>({
       path: `/api/v1/chat/sessions/statistics`,
       method: "GET",
       query: query,
@@ -516,7 +513,7 @@ export class Chat<SecurityDataType = unknown> {
    * @secure
    */
   deleteAttachment = (id: number, params: RequestParams = {}) =>
-    this.http.request<ApiResultObject, ApiResultObject>({
+    this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `/api/v1/chat/sessions/attachments/${id}`,
       method: "DELETE",
       secure: true,

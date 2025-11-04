@@ -1,10 +1,9 @@
-import { PageQuery } from '@xcan-angus/infra';
+import { PageQuery, ApiLocaleResult } from '@xcan-angus/infra';
 import {
   ApiLocaleResultListPluginReviewVo,
   ApiLocaleResultPageResultPluginListVo,
   ApiLocaleResultPluginDetailVo,
   ApiLocaleResultPluginStatisticsVo,
-  ApiResultObject,
   GetPluginListParamsCategoryEnum,
   GetPluginListOrderByEnum,
   GetPluginListParamsStatusEnum,
@@ -42,7 +41,7 @@ export class Plugins<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultPluginDetailVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultPluginDetailVo, ApiLocaleResult>({
       path: `/api/v1/plugins/${id}/status`,
       method: "PUT",
       query: query,
@@ -113,7 +112,7 @@ export class Plugins<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultPageResultPluginListVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultPageResultPluginListVo, ApiLocaleResult>({
       path: `/api/v1/plugins`,
       method: "GET",
       query: query,
@@ -130,7 +129,7 @@ export class Plugins<SecurityDataType = unknown> {
    * @secure
    */
   createPlugin = (data: PluginCreateDto, params: RequestParams = {}) =>
-    this.http.request<ApiResultObject, ApiResultObject>({
+    this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `/api/v1/plugins`,
       method: "POST",
       body: data,
@@ -148,7 +147,7 @@ export class Plugins<SecurityDataType = unknown> {
    * @secure
    */
   listPluginReviews = (pluginId: number, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultListPluginReviewVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultListPluginReviewVo, ApiLocaleResult>({
       path: `/api/v1/plugins/${pluginId}/reviews`,
       method: "GET",
       secure: true,
@@ -168,7 +167,7 @@ export class Plugins<SecurityDataType = unknown> {
     data: PluginReviewCreateDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiResultObject, ApiResultObject>({
+    this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `/api/v1/plugins/${pluginId}/reviews`,
       method: "POST",
       body: data,
@@ -186,7 +185,7 @@ export class Plugins<SecurityDataType = unknown> {
    * @secure
    */
   usePlugin = (id: number, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultPluginDetailVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultPluginDetailVo, ApiLocaleResult>({
       path: `/api/v1/plugins/${id}/use`,
       method: "POST",
       secure: true,
@@ -202,7 +201,7 @@ export class Plugins<SecurityDataType = unknown> {
    * @secure
    */
   uninstallPlugin = (id: number, params: RequestParams = {}) =>
-    this.http.request<ApiResultObject, ApiResultObject>({
+    this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `/api/v1/plugins/${id}/uninstall`,
       method: "POST",
       secure: true,
@@ -218,7 +217,7 @@ export class Plugins<SecurityDataType = unknown> {
    * @secure
    */
   publishPlugin = (id: number, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultPluginDetailVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultPluginDetailVo, ApiLocaleResult>({
       path: `/api/v1/plugins/${id}/publish`,
       method: "POST",
       secure: true,
@@ -234,7 +233,7 @@ export class Plugins<SecurityDataType = unknown> {
    * @secure
    */
   installPlugin = (id: number, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultPluginDetailVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultPluginDetailVo, ApiLocaleResult>({
       path: `/api/v1/plugins/${id}/install`,
       method: "POST",
       secure: true,
@@ -250,7 +249,7 @@ export class Plugins<SecurityDataType = unknown> {
    * @secure
    */
   verifyPlugin = (data: PluginVerifyDto, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultPluginDetailVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultPluginDetailVo, ApiLocaleResult>({
       path: `/api/v1/plugins/verify`,
       method: "POST",
       body: data,
@@ -268,7 +267,7 @@ export class Plugins<SecurityDataType = unknown> {
    * @secure
    */
   getPluginDetail = (id: number, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultPluginDetailVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultPluginDetailVo, ApiLocaleResult>({
       path: `/api/v1/plugins/${id}`,
       method: "GET",
       secure: true,
@@ -284,7 +283,7 @@ export class Plugins<SecurityDataType = unknown> {
    * @secure
    */
   deletePlugin = (id: number, params: RequestParams = {}) =>
-    this.http.request<ApiResultObject, ApiResultObject>({
+    this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `/api/v1/plugins/${id}`,
       method: "DELETE",
       secure: true,
@@ -304,7 +303,7 @@ export class Plugins<SecurityDataType = unknown> {
     data: PluginUpdateDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultPluginDetailVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultPluginDetailVo, ApiLocaleResult>({
       path: `/api/v1/plugins/${id}`,
       method: "PATCH",
       body: data,
@@ -328,7 +327,7 @@ export class Plugins<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultPluginStatisticsVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultPluginStatisticsVo, ApiLocaleResult>({
       path: `/api/v1/plugins/statistics`,
       method: "GET",
       query: query,

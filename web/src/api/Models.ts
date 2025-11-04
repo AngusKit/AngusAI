@@ -1,9 +1,8 @@
-import { PageQuery } from '@xcan-angus/infra';
+import { PageQuery, ApiLocaleResult } from '@xcan-angus/infra';
 import {
   ApiLocaleResultModelDetailVo,
   ApiLocaleResultModelStatisticsVo,
   ApiLocaleResultPageResultModelListVo,
-  ApiResultObject,
   GetModelListParamsOrderByEnum,
   GetModelListParamsProviderEnum,
   GetModelListParamsStatusEnum,
@@ -37,7 +36,7 @@ export class Models<SecurityDataType = unknown> {
     data: ModelConfig,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultModelDetailVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultModelDetailVo, ApiLocaleResult>({
       path: `/api/v1/models/${id}/config`,
       method: "PUT",
       body: data,
@@ -77,7 +76,7 @@ export class Models<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultPageResultModelListVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultPageResultModelListVo, ApiLocaleResult>({
       path: `/api/v1/models`,
       method: "GET",
       query: query,
@@ -94,7 +93,7 @@ export class Models<SecurityDataType = unknown> {
    * @secure
    */
   createModel = (data: ModelCreateDto, params: RequestParams = {}) =>
-    this.http.request<ApiResultObject, ApiResultObject>({
+    this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `/api/v1/models`,
       method: "POST",
       body: data,
@@ -112,7 +111,7 @@ export class Models<SecurityDataType = unknown> {
    * @secure
    */
   testModel = (id: number, data: ModelTestDto, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultModelDetailVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultModelDetailVo, ApiLocaleResult>({
       path: `/api/v1/models/${id}/test`,
       method: "POST",
       body: data,
@@ -140,7 +139,7 @@ export class Models<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultModelDetailVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultModelDetailVo, ApiLocaleResult>({
       path: `/api/v1/models/${id}/stop`,
       method: "POST",
       query: query,
@@ -157,7 +156,7 @@ export class Models<SecurityDataType = unknown> {
    * @secure
    */
   startModel = (id: number, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultModelDetailVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultModelDetailVo, ApiLocaleResult>({
       path: `/api/v1/models/${id}/start`,
       method: "POST",
       secure: true,
@@ -173,7 +172,7 @@ export class Models<SecurityDataType = unknown> {
    * @secure
    */
   restartModel = (id: number, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultModelDetailVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultModelDetailVo, ApiLocaleResult>({
       path: `/api/v1/models/${id}/restart`,
       method: "POST",
       secure: true,
@@ -189,7 +188,7 @@ export class Models<SecurityDataType = unknown> {
    * @secure
    */
   getModelDetail = (id: number, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultModelDetailVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultModelDetailVo, ApiLocaleResult>({
       path: `/api/v1/models/${id}`,
       method: "GET",
       secure: true,
@@ -205,7 +204,7 @@ export class Models<SecurityDataType = unknown> {
    * @secure
    */
   deleteModel = (id: number, params: RequestParams = {}) =>
-    this.http.request<ApiResultObject, ApiResultObject>({
+    this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `/api/v1/models/${id}`,
       method: "DELETE",
       secure: true,
@@ -225,7 +224,7 @@ export class Models<SecurityDataType = unknown> {
     data: ModelUpdateDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultModelDetailVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultModelDetailVo, ApiLocaleResult>({
       path: `/api/v1/models/${id}`,
       method: "PATCH",
       body: data,
@@ -249,7 +248,7 @@ export class Models<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultModelStatisticsVo, ApiResultObject>({
+    this.http.request<ApiLocaleResultModelStatisticsVo, ApiLocaleResult>({
       path: `/api/v1/models/statistics`,
       method: "GET",
       query: query,
