@@ -1,0 +1,338 @@
+/* eslint-disable */
+/* tslint:disable */
+// @ts-nocheck
+/*
+ * ---------------------------------------------------------------
+ * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
+ * ##                                                           ##
+ * ## AUTHOR: acacode                                           ##
+ * ## SOURCE: https://github.com/acacode/swagger-typescript-api ##
+ * ---------------------------------------------------------------
+ */
+
+import {
+  ApiLocaleResultModelDetailVo,
+  ApiLocaleResultModelStatisticsVo,
+  ApiLocaleResultPageResultModelListVo,
+  ApiResultObject,
+  GetModelListParamsFilters0OpEnum,
+  GetModelListParamsFilters1OpEnum,
+  GetModelListParamsInfoScopeEnum,
+  GetModelListParamsOrderByEnum,
+  GetModelListParamsOrderSortEnum,
+  GetModelListParamsProviderEnum,
+  GetModelListParamsStatusEnum,
+  GetModelListParamsTypeEnum,
+  GetModelStatisticsParamsPeriodEnum,
+  ModelConfig,
+  ModelCreateDto,
+  ModelTestDto,
+  ModelUpdateDto,
+} from "./data-contracts.ts";
+import { ContentType, HttpClient, RequestParams } from "./http-client.ts";
+
+export class Models<SecurityDataType = unknown> {
+  http: HttpClient<SecurityDataType>;
+
+  constructor(http: HttpClient<SecurityDataType>) {
+    this.http = http;
+  }
+
+  /**
+   * @description 更新模型的详细配置
+   *
+   * @tags Model
+   * @name UpdateModelConfig
+   * @summary 更新模型配置
+   * @request PUT:/api/v1/models/{id}/config
+   * @secure
+   */
+  updateModelConfig = (
+    id: number,
+    data: ModelConfig,
+    params: RequestParams = {},
+  ) =>
+    this.http.request<ApiLocaleResultModelDetailVo, ApiResultObject>({
+      path: `/api/v1/models/${id}/config`,
+      method: "PUT",
+      body: data,
+      secure: true,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * @description 获取当前用户的模型列表，支持分页、搜索和筛选
+   *
+   * @tags Model
+   * @name GetModelList
+   * @summary 获取模型列表
+   * @request GET:/api/v1/models
+   * @secure
+   */
+  getModelList = (
+    query?: {
+      /**
+       * 模型ID
+       * @format int64
+       */
+      id?: number;
+      /**
+       * 模型名称
+       * @example "GPT-4"
+       */
+      name?: string;
+      /** 模型类型 */
+      type?: GetModelListParamsTypeEnum;
+      /** 模型提供商 */
+      provider?: GetModelListParamsProviderEnum;
+      /** 状态筛选 */
+      status?: GetModelListParamsStatusEnum;
+      /**
+       * 所属租户ID
+       * @format int64
+       * @example 1
+       */
+      tenantId?: number;
+      /**
+       * 创建人ID
+       * @format int64
+       * @example 1
+       */
+      createdBy?: number;
+      /**
+       * 创建时间
+       * @format date-time
+       * @example "2024-10-12 00:00:00"
+       */
+      createdDate?: string;
+      /** 排序字段 */
+      orderBy?: GetModelListParamsOrderByEnum;
+      /**
+       * Page number for paginated data (default: 1)
+       * @format int32
+       * @min 1
+       * @max 100000
+       */
+      pageNo?: number;
+      /**
+       * Number of items per page (default: 10)
+       * @format int32
+       * @min 1
+       * @max 2000
+       */
+      pageSize?: number;
+      /** Specifies the direction of the sorting (ascending or descending) */
+      orderSort?: GetModelListParamsOrderSortEnum;
+      /** Scope of information to query (BASIC or DETAIL). Interface performance optimization parameters, only valid for some interfaces */
+      infoScope?: GetModelListParamsInfoScopeEnum;
+      /** Whether to use full-text search (default: false, uses DB index search if false) */
+      fullTextSearch?: boolean;
+      /** Search keyword */
+      keyword?: string;
+      /**
+       * ID of the last modifier
+       * @format int64
+       * @example 1
+       */
+      modifiedBy?: number;
+      /**
+       * Last modification date
+       * @format date-time
+       * @example "2024-10-12 00:00:00"
+       */
+      lastModifiedDate?: string;
+      /** Customize the filter parameter name. Note: The parameter name must be a whitelist parameter */
+      "filters[0].key"?: string;
+      /** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
+      "filters[0].op"?: GetModelListParamsFilters0OpEnum;
+      /** Customize the filter value */
+      "filters[0].value"?: any;
+      /** Customize the filter parameter name. Note: The parameter name must be a whitelist parameter */
+      "filters[1].key"?: string;
+      /** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
+      "filters[1].op"?: GetModelListParamsFilters1OpEnum;
+      /** Customize the filter value */
+      "filters[1].value"?: any;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.http.request<ApiLocaleResultPageResultModelListVo, ApiResultObject>({
+      path: `/api/v1/models`,
+      method: "GET",
+      query: query,
+      secure: true,
+      ...params,
+    });
+  /**
+   * @description 添加新模型
+   *
+   * @tags Model
+   * @name CreateModel
+   * @summary 添加模型
+   * @request POST:/api/v1/models
+   * @secure
+   */
+  createModel = (data: ModelCreateDto, params: RequestParams = {}) =>
+    this.http.request<ApiResultObject, ApiResultObject>({
+      path: `/api/v1/models`,
+      method: "POST",
+      body: data,
+      secure: true,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * @description 测试模型连接和配置
+   *
+   * @tags Model
+   * @name TestModel
+   * @summary 测试模型连接
+   * @request POST:/api/v1/models/{id}/test
+   * @secure
+   */
+  testModel = (id: number, data: ModelTestDto, params: RequestParams = {}) =>
+    this.http.request<ApiLocaleResultModelDetailVo, ApiResultObject>({
+      path: `/api/v1/models/${id}/test`,
+      method: "POST",
+      body: data,
+      secure: true,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * @description 停止模型
+   *
+   * @tags Model
+   * @name StopModel
+   * @summary 停止模型
+   * @request POST:/api/v1/models/{id}/stop
+   * @secure
+   */
+  stopModel = (
+    id: number,
+    query?: {
+      /**
+       * 优雅停止
+       * @default true
+       */
+      graceful?: boolean;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.http.request<ApiLocaleResultModelDetailVo, ApiResultObject>({
+      path: `/api/v1/models/${id}/stop`,
+      method: "POST",
+      query: query,
+      secure: true,
+      ...params,
+    });
+  /**
+   * @description 启动模型
+   *
+   * @tags Model
+   * @name StartModel
+   * @summary 启动模型
+   * @request POST:/api/v1/models/{id}/start
+   * @secure
+   */
+  startModel = (id: number, params: RequestParams = {}) =>
+    this.http.request<ApiLocaleResultModelDetailVo, ApiResultObject>({
+      path: `/api/v1/models/${id}/start`,
+      method: "POST",
+      secure: true,
+      ...params,
+    });
+  /**
+   * @description 重启模型（先停止再启动）
+   *
+   * @tags Model
+   * @name RestartModel
+   * @summary 重启模型
+   * @request POST:/api/v1/models/{id}/restart
+   * @secure
+   */
+  restartModel = (id: number, params: RequestParams = {}) =>
+    this.http.request<ApiLocaleResultModelDetailVo, ApiResultObject>({
+      path: `/api/v1/models/${id}/restart`,
+      method: "POST",
+      secure: true,
+      ...params,
+    });
+  /**
+   * @description 获取指定模型的详细信息
+   *
+   * @tags Model
+   * @name GetModelDetail
+   * @summary 获取模型详情
+   * @request GET:/api/v1/models/{id}
+   * @secure
+   */
+  getModelDetail = (id: number, params: RequestParams = {}) =>
+    this.http.request<ApiLocaleResultModelDetailVo, ApiResultObject>({
+      path: `/api/v1/models/${id}`,
+      method: "GET",
+      secure: true,
+      ...params,
+    });
+  /**
+   * @description 删除指定模型
+   *
+   * @tags Model
+   * @name DeleteModel
+   * @summary 删除模型
+   * @request DELETE:/api/v1/models/{id}
+   * @secure
+   */
+  deleteModel = (id: number, params: RequestParams = {}) =>
+    this.http.request<ApiResultObject, ApiResultObject>({
+      path: `/api/v1/models/${id}`,
+      method: "DELETE",
+      secure: true,
+      ...params,
+    });
+  /**
+   * @description 更新模型配置
+   *
+   * @tags Model
+   * @name UpdateModel
+   * @summary 更新模型
+   * @request PATCH:/api/v1/models/{id}
+   * @secure
+   */
+  updateModel = (
+    id: number,
+    data: ModelUpdateDto,
+    params: RequestParams = {},
+  ) =>
+    this.http.request<ApiLocaleResultModelDetailVo, ApiResultObject>({
+      path: `/api/v1/models/${id}`,
+      method: "PATCH",
+      body: data,
+      secure: true,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * @description 获取模型调用统计数据
+   *
+   * @tags Model
+   * @name GetModelStatistics
+   * @summary 获取模型调用统计
+   * @request GET:/api/v1/models/statistics
+   * @secure
+   */
+  getModelStatistics = (
+    query?: {
+      /** 统计周期 */
+      period?: GetModelStatisticsParamsPeriodEnum;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.http.request<ApiLocaleResultModelStatisticsVo, ApiResultObject>({
+      path: `/api/v1/models/statistics`,
+      method: "GET",
+      query: query,
+      secure: true,
+      ...params,
+    });
+}

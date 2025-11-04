@@ -24,3 +24,4 @@ coverage/
 .idea
 .husky
 /package-lock.json
+/temp/
