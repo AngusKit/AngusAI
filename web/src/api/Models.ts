@@ -1,25 +1,10 @@
-/* eslint-disable */
-/* tslint:disable */
-// @ts-nocheck
-/*
- * ---------------------------------------------------------------
- * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
- * ##                                                           ##
- * ## AUTHOR: acacode                                           ##
- * ## SOURCE: https://github.com/acacode/swagger-typescript-api ##
- * ---------------------------------------------------------------
- */
-
+import { PageQuery } from '@xcan-angus/infra';
 import {
   ApiLocaleResultModelDetailVo,
   ApiLocaleResultModelStatisticsVo,
   ApiLocaleResultPageResultModelListVo,
   ApiResultObject,
-  GetModelListParamsFilters0OpEnum,
-  GetModelListParamsFilters1OpEnum,
-  GetModelListParamsInfoScopeEnum,
   GetModelListParamsOrderByEnum,
-  GetModelListParamsOrderSortEnum,
   GetModelListParamsProviderEnum,
   GetModelListParamsStatusEnum,
   GetModelListParamsTypeEnum,
@@ -70,7 +55,7 @@ export class Models<SecurityDataType = unknown> {
    * @secure
    */
   getModelList = (
-    query?: {
+    query?: PageQuery & {
       /**
        * 模型ID
        * @format int64
@@ -87,72 +72,8 @@ export class Models<SecurityDataType = unknown> {
       provider?: GetModelListParamsProviderEnum;
       /** 状态筛选 */
       status?: GetModelListParamsStatusEnum;
-      /**
-       * 所属租户ID
-       * @format int64
-       * @example 1
-       */
-      tenantId?: number;
-      /**
-       * 创建人ID
-       * @format int64
-       * @example 1
-       */
-      createdBy?: number;
-      /**
-       * 创建时间
-       * @format date-time
-       * @example "2024-10-12 00:00:00"
-       */
-      createdDate?: string;
       /** 排序字段 */
       orderBy?: GetModelListParamsOrderByEnum;
-      /**
-       * Page number for paginated data (default: 1)
-       * @format int32
-       * @min 1
-       * @max 100000
-       */
-      pageNo?: number;
-      /**
-       * Number of items per page (default: 10)
-       * @format int32
-       * @min 1
-       * @max 2000
-       */
-      pageSize?: number;
-      /** Specifies the direction of the sorting (ascending or descending) */
-      orderSort?: GetModelListParamsOrderSortEnum;
-      /** Scope of information to query (BASIC or DETAIL). Interface performance optimization parameters, only valid for some interfaces */
-      infoScope?: GetModelListParamsInfoScopeEnum;
-      /** Whether to use full-text search (default: false, uses DB index search if false) */
-      fullTextSearch?: boolean;
-      /** Search keyword */
-      keyword?: string;
-      /**
-       * ID of the last modifier
-       * @format int64
-       * @example 1
-       */
-      modifiedBy?: number;
-      /**
-       * Last modification date
-       * @format date-time
-       * @example "2024-10-12 00:00:00"
-       */
-      lastModifiedDate?: string;
-      /** Customize the filter parameter name. Note: The parameter name must be a whitelist parameter */
-      "filters[0].key"?: string;
-      /** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
-      "filters[0].op"?: GetModelListParamsFilters0OpEnum;
-      /** Customize the filter value */
-      "filters[0].value"?: any;
-      /** Customize the filter parameter name. Note: The parameter name must be a whitelist parameter */
-      "filters[1].key"?: string;
-      /** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
-      "filters[1].op"?: GetModelListParamsFilters1OpEnum;
-      /** Customize the filter value */
-      "filters[1].value"?: any;
     },
     params: RequestParams = {},
   ) =>

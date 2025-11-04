@@ -1,15 +1,4 @@
-/* eslint-disable */
-/* tslint:disable */
-// @ts-nocheck
-/*
- * ---------------------------------------------------------------
- * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
- * ##                                                           ##
- * ## AUTHOR: acacode                                           ##
- * ## SOURCE: https://github.com/acacode/swagger-typescript-api ##
- * ---------------------------------------------------------------
- */
-
+import { PageQuery } from '@xcan-angus/infra';
 import {
   ApiLocaleResultDatasetDetailVo,
   ApiLocaleResultDatasetStatisticsVo,
@@ -24,18 +13,10 @@ import {
   DatasetUpdateDto,
   DatasourceConnectionTestDto,
   DataSourceUpdateDto,
-  GetDatasetDataListParamsFilters0OpEnum,
-  GetDatasetDataListParamsFilters1OpEnum,
-  GetDatasetDataListParamsInfoScopeEnum,
-  GetDatasetDataListParamsOrderByEnum,
-  GetDatasetDataListParamsOrderSortEnum,
+  GetDatasetDataListOrderByEnum,
   GetDatasetDataListParamsStatusEnum,
   GetDatasetDataListParamsTypeEnum,
-  GetDatasetListParamsFilters0OpEnum,
-  GetDatasetListParamsFilters1OpEnum,
-  GetDatasetListParamsInfoScopeEnum,
-  GetDatasetListParamsOrderByEnum,
-  GetDatasetListParamsOrderSortEnum,
+  GetDatasetListOrderByEnum,
   GetDatasetListParamsTypeEnum,
   GetDatasetListParamsVisibilityEnum,
   ModifyDatasetVisibilityParamsVisibilityEnum,
@@ -121,7 +102,7 @@ export class Datasets<SecurityDataType = unknown> {
    * @secure
    */
   getDatasetList = (
-    query?: {
+    query?: PageQuery & {
       /**
        * 数据集ID
        * @format int64
@@ -139,71 +120,7 @@ export class Datasets<SecurityDataType = unknown> {
        * 排序字段
        * @example "modifiedDate"
        */
-      orderBy?: GetDatasetListParamsOrderByEnum;
-      /**
-       * Page number for paginated data (default: 1)
-       * @format int32
-       * @min 1
-       * @max 100000
-       */
-      pageNo?: number;
-      /**
-       * Number of items per page (default: 10)
-       * @format int32
-       * @min 1
-       * @max 2000
-       */
-      pageSize?: number;
-      /** Specifies the direction of the sorting (ascending or descending) */
-      orderSort?: GetDatasetListParamsOrderSortEnum;
-      /** Scope of information to query (BASIC or DETAIL). Interface performance optimization parameters, only valid for some interfaces */
-      infoScope?: GetDatasetListParamsInfoScopeEnum;
-      /** Whether to use full-text search (default: false, uses DB index search if false) */
-      fullTextSearch?: boolean;
-      /** Search keyword */
-      keyword?: string;
-      /**
-       * Tenant ID to which this belongs
-       * @format int64
-       * @example 1
-       */
-      tenantId?: number;
-      /**
-       * ID of the creator
-       * @format int64
-       * @example 1
-       */
-      createdBy?: number;
-      /**
-       * Creation date
-       * @format date-time
-       * @example "2024-10-12 00:00:00"
-       */
-      createdDate?: string;
-      /**
-       * ID of the last modifier
-       * @format int64
-       * @example 1
-       */
-      modifiedBy?: number;
-      /**
-       * Last modification date
-       * @format date-time
-       * @example "2024-10-12 00:00:00"
-       */
-      lastModifiedDate?: string;
-      /** Customize the filter parameter name. Note: The parameter name must be a whitelist parameter */
-      "filters[0].key"?: string;
-      /** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
-      "filters[0].op"?: GetDatasetListParamsFilters0OpEnum;
-      /** Customize the filter value */
-      "filters[0].value"?: any;
-      /** Customize the filter parameter name. Note: The parameter name must be a whitelist parameter */
-      "filters[1].key"?: string;
-      /** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
-      "filters[1].op"?: GetDatasetListParamsFilters1OpEnum;
-      /** Customize the filter value */
-      "filters[1].value"?: any;
+      orderBy?: GetDatasetListOrderByEnum;
     },
     params: RequestParams = {},
   ) =>
@@ -408,7 +325,7 @@ export class Datasets<SecurityDataType = unknown> {
    */
   getDatasetDataList = (
     id: number,
-    query?: {
+    query?: PageQuery & {
       /** 数据名称（文件名或表名） */
       name?: string;
       /** 数据类型筛选 */
@@ -421,74 +338,10 @@ export class Datasets<SecurityDataType = unknown> {
        */
       dataSize?: number;
       /**
-       * 所属租户ID
-       * @format int64
-       * @example 1
-       */
-      tenantId?: number;
-      /**
        * 排序字段
        * @example "modifiedDate"
        */
-      orderBy?: GetDatasetDataListParamsOrderByEnum;
-      /**
-       * Page number for paginated data (default: 1)
-       * @format int32
-       * @min 1
-       * @max 100000
-       */
-      pageNo?: number;
-      /**
-       * Number of items per page (default: 10)
-       * @format int32
-       * @min 1
-       * @max 2000
-       */
-      pageSize?: number;
-      /** Specifies the direction of the sorting (ascending or descending) */
-      orderSort?: GetDatasetDataListParamsOrderSortEnum;
-      /** Scope of information to query (BASIC or DETAIL). Interface performance optimization parameters, only valid for some interfaces */
-      infoScope?: GetDatasetDataListParamsInfoScopeEnum;
-      /** Whether to use full-text search (default: false, uses DB index search if false) */
-      fullTextSearch?: boolean;
-      /** Search keyword */
-      keyword?: string;
-      /**
-       * ID of the creator
-       * @format int64
-       * @example 1
-       */
-      createdBy?: number;
-      /**
-       * Creation date
-       * @format date-time
-       * @example "2024-10-12 00:00:00"
-       */
-      createdDate?: string;
-      /**
-       * ID of the last modifier
-       * @format int64
-       * @example 1
-       */
-      modifiedBy?: number;
-      /**
-       * Last modification date
-       * @format date-time
-       * @example "2024-10-12 00:00:00"
-       */
-      lastModifiedDate?: string;
-      /** Customize the filter parameter name. Note: The parameter name must be a whitelist parameter */
-      "filters[0].key"?: string;
-      /** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
-      "filters[0].op"?: GetDatasetDataListParamsFilters0OpEnum;
-      /** Customize the filter value */
-      "filters[0].value"?: any;
-      /** Customize the filter parameter name. Note: The parameter name must be a whitelist parameter */
-      "filters[1].key"?: string;
-      /** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
-      "filters[1].op"?: GetDatasetDataListParamsFilters1OpEnum;
-      /** Customize the filter value */
-      "filters[1].value"?: any;
+      orderBy?: GetDatasetDataListOrderByEnum;
     },
     params: RequestParams = {},
   ) =>

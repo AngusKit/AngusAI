@@ -1,7 +1,6 @@
 import { PageQuery } from '@xcan-angus/infra';
 import {
     ActivityListOrderByEnum,
-    ActivityListOrderSortEnum,
     ApiPageResultActivityDetailVo,
     ApiResultObject,
 } from "./data-contracts.ts";
@@ -23,7 +22,7 @@ export class Activity<SecurityDataType = unknown> {
      * @secure
      */
     activityList = (
-        query?: PageQuery &{
+        query?: PageQuery & {
             /**
              * Activity record identifier
              * @format int64
@@ -53,8 +52,6 @@ export class Activity<SecurityDataType = unknown> {
              * @example "activityDate"
              */
             orderBy?: ActivityListOrderByEnum;
-            /** Specifies the direction of the sorting (ascending or descending) */
-            orderSort?: ActivityListOrderSortEnum;
         },
         params: RequestParams = {},
     ) =>

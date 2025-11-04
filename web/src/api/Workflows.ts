@@ -1,15 +1,4 @@
-/* eslint-disable */
-/* tslint:disable */
-// @ts-nocheck
-/*
- * ---------------------------------------------------------------
- * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
- * ##                                                           ##
- * ## AUTHOR: acacode                                           ##
- * ## SOURCE: https://github.com/acacode/swagger-typescript-api ##
- * ---------------------------------------------------------------
- */
-
+import { PageQuery } from '@xcan-angus/infra';
 import {
   ApiLocaleResultExecutionDetailVo,
   ApiLocaleResultPageResultExecutionLogVo,
@@ -17,15 +6,7 @@ import {
   ApiLocaleResultWorkflowDetailVo,
   ApiLocaleResultWorkflowStatisticsVo,
   ApiResultObject,
-  GetExecutionLogsParamsFilters0OpEnum,
-  GetExecutionLogsParamsFilters1OpEnum,
-  GetExecutionLogsParamsInfoScopeEnum,
-  GetExecutionLogsParamsOrderSortEnum,
-  GetWorkflowListParamsFilters0OpEnum,
-  GetWorkflowListParamsFilters1OpEnum,
-  GetWorkflowListParamsInfoScopeEnum,
-  GetWorkflowListParamsOrderByEnum,
-  GetWorkflowListParamsOrderSortEnum,
+  GetWorkflowListOrderByEnum,
   GetWorkflowListParamsStatusEnum,
   GetWorkflowListParamsTypeEnum,
   ModifyWorkflowVisibilityParamsVisibilityEnum,
@@ -99,7 +80,7 @@ export class Workflows<SecurityDataType = unknown> {
    * @secure
    */
   getWorkflowList = (
-    query?: {
+    query?: PageQuery & {
       /**
        * 工作流名称
        * @example "用户注册流程"
@@ -114,72 +95,8 @@ export class Workflows<SecurityDataType = unknown> {
       type?: GetWorkflowListParamsTypeEnum;
       /** 工作流状态 */
       status?: GetWorkflowListParamsStatusEnum;
-      /**
-       * 所属租户ID
-       * @format int64
-       * @example 1
-       */
-      tenantId?: number;
-      /**
-       * 创建人ID
-       * @format int64
-       * @example 1
-       */
-      createdBy?: number;
-      /**
-       * 创建时间
-       * @format date-time
-       * @example "2024-10-12 00:00:00"
-       */
-      createdDate?: string;
       /** 排序字段 */
-      orderBy?: GetWorkflowListParamsOrderByEnum;
-      /**
-       * Page number for paginated data (default: 1)
-       * @format int32
-       * @min 1
-       * @max 100000
-       */
-      pageNo?: number;
-      /**
-       * Number of items per page (default: 10)
-       * @format int32
-       * @min 1
-       * @max 2000
-       */
-      pageSize?: number;
-      /** Specifies the direction of the sorting (ascending or descending) */
-      orderSort?: GetWorkflowListParamsOrderSortEnum;
-      /** Scope of information to query (BASIC or DETAIL). Interface performance optimization parameters, only valid for some interfaces */
-      infoScope?: GetWorkflowListParamsInfoScopeEnum;
-      /** Whether to use full-text search (default: false, uses DB index search if false) */
-      fullTextSearch?: boolean;
-      /** Search keyword */
-      keyword?: string;
-      /**
-       * ID of the last modifier
-       * @format int64
-       * @example 1
-       */
-      modifiedBy?: number;
-      /**
-       * Last modification date
-       * @format date-time
-       * @example "2024-10-12 00:00:00"
-       */
-      lastModifiedDate?: string;
-      /** Customize the filter parameter name. Note: The parameter name must be a whitelist parameter */
-      "filters[0].key"?: string;
-      /** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
-      "filters[0].op"?: GetWorkflowListParamsFilters0OpEnum;
-      /** Customize the filter value */
-      "filters[0].value"?: any;
-      /** Customize the filter parameter name. Note: The parameter name must be a whitelist parameter */
-      "filters[1].key"?: string;
-      /** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
-      "filters[1].op"?: GetWorkflowListParamsFilters1OpEnum;
-      /** Customize the filter value */
-      "filters[1].value"?: any;
+      orderBy?: GetWorkflowListOrderByEnum;
     },
     params: RequestParams = {},
   ) =>
@@ -367,7 +284,7 @@ export class Workflows<SecurityDataType = unknown> {
    * @secure
    */
   getExecutionLogs = (
-    query?: {
+    query?: PageQuery & {
       /**
        * 工作流ID
        * @format int64
@@ -377,72 +294,6 @@ export class Workflows<SecurityDataType = unknown> {
       workflowName?: string;
       /** 状态筛选 */
       status?: string;
-      /**
-       * Page number for paginated data (default: 1)
-       * @format int32
-       * @min 1
-       * @max 100000
-       */
-      pageNo?: number;
-      /**
-       * Number of items per page (default: 10)
-       * @format int32
-       * @min 1
-       * @max 2000
-       */
-      pageSize?: number;
-      /** Field name to sort the data by */
-      orderBy?: string;
-      /** Specifies the direction of the sorting (ascending or descending) */
-      orderSort?: GetExecutionLogsParamsOrderSortEnum;
-      /** Scope of information to query (BASIC or DETAIL). Interface performance optimization parameters, only valid for some interfaces */
-      infoScope?: GetExecutionLogsParamsInfoScopeEnum;
-      /** Whether to use full-text search (default: false, uses DB index search if false) */
-      fullTextSearch?: boolean;
-      /** Search keyword */
-      keyword?: string;
-      /**
-       * Tenant ID to which this belongs
-       * @format int64
-       * @example 1
-       */
-      tenantId?: number;
-      /**
-       * ID of the creator
-       * @format int64
-       * @example 1
-       */
-      createdBy?: number;
-      /**
-       * Creation date
-       * @format date-time
-       * @example "2024-10-12 00:00:00"
-       */
-      createdDate?: string;
-      /**
-       * ID of the last modifier
-       * @format int64
-       * @example 1
-       */
-      modifiedBy?: number;
-      /**
-       * Last modification date
-       * @format date-time
-       * @example "2024-10-12 00:00:00"
-       */
-      lastModifiedDate?: string;
-      /** Customize the filter parameter name. Note: The parameter name must be a whitelist parameter */
-      "filters[0].key"?: string;
-      /** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
-      "filters[0].op"?: GetExecutionLogsParamsFilters0OpEnum;
-      /** Customize the filter value */
-      "filters[0].value"?: any;
-      /** Customize the filter parameter name. Note: The parameter name must be a whitelist parameter */
-      "filters[1].key"?: string;
-      /** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
-      "filters[1].op"?: GetExecutionLogsParamsFilters1OpEnum;
-      /** Customize the filter value */
-      "filters[1].value"?: any;
     },
     params: RequestParams = {},
   ) =>

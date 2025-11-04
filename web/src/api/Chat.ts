@@ -1,15 +1,4 @@
-/* eslint-disable */
-/* tslint:disable */
-// @ts-nocheck
-/*
- * ---------------------------------------------------------------
- * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
- * ##                                                           ##
- * ## AUTHOR: acacode                                           ##
- * ## SOURCE: https://github.com/acacode/swagger-typescript-api ##
- * ---------------------------------------------------------------
- */
-
+import { PageQuery } from '@xcan-angus/infra';
 import {
   ApiLocaleResultChatStatisticsVo,
   ApiLocaleResultInteger,
@@ -48,19 +37,7 @@ export class Chat<SecurityDataType = unknown> {
    * @secure
    */
   getSessionList = (
-    query?: {
-      /**
-       * 页码
-       * @format int32
-       * @example 1
-       */
-      pageNo?: number;
-      /**
-       * 每页大小
-       * @format int32
-       * @example 20
-       */
-      pageSize?: number;
+    query?: PageQuery & {
       /**
        * 筛选指定应用
        * @format int64
@@ -71,16 +48,6 @@ export class Chat<SecurityDataType = unknown> {
        * @format int64
        */
       modelId?: number;
-      /**
-       * 排序字段
-       * @example "createdDate"
-       */
-      orderBy?: string;
-      /**
-       * 排序方式
-       * @example "desc"
-       */
-      orderSort?: string;
       /** 是否已归档 */
       isArchived?: boolean;
       /** 是否已收藏（星标） */

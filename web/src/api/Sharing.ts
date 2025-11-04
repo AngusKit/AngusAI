@@ -1,15 +1,4 @@
-/* eslint-disable */
-/* tslint:disable */
-// @ts-nocheck
-/*
- * ---------------------------------------------------------------
- * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
- * ##                                                           ##
- * ## AUTHOR: acacode                                           ##
- * ## SOURCE: https://github.com/acacode/swagger-typescript-api ##
- * ---------------------------------------------------------------
- */
-
+import { PageQuery } from '@xcan-angus/infra';
 import {
   ApiLocaleResultMapResourceInfoListSharePermission,
   ApiLocaleResultPageResultResourceSharingListVo,
@@ -19,11 +8,7 @@ import {
   ApiResultObject,
   CheckResourceAccessParamsResourceTypeEnum,
   GetResourcePermissionsParamsResourceTypeEnum,
-  GetResourceSharingListParamsFilters0OpEnum,
-  GetResourceSharingListParamsFilters1OpEnum,
-  GetResourceSharingListParamsInfoScopeEnum,
-  GetResourceSharingListParamsOrderByEnum,
-  GetResourceSharingListParamsOrderSortEnum,
+  GetResourceSharingListOrderByEnum,
   GetResourceSharingListParamsPermissionEnum,
   GetResourceSharingListParamsSharedWithEnum,
   GetResourceSharingListParamsTypeEnum,
@@ -127,7 +112,7 @@ export class Sharing<SecurityDataType = unknown> {
    * @secure
    */
   getResourceSharingList = (
-    query?: {
+    query?: PageQuery & {
       /**
        * 共享ID
        * @format int64
@@ -139,72 +124,8 @@ export class Sharing<SecurityDataType = unknown> {
       permission?: GetResourceSharingListParamsPermissionEnum;
       /** 共享范围筛选 */
       sharedWith?: GetResourceSharingListParamsSharedWithEnum;
-      /**
-       * 所属租户ID
-       * @format int64
-       * @example 1
-       */
-      tenantId?: number;
-      /**
-       * 创建人ID
-       * @format int64
-       * @example 1
-       */
-      createdBy?: number;
-      /**
-       * 创建时间
-       * @format date-time
-       * @example "2024-10-12 00:00:00"
-       */
-      createdDate?: string;
       /** 排序字段 */
-      orderBy?: GetResourceSharingListParamsOrderByEnum;
-      /**
-       * Page number for paginated data (default: 1)
-       * @format int32
-       * @min 1
-       * @max 100000
-       */
-      pageNo?: number;
-      /**
-       * Number of items per page (default: 10)
-       * @format int32
-       * @min 1
-       * @max 2000
-       */
-      pageSize?: number;
-      /** Specifies the direction of the sorting (ascending or descending) */
-      orderSort?: GetResourceSharingListParamsOrderSortEnum;
-      /** Scope of information to query (BASIC or DETAIL). Interface performance optimization parameters, only valid for some interfaces */
-      infoScope?: GetResourceSharingListParamsInfoScopeEnum;
-      /** Whether to use full-text search (default: false, uses DB index search if false) */
-      fullTextSearch?: boolean;
-      /** Search keyword */
-      keyword?: string;
-      /**
-       * ID of the last modifier
-       * @format int64
-       * @example 1
-       */
-      modifiedBy?: number;
-      /**
-       * Last modification date
-       * @format date-time
-       * @example "2024-10-12 00:00:00"
-       */
-      lastModifiedDate?: string;
-      /** Customize the filter parameter name. Note: The parameter name must be a whitelist parameter */
-      "filters[0].key"?: string;
-      /** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
-      "filters[0].op"?: GetResourceSharingListParamsFilters0OpEnum;
-      /** Customize the filter value */
-      "filters[0].value"?: any;
-      /** Customize the filter parameter name. Note: The parameter name must be a whitelist parameter */
-      "filters[1].key"?: string;
-      /** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
-      "filters[1].op"?: GetResourceSharingListParamsFilters1OpEnum;
-      /** Customize the filter value */
-      "filters[1].value"?: any;
+      orderBy?: GetResourceSharingListOrderByEnum;
     },
     params: RequestParams = {},
   ) =>

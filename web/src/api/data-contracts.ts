@@ -7288,7 +7288,7 @@ export enum GetWorkflowListParamsStatusEnum {
 }
 
 /** 排序字段 */
-export enum GetWorkflowListParamsOrderByEnum {
+export enum GetWorkflowListOrderByEnum {
   Id = "id",
   CreatedDate = "createdDate",
   Name = "name",
@@ -7320,7 +7320,7 @@ export enum GetResourceSharingListParamsSharedWithEnum {
 }
 
 /** 排序字段 */
-export enum GetResourceSharingListParamsOrderByEnum {
+export enum GetResourceSharingListOrderByEnum {
   Id = "id",
   Type = "type",
   Permission = "permission",
@@ -7367,7 +7367,7 @@ export enum GetPluginListParamsTypeEnum {
 }
 
 /** 排序字段 */
-export enum GetPluginListParamsOrderByEnum {
+export enum GetPluginListOrderByEnum {
   Id = "id",
   CreatedDate = "createdDate",
   Name = "name",
@@ -7447,7 +7447,7 @@ export enum GetKnowledgeBaseListParamsVisibilityEnum {
  * 排序字段
  * @example "modifiedDate"
  */
-export enum GetKnowledgeBaseListParamsOrderByEnum {
+export enum GetKnowledgeBaseListOrderByEnum {
   CreatedDate = "createdDate",
   ModifiedDate = "modifiedDate",
   DocumentsCount = "documentsCount",
@@ -7472,7 +7472,7 @@ export enum GetDocumentListParamsStatusEnum {
 }
 
 /** 排序字段 */
-export enum GetDocumentListParamsOrderByEnum {
+export enum GetDocumentListOrderByEnum {
   Id = "id",
   CreatedDate = "createdDate",
   Name = "name",
@@ -7496,7 +7496,7 @@ export enum GetDatasetListParamsVisibilityEnum {
  * 排序字段
  * @example "modifiedDate"
  */
-export enum GetDatasetListParamsOrderByEnum {
+export enum GetDatasetListOrderByEnum {
   Name = "name",
   Type = "type",
   Status = "status",
@@ -7523,7 +7523,7 @@ export enum GetApplicationListParamsStatusEnum {
  * 排序字段
  * @example "modifiedDate"
  */
-export enum GetApplicationListParamsOrderByEnum {
+export enum GetApplicationListOrderByEnum {
   CreatedDate = "createdDate",
   ModifiedDate = "modifiedDate",
   Status = "status",
@@ -7591,7 +7591,7 @@ export enum GetDatasetDataListParamsStatusEnum {
  * 排序字段
  * @example "modifiedDate"
  */
-export enum GetDatasetDataListParamsOrderByEnum {
+export enum GetDatasetDataListOrderByEnum {
   Name = "name",
   Type = "type",
   Size = "size",
