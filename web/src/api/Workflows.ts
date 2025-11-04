@@ -6,15 +6,13 @@ import {
   WorkflowDetailResult,
   WorkflowStatisticsResult,
   GetWorkflowListOrderByEnum,
-  GetWorkflowListParamsStatusEnum,
-  GetWorkflowListParamsTypeEnum,
-  ModifyWorkflowVisibilityParamsVisibilityEnum,
   WorkflowConfigUpdateDto,
   WorkflowCreateDto,
   WorkflowExecuteDto,
   WorkflowUpdateDto,
 } from "./data-contracts.ts";
 import { ContentType, HttpClient, RequestParams } from "./http-client.ts";
+import {VisibilityEnum, WorkflowStatusEnum, WorkflowTypeEnum} from "@/enums/enums.ts";
 
 export class Workflows<SecurityDataType = unknown> {
   http: HttpClient<SecurityDataType>;
@@ -36,7 +34,7 @@ export class Workflows<SecurityDataType = unknown> {
     id: number,
     query: {
       /** 可见性 */
-      visibility: ModifyWorkflowVisibilityParamsVisibilityEnum;
+      visibility: VisibilityEnum;
     },
     params: RequestParams = {},
   ) =>
@@ -91,9 +89,9 @@ export class Workflows<SecurityDataType = unknown> {
        */
       iconBg?: string;
       /** 工作流类型 */
-      type?: GetWorkflowListParamsTypeEnum;
+      type?: WorkflowTypeEnum;
       /** 工作流状态 */
-      status?: GetWorkflowListParamsStatusEnum;
+      status?: WorkflowStatusEnum;
       /** 排序字段 */
       orderBy?: GetWorkflowListOrderByEnum;
     },

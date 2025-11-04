@@ -4,18 +4,14 @@ import {
   PageResultPluginListResult,
   PluginDetailResult,
   PluginStatisticsResult,
-  GetPluginListParamsCategoryEnum,
   GetPluginListOrderByEnum,
-  GetPluginListParamsStatusEnum,
-  GetPluginListParamsTypeEnum,
-  GetPluginStatisticsParamsPeriodEnum,
-  ModifyPluginStatusParamsStatusEnum,
   PluginCreateDto,
   PluginReviewCreateDto,
   PluginUpdateDto,
   PluginVerifyDto,
 } from "./data-contracts.ts";
 import { ContentType, HttpClient, RequestParams } from "./http-client.ts";
+import {PluginCategoryEnum, PluginStatusEnum, PluginTypeEnum, StatisticsPeriodEnum} from "@/enums/enums.ts";
 
 export class Plugins<SecurityDataType = unknown> {
   http: HttpClient<SecurityDataType>;
@@ -37,7 +33,7 @@ export class Plugins<SecurityDataType = unknown> {
     id: number,
     query: {
       /** 插件状态 */
-      status: ModifyPluginStatusParamsStatusEnum;
+      status: PluginStatusEnum;
     },
     params: RequestParams = {},
   ) =>
@@ -67,11 +63,11 @@ export class Plugins<SecurityDataType = unknown> {
       /** 插件名称 */
       name?: string;
       /** 分类筛选 */
-      category?: GetPluginListParamsCategoryEnum;
+      category?: PluginCategoryEnum;
       /** 状态筛选 */
-      status?: GetPluginListParamsStatusEnum;
+      status?: PluginStatusEnum;
       /** 类型筛选 */
-      type?: GetPluginListParamsTypeEnum;
+      type?: PluginTypeEnum;
       /** 是否公开 */
       isPublic?: boolean;
       /** 是否系统插件 */
@@ -323,7 +319,7 @@ export class Plugins<SecurityDataType = unknown> {
   getPluginStatistics = (
     query?: {
       /** 统计周期 */
-      period?: GetPluginStatisticsParamsPeriodEnum;
+      period?: StatisticsPeriodEnum;
     },
     params: RequestParams = {},
   ) =>

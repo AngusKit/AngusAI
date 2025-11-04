@@ -1,4 +1,35 @@
-import { ApiLocaleResult, TenantAuditingVo } from '@xcan-angus/infra';
+import {ApiLocaleResult, TenantAuditingVo} from '@xcan-angus/infra';
+import {
+  ApiKeyPermissionsEnum,
+  ApiKeyStatusEnum,
+  ApplicationCategoryEnum,
+  ApplicationStatusEnum,
+  DatasetDataStatusEnum,
+  DatasetDataTypeEnum,
+  DatasetStatusEnum,
+  DatasetTypeEnum,
+  DatasourceTypeEnum,
+  IndustryEnum,
+  KnowledgeBaseDocStatusEnum,
+  KnowledgeBaseDocTypeEnum,
+  MemberPermissionEnum,
+  MessageRoleEnum,
+  MetricTrendEnum,
+  ModelFeaturesEnum,
+  ModelProviderEnum,
+  ModelStatusEnum,
+  ModelTypeEnum,
+  PluginCategoryEnum,
+  PluginStatusEnum,
+  PluginTypeEnum,
+  ResourceTypeEnum,
+  SharedWithEnum,
+  SyncDataStatusEnum,
+  TeamScaleEnum,
+  VisibilityEnum,
+  WorkflowStatusEnum,
+  WorkflowTypeEnum
+} from "@/enums/enums.ts";
 
 export interface ExecutionStats {
   /** @format int64 */
@@ -36,9 +67,9 @@ export interface WorkflowDetailVo extends TenantAuditingVo {
   /** 背景色 */
   iconBg?: string;
   /** 工作流类型 */
-  type?: WorkflowDetailVoTypeEnum;
+  type?: WorkflowTypeEnum;
   /** 工作流状态 */
-  status?: WorkflowDetailVoStatusEnum;
+  status?: WorkflowStatusEnum;
   /** 是否启用 */
   enabled?: boolean;
   /** 版本号 */
@@ -71,9 +102,9 @@ export interface TeamSettingsDto {
   /** 团队描述 */
   teamDescription?: string;
   /** 团队规模 */
-  teamScale?: TeamSettingsDtoTeamScaleEnum;
+  teamScale?: TeamScaleEnum;
   /** 所在行业 */
-  industry?: TeamSettingsDtoIndustryEnum;
+  industry?: IndustryEnum;
 }
 
 /** The API response result of supporting international message. */
@@ -97,9 +128,9 @@ export interface TeamSettingsVo extends TenantAuditingVo {
   /** 团队描述 */
   teamDescription?: string;
   /** 团队规模 */
-  teamScale?: TeamSettingsVoTeamScaleEnum;
+  teamScale?: TeamScaleEnum;
   /** 所在行业 */
-  industry?: TeamSettingsVoIndustryEnum;
+  industry?: IndustryEnum;
 }
 
 /** 资源共享启用状态切换请求参数 */
@@ -129,7 +160,7 @@ export interface MemberVo {
   /** 头像 */
   userAvatar?: string;
   /** 权限 */
-  permission?: MemberVoPermissionEnum;
+  permission?: MemberPermissionEnum;
   /**
    * 共享时间
    * @format date-time
@@ -175,15 +206,15 @@ export interface ResourceSharingDetailVo extends TenantAuditingVo {
   /** 资源名称 */
   resourceName?: string;
   /** 资源类型 */
-  resourceType?: ResourceSharingDetailVoResourceTypeEnum;
+  resourceType?: ResourceTypeEnum;
   /** 是否启用 */
   enabled?: boolean;
   /** 所有者信息 */
   owner?: OwnerVo;
   /** 共享范围 */
-  sharedWith?: ResourceSharingDetailVoSharedWithEnum;
+  sharedWith?: SharedWithEnum;
   /** 默认权限 */
-  permission?: ResourceSharingDetailVoPermissionEnum;
+  permission?: MemberPermissionEnum;
   /**
    * 成员数量
    * @format int64
@@ -196,9 +227,9 @@ export interface ResourceSharingDetailVo extends TenantAuditingVo {
 /** 更新资源共享参数 */
 export interface ResourceSharingUpdateDto {
   /** 共享范围 */
-  sharedWith: ResourceSharingUpdateDtoSharedWithEnum;
+  sharedWith: SharedWithEnum;
   /** 权限 */
-  permission: ResourceSharingUpdateDtoPermissionEnum;
+  permission: MemberPermissionEnum;
   /** 成员ID列表 */
   memberIds?: number[];
 }
@@ -227,11 +258,11 @@ export interface PluginDetailVo extends TenantAuditingVo {
   /** 版本号 */
   version?: string;
   /** 插件分类 */
-  category?: PluginDetailVoCategoryEnum;
+  category?: PluginCategoryEnum;
   /** 插件状态 */
-  status?: PluginDetailVoStatusEnum;
+  status?: PluginStatusEnum;
   /** 插件类型 */
-  type?: PluginDetailVoTypeEnum;
+  type?: PluginTypeEnum;
   /** 标签列表 */
   tags?: string[];
   /**
@@ -323,9 +354,9 @@ export interface ModelConfig {
   /** 模型名称，例如 gpt-4o-mini */
   modelName: string;
   /** 模型类型，如：CHAT, EMBEDDING, VISION 等 */
-  modelType: ModelConfigModelTypeEnum;
+  modelType: ModelTypeEnum;
   /** 模型提供商，如：OPENAI、ANTHROPIC、OLLAMA 等 */
-  provider: ModelConfigProviderEnum;
+  provider: ModelProviderEnum;
   /** 模型版本标识 */
   version: string;
   /** 模型用途或能力描述 */
@@ -386,7 +417,7 @@ export interface ModelConfig {
    * 模型支持的特性枚举集合
    * @uniqueItems true
    */
-  features?: ModelConfigFeaturesEnum[];
+  features?: ModelFeaturesEnum[];
   /**
    * 支持的多模态类型，例如：image, audio
    * @uniqueItems true
@@ -487,13 +518,13 @@ export interface ModelDetailVo extends TenantAuditingVo {
   /** 模型描述 */
   description?: string;
   /** 模型类型 */
-  type?: ModelDetailVoTypeEnum;
+  type?: ModelTypeEnum;
   /** 模型提供商 */
-  provider?: ModelDetailVoProviderEnum;
+  provider?: ModelProviderEnum;
   /** 版本号 */
   version?: string;
   /** 模型状态 */
-  status?: ModelDetailVoStatusEnum;
+  status?: ModelStatusEnum;
   /** 配置信息 */
   config?: ModelConfig;
   /** 模型访问限制 */
@@ -701,7 +732,7 @@ export interface KnowledgeBaseDetailVo extends TenantAuditingVo {
    * 可见性
    * @example "PRIVATE"
    */
-  visibility?: KnowledgeBaseDetailVoVisibilityEnum;
+  visibility?: VisibilityEnum;
   /** 统计信息 */
   stats?: KnowledgeBaseStatsVo;
   /** 配置信息 */
@@ -777,7 +808,7 @@ export interface KnowledgeBaseDocListVo extends TenantAuditingVo {
    * 文档类型
    * @example "PDF"
    */
-  type?: KnowledgeBaseDocListVoTypeEnum;
+  type?: KnowledgeBaseDocTypeEnum;
   /**
    * 文件大小
    * @example 2.5
@@ -787,7 +818,7 @@ export interface KnowledgeBaseDocListVo extends TenantAuditingVo {
    * 处理状态
    * @example "COMPLETED"
    */
-  status?: KnowledgeBaseDocListVoStatusEnum;
+  status?: KnowledgeBaseDocStatusEnum;
   /**
    * 是否启用
    * @example true
@@ -845,11 +876,11 @@ export interface DatasetDetailVo extends TenantAuditingVo {
   /** 数据集描述 */
   description?: string;
   /** 数据集类型 */
-  type?: DatasetDetailVoTypeEnum;
+  type?: DatasetTypeEnum;
   /** 数据集状态 */
-  status?: DatasetDetailVoStatusEnum;
+  status?: DatasetStatusEnum;
   /** 可见性 */
-  visibility?: DatasetDetailVoVisibilityEnum;
+  visibility?: VisibilityEnum;
   /** 图标emoji */
   icon?: string;
   /** 背景色 */
@@ -867,7 +898,7 @@ export interface DatasourceConfigVo {
   /** 数据源名称 */
   name?: string;
   /** 数据库类型 */
-  databaseType?: DatasourceConfigVoDatabaseTypeEnum;
+  databaseType?: DatasourceTypeEnum;
   /** 数据库 */
   database?: string;
   /** 数据库Jdbc URL */
@@ -896,7 +927,7 @@ export interface DataSourceUpdateDto {
    * 数据源类型
    * @example "database"
    */
-  databaseType: DataSourceUpdateDtoDatabaseTypeEnum;
+  databaseType: DatasourceTypeEnum;
   /** 数据库 */
   database?: string;
   /** 数据库Jdbc URL */
@@ -958,9 +989,9 @@ export interface ApplicationDetailVo extends TenantAuditingVo {
   /** 应用描述 */
   description?: string;
   /** 应用分类 */
-  category?: ApplicationDetailVoCategoryEnum;
+  category?: ApplicationCategoryEnum;
   /** 应用状态 */
-  status?: ApplicationDetailVoStatusEnum;
+  status?: ApplicationStatusEnum;
   /** 默认语言 */
   language?: string;
   /**
@@ -1263,7 +1294,7 @@ export interface WorkflowCreateDto {
    */
   iconBg?: string;
   /** 工作流类型 */
-  type: WorkflowCreateDtoTypeEnum;
+  type: WorkflowTypeEnum;
   /** 初始配置 */
   config?: object;
 }
@@ -1318,11 +1349,11 @@ export interface ResourceSharingCreateDto {
    */
   resourceId: number;
   /** 资源类型 */
-  resourceType: ResourceSharingCreateDtoResourceTypeEnum;
+  resourceType: ResourceTypeEnum;
   /** 共享范围（all-全体成员，specific-指定成员） */
-  sharedWith: ResourceSharingCreateDtoSharedWithEnum;
+  sharedWith: SharedWithEnum;
   /** 权限（view-查看，edit-编辑，manage-管理） */
-  permission: ResourceSharingCreateDtoPermissionEnum;
+  permission: MemberPermissionEnum;
   /** 指定成员ID列表（sharedWith为specific时必填） */
   memberIds?: number[];
 }
@@ -1338,7 +1369,7 @@ export interface ApiKeyCreateDto {
    * 权限列表
    * @example ["READ","WRITE"]
    */
-  permissions: ApiKeyCreateDtoPermissionsEnum[];
+  permissions: ApiKeyPermissionsEnum[];
   /** 授权资源列表 */
   authorizedResources?: AuthorizedResource[];
   /**
@@ -1374,7 +1405,7 @@ export interface AuthorizedResource {
    * 资源类型
    * @example "APPLICATION"
    */
-  type?: AuthorizedResourceTypeEnum;
+  type?: ResourceTypeEnum;
   /**
    * 资源ID列表（空数组表示全部）
    * @example []
@@ -1398,11 +1429,11 @@ export interface ApiKeyDetailVo extends TenantAuditingVo {
   /** 部分可见密钥 */
   keyVisible?: string;
   /** 状态 */
-  status?: ApiKeyDetailVoStatusEnum;
+  status?: ApiKeyStatusEnum;
   /** 状态颜色 */
   statusColor?: string;
   /** 权限列表 */
-  permissions?: ApiKeyDetailVoPermissionsEnum[];
+  permissions?: ApiKeyPermissionsEnum[];
   /** 授权资源列表 */
   authorizedResources?: AuthorizedResourceVo[];
   /**
@@ -1454,7 +1485,7 @@ export type ApiKeyDetailResult = ApiLocaleResult & {
 /** 授权资源 */
 export interface AuthorizedResourceVo {
   /** 资源类型 */
-  type?: AuthorizedResourceVoTypeEnum;
+  type?: ResourceTypeEnum;
   /** 资源ID列表 */
   ids?: number[];
   /** 资源名称列表 */
@@ -1644,9 +1675,9 @@ export interface PluginCreateDto {
    */
   version: string;
   /** 插件分类 */
-  category: PluginCreateDtoCategoryEnum;
+  category: PluginCategoryEnum;
   /** 插件类型 */
-  type: PluginCreateDtoTypeEnum;
+  type: PluginTypeEnum;
   /** 标签列表 */
   tags?: string[];
   /**
@@ -1743,9 +1774,9 @@ export interface PluginVerifyDto {
    */
   version: string;
   /** 插件分类 */
-  category: PluginVerifyDtoCategoryEnum;
+  category: PluginCategoryEnum;
   /** 插件类型 */
-  type: PluginVerifyDtoTypeEnum;
+  type: PluginTypeEnum;
   /**
    * 插件规范文件，最大支持200MB
    * @format binary
@@ -1766,9 +1797,9 @@ export interface ModelCreateDto {
    */
   description: string;
   /** 模型类型 */
-  type: ModelCreateDtoTypeEnum;
+  type: ModelTypeEnum;
   /** 模型提供商 */
-  provider: ModelCreateDtoProviderEnum;
+  provider: ModelProviderEnum;
   /**
    * 版本号
    * @example "gpt-4-1106-preview"
@@ -1849,7 +1880,7 @@ export interface KnowledgeBaseCreateDto {
    * 可见性
    * @example "PRIVATE"
    */
-  visibility: KnowledgeBaseCreateDtoVisibilityEnum;
+  visibility: VisibilityEnum;
   /**
    * 标签
    * @example ["产品","文档"]
@@ -1877,7 +1908,7 @@ export interface KnowledgeBaseDocStatusVo {
    * 处理状态
    * @example "PROCESSING"
    */
-  status?: KnowledgeBaseDocStatusVoStatusEnum;
+  status?: KnowledgeBaseDocStatusEnum;
   /**
    * 处理进度
    * @format int32
@@ -1982,9 +2013,9 @@ export interface DatasetCreateDto {
    */
   description: string;
   /** 数据类型 */
-  type: DatasetCreateDtoTypeEnum;
+  type: DatasetTypeEnum;
   /** 可见性 */
-  visibility: DatasetCreateDtoVisibilityEnum;
+  visibility: VisibilityEnum;
   /**
    * 图标emoji
    * @example "📊"
@@ -2015,9 +2046,9 @@ export interface DatasetDataListVo extends TenantAuditingVo {
   /** 数据集数据名称 */
   name?: string;
   /** 数据类型 */
-  type?: DatasetDataListVoTypeEnum;
+  type?: DatasetDataTypeEnum;
   /** 状态 */
-  status?: DatasetDataListVoStatusEnum;
+  status?: DatasetDataStatusEnum;
   /**
    * 数据记录数
    * @format int64
@@ -2038,7 +2069,7 @@ export interface SyncDataVo {
   /** 同步文件名或表名 */
   name?: string;
   /** 同步状态 */
-  status?: SyncDataVoStatusEnum;
+  status?: SyncDataStatusEnum;
   /** 失败原因 */
   failedReason?: string;
 }
@@ -2051,7 +2082,7 @@ export interface DatasourceConnectionTestDto {
    */
   datasetId?: number;
   /** 数据源类型 */
-  databaseType?: DatasourceConnectionTestDtoDatabaseTypeEnum;
+  databaseType?: DatasourceTypeEnum;
   /** 数据库 */
   database?: string;
   /** 数据库Jdbc URL */
@@ -2231,7 +2262,7 @@ export interface MessageVo {
    */
   sessionId?: number;
   /** 消息角色 */
-  role?: MessageVoRoleEnum;
+  role?: MessageRoleEnum;
   /** 消息内容 */
   content?: string;
   /** 附件列表 */
@@ -2344,7 +2375,7 @@ export interface ApplicationCreateDto {
    */
   description?: string;
   /** 应用分类 */
-  category: ApplicationCreateDtoCategoryEnum;
+  category: ApplicationCategoryEnum;
   /**
    * 默认语言
    * @example "zh-CN"
@@ -2400,7 +2431,7 @@ export interface WorkflowUpdateDto {
    */
   iconBg?: string;
   /** 工作流类型 */
-  type?: WorkflowUpdateDtoTypeEnum;
+  type?: WorkflowTypeEnum;
 }
 
 /** 更新提示词请求参数 */
@@ -2448,11 +2479,11 @@ export interface PluginUpdateDto {
   /** 版本号 */
   version?: string;
   /** 插件分类 */
-  category?: PluginUpdateDtoCategoryEnum;
+  category?: PluginCategoryEnum;
   /** 插件状态 */
-  status?: PluginUpdateDtoStatusEnum;
+  status?: PluginStatusEnum;
   /** 插件类型 */
-  type?: PluginUpdateDtoTypeEnum;
+  type?: PluginTypeEnum;
   /** 标签列表 */
   tags?: string[];
   /** 是否公开 */
@@ -2496,9 +2527,9 @@ export interface ModelUpdateDto {
    */
   description?: string;
   /** 模型类型 */
-  type?: ModelUpdateDtoTypeEnum;
+  type?: ModelTypeEnum;
   /** 模型提供商 */
-  provider?: ModelUpdateDtoProviderEnum;
+  provider?: ModelProviderEnum;
   /**
    * 版本号
    * @example "gpt-4-1106-preview"
@@ -2549,7 +2580,7 @@ export interface KnowledgeBaseUpdateDto {
    * 可见性
    * @example "PRIVATE"
    */
-  visibility?: KnowledgeBaseUpdateDtoVisibilityEnum;
+  visibility?: VisibilityEnum;
   /**
    * 标签
    * @example ["产品","文档"]
@@ -2582,7 +2613,7 @@ export interface DatasetUpdateDto {
    */
   iconBg?: string;
   /** 可见性 */
-  visibility?: DatasetUpdateDtoVisibilityEnum;
+  visibility?: VisibilityEnum;
   /** 标签，最多5个 */
   tags?: string[];
 }
@@ -2637,7 +2668,7 @@ export interface ApplicationUpdateDto {
    */
   description?: string;
   /** 应用分类 */
-  category?: ApplicationUpdateDtoCategoryEnum;
+  category?: ApplicationCategoryEnum;
   /**
    * 默认语言
    * @example "zh-CN"
@@ -2678,9 +2709,9 @@ export interface WorkflowListVo extends TenantAuditingVo {
   /** 背景色 */
   iconBg?: string;
   /** 工作流类型 */
-  type?: WorkflowListVoTypeEnum;
+  type?: WorkflowTypeEnum;
   /** 工作流状态 */
-  status?: WorkflowListVoStatusEnum;
+  status?: WorkflowStatusEnum;
   /** 是否启用 */
   enabled?: boolean;
   /**
@@ -2849,7 +2880,7 @@ export interface ResourceSharingListVo extends TenantAuditingVo {
   /** 资源名称 */
   resourceName?: string;
   /** 资源类型 */
-  resourceType?: ResourceSharingListVoResourceTypeEnum;
+  resourceType?: ResourceTypeEnum;
   /** 是否启用 */
   enabled?: boolean;
   /**
@@ -2864,14 +2895,14 @@ export interface ResourceSharingListVo extends TenantAuditingVo {
   /** 所有者头像 */
   ownerAvatar?: string;
   /** 共享范围 */
-  sharedWith?: ResourceSharingListVoSharedWithEnum;
+  sharedWith?: SharedWithEnum;
   /**
    * 成员数量
    * @format int32
    */
   memberCount?: number;
   /** 权限 */
-  permission?: ResourceSharingListVoPermissionEnum;
+  permission?: MemberPermissionEnum;
   /**
    * 访问次数
    * @format int64
@@ -2934,7 +2965,7 @@ export interface ResourceSharingStatisticsVo {
    */
   totalAccesses?: number;
   /** 共享资源平均授权权限 */
-  avgPermission?: ResourceSharingStatisticsVoAvgPermissionEnum;
+  avgPermission?: MemberPermissionEnum;
   /** 共享资源访问统计 */
   accessStats?: AccessStatisticsVo;
 }
@@ -2966,7 +2997,7 @@ export interface ResourceAccessCheckVo {
   /** 是否有访问权限 */
   hasAccess?: boolean;
   /** 资源授权权限列表 */
-  resourcePermissions?: ResourceAccessCheckVoResourcePermissionsEnum[];
+  resourcePermissions?: MemberPermissionEnum[];
   /**
    * 授权用户ID
    * @format int64
@@ -2980,7 +3011,7 @@ export interface ResourceAccessCheckVo {
 export type ResourceInfoListSharePermissionResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: Record<
-    string, ApiLocaleResultMapResourceInfoListSharePermissionDataEnum[]
+    string, MemberPermissionEnum[]
   >;
 };
 
@@ -2998,11 +3029,11 @@ export interface ApiKeyListVo extends TenantAuditingVo {
   /** 部分可见密钥 */
   keyVisible?: string;
   /** 状态 */
-  status?: ApiKeyListVoStatusEnum;
+  status?: ApiKeyStatusEnum;
   /** 状态颜色 */
   statusColor?: string;
   /** 权限列表 */
-  permissions?: ApiKeyListVoPermissionsEnum[];
+  permissions?: ApiKeyPermissionsEnum[];
   /** 授权资源列表 */
   authorizedResources?: AuthorizedResourceVo[];
   /**
@@ -3127,11 +3158,11 @@ export interface PluginListVo extends TenantAuditingVo {
   /** 版本号 */
   version?: string;
   /** 插件分类 */
-  category?: PluginListVoCategoryEnum;
+  category?: PluginCategoryEnum;
   /** 插件状态 */
-  status?: PluginListVoStatusEnum;
+  status?: PluginStatusEnum;
   /** 插件类型 */
-  type?: PluginListVoTypeEnum;
+  type?: PluginTypeEnum;
   /** 标签列表 */
   tags?: string[];
   /**
@@ -3191,7 +3222,7 @@ export type PluginStatisticsResult = ApiLocaleResult & {
 /** 分类统计 */
 export interface CategoryStats {
   /** 分类 */
-  category?: CategoryStatsCategoryEnum;
+  category?: PluginCategoryEnum;
   /**
    * 插件数量
    * @format int64
@@ -3305,13 +3336,13 @@ export interface ModelListVo extends TenantAuditingVo {
   /** 模型描述 */
   description?: string;
   /** 模型类型 */
-  type?: ModelListVoTypeEnum;
+  type?: ModelTypeEnum;
   /** 模型提供商 */
-  provider?: ModelListVoProviderEnum;
+  provider?: ModelProviderEnum;
   /** 版本号 */
   version?: string;
   /** 模型状态 */
-  status?: ModelListVoStatusEnum;
+  status?: ModelStatusEnum;
 }
 
 export interface PageModelListVo {
@@ -3448,7 +3479,7 @@ export interface KnowledgeBaseListVo extends TenantAuditingVo {
    * 可见性
    * @example "PRIVATE"
    */
-  visibility?: KnowledgeBaseListVoVisibilityEnum;
+  visibility?: VisibilityEnum;
 }
 
 export interface PageKnowledgeBaseListVo {
@@ -3497,11 +3528,11 @@ export interface DatasetListVo extends TenantAuditingVo {
   /** 数据集描述 */
   description?: string;
   /** 数据集类型 */
-  type?: DatasetListVoTypeEnum;
+  type?: DatasetTypeEnum;
   /** 数据集状态 */
-  status?: DatasetListVoStatusEnum;
+  status?: DatasetStatusEnum;
   /** 可见性 */
-  visibility?: DatasetListVoVisibilityEnum;
+  visibility?: VisibilityEnum;
   /** 图标emoji */
   icon?: string;
   /** 背景色 */
@@ -3617,7 +3648,7 @@ export type PageSessionListResult = ApiLocaleResult & {
 /** 最后一条消息 */
 export interface LastMessage {
   /** 消息角色 */
-  role?: LastMessageRoleEnum;
+  role?: MessageRoleEnum;
   /** 消息摘要 */
   content?: string;
   /**
@@ -3828,9 +3859,9 @@ export interface ApplicationListVo extends TenantAuditingVo {
   /** 应用描述 */
   description?: string;
   /** 应用分类 */
-  category?: ApplicationListVoCategoryEnum;
+  category?: ApplicationCategoryEnum;
   /** 应用状态 */
-  status?: ApplicationListVoStatusEnum;
+  status?: ApplicationStatusEnum;
   /** 使用的模型 */
   model?: string;
   /**
@@ -4142,7 +4173,7 @@ export interface MetricVo {
    */
   change?: string;
   /** 趋势 */
-  trend?: MetricVoTrendEnum;
+  trend?: MetricTrendEnum;
   /**
    * 对比说明
    * @example "与上周期相比"
@@ -4347,7 +4378,7 @@ export interface ErrorByStatusCodeVo {
    */
   percentageValue?: number;
   /** 趋势 */
-  trend?: ErrorByStatusCodeVoTrendEnum;
+  trend?: MetricTrendEnum;
   /**
    * 变化
    * @example "+12%"
@@ -4456,921 +4487,26 @@ export interface DatasetDataBatchDeleteDto {
   names?: string[];
 }
 
-/** 工作流类型 */
-export enum WorkflowDetailVoTypeEnum {
-  SINGLE_TASK = "SINGLE_TASK",
-  MULTI_TURN = "MULTI_TURN",
-  SCHEDULED = "SCHEDULED",
-  EVENT_DRIVEN = "EVENT_DRIVEN",
-}
 
-/** 工作流状态 */
-export enum WorkflowDetailVoStatusEnum {
-  DRAFT = "DRAFT",
-  RUNNING = "RUNNING",
-  STOPPED = "STOPPED",
-}
-
-/** 团队规模 */
-export enum TeamSettingsDtoTeamScaleEnum {
-  MICRO = "MICRO",
-  SMALL = "SMALL",
-  MEDIUM = "MEDIUM",
-  LARGE = "LARGE",
-  ENTERPRISE = "ENTERPRISE",
-}
-
-/** 所在行业 */
-export enum TeamSettingsDtoIndustryEnum {
-  INTERNET = "INTERNET",
-  FINANCE = "FINANCE",
-  MANUFACTURING = "MANUFACTURING",
-  RETAIL = "RETAIL",
-  EDUCATION = "EDUCATION",
-  MEDICAL = "MEDICAL",
-  ENTERTAINMENT = "ENTERTAINMENT",
-  REAL_ESTATE = "REAL_ESTATE",
-  LOGISTICS = "LOGISTICS",
-  ENERGY = "ENERGY",
-  GOVERNMENT = "GOVERNMENT",
-  CONSULTING = "CONSULTING",
-  AGRICULTURE = "AGRICULTURE",
-  OTHER = "OTHER",
-}
-
-/** 团队规模 */
-export enum TeamSettingsVoTeamScaleEnum {
-  MICRO = "MICRO",
-  SMALL = "SMALL",
-  MEDIUM = "MEDIUM",
-  LARGE = "LARGE",
-  ENTERPRISE = "ENTERPRISE",
-}
-
-/** 所在行业 */
-export enum TeamSettingsVoIndustryEnum {
-  INTERNET = "INTERNET",
-  FINANCE = "FINANCE",
-  MANUFACTURING = "MANUFACTURING",
-  RETAIL = "RETAIL",
-  EDUCATION = "EDUCATION",
-  MEDICAL = "MEDICAL",
-  ENTERTAINMENT = "ENTERTAINMENT",
-  REAL_ESTATE = "REAL_ESTATE",
-  LOGISTICS = "LOGISTICS",
-  ENERGY = "ENERGY",
-  GOVERNMENT = "GOVERNMENT",
-  CONSULTING = "CONSULTING",
-  AGRICULTURE = "AGRICULTURE",
-  OTHER = "OTHER",
-}
-
-/** 权限 */
-export enum MemberVoPermissionEnum {
-  VIEW = "VIEW",
-  EDIT = "EDIT",
-  MANAGE = "MANAGE",
-}
-
-/** 资源类型 */
-export enum ResourceSharingDetailVoResourceTypeEnum {
-  APPLICATION = "APPLICATION",
-  WORKFLOW = "WORKFLOW",
-  DATASET = "DATASET",
-  KNOWLEDGE = "KNOWLEDGE",
-  PLUGIN = "PLUGIN",
-  MODEL = "MODEL",
-}
-
-/** 共享范围 */
-export enum ResourceSharingDetailVoSharedWithEnum {
-  ALL = "ALL",
-  SPECIFIC = "SPECIFIC",
-}
-
-/** 默认权限 */
-export enum ResourceSharingDetailVoPermissionEnum {
-  VIEW = "VIEW",
-  EDIT = "EDIT",
-  MANAGE = "MANAGE",
-}
-
-/** 共享范围 */
-export enum ResourceSharingUpdateDtoSharedWithEnum {
-  ALL = "ALL",
-  SPECIFIC = "SPECIFIC",
-}
-
-/** 权限 */
-export enum ResourceSharingUpdateDtoPermissionEnum {
-  VIEW = "VIEW",
-  EDIT = "EDIT",
-  MANAGE = "MANAGE",
-}
-
-/** 插件分类 */
-export enum PluginDetailVoCategoryEnum {
-  TOOLS = "TOOLS",
-  DATASOURCE = "DATASOURCE",
-  NOTIFICATION = "NOTIFICATION",
-  FILE_PROCESSING = "FILE_PROCESSING",
-  SEARCH = "SEARCH",
-  ANALYTICS = "ANALYTICS",
-  INTEGRATION = "INTEGRATION",
-  OTHER = "OTHER",
-}
-
-/** 插件状态 */
-export enum PluginDetailVoStatusEnum {
-  ACTIVE = "ACTIVE",
-  INACTIVE = "INACTIVE",
-  UNINSTALLED = "UNINSTALLED",
-  MAINTENANCE = "MAINTENANCE",
-  DEPRECATED = "DEPRECATED",
-}
-
-/** 插件类型 */
-export enum PluginDetailVoTypeEnum {
-  API = "API",
-  TOOL = "TOOL",
-  DATASOURCE = "DATASOURCE",
-  EXTENSION = "EXTENSION",
-  THEME = "THEME",
-}
-
-/** 模型类型，如：CHAT, EMBEDDING, VISION 等 */
-export enum ModelConfigModelTypeEnum {
-  CHAT = "CHAT",
-  IMAGE = "IMAGE",
-  AUDIO = "AUDIO",
-  EMBEDDING = "EMBEDDING",
-  MODERATION = "MODERATION",
-}
-
-/** 模型提供商，如：OPENAI、ANTHROPIC、OLLAMA 等 */
-export enum ModelConfigProviderEnum {
-  OPENAI = "OPENAI",
-  ANTHROPIC = "ANTHROPIC",
-  AZURE_OPENAI = "AZURE_OPENAI",
-  GOOGLE_VERTEXAI = "GOOGLE_VERTEXAI",
-  AMAZON_BEDROCK = "AMAZON_BEDROCK",
-  OLLAMA = "OLLAMA",
-  HUGGINGFACE = "HUGGINGFACE",
-  ONNX_TRANSFORMERS = "ONNX_TRANSFORMERS",
-  POSTGRESML = "POSTGRESML",
-  MISTRAL_AI = "MISTRAL_AI",
-  DEEPSEEK = "DEEPSEEK",
-  MOONSHOT_AI = "MOONSHOT_AI",
-  ZHIPU_AI = "ZHIPU_AI",
-  MINIMAX = "MINIMAX",
-  GROQ = "GROQ",
-  NVIDIA = "NVIDIA",
-  OCI_GENAI = "OCI_GENAI",
-  PERPLEXITY = "PERPLEXITY",
-  QIANFAN = "QIANFAN",
-  STABILITY = "STABILITY",
-  LOCAL = "LOCAL",
-  CUSTOM = "CUSTOM",
-}
-
-export enum ModelConfigFeaturesEnum {
-  MULTIMODALITY = "MULTIMODALITY",
-  TOOLS_FUNCTIONS = "TOOLS_FUNCTIONS",
-  STREAMING = "STREAMING",
-  RETRY = "RETRY",
-  OBSERVABILITY = "OBSERVABILITY",
-  BUILT_IN_JSON = "BUILT_IN_JSON",
-  LOCAL = "LOCAL",
-  OPENAI_API_COMPATIBLE = "OPENAI_API_COMPATIBLE",
-}
-
-/** 模型类型 */
-export enum ModelDetailVoTypeEnum {
-  CHAT = "CHAT",
-  IMAGE = "IMAGE",
-  AUDIO = "AUDIO",
-  EMBEDDING = "EMBEDDING",
-  MODERATION = "MODERATION",
-}
-
-/** 模型提供商 */
-export enum ModelDetailVoProviderEnum {
-  OPENAI = "OPENAI",
-  ANTHROPIC = "ANTHROPIC",
-  AZURE_OPENAI = "AZURE_OPENAI",
-  GOOGLE_VERTEXAI = "GOOGLE_VERTEXAI",
-  AMAZON_BEDROCK = "AMAZON_BEDROCK",
-  OLLAMA = "OLLAMA",
-  HUGGINGFACE = "HUGGINGFACE",
-  ONNX_TRANSFORMERS = "ONNX_TRANSFORMERS",
-  POSTGRESML = "POSTGRESML",
-  MISTRAL_AI = "MISTRAL_AI",
-  DEEPSEEK = "DEEPSEEK",
-  MOONSHOT_AI = "MOONSHOT_AI",
-  ZHIPU_AI = "ZHIPU_AI",
-  MINIMAX = "MINIMAX",
-  GROQ = "GROQ",
-  NVIDIA = "NVIDIA",
-  OCI_GENAI = "OCI_GENAI",
-  PERPLEXITY = "PERPLEXITY",
-  QIANFAN = "QIANFAN",
-  STABILITY = "STABILITY",
-  LOCAL = "LOCAL",
-  CUSTOM = "CUSTOM",
-}
-
-/** 模型状态 */
-export enum ModelDetailVoStatusEnum {
-  STOPPED = "STOPPED",
-  RUNNING = "RUNNING",
-  ERROR = "ERROR",
+/**
+ * 排序字段
+ * @example "modifiedDate"
+ */
+export enum GetApplicationListOrderByEnum {
+  CreatedDate = "createdDate",
+  ModifiedDate = "modifiedDate",
+  Status = "status",
+  Category = "category",
+  Name = "name",
 }
 
 /**
- * 可见性
- * @example "PRIVATE"
+ * 排序字段
+ * @example "activityDate"
  */
-export enum KnowledgeBaseDetailVoVisibilityEnum {
-  PRIVATE = "PRIVATE",
-  TEAM = "TEAM",
-  PUBLIC = "PUBLIC",
-}
-
-/**
- * 文档类型
- * @example "PDF"
- */
-export enum KnowledgeBaseDocListVoTypeEnum {
-  TXT = "TXT",
-  PDF = "PDF",
-  DOCX = "DOCX",
-  MD = "MD",
-  HTML = "HTML",
-}
-
-/**
- * 处理状态
- * @example "COMPLETED"
- */
-export enum KnowledgeBaseDocListVoStatusEnum {
-  UPLOADING = "UPLOADING",
-  PROCESSING = "PROCESSING",
-  COMPLETED = "COMPLETED",
-  FAILED = "FAILED",
-}
-
-/** 数据集类型 */
-export enum DatasetDetailVoTypeEnum {
-  FILE = "FILE",
-  DATASOURCE = "DATASOURCE",
-}
-
-/** 数据集状态 */
-export enum DatasetDetailVoStatusEnum {
-  ACTIVE = "ACTIVE",
-  INACTIVE = "INACTIVE",
-  PREPARING = "PREPARING",
-}
-
-/** 可见性 */
-export enum DatasetDetailVoVisibilityEnum {
-  PRIVATE = "PRIVATE",
-  TEAM = "TEAM",
-  PUBLIC = "PUBLIC",
-}
-
-/** 数据库类型 */
-export enum DatasourceConfigVoDatabaseTypeEnum {
-  MySQL = "MySQL",
-  SQLServer = "SQLServer",
-  DB2 = "DB2",
-  PostgreSQL = "PostgreSQL",
-  Oracle = "Oracle",
-}
-
-/**
- * 数据源类型
- * @example "database"
- */
-export enum DataSourceUpdateDtoDatabaseTypeEnum {
-  MySQL = "MySQL",
-  SQLServer = "SQLServer",
-  DB2 = "DB2",
-  PostgreSQL = "PostgreSQL",
-  Oracle = "Oracle",
-}
-
-/** 应用分类 */
-export enum ApplicationDetailVoCategoryEnum {
-  CHATBOT = "CHATBOT",
-  ASSISTANT = "ASSISTANT",
-  WORKFLOW = "WORKFLOW",
-  KNOWLEDGE_BASE = "KNOWLEDGE_BASE",
-}
-
-/** 应用状态 */
-export enum ApplicationDetailVoStatusEnum {
-  DRAFT = "DRAFT",
-  PUBLISHED = "PUBLISHED",
-  PAUSED = "PAUSED",
-}
-
-/** 工作流类型 */
-export enum WorkflowCreateDtoTypeEnum {
-  SINGLE_TASK = "SINGLE_TASK",
-  MULTI_TURN = "MULTI_TURN",
-  SCHEDULED = "SCHEDULED",
-  EVENT_DRIVEN = "EVENT_DRIVEN",
-}
-
-/** 资源类型 */
-export enum ResourceSharingCreateDtoResourceTypeEnum {
-  APPLICATION = "APPLICATION",
-  WORKFLOW = "WORKFLOW",
-  DATASET = "DATASET",
-  KNOWLEDGE = "KNOWLEDGE",
-  PLUGIN = "PLUGIN",
-  MODEL = "MODEL",
-}
-
-/** 共享范围（all-全体成员，specific-指定成员） */
-export enum ResourceSharingCreateDtoSharedWithEnum {
-  ALL = "ALL",
-  SPECIFIC = "SPECIFIC",
-}
-
-/** 权限（view-查看，edit-编辑，manage-管理） */
-export enum ResourceSharingCreateDtoPermissionEnum {
-  VIEW = "VIEW",
-  EDIT = "EDIT",
-  MANAGE = "MANAGE",
-}
-
-export enum ApiKeyCreateDtoPermissionsEnum {
-  READ = "READ",
-  WRITE = "WRITE",
-  DELETE = "DELETE",
-}
-
-/**
- * 资源类型
- * @example "APPLICATION"
- */
-export enum AuthorizedResourceTypeEnum {
-  APPLICATION = "APPLICATION",
-  WORKFLOW = "WORKFLOW",
-  DATASET = "DATASET",
-  KNOWLEDGE = "KNOWLEDGE",
-  PLUGIN = "PLUGIN",
-  MODEL = "MODEL",
-}
-
-/** 状态 */
-export enum ApiKeyDetailVoStatusEnum {
-  ACTIVE = "ACTIVE",
-  REVOKED = "REVOKED",
-  EXPIRED = "EXPIRED",
-}
-
-export enum ApiKeyDetailVoPermissionsEnum {
-  READ = "READ",
-  WRITE = "WRITE",
-  DELETE = "DELETE",
-}
-
-/** 资源类型 */
-export enum AuthorizedResourceVoTypeEnum {
-  APPLICATION = "APPLICATION",
-  WORKFLOW = "WORKFLOW",
-  DATASET = "DATASET",
-  KNOWLEDGE = "KNOWLEDGE",
-  PLUGIN = "PLUGIN",
-  MODEL = "MODEL",
-}
-
-/** 插件分类 */
-export enum PluginCreateDtoCategoryEnum {
-  TOOLS = "TOOLS",
-  DATASOURCE = "DATASOURCE",
-  NOTIFICATION = "NOTIFICATION",
-  FILE_PROCESSING = "FILE_PROCESSING",
-  SEARCH = "SEARCH",
-  ANALYTICS = "ANALYTICS",
-  INTEGRATION = "INTEGRATION",
-  OTHER = "OTHER",
-}
-
-/** 插件类型 */
-export enum PluginCreateDtoTypeEnum {
-  API = "API",
-  TOOL = "TOOL",
-  DATASOURCE = "DATASOURCE",
-  EXTENSION = "EXTENSION",
-  THEME = "THEME",
-}
-
-/** 插件分类 */
-export enum PluginVerifyDtoCategoryEnum {
-  TOOLS = "TOOLS",
-  DATASOURCE = "DATASOURCE",
-  NOTIFICATION = "NOTIFICATION",
-  FILE_PROCESSING = "FILE_PROCESSING",
-  SEARCH = "SEARCH",
-  ANALYTICS = "ANALYTICS",
-  INTEGRATION = "INTEGRATION",
-  OTHER = "OTHER",
-}
-
-/** 插件类型 */
-export enum PluginVerifyDtoTypeEnum {
-  API = "API",
-  TOOL = "TOOL",
-  DATASOURCE = "DATASOURCE",
-  EXTENSION = "EXTENSION",
-  THEME = "THEME",
-}
-
-/** 模型类型 */
-export enum ModelCreateDtoTypeEnum {
-  CHAT = "CHAT",
-  IMAGE = "IMAGE",
-  AUDIO = "AUDIO",
-  EMBEDDING = "EMBEDDING",
-  MODERATION = "MODERATION",
-}
-
-/** 模型提供商 */
-export enum ModelCreateDtoProviderEnum {
-  OPENAI = "OPENAI",
-  ANTHROPIC = "ANTHROPIC",
-  AZURE_OPENAI = "AZURE_OPENAI",
-  GOOGLE_VERTEXAI = "GOOGLE_VERTEXAI",
-  AMAZON_BEDROCK = "AMAZON_BEDROCK",
-  OLLAMA = "OLLAMA",
-  HUGGINGFACE = "HUGGINGFACE",
-  ONNX_TRANSFORMERS = "ONNX_TRANSFORMERS",
-  POSTGRESML = "POSTGRESML",
-  MISTRAL_AI = "MISTRAL_AI",
-  DEEPSEEK = "DEEPSEEK",
-  MOONSHOT_AI = "MOONSHOT_AI",
-  ZHIPU_AI = "ZHIPU_AI",
-  MINIMAX = "MINIMAX",
-  GROQ = "GROQ",
-  NVIDIA = "NVIDIA",
-  OCI_GENAI = "OCI_GENAI",
-  PERPLEXITY = "PERPLEXITY",
-  QIANFAN = "QIANFAN",
-  STABILITY = "STABILITY",
-  LOCAL = "LOCAL",
-  CUSTOM = "CUSTOM",
-}
-
-/**
- * 可见性
- * @example "PRIVATE"
- */
-export enum KnowledgeBaseCreateDtoVisibilityEnum {
-  PRIVATE = "PRIVATE",
-  TEAM = "TEAM",
-  PUBLIC = "PUBLIC",
-}
-
-/**
- * 处理状态
- * @example "PROCESSING"
- */
-export enum KnowledgeBaseDocStatusVoStatusEnum {
-  UPLOADING = "UPLOADING",
-  PROCESSING = "PROCESSING",
-  COMPLETED = "COMPLETED",
-  FAILED = "FAILED",
-}
-
-/** 数据类型 */
-export enum DatasetCreateDtoTypeEnum {
-  FILE = "FILE",
-  DATASOURCE = "DATASOURCE",
-}
-
-/** 可见性 */
-export enum DatasetCreateDtoVisibilityEnum {
-  PRIVATE = "PRIVATE",
-  TEAM = "TEAM",
-  PUBLIC = "PUBLIC",
-}
-
-/** 数据类型 */
-export enum DatasetDataListVoTypeEnum {
-  EXCEL = "EXCEL",
-  CSV = "CSV",
-  TABLE = "TABLE",
-}
-
-/** 状态 */
-export enum DatasetDataListVoStatusEnum {
-  UPLOADING = "UPLOADING",
-  PROCESSING = "PROCESSING",
-  COMPLETED = "COMPLETED",
-  FAILED = "FAILED",
-}
-
-/** 同步状态 */
-export enum SyncDataVoStatusEnum {
-  PROCESSING = "PROCESSING",
-  COMPLETED = "COMPLETED",
-  FAILED = "FAILED",
-}
-
-/** 数据源类型 */
-export enum DatasourceConnectionTestDtoDatabaseTypeEnum {
-  MySQL = "MySQL",
-  SQLServer = "SQLServer",
-  DB2 = "DB2",
-  PostgreSQL = "PostgreSQL",
-  Oracle = "Oracle",
-}
-
-/** 消息角色 */
-export enum MessageVoRoleEnum {
-  USER = "USER",
-  ASSISTANT = "ASSISTANT",
-  SYSTEM = "SYSTEM",
-}
-
-/** 应用分类 */
-export enum ApplicationCreateDtoCategoryEnum {
-  CHATBOT = "CHATBOT",
-  ASSISTANT = "ASSISTANT",
-  WORKFLOW = "WORKFLOW",
-  KNOWLEDGE_BASE = "KNOWLEDGE_BASE",
-}
-
-/** 工作流类型 */
-export enum WorkflowUpdateDtoTypeEnum {
-  SINGLE_TASK = "SINGLE_TASK",
-  MULTI_TURN = "MULTI_TURN",
-  SCHEDULED = "SCHEDULED",
-  EVENT_DRIVEN = "EVENT_DRIVEN",
-}
-
-/** 插件分类 */
-export enum PluginUpdateDtoCategoryEnum {
-  TOOLS = "TOOLS",
-  DATASOURCE = "DATASOURCE",
-  NOTIFICATION = "NOTIFICATION",
-  FILE_PROCESSING = "FILE_PROCESSING",
-  SEARCH = "SEARCH",
-  ANALYTICS = "ANALYTICS",
-  INTEGRATION = "INTEGRATION",
-  OTHER = "OTHER",
-}
-
-/** 插件状态 */
-export enum PluginUpdateDtoStatusEnum {
-  ACTIVE = "ACTIVE",
-  INACTIVE = "INACTIVE",
-  UNINSTALLED = "UNINSTALLED",
-  MAINTENANCE = "MAINTENANCE",
-  DEPRECATED = "DEPRECATED",
-}
-
-/** 插件类型 */
-export enum PluginUpdateDtoTypeEnum {
-  API = "API",
-  TOOL = "TOOL",
-  DATASOURCE = "DATASOURCE",
-  EXTENSION = "EXTENSION",
-  THEME = "THEME",
-}
-
-/** 模型类型 */
-export enum ModelUpdateDtoTypeEnum {
-  CHAT = "CHAT",
-  IMAGE = "IMAGE",
-  AUDIO = "AUDIO",
-  EMBEDDING = "EMBEDDING",
-  MODERATION = "MODERATION",
-}
-
-/** 模型提供商 */
-export enum ModelUpdateDtoProviderEnum {
-  OPENAI = "OPENAI",
-  ANTHROPIC = "ANTHROPIC",
-  AZURE_OPENAI = "AZURE_OPENAI",
-  GOOGLE_VERTEXAI = "GOOGLE_VERTEXAI",
-  AMAZON_BEDROCK = "AMAZON_BEDROCK",
-  OLLAMA = "OLLAMA",
-  HUGGINGFACE = "HUGGINGFACE",
-  ONNX_TRANSFORMERS = "ONNX_TRANSFORMERS",
-  POSTGRESML = "POSTGRESML",
-  MISTRAL_AI = "MISTRAL_AI",
-  DEEPSEEK = "DEEPSEEK",
-  MOONSHOT_AI = "MOONSHOT_AI",
-  ZHIPU_AI = "ZHIPU_AI",
-  MINIMAX = "MINIMAX",
-  GROQ = "GROQ",
-  NVIDIA = "NVIDIA",
-  OCI_GENAI = "OCI_GENAI",
-  PERPLEXITY = "PERPLEXITY",
-  QIANFAN = "QIANFAN",
-  STABILITY = "STABILITY",
-  LOCAL = "LOCAL",
-  CUSTOM = "CUSTOM",
-}
-
-/**
- * 可见性
- * @example "PRIVATE"
- */
-export enum KnowledgeBaseUpdateDtoVisibilityEnum {
-  PRIVATE = "PRIVATE",
-  TEAM = "TEAM",
-  PUBLIC = "PUBLIC",
-}
-
-/** 可见性 */
-export enum DatasetUpdateDtoVisibilityEnum {
-  PRIVATE = "PRIVATE",
-  TEAM = "TEAM",
-  PUBLIC = "PUBLIC",
-}
-
-/** 应用分类 */
-export enum ApplicationUpdateDtoCategoryEnum {
-  CHATBOT = "CHATBOT",
-  ASSISTANT = "ASSISTANT",
-  WORKFLOW = "WORKFLOW",
-  KNOWLEDGE_BASE = "KNOWLEDGE_BASE",
-}
-
-/** 工作流类型 */
-export enum WorkflowListVoTypeEnum {
-  SINGLE_TASK = "SINGLE_TASK",
-  MULTI_TURN = "MULTI_TURN",
-  SCHEDULED = "SCHEDULED",
-  EVENT_DRIVEN = "EVENT_DRIVEN",
-}
-
-/** 工作流状态 */
-export enum WorkflowListVoStatusEnum {
-  DRAFT = "DRAFT",
-  RUNNING = "RUNNING",
-  STOPPED = "STOPPED",
-}
-
-/** 资源类型 */
-export enum ResourceSharingListVoResourceTypeEnum {
-  APPLICATION = "APPLICATION",
-  WORKFLOW = "WORKFLOW",
-  DATASET = "DATASET",
-  KNOWLEDGE = "KNOWLEDGE",
-  PLUGIN = "PLUGIN",
-  MODEL = "MODEL",
-}
-
-/** 共享范围 */
-export enum ResourceSharingListVoSharedWithEnum {
-  ALL = "ALL",
-  SPECIFIC = "SPECIFIC",
-}
-
-/** 权限 */
-export enum ResourceSharingListVoPermissionEnum {
-  VIEW = "VIEW",
-  EDIT = "EDIT",
-  MANAGE = "MANAGE",
-}
-
-/** 共享资源平均授权权限 */
-export enum ResourceSharingStatisticsVoAvgPermissionEnum {
-  VIEW = "VIEW",
-  EDIT = "EDIT",
-  MANAGE = "MANAGE",
-}
-
-export enum ResourceAccessCheckVoResourcePermissionsEnum {
-  VIEW = "VIEW",
-  EDIT = "EDIT",
-  MANAGE = "MANAGE",
-}
-
-export enum ApiLocaleResultMapResourceInfoListSharePermissionDataEnum {
-  VIEW = "VIEW",
-  EDIT = "EDIT",
-  MANAGE = "MANAGE",
-}
-
-/** 状态 */
-export enum ApiKeyListVoStatusEnum {
-  ACTIVE = "ACTIVE",
-  REVOKED = "REVOKED",
-  EXPIRED = "EXPIRED",
-}
-
-export enum ApiKeyListVoPermissionsEnum {
-  READ = "READ",
-  WRITE = "WRITE",
-  DELETE = "DELETE",
-}
-
-/** 插件分类 */
-export enum PluginListVoCategoryEnum {
-  TOOLS = "TOOLS",
-  DATASOURCE = "DATASOURCE",
-  NOTIFICATION = "NOTIFICATION",
-  FILE_PROCESSING = "FILE_PROCESSING",
-  SEARCH = "SEARCH",
-  ANALYTICS = "ANALYTICS",
-  INTEGRATION = "INTEGRATION",
-  OTHER = "OTHER",
-}
-
-/** 插件状态 */
-export enum PluginListVoStatusEnum {
-  ACTIVE = "ACTIVE",
-  INACTIVE = "INACTIVE",
-  UNINSTALLED = "UNINSTALLED",
-  MAINTENANCE = "MAINTENANCE",
-  DEPRECATED = "DEPRECATED",
-}
-
-/** 插件类型 */
-export enum PluginListVoTypeEnum {
-  API = "API",
-  TOOL = "TOOL",
-  DATASOURCE = "DATASOURCE",
-  EXTENSION = "EXTENSION",
-  THEME = "THEME",
-}
-
-/** 分类 */
-export enum CategoryStatsCategoryEnum {
-  TOOLS = "TOOLS",
-  DATASOURCE = "DATASOURCE",
-  NOTIFICATION = "NOTIFICATION",
-  FILE_PROCESSING = "FILE_PROCESSING",
-  SEARCH = "SEARCH",
-  ANALYTICS = "ANALYTICS",
-  INTEGRATION = "INTEGRATION",
-  OTHER = "OTHER",
-}
-
-/** 模型类型 */
-export enum ModelListVoTypeEnum {
-  CHAT = "CHAT",
-  IMAGE = "IMAGE",
-  AUDIO = "AUDIO",
-  EMBEDDING = "EMBEDDING",
-  MODERATION = "MODERATION",
-}
-
-/** 模型提供商 */
-export enum ModelListVoProviderEnum {
-  OPENAI = "OPENAI",
-  ANTHROPIC = "ANTHROPIC",
-  AZURE_OPENAI = "AZURE_OPENAI",
-  GOOGLE_VERTEXAI = "GOOGLE_VERTEXAI",
-  AMAZON_BEDROCK = "AMAZON_BEDROCK",
-  OLLAMA = "OLLAMA",
-  HUGGINGFACE = "HUGGINGFACE",
-  ONNX_TRANSFORMERS = "ONNX_TRANSFORMERS",
-  POSTGRESML = "POSTGRESML",
-  MISTRAL_AI = "MISTRAL_AI",
-  DEEPSEEK = "DEEPSEEK",
-  MOONSHOT_AI = "MOONSHOT_AI",
-  ZHIPU_AI = "ZHIPU_AI",
-  MINIMAX = "MINIMAX",
-  GROQ = "GROQ",
-  NVIDIA = "NVIDIA",
-  OCI_GENAI = "OCI_GENAI",
-  PERPLEXITY = "PERPLEXITY",
-  QIANFAN = "QIANFAN",
-  STABILITY = "STABILITY",
-  LOCAL = "LOCAL",
-  CUSTOM = "CUSTOM",
-}
-
-/** 模型状态 */
-export enum ModelListVoStatusEnum {
-  STOPPED = "STOPPED",
-  RUNNING = "RUNNING",
-  ERROR = "ERROR",
-}
-
-/**
- * 可见性
- * @example "PRIVATE"
- */
-export enum KnowledgeBaseListVoVisibilityEnum {
-  PRIVATE = "PRIVATE",
-  TEAM = "TEAM",
-  PUBLIC = "PUBLIC",
-}
-
-/** 数据集类型 */
-export enum DatasetListVoTypeEnum {
-  FILE = "FILE",
-  DATASOURCE = "DATASOURCE",
-}
-
-/** 数据集状态 */
-export enum DatasetListVoStatusEnum {
-  ACTIVE = "ACTIVE",
-  INACTIVE = "INACTIVE",
-  PREPARING = "PREPARING",
-}
-
-/** 可见性 */
-export enum DatasetListVoVisibilityEnum {
-  PRIVATE = "PRIVATE",
-  TEAM = "TEAM",
-  PUBLIC = "PUBLIC",
-}
-
-/** 消息角色 */
-export enum LastMessageRoleEnum {
-  USER = "USER",
-  ASSISTANT = "ASSISTANT",
-  SYSTEM = "SYSTEM",
-}
-
-/** 应用分类 */
-export enum ApplicationListVoCategoryEnum {
-  CHATBOT = "CHATBOT",
-  ASSISTANT = "ASSISTANT",
-  WORKFLOW = "WORKFLOW",
-  KNOWLEDGE_BASE = "KNOWLEDGE_BASE",
-}
-
-/** 应用状态 */
-export enum ApplicationListVoStatusEnum {
-  DRAFT = "DRAFT",
-  PUBLISHED = "PUBLISHED",
-  PAUSED = "PAUSED",
-}
-
-/** 趋势 */
-export enum MetricVoTrendEnum {
-  Up = "up",
-  Down = "down",
-}
-
-/** 趋势 */
-export enum ErrorByStatusCodeVoTrendEnum {
-  Up = "up",
-  Down = "down",
-}
-
-/** 可见性 */
-export enum ModifyWorkflowVisibilityParamsVisibilityEnum {
-  PRIVATE = "PRIVATE",
-  TEAM = "TEAM",
-  PUBLIC = "PUBLIC",
-}
-
-/** 插件状态 */
-export enum ModifyPluginStatusParamsStatusEnum {
-  ACTIVE = "ACTIVE",
-  INACTIVE = "INACTIVE",
-  UNINSTALLED = "UNINSTALLED",
-  MAINTENANCE = "MAINTENANCE",
-  DEPRECATED = "DEPRECATED",
-}
-
-/** 可见性 */
-export enum ModifyKnowledgeBaseVisibilityParamsVisibilityEnum {
-  PRIVATE = "PRIVATE",
-  TEAM = "TEAM",
-  PUBLIC = "PUBLIC",
-}
-
-/** 可见性 */
-export enum ModifyDatasetVisibilityParamsVisibilityEnum {
-  PRIVATE = "PRIVATE",
-  TEAM = "TEAM",
-  PUBLIC = "PUBLIC",
-}
-
-/** 应用状态 */
-export enum ModifyApplicationStatusParamsStatusEnum {
-  DRAFT = "DRAFT",
-  PUBLISHED = "PUBLISHED",
-  PAUSED = "PAUSED",
-}
-
-/** 工作流类型 */
-export enum GetWorkflowListParamsTypeEnum {
-  SINGLE_TASK = "SINGLE_TASK",
-  MULTI_TURN = "MULTI_TURN",
-  SCHEDULED = "SCHEDULED",
-  EVENT_DRIVEN = "EVENT_DRIVEN",
-}
-
-/** 工作流状态 */
-export enum GetWorkflowListParamsStatusEnum {
-  DRAFT = "DRAFT",
-  RUNNING = "RUNNING",
-  STOPPED = "STOPPED",
+export enum ActivityListOrderByEnum {
+  Id = "id",
+  ActivityDate = "activityDate",
 }
 
 /** 排序字段 */
@@ -5380,29 +4516,6 @@ export enum GetWorkflowListOrderByEnum {
   Name = "name",
   Type = "type",
   Status = "status",
-}
-
-/** 资源类型筛选 */
-export enum GetResourceSharingListParamsTypeEnum {
-  APPLICATION = "APPLICATION",
-  WORKFLOW = "WORKFLOW",
-  DATASET = "DATASET",
-  KNOWLEDGE = "KNOWLEDGE",
-  PLUGIN = "PLUGIN",
-  MODEL = "MODEL",
-}
-
-/** 权限筛选 */
-export enum GetResourceSharingListParamsPermissionEnum {
-  VIEW = "VIEW",
-  EDIT = "EDIT",
-  MANAGE = "MANAGE",
-}
-
-/** 共享范围筛选 */
-export enum GetResourceSharingListParamsSharedWithEnum {
-  ALL = "ALL",
-  SPECIFIC = "SPECIFIC",
 }
 
 /** 排序字段 */
@@ -5422,36 +4535,6 @@ export enum GetPromptListParamsOrderByEnum {
   Size = "size",
 }
 
-/** 分类筛选 */
-export enum GetPluginListParamsCategoryEnum {
-  TOOLS = "TOOLS",
-  DATASOURCE = "DATASOURCE",
-  NOTIFICATION = "NOTIFICATION",
-  FILE_PROCESSING = "FILE_PROCESSING",
-  SEARCH = "SEARCH",
-  ANALYTICS = "ANALYTICS",
-  INTEGRATION = "INTEGRATION",
-  OTHER = "OTHER",
-}
-
-/** 状态筛选 */
-export enum GetPluginListParamsStatusEnum {
-  ACTIVE = "ACTIVE",
-  INACTIVE = "INACTIVE",
-  UNINSTALLED = "UNINSTALLED",
-  MAINTENANCE = "MAINTENANCE",
-  DEPRECATED = "DEPRECATED",
-}
-
-/** 类型筛选 */
-export enum GetPluginListParamsTypeEnum {
-  API = "API",
-  TOOL = "TOOL",
-  DATASOURCE = "DATASOURCE",
-  EXTENSION = "EXTENSION",
-  THEME = "THEME",
-}
-
 /** 排序字段 */
 export enum GetPluginListOrderByEnum {
   Id = "id",
@@ -5467,48 +4550,6 @@ export enum GetPluginListOrderByEnum {
   MinRating = "minRating",
 }
 
-/** 模型类型 */
-export enum GetModelListParamsTypeEnum {
-  CHAT = "CHAT",
-  IMAGE = "IMAGE",
-  AUDIO = "AUDIO",
-  EMBEDDING = "EMBEDDING",
-  MODERATION = "MODERATION",
-}
-
-/** 模型提供商 */
-export enum GetModelListParamsProviderEnum {
-  OPENAI = "OPENAI",
-  ANTHROPIC = "ANTHROPIC",
-  AZURE_OPENAI = "AZURE_OPENAI",
-  GOOGLE_VERTEXAI = "GOOGLE_VERTEXAI",
-  AMAZON_BEDROCK = "AMAZON_BEDROCK",
-  OLLAMA = "OLLAMA",
-  HUGGINGFACE = "HUGGINGFACE",
-  ONNX_TRANSFORMERS = "ONNX_TRANSFORMERS",
-  POSTGRESML = "POSTGRESML",
-  MISTRAL_AI = "MISTRAL_AI",
-  DEEPSEEK = "DEEPSEEK",
-  MOONSHOT_AI = "MOONSHOT_AI",
-  ZHIPU_AI = "ZHIPU_AI",
-  MINIMAX = "MINIMAX",
-  GROQ = "GROQ",
-  NVIDIA = "NVIDIA",
-  OCI_GENAI = "OCI_GENAI",
-  PERPLEXITY = "PERPLEXITY",
-  QIANFAN = "QIANFAN",
-  STABILITY = "STABILITY",
-  LOCAL = "LOCAL",
-  CUSTOM = "CUSTOM",
-}
-
-/** 状态筛选 */
-export enum GetModelListParamsStatusEnum {
-  STOPPED = "STOPPED",
-  RUNNING = "RUNNING",
-  ERROR = "ERROR",
-}
-
 /** 排序字段 */
 export enum GetModelListParamsOrderByEnum {
   Id = "id",
@@ -5517,16 +4558,6 @@ export enum GetModelListParamsOrderByEnum {
   Type = "type",
   Provider = "provider",
   Status = "status",
-}
-
-/**
- * 可见性筛选
- * @example "PRIVATE"
- */
-export enum GetKnowledgeBaseListParamsVisibilityEnum {
-  PRIVATE = "PRIVATE",
-  TEAM = "TEAM",
-  PUBLIC = "PUBLIC",
 }
 
 /**
@@ -5540,42 +4571,12 @@ export enum GetKnowledgeBaseListOrderByEnum {
   Name = "name",
 }
 
-/** 文档类型筛选 */
-export enum GetDocumentListParamsTypeEnum {
-  TXT = "TXT",
-  PDF = "PDF",
-  DOCX = "DOCX",
-  MD = "MD",
-  HTML = "HTML",
-}
-
-/** 状态筛选 */
-export enum GetDocumentListParamsStatusEnum {
-  UPLOADING = "UPLOADING",
-  PROCESSING = "PROCESSING",
-  COMPLETED = "COMPLETED",
-  FAILED = "FAILED",
-}
-
 /** 排序字段 */
 export enum GetDocumentListOrderByEnum {
   Id = "id",
   CreatedDate = "createdDate",
   Name = "name",
   Size = "size",
-}
-
-/** 数据集类型 */
-export enum GetDatasetListParamsTypeEnum {
-  FILE = "FILE",
-  DATASOURCE = "DATASOURCE",
-}
-
-/** 可见性 */
-export enum GetDatasetListParamsVisibilityEnum {
-  PRIVATE = "PRIVATE",
-  TEAM = "TEAM",
-  PUBLIC = "PUBLIC",
 }
 
 /**
@@ -5590,89 +4591,6 @@ export enum GetDatasetListOrderByEnum {
   ModifiedDate = "modifiedDate",
 }
 
-/** 分类筛选 */
-export enum GetApplicationListParamsCategoryEnum {
-  CHATBOT = "CHATBOT",
-  ASSISTANT = "ASSISTANT",
-  WORKFLOW = "WORKFLOW",
-  KNOWLEDGE_BASE = "KNOWLEDGE_BASE",
-}
-
-/** 状态筛选 */
-export enum GetApplicationListParamsStatusEnum {
-  DRAFT = "DRAFT",
-  PUBLISHED = "PUBLISHED",
-  PAUSED = "PAUSED",
-}
-
-/**
- * 排序字段
- * @example "modifiedDate"
- */
-export enum GetApplicationListOrderByEnum {
-  CreatedDate = "createdDate",
-  ModifiedDate = "modifiedDate",
-  Status = "status",
-  Category = "category",
-  Name = "name",
-}
-
-/** 统计周期 */
-export enum GetResourceSharingStatisticsParamsPeriodEnum {
-  TODAY = "TODAY",
-  LAST_7_DAYS = "LAST_7_DAYS",
-  LAST_30_DAYS = "LAST_30_DAYS",
-}
-
-/** 资源类型 */
-export enum CheckResourceAccessParamsResourceTypeEnum {
-  APPLICATION = "APPLICATION",
-  WORKFLOW = "WORKFLOW",
-  DATASET = "DATASET",
-  KNOWLEDGE = "KNOWLEDGE",
-  PLUGIN = "PLUGIN",
-  MODEL = "MODEL",
-}
-
-/** 资源类型 */
-export enum GetResourcePermissionsParamsResourceTypeEnum {
-  APPLICATION = "APPLICATION",
-  WORKFLOW = "WORKFLOW",
-  DATASET = "DATASET",
-  KNOWLEDGE = "KNOWLEDGE",
-  PLUGIN = "PLUGIN",
-  MODEL = "MODEL",
-}
-
-/** 统计周期 */
-export enum GetPluginStatisticsParamsPeriodEnum {
-  TODAY = "TODAY",
-  LAST_7_DAYS = "LAST_7_DAYS",
-  LAST_30_DAYS = "LAST_30_DAYS",
-}
-
-/** 统计周期 */
-export enum GetModelStatisticsParamsPeriodEnum {
-  TODAY = "TODAY",
-  LAST_7_DAYS = "LAST_7_DAYS",
-  LAST_30_DAYS = "LAST_30_DAYS",
-}
-
-/** 数据类型筛选 */
-export enum GetDatasetDataListParamsTypeEnum {
-  EXCEL = "EXCEL",
-  CSV = "CSV",
-  TABLE = "TABLE",
-}
-
-/** 数据处理状态筛选 */
-export enum GetDatasetDataListParamsStatusEnum {
-  UPLOADING = "UPLOADING",
-  PROCESSING = "PROCESSING",
-  COMPLETED = "COMPLETED",
-  FAILED = "FAILED",
-}
-
 /**
  * 排序字段
  * @example "modifiedDate"
@@ -5685,155 +4603,3 @@ export enum GetDatasetDataListOrderByEnum {
   ModifiedDate = "modifiedDate",
 }
 
-/**
- * 时间范围
- * @example "7days"
- */
-export enum GetTopEndpointsParamsTimeRangeEnum {
-  Value24Hours = "24hours",
-  Value7Days = "7days",
-  Value30Days = "30days",
-  Value90Days = "90days",
-}
-
-/** 数据粒度 */
-export enum GetTopEndpointsParamsGranularityEnum {
-  Hour = "hour",
-  Day = "day",
-  Week = "week",
-}
-
-/**
- * 时间范围
- * @example "7days"
- */
-export enum GetTokenUsageTrendParamsTimeRangeEnum {
-  Value24Hours = "24hours",
-  Value7Days = "7days",
-  Value30Days = "30days",
-  Value90Days = "90days",
-}
-
-/** 数据粒度 */
-export enum GetTokenUsageTrendParamsGranularityEnum {
-  Hour = "hour",
-  Day = "day",
-  Week = "week",
-}
-
-/**
- * 时间范围
- * @example "7days"
- */
-export enum GetResponseTimeAnalysisParamsTimeRangeEnum {
-  Value24Hours = "24hours",
-  Value7Days = "7days",
-  Value30Days = "30days",
-  Value90Days = "90days",
-}
-
-/** 数据粒度 */
-export enum GetResponseTimeAnalysisParamsGranularityEnum {
-  Hour = "hour",
-  Day = "day",
-  Week = "week",
-}
-
-/**
- * 时间范围
- * @example "7days"
- */
-export enum GetAnalyticsOverviewParamsTimeRangeEnum {
-  Value24Hours = "24hours",
-  Value7Days = "7days",
-  Value30Days = "30days",
-  Value90Days = "90days",
-}
-
-/** 数据粒度 */
-export enum GetAnalyticsOverviewParamsGranularityEnum {
-  Hour = "hour",
-  Day = "day",
-  Week = "week",
-}
-
-/**
- * 时间范围
- * @example "7days"
- */
-export enum GetModelDistributionParamsTimeRangeEnum {
-  Value24Hours = "24hours",
-  Value7Days = "7days",
-  Value30Days = "30days",
-  Value90Days = "90days",
-}
-
-/** 数据粒度 */
-export enum GetModelDistributionParamsGranularityEnum {
-  Hour = "hour",
-  Day = "day",
-  Week = "week",
-}
-
-/**
- * 时间范围
- * @example "7days"
- */
-export enum GetErrorAnalysisParamsTimeRangeEnum {
-  Value24Hours = "24hours",
-  Value7Days = "7days",
-  Value30Days = "30days",
-  Value90Days = "90days",
-}
-
-/** 数据粒度 */
-export enum GetErrorAnalysisParamsGranularityEnum {
-  Hour = "hour",
-  Day = "day",
-  Week = "week",
-}
-
-/**
- * 时间范围
- * @example "7days"
- */
-export enum GetAppDistributionParamsTimeRangeEnum {
-  Value24Hours = "24hours",
-  Value7Days = "7days",
-  Value30Days = "30days",
-  Value90Days = "90days",
-}
-
-/** 数据粒度 */
-export enum GetAppDistributionParamsGranularityEnum {
-  Hour = "hour",
-  Day = "day",
-  Week = "week",
-}
-
-/**
- * 时间范围
- * @example "7days"
- */
-export enum GetApiCallsTrendParamsTimeRangeEnum {
-  Value24Hours = "24hours",
-  Value7Days = "7days",
-  Value30Days = "30days",
-  Value90Days = "90days",
-}
-
-/** 数据粒度 */
-export enum GetApiCallsTrendParamsGranularityEnum {
-  Hour = "hour",
-  Day = "day",
-  Week = "week",
-}
-
-/**
- * 排序字段
- * @example "activityDate"
- */
-export enum ActivityListOrderByEnum {
-  Id = "id",
-  ActivityDate = "activityDate",
-}

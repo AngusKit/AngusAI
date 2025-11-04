@@ -13,14 +13,11 @@ import {
   DatasourceConnectionTestDto,
   DataSourceUpdateDto,
   GetDatasetDataListOrderByEnum,
-  GetDatasetDataListParamsStatusEnum,
-  GetDatasetDataListParamsTypeEnum,
   GetDatasetListOrderByEnum,
-  GetDatasetListParamsTypeEnum,
-  GetDatasetListParamsVisibilityEnum,
-  ModifyDatasetVisibilityParamsVisibilityEnum,
+
 } from "./data-contracts.ts";
 import { ContentType, HttpClient, RequestParams } from "./http-client.ts";
+import {DatasetDataStatusEnum, DatasetDataTypeEnum, DatasetTypeEnum, VisibilityEnum} from "@/enums/enums.ts";
 
 export class Datasets<SecurityDataType = unknown> {
   http: HttpClient<SecurityDataType>;
@@ -42,7 +39,7 @@ export class Datasets<SecurityDataType = unknown> {
     id: number,
     query: {
       /** 可见性 */
-      visibility: ModifyDatasetVisibilityParamsVisibilityEnum;
+      visibility: VisibilityEnum;
     },
     params: RequestParams = {},
   ) =>
@@ -110,9 +107,9 @@ export class Datasets<SecurityDataType = unknown> {
       /** 数据集名称 */
       name?: string;
       /** 数据集类型 */
-      type?: GetDatasetListParamsTypeEnum;
+      type?: DatasetTypeEnum;
       /** 可见性 */
-      visibility?: GetDatasetListParamsVisibilityEnum;
+      visibility?: VisibilityEnum;
       /** 标签筛选 */
       tags?: string;
       /**
@@ -328,9 +325,9 @@ export class Datasets<SecurityDataType = unknown> {
       /** 数据名称（文件名或表名） */
       name?: string;
       /** 数据类型筛选 */
-      type?: GetDatasetDataListParamsTypeEnum;
+      type?: DatasetDataTypeEnum;
       /** 数据处理状态筛选 */
-      status?: GetDatasetDataListParamsStatusEnum;
+      status?: DatasetDataStatusEnum;
       /**
        * 数据大小
        * @format int64

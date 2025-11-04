@@ -5,18 +5,13 @@ import {
   ResourceAccessCheckResult,
   ResourceSharingDetailResult,
   ResourceSharingStatisticsResult,
-  CheckResourceAccessParamsResourceTypeEnum,
-  GetResourcePermissionsParamsResourceTypeEnum,
   GetResourceSharingListOrderByEnum,
-  GetResourceSharingListParamsPermissionEnum,
-  GetResourceSharingListParamsSharedWithEnum,
-  GetResourceSharingListParamsTypeEnum,
-  GetResourceSharingStatisticsParamsPeriodEnum,
   ResourceSharingCreateDto,
   ResourceSharingToggleDto,
   ResourceSharingUpdateDto,
 } from "./data-contracts.ts";
 import { ContentType, HttpClient, RequestParams } from "./http-client.ts";
+import {MemberPermissionEnum, ResourceTypeEnum, SharedWithEnum, StatisticsPeriodEnum} from "@/enums/enums.ts";
 
 export class Sharing<SecurityDataType = unknown> {
   http: HttpClient<SecurityDataType>;
@@ -118,11 +113,11 @@ export class Sharing<SecurityDataType = unknown> {
        */
       id?: number;
       /** 资源类型筛选 */
-      type?: GetResourceSharingListParamsTypeEnum;
+      type?: ResourceTypeEnum;
       /** 权限筛选 */
-      permission?: GetResourceSharingListParamsPermissionEnum;
+      permission?: MemberPermissionEnum;
       /** 共享范围筛选 */
-      sharedWith?: GetResourceSharingListParamsSharedWithEnum;
+      sharedWith?: SharedWithEnum;
       /** 排序字段 */
       orderBy?: GetResourceSharingListOrderByEnum;
     },
@@ -172,7 +167,7 @@ export class Sharing<SecurityDataType = unknown> {
     id: number,
     query?: {
       /** 统计周期 */
-      period?: GetResourceSharingStatisticsParamsPeriodEnum;
+      period?: StatisticsPeriodEnum;
     },
     params: RequestParams = {},
   ) =>
@@ -203,7 +198,7 @@ export class Sharing<SecurityDataType = unknown> {
        */
       resourceId: number;
       /** 资源类型 */
-      resourceType: CheckResourceAccessParamsResourceTypeEnum;
+      resourceType: ResourceTypeEnum;
     },
     params: RequestParams = {},
   ) =>
@@ -231,7 +226,7 @@ export class Sharing<SecurityDataType = unknown> {
        */
       resourceId: number;
       /** 资源类型 */
-      resourceType: GetResourcePermissionsParamsResourceTypeEnum;
+      resourceType: ResourceTypeEnum;
     },
     params: RequestParams = {},
   ) =>

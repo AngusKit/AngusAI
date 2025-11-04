@@ -4,16 +4,13 @@ import {
   ModelStatisticsResult,
   PageResultModelListResult,
   GetModelListParamsOrderByEnum,
-  GetModelListParamsProviderEnum,
-  GetModelListParamsStatusEnum,
-  GetModelListParamsTypeEnum,
-  GetModelStatisticsParamsPeriodEnum,
   ModelConfig,
   ModelCreateDto,
   ModelTestDto,
   ModelUpdateDto,
 } from "./data-contracts.ts";
 import { ContentType, HttpClient, RequestParams } from "./http-client.ts";
+import {ModelProviderEnum, ModelStatusEnum, ModelTypeEnum, StatisticsPeriodEnum} from "@/enums/enums.ts";
 
 export class Models<SecurityDataType = unknown> {
   http: HttpClient<SecurityDataType>;
@@ -66,11 +63,11 @@ export class Models<SecurityDataType = unknown> {
        */
       name?: string;
       /** 模型类型 */
-      type?: GetModelListParamsTypeEnum;
+      type?: ModelTypeEnum;
       /** 模型提供商 */
-      provider?: GetModelListParamsProviderEnum;
+      provider?: ModelProviderEnum;
       /** 状态筛选 */
-      status?: GetModelListParamsStatusEnum;
+      status?: ModelStatusEnum;
       /** 排序字段 */
       orderBy?: GetModelListParamsOrderByEnum;
     },
@@ -244,7 +241,7 @@ export class Models<SecurityDataType = unknown> {
   getModelStatistics = (
     query?: {
       /** 统计周期 */
-      period?: GetModelStatisticsParamsPeriodEnum;
+      period?: StatisticsPeriodEnum;
     },
     params: RequestParams = {},
   ) =>

@@ -7,12 +7,11 @@ import {
   ApplicationDuplicateDto,
   ApplicationShareDto,
   ApplicationUpdateDto,
-  GetApplicationListParamsCategoryEnum,
   GetApplicationListOrderByEnum,
-  GetApplicationListParamsStatusEnum,
-  ModifyApplicationStatusParamsStatusEnum,
+
 } from "./data-contracts.ts";
 import { ContentType, HttpClient, RequestParams } from "./http-client.ts";
+import {ApplicationCategoryEnum, ApplicationStatusEnum} from "@/enums/enums.ts";
 
 export class Applications<SecurityDataType = unknown> {
   http: HttpClient<SecurityDataType>;
@@ -34,7 +33,7 @@ export class Applications<SecurityDataType = unknown> {
     id: number,
     query: {
       /** 应用状态 */
-      status: ModifyApplicationStatusParamsStatusEnum;
+      status: ApplicationStatusEnum;
     },
     params: RequestParams = {},
   ) =>
@@ -79,9 +78,9 @@ export class Applications<SecurityDataType = unknown> {
   getApplicationList = (
     query?: PageQuery & {
       /** 分类筛选 */
-      category?: GetApplicationListParamsCategoryEnum;
+      category?: ApplicationCategoryEnum;
       /** 状态筛选 */
-      status?: GetApplicationListParamsStatusEnum;
+      status?: ApplicationStatusEnum;
       /** 是否公开访问 */
       publicAccess?: boolean;
       /** 是否启用嵌入 */

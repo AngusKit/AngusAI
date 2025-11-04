@@ -5,13 +5,12 @@ import {
   ListKnowledgeBaseDocSearchResult,
   PageKnowledgeBaseDocListResult,
   GetDocumentListOrderByEnum,
-  GetDocumentListParamsStatusEnum,
-  GetDocumentListParamsTypeEnum,
   KnowledgeBaseDocBatchDeleteDto,
   KnowledgeBaseDocSearchDto,
   KnowledgeBaseDocToggleDto,
 } from "./data-contracts.ts";
 import { ContentType, HttpClient, RequestParams } from "./http-client.ts";
+import {KnowledgeBaseDocStatusEnum, KnowledgeBaseDocTypeEnum} from "@/enums/enums.ts";
 
 export class Documents<SecurityDataType = unknown> {
   http: HttpClient<SecurityDataType>;
@@ -78,9 +77,9 @@ export class Documents<SecurityDataType = unknown> {
     knowledgeBaseId: number,
     query?: PageQuery & {
       /** 文档类型筛选 */
-      type?: GetDocumentListParamsTypeEnum;
+      type?: KnowledgeBaseDocTypeEnum;
       /** 状态筛选 */
-      status?: GetDocumentListParamsStatusEnum;
+      status?: KnowledgeBaseDocStatusEnum;
       /** 启用状态筛选 */
       enabled?: boolean;
       /** 排序字段 */

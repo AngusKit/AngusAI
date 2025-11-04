@@ -3,13 +3,13 @@ import {
   KnowledgeBaseDetailResult,
   PageResultKnowledgeBaseListResult,
   GetKnowledgeBaseListOrderByEnum,
-  GetKnowledgeBaseListParamsVisibilityEnum,
   KnowledgeBaseCreateDto,
   KnowledgeBaseToggleDto,
   KnowledgeBaseUpdateDto,
-  ModifyKnowledgeBaseVisibilityParamsVisibilityEnum,
+
 } from "./data-contracts.ts";
 import { ContentType, HttpClient, RequestParams } from "./http-client.ts";
+import {VisibilityEnum} from "@/enums/enums.ts";
 
 export class KnowledgeBases<SecurityDataType = unknown> {
   http: HttpClient<SecurityDataType>;
@@ -31,7 +31,7 @@ export class KnowledgeBases<SecurityDataType = unknown> {
     id: number,
     query: {
       /** 可见性 */
-      visibility: ModifyKnowledgeBaseVisibilityParamsVisibilityEnum;
+      visibility: VisibilityEnum;
     },
     params: RequestParams = {},
   ) =>
@@ -89,7 +89,7 @@ export class KnowledgeBases<SecurityDataType = unknown> {
        * 可见性筛选
        * @example "PRIVATE"
        */
-      visibility?: GetKnowledgeBaseListParamsVisibilityEnum;
+      visibility?: VisibilityEnum;
       /**
        * 启用状态筛选
        * @example true

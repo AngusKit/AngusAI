@@ -8,24 +8,10 @@ import {
   ResponseTimeAnalysisResult,
   TokenUsageTrendResult,
   TopEndpointsResult,
-  GetAnalyticsOverviewParamsGranularityEnum,
-  GetAnalyticsOverviewParamsTimeRangeEnum,
-  GetApiCallsTrendParamsGranularityEnum,
-  GetApiCallsTrendParamsTimeRangeEnum,
-  GetAppDistributionParamsGranularityEnum,
-  GetAppDistributionParamsTimeRangeEnum,
-  GetErrorAnalysisParamsGranularityEnum,
-  GetErrorAnalysisParamsTimeRangeEnum,
-  GetModelDistributionParamsGranularityEnum,
-  GetModelDistributionParamsTimeRangeEnum,
-  GetResponseTimeAnalysisParamsGranularityEnum,
-  GetResponseTimeAnalysisParamsTimeRangeEnum,
-  GetTokenUsageTrendParamsGranularityEnum,
-  GetTokenUsageTrendParamsTimeRangeEnum,
-  GetTopEndpointsParamsGranularityEnum,
-  GetTopEndpointsParamsTimeRangeEnum,
+
 } from "./data-contracts.ts";
 import { HttpClient, RequestParams } from "./http-client.ts";
+import {GranularityEnum, TimeRangeEnum} from "@/enums/enums.ts";
 
 export class Analytics<SecurityDataType = unknown> {
   http: HttpClient<SecurityDataType>;
@@ -54,9 +40,9 @@ export class Analytics<SecurityDataType = unknown> {
        * 时间范围
        * @example "7days"
        */
-      timeRange?: GetTopEndpointsParamsTimeRangeEnum;
+      timeRange?: TimeRangeEnum;
       /** 数据粒度 */
-      granularity?: GetTopEndpointsParamsGranularityEnum;
+      granularity?: GranularityEnum;
       /**
        * Top N，默认10
        * @format int32
@@ -98,9 +84,9 @@ export class Analytics<SecurityDataType = unknown> {
        * 时间范围
        * @example "7days"
        */
-      timeRange?: GetTokenUsageTrendParamsTimeRangeEnum;
+      timeRange?: TimeRangeEnum;
       /** 数据粒度 */
-      granularity?: GetTokenUsageTrendParamsGranularityEnum;
+      granularity?: GranularityEnum;
     },
     params: RequestParams = {},
   ) =>
@@ -131,9 +117,9 @@ export class Analytics<SecurityDataType = unknown> {
        * 时间范围
        * @example "7days"
        */
-      timeRange?: GetResponseTimeAnalysisParamsTimeRangeEnum;
+      timeRange?: TimeRangeEnum;
       /** 数据粒度 */
-      granularity?: GetResponseTimeAnalysisParamsGranularityEnum;
+      granularity?: GranularityEnum;
     },
     params: RequestParams = {},
   ) =>
@@ -164,9 +150,9 @@ export class Analytics<SecurityDataType = unknown> {
        * 时间范围
        * @example "7days"
        */
-      timeRange?: GetAnalyticsOverviewParamsTimeRangeEnum;
+      timeRange?: TimeRangeEnum;
       /** 数据粒度 */
-      granularity?: GetAnalyticsOverviewParamsGranularityEnum;
+      granularity?: GranularityEnum;
     },
     params: RequestParams = {},
   ) =>
@@ -197,9 +183,9 @@ export class Analytics<SecurityDataType = unknown> {
        * 时间范围
        * @example "7days"
        */
-      timeRange?: GetModelDistributionParamsTimeRangeEnum;
+      timeRange?: TimeRangeEnum;
       /** 数据粒度 */
-      granularity?: GetModelDistributionParamsGranularityEnum;
+      granularity?: GranularityEnum;
     },
     params: RequestParams = {},
   ) =>
@@ -230,9 +216,9 @@ export class Analytics<SecurityDataType = unknown> {
        * 时间范围
        * @example "7days"
        */
-      timeRange?: GetErrorAnalysisParamsTimeRangeEnum;
+      timeRange?: TimeRangeEnum;
       /** 数据粒度 */
-      granularity?: GetErrorAnalysisParamsGranularityEnum;
+      granularity?: GranularityEnum;
     },
     params: RequestParams = {},
   ) =>
@@ -263,9 +249,9 @@ export class Analytics<SecurityDataType = unknown> {
        * 时间范围
        * @example "7days"
        */
-      timeRange?: GetAppDistributionParamsTimeRangeEnum;
+      timeRange?: TimeRangeEnum;
       /** 数据粒度 */
-      granularity?: GetAppDistributionParamsGranularityEnum;
+      granularity?: GranularityEnum;
       /**
        * Top N，默认10
        * @format int32
@@ -302,9 +288,9 @@ export class Analytics<SecurityDataType = unknown> {
        * 时间范围
        * @example "7days"
        */
-      timeRange?: GetApiCallsTrendParamsTimeRangeEnum;
+      timeRange?: TimeRangeEnum;
       /** 数据粒度 */
-      granularity?: GetApiCallsTrendParamsGranularityEnum;
+      granularity?: GranularityEnum;
     },
     params: RequestParams = {},
   ) =>
