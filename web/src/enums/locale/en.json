@@ -1,0 +1,10 @@
+{
+  "xcm": {
+    "enum": {
+      "NodeSource": {
+        "OWN_NODE": "Own Node",
+        "ONLINE_BUY": "Online Purchase"
+      }
+    }
+  }
+}

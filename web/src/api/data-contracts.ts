@@ -7296,48 +7296,6 @@ export enum GetWorkflowListParamsOrderByEnum {
   Status = "status",
 }
 
-/** Specifies the direction of the sorting (ascending or descending) */
-export enum GetWorkflowListParamsOrderSortEnum {
-  ASC = "ASC",
-  DESC = "DESC",
-}
-
-/** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
-export enum GetWorkflowListParamsFilters0OpEnum {
-  GREATER_THAN = "GREATER_THAN",
-  LESS_THAN = "LESS_THAN",
-  GREATER_THAN_EQUAL = "GREATER_THAN_EQUAL",
-  LESS_THAN_EQUAL = "LESS_THAN_EQUAL",
-  EQUAL = "EQUAL",
-  NOT_EQUAL = "NOT_EQUAL",
-  MATCH = "MATCH",
-  MATCH_END = "MATCH_END",
-  NOT_MATCH = "NOT_MATCH",
-  NOT_MATCH_END = "NOT_MATCH_END",
-  IN = "IN",
-  NOT_IN = "NOT_IN",
-  IS_NULL = "IS_NULL",
-  IS_NOT_NULL = "IS_NOT_NULL",
-}
-
-/** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
-export enum GetWorkflowListParamsFilters1OpEnum {
-  GREATER_THAN = "GREATER_THAN",
-  LESS_THAN = "LESS_THAN",
-  GREATER_THAN_EQUAL = "GREATER_THAN_EQUAL",
-  LESS_THAN_EQUAL = "LESS_THAN_EQUAL",
-  EQUAL = "EQUAL",
-  NOT_EQUAL = "NOT_EQUAL",
-  MATCH = "MATCH",
-  MATCH_END = "MATCH_END",
-  NOT_MATCH = "NOT_MATCH",
-  NOT_MATCH_END = "NOT_MATCH_END",
-  IN = "IN",
-  NOT_IN = "NOT_IN",
-  IS_NULL = "IS_NULL",
-  IS_NOT_NULL = "IS_NOT_NULL",
-}
-
 /** 资源类型筛选 */
 export enum GetResourceSharingListParamsTypeEnum {
   APPLICATION = "APPLICATION",
@@ -7370,96 +7328,12 @@ export enum GetResourceSharingListParamsOrderByEnum {
   CreatedDate = "createdDate",
 }
 
-/** Specifies the direction of the sorting (ascending or descending) */
-export enum GetResourceSharingListParamsOrderSortEnum {
-  ASC = "ASC",
-  DESC = "DESC",
-}
-
-/** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
-export enum GetResourceSharingListParamsFilters0OpEnum {
-  GREATER_THAN = "GREATER_THAN",
-  LESS_THAN = "LESS_THAN",
-  GREATER_THAN_EQUAL = "GREATER_THAN_EQUAL",
-  LESS_THAN_EQUAL = "LESS_THAN_EQUAL",
-  EQUAL = "EQUAL",
-  NOT_EQUAL = "NOT_EQUAL",
-  MATCH = "MATCH",
-  MATCH_END = "MATCH_END",
-  NOT_MATCH = "NOT_MATCH",
-  NOT_MATCH_END = "NOT_MATCH_END",
-  IN = "IN",
-  NOT_IN = "NOT_IN",
-  IS_NULL = "IS_NULL",
-  IS_NOT_NULL = "IS_NOT_NULL",
-}
-
-/** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
-export enum GetResourceSharingListParamsFilters1OpEnum {
-  GREATER_THAN = "GREATER_THAN",
-  LESS_THAN = "LESS_THAN",
-  GREATER_THAN_EQUAL = "GREATER_THAN_EQUAL",
-  LESS_THAN_EQUAL = "LESS_THAN_EQUAL",
-  EQUAL = "EQUAL",
-  NOT_EQUAL = "NOT_EQUAL",
-  MATCH = "MATCH",
-  MATCH_END = "MATCH_END",
-  NOT_MATCH = "NOT_MATCH",
-  NOT_MATCH_END = "NOT_MATCH_END",
-  IN = "IN",
-  NOT_IN = "NOT_IN",
-  IS_NULL = "IS_NULL",
-  IS_NOT_NULL = "IS_NOT_NULL",
-}
-
 /** 排序字段 */
 export enum GetPromptListParamsOrderByEnum {
   Id = "id",
   CreatedDate = "createdDate",
   Name = "name",
   Size = "size",
-}
-
-/** Specifies the direction of the sorting (ascending or descending) */
-export enum GetPromptListParamsOrderSortEnum {
-  ASC = "ASC",
-  DESC = "DESC",
-}
-
-/** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
-export enum GetPromptListParamsFilters0OpEnum {
-  GREATER_THAN = "GREATER_THAN",
-  LESS_THAN = "LESS_THAN",
-  GREATER_THAN_EQUAL = "GREATER_THAN_EQUAL",
-  LESS_THAN_EQUAL = "LESS_THAN_EQUAL",
-  EQUAL = "EQUAL",
-  NOT_EQUAL = "NOT_EQUAL",
-  MATCH = "MATCH",
-  MATCH_END = "MATCH_END",
-  NOT_MATCH = "NOT_MATCH",
-  NOT_MATCH_END = "NOT_MATCH_END",
-  IN = "IN",
-  NOT_IN = "NOT_IN",
-  IS_NULL = "IS_NULL",
-  IS_NOT_NULL = "IS_NOT_NULL",
-}
-
-/** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
-export enum GetPromptListParamsFilters1OpEnum {
-  GREATER_THAN = "GREATER_THAN",
-  LESS_THAN = "LESS_THAN",
-  GREATER_THAN_EQUAL = "GREATER_THAN_EQUAL",
-  LESS_THAN_EQUAL = "LESS_THAN_EQUAL",
-  EQUAL = "EQUAL",
-  NOT_EQUAL = "NOT_EQUAL",
-  MATCH = "MATCH",
-  MATCH_END = "MATCH_END",
-  NOT_MATCH = "NOT_MATCH",
-  NOT_MATCH_END = "NOT_MATCH_END",
-  IN = "IN",
-  NOT_IN = "NOT_IN",
-  IS_NULL = "IS_NULL",
-  IS_NOT_NULL = "IS_NOT_NULL",
 }
 
 /** 分类筛选 */
@@ -7505,48 +7379,6 @@ export enum GetPluginListParamsOrderByEnum {
   ReviewCount = "reviewCount",
   Rating = "rating",
   MinRating = "minRating",
-}
-
-/** Specifies the direction of the sorting (ascending or descending) */
-export enum GetPluginListParamsOrderSortEnum {
-  ASC = "ASC",
-  DESC = "DESC",
-}
-
-/** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
-export enum GetPluginListParamsFilters0OpEnum {
-  GREATER_THAN = "GREATER_THAN",
-  LESS_THAN = "LESS_THAN",
-  GREATER_THAN_EQUAL = "GREATER_THAN_EQUAL",
-  LESS_THAN_EQUAL = "LESS_THAN_EQUAL",
-  EQUAL = "EQUAL",
-  NOT_EQUAL = "NOT_EQUAL",
-  MATCH = "MATCH",
-  MATCH_END = "MATCH_END",
-  NOT_MATCH = "NOT_MATCH",
-  NOT_MATCH_END = "NOT_MATCH_END",
-  IN = "IN",
-  NOT_IN = "NOT_IN",
-  IS_NULL = "IS_NULL",
-  IS_NOT_NULL = "IS_NOT_NULL",
-}
-
-/** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
-export enum GetPluginListParamsFilters1OpEnum {
-  GREATER_THAN = "GREATER_THAN",
-  LESS_THAN = "LESS_THAN",
-  GREATER_THAN_EQUAL = "GREATER_THAN_EQUAL",
-  LESS_THAN_EQUAL = "LESS_THAN_EQUAL",
-  EQUAL = "EQUAL",
-  NOT_EQUAL = "NOT_EQUAL",
-  MATCH = "MATCH",
-  MATCH_END = "MATCH_END",
-  NOT_MATCH = "NOT_MATCH",
-  NOT_MATCH_END = "NOT_MATCH_END",
-  IN = "IN",
-  NOT_IN = "NOT_IN",
-  IS_NULL = "IS_NULL",
-  IS_NOT_NULL = "IS_NOT_NULL",
 }
 
 /** 模型类型 */
@@ -7601,48 +7433,6 @@ export enum GetModelListParamsOrderByEnum {
   Status = "status",
 }
 
-/** Specifies the direction of the sorting (ascending or descending) */
-export enum GetModelListParamsOrderSortEnum {
-  ASC = "ASC",
-  DESC = "DESC",
-}
-
-/** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
-export enum GetModelListParamsFilters0OpEnum {
-  GREATER_THAN = "GREATER_THAN",
-  LESS_THAN = "LESS_THAN",
-  GREATER_THAN_EQUAL = "GREATER_THAN_EQUAL",
-  LESS_THAN_EQUAL = "LESS_THAN_EQUAL",
-  EQUAL = "EQUAL",
-  NOT_EQUAL = "NOT_EQUAL",
-  MATCH = "MATCH",
-  MATCH_END = "MATCH_END",
-  NOT_MATCH = "NOT_MATCH",
-  NOT_MATCH_END = "NOT_MATCH_END",
-  IN = "IN",
-  NOT_IN = "NOT_IN",
-  IS_NULL = "IS_NULL",
-  IS_NOT_NULL = "IS_NOT_NULL",
-}
-
-/** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
-export enum GetModelListParamsFilters1OpEnum {
-  GREATER_THAN = "GREATER_THAN",
-  LESS_THAN = "LESS_THAN",
-  GREATER_THAN_EQUAL = "GREATER_THAN_EQUAL",
-  LESS_THAN_EQUAL = "LESS_THAN_EQUAL",
-  EQUAL = "EQUAL",
-  NOT_EQUAL = "NOT_EQUAL",
-  MATCH = "MATCH",
-  MATCH_END = "MATCH_END",
-  NOT_MATCH = "NOT_MATCH",
-  NOT_MATCH_END = "NOT_MATCH_END",
-  IN = "IN",
-  NOT_IN = "NOT_IN",
-  IS_NULL = "IS_NULL",
-  IS_NOT_NULL = "IS_NOT_NULL",
-}
-
 /**
  * 可见性筛选
  * @example "PRIVATE"
@@ -7662,48 +7452,6 @@ export enum GetKnowledgeBaseListParamsOrderByEnum {
   ModifiedDate = "modifiedDate",
   DocumentsCount = "documentsCount",
   Name = "name",
-}
-
-/** Specifies the direction of the sorting (ascending or descending) */
-export enum GetKnowledgeBaseListParamsOrderSortEnum {
-  ASC = "ASC",
-  DESC = "DESC",
-}
-
-/** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
-export enum GetKnowledgeBaseListParamsFilters0OpEnum {
-  GREATER_THAN = "GREATER_THAN",
-  LESS_THAN = "LESS_THAN",
-  GREATER_THAN_EQUAL = "GREATER_THAN_EQUAL",
-  LESS_THAN_EQUAL = "LESS_THAN_EQUAL",
-  EQUAL = "EQUAL",
-  NOT_EQUAL = "NOT_EQUAL",
-  MATCH = "MATCH",
-  MATCH_END = "MATCH_END",
-  NOT_MATCH = "NOT_MATCH",
-  NOT_MATCH_END = "NOT_MATCH_END",
-  IN = "IN",
-  NOT_IN = "NOT_IN",
-  IS_NULL = "IS_NULL",
-  IS_NOT_NULL = "IS_NOT_NULL",
-}
-
-/** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
-export enum GetKnowledgeBaseListParamsFilters1OpEnum {
-  GREATER_THAN = "GREATER_THAN",
-  LESS_THAN = "LESS_THAN",
-  GREATER_THAN_EQUAL = "GREATER_THAN_EQUAL",
-  LESS_THAN_EQUAL = "LESS_THAN_EQUAL",
-  EQUAL = "EQUAL",
-  NOT_EQUAL = "NOT_EQUAL",
-  MATCH = "MATCH",
-  MATCH_END = "MATCH_END",
-  NOT_MATCH = "NOT_MATCH",
-  NOT_MATCH_END = "NOT_MATCH_END",
-  IN = "IN",
-  NOT_IN = "NOT_IN",
-  IS_NULL = "IS_NULL",
-  IS_NOT_NULL = "IS_NOT_NULL",
 }
 
 /** 文档类型筛选 */
@@ -7731,48 +7479,6 @@ export enum GetDocumentListParamsOrderByEnum {
   Size = "size",
 }
 
-/** Specifies the direction of the sorting (ascending or descending) */
-export enum GetDocumentListParamsOrderSortEnum {
-  ASC = "ASC",
-  DESC = "DESC",
-}
-
-/** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
-export enum GetDocumentListParamsFilters0OpEnum {
-  GREATER_THAN = "GREATER_THAN",
-  LESS_THAN = "LESS_THAN",
-  GREATER_THAN_EQUAL = "GREATER_THAN_EQUAL",
-  LESS_THAN_EQUAL = "LESS_THAN_EQUAL",
-  EQUAL = "EQUAL",
-  NOT_EQUAL = "NOT_EQUAL",
-  MATCH = "MATCH",
-  MATCH_END = "MATCH_END",
-  NOT_MATCH = "NOT_MATCH",
-  NOT_MATCH_END = "NOT_MATCH_END",
-  IN = "IN",
-  NOT_IN = "NOT_IN",
-  IS_NULL = "IS_NULL",
-  IS_NOT_NULL = "IS_NOT_NULL",
-}
-
-/** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
-export enum GetDocumentListParamsFilters1OpEnum {
-  GREATER_THAN = "GREATER_THAN",
-  LESS_THAN = "LESS_THAN",
-  GREATER_THAN_EQUAL = "GREATER_THAN_EQUAL",
-  LESS_THAN_EQUAL = "LESS_THAN_EQUAL",
-  EQUAL = "EQUAL",
-  NOT_EQUAL = "NOT_EQUAL",
-  MATCH = "MATCH",
-  MATCH_END = "MATCH_END",
-  NOT_MATCH = "NOT_MATCH",
-  NOT_MATCH_END = "NOT_MATCH_END",
-  IN = "IN",
-  NOT_IN = "NOT_IN",
-  IS_NULL = "IS_NULL",
-  IS_NOT_NULL = "IS_NOT_NULL",
-}
-
 /** 数据集类型 */
 export enum GetDatasetListParamsTypeEnum {
   FILE = "FILE",
@@ -7796,48 +7502,6 @@ export enum GetDatasetListParamsOrderByEnum {
   Status = "status",
   CreatedDate = "createdDate",
   ModifiedDate = "modifiedDate",
-}
-
-/** Specifies the direction of the sorting (ascending or descending) */
-export enum GetDatasetListParamsOrderSortEnum {
-  ASC = "ASC",
-  DESC = "DESC",
-}
-
-/** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
-export enum GetDatasetListParamsFilters0OpEnum {
-  GREATER_THAN = "GREATER_THAN",
-  LESS_THAN = "LESS_THAN",
-  GREATER_THAN_EQUAL = "GREATER_THAN_EQUAL",
-  LESS_THAN_EQUAL = "LESS_THAN_EQUAL",
-  EQUAL = "EQUAL",
-  NOT_EQUAL = "NOT_EQUAL",
-  MATCH = "MATCH",
-  MATCH_END = "MATCH_END",
-  NOT_MATCH = "NOT_MATCH",
-  NOT_MATCH_END = "NOT_MATCH_END",
-  IN = "IN",
-  NOT_IN = "NOT_IN",
-  IS_NULL = "IS_NULL",
-  IS_NOT_NULL = "IS_NOT_NULL",
-}
-
-/** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
-export enum GetDatasetListParamsFilters1OpEnum {
-  GREATER_THAN = "GREATER_THAN",
-  LESS_THAN = "LESS_THAN",
-  GREATER_THAN_EQUAL = "GREATER_THAN_EQUAL",
-  LESS_THAN_EQUAL = "LESS_THAN_EQUAL",
-  EQUAL = "EQUAL",
-  NOT_EQUAL = "NOT_EQUAL",
-  MATCH = "MATCH",
-  MATCH_END = "MATCH_END",
-  NOT_MATCH = "NOT_MATCH",
-  NOT_MATCH_END = "NOT_MATCH_END",
-  IN = "IN",
-  NOT_IN = "NOT_IN",
-  IS_NULL = "IS_NULL",
-  IS_NOT_NULL = "IS_NOT_NULL",
 }
 
 /** 分类筛选 */
@@ -7865,90 +7529,6 @@ export enum GetApplicationListParamsOrderByEnum {
   Status = "status",
   Category = "category",
   Name = "name",
-}
-
-/** Specifies the direction of the sorting (ascending or descending) */
-export enum GetApplicationListParamsOrderSortEnum {
-  ASC = "ASC",
-  DESC = "DESC",
-}
-
-/** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
-export enum GetApplicationListParamsFilters0OpEnum {
-  GREATER_THAN = "GREATER_THAN",
-  LESS_THAN = "LESS_THAN",
-  GREATER_THAN_EQUAL = "GREATER_THAN_EQUAL",
-  LESS_THAN_EQUAL = "LESS_THAN_EQUAL",
-  EQUAL = "EQUAL",
-  NOT_EQUAL = "NOT_EQUAL",
-  MATCH = "MATCH",
-  MATCH_END = "MATCH_END",
-  NOT_MATCH = "NOT_MATCH",
-  NOT_MATCH_END = "NOT_MATCH_END",
-  IN = "IN",
-  NOT_IN = "NOT_IN",
-  IS_NULL = "IS_NULL",
-  IS_NOT_NULL = "IS_NOT_NULL",
-}
-
-/** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
-export enum GetApplicationListParamsFilters1OpEnum {
-  GREATER_THAN = "GREATER_THAN",
-  LESS_THAN = "LESS_THAN",
-  GREATER_THAN_EQUAL = "GREATER_THAN_EQUAL",
-  LESS_THAN_EQUAL = "LESS_THAN_EQUAL",
-  EQUAL = "EQUAL",
-  NOT_EQUAL = "NOT_EQUAL",
-  MATCH = "MATCH",
-  MATCH_END = "MATCH_END",
-  NOT_MATCH = "NOT_MATCH",
-  NOT_MATCH_END = "NOT_MATCH_END",
-  IN = "IN",
-  NOT_IN = "NOT_IN",
-  IS_NULL = "IS_NULL",
-  IS_NOT_NULL = "IS_NOT_NULL",
-}
-
-/** Specifies the direction of the sorting (ascending or descending) */
-export enum GetExecutionLogsParamsOrderSortEnum {
-  ASC = "ASC",
-  DESC = "DESC",
-}
-
-/** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
-export enum GetExecutionLogsParamsFilters0OpEnum {
-  GREATER_THAN = "GREATER_THAN",
-  LESS_THAN = "LESS_THAN",
-  GREATER_THAN_EQUAL = "GREATER_THAN_EQUAL",
-  LESS_THAN_EQUAL = "LESS_THAN_EQUAL",
-  EQUAL = "EQUAL",
-  NOT_EQUAL = "NOT_EQUAL",
-  MATCH = "MATCH",
-  MATCH_END = "MATCH_END",
-  NOT_MATCH = "NOT_MATCH",
-  NOT_MATCH_END = "NOT_MATCH_END",
-  IN = "IN",
-  NOT_IN = "NOT_IN",
-  IS_NULL = "IS_NULL",
-  IS_NOT_NULL = "IS_NOT_NULL",
-}
-
-/** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
-export enum GetExecutionLogsParamsFilters1OpEnum {
-  GREATER_THAN = "GREATER_THAN",
-  LESS_THAN = "LESS_THAN",
-  GREATER_THAN_EQUAL = "GREATER_THAN_EQUAL",
-  LESS_THAN_EQUAL = "LESS_THAN_EQUAL",
-  EQUAL = "EQUAL",
-  NOT_EQUAL = "NOT_EQUAL",
-  MATCH = "MATCH",
-  MATCH_END = "MATCH_END",
-  NOT_MATCH = "NOT_MATCH",
-  NOT_MATCH_END = "NOT_MATCH_END",
-  IN = "IN",
-  NOT_IN = "NOT_IN",
-  IS_NULL = "IS_NULL",
-  IS_NOT_NULL = "IS_NOT_NULL",
 }
 
 /** 统计周期 */
@@ -8017,48 +7597,6 @@ export enum GetDatasetDataListParamsOrderByEnum {
   Size = "size",
   CreatedDate = "createdDate",
   ModifiedDate = "modifiedDate",
-}
-
-/** Specifies the direction of the sorting (ascending or descending) */
-export enum GetDatasetDataListParamsOrderSortEnum {
-  ASC = "ASC",
-  DESC = "DESC",
-}
-
-/** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
-export enum GetDatasetDataListParamsFilters0OpEnum {
-  GREATER_THAN = "GREATER_THAN",
-  LESS_THAN = "LESS_THAN",
-  GREATER_THAN_EQUAL = "GREATER_THAN_EQUAL",
-  LESS_THAN_EQUAL = "LESS_THAN_EQUAL",
-  EQUAL = "EQUAL",
-  NOT_EQUAL = "NOT_EQUAL",
-  MATCH = "MATCH",
-  MATCH_END = "MATCH_END",
-  NOT_MATCH = "NOT_MATCH",
-  NOT_MATCH_END = "NOT_MATCH_END",
-  IN = "IN",
-  NOT_IN = "NOT_IN",
-  IS_NULL = "IS_NULL",
-  IS_NOT_NULL = "IS_NOT_NULL",
-}
-
-/** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
-export enum GetDatasetDataListParamsFilters1OpEnum {
-  GREATER_THAN = "GREATER_THAN",
-  LESS_THAN = "LESS_THAN",
-  GREATER_THAN_EQUAL = "GREATER_THAN_EQUAL",
-  LESS_THAN_EQUAL = "LESS_THAN_EQUAL",
-  EQUAL = "EQUAL",
-  NOT_EQUAL = "NOT_EQUAL",
-  MATCH = "MATCH",
-  MATCH_END = "MATCH_END",
-  NOT_MATCH = "NOT_MATCH",
-  NOT_MATCH_END = "NOT_MATCH_END",
-  IN = "IN",
-  NOT_IN = "NOT_IN",
-  IS_NULL = "IS_NULL",
-  IS_NOT_NULL = "IS_NOT_NULL",
 }
 
 /**
@@ -8212,46 +7750,4 @@ export enum GetApiCallsTrendParamsGranularityEnum {
 export enum ActivityListOrderByEnum {
   Id = "id",
   ActivityDate = "activityDate",
-}
-
-/** Specifies the direction of the sorting (ascending or descending) */
-export enum ActivityListOrderSortEnum {
-  ASC = "ASC",
-  DESC = "DESC",
-}
-
-/** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
-export enum ActivityListParamsFilters0OpEnum {
-  GREATER_THAN = "GREATER_THAN",
-  LESS_THAN = "LESS_THAN",
-  GREATER_THAN_EQUAL = "GREATER_THAN_EQUAL",
-  LESS_THAN_EQUAL = "LESS_THAN_EQUAL",
-  EQUAL = "EQUAL",
-  NOT_EQUAL = "NOT_EQUAL",
-  MATCH = "MATCH",
-  MATCH_END = "MATCH_END",
-  NOT_MATCH = "NOT_MATCH",
-  NOT_MATCH_END = "NOT_MATCH_END",
-  IN = "IN",
-  NOT_IN = "NOT_IN",
-  IS_NULL = "IS_NULL",
-  IS_NOT_NULL = "IS_NOT_NULL",
-}
-
-/** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
-export enum ActivityListParamsFilters1OpEnum {
-  GREATER_THAN = "GREATER_THAN",
-  LESS_THAN = "LESS_THAN",
-  GREATER_THAN_EQUAL = "GREATER_THAN_EQUAL",
-  LESS_THAN_EQUAL = "LESS_THAN_EQUAL",
-  EQUAL = "EQUAL",
-  NOT_EQUAL = "NOT_EQUAL",
-  MATCH = "MATCH",
-  MATCH_END = "MATCH_END",
-  NOT_MATCH = "NOT_MATCH",
-  NOT_MATCH_END = "NOT_MATCH_END",
-  IN = "IN",
-  NOT_IN = "NOT_IN",
-  IS_NULL = "IS_NULL",
-  IS_NOT_NULL = "IS_NOT_NULL",
 }

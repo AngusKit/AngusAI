@@ -1,0 +1,10 @@
+{
+  "xcm": {
+    "enum": {
+      "NodeSource": {
+        "OWN_NODE": "自有节点",
+        "ONLINE_BUY": "在线购买"
+      }
+    }
+  }
+}
