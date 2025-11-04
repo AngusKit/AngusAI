@@ -1,10 +1,10 @@
 import { PageQuery, ApiLocaleResult } from '@xcan-angus/infra';
 import {
-  ApiLocaleResultExecutionDetailVo,
-  ApiLocaleResultPageResultExecutionLogVo,
-  ApiLocaleResultPageResultWorkflowListVo,
-  ApiResultWorkflowDetailVo,
-  ApiLocaleResultWorkflowStatisticsVo,
+  ExecutionDetailResult,
+  ExecutionLogResult,
+  WorkflowListResult,
+  WorkflowDetailResult,
+  WorkflowStatisticsResult,
   GetWorkflowListOrderByEnum,
   GetWorkflowListParamsStatusEnum,
   GetWorkflowListParamsTypeEnum,
@@ -40,7 +40,7 @@ export class Workflows<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiResultWorkflowDetailVo, ApiLocaleResult>({
+    this.http.request<WorkflowDetailResult, ApiLocaleResult>({
       path: `/api/v1/workflows/${id}/visibility`,
       method: "PUT",
       query: query,
@@ -61,7 +61,7 @@ export class Workflows<SecurityDataType = unknown> {
     data: WorkflowConfigUpdateDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiResultWorkflowDetailVo, ApiLocaleResult>({
+    this.http.request<WorkflowDetailResult, ApiLocaleResult>({
       path: `/api/v1/workflows/${id}/config`,
       method: "PUT",
       body: data,
@@ -99,7 +99,7 @@ export class Workflows<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultPageResultWorkflowListVo, ApiLocaleResult>(
+    this.http.request<WorkflowListResult, ApiLocaleResult>(
       {
         path: `/api/v1/workflows`,
         method: "GET",
@@ -136,7 +136,7 @@ export class Workflows<SecurityDataType = unknown> {
    * @secure
    */
   stopWorkflow = (id: number, params: RequestParams = {}) =>
-    this.http.request<ApiResultWorkflowDetailVo, ApiLocaleResult>({
+    this.http.request<WorkflowDetailResult, ApiLocaleResult>({
       path: `/api/v1/workflows/${id}/stop`,
       method: "POST",
       secure: true,
@@ -152,7 +152,7 @@ export class Workflows<SecurityDataType = unknown> {
    * @secure
    */
   startWorkflow = (id: number, params: RequestParams = {}) =>
-    this.http.request<ApiResultWorkflowDetailVo, ApiLocaleResult>({
+    this.http.request<WorkflowDetailResult, ApiLocaleResult>({
       path: `/api/v1/workflows/${id}/start`,
       method: "POST",
       secure: true,
@@ -190,7 +190,7 @@ export class Workflows<SecurityDataType = unknown> {
    * @secure
    */
   getWorkflowDetail = (id: number, params: RequestParams = {}) =>
-    this.http.request<ApiResultWorkflowDetailVo, ApiLocaleResult>({
+    this.http.request<WorkflowDetailResult, ApiLocaleResult>({
       path: `/api/v1/workflows/${id}`,
       method: "GET",
       secure: true,
@@ -226,7 +226,7 @@ export class Workflows<SecurityDataType = unknown> {
     data: WorkflowUpdateDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiResultWorkflowDetailVo, ApiLocaleResult>({
+    this.http.request<WorkflowDetailResult, ApiLocaleResult>({
       path: `/api/v1/workflows/${id}`,
       method: "PATCH",
       body: data,
@@ -250,7 +250,7 @@ export class Workflows<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultWorkflowStatisticsVo, ApiLocaleResult>({
+    this.http.request<WorkflowStatisticsResult, ApiLocaleResult>({
       path: `/api/v1/workflows/statistics`,
       method: "GET",
       query: query,
@@ -267,7 +267,7 @@ export class Workflows<SecurityDataType = unknown> {
    * @secure
    */
   getExecutionDetail = (executionId: string, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultExecutionDetailVo, ApiLocaleResult>({
+    this.http.request<ExecutionDetailResult, ApiLocaleResult>({
       path: `/api/v1/workflows/executions/${executionId}`,
       method: "GET",
       secure: true,
@@ -296,7 +296,7 @@ export class Workflows<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultPageResultExecutionLogVo, ApiLocaleResult>(
+    this.http.request<ExecutionLogResult, ApiLocaleResult>(
       {
         path: `/api/v1/workflows/execution-logs`,
         method: "GET",

@@ -1,7 +1,7 @@
 import { PageQuery, ApiLocaleResult } from '@xcan-angus/infra';
 import {
-  ApiLocaleResultKnowledgeBaseDetailVo,
-  ApiLocaleResultPageResultKnowledgeBaseListVo,
+  KnowledgeBaseDetailResult,
+  PageResultKnowledgeBaseListResult,
   GetKnowledgeBaseListOrderByEnum,
   GetKnowledgeBaseListParamsVisibilityEnum,
   KnowledgeBaseCreateDto,
@@ -35,7 +35,7 @@ export class KnowledgeBases<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultKnowledgeBaseDetailVo, ApiLocaleResult>({
+    this.http.request<KnowledgeBaseDetailResult, ApiLocaleResult>({
       path: `/api/v1/knowledge-bases/${id}/visibility`,
       method: "PUT",
       query: query,
@@ -56,7 +56,7 @@ export class KnowledgeBases<SecurityDataType = unknown> {
     data: KnowledgeBaseToggleDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultKnowledgeBaseDetailVo, ApiLocaleResult>({
+    this.http.request<KnowledgeBaseDetailResult, ApiLocaleResult>({
       path: `/api/v1/knowledge-bases/${id}/toggle`,
       method: "PUT",
       body: data,
@@ -110,7 +110,7 @@ export class KnowledgeBases<SecurityDataType = unknown> {
     params: RequestParams = {},
   ) =>
     this.http.request<
-      ApiLocaleResultPageResultKnowledgeBaseListVo,
+      PageResultKnowledgeBaseListResult,
       ApiLocaleResult
     >({
       path: `/api/v1/knowledge-bases`,
@@ -150,7 +150,7 @@ export class KnowledgeBases<SecurityDataType = unknown> {
    * @secure
    */
   getKnowledgeBaseDetail = (id: number, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultKnowledgeBaseDetailVo, ApiLocaleResult>({
+    this.http.request<KnowledgeBaseDetailResult, ApiLocaleResult>({
       path: `/api/v1/knowledge-bases/${id}`,
       method: "GET",
       secure: true,
@@ -186,7 +186,7 @@ export class KnowledgeBases<SecurityDataType = unknown> {
     data: KnowledgeBaseUpdateDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultKnowledgeBaseDetailVo, ApiLocaleResult>({
+    this.http.request<KnowledgeBaseDetailResult, ApiLocaleResult>({
       path: `/api/v1/knowledge-bases/${id}`,
       method: "PATCH",
       body: data,

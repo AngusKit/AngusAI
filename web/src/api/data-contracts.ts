@@ -15,7 +15,7 @@ export interface ExecutionStats {
 }
 
 /** The API response result of supporting international message. */
-export type ApiResultWorkflowDetailVo = ApiLocaleResult & {
+export type WorkflowDetailResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: WorkflowDetailVo;
 };
@@ -77,7 +77,7 @@ export interface TeamSettingsDto {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultTeamSettingsVo = ApiLocaleResult & {
+export type TeamSettingsResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: TeamSettingsVo;
 };
@@ -112,7 +112,7 @@ export interface ResourceSharingToggleDto {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultResourceSharingDetailVo = ApiLocaleResult & {
+export type ResourceSharingDetailResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: ResourceSharingDetailVo;
 };
@@ -204,7 +204,7 @@ export interface ResourceSharingUpdateDto {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultPluginDetailVo = ApiLocaleResult & {
+export type PluginDetailResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: PluginDetailVo;
 };
@@ -417,7 +417,7 @@ export interface ModelConfig {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultModelDetailVo = ApiLocaleResult & {
+export type ModelDetailResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: ModelDetailVo;
 };
@@ -622,7 +622,7 @@ export interface TodayGrowthTrend {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultKnowledgeBaseDetailVo = ApiLocaleResult & {
+export type KnowledgeBaseDetailResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: KnowledgeBaseDetailVo;
 };
@@ -755,7 +755,7 @@ export interface KnowledgeBaseDocToggleDto {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultKnowledgeBaseDocListVo = ApiLocaleResult & {
+export type KnowledgeBaseDocLisResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: KnowledgeBaseDocListVo;
 };
@@ -810,7 +810,7 @@ export interface KnowledgeBaseDocListVo extends TenantAuditingVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultDatasetDetailVo = ApiLocaleResult & {
+export type DatasetDetailResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: DatasetDetailVo;
 };
@@ -915,13 +915,13 @@ export interface DataSourceUpdateDto {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultDatasourceConfigVo = ApiLocaleResult & {
+export type DatasourceConfigResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: DatasourceConfigVo;
 };
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultApplicationDetailVo = ApiLocaleResult & {
+export type ApplicationDetailResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: ApplicationDetailVo;
 };
@@ -1280,7 +1280,7 @@ export interface WorkflowExecuteDto {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultWorkflowExecuteResultVo = ApiLocaleResult & {
+export type WorkflowExecuteResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: WorkflowExecuteResultVo;
 };
@@ -1446,7 +1446,7 @@ export interface ApiKeyDetailVo extends TenantAuditingVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultApiKeyDetailVo = ApiLocaleResult & {
+export type ApiKeyDetailResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: ApiKeyDetailVo;
 };
@@ -1512,7 +1512,7 @@ export interface PromptCreateDto {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultPromptDetailVo = ApiLocaleResult & {
+export type PromptDetailResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: PromptDetailVo;
 };
@@ -1577,7 +1577,7 @@ export interface PromptCategoryCreateDto {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultPromptCategoryVo = ApiLocaleResult & {
+export type PromptCategoryResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: PromptCategoryVo;
 };
@@ -1702,7 +1702,7 @@ export interface PluginReviewCreateDto {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultPluginReviewVo = ApiLocaleResult & {
+export type PluginReviewResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: PluginReviewVo;
 };
@@ -1860,7 +1860,7 @@ export interface KnowledgeBaseCreateDto {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultKnowledgeBaseDocStatusVo = ApiLocaleResult & {
+export type KnowledgeBaseDocStatusResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: KnowledgeBaseDocStatusVo;
 };
@@ -1895,7 +1895,7 @@ export interface KnowledgeBaseDocStatusVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultListKnowledgeBaseDocListVo = ApiLocaleResult & {
+export type ListKnowledgeBaseDocListResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: KnowledgeBaseDocListVo[];
 };
@@ -1919,7 +1919,7 @@ export interface KnowledgeBaseDocSearchDto {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultListKnowledgeBaseDocSearchResultVo = ApiLocaleResult & {
+export type ListKnowledgeBaseDocSearchResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: KnowledgeBaseDocSearchResultVo[];
 };
@@ -2000,7 +2000,7 @@ export interface DatasetCreateDto {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultListDatasetDataListVo = ApiLocaleResult & {
+export type ListDatasetDataResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: DatasetDataListVo[];
 };
@@ -2028,7 +2028,7 @@ export interface DatasetDataListVo extends TenantAuditingVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultListSyncDataVo = ApiLocaleResult & {
+export type ListSyncDataResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: SyncDataVo[];
 };
@@ -2070,7 +2070,7 @@ export interface DatasourceConnectionTestDto {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultDatasourceConnectionTestVo = ApiLocaleResult & {
+export type DatasourceConnectionTestResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: DatasourceConnectionTestVo;
 };
@@ -2153,7 +2153,7 @@ export interface SessionCreateDto {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultSessionDetailVo = ApiLocaleResult & {
+export type SessionDetailResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: SessionDetailVo;
 };
@@ -2193,7 +2193,7 @@ export interface SessionDetailVo extends TenantAuditingVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultMessageVo = ApiLocaleResult & {
+export type MessageResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: MessageVo;
 };
@@ -2263,7 +2263,7 @@ export interface MessageSendDto {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultMessageSendVo = ApiLocaleResult & {
+export type MessageSendResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: MessageSendVo;
 };
@@ -2296,7 +2296,7 @@ export interface SessionBatchDeleteDto {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultAttachmentUploadVo = ApiLocaleResult & {
+export type AttachmentUploadResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: AttachmentUploadVo;
 };
@@ -2646,12 +2646,12 @@ export interface ApplicationUpdateDto {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultPageResultWorkflowListVo = ApiLocaleResult & {
+export type WorkflowListResult = ApiLocaleResult & {
   /** Actual response data or error details. */
-  data?: PageResultWorkflowListVo;
+  data?: PageWorkflowListVo;
 };
 
-export interface PageResultWorkflowListVo {
+export interface PageWorkflowListVo {
   /**
    * Total number
    * @format int64
@@ -2695,7 +2695,7 @@ export interface WorkflowListVo extends TenantAuditingVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultWorkflowStatisticsVo = ApiLocaleResult & {
+export type WorkflowStatisticsResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: WorkflowStatisticsVo;
 };
@@ -2713,7 +2713,7 @@ export interface WorkflowStatisticsVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultExecutionDetailVo = ApiLocaleResult & {
+export type ExecutionDetailResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: ExecutionDetailVo;
 };
@@ -2757,9 +2757,9 @@ export interface ExecutionDetailVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultPageResultExecutionLogVo = ApiLocaleResult & {
+export type ExecutionLogResult = ApiLocaleResult & {
   /** Actual response data or error details. */
-  data?: PageResultExecutionLogVo;
+  data?: PageExecutionLogVo;
 };
 
 /** 执行日志响应 */
@@ -2806,7 +2806,7 @@ export interface ExecutionLogVo {
   nodeExecutions?: object;
 }
 
-export interface PageResultExecutionLogVo {
+export interface PageExecutionLogVo {
   /**
    * Total number
    * @format int64
@@ -2818,12 +2818,12 @@ export interface PageResultExecutionLogVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultPageResultResourceSharingListVo = ApiLocaleResult & {
+export type ResourceSharingListResult = ApiLocaleResult & {
   /** Actual response data or error details. */
-  data?: PageResultResourceSharingListVo;
+  data?: PageResourceSharingListVo;
 };
 
-export interface PageResultResourceSharingListVo {
+export interface PageResourceSharingListVo {
   /**
    * Total number
    * @format int64
@@ -2911,7 +2911,7 @@ export interface AccessStatisticsVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultResourceSharingStatisticsVo = ApiLocaleResult & {
+export type ResourceSharingStatisticsResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: ResourceSharingStatisticsVo;
 };
@@ -2956,7 +2956,7 @@ export interface ViewTrendVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultResourceAccessCheckVo = ApiLocaleResult & {
+export type ResourceAccessCheckResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: ResourceAccessCheckVo;
 };
@@ -2977,7 +2977,7 @@ export interface ResourceAccessCheckVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultMapResourceInfoListSharePermission = ApiLocaleResult & {
+export type ResourceInfoListSharePermissionResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: Record<
     string, ApiLocaleResultMapResourceInfoListSharePermissionDataEnum[]
@@ -3038,13 +3038,13 @@ export interface ApiKeyListVo extends TenantAuditingVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultListApiKeyListVo = ApiLocaleResult & {
+export type ListApiKeyResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: ApiKeyListVo[];
 };
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultPageResultPromptListVo = ApiLocaleResult & {
+export type PagePromptListResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: PageResultPromptListVo;
 };
@@ -3087,13 +3087,13 @@ export interface PromptListVo extends TenantAuditingVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultListPromptCategoryVo = ApiLocaleResult & {
+export type ListPromptCategoryResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: PromptCategoryVo[];
 };
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultPageResultPluginListVo = ApiLocaleResult & {
+export type PageResultPluginListResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: PageResultPluginListVo;
 };
@@ -3177,13 +3177,13 @@ export interface PluginListVo extends TenantAuditingVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultListPluginReviewVo = ApiLocaleResult & {
+export type ListPluginReviewResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: PluginReviewVo[];
 };
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultPluginStatisticsVo = ApiLocaleResult & {
+export type PluginStatisticsResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: PluginStatisticsVo;
 };
@@ -3288,9 +3288,9 @@ export interface TrendingPlugin {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultPageResultModelListVo = ApiLocaleResult & {
+export type PageResultModelListResult = ApiLocaleResult & {
   /** Actual response data or error details. */
-  data?: PageResultModelListVo;
+  data?: PageModelListVo;
 };
 
 /** 模型列表项响应 */
@@ -3314,7 +3314,7 @@ export interface ModelListVo extends TenantAuditingVo {
   status?: ModelListVoStatusEnum;
 }
 
-export interface PageResultModelListVo {
+export interface PageModelListVo {
   /**
    * Total number
    * @format int64
@@ -3326,7 +3326,7 @@ export interface PageResultModelListVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultModelStatisticsVo = ApiLocaleResult & {
+export type ModelStatisticsResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: ModelStatisticsVo;
 };
@@ -3390,9 +3390,9 @@ export interface ModelStatisticsVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultPageResultKnowledgeBaseListVo = ApiLocaleResult & {
+export type PageResultKnowledgeBaseListResult = ApiLocaleResult & {
   /** Actual response data or error details. */
-  data?: PageResultKnowledgeBaseListVo;
+  data?: PageKnowledgeBaseListVo;
 };
 
 /** 知识库列表视图对象 */
@@ -3451,7 +3451,7 @@ export interface KnowledgeBaseListVo extends TenantAuditingVo {
   visibility?: KnowledgeBaseListVoVisibilityEnum;
 }
 
-export interface PageResultKnowledgeBaseListVo {
+export interface PageKnowledgeBaseListVo {
   /**
    * Total number
    * @format int64
@@ -3463,12 +3463,12 @@ export interface PageResultKnowledgeBaseListVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultPageResultKnowledgeBaseDocListVo = ApiLocaleResult & {
+export type PageKnowledgeBaseDocListResult = ApiLocaleResult & {
   /** Actual response data or error details. */
-  data?: PageResultKnowledgeBaseDocListVo;
+  data?: PageKnowledgeBaseDocListVo;
 };
 
-export interface PageResultKnowledgeBaseDocListVo {
+export interface PageKnowledgeBaseDocListVo {
   /**
    * Total number
    * @format int64
@@ -3480,7 +3480,7 @@ export interface PageResultKnowledgeBaseDocListVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultPageResultDatasetListVo = ApiLocaleResult & {
+export type PageDatasetListResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: PageResultDatasetListVo;
 };
@@ -3526,7 +3526,7 @@ export interface PageResultDatasetListVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultDatasourceTableDataPreviewVo = ApiLocaleResult & {
+export type DatasourceTableDataPreviewResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: DatasourceTableDataPreviewVo;
 };
@@ -3551,12 +3551,12 @@ export interface DatasourceTableDataPreviewVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultPageResultDatasetDataListVo = ApiLocaleResult & {
+export type PageDatasetDataListResult = ApiLocaleResult & {
   /** Actual response data or error details. */
-  data?: PageResultDatasetDataListVo;
+  data?: PageDatasetDataListVo;
 };
 
-export interface PageResultDatasetDataListVo {
+export interface PageDatasetDataListVo {
   /**
    * Total number
    * @format int64
@@ -3568,7 +3568,7 @@ export interface PageResultDatasetDataListVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultDatasetStatisticsVo = ApiLocaleResult & {
+export type DatasetStatisticsResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: DatasetStatisticsVo;
 };
@@ -3609,9 +3609,9 @@ export interface DatasetStatisticsVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultPageResultSessionListVo = ApiLocaleResult & {
+export type PageSessionListResult = ApiLocaleResult & {
   /** Actual response data or error details. */
-  data?: PageResultSessionListVo;
+  data?: PageSessionListVo;
 };
 
 /** 最后一条消息 */
@@ -3627,7 +3627,7 @@ export interface LastMessage {
   datetime?: number;
 }
 
-export interface PageResultSessionListVo {
+export interface PageSessionListVo {
   /**
    * Total number
    * @format int64
@@ -3673,12 +3673,12 @@ export interface SessionListVo extends TenantAuditingVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultPageResultMessageVo = ApiLocaleResult & {
+export type PageMessageResult = ApiLocaleResult & {
   /** Actual response data or error details. */
-  data?: PageResultMessageVo;
+  data?: PageMessageVo;
 };
 
-export interface PageResultMessageVo {
+export interface PageMessageVo {
   /**
    * Total number
    * @format int64
@@ -3690,7 +3690,7 @@ export interface PageResultMessageVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultChatStatisticsVo = ApiLocaleResult & {
+export type ChatStatisticsResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: ChatStatisticsVo;
 };
@@ -3809,9 +3809,9 @@ export interface UsageTrend {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultPageResultApplicationListVo = ApiLocaleResult & {
+export type PageApplicationListResult = ApiLocaleResult & {
   /** Actual response data or error details. */
-  data?: PageResultApplicationListVo;
+  data?: PageApplicationListVo;
 };
 
 /** 应用列表项 */
@@ -3861,7 +3861,7 @@ export interface ApplicationListVo extends TenantAuditingVo {
   publishedDate?: string;
 }
 
-export interface PageResultApplicationListVo {
+export interface PageApplicationListVo {
   /**
    * Total number
    * @format int64
@@ -3873,7 +3873,7 @@ export interface PageResultApplicationListVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultApplicationStatisticsVo = ApiLocaleResult & {
+export type ApplicationStatisticsResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: ApplicationStatisticsVo;
 };
@@ -3958,7 +3958,7 @@ export interface TrendsStatsVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultTopEndpointsVo = ApiLocaleResult & {
+export type TopEndpointsResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: TopEndpointsVo;
 };
@@ -4019,7 +4019,7 @@ export interface TopEndpointsVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultTokenUsageTrendVo = ApiLocaleResult & {
+export type TokenUsageTrendResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: TokenUsageTrendVo;
 };
@@ -4093,7 +4093,7 @@ export interface TrendItemVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultResponseTimeAnalysisVo = ApiLocaleResult & {
+export type ResponseTimeAnalysisResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: ResponseTimeAnalysisVo;
 };
@@ -4119,7 +4119,7 @@ export interface AnalyticsOverviewVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultAnalyticsOverviewVo = ApiLocaleResult & {
+export type AnalyticsOverviewResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: AnalyticsOverviewVo;
 };
@@ -4201,7 +4201,7 @@ export interface SuccessRateVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultModelDistributionVo = ApiLocaleResult & {
+export type ModelDistributionResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: ModelDistributionVo;
 };
@@ -4280,7 +4280,7 @@ export interface TotalVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultErrorAnalysisVo = ApiLocaleResult & {
+export type ErrorAnalysisResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: ErrorAnalysisVo;
 };
@@ -4382,7 +4382,7 @@ export interface ErrorTrendItemVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultAppDistributionVo = ApiLocaleResult & {
+export type AppDistributionResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: AppDistributionVo;
   /**
@@ -4411,7 +4411,7 @@ export interface ApiCallsTrendVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiLocaleResultApiCallsTrendVo = ApiLocaleResult & {
+export type ApiCallsTrendResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: ApiCallsTrendVo;
 };
@@ -4434,12 +4434,12 @@ export interface ActivityDetailVo {
 }
 
 /** The API response result of supporting international message. */
-export type ApiPageResultActivityDetailVo = ApiLocaleResult & {
+export type ActivityDetailResult = ApiLocaleResult & {
   /** Actual response data or error details. */
-  data?: PageResultActivityDetailVo;
+  data?: PageActivityDetailVo;
 };
 
-export interface PageResultActivityDetailVo {
+export interface PageActivityDetailVo {
   /**
    * Total number
    * @format int64

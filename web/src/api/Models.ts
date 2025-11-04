@@ -1,8 +1,8 @@
 import { PageQuery, ApiLocaleResult } from '@xcan-angus/infra';
 import {
-  ApiLocaleResultModelDetailVo,
-  ApiLocaleResultModelStatisticsVo,
-  ApiLocaleResultPageResultModelListVo,
+  ModelDetailResult,
+  ModelStatisticsResult,
+  PageResultModelListResult,
   GetModelListParamsOrderByEnum,
   GetModelListParamsProviderEnum,
   GetModelListParamsStatusEnum,
@@ -36,7 +36,7 @@ export class Models<SecurityDataType = unknown> {
     data: ModelConfig,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultModelDetailVo, ApiLocaleResult>({
+    this.http.request<ModelDetailResult, ApiLocaleResult>({
       path: `/api/v1/models/${id}/config`,
       method: "PUT",
       body: data,
@@ -76,7 +76,7 @@ export class Models<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultPageResultModelListVo, ApiLocaleResult>({
+    this.http.request<PageResultModelListResult, ApiLocaleResult>({
       path: `/api/v1/models`,
       method: "GET",
       query: query,
@@ -111,7 +111,7 @@ export class Models<SecurityDataType = unknown> {
    * @secure
    */
   testModel = (id: number, data: ModelTestDto, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultModelDetailVo, ApiLocaleResult>({
+    this.http.request<ModelDetailResult, ApiLocaleResult>({
       path: `/api/v1/models/${id}/test`,
       method: "POST",
       body: data,
@@ -139,7 +139,7 @@ export class Models<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultModelDetailVo, ApiLocaleResult>({
+    this.http.request<ModelDetailResult, ApiLocaleResult>({
       path: `/api/v1/models/${id}/stop`,
       method: "POST",
       query: query,
@@ -156,7 +156,7 @@ export class Models<SecurityDataType = unknown> {
    * @secure
    */
   startModel = (id: number, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultModelDetailVo, ApiLocaleResult>({
+    this.http.request<ModelDetailResult, ApiLocaleResult>({
       path: `/api/v1/models/${id}/start`,
       method: "POST",
       secure: true,
@@ -172,7 +172,7 @@ export class Models<SecurityDataType = unknown> {
    * @secure
    */
   restartModel = (id: number, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultModelDetailVo, ApiLocaleResult>({
+    this.http.request<ModelDetailResult, ApiLocaleResult>({
       path: `/api/v1/models/${id}/restart`,
       method: "POST",
       secure: true,
@@ -188,7 +188,7 @@ export class Models<SecurityDataType = unknown> {
    * @secure
    */
   getModelDetail = (id: number, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultModelDetailVo, ApiLocaleResult>({
+    this.http.request<ModelDetailResult, ApiLocaleResult>({
       path: `/api/v1/models/${id}`,
       method: "GET",
       secure: true,
@@ -224,7 +224,7 @@ export class Models<SecurityDataType = unknown> {
     data: ModelUpdateDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultModelDetailVo, ApiLocaleResult>({
+    this.http.request<ModelDetailResult, ApiLocaleResult>({
       path: `/api/v1/models/${id}`,
       method: "PATCH",
       body: data,
@@ -248,7 +248,7 @@ export class Models<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultModelStatisticsVo, ApiLocaleResult>({
+    this.http.request<ModelStatisticsResult, ApiLocaleResult>({
       path: `/api/v1/models/statistics`,
       method: "GET",
       query: query,

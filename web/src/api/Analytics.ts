@@ -1,13 +1,13 @@
 import { ApiLocaleResult } from '@xcan-angus/infra';
 import {
-  ApiLocaleResultAnalyticsOverviewVo,
-  ApiLocaleResultApiCallsTrendVo,
-  ApiLocaleResultAppDistributionVo,
-  ApiLocaleResultErrorAnalysisVo,
-  ApiLocaleResultModelDistributionVo,
-  ApiLocaleResultResponseTimeAnalysisVo,
-  ApiLocaleResultTokenUsageTrendVo,
-  ApiLocaleResultTopEndpointsVo,
+  AnalyticsOverviewResult,
+  ApiCallsTrendResult,
+  AppDistributionResult,
+  ErrorAnalysisResult,
+  ModelDistributionResult,
+  ResponseTimeAnalysisResult,
+  TokenUsageTrendResult,
+  TopEndpointsResult,
   GetAnalyticsOverviewParamsGranularityEnum,
   GetAnalyticsOverviewParamsTimeRangeEnum,
   GetApiCallsTrendParamsGranularityEnum,
@@ -71,7 +71,7 @@ export class Analytics<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultTopEndpointsVo, ApiLocaleResult>({
+    this.http.request<TopEndpointsResult, ApiLocaleResult>({
       path: `/api/v1/analytics/top-endpoints`,
       method: "GET",
       query: query,
@@ -104,7 +104,7 @@ export class Analytics<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultTokenUsageTrendVo, ApiLocaleResult>({
+    this.http.request<TokenUsageTrendResult, ApiLocaleResult>({
       path: `/api/v1/analytics/token-usage`,
       method: "GET",
       query: query,
@@ -137,7 +137,7 @@ export class Analytics<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultResponseTimeAnalysisVo, ApiLocaleResult>({
+    this.http.request<ResponseTimeAnalysisResult, ApiLocaleResult>({
       path: `/api/v1/analytics/response-time`,
       method: "GET",
       query: query,
@@ -170,7 +170,7 @@ export class Analytics<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultAnalyticsOverviewVo, ApiLocaleResult>({
+    this.http.request<AnalyticsOverviewResult, ApiLocaleResult>({
       path: `/api/v1/analytics/overview`,
       method: "GET",
       query: query,
@@ -203,7 +203,7 @@ export class Analytics<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultModelDistributionVo, ApiLocaleResult>({
+    this.http.request<ModelDistributionResult, ApiLocaleResult>({
       path: `/api/v1/analytics/model-distribution`,
       method: "GET",
       query: query,
@@ -236,7 +236,7 @@ export class Analytics<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultErrorAnalysisVo, ApiLocaleResult>({
+    this.http.request<ErrorAnalysisResult, ApiLocaleResult>({
       path: `/api/v1/analytics/errors`,
       method: "GET",
       query: query,
@@ -275,7 +275,7 @@ export class Analytics<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultAppDistributionVo, ApiLocaleResult>({
+    this.http.request<AppDistributionResult, ApiLocaleResult>({
       path: `/api/v1/analytics/app-distribution`,
       method: "GET",
       query: query,
@@ -308,7 +308,7 @@ export class Analytics<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultApiCallsTrendVo, ApiLocaleResult>({
+    this.http.request<ApiCallsTrendResult, ApiLocaleResult>({
       path: `/api/v1/analytics/api-calls`,
       method: "GET",
       query: query,

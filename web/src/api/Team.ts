@@ -1,6 +1,6 @@
 import { PageQuery, ApiLocaleResult } from '@xcan-angus/infra';
 import {
-  ApiLocaleResultTeamSettingsVo,
+  TeamSettingsResult,
   TeamSettingsDto,
 } from "./data-contracts.ts";
 import { ContentType, HttpClient, RequestParams } from "./http-client.ts";
@@ -22,7 +22,7 @@ export class Team<SecurityDataType = unknown> {
    * @secure
    */
   getTeamSettingsDetail = (params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultTeamSettingsVo, ApiLocaleResult>({
+    this.http.request<TeamSettingsResult, ApiLocaleResult>({
       path: `/api/v1/team/settings`,
       method: "GET",
       secure: true,
@@ -38,7 +38,7 @@ export class Team<SecurityDataType = unknown> {
    * @secure
    */
   updateTeamSettings = (data: TeamSettingsDto, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultTeamSettingsVo, ApiLocaleResult>({
+    this.http.request<TeamSettingsResult, ApiLocaleResult>({
       path: `/api/v1/team/settings`,
       method: "PUT",
       body: data,

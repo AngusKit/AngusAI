@@ -1,7 +1,7 @@
 import { ApiLocaleResult } from '@xcan-angus/infra';
 import {
-  ApiLocaleResultListPromptCategoryVo,
-  ApiLocaleResultPromptCategoryVo,
+  ListPromptCategoryResult,
+  PromptCategoryResult,
   PromptCategoryCreateDto,
   PromptCategoryUpdateDto,
 } from "./data-contracts.ts";
@@ -45,7 +45,7 @@ export class PromptCategories<SecurityDataType = unknown> {
    * @secure
    */
   getPromptCategoryDetail = (id: number, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultPromptCategoryVo, ApiLocaleResult>({
+    this.http.request<PromptCategoryResult, ApiLocaleResult>({
       path: `/api/v1/prompt-categories/${id}`,
       method: "GET",
       secure: true,
@@ -81,7 +81,7 @@ export class PromptCategories<SecurityDataType = unknown> {
     data: PromptCategoryUpdateDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultPromptCategoryVo, ApiLocaleResult>({
+    this.http.request<PromptCategoryResult, ApiLocaleResult>({
       path: `/api/v1/prompt-categories/${id}`,
       method: "PATCH",
       body: data,
@@ -109,7 +109,7 @@ export class PromptCategories<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultPromptCategoryVo, ApiLocaleResult>({
+    this.http.request<PromptCategoryResult, ApiLocaleResult>({
       path: `/api/v1/prompt-categories/${id}/order`,
       method: "PATCH",
       query: query,
@@ -126,7 +126,7 @@ export class PromptCategories<SecurityDataType = unknown> {
    * @secure
    */
   getPromptCategoryTree = (params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultListPromptCategoryVo, ApiLocaleResult>({
+    this.http.request<ListPromptCategoryResult, ApiLocaleResult>({
       path: `/api/v1/prompt-categories/tree`,
       method: "GET",
       secure: true,

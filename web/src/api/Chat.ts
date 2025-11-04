@@ -1,10 +1,10 @@
 import { PageQuery, ApiLocaleResult } from '@xcan-angus/infra';
 import {
-  ApiLocaleResultChatStatisticsVo,
-  ApiLocaleResultMessageVo,
-  ApiLocaleResultPageResultMessageVo,
-  ApiLocaleResultPageResultSessionListVo,
-  ApiLocaleResultSessionDetailVo,
+  ChatStatisticsResult,
+  MessageResult,
+  PageMessageResult,
+  PageSessionListResult,
+  SessionDetailResult,
   MessageFeedbackDto,
   MessageSendDto,
   SessionBatchDeleteDto,
@@ -54,7 +54,7 @@ export class Chat<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultPageResultSessionListVo, ApiLocaleResult>({
+    this.http.request<PageSessionListResult, ApiLocaleResult>({
       path: `/api/v1/chat/sessions`,
       method: "GET",
       query: query,
@@ -89,7 +89,7 @@ export class Chat<SecurityDataType = unknown> {
    * @secure
    */
   stopGeneration = (sessionId: number, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultMessageVo, ApiLocaleResult>({
+    this.http.request<MessageResult, ApiLocaleResult>({
       path: `/api/v1/chat/sessions/${sessionId}/stop`,
       method: "POST",
       secure: true,
@@ -132,7 +132,7 @@ export class Chat<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultPageResultMessageVo, ApiLocaleResult>({
+    this.http.request<PageMessageResult, ApiLocaleResult>({
       path: `/api/v1/chat/sessions/${sessionId}/messages`,
       method: "GET",
       query: query,
@@ -212,7 +212,7 @@ export class Chat<SecurityDataType = unknown> {
     data: MessageFeedbackDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultMessageVo, ApiLocaleResult>({
+    this.http.request<MessageResult, ApiLocaleResult>({
       path: `/api/v1/chat/sessions/${sessionId}/messages/${messageId}/feedback`,
       method: "POST",
       body: data,
@@ -344,7 +344,7 @@ export class Chat<SecurityDataType = unknown> {
     data: SessionSwitchModelDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultSessionDetailVo, ApiLocaleResult>({
+    this.http.request<SessionDetailResult, ApiLocaleResult>({
       path: `/api/v1/chat/sessions/${sessionId}/switch-model`,
       method: "PATCH",
       body: data,
@@ -366,7 +366,7 @@ export class Chat<SecurityDataType = unknown> {
     data: SessionSwitchAppDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultSessionDetailVo, ApiLocaleResult>({
+    this.http.request<SessionDetailResult, ApiLocaleResult>({
       path: `/api/v1/chat/sessions/${sessionId}/switch-app`,
       method: "PATCH",
       body: data,
@@ -388,7 +388,7 @@ export class Chat<SecurityDataType = unknown> {
     data: SessionStarDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultSessionDetailVo, ApiLocaleResult>({
+    this.http.request<SessionDetailResult, ApiLocaleResult>({
       path: `/api/v1/chat/sessions/${sessionId}/star`,
       method: "PATCH",
       body: data,
@@ -406,7 +406,7 @@ export class Chat<SecurityDataType = unknown> {
    * @secure
    */
   getSessionDetail = (id: number, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultSessionDetailVo, ApiLocaleResult>({
+    this.http.request<SessionDetailResult, ApiLocaleResult>({
       path: `/api/v1/chat/sessions/${id}`,
       method: "GET",
       secure: true,
@@ -442,7 +442,7 @@ export class Chat<SecurityDataType = unknown> {
     data: SessionUpdateDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultSessionDetailVo, ApiLocaleResult>({
+    this.http.request<SessionDetailResult, ApiLocaleResult>({
       path: `/api/v1/chat/sessions/${id}`,
       method: "PATCH",
       body: data,
@@ -496,7 +496,7 @@ export class Chat<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultChatStatisticsVo, ApiLocaleResult>({
+    this.http.request<ChatStatisticsResult, ApiLocaleResult>({
       path: `/api/v1/chat/sessions/statistics`,
       method: "GET",
       query: query,

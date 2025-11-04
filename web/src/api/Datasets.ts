@@ -1,12 +1,12 @@
 import { PageQuery, ApiLocaleResult } from '@xcan-angus/infra';
 import {
-  ApiLocaleResultDatasetDetailVo,
-  ApiLocaleResultDatasetStatisticsVo,
-  ApiLocaleResultDatasourceConnectionTestVo,
-  ApiLocaleResultDatasourceTableDataPreviewVo,
-  ApiLocaleResultListSyncDataVo,
-  ApiLocaleResultPageResultDatasetDataListVo,
-  ApiLocaleResultPageResultDatasetListVo,
+  DatasetDetailResult,
+  DatasetStatisticsResult,
+  DatasourceConnectionTestResult,
+  DatasourceTableDataPreviewResult,
+  ListSyncDataResult,
+  PageDatasetDataListResult,
+  PageDatasetListResult,
   DatasetCreateDto,
   DatasetDataBatchDeleteDto,
   DatasetUpdateDto,
@@ -46,7 +46,7 @@ export class Datasets<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultDatasetDetailVo, ApiLocaleResult>({
+    this.http.request<DatasetDetailResult, ApiLocaleResult>({
       path: `/api/v1/datasets/${id}/visibility`,
       method: "PUT",
       query: query,
@@ -123,7 +123,7 @@ export class Datasets<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultPageResultDatasetListVo, ApiLocaleResult>({
+    this.http.request<PageDatasetListResult, ApiLocaleResult>({
       path: `/api/v1/datasets`,
       method: "GET",
       query: query,
@@ -189,7 +189,7 @@ export class Datasets<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultListSyncDataVo, ApiLocaleResult>({
+    this.http.request<ListSyncDataResult, ApiLocaleResult>({
       path: `/api/v1/datasets/${id}/data/sync`,
       method: "POST",
       query: query,
@@ -210,7 +210,7 @@ export class Datasets<SecurityDataType = unknown> {
     params: RequestParams = {},
   ) =>
     this.http.request<
-      ApiLocaleResultDatasourceConnectionTestVo,
+      DatasourceConnectionTestResult,
       ApiLocaleResult
     >({
       path: `/api/v1/datasets/datasource/test`,
@@ -230,7 +230,7 @@ export class Datasets<SecurityDataType = unknown> {
    * @secure
    */
   getDatasetDetail = (id: number, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultDatasetDetailVo, ApiLocaleResult>({
+    this.http.request<DatasetDetailResult, ApiLocaleResult>({
       path: `/api/v1/datasets/${id}`,
       method: "GET",
       secure: true,
@@ -266,7 +266,7 @@ export class Datasets<SecurityDataType = unknown> {
     data: DatasetUpdateDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultDatasetDetailVo, ApiLocaleResult>({
+    this.http.request<DatasetDetailResult, ApiLocaleResult>({
       path: `/api/v1/datasets/${id}`,
       method: "PATCH",
       body: data,
@@ -304,7 +304,7 @@ export class Datasets<SecurityDataType = unknown> {
     params: RequestParams = {},
   ) =>
     this.http.request<
-      ApiLocaleResultDatasourceTableDataPreviewVo,
+      DatasourceTableDataPreviewResult,
       ApiLocaleResult
     >({
       path: `/api/v1/datasets/${id}/datasource/preview`,
@@ -345,7 +345,7 @@ export class Datasets<SecurityDataType = unknown> {
     params: RequestParams = {},
   ) =>
     this.http.request<
-      ApiLocaleResultPageResultDatasetDataListVo,
+      PageDatasetDataListResult,
       ApiLocaleResult
     >({
       path: `/api/v1/datasets/${id}/data`,
@@ -373,7 +373,7 @@ export class Datasets<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultDatasetStatisticsVo, ApiLocaleResult>({
+    this.http.request<DatasetStatisticsResult, ApiLocaleResult>({
       path: `/api/v1/datasets/statistics`,
       method: "GET",
       query: query,

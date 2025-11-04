@@ -1,7 +1,7 @@
 import { PageQuery, ApiLocaleResult } from '@xcan-angus/infra';
 import {
-  ApiLocaleResultPageResultPromptListVo,
-  ApiLocaleResultPromptDetailVo,
+  PagePromptListResult,
+  PromptDetailResult,
   GetPromptListParamsOrderByEnum,
   PromptCreateDto,
   PromptUpdateDto,
@@ -40,7 +40,7 @@ export class Prompts<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultPageResultPromptListVo, ApiLocaleResult>({
+    this.http.request<PagePromptListResult, ApiLocaleResult>({
       path: `/api/v1/prompts`,
       method: "GET",
       query: query,
@@ -75,7 +75,7 @@ export class Prompts<SecurityDataType = unknown> {
    * @secure
    */
   usePrompt = (id: number, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultPromptDetailVo, ApiLocaleResult>({
+    this.http.request<PromptDetailResult, ApiLocaleResult>({
       path: `/api/v1/prompts/${id}/use`,
       method: "POST",
       secure: true,
@@ -98,7 +98,7 @@ export class Prompts<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultPromptDetailVo, ApiLocaleResult>({
+    this.http.request<PromptDetailResult, ApiLocaleResult>({
       path: `/api/v1/prompts/${id}/favorite`,
       method: "POST",
       query: query,
@@ -139,7 +139,7 @@ export class Prompts<SecurityDataType = unknown> {
    * @secure
    */
   getPromptDetail = (id: number, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultPromptDetailVo, ApiLocaleResult>({
+    this.http.request<PromptDetailResult, ApiLocaleResult>({
       path: `/api/v1/prompts/${id}`,
       method: "GET",
       secure: true,
@@ -175,7 +175,7 @@ export class Prompts<SecurityDataType = unknown> {
     data: PromptUpdateDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultPromptDetailVo, ApiLocaleResult>({
+    this.http.request<PromptDetailResult, ApiLocaleResult>({
       path: `/api/v1/prompts/${id}`,
       method: "PATCH",
       body: data,

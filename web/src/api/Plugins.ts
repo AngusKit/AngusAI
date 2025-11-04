@@ -1,9 +1,9 @@
 import { PageQuery, ApiLocaleResult } from '@xcan-angus/infra';
 import {
-  ApiLocaleResultListPluginReviewVo,
-  ApiLocaleResultPageResultPluginListVo,
-  ApiLocaleResultPluginDetailVo,
-  ApiLocaleResultPluginStatisticsVo,
+  ListPluginReviewResult,
+  PageResultPluginListResult,
+  PluginDetailResult,
+  PluginStatisticsResult,
   GetPluginListParamsCategoryEnum,
   GetPluginListOrderByEnum,
   GetPluginListParamsStatusEnum,
@@ -41,7 +41,7 @@ export class Plugins<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultPluginDetailVo, ApiLocaleResult>({
+    this.http.request<PluginDetailResult, ApiLocaleResult>({
       path: `/api/v1/plugins/${id}/status`,
       method: "PUT",
       query: query,
@@ -112,7 +112,7 @@ export class Plugins<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultPageResultPluginListVo, ApiLocaleResult>({
+    this.http.request<PageResultPluginListResult, ApiLocaleResult>({
       path: `/api/v1/plugins`,
       method: "GET",
       query: query,
@@ -147,7 +147,7 @@ export class Plugins<SecurityDataType = unknown> {
    * @secure
    */
   listPluginReviews = (pluginId: number, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultListPluginReviewVo, ApiLocaleResult>({
+    this.http.request<ListPluginReviewResult, ApiLocaleResult>({
       path: `/api/v1/plugins/${pluginId}/reviews`,
       method: "GET",
       secure: true,
@@ -185,7 +185,7 @@ export class Plugins<SecurityDataType = unknown> {
    * @secure
    */
   usePlugin = (id: number, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultPluginDetailVo, ApiLocaleResult>({
+    this.http.request<PluginDetailResult, ApiLocaleResult>({
       path: `/api/v1/plugins/${id}/use`,
       method: "POST",
       secure: true,
@@ -217,7 +217,7 @@ export class Plugins<SecurityDataType = unknown> {
    * @secure
    */
   publishPlugin = (id: number, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultPluginDetailVo, ApiLocaleResult>({
+    this.http.request<PluginDetailResult, ApiLocaleResult>({
       path: `/api/v1/plugins/${id}/publish`,
       method: "POST",
       secure: true,
@@ -233,7 +233,7 @@ export class Plugins<SecurityDataType = unknown> {
    * @secure
    */
   installPlugin = (id: number, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultPluginDetailVo, ApiLocaleResult>({
+    this.http.request<PluginDetailResult, ApiLocaleResult>({
       path: `/api/v1/plugins/${id}/install`,
       method: "POST",
       secure: true,
@@ -249,7 +249,7 @@ export class Plugins<SecurityDataType = unknown> {
    * @secure
    */
   verifyPlugin = (data: PluginVerifyDto, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultPluginDetailVo, ApiLocaleResult>({
+    this.http.request<PluginDetailResult, ApiLocaleResult>({
       path: `/api/v1/plugins/verify`,
       method: "POST",
       body: data,
@@ -267,7 +267,7 @@ export class Plugins<SecurityDataType = unknown> {
    * @secure
    */
   getPluginDetail = (id: number, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultPluginDetailVo, ApiLocaleResult>({
+    this.http.request<PluginDetailResult, ApiLocaleResult>({
       path: `/api/v1/plugins/${id}`,
       method: "GET",
       secure: true,
@@ -303,7 +303,7 @@ export class Plugins<SecurityDataType = unknown> {
     data: PluginUpdateDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultPluginDetailVo, ApiLocaleResult>({
+    this.http.request<PluginDetailResult, ApiLocaleResult>({
       path: `/api/v1/plugins/${id}`,
       method: "PATCH",
       body: data,
@@ -327,7 +327,7 @@ export class Plugins<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultPluginStatisticsVo, ApiLocaleResult>({
+    this.http.request<PluginStatisticsResult, ApiLocaleResult>({
       path: `/api/v1/plugins/statistics`,
       method: "GET",
       query: query,

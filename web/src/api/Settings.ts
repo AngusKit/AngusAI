@@ -2,8 +2,8 @@ import { PageQuery, ApiLocaleResult } from '@xcan-angus/infra';
 import {
   ApiKeyCreateDto,
   ApiKeyRevokeDto,
-  ApiLocaleResultApiKeyDetailVo,
-  ApiLocaleResultListApiKeyListVo,
+  ApiKeyDetailResult,
+  ListApiKeyResult,
 } from "./data-contracts.ts";
 import { ContentType, HttpClient, RequestParams } from "./http-client.ts";
 
@@ -24,7 +24,7 @@ export class Settings<SecurityDataType = unknown> {
    * @secure
    */
   listApiKeys = (params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultListApiKeyListVo, ApiLocaleResult>({
+    this.http.request<ListApiKeyResult, ApiLocaleResult>({
       path: `/api/v1/settings/api-keys`,
       method: "GET",
       secure: true,
@@ -80,7 +80,7 @@ export class Settings<SecurityDataType = unknown> {
    * @secure
    */
   getApiKeyDetail = (id: number, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultApiKeyDetailVo, ApiLocaleResult>({
+    this.http.request<ApiKeyDetailResult, ApiLocaleResult>({
       path: `/api/v1/settings/api-keys/${id}`,
       method: "GET",
       secure: true,

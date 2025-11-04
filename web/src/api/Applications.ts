@@ -1,7 +1,7 @@
 import { PageQuery, ApiLocaleResult } from '@xcan-angus/infra';
 import {
-  ApiLocaleResultApplicationDetailVo,
-  ApiLocaleResultApplicationStatisticsVo,
+  ApplicationDetailResult,
+  ApplicationStatisticsResult,
   ApplicationConfig,
   ApplicationCreateDto,
   ApplicationDuplicateDto,
@@ -38,7 +38,7 @@ export class Applications<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultApplicationDetailVo, ApiLocaleResult>({
+    this.http.request<ApplicationDetailResult, ApiLocaleResult>({
       path: `/api/v1/applications/${id}/status`,
       method: "PUT",
       query: query,
@@ -59,7 +59,7 @@ export class Applications<SecurityDataType = unknown> {
     data: ApplicationConfig,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultApplicationDetailVo, ApiLocaleResult>({
+    this.http.request<ApplicationDetailResult, ApiLocaleResult>({
       path: `/api/v1/applications/${id}/config`,
       method: "PUT",
       body: data,
@@ -140,7 +140,7 @@ export class Applications<SecurityDataType = unknown> {
     data: ApplicationShareDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultApplicationDetailVo, ApiLocaleResult>({
+    this.http.request<ApplicationDetailResult, ApiLocaleResult>({
       path: `/api/v1/applications/${id}/share`,
       method: "POST",
       body: data,
@@ -216,7 +216,7 @@ export class Applications<SecurityDataType = unknown> {
     data: ApplicationUpdateDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultApplicationDetailVo, ApiLocaleResult>({
+    this.http.request<ApplicationDetailResult, ApiLocaleResult>({
       path: `/api/v1/applications/${id}`,
       method: "PATCH",
       body: data,
@@ -245,7 +245,7 @@ export class Applications<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultApplicationStatisticsVo, ApiLocaleResult>({
+    this.http.request<ApplicationStatisticsResult, ApiLocaleResult>({
       path: `/api/v1/applications/${id}/statistics`,
       method: "GET",
       query: query,

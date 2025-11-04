@@ -1,9 +1,9 @@
 import { PageQuery, ApiLocaleResult } from '@xcan-angus/infra';
 import {
-  ApiLocaleResultKnowledgeBaseDocListVo,
-  ApiLocaleResultKnowledgeBaseDocStatusVo,
-  ApiLocaleResultListKnowledgeBaseDocSearchResultVo,
-  ApiLocaleResultPageResultKnowledgeBaseDocListVo,
+  KnowledgeBaseDocLisResult,
+  KnowledgeBaseDocStatusResult,
+  ListKnowledgeBaseDocSearchResult,
+  PageKnowledgeBaseDocListResult,
   GetDocumentListOrderByEnum,
   GetDocumentListParamsStatusEnum,
   GetDocumentListParamsTypeEnum,
@@ -35,7 +35,7 @@ export class Documents<SecurityDataType = unknown> {
     data: KnowledgeBaseDocToggleDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultKnowledgeBaseDocListVo, ApiLocaleResult>({
+    this.http.request<KnowledgeBaseDocLisResult, ApiLocaleResult>({
       path: `/api/v1/documents/${documentId}/knowledge-bases/${knowledgeBaseId}/toggle`,
       method: "PUT",
       body: data,
@@ -57,7 +57,7 @@ export class Documents<SecurityDataType = unknown> {
     knowledgeBaseId: number,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultKnowledgeBaseDocStatusVo, ApiLocaleResult>(
+    this.http.request<KnowledgeBaseDocStatusResult, ApiLocaleResult>(
       {
         path: `/api/v1/documents/${documentId}/knowledge-bases/${knowledgeBaseId}/reprocess`,
         method: "POST",
@@ -89,7 +89,7 @@ export class Documents<SecurityDataType = unknown> {
     params: RequestParams = {},
   ) =>
     this.http.request<
-      ApiLocaleResultPageResultKnowledgeBaseDocListVo,
+      PageKnowledgeBaseDocListResult,
       ApiLocaleResult
     >({
       path: `/api/v1/documents/knowledge-bases/${knowledgeBaseId}`,
@@ -137,7 +137,7 @@ export class Documents<SecurityDataType = unknown> {
     params: RequestParams = {},
   ) =>
     this.http.request<
-      ApiLocaleResultListKnowledgeBaseDocSearchResultVo,
+      ListKnowledgeBaseDocSearchResult,
       ApiLocaleResult
     >({
       path: `/api/v1/documents/knowledge-bases/${knowledgeBaseId}/search`,
