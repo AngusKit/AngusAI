@@ -146,7 +146,6 @@ public class VectorStoreFacadeImpl implements VectorStoreFacade {
 
     // 性能趋势（使用用户指定的时间范围）
     vo.setPerformanceTrend(buildPerformanceTrend(start, end));
-
     return vo;
   }
 
