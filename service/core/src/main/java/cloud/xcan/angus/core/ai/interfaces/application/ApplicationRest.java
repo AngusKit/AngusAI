@@ -133,7 +133,7 @@ public class ApplicationRest {
       @ApiResponse(responseCode = "200", description = "应用详情获取成功"),
       @ApiResponse(responseCode = "404", description = "应用不存在")
   })
-  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @ResponseStatus(HttpStatus.OK)
   @GetMapping("/{id}")
   public ApiLocaleResult<ApplicationDetailVo> getDetail(
       @Parameter(description = "应用ID") @PathVariable Long id) {
@@ -144,7 +144,7 @@ public class ApplicationRest {
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "应用列表获取成功")
   })
-  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @ResponseStatus(HttpStatus.OK)
   @GetMapping
   public ApiLocaleResult<PageResult<ApplicationListVo>> list(
       @Valid @ParameterObject ApplicationFindDto dto) {

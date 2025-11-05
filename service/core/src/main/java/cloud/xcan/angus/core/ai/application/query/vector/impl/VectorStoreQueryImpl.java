@@ -42,11 +42,9 @@ public class VectorStoreQueryImpl implements VectorStoreQuery {
     return new BizTemplate<Page<VectorStore>>() {
       @Override
       protected Page<VectorStore> process() {
-        if (fullTextSearch) {
-          return vectorStoreSearchRepo.find(spec.getCriteria(), pageable, VectorStore.class, match);
-        } else {
-          return vectorStoreRepo.findAll(spec, pageable);
-        }
+        return fullTextSearch
+            ? vectorStoreSearchRepo.find(spec.getCriteria(), pageable, VectorStore.class, match)
+            : vectorStoreRepo.findAll(spec, pageable);
       }
     }.execute();
   }
@@ -58,7 +56,7 @@ public class VectorStoreQueryImpl implements VectorStoreQuery {
       protected VectorStoreStatisticsVo process() {
         // TODO: 实现统计信息查询
         VectorStoreStatisticsVo statistics = new VectorStoreStatisticsVo();
-        
+
         // 设置总体统计
         VectorStoreStatisticsVo.Overview overview = new VectorStoreStatisticsVo.Overview();
         overview.setTotalStores(vectorStoreRepo.count());
@@ -66,9 +64,9 @@ public class VectorStoreQueryImpl implements VectorStoreQuery {
         overview.setTotalVectors(0L); // TODO: 从向量数据统计
         overview.setTodayQueries(0L); // TODO: 从查询日志统计
         statistics.setOverview(overview);
-        
+
         // TODO: 实现类型分布、使用率排行、性能趋势
-        
+
         return statistics;
       }
     }.execute();

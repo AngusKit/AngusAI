@@ -7,7 +7,6 @@ import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.VectorStoreFindDto;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.VectorStoreUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.vo.ConnectionTestVo;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.vo.SyncTaskVo;
-import cloud.xcan.angus.core.ai.interfaces.vector.facade.vo.VectorStoreListVo;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.vo.VectorStoreStatisticsVo;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.vo.VectorStoreVo;
 import cloud.xcan.angus.remote.PageResult;
@@ -43,11 +42,6 @@ public interface VectorStoreFacade {
   ConnectionTestVo testConnection(Long id, ConnectionTestDto dto);
 
   /**
-   * 同步向量数据
-   */
-  SyncTaskVo sync(Long id, SyncDto dto);
-
-  /**
    * 获取存储源详情
    */
   VectorStoreVo getDetail(Long id);
@@ -55,7 +49,7 @@ public interface VectorStoreFacade {
   /**
    * 获取存储源列表
    */
-  PageResult<VectorStoreListVo> list(VectorStoreFindDto dto);
+  PageResult<VectorStoreVo> list(VectorStoreFindDto dto);
 
   /**
    * 获取统计信息

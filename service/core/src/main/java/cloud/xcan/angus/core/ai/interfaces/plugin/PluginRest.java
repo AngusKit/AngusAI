@@ -97,7 +97,7 @@ public class PluginRest {
   @ApiResponses(value = {
       @ApiResponse(responseCode = "204", description = "卸载成功")
   })
-  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @ResponseStatus(HttpStatus.OK)
   @PostMapping("/{id}/uninstall")
   public ApiLocaleResult<PluginDetailVo> uninstall(
       @Parameter(description = "插件ID") @PathVariable Long id) {

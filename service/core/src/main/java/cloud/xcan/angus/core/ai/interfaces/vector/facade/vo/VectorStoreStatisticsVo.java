@@ -12,6 +12,9 @@ public class VectorStoreStatisticsVo {
   @Schema(description = "总体统计")
   private Overview overview;
 
+  @Schema(description = "近一月趋势")
+  private Overview lastMonthGrowthTrend;
+
   @Schema(description = "类型分布")
   private List<TypeDistribution> typeDistribution;
 
@@ -42,9 +45,6 @@ public class VectorStoreStatisticsVo {
   public static class TypeDistribution {
     @Schema(description = "类型")
     private VectorStoreType type;
-
-    @Schema(description = "类型标签")
-    private String typeLabel;
 
     @Schema(description = "数量")
     private Long count;
