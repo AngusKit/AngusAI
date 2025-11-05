@@ -22,6 +22,7 @@ import cloud.xcan.angus.core.ai.interfaces.vector.facade.vo.ConnectionTestVo;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.vo.VectorStoreStatisticsVo;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.vo.VectorStoreVo;
 import cloud.xcan.angus.core.ai.infra.ai.vector.VectorStoreType;
+import cloud.xcan.angus.core.biz.NameJoin;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.PageResult;
 import jakarta.annotation.Resource;
@@ -58,6 +59,7 @@ public class VectorStoreFacadeImpl implements VectorStoreFacade {
   private static final int TOP_N = 10;
   private static final int DEFAULT_MONTHS = 1; // 默认统计近一月
 
+  @NameJoin
   @Override
   public VectorStoreVo create(VectorStoreCreateDto dto) {
     VectorStore vectorStore = VectorStoreAssembler.toCreateDomain(dto);
@@ -65,6 +67,7 @@ public class VectorStoreFacadeImpl implements VectorStoreFacade {
     return VectorStoreAssembler.toVo(saved);
   }
 
+  @NameJoin
   @Override
   public VectorStoreVo update(Long id, VectorStoreUpdateDto dto) {
     VectorStore vectorStore = VectorStoreAssembler.toUpdateDomain(id, dto);
@@ -72,6 +75,7 @@ public class VectorStoreFacadeImpl implements VectorStoreFacade {
     return VectorStoreAssembler.toVo(saved);
   }
 
+  @NameJoin
   @Override
   public VectorStoreVo toggleEnabled(Long id, Boolean enabled) {
     VectorStore saved = vectorStoreCmd.toggleEnabled(id, enabled);
@@ -89,12 +93,14 @@ public class VectorStoreFacadeImpl implements VectorStoreFacade {
     vectorStoreCmd.delete(id, force != null ? force : false);
   }
 
+  @NameJoin
   @Override
   public VectorStoreVo getDetail(Long id) {
     VectorStore vectorStore = vectorStoreQuery.findAndCheck(id);
     return VectorStoreAssembler.toVo(vectorStore);
   }
 
+  @NameJoin
   @Override
   public PageResult<VectorStoreVo> list(VectorStoreFindDto dto) {
     GenericSpecification<VectorStore> spec = VectorStoreAssembler.getSpecification(dto);
