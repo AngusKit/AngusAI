@@ -77,16 +77,6 @@ public class VectorStoreFacadeImpl implements VectorStoreFacade {
   }
 
   @Override
-  public SyncTaskVo sync(Long id, SyncDto dto) {
-    String taskId = vectorStoreCmd.sync(id, dto);
-    SyncTaskVo vo = new SyncTaskVo();
-    vo.setTaskId(taskId);
-    vo.setStatus("pending");
-    vo.setEstimatedTime(0L); // TODO: 估算时间
-    return vo;
-  }
-
-  @Override
   public void delete(Long id, Boolean force) {
     vectorStoreCmd.delete(id, force != null ? force : false);
   }

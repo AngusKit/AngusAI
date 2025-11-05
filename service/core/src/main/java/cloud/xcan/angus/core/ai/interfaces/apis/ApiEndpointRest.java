@@ -1,6 +1,5 @@
 package cloud.xcan.angus.core.ai.interfaces.apis;
 
-import cloud.xcan.angus.core.ai.interfaces.apis.facade.ApiCollectionFacade;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.ApiEndpointFacade;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiEndpointCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiEndpointFindDto;
@@ -22,7 +21,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,7 +43,7 @@ public class ApiEndpointRest {
   @Resource
   private ApiEndpointFacade apiEndpointFacade;
 
-  @Operation(summary = "添加端点", description = "手动添加接口端点")
+  @Operation(operationId = "apiEndpointCreate", summary = "添加端点", description = "手动添加接口端点")
   @ApiResponses({
       @ApiResponse(responseCode = "201", description = "创建成功"),
       @ApiResponse(responseCode = "409", description = "端点已存在")
@@ -58,7 +56,7 @@ public class ApiEndpointRest {
     return ApiLocaleResult.success(apiEndpointFacade.createEndpoint(collectionId, dto));
   }
 
-  @Operation(summary = "更新端点", description = "更新接口端点信息")
+  @Operation(operationId = "apiEndpointUpdate", summary = "更新端点", description = "更新接口端点信息")
   @PutMapping("/{collectionId}/endpoints/{endpointId}")
   public ApiLocaleResult<ApiEndpointVo> updateEndpoint(
       @Parameter(description = "接口集ID", required = true) @PathVariable Long collectionId,
@@ -67,7 +65,7 @@ public class ApiEndpointRest {
     return ApiLocaleResult.success(apiEndpointFacade.updateEndpoint(collectionId, endpointId, dto));
   }
 
-  @Operation(summary = "切换端点状态", description = "启用/禁用端点")
+  @Operation(operationId = "apiEndpointToggle", summary = "切换端点状态", description = "启用/禁用端点")
   @PatchMapping("/{collectionId}/endpoints/{endpointId}/toggle")
   public ApiLocaleResult<ApiEndpointVo> toggleEndpoint(
       @Parameter(description = "接口集ID", required = true) @PathVariable Long collectionId,
@@ -76,7 +74,7 @@ public class ApiEndpointRest {
     return ApiLocaleResult.success(apiEndpointFacade.toggleEndpoint(collectionId, endpointId, enabled));
   }
 
-  @Operation(summary = "测试接口端点", description = "测试接口端点是否可用")
+  @Operation(operationId = "apiEndpointTest", summary = "测试接口端点", description = "测试接口端点是否可用")
   @PostMapping("/{collectionId}/endpoints/{endpointId}/test")
   public ApiLocaleResult<ApiEndpointTestVo> testEndpoint(
       @Parameter(description = "接口集ID", required = true) @PathVariable Long collectionId,
@@ -88,7 +86,7 @@ public class ApiEndpointRest {
     return ApiLocaleResult.success(apiEndpointFacade.testEndpoint(collectionId, endpointId, dto));
   }
 
-  @Operation(summary = "删除端点", description = "删除接口端点")
+  @Operation(operationId = "apiEndpointDelete", summary = "删除端点", description = "删除接口端点")
   @DeleteMapping("/{collectionId}/endpoints/{endpointId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public ApiLocaleResult<?> deleteEndpoint(
@@ -100,7 +98,7 @@ public class ApiEndpointRest {
 
   // TODO 接口详细接口
 
-  @Operation(summary = "获取端点列表", description = "获取接口集的端点列表")
+  @Operation(operationId = "apiEndpointList", summary = "获取端点列表", description = "获取接口集的端点列表")
   @GetMapping("/{collectionId}/endpoints")
   public ApiLocaleResult<PageResult<ApiEndpointVo>> listEndpoints(
       @Parameter(description = "接口集ID", required = true) @PathVariable Long collectionId,

@@ -5,16 +5,10 @@ import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionCreateDt
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionFindDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionImportDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionUpdateDto;
-import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiEndpointCreateDto;
-import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiEndpointFindDto;
-import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiEndpointTestDto;
-import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiEndpointUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.SecurityConfigDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionImportVo;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionListVo;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionVo;
-import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiEndpointTestVo;
-import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiEndpointVo;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.OpenApiExportVo;
 import cloud.xcan.angus.remote.ApiLocaleResult;
 import cloud.xcan.angus.remote.PageResult;
@@ -52,10 +46,9 @@ public class ApiCollectionRest {
   @Resource
   private ApiCollectionFacade apiCollectionFacade;
 
-  @Operation(summary = "创建接口集", description = "手动创建一个空的API接口集")
+  @Operation(operationId = "apiCollectionCreate", summary = "创建接口集", description = "手动创建一个空的API接口集")
   @ApiResponses({
       @ApiResponse(responseCode = "201", description = "创建成功"),
-      @ApiResponse(responseCode = "400", description = "参数错误"),
       @ApiResponse(responseCode = "409", description = "接口集名称已存在")
   })
   @PostMapping
@@ -64,10 +57,9 @@ public class ApiCollectionRest {
     return ApiLocaleResult.success(apiCollectionFacade.create(dto));
   }
 
-  @Operation(summary = "更新接口集", description = "更新接口集信息")
+  @Operation(operationId = "apiCollectionUpdate", summary = "更新接口集", description = "更新接口集信息")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "更新成功"),
-      @ApiResponse(responseCode = "404", description = "接口集不存在"),
       @ApiResponse(responseCode = "409", description = "接口集名称已存在")
   })
   @PatchMapping("/{id}")
@@ -77,7 +69,7 @@ public class ApiCollectionRest {
     return ApiLocaleResult.success(apiCollectionFacade.update(id, dto));
   }
 
-  @Operation(summary = "更新安全配置", description = "配置接口集的安全认证方式")
+  @Operation(operationId = "apiCollectionUpdateSecurity", summary = "更新安全配置", description = "配置接口集的安全认证方式")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "配置成功"),
       @ApiResponse(responseCode = "404", description = "接口集不存在")
@@ -91,10 +83,9 @@ public class ApiCollectionRest {
 
   // TODO 更新Server配置
 
-  @Operation(summary = "删除接口集", description = "删除指定的接口集，如果被引用需要force=true才能删除")
+  @Operation(operationId = "apiCollectionDelete", summary = "删除接口集", description = "删除指定的接口集，如果被引用需要force=true才能删除")
   @ApiResponses({
       @ApiResponse(responseCode = "204", description = "删除成功"),
-      @ApiResponse(responseCode = "404", description = "接口集不存在"),
       @ApiResponse(responseCode = "400", description = "接口集被引用，无法删除")
   })
   @DeleteMapping("/{id}")
@@ -106,7 +97,7 @@ public class ApiCollectionRest {
     return ApiLocaleResult.success(null);
   }
 
-  @Operation(summary = "获取接口集详情", description = "根据ID获取接口集的详细信息")
+  @Operation(operationId = "apiCollectionGetDetail", summary = "获取接口集详情", description = "根据ID获取接口集的详细信息")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "查询成功"),
       @ApiResponse(responseCode = "404", description = "接口集不存在")
@@ -117,14 +108,14 @@ public class ApiCollectionRest {
     return ApiLocaleResult.success(apiCollectionFacade.getDetail(id));
   }
 
-  @Operation(summary = "获取接口集列表", description = "分页查询接口集列表，支持关键词搜索、来源筛选、可见性筛选等")
+  @Operation(operationId = "apiCollectionList", summary = "获取接口集列表", description = "分页查询接口集列表，支持关键词搜索、来源筛选、可见性筛选等")
   @GetMapping
   public ApiLocaleResult<PageResult<ApiCollectionListVo>> list(
       @Valid @ParameterObject ApiCollectionFindDto dto) {
     return ApiLocaleResult.success(apiCollectionFacade.list(dto));
   }
 
-  @Operation(summary = "导入接口集", description = "从OpenAPI/Swagger/Postman文件导入接口集")
+  @Operation(operationId = "apiCollectionImport", summary = "导入接口集", description = "从OpenAPI/Swagger/Postman文件导入接口集")
   @ApiResponses({
       @ApiResponse(responseCode = "201", description = "导入成功"),
       @ApiResponse(responseCode = "400", description = "文件格式错误或文件过大")
@@ -136,7 +127,7 @@ public class ApiCollectionRest {
     return ApiLocaleResult.success(apiCollectionFacade.importCollection(dto));
   }
 
-  @Operation(summary = "导出OpenAPI规范", description = "导出接口集为OpenAPI 3.0规范")
+  @Operation(operationId = "apiCollectionExportOpenApi", summary = "导出OpenAPI规范", description = "导出接口集为OpenAPI 3.0规范")
   @GetMapping("/{id}/export")
   public ApiLocaleResult<OpenApiExportVo> exportOpenApi(
       @Parameter(description = "接口集ID", required = true) @PathVariable Long id,
