@@ -43,11 +43,6 @@ public interface VectorStoreFacade {
   ConnectionTestVo testConnection(Long id, ConnectionTestDto dto);
 
   /**
-   * 同步向量数据
-   */
-  SyncTaskVo sync(Long id, SyncDto dto);
-
-  /**
    * 获取存储源详情
    */
   VectorStoreVo getDetail(Long id);

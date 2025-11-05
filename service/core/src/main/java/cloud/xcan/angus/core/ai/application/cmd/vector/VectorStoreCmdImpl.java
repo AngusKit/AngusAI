@@ -90,29 +90,6 @@ public class VectorStoreCmdImpl extends CommCmd<VectorStore, Long> implements Ve
   }
 
   @Override
-  public void delete(Long id, Boolean force) {
-    new BizTemplate<Void>() {
-      @Override
-      protected void checkParams() {
-        // 检查存储源是否存在
-        vectorStoreQuery.findAndCheck(id);
-
-        // TODO: 检查是否被知识库引用
-        // 如果force=false且被引用，抛出异常
-        // if (!force && hasReferences(id)) {
-        //   throw ProtocolException.of("存储源被引用，无法删除", new Object[]{});
-        // }
-      }
-
-      @Override
-      protected Void process() {
-        vectorStoreRepo.deleteById(id);
-        return null;
-      }
-    }.execute();
-  }
-
-  @Override
   public VectorStore toggleEnabled(Long id, Boolean enabled) {
     return new BizTemplate<VectorStore>() {
       VectorStore vectorStoreDb;
@@ -150,17 +127,17 @@ public class VectorStoreCmdImpl extends CommCmd<VectorStore, Long> implements Ve
           // TODO: 实际调用VectorStoreFactory进行连接测试
           // VectorStoreFactory factory = ...;
           // boolean connected = factory.testConnection(vectorStoreDb);
-          
+
           // 模拟连接测试
           boolean connected = true;
-          
+
           if (connected) {
             vectorStoreDb.setStatus("connected");
             // TODO: 更新indexCount等信息
           } else {
             vectorStoreDb.setStatus("disconnected");
           }
-          
+
           return vectorStoreRepo.save(vectorStoreDb);
         } catch (Exception e) {
           vectorStoreDb.setStatus("disconnected");
@@ -172,28 +149,24 @@ public class VectorStoreCmdImpl extends CommCmd<VectorStore, Long> implements Ve
   }
 
   @Override
-  public String sync(Long id, SyncDto dto) {
-    return new BizTemplate<String>() {
-      VectorStore vectorStoreDb;
-
+  public void delete(Long id, Boolean force) {
+    new BizTemplate<Void>() {
       @Override
       protected void checkParams() {
-        vectorStoreDb = vectorStoreQuery.findAndCheck(id);
+        // 检查存储源是否存在
+        vectorStoreQuery.findAndCheck(id);
+
+        // TODO: 检查是否被知识库引用
+        // 如果force=false且被引用，抛出异常
+        // if (!force && hasReferences(id)) {
+        //   throw ProtocolException.of("存储源被引用，无法删除", new Object[]{});
+        // }
       }
 
       @Override
-      protected String process() {
-        // 生成任务ID
-        String taskId = UUID.randomUUID().toString();
-        
-        // TODO: 实际执行同步任务（异步）
-        // syncService.sync(vectorStoreDb, dto.getFullSync(), taskId);
-        
-        // 更新最后同步时间
-        vectorStoreDb.setLastSyncTime(System.currentTimeMillis());
-        vectorStoreRepo.save(vectorStoreDb);
-        
-        return taskId;
+      protected Void process() {
+        vectorStoreRepo.deleteById(id);
+        return null;
       }
     }.execute();
   }

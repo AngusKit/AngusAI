@@ -1,13 +1,16 @@
 package cloud.xcan.angus.core.ai.interfaces.vector.facade.vo;
 
+import cloud.xcan.angus.core.ai.infra.ai.vector.VectorStoreConfig;
 import cloud.xcan.angus.core.ai.infra.ai.vector.VectorStoreType;
+import cloud.xcan.angus.remote.vo.TenantAuditingVo;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.Map;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Schema(description = "向量存储源详情")
-public class VectorStoreVo {
+public class VectorStoreVo extends TenantAuditingVo {
 
   @Schema(description = "存储源ID")
   private Long id;
@@ -18,26 +21,11 @@ public class VectorStoreVo {
   @Schema(description = "数据库类型")
   private VectorStoreType type;
 
-  @Schema(description = "类型标签")
-  private String typeLabel;
-
-  @Schema(description = "类型图标")
-  private String typeIcon;
-
   @Schema(description = "描述")
   private String description;
 
-  @Schema(description = "连接地址")
-  private String endpoint;
-
   @Schema(description = "状态")
   private String status;
-
-  @Schema(description = "状态标签")
-  private String statusLabel;
-
-  @Schema(description = "状态颜色")
-  private String statusColor;
 
   @Schema(description = "是否启用")
   private Boolean enabled;
@@ -48,28 +36,8 @@ public class VectorStoreVo {
   @Schema(description = "索引数量")
   private Long indexCount;
 
-  @Schema(description = "创建时间")
-  private String createdTime;
+  @Schema(description = "配置信息")
+  private VectorStoreConfig config;
 
-  @Schema(description = "创建时间戳")
-  private Long createdTimestamp;
-
-  @Schema(description = "最后同步时间")
-  private String lastSync;
-
-  @Schema(description = "最后同步时间戳")
-  private Long lastSyncTimestamp;
-
-  @Schema(description = "配置信息（脱敏）")
-  private Map<String, String> config;
-
-  @Schema(description = "性能指标")
-  private Map<String, Object> performance;
-
-  @Schema(description = "是否自动同步")
-  private Boolean autoSync;
-
-  @Schema(description = "同步间隔（分钟）")
-  private Integer syncInterval;
 }
 
