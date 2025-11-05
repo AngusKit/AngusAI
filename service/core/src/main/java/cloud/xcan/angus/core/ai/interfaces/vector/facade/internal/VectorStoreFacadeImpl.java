@@ -51,11 +51,6 @@ public class VectorStoreFacadeImpl implements VectorStoreFacade {
   }
 
   @Override
-  public void delete(Long id, Boolean force) {
-    vectorStoreCmd.delete(id, force != null ? force : false);
-  }
-
-  @Override
   public VectorStoreVo toggleEnabled(Long id, Boolean enabled) {
     VectorStore saved = vectorStoreCmd.toggleEnabled(id, enabled);
     return VectorStoreAssembler.toVo(saved);
@@ -64,13 +59,13 @@ public class VectorStoreFacadeImpl implements VectorStoreFacade {
   @Override
   public ConnectionTestVo testConnection(Long id, ConnectionTestDto dto) {
     VectorStore vectorStore = vectorStoreCmd.testConnection(id, dto);
-    
+
     // 构建测试结果
     ConnectionTestVo.TestDetails testDetails = new ConnectionTestVo.TestDetails();
     testDetails.setIndexCount(vectorStore.getIndexCount());
     testDetails.setDimension(vectorStore.getDimension());
     // TODO: 设置responseTime和version
-    
+
     ConnectionTestVo.ErrorInfo error = null;
     boolean success = "connected".equals(vectorStore.getStatus());
     if (!success) {
@@ -78,7 +73,6 @@ public class VectorStoreFacadeImpl implements VectorStoreFacade {
       error.setCode("CONNECTION_FAILED");
       error.setMessage("连接失败");
     }
-    
     return VectorStoreAssembler.toConnectionTestVo(vectorStore, success, testDetails, error);
   }
 
@@ -90,6 +84,11 @@ public class VectorStoreFacadeImpl implements VectorStoreFacade {
     vo.setStatus("pending");
     vo.setEstimatedTime(0L); // TODO: 估算时间
     return vo;
+  }
+
+  @Override
+  public void delete(Long id, Boolean force) {
+    vectorStoreCmd.delete(id, force != null ? force : false);
   }
 
   @Override
