@@ -20,7 +20,7 @@ import type {
   ResponseType,
 } from "axios";
 import axios from "axios";
-import { DomainManager, preloadVisitorId, ApiType, isInIframe, getParamsFromIframeUrl, LockUtils } from '@xcan-angus/infra';
+import { app, DomainManager, preloadVisitorId, ApiType, isInIframe, getParamsFromIframeUrl, LockUtils, cookieUtils, API_SUCCESS_CODE, isObject, API_SUCCESS_MESSAGE, API_SERVER_ERROR_CODE, SYSTEM_ERROR_MESSAGE, errorCenter } from '@xcan-angus/infra';
 
 export type QueryParamsType = Record<string | number, any>;
 
@@ -86,17 +86,70 @@ export class HttpClient<SecurityDataType = unknown> {
     this.securityWorker = securityWorker;
   }
 
+  // Refresh token logic, updates cookies and iframe params if needed
+  const refreshToken = async () => {
+    let refreshToken = isInIframe()
+        ? getParamsFromIframeUrl(IFRAME_ACCESS_TOKEN_NAME)
+        : cookieUtils.get(REFRESH_TOKEN_AUTH_KEY);
+
+    // No refresh token, redirect to signin
+    if (!refreshToken) {
+        app.toSignIn(true);
+    }
+
+    let url = RouterUtils.getRefreshTokenUrl();
+    let env = appContext.getContext().env;
+    let body = {
+        refreshToken,
+        clientId: env.oauthClientId,
+        clientSecret: env.oauthClientSecret,
+    };
+
+    const response = await this.request({
+      url: url,
+      method: 'post',
+      query: body
+    });
+
+    if (!response.data) {
+        app.toSignIn(true);
+        return
+    }
+
+    const _resData = (response as AxiosResponse).data?.data as ApiResult;
+
+    let tokenInfo: TokenInfo = {
+        request_auth_time: new Date().toISOString(),
+        ..._resData
+    };
+    cookieUtils.setTokenInfo(tokenInfo);
+
+    if (isInIframe()) {
+        const _url = new URL(location.href);
+        _url.searchParams.set(IFRAME_ACCESS_TOKEN_NAME, tokenInfo.access_token as string);
+        _url.searchParams.set(IFRAME_REFRESH_TOKEN_NAME, tokenInfo.refresh_token as string);
+        _url.searchParams.set(IFRAME_EXPIRES_IN_NAME, tokenInfo.expires_in + '');
+        _url.searchParams.set(IFRAME_REQUEST_AUTH_TIME_NAME, tokenInfo.request_auth_time as string);
+        location.href = _url.href;
+    }
+  }
+
   initInstanceUse = () => {
     let domainManager: DomainManager = DomainManager.getInstance(appContext.getProfile());
     this.instance?.interceptors.request.use(
-      async (config) => await requestInterceptor(config, domainManager),
+      async (config) => await this.requestInterceptor(config, domainManager),
       (err) => { throw err; }
     );
+
+    this.instance?.interceptors.response.use(
+      (response: AxiosResponse): Promise<AxiosResponse<ApiResult>> => this.responseInterceptor(response),
+      (err: AxiosError) => this.responseErrorInterceptor(err)
+  );
   }
   requestInterceptor = async (config: InternalAxiosRequestConfig, domainManager: DomainManager) => {
 
     // Set language and device headers
-    config.headers['Accept-Language'] = cookie.getCurrentLanguage();
+    config.headers['Accept-Language'] = cookieUtils.getCurrentLanguage();
     config.headers['Vary'] = 'Accept-Language';
     config.headers['XC-Auth-Device-Id'] = await preloadVisitorId();
 
@@ -108,10 +161,67 @@ export class HttpClient<SecurityDataType = unknown> {
 
       let accessToken = isInIframe()
           ? getParamsFromIframeUrl(IFRAME_ACCESS_TOKEN_NAME) || ''
-          : cookie.get('access_token');
+          : cookieUtils.get('access_token');
       config.headers.Authorization = `Bearer ${accessToken}`;
   }
     return config;
+  }
+
+  // Response interceptor: formats response and attaches filename if present
+  const responseInterceptor = (response: AxiosResponse) => {
+    let filename = getFilenameFromResponse(response);
+    const headers = {...response.headers, filename};
+    const status = response.status;
+    // TODO: If code != 'S', should show a prompt
+    if (response?.data && isObject(response.data) && (response.data?.message || response.data?.msg)) {
+        throw {
+            message: response.data.message || response.data.msg
+        };
+    }
+    if (status === 401) {
+        app.toSignIn(true);
+    }
+    return {
+        status,
+        headers,
+        code: API_SUCCESS_CODE,
+        data: response?.data,
+        ...(response?.data || {})
+    };
+  }
+
+  // Response error interceptor: formats error as ApiResult
+  const responseErrorInterceptor = (err: AxiosError) => {
+    if (!err?.response) {
+        throw {
+            status: err.status,
+            config: err.config,
+            code: API_SERVER_ERROR_CODE,
+            message: err.message
+        } as ApiResult;
+    }
+
+    const response = err.response;
+    const data = response.data as ApiResult;
+    const result = data && data.code ? {
+        ...data,
+        message: data.message || data.msg
+    } : {
+        code: API_SERVER_ERROR_CODE,
+        message: SYSTEM_ERROR_MESSAGE
+    }
+    const resConfig = response.config || {};
+    const isApi = (resConfig.url || '')?.includes('/api/');
+    if (isApi && response.status === 401) {
+        app.toSignIn(true);
+    }
+
+    throw {
+        status: response.status,
+        headers: response.headers,
+        config: response.config,
+        ...result,
+    } as ApiResult;
   }
 
   setSecurityData = (data: SecurityDataType | null) => {
@@ -204,17 +314,27 @@ export class HttpClient<SecurityDataType = unknown> {
       body = JSON.stringify(body);
     }
 
-    return this.instance.request({
-      ...requestParams,
-      headers: {
-        ...(requestParams.headers || {}),
-        ...(type ? { "Content-Type": type } : {}),
-      },
-      params: query,
-      responseType: responseFormat,
-      data: body,
-      url: path,
-    });
+    try {
+      const response = await this.instance.request({
+        ...requestParams,
+        headers: {
+          ...(requestParams.headers || {}),
+          ...(type ? { "Content-Type": type } : {}),
+        },
+        params: query,
+        responseType: responseFormat,
+        data: body,
+        url: path,
+      });
+      return response;
+    } catch (err) {
+      if (requestParams.method !== 'get') {
+        errorCenter.notify(error?.message || SYSTEM_ERROR_MESSAGE);
+      }
+      return {
+        error: err
+      };
+    }
   };
 }
 
