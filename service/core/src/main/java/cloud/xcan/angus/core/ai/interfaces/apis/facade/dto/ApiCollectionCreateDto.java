@@ -2,9 +2,11 @@ package cloud.xcan.angus.core.ai.interfaces.apis.facade.dto;
 
 import cloud.xcan.angus.core.ai.domain.Visibility;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.servers.Server;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import java.util.Map;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
@@ -14,32 +16,23 @@ public class ApiCollectionCreateDto {
 
   @NotBlank
   @Length(max = 100)
-  @Schema(description = "接口集名称", required = true)
+  @Schema(description = "接口集名称", requiredMode = RequiredMode.REQUIRED)
   private String name;
 
   @Length(max = 500)
-  @Schema(description = "描述")
+  @Schema(description = "接口集描述")
   private String description;
 
-  @Schema(description = "可见性", example = "PRIVATE")
+  @Schema(description = "可见性：PRIVATE-私有，TEAM-团队，PUBLIC-公开", example = "PRIVATE")
   private Visibility visibility = Visibility.PRIVATE;
 
   @Valid
-  @Schema(description = "服务器配置")
-  private ServerConfigDto serverConfig;
+  @Schema(description = "服务器配置，遵循OpenAPI Server Object规范")
+  private Server server;
 
   @Valid
-  @Schema(description = "安全配置")
-  private Map<String, Object> securityConfig;
+  @Schema(description = "安全配置，遵循OpenAPI Security Scheme Object规范")
+  private SecurityScheme security;
 
-  @Data
-  @Schema(description = "服务器配置")
-  public static class ServerConfigDto {
-    @Schema(description = "服务器地址", example = "https://api.example.com")
-    private String url;
-
-    @Schema(description = "描述")
-    private String description;
-  }
 }
 

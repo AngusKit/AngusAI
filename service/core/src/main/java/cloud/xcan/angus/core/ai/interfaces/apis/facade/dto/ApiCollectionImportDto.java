@@ -2,7 +2,9 @@ package cloud.xcan.angus.core.ai.interfaces.apis.facade.dto;
 
 import cloud.xcan.angus.core.ai.domain.Visibility;
 import cloud.xcan.angus.core.ai.domain.apis.ApiCollectionSource;
+import cloud.xcan.angus.core.ai.domain.apis.ConflictStrategy;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
@@ -13,11 +15,11 @@ import org.springframework.web.multipart.MultipartFile;
 public class ApiCollectionImportDto {
 
   @NotNull
-  @Schema(description = "上传的文件", required = true)
+  @Schema(description = "上传的文件", requiredMode = RequiredMode.REQUIRED)
   private MultipartFile file;
 
   @NotNull
-  @Schema(description = "文件类型", required = true, allowableValues = {"OPENAPI", "SWAGGER", "POSTMAN"})
+  @Schema(description = "文件类型", requiredMode = RequiredMode.REQUIRED, allowableValues = {"OPENAPI", "SWAGGER", "POSTMAN"})
   private ApiCollectionSource type;
 
   @Length(max = 100)
@@ -33,8 +35,8 @@ public class ApiCollectionImportDto {
   @Data
   @Schema(description = "导入策略")
   public static class ImportStrategyDto {
-    @Schema(description = "冲突处理策略", allowableValues = {"overwrite", "ignore", "merge"})
-    private String conflictStrategy = "ignore";
+    @Schema(description = "冲突处理策略：OVERWRITE-覆盖现有接口，IGNORE-跳过重复接口，MERGE-合并配置", example = "IGNORE")
+    private ConflictStrategy conflictStrategy = ConflictStrategy.IGNORE;
 
     @Schema(description = "是否导入安全配置", example = "true")
     private Boolean importSecurity = true;

@@ -6,24 +6,25 @@ import cloud.xcan.angus.remote.PageQuery;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.hibernate.validator.constraints.Length;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Schema(description = "查询接口集请求参数")
 public class ApiCollectionFindDto extends PageQuery {
 
-  @Schema(description = "关键词搜索（名称、描述）")
-  @Length(max = 100)
-  private String keyword;
+  @Schema(description = "接口集ID")
+  private Long id;
 
-  @Schema(description = "来源筛选")
+  @Schema(description = "接口集名称，支持模糊查询")
+  private String name;
+
+  @Schema(description = "来源筛选：OPENAPI-OpenAPI 3.0，SWAGGER-Swagger 2.0，POSTMAN-Postman Collection，MANUAL-手动创建")
   private ApiCollectionSource source;
 
-  @Schema(description = "可见性筛选")
+  @Schema(description = "可见性筛选：PRIVATE-私有，TEAM-团队，PUBLIC-公开")
   private Visibility visibility;
 
-  @Schema(description = "排序字段", allowableValues = {"id", "name", "createdDate", "modifiedDate"})
+  @Schema(description = "排序字段", allowableValues = {"id", "name", "source", "visibility", "createdDate"})
   private String orderBy = "createdDate";
 
   @Override
