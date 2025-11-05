@@ -8,6 +8,9 @@ import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import jakarta.annotation.Resource;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -56,6 +59,36 @@ public class ApiEndpointQueryImpl implements ApiEndpointQuery {
   @Override
   public Long countEnabledEndpointsByCollectionId(Long collectionId) {
     return apiEndpointRepo.countEnabledByCollectionId(collectionId);
+  }
+
+  @Override
+  public Map<Long, Long> countEndpointsByCollectionIds(List<Long> collectionIds) {
+    if (collectionIds == null || collectionIds.isEmpty()) {
+      return new HashMap<>();
+    }
+    List<Object[]> results = apiEndpointRepo.countByCollectionIds(collectionIds);
+    Map<Long, Long> countMap = new HashMap<>();
+    for (Object[] result : results) {
+      Long collectionId = (Long) result[0];
+      Long count = (Long) result[1];
+      countMap.put(collectionId, count);
+    }
+    return countMap;
+  }
+
+  @Override
+  public Map<Long, Long> countEnabledEndpointsByCollectionIds(List<Long> collectionIds) {
+    if (collectionIds == null || collectionIds.isEmpty()) {
+      return new HashMap<>();
+    }
+    List<Object[]> results = apiEndpointRepo.countEnabledByCollectionIds(collectionIds);
+    Map<Long, Long> countMap = new HashMap<>();
+    for (Object[] result : results) {
+      Long collectionId = (Long) result[0];
+      Long count = (Long) result[1];
+      countMap.put(collectionId, count);
+    }
+    return countMap;
   }
 
 }

@@ -21,6 +21,9 @@ import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.PageResult;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -81,13 +84,23 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     Page<ApiCollection> page = apiCollectionQuery.find(spec, dto.tranPage(),
         dto.fullTextSearch, getMatchSearchFields(dto.getClass()));
 
-    // 设置统计信息 TODO 改成批量查询统计
-    page.getContent().forEach(collection -> {
-      Long endpointsCount = apiEndpointQuery.countEndpointsByCollectionId(collection.getId());
-      Long enabledCount = apiEndpointQuery.countEnabledEndpointsByCollectionId(collection.getId());
-      collection.setEndpointsCount(endpointsCount);
-      collection.setEnabledEndpointsCount(enabledCount);
-    });
+    // 批量查询统计信息
+    List<ApiCollection> collections = page.getContent();
+    if (!collections.isEmpty()) {
+      List<Long> collectionIds = collections.stream()
+          .map(ApiCollection::getId)
+          .collect(Collectors.toList());
+      
+      Map<Long, Long> endpointsCountMap = apiEndpointQuery.countEndpointsByCollectionIds(collectionIds);
+      Map<Long, Long> enabledEndpointsCountMap = apiEndpointQuery.countEnabledEndpointsByCollectionIds(collectionIds);
+      
+      collections.forEach(collection -> {
+        Long endpointsCount = endpointsCountMap.getOrDefault(collection.getId(), 0L);
+        Long enabledCount = enabledEndpointsCountMap.getOrDefault(collection.getId(), 0L);
+        collection.setEndpointsCount(endpointsCount);
+        collection.setEnabledEndpointsCount(enabledCount);
+      });
+    }
     return buildVoPageResult(page, ApiCollectionAssembler::toListVo);
   }
 
