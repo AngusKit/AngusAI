@@ -28,7 +28,7 @@ public class ApiEndpointUpdateDto {
   //  @NotBlank
   //  @Length(max = 800)
   //  @Schema(description = "路径", example = "/v1/chat/completions", requiredMode = RequiredMode.REQUIRED)
-  //  private String endpoint;
+  //  private String path;
 
   @Length(max = 1000)
   @Schema(description = "端点描述")

@@ -1,6 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.apis.facade.dto;
 
-import cloud.xcan.angus.core.ai.domain.apis.ApiEndpoint.HttpMethod;
+import io.swagger.v3.oas.models.PathItem.HttpMethod;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import io.swagger.v3.oas.models.parameters.Parameter;
@@ -30,7 +30,7 @@ public class ApiEndpointCreateDto {
   @NotBlank
   @Length(max = 800)
   @Schema(description = "接口路径，不包含查询参数", example = "/v1/chat/completions", requiredMode = RequiredMode.REQUIRED)
-  private String endpoint;
+  private String path;
 
   @Length(max = 1000)
   @Schema(description = "端点描述")

@@ -21,7 +21,7 @@ public class ApiEndpointTestVo {
   private Map<String, String> responseHeaders;
 
   @Schema(description = "响应体")
-  private Object responseBody;
+  private String responseBody;
 
   @Schema(description = "错误信息")
   private String error;

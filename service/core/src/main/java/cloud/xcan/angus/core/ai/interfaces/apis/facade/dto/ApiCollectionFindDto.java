@@ -24,7 +24,7 @@ public class ApiCollectionFindDto extends PageQuery {
   @Schema(description = "可见性筛选：PRIVATE-私有，TEAM-团队，PUBLIC-公开")
   private Visibility visibility;
 
-  @Schema(description = "排序字段", allowableValues = {"id", "name", "source", "visibility", "createdDate"})
+  @Schema(description = "排序字段", allowableValues = {"id", "name", "createdDate", "source", "visibility"})
   private String orderBy = "createdDate";
 
   @Override

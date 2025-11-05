@@ -41,11 +41,9 @@ public class ApiCollectionQueryImpl implements ApiCollectionQuery {
     return new BizTemplate<Page<ApiCollection>>() {
       @Override
       protected Page<ApiCollection> process() {
-        if (fullTextSearch) {
-          return apiCollectionSearchRepo.find(spec.getCriteria(), pageable, ApiCollection.class, match);
-        } else {
-          return apiCollectionRepo.findAll(spec, pageable);
-        }
+        return fullTextSearch
+            ? apiCollectionSearchRepo.find(spec.getCriteria(), pageable, ApiCollection.class, match)
+            : apiCollectionRepo.findAll(spec, pageable);
       }
     }.execute();
   }

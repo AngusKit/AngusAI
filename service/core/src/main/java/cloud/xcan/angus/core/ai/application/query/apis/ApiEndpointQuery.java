@@ -23,8 +23,13 @@ public interface ApiEndpointQuery {
       boolean fullTextSearch, String[] match);
 
   /**
-   * 根据接口集ID查询所有端点
+   * 统计接口集下的端点数量
    */
-  List<ApiEndpoint> findByCollectionId(Long collectionId);
+  Long countEndpointsByCollectionId(Long id);
+
+  /**
+   * 统计接口集下的端点数量
+   */
+  Long countEnabledEndpointsByCollectionId(Long id);
 }
 

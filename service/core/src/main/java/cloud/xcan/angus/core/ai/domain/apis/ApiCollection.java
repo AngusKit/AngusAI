@@ -3,6 +3,8 @@ package cloud.xcan.angus.core.ai.domain.apis;
 import cloud.xcan.angus.core.ai.domain.Visibility;
 import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.servers.Server;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -10,7 +12,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -37,43 +38,24 @@ public class ApiCollection extends TenantAuditingEntity<ApiCollection, Long> {
 
   @Enumerated(EnumType.STRING)
   @Column(name = "source", nullable = false)
-  private ApiCollectionSource source = ApiCollectionSource.MANUAL;
+  private ApiCollectionSource source;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "visibility", nullable = false)
-  private Visibility visibility = Visibility.PRIVATE;
+  private Visibility visibility;
 
   @Type(JsonType.class)
-  @Column(columnDefinition = "json", name = "server_config")
-  private Map<String, Object> serverConfig;
+  @Column(columnDefinition = "json", name = "server")
+  private Server server;
 
   @Type(JsonType.class)
-  @Column(columnDefinition = "json", name = "security_config")
-  private Map<String, Object> securityConfig;
-
-  @Column(name = "last_used_at")
-  private Long lastUsedAt;
+  @Column(columnDefinition = "json", name = "security")
+  private SecurityScheme security;
 
   @Transient
   private Long endpointsCount = 0L;
-
   @Transient
-  private Long enabledCount = 0L;
-
-  @Transient
-  private String sourceLabel;
-
-  @Transient
-  private String sourceIcon;
-
-  @Transient
-  private String visibilityLabel;
-
-  @Transient
-  private Boolean hasServerConfig;
-
-  @Transient
-  private Boolean hasSecurityConfig;
+  private Long enabledEndpointsCount = 0L;
 
   @Override
   public Long identity() {

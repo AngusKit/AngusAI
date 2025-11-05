@@ -5,39 +5,38 @@ import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionCreateDt
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionFindDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionImportDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionUpdateDto;
-import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.SecurityConfigDto;
+import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionImportVo;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionListVo;
-import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionVo;
-import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.OpenApiExportVo;
 import cloud.xcan.angus.remote.ApiLocaleResult;
 import cloud.xcan.angus.remote.PageResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * 接口集管理 REST 控制器
- */
-@Tag(name = "ApiCollection", description = "接口集管理")
+@Tag(name = "接口集", description = "接口集管理")
 @Validated
 @RestController
 @RequestMapping("/api/v1/api-collections")
@@ -53,7 +52,8 @@ public class ApiCollectionRest {
   })
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  public ApiLocaleResult<ApiCollectionVo> create(@Valid @RequestBody ApiCollectionCreateDto dto) {
+  public ApiLocaleResult<ApiCollectionDetailVo> create(
+      @Valid @RequestBody ApiCollectionCreateDto dto) {
     return ApiLocaleResult.success(apiCollectionFacade.create(dto));
   }
 
@@ -63,25 +63,11 @@ public class ApiCollectionRest {
       @ApiResponse(responseCode = "409", description = "接口集名称已存在")
   })
   @PatchMapping("/{id}")
-  public ApiLocaleResult<ApiCollectionVo> update(
+  public ApiLocaleResult<ApiCollectionDetailVo> update(
       @Parameter(description = "接口集ID", required = true) @PathVariable Long id,
       @Valid @RequestBody ApiCollectionUpdateDto dto) {
     return ApiLocaleResult.success(apiCollectionFacade.update(id, dto));
   }
-
-  @Operation(operationId = "apiCollectionUpdateSecurity", summary = "更新安全配置", description = "配置接口集的安全认证方式")
-  @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "配置成功"),
-      @ApiResponse(responseCode = "404", description = "接口集不存在")
-  })
-  @PutMapping("/{id}/security")
-  public ApiLocaleResult<ApiCollectionVo> updateSecurity(
-      @Parameter(description = "接口集ID", required = true) @PathVariable Long id,
-      @Valid @RequestBody SecurityConfigDto dto) {
-    return ApiLocaleResult.success(apiCollectionFacade.updateSecurity(id, dto));
-  }
-
-  // TODO 更新Server配置
 
   @Operation(operationId = "apiCollectionDelete", summary = "删除接口集", description = "删除指定的接口集，如果被引用需要force=true才能删除")
   @ApiResponses({
@@ -102,7 +88,7 @@ public class ApiCollectionRest {
       @ApiResponse(responseCode = "404", description = "接口集不存在")
   })
   @GetMapping("/{id}")
-  public ApiLocaleResult<ApiCollectionVo> getDetail(
+  public ApiLocaleResult<ApiCollectionDetailVo> getDetail(
       @Parameter(description = "接口集ID", required = true) @PathVariable Long id) {
     return ApiLocaleResult.success(apiCollectionFacade.getDetail(id));
   }
@@ -114,25 +100,30 @@ public class ApiCollectionRest {
     return ApiLocaleResult.success(apiCollectionFacade.list(dto));
   }
 
+  // TODO 统计接口
+
   @Operation(operationId = "apiCollectionImport", summary = "导入接口集", description = "从OpenAPI/Swagger/Postman文件导入接口集")
   @ApiResponses({
       @ApiResponse(responseCode = "201", description = "导入成功"),
       @ApiResponse(responseCode = "400", description = "文件格式错误或文件过大")
   })
-  @PostMapping("/import")
+  @PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @ResponseStatus(HttpStatus.CREATED)
   public ApiLocaleResult<ApiCollectionImportVo> importCollection(
-      @Valid ApiCollectionImportDto dto) {
+      @Parameter(content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE), schema = @Schema(type = "object")) @Valid ApiCollectionImportDto dto) {
     return ApiLocaleResult.success(apiCollectionFacade.importCollection(dto));
   }
 
-  @Operation(operationId = "apiCollectionExportOpenApi", summary = "导出OpenAPI规范", description = "导出接口集为OpenAPI 3.0规范")
-  @GetMapping("/{id}/export")
-  public ApiLocaleResult<OpenApiExportVo> exportOpenApi(
+  @Operation(operationId = "apiCollectionExportOpenApi", summary = "导出OpenAPI规范", description = "导出接口集为OpenAPI 3.1规范")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "APIs exported successfully")})
+  @PostMapping(value = "/{id}/export")
+  public ResponseEntity<org.springframework.core.io.Resource> exportOpenApi(
       @Parameter(description = "接口集ID", required = true) @PathVariable Long id,
       @Parameter(description = "导出格式") @RequestParam(required = false, defaultValue = "json") String format,
-      @Parameter(description = "是否包含禁用的端点") @RequestParam(required = false, defaultValue = "false") Boolean includeDisabled) {
-    return ApiLocaleResult.success(apiCollectionFacade.exportOpenApi(id, format, includeDisabled));
+      @Parameter(description = "是否包含禁用的端点") @RequestParam(required = false, defaultValue = "false") Boolean includeDisabled,
+      HttpServletResponse response) {
+    return apiCollectionFacade.exportOpenApi(id, format, includeDisabled, response);
   }
 
 }

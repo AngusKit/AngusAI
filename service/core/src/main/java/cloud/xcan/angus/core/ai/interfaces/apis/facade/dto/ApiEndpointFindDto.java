@@ -1,8 +1,8 @@
 package cloud.xcan.angus.core.ai.interfaces.apis.facade.dto;
 
-import cloud.xcan.angus.core.ai.domain.apis.ApiEndpoint.HttpMethod;
 import cloud.xcan.angus.remote.PageQuery;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.models.PathItem.HttpMethod;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

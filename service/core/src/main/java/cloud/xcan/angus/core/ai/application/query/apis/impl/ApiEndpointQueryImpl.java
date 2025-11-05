@@ -3,11 +3,11 @@ package cloud.xcan.angus.core.ai.application.query.apis.impl;
 import cloud.xcan.angus.core.ai.application.query.apis.ApiEndpointQuery;
 import cloud.xcan.angus.core.ai.domain.apis.ApiEndpoint;
 import cloud.xcan.angus.core.ai.domain.apis.ApiEndpointRepo;
+import cloud.xcan.angus.core.ai.domain.apis.ApiEndpointSearchRepo;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import jakarta.annotation.Resource;
-import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,6 +20,9 @@ public class ApiEndpointQueryImpl implements ApiEndpointQuery {
 
   @Resource
   private ApiEndpointRepo apiEndpointRepo;
+
+  @Resource
+  private ApiEndpointSearchRepo apiEndpointSearchRepo;
 
   @Override
   public ApiEndpoint findAndCheck(Long id) {
@@ -38,20 +41,22 @@ public class ApiEndpointQueryImpl implements ApiEndpointQuery {
     return new BizTemplate<Page<ApiEndpoint>>() {
       @Override
       protected Page<ApiEndpoint> process() {
-        // 接口端点暂时不支持全文搜索，使用普通查询
-        return apiEndpointRepo.findAll(spec, pageable);
+        return fullTextSearch
+            ? apiEndpointSearchRepo.find(spec.getCriteria(), pageable, ApiEndpoint.class, match)
+            : apiEndpointRepo.findAll(spec, pageable);
       }
     }.execute();
   }
 
   @Override
-  public List<ApiEndpoint> findByCollectionId(Long collectionId) {
-    return new BizTemplate<List<ApiEndpoint>>() {
-      @Override
-      protected List<ApiEndpoint> process() {
-        return apiEndpointRepo.findByCollectionId(collectionId);
-      }
-    }.execute();
+  public Long countEndpointsByCollectionId(Long collectionId) {
+    return apiEndpointRepo.countByCollectionId(collectionId);
   }
+
+  @Override
+  public Long countEnabledEndpointsByCollectionId(Long collectionId) {
+    return apiEndpointRepo.countEnabledByCollectionId(collectionId);
+  }
+
 }
 
