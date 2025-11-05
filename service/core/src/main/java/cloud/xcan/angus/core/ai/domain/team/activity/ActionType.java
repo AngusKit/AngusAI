@@ -35,7 +35,15 @@ public enum ActionType {
   // 配置操作
   CONFIGURE,          // 配置
   ENABLE,             // 启用
-  DISABLE,            // 禁用
+  DISABLE,
+  ;            // 禁用
 
+  public String getDescMessageKey() {
+    return null;
+  }
+
+  public String getDetailMessageKey() {
+    return null;
+  }
 }
 

@@ -6,8 +6,4 @@ public interface ActivityResource {
 
   String getName();
 
-  Long getParentId();
-
-  Long getProjectId();
-
 }

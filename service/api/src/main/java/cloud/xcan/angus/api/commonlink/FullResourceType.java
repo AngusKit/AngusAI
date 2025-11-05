@@ -16,5 +16,10 @@ public enum FullResourceType {
   RESOURCE_SHARDING, // 资源共享
 
   API_KEY,           // API密钥
-  BILLING,           // 计费
+  BILLING,
+  ;           // 计费
+
+  public Object getMessage() {
+    return null;
+  }
 }

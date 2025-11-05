@@ -1,21 +1,28 @@
 package cloud.xcan.angus.core.ai.application.query.team.impl;
 
+import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.DATE_FMT;
+import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.parseEndDate;
+import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.parseStartDate;
 import static cloud.xcan.angus.spec.utils.ObjectUtils.isEmpty;
 
-import cloud.xcan.angus.api.commonlink.FullResourceType;
 import cloud.xcan.angus.api.manager.UserManager;
-import cloud.xcan.angus.core.ai.application.converter.ActivityConverter;
 import cloud.xcan.angus.core.ai.application.query.team.ActivityQuery;
 import cloud.xcan.angus.core.ai.domain.team.activity.Activity;
-import cloud.xcan.angus.core.ai.domain.team.activity.ActivityListRepo;
 import cloud.xcan.angus.core.ai.domain.team.activity.ActivityRepo;
 import cloud.xcan.angus.core.ai.domain.team.activity.ActivitySearchRepo;
-import cloud.xcan.angus.core.ai.domain.team.activity.ActivitySummary;
+import cloud.xcan.angus.core.ai.domain.team.activity.ActivityStatus;
+import cloud.xcan.angus.core.ai.interfaces.team.facade.vo.ActivityStatisticsVo;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
-import cloud.xcan.angus.core.jpa.repository.summary.SummaryQueryRegister;
 import jakarta.annotation.Resource;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -23,34 +30,13 @@ import org.springframework.stereotype.Service;
 /**
  * Implementation of activity query operations for activity management and reporting.
  *
- * <p>This class provides comprehensive functionality for querying and retrieving
- * activity data, including pagination, full-text search, and summary generation.</p>
- *
- * <p>It handles activity data enrichment with project names and user information,
- * supporting both detailed activity queries and summary statistics.</p>
- *
- * <p>Key features include:
- * <ul>
- *   <li>Activity pagination with specification-based filtering</li>
- *   <li>Full-text search capabilities for activity content</li>
- *   <li>Activity data enrichment (project names, user information)</li>
- *   <li>Activity summary generation by target</li>
- *   <li>Activity count statistics by main target</li>
- *   <li>Summary query registration for reporting</li>
- * </ul></p>
- *
  * @author XiaoLong Liu
  */
 @Service
-@SummaryQueryRegister(name = "Activity", table = "activity", groupByColumns = {"opt_date",
-    "target_type"})
 public class ActivityQueryImpl implements ActivityQuery {
 
   @Resource
   private ActivityRepo activityRepo;
-
-  @Resource
-  private ActivityListRepo activityListRepo;
 
   @Resource
   private ActivitySearchRepo activitySearchRepo;
@@ -58,20 +44,10 @@ public class ActivityQueryImpl implements ActivityQuery {
   @Resource
   private UserManager userManager;
 
+  private static final int TOP_N = 10;
+
   /**
    * Finds activities with pagination, filtering, and optional full-text search.
-   *
-   * <p>This method retrieves activities based on specification criteria with support
-   * for pagination and optional full-text search capabilities.</p>
-   *
-   * <p>The method automatically enriches activity data with project names and
-   * user information for enhanced display.</p>
-   *
-   * @param spec           the specification for filtering activities
-   * @param pageable       the pagination and sorting parameters
-   * @param fullTextSearch whether to use full-text search
-   * @param match          the full-text search match fields
-   * @return a page of activities with enriched data
    */
   @Override
   public Page<Activity> find(GenericSpecification<Activity> spec, PageRequest pageable,
@@ -83,7 +59,7 @@ public class ActivityQueryImpl implements ActivityQuery {
         // Execute activity query with full-text search or standard search
         Page<Activity> page = fullTextSearch
             ? activitySearchRepo.find(spec.getCriteria(), pageable, Activity.class, match)
-            : activityListRepo.find(spec.getCriteria(), pageable, Activity.class, null);
+            : activityRepo.findAll(spec, pageable);
 
         // Enrich activity data with project names and user information if content exists
         if (page.hasContent()) {
@@ -95,31 +71,160 @@ public class ActivityQueryImpl implements ActivityQuery {
   }
 
   /**
-   * Finds activity summaries for a specific target with user information enrichment.
+   * Retrieves activity statistics for a given date range.
    *
-   * <p>This method retrieves all activities for a given target and converts them
-   * to summary format with enriched user information.</p>
+   * <p>This method provides various statistics about activities, including
+   * total count, success rate, distribution by action type, resource type,
+   * status, and trends over time.</p>
    *
-   * <p>The method returns null if no activities are found for the target.</p>
-   *
-   * @param targetType the type of target to search for
-   * @param targetId   the ID of the target
-   * @return list of activity summaries or null if no activities found
+   * @param startDate the start date of the range (inclusive)
+   * @param endDate   the end date of the range (exclusive)
+   * @return an ActivityStatisticsVo object containing the statistics
    */
   @Override
-  public List<ActivitySummary> findSummaryByTarget(FullResourceType targetType, Long targetId) {
-    // Retrieve all activities for the specified target
-    List<Activity> activities = activityRepo.findByResourceTypeAndResourceId(targetType, targetId);
-    if (isEmpty(activities)) {
-      return null;
+  public ActivityStatisticsVo getStatistics(String startDate, String endDate) {
+    // parse and normalize date range
+    LocalDateTime start = parseStartDate(startDate);
+    LocalDateTime end = parseEndDate(endDate);
+
+    ActivityStatisticsVo vo = new ActivityStatisticsVo();
+
+    // Overview
+    long total = activityRepo.countByActivityDateBetween(start, end);
+    ActivityStatisticsVo.Overview ov = new ActivityStatisticsVo.Overview();
+    ov.setTotalActivities(total);
+
+    // today based on end
+    LocalDate todayDate = end.toLocalDate();
+    LocalDateTime tstart = todayDate.atStartOfDay();
+    LocalDateTime tend = todayDate.atTime(LocalTime.MAX);
+    long todayCount = activityRepo.countByActivityDateBetween(tstart, tend);
+    ov.setTodayActivities(todayCount);
+
+    Long activeUsers = activityRepo.countDistinctUsersByDateRange(start, end);
+    ov.setActiveUsers(activeUsers == null ? 0L : activeUsers);
+
+    Long succ = activityRepo.countByStatusAndDateRange(ActivityStatus.SUCCESS.name(), start, end);
+    double successRate = (ov.getTotalActivities() == 0) ? 0.0 : (succ.doubleValue() * 100.0 / ov.getTotalActivities());
+    ov.setSuccessRate(successRate);
+    vo.setOverview(ov);
+
+    // distributions
+    vo.setActionTypeDistribution(buildActionDistribution(start, end, ov.getTotalActivities()));
+    vo.setResourceTypeDistribution(buildResourceDistribution(start, end, ov.getTotalActivities()));
+    vo.setStatusDistribution(buildStatusDistribution(start, end));
+
+    // top users
+    List<ActivityStatisticsVo.TopUser> topUsers = buildTopUsers(start, end);
+    // enrich userName and userAvatar using userManager
+    if (!topUsers.isEmpty()) {
+      userManager.setUserNameAndAvatar(topUsers, "userId", "userName", "userAvatar");
     }
+    vo.setTopActiveUsers(topUsers);
 
-    // Enrich activities with user information
-    userManager.setUserNameAndAvatar(activities, "userId", "fullName", "avatar");
+    // time trend
+    vo.setTimeTrend(buildTimeTrend(start, end));
 
-    // Convert activities to summary format
-    return activities.stream().map(ActivityConverter::toActivitySummary)
-        .toList();
+    // top resources
+    vo.setTopResources(buildTopResources(start, end));
+    return vo;
+  }
+
+  private List<ActivityStatisticsVo.ActionTypeDistribution> buildActionDistribution(LocalDateTime start, LocalDateTime end, long total) {
+    List<Object[]> rows = activityRepo.countGroupByActionType(start, end);
+    List<ActivityStatisticsVo.ActionTypeDistribution> list = new ArrayList<>();
+    if (rows == null) return list;
+    for (Object[] r : rows) {
+      ActivityStatisticsVo.ActionTypeDistribution d = new ActivityStatisticsVo.ActionTypeDistribution();
+      d.setActionType(Objects.toString(r[0], null));
+      d.setActionTypeLabel(d.getActionType());
+      d.setCount(r[1] == null ? 0L : ((Number) r[1]).longValue());
+      d.setPercentage(total == 0 ? 0.0 : (d.getCount() * 100.0 / total));
+      list.add(d);
+    }
+    return list;
+  }
+
+  private List<ActivityStatisticsVo.ResourceTypeDistribution> buildResourceDistribution(LocalDateTime start, LocalDateTime end, long total) {
+    List<Object[]> rows = activityRepo.countGroupByResourceType(start, end);
+    List<ActivityStatisticsVo.ResourceTypeDistribution> list = new ArrayList<>();
+    if (rows == null) return list;
+    for (Object[] r : rows) {
+      ActivityStatisticsVo.ResourceTypeDistribution d = new ActivityStatisticsVo.ResourceTypeDistribution();
+      d.setResourceType(Objects.toString(r[0], null));
+      d.setResourceTypeLabel(d.getResourceType());
+      d.setCount(r[1] == null ? 0L : ((Number) r[1]).longValue());
+      d.setPercentage(total == 0 ? 0.0 : (d.getCount() * 100.0 / total));
+      list.add(d);
+    }
+    return list;
+  }
+
+  private ActivityStatisticsVo.StatusDistribution buildStatusDistribution(LocalDateTime start, LocalDateTime end) {
+    List<Object[]> rows = activityRepo.countGroupByStatus(start, end);
+    ActivityStatisticsVo.StatusDistribution sd = new ActivityStatisticsVo.StatusDistribution();
+    if (rows == null) return sd;
+    for (Object[] r : rows) {
+      String st = Objects.toString(r[0], "");
+      long cnt = r[1] == null ? 0L : ((Number) r[1]).longValue();
+      if (ActivityStatus.SUCCESS.name().equalsIgnoreCase(st)) sd.setSuccess(cnt);
+      else if (ActivityStatus.FAILED.name().equalsIgnoreCase(st)) sd.setFailed(cnt);
+      else if (ActivityStatus.WARNING.name().equalsIgnoreCase(st)) sd.setWarning(cnt);
+    }
+    return sd;
+  }
+
+  private List<ActivityStatisticsVo.TopUser> buildTopUsers(LocalDateTime start, LocalDateTime end) {
+    List<Object[]> rows = activityRepo.topUsersBetween(start, end, TOP_N);
+    List<ActivityStatisticsVo.TopUser> users = new ArrayList<>();
+    if (rows == null) return users;
+    for (Object[] r : rows) {
+      ActivityStatisticsVo.TopUser u = new ActivityStatisticsVo.TopUser();
+      u.setUserId(r[0] == null ? null : ((Number) r[0]).longValue());
+      u.setActivityCount(r[1] == null ? 0L : ((Number) r[1]).longValue());
+      u.setLastActivityDate(Objects.toString(r[2], null));
+      users.add(u);
+    }
+    return users;
+  }
+
+  private List<ActivityStatisticsVo.TimeTrend> buildTimeTrend(LocalDateTime start, LocalDateTime end) {
+    List<Object[]> rows = activityRepo.timeTrendByDay(start, end);
+    List<ActivityStatisticsVo.TimeTrend> trends = new ArrayList<>();
+    if (rows == null) return trends;
+    for (Object[] r : rows) {
+      ActivityStatisticsVo.TimeTrend t = new ActivityStatisticsVo.TimeTrend();
+      String date = Objects.toString(r[0], null);
+      t.setDate(date);
+      try {
+        LocalDateTime dt = LocalDate.parse(date, DATE_FMT).atStartOfDay();
+        long ts = dt.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        t.setTimestamp(ts);
+      } catch (Exception e) {
+        t.setTimestamp(null);
+      }
+      t.setCount(r[1] == null ? 0L : ((Number) r[1]).longValue());
+      t.setSuccessCount(r[2] == null ? 0L : ((Number) r[2]).longValue());
+      t.setFailedCount(r[3] == null ? 0L : ((Number) r[3]).longValue());
+      trends.add(t);
+    }
+    return trends;
+  }
+
+  private List<ActivityStatisticsVo.TopResource> buildTopResources(LocalDateTime start, LocalDateTime end) {
+    List<Object[]> rows = activityRepo.topResourcesBetween(start, end, TOP_N);
+    List<ActivityStatisticsVo.TopResource> res = new ArrayList<>();
+    if (rows == null) return res;
+    for (Object[] r : rows) {
+      ActivityStatisticsVo.TopResource tr = new ActivityStatisticsVo.TopResource();
+      tr.setResourceId(r[0] == null ? null : ((Number) r[0]).longValue());
+      tr.setResourceType(Objects.toString(r[1], null));
+      tr.setResourceName(Objects.toString(r[2], null));
+      tr.setOperationCount(r[3] == null ? 0L : ((Number) r[3]).longValue());
+      tr.setLastOperationDate(Objects.toString(r[4], null));
+      res.add(tr);
+    }
+    return res;
   }
 
 }

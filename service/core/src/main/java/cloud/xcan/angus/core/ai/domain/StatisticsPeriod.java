@@ -8,6 +8,7 @@ package cloud.xcan.angus.core.ai.domain;
 public enum StatisticsPeriod {
   TODAY,
   LAST_7_DAYS,
-  LAST_30_DAYS
+  LAST_30_DAYS,
+  LAST_YEAR
 }
 

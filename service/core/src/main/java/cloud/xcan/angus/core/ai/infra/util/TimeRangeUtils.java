@@ -4,9 +4,42 @@ import cloud.xcan.angus.core.ai.domain.StatisticsPeriod;
 import cloud.xcan.angus.remote.search.SearchCriteria;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Set;
 
 public class TimeRangeUtils {
+
+  public static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+  public static final DateTimeFormatter DATETIME_FMT = DateTimeFormatter.ofPattern(
+      "yyyy-MM-dd HH:mm:ss");
+
+  // --- helper methods ---
+  public static LocalDateTime parseStartDate(String startDate) {
+    try {
+      if (startDate != null) {
+        if (startDate.length() == 10) {
+          return LocalDate.parse(startDate, DATE_FMT).atStartOfDay();
+        }
+        return LocalDateTime.parse(startDate, DATETIME_FMT);
+      }
+    } catch (Exception ignored) {
+    }
+    return LocalDateTime.of(1970, 1, 1, 0, 0);
+  }
+
+  public static LocalDateTime parseEndDate(String endDate) {
+    try {
+      if (endDate != null) {
+        if (endDate.length() == 10) {
+          return LocalDate.parse(endDate, DATE_FMT).atTime(LocalTime.MAX);
+        }
+        return LocalDateTime.parse(endDate, DATETIME_FMT);
+      }
+    } catch (Exception ignored) {
+    }
+    return LocalDateTime.now();
+  }
 
   public static Set<SearchCriteria> buildPeriodFilters(StatisticsPeriod period) {
     var base = SearchCriteria.criteria();

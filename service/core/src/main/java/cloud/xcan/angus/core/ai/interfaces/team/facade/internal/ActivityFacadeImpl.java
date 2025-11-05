@@ -10,6 +10,7 @@ import cloud.xcan.angus.core.ai.interfaces.team.facade.ActivityFacade;
 import cloud.xcan.angus.core.ai.interfaces.team.facade.dto.ActivityFindDto;
 import cloud.xcan.angus.core.ai.interfaces.team.facade.internal.assembler.ActivityAssembler;
 import cloud.xcan.angus.core.ai.interfaces.team.facade.vo.ActivityDetailVo;
+import cloud.xcan.angus.core.ai.interfaces.team.facade.vo.ActivityStatisticsVo;
 import cloud.xcan.angus.remote.PageResult;
 import jakarta.annotation.Resource;
 import org.springframework.data.domain.Page;
@@ -26,6 +27,11 @@ public class ActivityFacadeImpl implements ActivityFacade {
     Page<Activity> page = activityQuery.find(getSpecification(dto), dto.tranPage(),
         dto.fullTextSearch, getMatchSearchFields(dto.getClass()));
     return buildVoPageResult(page, ActivityAssembler::toDetailVo);
+  }
+
+  @Override
+  public ActivityStatisticsVo getStatistics(String startDate, String endDate) {
+    return activityQuery.getStatistics(startDate, endDate);
   }
 
 }

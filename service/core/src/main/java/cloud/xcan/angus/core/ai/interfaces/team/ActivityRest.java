@@ -18,6 +18,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import cloud.xcan.angus.core.ai.interfaces.team.facade.dto.ActivityStatisticsDto;
+import cloud.xcan.angus.core.ai.interfaces.team.facade.vo.ActivityStatisticsVo;
+
 @Tag(name = "Activity", description = "User Activity Management - APIs for querying user activity logs with filtering and pagination support")
 @Validated
 @RestController
@@ -36,6 +39,12 @@ public class ActivityRest {
   public ApiLocaleResult<PageResult<ActivityDetailVo>> list(
       @Valid @ParameterObject ActivityFindDto dto) {
     return ApiLocaleResult.success(activityFacade.list(dto));
+  }
+
+  @Operation(operationId = "getActivityStatistics", summary = "获取活动统计", description = "获取活动模块统计数据")
+  @GetMapping("/statistics")
+  public ApiLocaleResult<ActivityStatisticsVo> getStatistics(@ParameterObject ActivityStatisticsDto dto) {
+    return ApiLocaleResult.success(activityFacade.getStatistics(dto.getStartDate(), dto.getEndDate()));
   }
 
 }

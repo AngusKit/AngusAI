@@ -7,10 +7,9 @@ import static cloud.xcan.angus.spec.utils.ObjectUtils.isEmpty;
 import static java.util.Objects.nonNull;
 
 import cloud.xcan.angus.api.commonlink.FullResourceType;
+import cloud.xcan.angus.core.ai.domain.team.activity.ActionType;
 import cloud.xcan.angus.core.ai.domain.team.activity.Activity;
 import cloud.xcan.angus.core.ai.domain.team.activity.ActivityResource;
-import cloud.xcan.angus.core.ai.domain.team.activity.ActivitySummary;
-import cloud.xcan.angus.core.ai.domain.team.activity.ActionType;
 import cloud.xcan.angus.spec.locale.EnumValueMessage;
 import cloud.xcan.angus.spec.principal.Principal;
 import cloud.xcan.angus.spec.principal.PrincipalContext;
@@ -60,13 +59,14 @@ public class ActivityConverter {
    * @param params The last parameter is the resource name
    */
   private static Activity createActivity(FullResourceType targetType, ActivityResource resource,
-      ActionType activityType, Principal principal, Object[] params) {
-    Activity activity = new Activity().setType(activityType)
+      ActionType actionType, Principal principal, Object[] params) {
+    Activity activity = new Activity()
+        .setActionType(actionType)
         .setResourceType(targetType)
         .setUserId(principal.getUserId())
         .setActivityDate(LocalDateTime.now())
-        .setDescription(getDescription(targetType, activityType, params))
-        .setDetail(getDetail(targetType, resource, activityType, params));
+        .setDescription(getDescription(targetType, actionType, params))
+        .setDetail(getDetail(targetType, resource, actionType, params));
     activity.setTenantId(principal.getTenantId());
     if (nonNull(resource)) {
       activity.setResourceId(resource.getId())
@@ -104,22 +104,22 @@ public class ActivityConverter {
    * Set the resource name to the second parameter position.
    */
   private static String getDetail(FullResourceType targetType, ActivityResource resource,
-      ActionType activityType, Object[] params) {
+      ActionType actionType, Object[] params) {
     if (isEmpty(params)) {
-      return message(activityType.getDetailMessageKey(),
+      return message(actionType.getDetailMessageKey(),
           new Object[]{targetType.getMessage(), "[" + resource.getName() + "]"
               , getDefaultLanguage().toLocale()});
     }
     assertTrue(params.length <= 2, "Support max two parameters");
     if (params.length == 1) {
       // Move the resource name to the front
-      return message(activityType.getDetailMessageKey(),
+      return message(actionType.getDetailMessageKey(),
           new Object[]{targetType.getMessage(), "[" + resource.getName() + "]",
               safeEnumString(params[0])},
           getDefaultLanguage().toLocale());
     }
     // Move the resource name to the front
-    return message(activityType.getDetailMessageKey(),
+    return message(actionType.getDetailMessageKey(),
         new Object[]{targetType.getMessage(), "[" + resource.getName() + "]",
             safeEnumString(params[0]), safeEnumString(params[1])}, getDefaultLanguage().toLocale());
   }
@@ -139,16 +139,4 @@ public class ActivityConverter {
     return params;
   }
 
-  public static ActivitySummary toActivitySummary(Activity activity) {
-    return new ActivitySummary().setId(activity.getId())
-        .setUserId(activity.getUserId())
-        .setUserName(activity.getUserName())
-        .setUserAvatar(activity.getUserAvatar())
-        .setTargetId(activity.getResourceId())
-        .setTargetType(activity.getResourceType())
-        .setTargetName(activity.getResourceName())
-        .setActivityDate(activity.getActivityDate())
-        .setDescription(activity.getDescription())
-        .setDetail(activity.getDetail());
-  }
 }
