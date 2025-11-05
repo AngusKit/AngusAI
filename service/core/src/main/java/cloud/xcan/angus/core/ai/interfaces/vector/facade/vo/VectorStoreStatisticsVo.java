@@ -27,6 +27,7 @@ public class VectorStoreStatisticsVo {
   @Data
   @Schema(description = "总体统计")
   public static class Overview {
+
     @Schema(description = "存储源总数")
     private Long totalStores;
 
@@ -43,6 +44,7 @@ public class VectorStoreStatisticsVo {
   @Data
   @Schema(description = "类型分布")
   public static class TypeDistribution {
+
     @Schema(description = "类型")
     private VectorStoreType type;
 
@@ -56,6 +58,7 @@ public class VectorStoreStatisticsVo {
   @Data
   @Schema(description = "使用率排行")
   public static class TopStore {
+
     @Schema(description = "存储源ID")
     private Long id;
 
@@ -78,6 +81,7 @@ public class VectorStoreStatisticsVo {
   @Data
   @Schema(description = "性能趋势")
   public static class PerformanceTrend {
+
     @Schema(description = "时间戳")
     private Long timestamp;
 

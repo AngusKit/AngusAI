@@ -1,8 +1,8 @@
 package cloud.xcan.angus.core.ai.interfaces.apis.facade.dto;
 
-import io.swagger.v3.oas.models.PathItem.HttpMethod;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
+import io.swagger.v3.oas.models.PathItem.HttpMethod;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;

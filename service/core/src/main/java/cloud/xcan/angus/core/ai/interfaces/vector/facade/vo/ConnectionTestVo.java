@@ -23,6 +23,7 @@ public class ConnectionTestVo {
   @Data
   @Schema(description = "测试详情")
   public static class TestDetails {
+
     @Schema(description = "索引数量")
     private Long indexCount;
 

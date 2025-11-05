@@ -86,7 +86,8 @@ public class VectorStoreQueryImpl implements VectorStoreQuery {
   /**
    * 获取热门存储源（按查询次数）
    */
-  public List<Object[]> getTopStoresByQueryCount(LocalDateTime start, LocalDateTime end, int limit) {
+  public List<Object[]> getTopStoresByQueryCount(LocalDateTime start, LocalDateTime end,
+      int limit) {
     return vectorStoreAccessLogRepo.topStoresByQueryCount(start, end, limit);
   }
 

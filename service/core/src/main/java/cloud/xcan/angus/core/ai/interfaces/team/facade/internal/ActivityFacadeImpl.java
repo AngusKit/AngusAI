@@ -54,8 +54,8 @@ public class ActivityFacadeImpl implements ActivityFacade {
    * Retrieves activity statistics for a given date range.
    *
    * <p>This method provides various statistics about activities, including
-   * total count, success rate, distribution by action type, resource type,
-   * status, and trends over time.</p>
+   * total count, success rate, distribution by action type, resource type, status, and trends over
+   * time.</p>
    *
    * @param startDate the start date of the range (inclusive)
    * @param endDate   the end date of the range (exclusive)
@@ -84,8 +84,10 @@ public class ActivityFacadeImpl implements ActivityFacade {
     long activeUsers = activityQueryImpl.countDistinctUsersByDateRange(start, end);
     ov.setActiveUsers(activeUsers);
 
-    Long succ = activityQueryImpl.countByStatusAndDateRange(ActivityStatus.SUCCESS.name(), start, end);
-    double successRate = (ov.getTotalActivities() == 0) ? 0.0 : (succ.doubleValue() * 100.0 / ov.getTotalActivities());
+    Long succ = activityQueryImpl.countByStatusAndDateRange(ActivityStatus.SUCCESS.name(), start,
+        end);
+    double successRate = (ov.getTotalActivities() == 0) ? 0.0
+        : (succ.doubleValue() * 100.0 / ov.getTotalActivities());
     ov.setSuccessRate(successRate);
     vo.setOverview(ov);
 
@@ -110,10 +112,13 @@ public class ActivityFacadeImpl implements ActivityFacade {
     return vo;
   }
 
-  private List<ActivityStatisticsVo.ActionTypeDistribution> buildActionDistribution(LocalDateTime start, LocalDateTime end, long total) {
+  private List<ActivityStatisticsVo.ActionTypeDistribution> buildActionDistribution(
+      LocalDateTime start, LocalDateTime end, long total) {
     List<Object[]> rows = activityQueryImpl.getActionTypeDistribution(start, end);
     List<ActivityStatisticsVo.ActionTypeDistribution> list = new ArrayList<>();
-    if (rows == null) return list;
+    if (rows == null) {
+      return list;
+    }
     for (Object[] r : rows) {
       ActivityStatisticsVo.ActionTypeDistribution d = new ActivityStatisticsVo.ActionTypeDistribution();
       d.setActionType(Objects.toString(r[0], null));
@@ -125,10 +130,13 @@ public class ActivityFacadeImpl implements ActivityFacade {
     return list;
   }
 
-  private List<ActivityStatisticsVo.ResourceTypeDistribution> buildResourceDistribution(LocalDateTime start, LocalDateTime end, long total) {
+  private List<ActivityStatisticsVo.ResourceTypeDistribution> buildResourceDistribution(
+      LocalDateTime start, LocalDateTime end, long total) {
     List<Object[]> rows = activityQueryImpl.getResourceTypeDistribution(start, end);
     List<ActivityStatisticsVo.ResourceTypeDistribution> list = new ArrayList<>();
-    if (rows == null) return list;
+    if (rows == null) {
+      return list;
+    }
     for (Object[] r : rows) {
       ActivityStatisticsVo.ResourceTypeDistribution d = new ActivityStatisticsVo.ResourceTypeDistribution();
       d.setResourceType(Objects.toString(r[0], null));
@@ -140,16 +148,23 @@ public class ActivityFacadeImpl implements ActivityFacade {
     return list;
   }
 
-  private ActivityStatisticsVo.StatusDistribution buildStatusDistribution(LocalDateTime start, LocalDateTime end) {
+  private ActivityStatisticsVo.StatusDistribution buildStatusDistribution(LocalDateTime start,
+      LocalDateTime end) {
     List<Object[]> rows = activityQueryImpl.getStatusDistribution(start, end);
     ActivityStatisticsVo.StatusDistribution sd = new ActivityStatisticsVo.StatusDistribution();
-    if (rows == null) return sd;
+    if (rows == null) {
+      return sd;
+    }
     for (Object[] r : rows) {
       String st = Objects.toString(r[0], "");
       long cnt = r[1] == null ? 0L : ((Number) r[1]).longValue();
-      if (ActivityStatus.SUCCESS.name().equalsIgnoreCase(st)) sd.setSuccess(cnt);
-      else if (ActivityStatus.FAILED.name().equalsIgnoreCase(st)) sd.setFailed(cnt);
-      else if (ActivityStatus.WARNING.name().equalsIgnoreCase(st)) sd.setWarning(cnt);
+      if (ActivityStatus.SUCCESS.name().equalsIgnoreCase(st)) {
+        sd.setSuccess(cnt);
+      } else if (ActivityStatus.FAILED.name().equalsIgnoreCase(st)) {
+        sd.setFailed(cnt);
+      } else if (ActivityStatus.WARNING.name().equalsIgnoreCase(st)) {
+        sd.setWarning(cnt);
+      }
     }
     return sd;
   }
@@ -157,7 +172,9 @@ public class ActivityFacadeImpl implements ActivityFacade {
   private List<ActivityStatisticsVo.TopUser> buildTopUsers(LocalDateTime start, LocalDateTime end) {
     List<Object[]> rows = activityQueryImpl.getTopUsers(start, end, TOP_N);
     List<ActivityStatisticsVo.TopUser> users = new ArrayList<>();
-    if (rows == null) return users;
+    if (rows == null) {
+      return users;
+    }
     for (Object[] r : rows) {
       ActivityStatisticsVo.TopUser u = new ActivityStatisticsVo.TopUser();
       u.setUserId(r[0] == null ? null : ((Number) r[0]).longValue());
@@ -168,10 +185,13 @@ public class ActivityFacadeImpl implements ActivityFacade {
     return users;
   }
 
-  private List<ActivityStatisticsVo.TimeTrend> buildTimeTrend(LocalDateTime start, LocalDateTime end) {
+  private List<ActivityStatisticsVo.TimeTrend> buildTimeTrend(LocalDateTime start,
+      LocalDateTime end) {
     List<Object[]> rows = activityQueryImpl.getTimeTrendByDay(start, end);
     List<ActivityStatisticsVo.TimeTrend> trends = new ArrayList<>();
-    if (rows == null) return trends;
+    if (rows == null) {
+      return trends;
+    }
     for (Object[] r : rows) {
       ActivityStatisticsVo.TimeTrend t = new ActivityStatisticsVo.TimeTrend();
       String date = Objects.toString(r[0], null);
@@ -191,10 +211,13 @@ public class ActivityFacadeImpl implements ActivityFacade {
     return trends;
   }
 
-  private List<ActivityStatisticsVo.TopResource> buildTopResources(LocalDateTime start, LocalDateTime end) {
+  private List<ActivityStatisticsVo.TopResource> buildTopResources(LocalDateTime start,
+      LocalDateTime end) {
     List<Object[]> rows = activityQueryImpl.getTopResources(start, end, TOP_N);
     List<ActivityStatisticsVo.TopResource> res = new ArrayList<>();
-    if (rows == null) return res;
+    if (rows == null) {
+      return res;
+    }
     for (Object[] r : rows) {
       ActivityStatisticsVo.TopResource tr = new ActivityStatisticsVo.TopResource();
       tr.setResourceId(r[0] == null ? null : ((Number) r[0]).longValue());

@@ -19,7 +19,8 @@ public class ApiCollectionImportDto {
   private MultipartFile file;
 
   @NotNull
-  @Schema(description = "文件类型", requiredMode = RequiredMode.REQUIRED, allowableValues = {"OPENAPI", "SWAGGER", "POSTMAN"})
+  @Schema(description = "文件类型", requiredMode = RequiredMode.REQUIRED, allowableValues = {
+      "OPENAPI", "SWAGGER", "POSTMAN"})
   private ApiCollectionSource type;
 
   @Length(max = 100)
@@ -35,6 +36,7 @@ public class ApiCollectionImportDto {
   @Data
   @Schema(description = "导入策略")
   public static class ImportStrategyDto {
+
     @Schema(description = "冲突处理策略：OVERWRITE-覆盖现有接口，IGNORE-跳过重复接口，MERGE-合并配置", example = "IGNORE")
     private ConflictStrategy conflictStrategy = ConflictStrategy.IGNORE;
 

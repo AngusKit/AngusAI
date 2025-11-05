@@ -34,14 +34,12 @@ public interface ApiEndpointQuery {
   Long countEnabledEndpointsByCollectionId(Long id);
 
   /**
-   * 批量统计接口集下的端点数量
-   * 返回 Map<collectionId, count>
+   * 批量统计接口集下的端点数量 返回 Map<collectionId, count>
    */
   Map<Long, Long> countEndpointsByCollectionIds(List<Long> collectionIds);
 
   /**
-   * 批量统计接口集下启用的端点数量
-   * 返回 Map<collectionId, enabledCount>
+   * 批量统计接口集下启用的端点数量 返回 Map<collectionId, enabledCount>
    */
   Map<Long, Long> countEnabledEndpointsByCollectionIds(List<Long> collectionIds);
 
@@ -56,8 +54,7 @@ public interface ApiEndpointQuery {
   Long countTotalEnabledEndpoints();
 
   /**
-   * 批量根据ID查询端点
-   * 返回 Map<endpointId, ApiEndpoint>
+   * 批量根据ID查询端点 返回 Map<endpointId, ApiEndpoint>
    */
   Map<Long, ApiEndpoint> findByIds(List<Long> endpointIds);
 }

@@ -2,12 +2,10 @@ package cloud.xcan.angus.core.ai.interfaces.vector.facade;
 
 import cloud.xcan.angus.core.ai.interfaces.team.facade.dto.ActivityStatisticsDto;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.ConnectionTestDto;
-import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.SyncDto;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.VectorStoreCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.VectorStoreFindDto;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.VectorStoreUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.vo.ConnectionTestVo;
-import cloud.xcan.angus.core.ai.interfaces.vector.facade.vo.SyncTaskVo;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.vo.VectorStoreStatisticsVo;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.vo.VectorStoreVo;
 import cloud.xcan.angus.remote.PageResult;

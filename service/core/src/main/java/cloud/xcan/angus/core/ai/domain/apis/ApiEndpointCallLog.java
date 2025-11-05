@@ -13,8 +13,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 /**
- * API端点调用记录实体
- * 用于记录API端点的调用记录，包括调用时间、响应时间、状态等信息
+ * API端点调用记录实体 用于记录API端点的调用记录，包括调用时间、响应时间、状态等信息
  */
 @Entity
 @Table(name = "api_endpoint_call_log")

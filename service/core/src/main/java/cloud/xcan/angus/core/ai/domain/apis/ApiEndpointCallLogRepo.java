@@ -22,8 +22,8 @@ public interface ApiEndpointCallLogRepo extends BaseRepository<ApiEndpointCallLo
   List<ApiEndpointCallLog> findByCallDateBetween(LocalDateTime start, LocalDateTime end);
 
   /**
-   * 按端点分组统计调用次数和平均响应时间（TOP N）
-   * 返回 List<Object[]>，其中 [0]=endpointId (Long), [1]=count (Long), [2]=avgResponseTime (Double)
+   * 按端点分组统计调用次数和平均响应时间（TOP N） 返回 List<Object[]>，其中 [0]=endpointId (Long), [1]=count (Long),
+   * [2]=avgResponseTime (Double)
    */
   @Query(value = "SELECT endpoint_id, COUNT(1) cnt, AVG(response_time_ms) avg_time " +
       "FROM api_endpoint_call_log WHERE call_date >= :start AND call_date <= :end " +
@@ -32,8 +32,7 @@ public interface ApiEndpointCallLogRepo extends BaseRepository<ApiEndpointCallLo
       @Param("end") LocalDateTime end, @Param("limit") Integer limit);
 
   /**
-   * 按端点分组统计平均响应时间
-   * 返回 List<Object[]>，其中 [0]=endpointId (Long), [1]=avgResponseTime (Double)
+   * 按端点分组统计平均响应时间 返回 List<Object[]>，其中 [0]=endpointId (Long), [1]=avgResponseTime (Double)
    */
   @Query("SELECT l.endpointId, AVG(l.responseTimeMs) " +
       "FROM ApiEndpointCallLog l WHERE l.callDate BETWEEN :start AND :end " +
@@ -42,8 +41,8 @@ public interface ApiEndpointCallLogRepo extends BaseRepository<ApiEndpointCallLo
       @Param("end") LocalDateTime end);
 
   /**
-   * 按日期分组统计性能趋势
-   * 返回 List<Object[]>，其中 [0]=date (String), [1]=totalCalls (Long), [2]=avgResponseTime (Double), [3]=errorCount (Long)
+   * 按日期分组统计性能趋势 返回 List<Object[]>，其中 [0]=date (String), [1]=totalCalls (Long), [2]=avgResponseTime
+   * (Double), [3]=errorCount (Long)
    */
   @Query(value = "SELECT DATE(call_date) d, COUNT(1) cnt, AVG(response_time_ms) avg_time, " +
       "SUM(CASE WHEN status='FAILED' THEN 1 ELSE 0 END) error_cnt " +

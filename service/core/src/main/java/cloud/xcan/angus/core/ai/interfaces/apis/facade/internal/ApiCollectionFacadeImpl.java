@@ -110,8 +110,10 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
           .map(ApiCollection::getId)
           .collect(Collectors.toList());
 
-      Map<Long, Long> endpointsCountMap = apiEndpointQuery.countEndpointsByCollectionIds(collectionIds);
-      Map<Long, Long> enabledEndpointsCountMap = apiEndpointQuery.countEnabledEndpointsByCollectionIds(collectionIds);
+      Map<Long, Long> endpointsCountMap = apiEndpointQuery.countEndpointsByCollectionIds(
+          collectionIds);
+      Map<Long, Long> enabledEndpointsCountMap = apiEndpointQuery.countEnabledEndpointsByCollectionIds(
+          collectionIds);
 
       collections.forEach(collection -> {
         Long endpointsCount = endpointsCountMap.getOrDefault(collection.getId(), 0L);
@@ -200,13 +202,14 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
   }
 
   /**
-   * 构建使用率排行
-   * 优化：批量查询端点，避免N+1查询问题
+   * 构建使用率排行 优化：批量查询端点，避免N+1查询问题
    */
-  private List<ApiCollectionStatisticsVo.TopStore> buildTopStores(LocalDateTime start, LocalDateTime end) {
+  private List<ApiCollectionStatisticsVo.TopStore> buildTopStores(LocalDateTime start,
+      LocalDateTime end) {
     // 获取调用次数和平均响应时间数据（按端点分组，TOP N）
     // 返回格式：[0]=endpointId, [1]=count, [2]=avgResponseTime
-    List<Object[]> callCountRows = apiEndpointCallLogQuery.getTopEndpointsByCallCount(start, end, TOP_N);
+    List<Object[]> callCountRows = apiEndpointCallLogQuery.getTopEndpointsByCallCount(start, end,
+        TOP_N);
 
     if (callCountRows == null || callCountRows.isEmpty()) {
       return new ArrayList<>();
@@ -256,7 +259,8 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
   /**
    * 构建性能趋势
    */
-  private List<ApiCollectionStatisticsVo.PerformanceTrend> buildPerformanceTrend(LocalDateTime start, LocalDateTime end) {
+  private List<ApiCollectionStatisticsVo.PerformanceTrend> buildPerformanceTrend(
+      LocalDateTime start, LocalDateTime end) {
     List<Object[]> rows = apiEndpointCallLogQuery.getPerformanceTrendByDay(start, end);
     List<ApiCollectionStatisticsVo.PerformanceTrend> trends = new ArrayList<>();
     if (rows == null) {

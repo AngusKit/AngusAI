@@ -39,7 +39,8 @@ public class ApiEndpointCallLogQueryImpl implements ApiEndpointCallLogQuery {
   }
 
   @Override
-  public List<Object[]> getTopEndpointsByCallCount(LocalDateTime start, LocalDateTime end, Integer limit) {
+  public List<Object[]> getTopEndpointsByCallCount(LocalDateTime start, LocalDateTime end,
+      Integer limit) {
     return new BizTemplate<List<Object[]>>() {
       @Override
       protected List<Object[]> process() {

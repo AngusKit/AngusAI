@@ -1,6 +1,5 @@
 package cloud.xcan.angus.core.ai.interfaces.apis.facade.vo;
 
-import cloud.xcan.angus.core.ai.infra.ai.vector.VectorStoreType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.models.PathItem.HttpMethod;
 import java.util.List;
@@ -25,6 +24,7 @@ public class ApiCollectionStatisticsVo {
   @Data
   @Schema(description = "总体统计")
   public static class Overview {
+
     @Schema(description = "接口集总数")
     private Integer apiCollectionCount;
 
@@ -44,6 +44,7 @@ public class ApiCollectionStatisticsVo {
   @Data
   @Schema(description = "使用率排行")
   public static class TopStore {
+
     @Schema(description = "端点ID")
     private Long id;
 
@@ -63,6 +64,7 @@ public class ApiCollectionStatisticsVo {
   @Data
   @Schema(description = "性能趋势")
   public static class PerformanceTrend {
+
     @Schema(description = "时间戳")
     private Long timestamp;
 

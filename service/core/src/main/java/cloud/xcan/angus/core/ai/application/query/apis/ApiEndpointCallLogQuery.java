@@ -20,20 +20,19 @@ public interface ApiEndpointCallLogQuery {
       LocalDateTime start, LocalDateTime end);
 
   /**
-   * 按端点分组统计调用次数和平均响应时间（TOP N）
-   * 返回 List<Object[]>，其中 [0]=endpointId (Long), [1]=count (Long), [2]=avgResponseTime (Double)
+   * 按端点分组统计调用次数和平均响应时间（TOP N） 返回 List<Object[]>，其中 [0]=endpointId (Long), [1]=count (Long),
+   * [2]=avgResponseTime (Double)
    */
   List<Object[]> getTopEndpointsByCallCount(LocalDateTime start, LocalDateTime end, Integer limit);
 
   /**
-   * 按端点分组统计平均响应时间
-   * 返回 List<Object[]>，其中 [0]=endpointId (Long), [1]=avgResponseTime (Double)
+   * 按端点分组统计平均响应时间 返回 List<Object[]>，其中 [0]=endpointId (Long), [1]=avgResponseTime (Double)
    */
   List<Object[]> getAvgResponseTimeByEndpoint(LocalDateTime start, LocalDateTime end);
 
   /**
-   * 按日期分组统计性能趋势
-   * 返回 List<Object[]>，其中 [0]=date (String), [1]=totalCalls (Long), [2]=avgResponseTime (Double), [3]=errorCount (Long)
+   * 按日期分组统计性能趋势 返回 List<Object[]>，其中 [0]=date (String), [1]=totalCalls (Long), [2]=avgResponseTime
+   * (Double), [3]=errorCount (Long)
    */
   List<Object[]> getPerformanceTrendByDay(LocalDateTime start, LocalDateTime end);
 }

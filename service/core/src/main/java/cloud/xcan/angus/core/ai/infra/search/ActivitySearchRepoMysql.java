@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class ActivitySearchRepoMysql extends SimpleSearchRepository<Activity>
     implements ActivitySearchRepo {
+
 }

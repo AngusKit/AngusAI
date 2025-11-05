@@ -18,15 +18,13 @@ public interface ApiEndpointRepo extends BaseRepository<ApiEndpoint, Long> {
   Long countEnabledByCollectionId(@Param("collectionId") Long collectionId);
 
   /**
-   * 批量统计接口集下的端点数量
-   * 返回 List<Object[]>，其中 [0]=collectionId (Long), [1]=count (Long)
+   * 批量统计接口集下的端点数量 返回 List<Object[]>，其中 [0]=collectionId (Long), [1]=count (Long)
    */
   @Query("SELECT e.collectionId, COUNT(e) FROM ApiEndpoint e WHERE e.collectionId IN :collectionIds GROUP BY e.collectionId")
   List<Object[]> countByCollectionIds(@Param("collectionIds") List<Long> collectionIds);
 
   /**
-   * 批量统计接口集下启用的端点数量
-   * 返回 List<Object[]>，其中 [0]=collectionId (Long), [1]=count (Long)
+   * 批量统计接口集下启用的端点数量 返回 List<Object[]>，其中 [0]=collectionId (Long), [1]=count (Long)
    */
   @Query("SELECT e.collectionId, COUNT(e) FROM ApiEndpoint e WHERE e.collectionId IN :collectionIds AND e.enabled = true GROUP BY e.collectionId")
   List<Object[]> countEnabledByCollectionIds(@Param("collectionIds") List<Long> collectionIds);
