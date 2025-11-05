@@ -47,5 +47,15 @@ public class ApiCollectionQueryImpl implements ApiCollectionQuery {
       }
     }.execute();
   }
+
+  @Override
+  public Long countTotalCollections() {
+    return new BizTemplate<Long>() {
+      @Override
+      protected Long process() {
+        return apiCollectionRepo.count();
+      }
+    }.execute();
+  }
 }
 

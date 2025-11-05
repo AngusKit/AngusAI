@@ -8,6 +8,7 @@ import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionUpdateDt
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionImportVo;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionListVo;
+import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionStatisticsVo;
 import cloud.xcan.angus.remote.ApiLocaleResult;
 import cloud.xcan.angus.remote.PageResult;
 import io.swagger.v3.oas.annotations.Operation;
@@ -100,7 +101,12 @@ public class ApiCollectionRest {
     return ApiLocaleResult.success(apiCollectionFacade.list(dto));
   }
 
-  // TODO 统计接口
+  @Operation(operationId = "apiCollectionGetStatistics", summary = "获取统计信息", description = "获取接口集的统计数据，包括总体统计、使用率排行、性能趋势等")
+  @GetMapping("/statistics")
+  public ApiLocaleResult<ApiCollectionStatisticsVo> getStatistics(
+      @ParameterObject ApiCollectionStatisticsVo dto) {
+    return ApiLocaleResult.success(apiCollectionFacade.getStatistics(dto));
+  }
 
   @Operation(operationId = "apiCollectionImport", summary = "导入接口集", description = "从OpenAPI/Swagger/Postman文件导入接口集")
   @ApiResponses({

@@ -7,6 +7,7 @@ import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionUpdateDt
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionImportVo;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionListVo;
+import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionStatisticsVo;
 import cloud.xcan.angus.remote.PageResult;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.io.Resource;
@@ -41,6 +42,11 @@ public interface ApiCollectionFacade {
    * 获取接口集列表
    */
   PageResult<ApiCollectionListVo> list(ApiCollectionFindDto dto);
+
+  /**
+   * 获取接口集统计数据
+   */
+  ApiCollectionStatisticsVo getStatistics(ApiCollectionStatisticsVo dto);
 
   /**
    * 导入接口集

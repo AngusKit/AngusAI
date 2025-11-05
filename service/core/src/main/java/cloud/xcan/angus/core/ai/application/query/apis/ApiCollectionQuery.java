@@ -20,5 +20,10 @@ public interface ApiCollectionQuery {
    */
   Page<ApiCollection> find(GenericSpecification<ApiCollection> spec, Pageable pageable,
       boolean fullTextSearch, String[] match);
+
+  /**
+   * 统计接口集总数
+   */
+  Long countTotalCollections();
 }
 

@@ -55,8 +55,6 @@ public class VectorStoreQueryImpl implements VectorStoreQuery {
     }.execute();
   }
 
-  // --- Statistics query methods (encapsulated from repos) ---
-
   /**
    * 统计存储源总数
    */

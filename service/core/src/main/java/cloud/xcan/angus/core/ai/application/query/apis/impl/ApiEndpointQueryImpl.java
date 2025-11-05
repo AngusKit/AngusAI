@@ -91,5 +91,43 @@ public class ApiEndpointQueryImpl implements ApiEndpointQuery {
     return countMap;
   }
 
+  @Override
+  public Long countTotalEndpoints() {
+    return new BizTemplate<Long>() {
+      @Override
+      protected Long process() {
+        return apiEndpointRepo.count();
+      }
+    }.execute();
+  }
+
+  @Override
+  public Long countTotalEnabledEndpoints() {
+    return new BizTemplate<Long>() {
+      @Override
+      protected Long process() {
+        return apiEndpointRepo.countEnabled();
+      }
+    }.execute();
+  }
+
+  @Override
+  public Map<Long, ApiEndpoint> findByIds(List<Long> endpointIds) {
+    return new BizTemplate<Map<Long, ApiEndpoint>>() {
+      @Override
+      protected Map<Long, ApiEndpoint> process() {
+        if (endpointIds == null || endpointIds.isEmpty()) {
+          return new HashMap<>();
+        }
+        List<ApiEndpoint> endpoints = apiEndpointRepo.findAllById(endpointIds);
+        Map<Long, ApiEndpoint> endpointMap = new HashMap<>();
+        for (ApiEndpoint endpoint : endpoints) {
+          endpointMap.put(endpoint.getId(), endpoint);
+        }
+        return endpointMap;
+      }
+    }.execute();
+  }
+
 }
 

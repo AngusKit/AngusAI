@@ -31,6 +31,12 @@ public interface ApiEndpointRepo extends BaseRepository<ApiEndpoint, Long> {
   @Query("SELECT e.collectionId, COUNT(e) FROM ApiEndpoint e WHERE e.collectionId IN :collectionIds AND e.enabled = true GROUP BY e.collectionId")
   List<Object[]> countEnabledByCollectionIds(@Param("collectionIds") List<Long> collectionIds);
 
+  /**
+   * 统计所有已启用的端点数量
+   */
+  @Query("SELECT COUNT(e) FROM ApiEndpoint e WHERE e.enabled = true")
+  Long countEnabled();
+
   boolean existsByCollectionIdAndMethodAndPath(Long collectionId, HttpMethod method, String path);
 
   boolean existsByCollectionIdAndMethodAndPathAndIdNot(Long collectionId, HttpMethod method,
