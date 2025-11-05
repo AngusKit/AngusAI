@@ -4,6 +4,7 @@ logs
 work
 dist
 tmp
+temp
 data
 .DS_Store
 .env
@@ -50,3 +51,4 @@ nbdist/
 .nb-gradle/
 /.github/
 /.vscode/
+
