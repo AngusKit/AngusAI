@@ -8,14 +8,11 @@ import cloud.xcan.angus.core.ai.application.query.vector.VectorStoreQuery;
 import cloud.xcan.angus.core.ai.domain.vector.VectorStore;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.VectorStoreFacade;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.ConnectionTestDto;
-import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.SyncDto;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.VectorStoreCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.VectorStoreFindDto;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.VectorStoreUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.internal.assembler.VectorStoreAssembler;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.vo.ConnectionTestVo;
-import cloud.xcan.angus.core.ai.interfaces.vector.facade.vo.SyncTaskVo;
-import cloud.xcan.angus.core.ai.interfaces.vector.facade.vo.VectorStoreListVo;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.vo.VectorStoreStatisticsVo;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.vo.VectorStoreVo;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
@@ -58,22 +55,8 @@ public class VectorStoreFacadeImpl implements VectorStoreFacade {
 
   @Override
   public ConnectionTestVo testConnection(Long id, ConnectionTestDto dto) {
-    VectorStore vectorStore = vectorStoreCmd.testConnection(id, dto);
-
-    // 构建测试结果
-    ConnectionTestVo.TestDetails testDetails = new ConnectionTestVo.TestDetails();
-    testDetails.setIndexCount(vectorStore.getIndexCount());
-    testDetails.setDimension(vectorStore.getDimension());
-    // TODO: 设置responseTime和version
-
-    ConnectionTestVo.ErrorInfo error = null;
-    boolean success = "connected".equals(vectorStore.getStatus());
-    if (!success) {
-      error = new ConnectionTestVo.ErrorInfo();
-      error.setCode("CONNECTION_FAILED");
-      error.setMessage("连接失败");
-    }
-    return VectorStoreAssembler.toConnectionTestVo(vectorStore, success, testDetails, error);
+    VectorStore vectorStore = vectorStoreCmd.testConnection(id, dto.getTimeout(), dto.getConfig());
+    return VectorStoreAssembler.toConnectionTestVo(vectorStore);
   }
 
   @Override
@@ -88,11 +71,11 @@ public class VectorStoreFacadeImpl implements VectorStoreFacade {
   }
 
   @Override
-  public PageResult<VectorStoreListVo> list(VectorStoreFindDto dto) {
+  public PageResult<VectorStoreVo> list(VectorStoreFindDto dto) {
     GenericSpecification<VectorStore> spec = VectorStoreAssembler.getSpecification(dto);
     Page<VectorStore> page = vectorStoreQuery.find(spec, dto.tranPage(),
         dto.fullTextSearch, getMatchSearchFields(dto.getClass()));
-    return buildVoPageResult(page, VectorStoreAssembler::toListVo);
+    return buildVoPageResult(page, VectorStoreAssembler::toVo);
   }
 
   @Override

@@ -1,6 +1,7 @@
 package cloud.xcan.angus.core.ai.interfaces.vector.facade.vo;
 
-import cloud.xcan.angus.core.ai.infra.ai.vector.VectorStoreConfig;
+import cloud.xcan.angus.core.ai.domain.ConnectionStatus;
+import cloud.xcan.angus.core.ai.domain.vector.VectorStoreConfig;
 import cloud.xcan.angus.core.ai.infra.ai.vector.VectorStoreType;
 import cloud.xcan.angus.remote.vo.TenantAuditingVo;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -25,13 +26,10 @@ public class VectorStoreVo extends TenantAuditingVo {
   private String description;
 
   @Schema(description = "状态")
-  private String status;
+  private ConnectionStatus status;
 
   @Schema(description = "是否启用")
   private Boolean enabled;
-
-  @Schema(description = "向量维度")
-  private Integer dimension;
 
   @Schema(description = "索引数量")
   private Long indexCount;

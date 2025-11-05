@@ -1,6 +1,7 @@
 package cloud.xcan.angus.core.ai.application.cmd.vector;
 
 import cloud.xcan.angus.core.ai.domain.vector.VectorStore;
+import cloud.xcan.angus.core.ai.domain.vector.VectorStoreConfig;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.ConnectionTestDto;
 
 /**
@@ -26,12 +27,11 @@ public interface VectorStoreCmd {
   /**
    * 连接测试
    */
-  VectorStore testConnection(Long id, ConnectionTestDto dto);
+  VectorStore testConnection(Long id, Integer timeout, VectorStoreConfig config);
 
   /**
    * 删除向量存储源
    */
   void delete(Long id, Boolean force);
-
 
 }

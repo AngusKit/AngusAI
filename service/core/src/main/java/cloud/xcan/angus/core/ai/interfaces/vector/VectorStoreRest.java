@@ -6,7 +6,6 @@ import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.VectorStoreCreateDt
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.VectorStoreFindDto;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.VectorStoreUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.vo.ConnectionTestVo;
-import cloud.xcan.angus.core.ai.interfaces.vector.facade.vo.VectorStoreListVo;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.vo.VectorStoreStatisticsVo;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.vo.VectorStoreVo;
 import cloud.xcan.angus.remote.ApiLocaleResult;
@@ -81,9 +80,9 @@ public class VectorStoreRest {
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "测试完成")
   })
-  @PostMapping("/{id}/test")
+  @PostMapping("/test")
   public ApiLocaleResult<ConnectionTestVo> testConnection(
-      @Parameter(description = "存储源ID", required = true) @PathVariable Long id,
+      @Parameter(description = "存储源ID", required = true) @RequestParam(required = false) Long id,
       @Valid @RequestBody(required = false) ConnectionTestDto dto) {
     return ApiLocaleResult.success(vectorStoreFacade.testConnection(id, dto));
   }
@@ -95,11 +94,10 @@ public class VectorStoreRest {
   })
   @DeleteMapping("/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public ApiLocaleResult<?> delete(
+  public void delete(
       @Parameter(description = "存储源ID", required = true) @PathVariable Long id,
       @Parameter(description = "强制删除（即使被引用）") @RequestParam(required = false) Boolean force) {
     vectorStoreFacade.delete(id, force);
-    return ApiLocaleResult.success(null);
   }
 
   @Operation(operationId = "vectorStoreGetDetail", summary = "获取存储源详情", description = "根据ID获取向量存储源的详细信息")
@@ -115,7 +113,7 @@ public class VectorStoreRest {
 
   @Operation(operationId = "vectorStoreList", summary = "获取存储源列表", description = "分页查询向量存储源列表，支持关键词搜索、类型筛选、状态筛选等")
   @GetMapping
-  public ApiLocaleResult<PageResult<VectorStoreListVo>> list(
+  public ApiLocaleResult<PageResult<VectorStoreVo>> list(
       @Valid @ParameterObject VectorStoreFindDto dto) {
     return ApiLocaleResult.success(vectorStoreFacade.list(dto));
   }

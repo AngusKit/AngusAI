@@ -1,8 +1,10 @@
 package cloud.xcan.angus.core.ai.domain.vector;
 
+import cloud.xcan.angus.core.ai.domain.ConnectionStatus;
 import cloud.xcan.angus.core.ai.infra.ai.vector.VectorStoreType;
 import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -39,48 +41,33 @@ public class VectorStore extends TenantAuditingEntity<VectorStore, Long> {
   @Column(name = "description", length = 500)
   private String description;
 
-  @Column(name = "endpoint", nullable = false, length = 500)
-  private String endpoint;
-
-  @Column(name = "dimension", nullable = false)
-  private Integer dimension;
-
   @Type(JsonType.class)
   @Column(columnDefinition = "json", name = "config")
-  private Map<String, String> config;
+  private VectorStoreConfig config;
 
+  @Enumerated(EnumType.STRING)
   @Column(name = "status", nullable = false, length = 20)
-  private String status = "disconnected"; // connected, disconnected, testing
+  private ConnectionStatus status;
 
   @Column(name = "enabled", nullable = false)
   private Boolean enabled = true;
 
-  @Column(name = "auto_sync", nullable = false)
-  private Boolean autoSync = false;
-
-  @Column(name = "sync_interval")
-  private Integer syncInterval = 60; // 分钟
-
+  // 测试连接返回信息
   @Column(name = "index_count")
-  private Long indexCount = 0L;
-
-  @Column(name = "last_sync_time")
-  private Long lastSyncTime;
-
-  @Transient
-  private String typeLabel;
-
-  @Transient
-  private String typeIcon;
-
-  @Transient
-  private String statusLabel;
-
-  @Transient
-  private String statusColor;
+  private Long indexCount;
+  @Column(name = "dimension")
+  private Integer dimension;
+  @Column(name = "response_time")
+  private Long responseTime;
+  @Column(name = "version")
+  private String version;
 
   @Transient
   private Map<String, Object> performance;
+  @Transient
+  private boolean testConnectionSuccess;
+  @Transient
+  private String testConnectionMessage;
 
   @Override
   public Long identity() {

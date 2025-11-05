@@ -92,10 +92,25 @@ public class VectorStoreConfig {
   @Schema(description = "命名空间（可选）。例如 Pinecone/Weaviate/Qdrant 的逻辑分区。", example = "tenantA")
   private String namespace;
 
+  // TODO 在接口实现处加入一次运行时校验（例如校验已存在集合/索引的维度与请求一致），并在失败时返回可读的错误提示
+  @NotNull
   @Min(1)
-  @Max(8192)
-  @Schema(description = "向量维度，需与嵌入模型一致（常见：1536/768/384）", example = "1536")
-  private Integer vectorDimensions = 1536;
+  @Max(4096)
+  @Schema(
+      description = """
+          向量维度。必须与所用嵌入模型输出维度一致，否则入库/检索会失败。
+          常见示例：
+          - 1536：OpenAI text-embedding-3-large/ada-002 等
+          - 1024：部分 MiniLM/Cohere 模型
+          - 768：BERT/MPNet/BGE-large 等
+          - 512：E5-base/BGE-base 等
+          - 384：all-MiniLM-L6-v2/E5-small 等
+          不同存储会据此建索引/集合：Elasticsearch/OpenSearch dense_vector.dims、Milvus/Qdrant/Weaviate/Pinecone 的集合 schema、PGVector 列维度等。""",
+      requiredMode = RequiredMode.REQUIRED,
+      example = "1536",
+      minimum = "1",
+      maximum = "4096")
+  private Integer dimension;
 
   /**
    * 按类型校验必要的连接配置，抛出 IllegalArgumentException 表示配置不完整/不合法。

@@ -89,11 +89,10 @@ public class ApiEndpointRest {
   @Operation(operationId = "apiEndpointDelete", summary = "删除端点", description = "删除接口端点")
   @DeleteMapping("/{collectionId}/endpoints/{endpointId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public ApiLocaleResult<?> deleteEndpoint(
+  public void deleteEndpoint(
       @Parameter(description = "接口集ID", required = true) @PathVariable Long collectionId,
       @Parameter(description = "端点ID", required = true) @PathVariable Long endpointId) {
     apiEndpointFacade.deleteEndpoint(collectionId, endpointId);
-    return ApiLocaleResult.success(null);
   }
 
   // TODO 接口详细接口

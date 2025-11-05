@@ -1,21 +1,21 @@
 package cloud.xcan.angus.core.ai.application.cmd.vector;
 
+import static cloud.xcan.angus.spec.utils.ObjectUtils.isNull;
 import static cloud.xcan.angus.spec.utils.ObjectUtils.nullSafe;
+import static java.util.Objects.nonNull;
 
 import cloud.xcan.angus.core.ai.application.query.vector.VectorStoreQuery;
+import cloud.xcan.angus.core.ai.domain.ConnectionStatus;
 import cloud.xcan.angus.core.ai.domain.vector.VectorStore;
+import cloud.xcan.angus.core.ai.domain.vector.VectorStoreConfig;
 import cloud.xcan.angus.core.ai.domain.vector.VectorStoreRepo;
-import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.ConnectionTestDto;
-import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.SyncDto;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
-import cloud.xcan.angus.core.utils.CoreUtils;
 import cloud.xcan.angus.remote.message.ProtocolException;
 import cloud.xcan.angus.remote.message.http.ResourceExisted;
 import jakarta.annotation.Resource;
-import java.util.Objects;
-import java.util.UUID;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -40,12 +40,13 @@ public class VectorStoreCmdImpl extends CommCmd<VectorStore, Long> implements Ve
         if (exists) {
           throw ResourceExisted.of("存储源名称「{0}」已存在", new Object[]{vectorStore.getName()});
         }
+        // 验证配置参数
+        vectorStore.getConfig().validateVectorDataSourceConfig();
       }
 
       @Override
       protected VectorStore process() {
-        // 设置默认状态为未连接
-        vectorStore.setStatus("disconnected");
+        // 不实际连接，配置错误也允许保存
         insert(vectorStore);
         return vectorStore;
       }
@@ -64,27 +65,28 @@ public class VectorStoreCmdImpl extends CommCmd<VectorStore, Long> implements Ve
 
         // 检查名称是否重复（排除自己）
         String actualName = nullSafe(vectorStore.getName(), vectorStoreDb.getName());
-        boolean exists = vectorStoreRepo.existsByNameAndIdNot(actualName, vectorStore.getId());
-        if (exists) {
+        if (vectorStoreRepo.existsByNameAndIdNot(actualName, vectorStore.getId())) {
           throw ResourceExisted.of("存储源名称「{0}」已存在", new Object[]{actualName});
         }
+        // 验证配置参数
+        vectorStore.getConfig().validateVectorDataSourceConfig();
       }
 
       @Override
       protected VectorStore process() {
-        // 如果endpoint或config发生变化，状态重置为disconnected
-        boolean endpointChanged = vectorStore.getEndpoint() != null
-            && !Objects.equals(vectorStore.getEndpoint(), vectorStoreDb.getEndpoint());
-        boolean configChanged = vectorStore.getConfig() != null
-            && !Objects.equals(vectorStore.getConfig(), vectorStoreDb.getConfig());
+        // TODO 如果config连接发生变化，测试连接，配置错误不允许保存
+        // TODO: 实际调用VectorStoreFactory进行连接测试
+        // VectorStoreFactory factory = ...;
+        // boolean connected = factory.testConnection(vectorStoreDb);
 
-        CoreUtils.copyPropertiesIgnoreNull(vectorStore, vectorStoreDb);
+        // 更新连接成功后数据源信息
+        //        private Long indexCount;
+        //        private Integer dimension;
+        //        private Long responseTime;
+        //        private String version;
 
-        if (endpointChanged || configChanged) {
-          vectorStoreDb.setStatus("disconnected");
-        }
-
-        return vectorStoreRepo.save(vectorStoreDb);
+        update(vectorStore, vectorStoreDb);
+        return vectorStoreDb;
       }
     }.execute();
   }
@@ -96,6 +98,7 @@ public class VectorStoreCmdImpl extends CommCmd<VectorStore, Long> implements Ve
 
       @Override
       protected void checkParams() {
+        // 检查存储源是否存在
         vectorStoreDb = vectorStoreQuery.findAndCheck(id);
       }
 
@@ -108,42 +111,47 @@ public class VectorStoreCmdImpl extends CommCmd<VectorStore, Long> implements Ve
   }
 
   @Override
-  public VectorStore testConnection(Long id, ConnectionTestDto dto) {
+  public VectorStore testConnection(@Nullable Long id, Integer timeout,
+      @Nullable VectorStoreConfig config) {
     return new BizTemplate<VectorStore>() {
       VectorStore vectorStoreDb;
 
       @Override
       protected void checkParams() {
-        vectorStoreDb = vectorStoreQuery.findAndCheck(id);
+        // 检查 id 和 config 不能全为空
+        if (isNull(id) && isNull(config)) {
+          throw ProtocolException.of("向量存储源ID和配置必须指定其中一个");
+        }
+
+        // 检查存储源是否存在
+        if (nonNull(id)) {
+          vectorStoreDb = vectorStoreQuery.findAndCheck(id);
+        }
       }
 
       @Override
       protected VectorStore process() {
-        // 设置状态为testing
-        vectorStoreDb.setStatus("testing");
-        vectorStoreRepo.save(vectorStoreDb);
-
         try {
+          VectorStoreConfig testConfig = nonNull(config) ? config : vectorStoreDb.getConfig();
+
           // TODO: 实际调用VectorStoreFactory进行连接测试
           // VectorStoreFactory factory = ...;
           // boolean connected = factory.testConnection(vectorStoreDb);
 
-          // 模拟连接测试
-          boolean connected = true;
-
-          if (connected) {
-            vectorStoreDb.setStatus("connected");
-            // TODO: 更新indexCount等信息
-          } else {
-            vectorStoreDb.setStatus("disconnected");
-          }
-
-          return vectorStoreRepo.save(vectorStoreDb);
+          // 设置状态
+          // vectorStoreDb.setStatus(?);
+          // 更新连接成功后数据源信息
+          // vectorStoreRepo.save(vectorStoreDb);
         } catch (Exception e) {
-          vectorStoreDb.setStatus("disconnected");
-          vectorStoreRepo.save(vectorStoreDb);
-          throw ProtocolException.of("连接测试失败: {0}", new Object[]{e.getMessage()});
+          vectorStoreDb.setStatus(ConnectionStatus.DISCONNECTED);
+          vectorStoreDb.setTestConnectionMessage(e.getMessage());
         }
+
+        // 如果是根据存储源ID测试，保存测试状态信息
+        if (isNull(config)) {
+          vectorStoreRepo.save(vectorStoreDb);
+        }
+        return vectorStoreDb;
       }
     }.execute();
   }

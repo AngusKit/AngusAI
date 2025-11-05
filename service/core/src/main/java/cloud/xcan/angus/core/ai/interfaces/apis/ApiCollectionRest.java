@@ -90,11 +90,10 @@ public class ApiCollectionRest {
   })
   @DeleteMapping("/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public ApiLocaleResult<?> delete(
+  public void delete(
       @Parameter(description = "接口集ID", required = true) @PathVariable Long id,
       @Parameter(description = "强制删除（即使被引用）") @RequestParam(required = false) Boolean force) {
     apiCollectionFacade.delete(id, force);
-    return ApiLocaleResult.success(null);
   }
 
   @Operation(operationId = "apiCollectionGetDetail", summary = "获取接口集详情", description = "根据ID获取接口集的详细信息")
