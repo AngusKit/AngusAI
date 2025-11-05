@@ -1,0 +1,37 @@
+package cloud.xcan.angus.core.ai.application.cmd.apis;
+
+import cloud.xcan.angus.core.ai.domain.apis.ApiCollection;
+import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionImportDto;
+import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.SecurityConfigDto;
+
+/**
+ * 接口集命令服务
+ */
+public interface ApiCollectionCmd {
+
+  /**
+   * 创建接口集
+   */
+  ApiCollection create(ApiCollection apiCollection);
+
+  /**
+   * 更新接口集
+   */
+  ApiCollection update(ApiCollection apiCollection);
+
+  /**
+   * 删除接口集
+   */
+  void delete(Long id, Boolean force);
+
+  /**
+   * 导入接口集
+   */
+  ApiCollection importCollection(ApiCollectionImportDto dto);
+
+  /**
+   * 配置安全认证
+   */
+  ApiCollection updateSecurity(Long id, SecurityConfigDto dto);
+}
+
