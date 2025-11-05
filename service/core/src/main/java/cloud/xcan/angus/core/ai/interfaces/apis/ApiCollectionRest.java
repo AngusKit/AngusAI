@@ -52,24 +52,6 @@ public class ApiCollectionRest {
   @Resource
   private ApiCollectionFacade apiCollectionFacade;
 
-  @Operation(summary = "获取接口集列表", description = "分页查询接口集列表，支持关键词搜索、来源筛选、可见性筛选等")
-  @GetMapping
-  public ApiLocaleResult<PageResult<ApiCollectionListVo>> list(
-      @Valid @ParameterObject ApiCollectionFindDto dto) {
-    return ApiLocaleResult.success(apiCollectionFacade.list(dto));
-  }
-
-  @Operation(summary = "获取接口集详情", description = "根据ID获取接口集的详细信息")
-  @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "查询成功"),
-      @ApiResponse(responseCode = "404", description = "接口集不存在")
-  })
-  @GetMapping("/{id}")
-  public ApiLocaleResult<ApiCollectionVo> getDetail(
-      @Parameter(description = "接口集ID", required = true) @PathVariable Long id) {
-    return ApiLocaleResult.success(apiCollectionFacade.getDetail(id));
-  }
-
   @Operation(summary = "创建接口集", description = "手动创建一个空的API接口集")
   @ApiResponses({
       @ApiResponse(responseCode = "201", description = "创建成功"),
@@ -95,6 +77,20 @@ public class ApiCollectionRest {
     return ApiLocaleResult.success(apiCollectionFacade.update(id, dto));
   }
 
+  @Operation(summary = "更新安全配置", description = "配置接口集的安全认证方式")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "配置成功"),
+      @ApiResponse(responseCode = "404", description = "接口集不存在")
+  })
+  @PutMapping("/{id}/security")
+  public ApiLocaleResult<ApiCollectionVo> updateSecurity(
+      @Parameter(description = "接口集ID", required = true) @PathVariable Long id,
+      @Valid @RequestBody SecurityConfigDto dto) {
+    return ApiLocaleResult.success(apiCollectionFacade.updateSecurity(id, dto));
+  }
+
+  // TODO 更新Server配置
+
   @Operation(summary = "删除接口集", description = "删除指定的接口集，如果被引用需要force=true才能删除")
   @ApiResponses({
       @ApiResponse(responseCode = "204", description = "删除成功"),
@@ -110,6 +106,24 @@ public class ApiCollectionRest {
     return ApiLocaleResult.success(null);
   }
 
+  @Operation(summary = "获取接口集详情", description = "根据ID获取接口集的详细信息")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "查询成功"),
+      @ApiResponse(responseCode = "404", description = "接口集不存在")
+  })
+  @GetMapping("/{id}")
+  public ApiLocaleResult<ApiCollectionVo> getDetail(
+      @Parameter(description = "接口集ID", required = true) @PathVariable Long id) {
+    return ApiLocaleResult.success(apiCollectionFacade.getDetail(id));
+  }
+
+  @Operation(summary = "获取接口集列表", description = "分页查询接口集列表，支持关键词搜索、来源筛选、可见性筛选等")
+  @GetMapping
+  public ApiLocaleResult<PageResult<ApiCollectionListVo>> list(
+      @Valid @ParameterObject ApiCollectionFindDto dto) {
+    return ApiLocaleResult.success(apiCollectionFacade.list(dto));
+  }
+
   @Operation(summary = "导入接口集", description = "从OpenAPI/Swagger/Postman文件导入接口集")
   @ApiResponses({
       @ApiResponse(responseCode = "201", description = "导入成功"),
@@ -122,18 +136,6 @@ public class ApiCollectionRest {
     return ApiLocaleResult.success(apiCollectionFacade.importCollection(dto));
   }
 
-  @Operation(summary = "更新安全配置", description = "配置接口集的安全认证方式")
-  @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "配置成功"),
-      @ApiResponse(responseCode = "404", description = "接口集不存在")
-  })
-  @PutMapping("/{id}/security")
-  public ApiLocaleResult<ApiCollectionVo> updateSecurity(
-      @Parameter(description = "接口集ID", required = true) @PathVariable Long id,
-      @Valid @RequestBody SecurityConfigDto dto) {
-    return ApiLocaleResult.success(apiCollectionFacade.updateSecurity(id, dto));
-  }
-
   @Operation(summary = "导出OpenAPI规范", description = "导出接口集为OpenAPI 3.0规范")
   @GetMapping("/{id}/export")
   public ApiLocaleResult<OpenApiExportVo> exportOpenApi(
@@ -143,64 +145,4 @@ public class ApiCollectionRest {
     return ApiLocaleResult.success(apiCollectionFacade.exportOpenApi(id, format, includeDisabled));
   }
 
-  @Operation(summary = "获取端点列表", description = "获取接口集的端点列表")
-  @GetMapping("/{collectionId}/endpoints")
-  public ApiLocaleResult<PageResult<ApiEndpointVo>> listEndpoints(
-      @Parameter(description = "接口集ID", required = true) @PathVariable Long collectionId,
-      @Valid @ParameterObject ApiEndpointFindDto dto) {
-    return ApiLocaleResult.success(apiCollectionFacade.listEndpoints(collectionId, dto));
-  }
-
-  @Operation(summary = "添加端点", description = "手动添加接口端点")
-  @ApiResponses({
-      @ApiResponse(responseCode = "201", description = "创建成功"),
-      @ApiResponse(responseCode = "409", description = "端点已存在")
-  })
-  @PostMapping("/{collectionId}/endpoints")
-  @ResponseStatus(HttpStatus.CREATED)
-  public ApiLocaleResult<ApiEndpointVo> createEndpoint(
-      @Parameter(description = "接口集ID", required = true) @PathVariable Long collectionId,
-      @Valid @RequestBody ApiEndpointCreateDto dto) {
-    return ApiLocaleResult.success(apiCollectionFacade.createEndpoint(collectionId, dto));
-  }
-
-  @Operation(summary = "更新端点", description = "更新接口端点信息")
-  @PatchMapping("/{collectionId}/endpoints/{endpointId}")
-  public ApiLocaleResult<ApiEndpointVo> updateEndpoint(
-      @Parameter(description = "接口集ID", required = true) @PathVariable Long collectionId,
-      @Parameter(description = "端点ID", required = true) @PathVariable Long endpointId,
-      @Valid @RequestBody ApiEndpointUpdateDto dto) {
-    return ApiLocaleResult.success(apiCollectionFacade.updateEndpoint(collectionId, endpointId, dto));
-  }
-
-  @Operation(summary = "删除端点", description = "删除接口端点")
-  @DeleteMapping("/{collectionId}/endpoints/{endpointId}")
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  public ApiLocaleResult<?> deleteEndpoint(
-      @Parameter(description = "接口集ID", required = true) @PathVariable Long collectionId,
-      @Parameter(description = "端点ID", required = true) @PathVariable Long endpointId) {
-    apiCollectionFacade.deleteEndpoint(collectionId, endpointId);
-    return ApiLocaleResult.success(null);
-  }
-
-  @Operation(summary = "切换端点状态", description = "启用/禁用端点")
-  @PatchMapping("/{collectionId}/endpoints/{endpointId}/toggle")
-  public ApiLocaleResult<ApiEndpointVo> toggleEndpoint(
-      @Parameter(description = "接口集ID", required = true) @PathVariable Long collectionId,
-      @Parameter(description = "端点ID", required = true) @PathVariable Long endpointId,
-      @Parameter(description = "目标状态", required = true) @RequestParam Boolean enabled) {
-    return ApiLocaleResult.success(apiCollectionFacade.toggleEndpoint(collectionId, endpointId, enabled));
-  }
-
-  @Operation(summary = "测试接口端点", description = "测试接口端点是否可用")
-  @PostMapping("/{collectionId}/endpoints/{endpointId}/test")
-  public ApiLocaleResult<ApiEndpointTestVo> testEndpoint(
-      @Parameter(description = "接口集ID", required = true) @PathVariable Long collectionId,
-      @Parameter(description = "端点ID", required = true) @PathVariable Long endpointId,
-      @Valid @RequestBody(required = false) ApiEndpointTestDto dto) {
-    if (dto == null) {
-      dto = new ApiEndpointTestDto();
-    }
-    return ApiLocaleResult.success(apiCollectionFacade.testEndpoint(collectionId, endpointId, dto));
-  }
 }

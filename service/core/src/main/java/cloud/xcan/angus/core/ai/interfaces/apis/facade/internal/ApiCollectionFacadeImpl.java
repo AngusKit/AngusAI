@@ -4,30 +4,21 @@ import static cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder.getMatchS
 import static cloud.xcan.angus.core.utils.CoreUtils.buildVoPageResult;
 
 import cloud.xcan.angus.core.ai.application.cmd.apis.ApiCollectionCmd;
-import cloud.xcan.angus.core.ai.application.cmd.apis.ApiEndpointCmd;
 import cloud.xcan.angus.core.ai.application.query.apis.ApiCollectionQuery;
 import cloud.xcan.angus.core.ai.application.query.apis.ApiEndpointQuery;
 import cloud.xcan.angus.core.ai.domain.apis.ApiCollection;
-import cloud.xcan.angus.core.ai.domain.apis.ApiEndpoint;
 import cloud.xcan.angus.core.ai.domain.apis.ApiCollectionRepo;
-import cloud.xcan.angus.core.ai.domain.apis.ApiEndpointRepo;
+import cloud.xcan.angus.core.ai.domain.apis.ApiEndpoint;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.ApiCollectionFacade;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionFindDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionImportDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionUpdateDto;
-import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiEndpointCreateDto;
-import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiEndpointFindDto;
-import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiEndpointTestDto;
-import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiEndpointUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.SecurityConfigDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.internal.assembler.ApiCollectionAssembler;
-import cloud.xcan.angus.core.ai.interfaces.apis.facade.internal.assembler.ApiEndpointAssembler;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionImportVo;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionListVo;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionVo;
-import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiEndpointTestVo;
-import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiEndpointVo;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.OpenApiExportVo;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.PageResult;
@@ -49,16 +40,10 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
   private ApiCollectionQuery apiCollectionQuery;
 
   @Resource
-  private ApiEndpointCmd apiEndpointCmd;
-
-  @Resource
   private ApiEndpointQuery apiEndpointQuery;
 
   @Resource
   private ApiCollectionRepo apiCollectionRepo;
-
-  @Resource
-  private ApiEndpointRepo apiEndpointRepo;
 
   @Override
   public ApiCollectionVo create(ApiCollectionCreateDto dto) {
@@ -75,45 +60,31 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
   }
 
   @Override
+  public ApiCollectionVo updateSecurity(Long id, SecurityConfigDto dto) {
+    ApiCollection saved = apiCollectionCmd.updateSecurity(id, dto);
+    return ApiCollectionAssembler.toVo(saved);
+  }
+
+  @Override
   public void delete(Long id, Boolean force) {
     apiCollectionCmd.delete(id, force != null ? force : false);
   }
 
   @Override
-  public ApiCollectionImportVo importCollection(ApiCollectionImportDto dto) {
-    ApiCollection collection = apiCollectionCmd.importCollection(dto);
-    
-    // TODO: 实际解析文件并导入端点
-    ApiCollectionImportVo vo = new ApiCollectionImportVo();
-    vo.setCollectionId(collection.getId());
-    vo.setName(collection.getName());
-    vo.setSource(collection.getSource());
-    
-    ApiCollectionImportVo.ImportStats stats = new ApiCollectionImportVo.ImportStats();
-    stats.setTotalEndpoints(0L);
-    stats.setImportedEndpoints(0L);
-    stats.setSkippedEndpoints(0L);
-    stats.setErrors(0L);
-    vo.setImportStats(stats);
-    
-    return vo;
-  }
-
-  @Override
   public ApiCollectionVo getDetail(Long id) {
     ApiCollection collection = apiCollectionQuery.findAndCheck(id);
-    
+
     // 设置统计信息
     Long endpointsCount = apiCollectionRepo.countEndpointsByCollectionId(id);
     Long enabledCount = apiCollectionRepo.countEnabledEndpointsByCollectionId(id);
     collection.setEndpointsCount(endpointsCount);
     collection.setEnabledCount(enabledCount);
-    
+
     // 获取端点列表
     List<ApiEndpoint> endpoints = apiEndpointQuery.findByCollectionId(id);
     ApiCollectionVo vo = ApiCollectionAssembler.toVo(collection);
     vo.setEndpoints(ApiCollectionAssembler.toEndpointVoList(endpoints));
-    
+
     return vo;
   }
 
@@ -122,7 +93,7 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     GenericSpecification<ApiCollection> spec = ApiCollectionAssembler.getSpecification(dto);
     Page<ApiCollection> page = apiCollectionQuery.find(spec, dto.tranPage(),
         dto.fullTextSearch, getMatchSearchFields(dto.getClass()));
-    
+
     // 设置统计信息
     page.getContent().forEach(collection -> {
       Long endpointsCount = apiCollectionRepo.countEndpointsByCollectionId(collection.getId());
@@ -130,14 +101,27 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
       collection.setEndpointsCount(endpointsCount);
       collection.setEnabledCount(enabledCount);
     });
-    
+
     return buildVoPageResult(page, ApiCollectionAssembler::toListVo);
   }
 
   @Override
-  public ApiCollectionVo updateSecurity(Long id, SecurityConfigDto dto) {
-    ApiCollection saved = apiCollectionCmd.updateSecurity(id, dto);
-    return ApiCollectionAssembler.toVo(saved);
+  public ApiCollectionImportVo importCollection(ApiCollectionImportDto dto) {
+    ApiCollection collection = apiCollectionCmd.importCollection(dto);
+
+    // TODO: 实际解析文件并导入端点
+    ApiCollectionImportVo vo = new ApiCollectionImportVo();
+    vo.setCollectionId(collection.getId());
+    vo.setName(collection.getName());
+    vo.setSource(collection.getSource());
+
+    ApiCollectionImportVo.ImportStats stats = new ApiCollectionImportVo.ImportStats();
+    stats.setTotalEndpoints(0L);
+    stats.setImportedEndpoints(0L);
+    stats.setSkippedEndpoints(0L);
+    stats.setErrors(0L);
+    vo.setImportStats(stats);
+    return vo;
   }
 
   @Override
@@ -149,50 +133,5 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     return vo;
   }
 
-  @Override
-  public PageResult<ApiEndpointVo> listEndpoints(Long collectionId, ApiEndpointFindDto dto) {
-    GenericSpecification<ApiEndpoint> spec = ApiCollectionAssembler.getEndpointSpecification(dto);
-    // 添加collectionId过滤
-    spec.getCriteria().add(cloud.xcan.angus.remote.search.SearchCriteria.equal("collectionId", collectionId));
-    
-    Page<ApiEndpoint> page = apiEndpointQuery.find(spec, dto.tranPage(),
-        dto.fullTextSearch, getMatchSearchFields(dto.getClass()));
-    return buildVoPageResult(page, ApiEndpointAssembler::toVo);
-  }
-
-  @Override
-  public ApiEndpointVo createEndpoint(Long collectionId, ApiEndpointCreateDto dto) {
-    ApiEndpoint endpoint = ApiEndpointAssembler.toCreateDomain(collectionId, dto);
-    ApiEndpoint saved = apiEndpointCmd.create(endpoint);
-    return ApiEndpointAssembler.toVo(saved);
-  }
-
-  @Override
-  public ApiEndpointVo updateEndpoint(Long collectionId, Long endpointId, ApiEndpointUpdateDto dto) {
-    ApiEndpoint endpoint = ApiEndpointAssembler.toUpdateDomain(endpointId, dto);
-    ApiEndpoint saved = apiEndpointCmd.update(endpoint);
-    return ApiEndpointAssembler.toVo(saved);
-  }
-
-  @Override
-  public void deleteEndpoint(Long collectionId, Long endpointId) {
-    apiEndpointCmd.delete(endpointId);
-  }
-
-  @Override
-  public ApiEndpointVo toggleEndpoint(Long collectionId, Long endpointId, Boolean enabled) {
-    ApiEndpoint saved = apiEndpointCmd.toggleEnabled(endpointId, enabled);
-    return ApiEndpointAssembler.toVo(saved);
-  }
-
-  @Override
-  public ApiEndpointTestVo testEndpoint(Long collectionId, Long endpointId, ApiEndpointTestDto dto) {
-    // TODO: 实际测试接口端点
-    ApiEndpointTestVo vo = new ApiEndpointTestVo();
-    vo.setSuccess(true);
-    vo.setStatusCode(200);
-    vo.setResponseTime(100L);
-    return vo;
-  }
 }
 
