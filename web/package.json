@@ -20,7 +20,10 @@
     "build:prod": "NODE_OPTIONS=--max-old-space-size=8192 node ./scripts/build.js -- --env=prod --edition_type=CLOUD_SERVICE",
     "build:priv:community": "NODE_OPTIONS=--max-old-space-size=8192 node ./scripts/build.js -- --env=priv --edition_type=COMMUNITY",
     "build:priv:enterprise": "NODE_OPTIONS=--max-old-space-size=8192 node ./scripts/build.js -- --env=priv --edition_type=ENTERPRISE",
-    "build:priv:datacenter": "NODE_OPTIONS=--max-old-space-size=8192 node ./scripts/build.js -- --env=priv --edition_type=DATACENTER"
+    "build:priv:datacenter": "NODE_OPTIONS=--max-old-space-size=8192 node ./scripts/build.js -- --env=priv --edition_type=DATACENTER",
+    "vite:build:dev": "vite build --mode dev",
+    "vite:build:prod": "vite build --mode prod",
+    "vite:build:priv": "vite build --mode priv"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.3",

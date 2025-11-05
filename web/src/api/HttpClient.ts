@@ -20,6 +20,7 @@ import type {
   ResponseType,
 } from "axios";
 import axios from "axios";
+import { DomainManager, preloadVisitorId, ApiType, isInIframe, getParamsFromIframeUrl, LockUtils } from '@xcan-angus/infra';
 
 export type QueryParamsType = Record<string | number, any>;
 
@@ -61,6 +62,7 @@ export enum ContentType {
   Text = "text/plain",
 }
 
+const lockUtils = new LockUtils();
 export class HttpClient<SecurityDataType = unknown> {
   public instance: AxiosInstance;
   private securityData: SecurityDataType | null = null;
@@ -78,12 +80,41 @@ export class HttpClient<SecurityDataType = unknown> {
       ...axiosConfig,
       baseURL: axiosConfig.baseURL || "{env}.xcan.cloud/ai",
     });
+    this.initInstanceUse();
     this.secure = secure;
     this.format = format;
     this.securityWorker = securityWorker;
   }
 
-  public setSecurityData = (data: SecurityDataType | null) => {
+  initInstanceUse = () => {
+    let domainManager: DomainManager = DomainManager.getInstance(appContext.getProfile());
+    this.instance?.interceptors.request.use(
+      async (config) => await requestInterceptor(config, domainManager),
+      (err) => { throw err; }
+    );
+  }
+  requestInterceptor = async (config: InternalAxiosRequestConfig, domainManager: DomainManager) => {
+
+    // Set language and device headers
+    config.headers['Accept-Language'] = cookie.getCurrentLanguage();
+    config.headers['Vary'] = 'Accept-Language';
+    config.headers['XC-Auth-Device-Id'] = await preloadVisitorId();
+
+    // Token logic for API endpoints
+    if (config.url.includes(ApiType.API)) {
+      if (appContext.isTokenExpiringOrExpired()) {
+          await lockUtils.executeWithLock('refreshToken',  () => refreshToken());
+      }
+
+      let accessToken = isInIframe()
+          ? getParamsFromIframeUrl(IFRAME_ACCESS_TOKEN_NAME) || ''
+          : cookie.get('access_token');
+      config.headers.Authorization = `Bearer ${accessToken}`;
+  }
+    return config;
+  }
+
+  setSecurityData = (data: SecurityDataType | null) => {
     this.securityData = data;
   };
 
