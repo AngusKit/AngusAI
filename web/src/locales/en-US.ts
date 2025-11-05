@@ -53,6 +53,8 @@ export const enUS: TranslationKeys = {
     billing: 'Billing & Subscription',
     teamSettings: 'Team Settings',
     plugins: 'Plugin Market',
+    activityLog: 'Activity Log'
+    
   },
 
   // Welcome Banner

@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { Send, Paperclip, Mic, StopCircle, MoreVertical, Sparkles, BookmarkPlus, Settings, Maximize2, ArrowLeft, Download, Share2, Palette, Check } from 'lucide-react';
-import { Button } from '../ui/button';
-import { Textarea } from '../ui/textarea';
-import { useLanguage } from '../ui/LanguageProvider';
+import { Button } from '@/ui/button';
+import { Textarea } from '@/ui/textarea';
+import { useLanguage } from '@/ui/LanguageProvider';
 import { toast } from 'sonner';
 import { ChatSidebar } from './ChatSidebar';
 import { ChatMessage } from './ChatMessage';
@@ -16,19 +16,19 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '../ui/dialog';
-import { Label } from '../ui/label';
-import { Input } from '../ui/input';
-import { Slider } from '../ui/slider';
-import { Switch } from '../ui/switch';
+} from '@/ui/dialog';
+import { Label } from '@/ui/label';
+import { Input } from '@/ui/input';
+import { Slider } from '@/ui/slider';
+import { Switch } from '@/ui/switch';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '../ui/dropdown-menu';
-import { cn } from '../ui/utils';
+} from '@/ui/dropdown-menu';
+import { cn } from '@/ui/utils';
 
 type TemplateType = 'modern-blue' | 'minimal-gray' | 'elegant-purple' | 'warm-orange';
 

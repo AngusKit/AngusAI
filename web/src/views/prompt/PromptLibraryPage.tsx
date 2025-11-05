@@ -1,17 +1,17 @@
 import { Search, Star, Copy, Plus, Trash2, Edit, Sparkles, BookOpen, Code, MessageSquare, TrendingUp, FolderPlus, Check, Shield } from 'lucide-react';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Textarea } from '../ui/textarea';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../ui/dialog';
-import { ScrollArea } from '../ui/scroll-area';
-import { Badge } from '../ui/badge';
-import { Label } from '../ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../ui/alert-dialog';
+import { Button } from '@/ui/button';
+import { Input } from '@/ui/input';
+import { Textarea } from '@/ui/textarea';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/ui/dialog';
+import { ScrollArea } from '@/ui/scroll-area';
+import { Badge } from '@/ui/badge';
+import { Label } from '@/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/ui/select';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/ui/alert-dialog';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { cn } from '../ui/utils';
-import { useLanguage } from '../ui/LanguageProvider';
+import { cn } from '@/ui/utils';
+import { useLanguage } from '@/ui/LanguageProvider';
 import { copyToClipboard } from '../../lib/clipboard';
 
 interface Prompt {

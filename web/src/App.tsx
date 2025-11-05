@@ -23,12 +23,13 @@ import {
   APIKeys,
   BillingSubscription,
   PromptLibraryPage,
-  Chat
+  Chat,
+  ActivityLog
 } from './views';
 
-import { ThemeProvider } from '@/views/ui/ThemeProvider';
-import { LanguageProvider } from '@/views/ui/LanguageProvider';
-import { Toaster } from '@/views/ui/sonner';
+import { ThemeProvider } from '@/ui/ThemeProvider';
+import { LanguageProvider } from '@/ui/LanguageProvider';
+import { Toaster } from '@/ui/sonner';
 import { useState } from 'react';
 
 export default function App() {
@@ -89,6 +90,7 @@ export default function App() {
               {activePage === 'vector-store' && <VectorStore />}
               {activePage === 'prompts' && <PromptLibraryPage />}
               {activePage === 'team-members' && <TeamMembers />}
+              {activePage === 'activity-log' && <ActivityLog />}
               {activePage === 'resource-sharing' && <ResourceSharing />}
               {activePage === 'team-settings' && <TeamSettings />}
               {activePage === 'individual-app-settings' && <AppSettingsPage onBack={() => setActivePage('apps')} />}

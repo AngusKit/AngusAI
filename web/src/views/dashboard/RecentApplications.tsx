@@ -1,10 +1,10 @@
 import { MessageSquare, FileText, Database, ExternalLink, Edit, Clock, BarChart, Settings } from 'lucide-react';
-import { Card } from '../ui/card';
-import { Button } from '../ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../ui/dialog';
-import { Skeleton } from '../ui/skeleton';
+import { Card } from '@/ui/card';
+import { Button } from '@/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/ui/dialog';
+import { Skeleton } from '@/ui/skeleton';
 import { useState } from 'react';
-import { useLanguage } from '../ui/LanguageProvider';
+import { useLanguage } from '@/ui/LanguageProvider';
 import { toast } from 'sonner';
 
 interface Tag {

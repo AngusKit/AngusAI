@@ -1,4 +1,5 @@
 import { PageQuery, ApiLocaleResult } from '@xcan-angus/infra';
+import httpClient from './HttpClient.ts';
 import {
     ActivityListOrderByEnum,
     ActivityDetailResult
@@ -65,3 +66,5 @@ export class Activity<SecurityDataType = unknown> {
             ...params,
         });
 }
+
+export default new Activity(httpClient);

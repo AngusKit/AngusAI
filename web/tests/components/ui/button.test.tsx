@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { Button } from '@/views/ui/button';
+import { Button } from '@/ui/button';
 
 describe('Button', () => {
   it('renders with default props', () => {

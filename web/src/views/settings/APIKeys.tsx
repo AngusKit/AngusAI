@@ -22,15 +22,15 @@ import {
   Package,
   Bot
 } from 'lucide-react';
-import { useLanguage } from '../ui/LanguageProvider';
-import { Button } from '../ui/button';
-import { Card } from '../ui/card';
-import { Badge } from '../ui/badge';
-import { Input } from '../ui/input';
-import { Label } from '../ui/label';
-import { Textarea } from '../ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Checkbox } from '../ui/checkbox';
+import { useLanguage } from '@/ui/LanguageProvider';
+import { Button } from '@/ui/button';
+import { Card } from '@/ui/card';
+import { Badge } from '@/ui/badge';
+import { Input } from '@/ui/input';
+import { Label } from '@/ui/label';
+import { Textarea } from '@/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/ui/select';
+import { Checkbox } from '@/ui/checkbox';
 import {
   Dialog,
   DialogContent,
@@ -38,14 +38,14 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '../ui/dialog';
+} from '@/ui/dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '../ui/dropdown-menu';
+} from '@/ui/dropdown-menu';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -55,7 +55,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '../ui/alert-dialog';
+} from '@/ui/alert-dialog';
 import { toast } from 'sonner';
 import { copyToClipboard } from '../../lib/clipboard';
 

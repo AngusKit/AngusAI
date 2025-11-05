@@ -12,10 +12,10 @@ import ReactFlow, {
   MiniMap,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { Button } from '../ui/button';
+import { Button } from '@/ui/button';
 import { Save, Maximize2, Minimize2, X, Play, Pause } from 'lucide-react';
-import { Card } from '../ui/card';
-import { Badge } from '../ui/badge';
+import { Card } from '@/ui/card';
+import { Badge } from '@/ui/badge';
 import { toast } from 'sonner';
 
 interface WorkflowEditorProps {
@@ -31,7 +31,7 @@ const initialNodes: Node[] = [
     id: '1',
     type: 'input',
     data: { label: '开始' },
-    position: { x: 250, y: 50 },
+    position: { x: 0, y: 0 },
     style: {
       background: '#3b82f6',
       color: 'white',
@@ -43,7 +43,7 @@ const initialNodes: Node[] = [
   {
     id: '2',
     data: { label: 'AI处理节点' },
-    position: { x: 250, y: 150 },
+    position: { x: 0, y: 0 },
     style: {
       background: '#8b5cf6',
       color: 'white',
@@ -55,7 +55,7 @@ const initialNodes: Node[] = [
   {
     id: '3',
     data: { label: '条件判断' },
-    position: { x: 100, y: 250 },
+    position: { x: 0, y: 0 },
     style: {
       background: '#f59e0b',
       color: 'white',
@@ -67,7 +67,7 @@ const initialNodes: Node[] = [
   {
     id: '4',
     data: { label: '数据存储' },
-    position: { x: 400, y: 250 },
+    position: { x: 0, y: 0 },
     style: {
       background: '#10b981',
       color: 'white',
@@ -80,7 +80,7 @@ const initialNodes: Node[] = [
     id: '5',
     type: 'output',
     data: { label: '结束' },
-    position: { x: 250, y: 350 },
+    position: { x: 0, y: 0 },
     style: {
       background: '#ef4444',
       color: 'white',
@@ -93,11 +93,11 @@ const initialNodes: Node[] = [
 
 // 初始连线数据
 const initialEdges: Edge[] = [
-  { id: 'e1-2', source: '1', target: '2', animated: true, style: { stroke: '#3b82f6' } },
-  { id: 'e2-3', source: '2', target: '3', animated: true, style: { stroke: '#8b5cf6' } },
-  { id: 'e2-4', source: '2', target: '4', animated: true, style: { stroke: '#8b5cf6' } },
-  { id: 'e3-5', source: '3', target: '5', style: { stroke: '#f59e0b' } },
-  { id: 'e4-5', source: '4', target: '5', style: { stroke: '#10b981' } },
+  { id: 'e1-2', source: '1', target: '2', type: 'smoothstep', animated: true, style: { stroke: '#3b82f6' } },
+  { id: 'e2-3', source: '2', target: '3', type: 'smoothstep', animated: true, style: { stroke: '#8b5cf6' } },
+  { id: 'e2-4', source: '2', target: '4', type: 'smoothstep', animated: true, style: { stroke: '#8b5cf6' } },
+  { id: 'e3-5', source: '3', target: '5', type: 'smoothstep', style: { stroke: '#f59e0b' } },
+  { id: 'e4-5', source: '4', target: '5', type: 'smoothstep', style: { stroke: '#10b981' } },
 ];
 
 export function WorkflowEditor({ workflowId, workflowName, workflowStatus, onClose }: WorkflowEditorProps) {

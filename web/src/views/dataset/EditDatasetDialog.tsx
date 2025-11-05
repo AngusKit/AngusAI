@@ -1,16 +1,16 @@
 import { Check } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Textarea } from '../ui/textarea';
-import { Label } from '../ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Checkbox } from '../ui/checkbox';
-import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
-import { Slider } from '../ui/slider';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/ui/dialog';
+import { Button } from '@/ui/button';
+import { Input } from '@/ui/input';
+import { Textarea } from '@/ui/textarea';
+import { Label } from '@/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/ui/select';
+import { Checkbox } from '@/ui/checkbox';
+import { RadioGroup, RadioGroupItem } from '@/ui/radio-group';
+import { Slider } from '@/ui/slider';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { Badge } from '../ui/badge';
+import { Badge } from '@/ui/badge';
 
 interface EditDatasetDialogProps {
   open: boolean;

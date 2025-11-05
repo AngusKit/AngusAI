@@ -1,9 +1,9 @@
 import { FileText, Zap, Coins, Users, TrendingUp, TrendingDown } from 'lucide-react';
-import { Card } from '../ui/card';
-import { Skeleton } from '../ui/skeleton';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../ui/dialog';
+import { Card } from '@/ui/card';
+import { Skeleton } from '@/ui/skeleton';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/ui/dialog';
 import { useState } from 'react';
-import { useLanguage } from '../ui/LanguageProvider';
+import { useLanguage } from '@/ui/LanguageProvider';
 
 interface StatData {
   icon: any;

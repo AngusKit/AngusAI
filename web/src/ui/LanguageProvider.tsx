@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode, useMemo, useCallback } from 'react';
-import { Language, languages, defaultLanguage, getNestedTranslation } from '../../lib/i18n';
+import { Language, languages, defaultLanguage, getNestedTranslation } from '../lib/i18n';
 
 interface LanguageContextType {
   language: Language;

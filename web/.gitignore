@@ -12,7 +12,6 @@ login-dev.ts
 .eslintcache
 cli/
 # package-lock.json
-public/meta/version.json
 public/meta/env
 public/meta/env.*
 public/*.conf

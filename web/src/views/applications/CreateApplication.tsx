@@ -1,16 +1,16 @@
 import { MessageSquare, Sparkles, HelpCircle, Bot, ChevronLeft, ChevronRight, Check, Code, Code2, Search, Zap, Database, FileText, Users, Send, Palette, Image, Smile, Star, Heart, Briefcase, Coffee, Globe, Bookmark, Cloud, Cpu, Music, Video, Camera, Mail, Phone, Map, Calendar, Bell, Settings, Folder, Archive, Download, Upload, Share2, Lock, Unlock, Eye, EyeOff, Edit, Trash2, Copy, Link, Hash, Percent, TrendingUp, BarChart, PieChart, Activity, Target, Flag, Award, Gift, Rocket, Layers, Command, BookOpen } from 'lucide-react';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Textarea } from '../ui/textarea';
-import { Label } from '../ui/label';
-import { Slider } from '../ui/slider';
-import { Switch } from '../ui/switch';
-import { ScrollArea } from '../ui/scroll-area';
-import { Badge } from '../ui/badge';
-import { Card } from '../ui/card';
-import { Separator } from '../ui/separator';
+import { Button } from '@/ui/button';
+import { Input } from '@/ui/input';
+import { Textarea } from '@/ui/textarea';
+import { Label } from '@/ui/label';
+import { Slider } from '@/ui/slider';
+import { Switch } from '@/ui/switch';
+import { ScrollArea } from '@/ui/scroll-area';
+import { Badge } from '@/ui/badge';
+import { Card } from '@/ui/card';
+import { Separator } from '@/ui/separator';
 import { useState } from 'react';
-import { useLanguage } from '../ui/LanguageProvider';
+import { useLanguage } from '@/ui/LanguageProvider';
 import { toast } from 'sonner';
 
 type AppType = 'chatbot' | 'text-generation' | 'knowledge' | 'agent';
