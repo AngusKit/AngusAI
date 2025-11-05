@@ -46,11 +46,21 @@ public class Activity extends TenantEntity<Activity, Long> {
   private Long userId;
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "type")
-  private ActivityType type;
+  @Column(name = "action_type")
+  private ActionType actionType;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "status")
+  private ActivityStatus status;
 
   @Column(name = "activity_date")
   private LocalDateTime activityDate;
+
+  @Column(name = "ip_address")
+  private String ipAddress;
+
+  @Column(name = "user_agent")
+  private String userAgent;
 
   private String description;
 

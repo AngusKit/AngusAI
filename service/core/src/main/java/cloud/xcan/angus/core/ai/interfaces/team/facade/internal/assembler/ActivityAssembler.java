@@ -16,10 +16,14 @@ public class ActivityAssembler {
         .setUserId(activity.getUserId())
         .setUserName(activity.getUserName())
         .setUserAvatar(activity.getUserAvatar())
-        .setTargetId(activity.getResourceId())
-        .setTargetType(activity.getResourceType())
-        .setTargetName(activity.getResourceName())
+        .setActionType(activity.getActionType())
+        .setStatus(activity.getStatus())
+        .setResourceId(activity.getResourceId())
+        .setResourceType(activity.getResourceType())
+        .setResourceName(activity.getResourceName())
         .setActivityDate(activity.getActivityDate())
+        .setIpAddress(activity.getIpAddress())
+        .setUserAgent(activity.getUserAgent())
         .setDescription(activity.getDescription())
         .setDetail(activity.getDetail());
   }
@@ -28,9 +32,9 @@ public class ActivityAssembler {
     // Build the final filters
     Set<SearchCriteria> filters = new SearchCriteriaBuilder<>(dto)
         .rangeSearchFields("id", "activityDate")
-        .orderByFields("id", "activityDate")
         .matchSearchFields("resourceName", "detail")
-        .inAndNotFields("resourceId", "resourceType")
+        .inAndNotFields("resourceId", "resourceType", "actionType", "status")
+        .orderByFields("id", "activityDate", "resourceType", "actionType", "status")
         .build();
     return new GenericSpecification<>(filters);
   }

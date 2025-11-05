@@ -10,7 +10,7 @@ import cloud.xcan.angus.api.commonlink.FullResourceType;
 import cloud.xcan.angus.core.ai.domain.team.activity.Activity;
 import cloud.xcan.angus.core.ai.domain.team.activity.ActivityResource;
 import cloud.xcan.angus.core.ai.domain.team.activity.ActivitySummary;
-import cloud.xcan.angus.core.ai.domain.team.activity.ActivityType;
+import cloud.xcan.angus.core.ai.domain.team.activity.ActionType;
 import cloud.xcan.angus.spec.locale.EnumValueMessage;
 import cloud.xcan.angus.spec.principal.Principal;
 import cloud.xcan.angus.spec.principal.PrincipalContext;
@@ -22,12 +22,12 @@ import java.util.List;
 public class ActivityConverter {
 
   public static <T extends ActivityResource> Activity toActivity(FullResourceType targetType,
-      T resource, ActivityType activityType, Object... params) {
+      T resource, ActionType activityType, Object... params) {
     return createActivity(targetType, resource, activityType, PrincipalContext.get(), params);
   }
 
   public static List<Activity> toActivities(FullResourceType targetType,
-      List<? extends ActivityResource> resources, ActivityType activityType,
+      List<? extends ActivityResource> resources, ActionType activityType,
       List<Object[]> params) {
     Principal principal = PrincipalContext.get();
     Long tenantId = nonNull(principal.getTenantId()) ? principal.getTenantId() : -1L;
@@ -42,7 +42,7 @@ public class ActivityConverter {
   }
 
   public static List<Activity> toActivities(FullResourceType targetType,
-      List<? extends ActivityResource> resources, ActivityType activityType, Object... params) {
+      List<? extends ActivityResource> resources, ActionType activityType, Object... params) {
     Principal principal = PrincipalContext.get();
     Long tenantId = nonNull(principal.getTenantId()) ? principal.getTenantId() : -1L;
     List<Activity> activities = new ArrayList<>(resources.size());
@@ -60,7 +60,7 @@ public class ActivityConverter {
    * @param params The last parameter is the resource name
    */
   private static Activity createActivity(FullResourceType targetType, ActivityResource resource,
-      ActivityType activityType, Principal principal, Object[] params) {
+      ActionType activityType, Principal principal, Object[] params) {
     Activity activity = new Activity().setType(activityType)
         .setResourceType(targetType)
         .setUserId(principal.getUserId())
@@ -78,7 +78,7 @@ public class ActivityConverter {
   /**
    * The resource name does not need to be displayed in the description activity.
    */
-  private static String getDescription(FullResourceType targetType, ActivityType activityType,
+  private static String getDescription(FullResourceType targetType, ActionType activityType,
       Object[] params) {
     if (isEmpty(params)) {
       return message(activityType.getDescMessageKey(),
@@ -104,7 +104,7 @@ public class ActivityConverter {
    * Set the resource name to the second parameter position.
    */
   private static String getDetail(FullResourceType targetType, ActivityResource resource,
-      ActivityType activityType, Object[] params) {
+      ActionType activityType, Object[] params) {
     if (isEmpty(params)) {
       return message(activityType.getDetailMessageKey(),
           new Object[]{targetType.getMessage(), "[" + resource.getName() + "]"

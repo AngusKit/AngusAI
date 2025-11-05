@@ -4,8 +4,13 @@ import static cloud.xcan.angus.spec.SpecConstant.DateFormat.DATE_FMT;
 import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_NAME_LENGTH_X2;
 
 import cloud.xcan.angus.api.commonlink.FullResourceType;
+import cloud.xcan.angus.core.ai.domain.team.activity.ActionType;
+import cloud.xcan.angus.core.ai.domain.team.activity.ActivityStatus;
 import cloud.xcan.angus.remote.PageQuery;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -28,19 +33,21 @@ public class ActivityFindDto extends PageQuery {
   @Schema(description = "User identifier who performed the operation")
   private Long userId;
 
-  @Length(max = MAX_NAME_LENGTH_X2)
-  @Schema(description = "Activity detail content for full-text search")
-  private String detail;
+  @Schema(description = "Activity action type")
+  private ActionType actionType;
 
-  @Schema(description = "所属租户ID", example = "1")
+  @Schema(description = "Activity status")
+  private ActivityStatus status;
+
+  @Schema(description = "Associated Tenant ID", example = "1")
   private Long tenantId;
 
   @DateTimeFormat(pattern = DATE_FMT)
   @Schema(description = "Activity date")
   private LocalDateTime activityDate;
 
-  @Schema(description = "排序字段", example = "activityDate", allowableValues = {"id",
-      "activityDate"})
+  @Schema(description = "Sort field", example = "activityDate",
+      allowableValues = {"id", "activityDate", "resourceType", "actionType", "status"})
   private String orderBy = "activityDate";
 
   @Override
