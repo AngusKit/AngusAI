@@ -10,6 +10,8 @@
  * ---------------------------------------------------------------
  */
 
+// import { AppOrServiceRoute } from '@xcan-angus/infra';
+
 import type {
   AxiosInstance,
   AxiosRequestConfig,
@@ -184,3 +186,5 @@ export class HttpClient<SecurityDataType = unknown> {
     });
   };
 }
+
+export default new HttpClient();

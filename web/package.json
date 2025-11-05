@@ -3,12 +3,24 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "vite",
     "build": "vite build",
     "openapi-ts": "openapi-ts",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "dev": "vite --mode dev",
+    "dev:env": "husky install && NODE_OPTIONS=--max-old-space-size=8192 node scripts/build.js",
+    "dev:dev": "husky install && NODE_OPTIONS=--max-old-space-size=8192 node ./scripts/build.js -- --env=dev --edition_type=CLOUD_SERVICE",
+    "dev:prod": "husky install && NODE_OPTIONS=--max-old-space-size=8192 node ./scripts/build.js -- --env=prod --edition_type=CLOUD_SERVICE",
+    "dev:priv:community": "husky install && NODE_OPTIONS=--max-old-space-size=8192 node scripts/build.js -- --env=priv --edition_type=COMMUNITY",
+    "dev:priv:enterprise": "husky install && NODE_OPTIONS=--max-old-space-size=8192 node scripts/build.js -- --env=priv --edition_type=ENTERPRISE",
+    "dev:priv:datacenter": "husky install && NODE_OPTIONS=--max-old-space-size=8192 node scripts/build.js -- --env=priv --edition_type=DATACENTER",
+    "build:env": "NODE_OPTIONS=--max-old-space-size=8192 node ./scripts/build.js",
+    "build:dev": "NODE_OPTIONS=--max-old-space-size=8192 node ./scripts/build.js -- --env=dev --edition_type=CLOUD_SERVICE",
+    "build:prod": "NODE_OPTIONS=--max-old-space-size=8192 node ./scripts/build.js -- --env=prod --edition_type=CLOUD_SERVICE",
+    "build:priv:community": "NODE_OPTIONS=--max-old-space-size=8192 node ./scripts/build.js -- --env=priv --edition_type=COMMUNITY",
+    "build:priv:enterprise": "NODE_OPTIONS=--max-old-space-size=8192 node ./scripts/build.js -- --env=priv --edition_type=ENTERPRISE",
+    "build:priv:datacenter": "NODE_OPTIONS=--max-old-space-size=8192 node ./scripts/build.js -- --env=priv --edition_type=DATACENTER"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.3",

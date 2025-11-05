@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useLanguage } from '../ui/LanguageProvider';
+import { useLanguage } from '@/ui/LanguageProvider';
 import {
   CreditCard,
   Download,
@@ -27,12 +27,12 @@ import {
   QrCode,
   XCircle
 } from 'lucide-react';
-import { Button } from '../ui/button';
-import { Card } from '../ui/card';
-import { Badge } from '../ui/badge';
-import { Progress } from '../ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import { Separator } from '../ui/separator';
+import { Button } from '@/ui/button';
+import { Card } from '@/ui/card';
+import { Badge } from '@/ui/badge';
+import { Progress } from '@/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/ui/tabs';
+import { Separator } from '@/ui/separator';
 import {
   Dialog,
   DialogContent,
@@ -40,11 +40,11 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '../ui/dialog';
-import { Input } from '../ui/input';
-import { Label } from '../ui/label';
-import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
-import { ScrollArea } from '../ui/scroll-area';
+} from '@/ui/dialog';
+import { Input } from '@/ui/input';
+import { Label } from '@/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/ui/radio-group';
+import { ScrollArea } from '@/ui/scroll-area';
 import { toast } from 'sonner';
 
 type BillingCycle = 'monthly' | 'quarterly' | 'yearly';

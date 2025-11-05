@@ -1,8 +1,8 @@
-import { Card } from '../ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import { Progress } from '../ui/progress';
+import { Card } from '@/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/ui/tabs';
+import { Progress } from '@/ui/progress';
 import { TrendingUp, TrendingDown } from 'lucide-react';
-import { useLanguage } from '../ui/LanguageProvider';
+import { useLanguage } from '@/ui/LanguageProvider';
 
 export function UsageDetails() {
   const { t } = useLanguage();

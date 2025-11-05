@@ -1,6 +1,6 @@
 import { X, File, FileText, Image as ImageIcon, Video, Music } from 'lucide-react';
-import { Button } from '../ui/button';
-import { cn } from '../ui/utils';
+import { Button } from '@/ui/button';
+import { cn } from '@/ui/utils';
 
 interface AttachmentPreviewProps {
   file: File;

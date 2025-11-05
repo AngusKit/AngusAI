@@ -1,15 +1,15 @@
 import { MessageSquare, Plus, Trash2, MoreVertical, ChevronLeft, Search, Clock, Star } from 'lucide-react';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { ScrollArea } from '../ui/scroll-area';
+import { Button } from '@/ui/button';
+import { Input } from '@/ui/input';
+import { ScrollArea } from '@/ui/scroll-area';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '../ui/dropdown-menu';
+} from '@/ui/dropdown-menu';
 import { useState } from 'react';
-import { cn } from '../ui/utils';
+import { cn } from '@/ui/utils';
 
 interface Session {
   id: string;

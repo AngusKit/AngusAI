@@ -51,6 +51,7 @@ export const zhCN = {
     billing: '计费订阅',
     teamSettings: '团队设置',
     plugins: '插件市场',
+    activityLog: '活动日志'
   },
 
   // AI 对话

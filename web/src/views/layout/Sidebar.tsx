@@ -1,10 +1,10 @@
-import { Home, FileText, Workflow, BookOpen, Package, Database, Settings, Users, Share2, BarChart3, Key, CreditCard, ChevronDown, Check, MessageSquare, Sparkles, Code2, Server } from 'lucide-react';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
+import { Home, FileText, Workflow, BookOpen, Package, Database, Settings, Users, Share2, BarChart3, Key, CreditCard, ChevronDown, Check, MessageSquare, Sparkles, Code2, Server, Activity } from 'lucide-react';
+import { Button } from '@/ui/button';
+import { Badge } from '@/ui/badge';
 import { AngusAILogo } from './AngusAILogo';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/ui/dropdown-menu';
 import { useState } from 'react';
-import { useLanguage } from '../ui/LanguageProvider';
+import { useLanguage } from '@/ui/LanguageProvider';
 import { toast } from 'sonner';
 
 interface SidebarProps {
@@ -39,6 +39,7 @@ export function Sidebar({ activePage, onPageChange }: SidebarProps) {
 
   const teamMenuItems = [
     { id: 'team-members', icon: Users, label: t('nav.members') },
+    { id: 'activity-log', icon: Activity, label: t('nav.activityLog') },
     { id: 'resource-sharing', icon: Share2, label: t('nav.sharing') },
     { id: 'team-settings', icon: Settings, label: t('nav.teamSettings') },
   ];
