@@ -25,5 +25,11 @@ public interface VectorStoreRepo extends BaseRepository<VectorStore, Long> {
 
   @Query("SELECT COUNT(v) FROM VectorStore v WHERE v.status = :status")
   Long countByStatus(@Param("status") String status);
+
+  /**
+   * 按类型分组统计存储源数量
+   */
+  @Query(value = "SELECT type, COUNT(1) cnt FROM vector_store GROUP BY type", nativeQuery = true)
+  List<Object[]> countGroupByType();
 }
 

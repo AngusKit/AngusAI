@@ -1,5 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.vector.facade;
 
+import cloud.xcan.angus.core.ai.interfaces.team.facade.dto.ActivityStatisticsDto;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.ConnectionTestDto;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.SyncDto;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.VectorStoreCreateDto;
@@ -54,5 +55,5 @@ public interface VectorStoreFacade {
   /**
    * 获取统计信息
    */
-  VectorStoreStatisticsVo getStatistics();
+  VectorStoreStatisticsVo getStatistics(ActivityStatisticsDto dto);
 }

@@ -55,7 +55,6 @@ public class ActivityQueryImpl implements ActivityQuery {
     }.execute();
   }
 
-  // --- Statistics query methods (encapsulated from ActivityRepo) ---
 
   /**
    * Counts activities between the given date range.
