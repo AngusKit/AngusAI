@@ -1,11 +1,11 @@
 
 import httpClient from '../api/HttpClient';
 
-import { updateAuthByPrivateParam, appContext, APP_CODE_MAP, PageQuery, routerUtils, AppOrServiceRoute, cookieUtils, CLIENT_ID_KEY, app } from '@xcan-angus/infra';
+import {appContext, APP_CODE_MAP, PageQuery, routerUtils, AppOrServiceRoute, cookieUtils, CLIENT_ID_KEY, app } from '@xcan-angus/infra';
 
 const initAfterAuthentication = async ({code}: { code: keyof typeof AppOrServiceRoute }): Promise<{ [key: string]: any }> => {
 //   Check for private parameters in URL and update authentication tokens
-  let {url, isPrivateParam} = updateAuthByPrivateParam();
+  let {url, isPrivateParam} = app.updateAuthByPrivateParam();
   if (isPrivateParam) {
       location.href = url.href;
       return {};
@@ -22,13 +22,13 @@ const initAfterAuthentication = async ({code}: { code: keyof typeof AppOrService
   // Fetch current user information from server
   let currentUserUrl = routerUtils.getCurrentUserEndpoint();
   const currentAppCode = APP_CODE_MAP[code];
-  const response = await httpClient.request({path: currentUserUrl, method: 'get', query: {
+  const response = await httpClient.request<any>({path: currentUserUrl, method: 'get', query: {
       infoScope: PageQuery.InfoScope.DETAIL,
       appCode: currentAppCode,
       editionType: appContext.getEditionType()
   }});
-  if (response.status !== 200) {
-      throw new Error(response.data?.message || response.data?.msg);
+  if (response?.data?.message) {
+      throw new Error(response?.data?.message);
   }
 
   const userInfo = response.data;

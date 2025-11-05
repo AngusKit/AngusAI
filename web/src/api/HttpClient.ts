@@ -20,7 +20,7 @@ import type {
   ResponseType,
 } from "axios";
 import axios from "axios";
-import { app, DomainManager, preloadVisitorId, ApiType, isInIframe, getParamsFromIframeUrl, LockUtils, cookieUtils, API_SUCCESS_CODE, isObject, API_SUCCESS_MESSAGE, API_SERVER_ERROR_CODE, SYSTEM_ERROR_MESSAGE, errorCenter } from '@xcan-angus/infra';
+import { app, appContext, DomainManager, ApiType, httpUtils, LockUtils, cookieUtils, API_SUCCESS_CODE, typeUtils, API_SUCCESS_MESSAGE, API_SERVER_ERROR_CODE, SYSTEM_ERROR_MESSAGE, eventQueue, REFRESH_TOKEN_AUTH_KEY } from '@xcan-angus/infra';
 
 export type QueryParamsType = Record<string | number, any>;
 
@@ -87,9 +87,9 @@ export class HttpClient<SecurityDataType = unknown> {
   }
 
   // Refresh token logic, updates cookies and iframe params if needed
-  const refreshToken = async () => {
-    let refreshToken = isInIframe()
-        ? getParamsFromIframeUrl(IFRAME_ACCESS_TOKEN_NAME)
+  refreshToken = async () => {
+    let refreshToken = httpUtils.isInIframe()
+        ? httpUtils.getParamsFromIframeUrl(IFRAME_ACCESS_TOKEN_NAME)
         : cookieUtils.get(REFRESH_TOKEN_AUTH_KEY);
 
     // No refresh token, redirect to signin
@@ -124,7 +124,7 @@ export class HttpClient<SecurityDataType = unknown> {
     };
     cookieUtils.setTokenInfo(tokenInfo);
 
-    if (isInIframe()) {
+    if (httpUtils.isInIframe()) {
         const _url = new URL(location.href);
         _url.searchParams.set(IFRAME_ACCESS_TOKEN_NAME, tokenInfo.access_token as string);
         _url.searchParams.set(IFRAME_REFRESH_TOKEN_NAME, tokenInfo.refresh_token as string);
@@ -151,15 +151,15 @@ export class HttpClient<SecurityDataType = unknown> {
     // Set language and device headers
     config.headers['Accept-Language'] = cookieUtils.getCurrentLanguage();
     config.headers['Vary'] = 'Accept-Language';
-    config.headers['XC-Auth-Device-Id'] = await preloadVisitorId();
+    config.headers['XC-Auth-Device-Id'] = await httpUtils.preloadVisitorId();
 
     // Token logic for API endpoints
     if (config.url.includes(ApiType.API)) {
       if (appContext.isTokenExpiringOrExpired()) {
-          await lockUtils.executeWithLock('refreshToken',  () => refreshToken());
+          await lockUtils.executeWithLock('refreshToken',  () => this.refreshToken());
       }
 
-      let accessToken = isInIframe()
+      let accessToken = httpUtils.isInIframe()
           ? getParamsFromIframeUrl(IFRAME_ACCESS_TOKEN_NAME) || ''
           : cookieUtils.get('access_token');
       config.headers.Authorization = `Bearer ${accessToken}`;
@@ -168,12 +168,12 @@ export class HttpClient<SecurityDataType = unknown> {
   }
 
   // Response interceptor: formats response and attaches filename if present
-  const responseInterceptor = (response: AxiosResponse) => {
-    let filename = getFilenameFromResponse(response);
+  responseInterceptor = (response: AxiosResponse) => {
+    let filename = httpUtils.getFilenameFromResponse(response);
     const headers = {...response.headers, filename};
     const status = response.status;
     // TODO: If code != 'S', should show a prompt
-    if (response?.data && isObject(response.data) && (response.data?.message || response.data?.msg)) {
+    if (response?.data && typeUtils.isObject(response.data) && (response.data?.message || response.data?.msg) && response.data?.code !== API_SUCCESS_CODE) {
         throw {
             message: response.data.message || response.data.msg
         };
@@ -191,7 +191,7 @@ export class HttpClient<SecurityDataType = unknown> {
   }
 
   // Response error interceptor: formats error as ApiResult
-  const responseErrorInterceptor = (err: AxiosError) => {
+  responseErrorInterceptor = (err: AxiosError) => {
     if (!err?.response) {
         throw {
             status: err.status,
@@ -329,10 +329,11 @@ export class HttpClient<SecurityDataType = unknown> {
       return response;
     } catch (err) {
       if (requestParams.method !== 'get') {
-        errorCenter.notify(error?.message || SYSTEM_ERROR_MESSAGE);
+        eventQueue.notify(error?.message || SYSTEM_ERROR_MESSAGE);
       }
       return {
-        error: err
+        ...err,
+        data: null
       };
     }
   };

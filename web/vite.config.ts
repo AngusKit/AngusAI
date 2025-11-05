@@ -16,7 +16,10 @@ export default defineConfig({
     outDir: 'build',
   },
   server: {
-    port: 3000,
-    open: true,
+    host: '0.0.0.0',
+    allowedHosts: ['dev-host.xcan.cloud'],
+    port: 80,
+    strictPort: true,
+    open: false,
   },
 });
