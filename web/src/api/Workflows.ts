@@ -11,7 +11,7 @@ import {
   WorkflowExecuteDto,
   WorkflowUpdateDto,
 } from "./DataContracts.ts";
-import { ContentType, HttpClient, RequestParams } from "./HttpClient.ts";
+import http, { ContentType, HttpClient, RequestParams } from "./HttpClient.ts";
 import {VisibilityEnum, WorkflowStatusEnum, WorkflowTypeEnum} from "@/enums/enums.ts";
 
 export class Workflows<SecurityDataType = unknown> {
@@ -304,3 +304,5 @@ export class Workflows<SecurityDataType = unknown> {
       },
     );
 }
+
+export default new Workflows(http);

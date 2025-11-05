@@ -6,7 +6,7 @@ import {
   PromptCreateDto,
   PromptUpdateDto,
 } from "./DataContracts.ts";
-import { ContentType, HttpClient, RequestParams } from "./HttpClient.ts";
+import http, { ContentType, HttpClient, RequestParams } from "./HttpClient.ts";
 
 export class Prompts<SecurityDataType = unknown> {
   http: HttpClient<SecurityDataType>;
@@ -184,3 +184,5 @@ export class Prompts<SecurityDataType = unknown> {
       ...params,
     });
 }
+
+export default new Prompts(http);

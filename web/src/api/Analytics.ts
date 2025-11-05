@@ -10,7 +10,8 @@ import {
   TopEndpointsResult,
 
 } from "./DataContracts.ts";
-import { HttpClient, RequestParams } from "./HttpClient.ts";
+
+import http, { HttpClient, RequestParams } from "./HttpClient.ts";
 import {GranularityEnum, TimeRangeEnum} from "@/enums/enums.ts";
 
 export class Analytics<SecurityDataType = unknown> {
@@ -302,3 +303,5 @@ export class Analytics<SecurityDataType = unknown> {
       ...params,
     });
 }
+
+export default new Analytics(http);

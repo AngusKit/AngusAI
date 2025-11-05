@@ -5,7 +5,7 @@ import {
   ApiKeyDetailResult,
   ListApiKeyResult,
 } from "./DataContracts.ts";
-import { ContentType, HttpClient, RequestParams } from "./HttpClient.ts";
+import http, { ContentType, HttpClient, RequestParams } from "./HttpClient.ts";
 
 export class Settings<SecurityDataType = unknown> {
   http: HttpClient<SecurityDataType>;
@@ -103,3 +103,5 @@ export class Settings<SecurityDataType = unknown> {
       ...params,
     });
 }
+
+export default new Settings(http);

@@ -16,7 +16,7 @@ import {
   GetDatasetListOrderByEnum,
 
 } from "./DataContracts.ts";
-import { ContentType, HttpClient, RequestParams } from "./HttpClient.ts";
+import http, { ContentType, HttpClient, RequestParams } from "./HttpClient.ts";
 import {DatasetDataStatusEnum, DatasetDataTypeEnum, DatasetTypeEnum, VisibilityEnum} from "@/enums/enums.ts";
 
 export class Datasets<SecurityDataType = unknown> {
@@ -400,3 +400,5 @@ export class Datasets<SecurityDataType = unknown> {
       ...params,
     });
 }
+
+export default new Datasets(http);

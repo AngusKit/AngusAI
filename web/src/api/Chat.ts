@@ -15,7 +15,7 @@ import {
   SessionUpdateDto,
   SseEmitter,
 } from "./DataContracts.ts";
-import { ContentType, HttpClient, RequestParams } from "./HttpClient.ts";
+import http, { ContentType, HttpClient, RequestParams } from "./HttpClient.ts";
 
 export class Chat<SecurityDataType = unknown> {
   http: HttpClient<SecurityDataType>;
@@ -520,3 +520,5 @@ export class Chat<SecurityDataType = unknown> {
       ...params,
     });
 }
+
+export default new Chat(http);

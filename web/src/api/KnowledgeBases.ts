@@ -8,7 +8,7 @@ import {
   KnowledgeBaseUpdateDto,
 
 } from "./DataContracts.ts";
-import { ContentType, HttpClient, RequestParams } from "./HttpClient.ts";
+import http, { ContentType, HttpClient, RequestParams } from "./HttpClient.ts";
 import {VisibilityEnum} from "@/enums/enums.ts";
 
 export class KnowledgeBases<SecurityDataType = unknown> {
@@ -195,3 +195,5 @@ export class KnowledgeBases<SecurityDataType = unknown> {
       ...params,
     });
 }
+
+export default new KnowledgeBases(http);

@@ -10,7 +10,7 @@ import {
   ResourceSharingToggleDto,
   ResourceSharingUpdateDto,
 } from "./DataContracts.ts";
-import { ContentType, HttpClient, RequestParams } from "./HttpClient.ts";
+import http, { ContentType, HttpClient, RequestParams } from "./HttpClient.ts";
 import {MemberPermissionEnum, ResourceTypeEnum, SharedWithEnum, StatisticsPeriodEnum} from "@/enums/enums.ts";
 
 export class Sharing<SecurityDataType = unknown> {
@@ -241,3 +241,5 @@ export class Sharing<SecurityDataType = unknown> {
       ...params,
     });
 }
+
+export default new Sharing(http);

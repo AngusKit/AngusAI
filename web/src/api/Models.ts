@@ -9,7 +9,7 @@ import {
   ModelTestDto,
   ModelUpdateDto,
 } from "./DataContracts.ts";
-import { ContentType, HttpClient, RequestParams } from "./HttpClient.ts";
+import http, { ContentType, HttpClient, RequestParams } from "./HttpClient.ts";
 import {ModelProviderEnum, ModelStatusEnum, ModelTypeEnum, StatisticsPeriodEnum} from "@/enums/enums.ts";
 
 export class Models<SecurityDataType = unknown> {
@@ -253,3 +253,5 @@ export class Models<SecurityDataType = unknown> {
       ...params,
     });
 }
+
+export default new Models(http);

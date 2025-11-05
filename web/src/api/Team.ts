@@ -3,7 +3,7 @@ import {
   TeamSettingsResult,
   TeamSettingsDto,
 } from "./DataContracts.ts";
-import { ContentType, HttpClient, RequestParams } from "./HttpClient.ts";
+import http, { ContentType, HttpClient, RequestParams } from "./HttpClient.ts";
 
 export class Team<SecurityDataType = unknown> {
   http: HttpClient<SecurityDataType>;
@@ -47,3 +47,5 @@ export class Team<SecurityDataType = unknown> {
       ...params,
     });
 }
+
+export default new Team(http);

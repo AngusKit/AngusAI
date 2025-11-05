@@ -10,7 +10,7 @@ import {
   GetApplicationListOrderByEnum,
 
 } from "./DataContracts.ts";
-import { ContentType, HttpClient, RequestParams } from "./HttpClient.ts";
+import http, { ContentType, HttpClient, RequestParams } from "./HttpClient.ts";
 import {ApplicationCategoryEnum, ApplicationStatusEnum} from "@/enums/enums.ts";
 
 export class Applications<SecurityDataType = unknown> {
@@ -252,3 +252,5 @@ export class Applications<SecurityDataType = unknown> {
       ...params,
     });
 }
+
+export default new Applications(http);

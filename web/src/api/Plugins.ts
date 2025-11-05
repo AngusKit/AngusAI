@@ -10,7 +10,7 @@ import {
   PluginUpdateDto,
   PluginVerifyDto,
 } from "./DataContracts.ts";
-import { ContentType, HttpClient, RequestParams } from "./HttpClient.ts";
+import http, { ContentType, HttpClient, RequestParams } from "./HttpClient.ts";
 import {PluginCategoryEnum, PluginStatusEnum, PluginTypeEnum, StatisticsPeriodEnum} from "@/enums/enums.ts";
 
 export class Plugins<SecurityDataType = unknown> {
@@ -331,3 +331,5 @@ export class Plugins<SecurityDataType = unknown> {
       ...params,
     });
 }
+
+export default new Plugins(http);

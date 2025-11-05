@@ -9,7 +9,7 @@ import {
   KnowledgeBaseDocSearchDto,
   KnowledgeBaseDocToggleDto,
 } from "./DataContracts.ts";
-import { ContentType, HttpClient, RequestParams } from "./HttpClient.ts";
+import http, { ContentType, HttpClient, RequestParams } from "./HttpClient.ts";
 import {KnowledgeBaseDocStatusEnum, KnowledgeBaseDocTypeEnum} from "@/enums/enums.ts";
 
 export class Documents<SecurityDataType = unknown> {
@@ -189,3 +189,5 @@ export class Documents<SecurityDataType = unknown> {
       ...params,
     });
 }
+
+export default new Documents(http);

@@ -5,7 +5,7 @@ import {
   PromptCategoryCreateDto,
   PromptCategoryUpdateDto,
 } from "./DataContracts.ts";
-import { ContentType, HttpClient, RequestParams } from "./HttpClient.ts";
+import http, { ContentType, HttpClient, RequestParams } from "./HttpClient.ts";
 
 export class PromptCategories<SecurityDataType = unknown> {
   http: HttpClient<SecurityDataType>;
@@ -156,3 +156,5 @@ export class PromptCategories<SecurityDataType = unknown> {
       ...params,
     });
 }
+
+export default new PromptCategories(http);
