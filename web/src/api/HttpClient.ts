@@ -1,6 +1,6 @@
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, HeadersDefaults, ResponseType } from 'axios';
 import axios from 'axios';
-import { API_SERVER_ERROR_CODE, API_SUCCESS_CODE, ApiType, ApiLocaleResult, app, appContext, cookieUtils, DomainManager, eventQueue, httpUtils, LockUtils, REFRESH_TOKEN_AUTH_KEY, SYSTEM_ERROR_MESSAGE, typeUtils, } from '@xcan-angus/infra';
+import { API_SERVER_ERROR_CODE, API_SUCCESS_CODE, ApiType, ApiLocaleResult, app, appContext, cookieUtils, DomainManager, eventQueue, httpUtils, LockUtils, REFRESH_TOKEN_AUTH_KEY, SYSTEM_ERROR_MESSAGE, typeUtils, IFRAME_ACCESS_TOKEN_NAME, IFRAME_EXPIRES_IN_NAME, IFRAME_REFRESH_TOKEN_NAME, IFRAME_REQUEST_AUTH_TIME_NAME } from '@xcan-angus/infra';
 
 export type QueryParamsType = Record<string | number, any>;
 
@@ -132,7 +132,7 @@ export class HttpClient<SecurityDataType = unknown> {
       }
 
       let accessToken = httpUtils.isInIframe()
-        ? getParamsFromIframeUrl(IFRAME_ACCESS_TOKEN_NAME) || ''
+        ? httpUtils.getParamsFromIframeUrl(IFRAME_ACCESS_TOKEN_NAME) || ''
         : cookieUtils.get('access_token');
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
@@ -288,11 +288,10 @@ export class HttpClient<SecurityDataType = unknown> {
       return response;
     } catch (err) {
       if (requestParams.method !== 'get') {
-        eventQueue.commit('http_error', error?.message || SYSTEM_ERROR_MESSAGE);
+        eventQueue.commit('http_error', err?.message || SYSTEM_ERROR_MESSAGE);
       }
       return {
-        ...err,
-        data: null,
+        ...(err || {})
       };
     }
   };
