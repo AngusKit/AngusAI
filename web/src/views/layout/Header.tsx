@@ -560,7 +560,7 @@ export function Header() {
                 <Avatar className="w-8 h-8 ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-gray-800">
                   <AvatarImage src={userInfo.avatar} alt={userInfo.fullName} />
                   <AvatarFallback className="bg-blue-500 text-white">
-                    {userInfo.fullName.slice(0, 2)}
+                    {userInfo.fullName ? userInfo.fullName.slice(0, 2) : ''}
                   </AvatarFallback>
                 </Avatar>
               </button>
@@ -573,7 +573,7 @@ export function Header() {
                   <Avatar className="w-12 h-12 ring-2 ring-blue-500">
                     <AvatarImage src={userInfo.avatar} alt={userInfo.fullName} />
                     <AvatarFallback className="bg-blue-500 text-white">
-                      {userInfo.fullName.slice(0, 2)}
+                      {userInfo.fullName ? userInfo.fullName.slice(0, 2) : ''}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1">

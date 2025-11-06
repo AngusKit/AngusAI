@@ -329,7 +329,7 @@ export class HttpClient<SecurityDataType = unknown> {
       return response;
     } catch (err) {
       if (requestParams.method !== 'get') {
-        eventQueue.notify(error?.message || SYSTEM_ERROR_MESSAGE);
+        eventQueue.commit('http_error', error?.message || SYSTEM_ERROR_MESSAGE);
       }
       return {
         ...err,
