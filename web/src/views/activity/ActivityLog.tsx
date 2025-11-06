@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React,{ useState, useContext } from 'react';
 import { useLanguage } from '@/ui/LanguageProvider';
 import { 
   Activity, 
@@ -32,6 +32,7 @@ import { Input } from '@/ui/input';
 import { Label } from '@/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/ui/select';
 import { Avatar, AvatarFallback } from '@/ui/avatar';
+import { MyContext } from '@/ui/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/ui/tabs';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/ui/pagination';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/ui/dialog';

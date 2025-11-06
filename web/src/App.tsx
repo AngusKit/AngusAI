@@ -26,14 +26,17 @@ import {
   Chat,
   ActivityLog
 } from './views';
-
+import { appContext } from '@xcan-angus/infra';
 import { ThemeProvider } from '@/ui/ThemeProvider';
 import { LanguageProvider } from '@/ui/LanguageProvider';
 import { Toaster } from '@/ui/sonner';
+import { MyContext } from '@/ui/utils';
 import { useState } from 'react';
+
 
 export default function App() {
   const [activePage, setActivePage] = useState('home');
+  const [userInfo, setUserInfo] = useState(appContext.getUser());
   const [selectedWorkflowForDesign, setSelectedWorkflowForDesign] = useState<{
     id: number;
     name: string;
@@ -43,6 +46,7 @@ export default function App() {
   return (
     <ThemeProvider>
       <LanguageProvider>
+        <MyContext.Provider value={{userInfo}}>
         <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
         <Toaster richColors position="top-right" />
       {activePage !== 'chat' && (
@@ -110,6 +114,7 @@ export default function App() {
         </main>
       </div>
     </div>
+    </MyContext.Provider>
     </LanguageProvider>
     </ThemeProvider>
   );

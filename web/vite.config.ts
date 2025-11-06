@@ -21,5 +21,15 @@ export default defineConfig({
     port: 80,
     strictPort: true,
     open: false,
+    proxy: {
+      '/ess/': {
+        target: 'http://dev-apis.xcan.cloud',
+        changeOrigin: true
+      },
+      '/storage/': {
+        target: 'http://dev-files.xcan.cloud',
+        changeOrigin: true
+      }
+    }
   },
 });

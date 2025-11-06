@@ -1,5 +1,5 @@
 
-  import { app, appContext, AppOrServiceRoute, http } from '@xcan-angus/infra';
+  import { app, AppOrServiceRoute } from '@xcan-angus/infra';
   import { initAfterAuthentication } from '@/lib/initAuth.ts'
   
   import { createRoot } from "react-dom/client";
@@ -9,9 +9,8 @@
   start();
 
   async function start () {
-
     await app.initEnvironment();
-    // await initAfterAuthentication({ code: AppOrServiceRoute.ai });
+    await initAfterAuthentication({ code: AppOrServiceRoute.gm });
     createRoot(document.getElementById("root")!).render(<App />);
   }
 
