@@ -295,6 +295,50 @@ export enum GranularityEnum {
   Week = "week",
 }
 
+/** 来源 */
+export enum ApiCollectionSourceEnum {
+  OPENAPI = "OPENAPI",
+  SWAGGER = "SWAGGER",
+  POSTMAN = "POSTMAN",
+  MANUAL = "MANUAL",
+}
+
+/** HTTP方法：GET、POST、PUT、DELETE、PATCH等 */
+export enum HttpMethodEnum {
+  POST = "POST",
+  GET = "GET",
+  PUT = "PUT",
+  PATCH = "PATCH",
+  DELETE = "DELETE",
+  HEAD = "HEAD",
+  OPTIONS = "OPTIONS",
+  TRACE = "TRACE",
+}
+
+/** 文件类型 */
+export enum ApiCollectionImportTypeEnum {
+  OPENAPI = "OPENAPI",
+  SWAGGER = "SWAGGER",
+  POSTMAN = "POSTMAN",
+}
+
+/**
+ * 冲突处理策略：OVERWRITE-覆盖现有接口，IGNORE-跳过重复接口，MERGE-合并配置
+ * @example "IGNORE"
+ */
+export enum ConflictStrategyEnum {
+  OVERWRITE = "OVERWRITE",
+  IGNORE = "IGNORE",
+  MERGE = "MERGE",
+}
+
+/** 状态 */
+export enum ImportStatusEnum {
+  Imported = "imported",
+  Skipped = "skipped",
+  Error = "error",
+}
+
 export const enumNamespaceMap = new Map<any, string>([
   [NodeSource, 'xcm.enum.NodeSource']
 ]);

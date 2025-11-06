@@ -3,6 +3,7 @@ package cloud.xcan.angus.core.ai.interfaces.apis.facade;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionFindDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionImportDto;
+import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionStatisticsDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionImportVo;
@@ -46,7 +47,7 @@ public interface ApiCollectionFacade {
   /**
    * 获取接口集统计数据
    */
-  ApiCollectionStatisticsVo getStatistics(ApiCollectionStatisticsVo dto);
+  ApiCollectionStatisticsVo getStatistics(ApiCollectionStatisticsDto dto);
 
   /**
    * 导入接口集

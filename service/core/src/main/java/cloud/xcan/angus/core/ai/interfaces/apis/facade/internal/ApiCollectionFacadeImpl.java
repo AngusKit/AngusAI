@@ -16,6 +16,7 @@ import cloud.xcan.angus.core.ai.interfaces.apis.facade.ApiCollectionFacade;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionFindDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionImportDto;
+import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionStatisticsDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.internal.assembler.ApiCollectionAssembler;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionDetailVo;
@@ -132,7 +133,7 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
    * @return 统计信息VO
    */
   @Override
-  public ApiCollectionStatisticsVo getStatistics(ApiCollectionStatisticsVo dto) {
+  public ApiCollectionStatisticsVo getStatistics(ApiCollectionStatisticsDto dto) {
     LocalDateTime now = LocalDateTime.now();
     LocalDate today = now.toLocalDate();
     LocalDateTime todayStart = today.atStartOfDay();
@@ -140,8 +141,8 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
 
     // 解析用户指定的时间范围，用于topStores和performanceTrend
     // 由于接口定义问题，暂时使用默认值（近一月）
-    LocalDateTime start = parseStartDate(null);
-    LocalDateTime end = parseEndDate(null);
+    LocalDateTime start = parseStartDate(dto.getStartDate());
+    LocalDateTime end = parseEndDate(dto.getEndDate());
 
     // 如果开始时间为默认值（1970），则使用近一月作为默认范围
     if (start.equals(LocalDateTime.of(1970, 1, 1, 0, 0))) {

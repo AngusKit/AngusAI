@@ -1,6 +1,6 @@
-##
 ## Script to generate TypeScript SDK from OpenAPI specification using swagger-typescript-api
-## Usage: cd AngusAI/web && ./scripts/generate-openapi-sdk.sh
+## Usage: cd AngusAI/web && sh ./scripts/generate-openapi-sdk.sh
+## Note: Use v22.9.0+
 
 swagger-typescript-api generate  \
 --axios \
