@@ -1,21 +1,16 @@
+import { ApiLocaleResult, PageQuery } from '@xcan-angus/infra';
 import {
-  ApiLocaleResultConnectionTestVo,
-  ApiLocaleResultPageResultVectorStoreVo,
-  ApiLocaleResultVectorStoreStatisticsVo,
-  ApiLocaleResultVectorStoreVo,
-  ApiResultObject,
+  ConnectionTestResult,
+  PageResultVectorStoreResult,
+  VectorStoreStatisticsResult,
+  VectorStoreResult,
   ConnectionTestDto,
   VectorStoreCreateDto,
-  VectorStoreListParamsFilters0OpEnum,
-  VectorStoreListParamsFilters1OpEnum,
-  VectorStoreListParamsInfoScopeEnum,
   VectorStoreListParamsOrderByEnum,
-  VectorStoreListParamsOrderSortEnum,
-  VectorStoreListParamsStatusEnum,
-  VectorStoreListParamsTypeEnum,
   VectorStoreUpdateDto,
 } from "./DataContracts";
 import { ContentType, HttpClient, RequestParams } from "./HttpClient";
+import {ConnectionStatusEnum, VectorStoreTypeEnum} from "@/enums/enums.ts";
 
 export class VectorStores<SecurityDataType = unknown> {
   http: HttpClient<SecurityDataType>;
@@ -34,83 +29,19 @@ export class VectorStores<SecurityDataType = unknown> {
    * @secure
    */
   vectorStoreList = (
-    query?: {
+    query?: PageQuery & {
       /** 数据库类型筛选 */
-      type?: VectorStoreListParamsTypeEnum;
+      type?: VectorStoreTypeEnum;
       /** 状态筛选 */
-      status?: VectorStoreListParamsStatusEnum;
+      status?: ConnectionStatusEnum;
       /** 启用状态筛选 */
       enabled?: boolean;
       /** 排序字段 */
       orderBy?: VectorStoreListParamsOrderByEnum;
-      /**
-       * Page number for paginated data (default: 1)
-       * @format int32
-       * @min 1
-       * @max 100000
-       */
-      pageNo?: number;
-      /**
-       * Number of items per page (default: 10)
-       * @format int32
-       * @min 1
-       * @max 2000
-       */
-      pageSize?: number;
-      /** Specifies the direction of the sorting (ascending or descending) */
-      orderSort?: VectorStoreListParamsOrderSortEnum;
-      /** Scope of information to query (BASIC or DETAIL). Interface performance optimization parameters, only valid for some interfaces */
-      infoScope?: VectorStoreListParamsInfoScopeEnum;
-      /** Whether to use full-text search (default: false, uses DB index search if false) */
-      fullTextSearch?: boolean;
-      /** Search keyword */
-      keyword?: string;
-      /**
-       * Tenant ID to which this belongs
-       * @format int64
-       * @example 1
-       */
-      tenantId?: number;
-      /**
-       * ID of the creator
-       * @format int64
-       * @example 1
-       */
-      createdBy?: number;
-      /**
-       * Creation date
-       * @format date-time
-       * @example "2024-10-12 00:00:00"
-       */
-      createdDate?: string;
-      /**
-       * ID of the last modifier
-       * @format int64
-       * @example 1
-       */
-      modifiedBy?: number;
-      /**
-       * Last modification date
-       * @format date-time
-       * @example "2024-10-12 00:00:00"
-       */
-      modifiedDate?: string;
-      /** Customize the filter parameter name. Note: The parameter name must be a whitelist parameter */
-      "filters[0].key"?: string;
-      /** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
-      "filters[0].op"?: VectorStoreListParamsFilters0OpEnum;
-      /** Customize the filter value */
-      "filters[0].value"?: any;
-      /** Customize the filter parameter name. Note: The parameter name must be a whitelist parameter */
-      "filters[1].key"?: string;
-      /** Customize the filter condition (EQUAL, NOT_EQUAL, GREATER_THAN, etc.) */
-      "filters[1].op"?: VectorStoreListParamsFilters1OpEnum;
-      /** Customize the filter value */
-      "filters[1].value"?: any;
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultPageResultVectorStoreVo, ApiResultObject>({
+    this.http.request<PageResultVectorStoreResult, ApiLocaleResult>({
       path: `/api/v1/vector-stores`,
       method: "GET",
       query: query,
@@ -130,7 +61,7 @@ export class VectorStores<SecurityDataType = unknown> {
     data: VectorStoreCreateDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiResultObject, ApiResultObject>({
+    this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `/api/v1/vector-stores`,
       method: "POST",
       body: data,
@@ -158,7 +89,7 @@ export class VectorStores<SecurityDataType = unknown> {
     data: ConnectionTestDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultConnectionTestVo, ApiResultObject>({
+    this.http.request<ConnectionTestResult, ApiLocaleResult>({
       path: `/api/v1/vector-stores/test`,
       method: "POST",
       query: query,
@@ -177,7 +108,7 @@ export class VectorStores<SecurityDataType = unknown> {
    * @secure
    */
   vectorStoreGetDetail = (id: number, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResultVectorStoreVo, ApiResultObject>({
+    this.http.request<VectorStoreResult, ApiLocaleResult>({
       path: `/api/v1/vector-stores/${id}`,
       method: "GET",
       secure: true,
@@ -200,7 +131,7 @@ export class VectorStores<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiResultObject, ApiResultObject>({
+    this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `/api/v1/vector-stores/${id}`,
       method: "DELETE",
       query: query,
@@ -221,7 +152,7 @@ export class VectorStores<SecurityDataType = unknown> {
     data: VectorStoreUpdateDto,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultVectorStoreVo, ApiResultObject>({
+    this.http.request<VectorStoreResult, ApiLocaleResult>({
       path: `/api/v1/vector-stores/${id}`,
       method: "PATCH",
       body: data,
@@ -246,7 +177,7 @@ export class VectorStores<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultVectorStoreVo, ApiResultObject>({
+    this.http.request<VectorStoreResult, ApiLocaleResult>({
       path: `/api/v1/vector-stores/${id}/toggle`,
       method: "PATCH",
       query: query,
@@ -277,7 +208,7 @@ export class VectorStores<SecurityDataType = unknown> {
     },
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiLocaleResultVectorStoreStatisticsVo, ApiResultObject>({
+    this.http.request<VectorStoreStatisticsResult, ApiLocaleResult>({
       path: `/api/v1/vector-stores/statistics`,
       method: "GET",
       query: query,

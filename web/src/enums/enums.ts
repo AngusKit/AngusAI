@@ -339,6 +339,36 @@ export enum ImportStatusEnum {
   Error = "error",
 }
 
+/** 连接状态 */
+export enum ConnectionStatusEnum {
+  CONNECTED = "CONNECTED",
+  DISCONNECTED = "DISCONNECTED",
+}
+
+/** 向量存储源类型 */
+export enum VectorStoreTypeEnum {
+  AZURE_AI_SERVICE = "AZURE_AI_SERVICE",
+  AZURE_COSMOS_DB = "AZURE_COSMOS_DB",
+  APACHE_CASSANDRA = "APACHE_CASSANDRA",
+  CHROMA = "CHROMA",
+  COUCHBASE = "COUCHBASE",
+  ELASTICSEARCH = "ELASTICSEARCH",
+  GEMFIRE = "GEMFIRE",
+  MARIADB = "MARIADB",
+  MILVUS = "MILVUS",
+  MONGODB_ATLAS = "MONGODB_ATLAS",
+  NEO4J = "NEO4J",
+  OPENSEARCH = "OPENSEARCH",
+  ORACLE = "ORACLE",
+  PGVECTOR = "PGVECTOR",
+  PINECONE = "PINECONE",
+  QDRANT = "QDRANT",
+  REDIS = "REDIS",
+  SAP_HANA = "SAP_HANA",
+  TYPESENSE = "TYPESENSE",
+  WEAVIATE = "WEAVIATE",
+}
+
 export const enumNamespaceMap = new Map<any, string>([
   [NodeSource, 'xcm.enum.NodeSource']
 ]);
