@@ -15,7 +15,7 @@ export * from './workflow';
 // Knowledge
 export * from './knowledge';
 
-// Dataset  
+// Dataset
 export * from './dataset';
 
 // Models
@@ -50,5 +50,3 @@ export * from './vector';
 
 // Activity
 export * from './activity';
-
-

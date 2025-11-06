@@ -1,14 +1,14 @@
-import { Database, Plus, MoreHorizontal, Eye, Trash2, Edit, FileText, Copy, Search, X, Filter, Grid3x3, List, Upload, File, Download, Code, Globe, Cloud, Link as LinkIcon, RefreshCw } from 'lucide-react';
+import { Database, Plus, MoreHorizontal, Eye, Trash2, Edit, FileText, Copy, Search, X, Filter, Grid3x3, List, Upload, File, Download, Code, Globe, Cloud, Link as LinkIcon, RefreshCw, } from 'lucide-react';
 import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
 import { Badge } from '@/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/ui/dropdown-menu';
 import { Input } from '@/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/ui/select';
-import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/ui/pagination';
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, } from '@/ui/pagination';
 import { Progress } from '@/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/ui/dialog';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/ui/alert-dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, } from '@/ui/alert-dialog';
 import { Label } from '@/ui/label';
 import { useState } from 'react';
 import { useLanguage } from '@/ui/LanguageProvider';
@@ -81,7 +81,7 @@ export function Dataset() {
       'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400',
       'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
     ];
-    
+
     // 根据标签内容生成一个稳定的索引
     const index = tag.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
     return colors[index];
@@ -542,16 +542,96 @@ export function Dataset() {
   }
 
   const tableRecords: TableRecord[] = [
-    { id: 1, customer_name: '张三', email: 'zhangsan@example.com', phone: '13800138000', city: '北京', registration_date: '2023-01-15', status: '活跃' },
-    { id: 2, customer_name: '李四', email: 'lisi@example.com', phone: '13900139000', city: '上海', registration_date: '2023-02-20', status: '活跃' },
-    { id: 3, customer_name: '王五', email: 'wangwu@example.com', phone: '13700137000', city: '广州', registration_date: '2023-03-10', status: '休眠' },
-    { id: 4, customer_name: '赵六', email: 'zhaoliu@example.com', phone: '13600136000', city: '深圳', registration_date: '2023-04-05', status: '活跃' },
-    { id: 5, customer_name: '孙七', email: 'sunqi@example.com', phone: '13500135000', city: '杭州', registration_date: '2023-05-12', status: '活跃' },
-    { id: 6, customer_name: '周八', email: 'zhouba@example.com', phone: '13400134000', city: '成都', registration_date: '2023-06-18', status: '休眠' },
-    { id: 7, customer_name: '吴九', email: 'wujiu@example.com', phone: '13300133000', city: '武汉', registration_date: '2023-07-22', status: '活跃' },
-    { id: 8, customer_name: '郑十', email: 'zhengshi@example.com', phone: '13200132000', city: '西安', registration_date: '2023-08-08', status: '活跃' },
-    { id: 9, customer_name: '钱十一', email: 'qianshiyi@example.com', phone: '13100131000', city: '南京', registration_date: '2023-09-14', status: '休眠' },
-    { id: 10, customer_name: '陈十二', email: 'chenshier@example.com', phone: '13000130000', city: '天津', registration_date: '2023-10-01', status: '活跃' },
+    {
+      id: 1,
+      customer_name: '张三',
+      email: 'zhangsan@example.com',
+      phone: '13800138000',
+      city: '北京',
+      registration_date: '2023-01-15',
+      status: '活跃',
+    },
+    {
+      id: 2,
+      customer_name: '李四',
+      email: 'lisi@example.com',
+      phone: '13900139000',
+      city: '上海',
+      registration_date: '2023-02-20',
+      status: '活跃',
+    },
+    {
+      id: 3,
+      customer_name: '王五',
+      email: 'wangwu@example.com',
+      phone: '13700137000',
+      city: '广州',
+      registration_date: '2023-03-10',
+      status: '休眠',
+    },
+    {
+      id: 4,
+      customer_name: '赵六',
+      email: 'zhaoliu@example.com',
+      phone: '13600136000',
+      city: '深圳',
+      registration_date: '2023-04-05',
+      status: '活跃',
+    },
+    {
+      id: 5,
+      customer_name: '孙七',
+      email: 'sunqi@example.com',
+      phone: '13500135000',
+      city: '杭州',
+      registration_date: '2023-05-12',
+      status: '活跃',
+    },
+    {
+      id: 6,
+      customer_name: '周八',
+      email: 'zhouba@example.com',
+      phone: '13400134000',
+      city: '成都',
+      registration_date: '2023-06-18',
+      status: '休眠',
+    },
+    {
+      id: 7,
+      customer_name: '吴九',
+      email: 'wujiu@example.com',
+      phone: '13300133000',
+      city: '武汉',
+      registration_date: '2023-07-22',
+      status: '活跃',
+    },
+    {
+      id: 8,
+      customer_name: '郑十',
+      email: 'zhengshi@example.com',
+      phone: '13200132000',
+      city: '西安',
+      registration_date: '2023-08-08',
+      status: '活跃',
+    },
+    {
+      id: 9,
+      customer_name: '钱十一',
+      email: 'qianshiyi@example.com',
+      phone: '13100131000',
+      city: '南京',
+      registration_date: '2023-09-14',
+      status: '休眠',
+    },
+    {
+      id: 10,
+      customer_name: '陈十二',
+      email: 'chenshier@example.com',
+      phone: '13000130000',
+      city: '天津',
+      registration_date: '2023-10-01',
+      status: '活跃',
+    },
   ];
 
   const tableColumns = selectedTable ? Object.keys(tableRecords[0] || {}) : [];
@@ -590,7 +670,7 @@ export function Dataset() {
   };
 
   // 过滤数据集
-  const filteredDatasets = datasets.filter((dataset) => {
+  const filteredDatasets = datasets.filter(dataset => {
     const searchLower = searchQuery.toLowerCase();
     return (
       dataset.name.toLowerCase().includes(searchLower) ||
@@ -610,40 +690,40 @@ export function Dataset() {
   const selectedDS = datasets.find(ds => ds.id === selectedDataset);
 
   return (
-    <div className="space-y-6">
+    <div className='space-y-6'>
       {/* Header */}
       <div>
-        <h1 className="text-2xl mb-1 dark:text-white">数据集</h1>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          数据集作为数据管理工具，用于AI模型应用和知识补充
-        </p>
+        <h1 className='text-2xl mb-1 dark:text-white'>数据集</h1>
+        <p className='text-sm text-gray-600 dark:text-gray-400'>数据集作为数据管理工具，用于AI模型应用和知识补充</p>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4'>
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <Card key={index} className="px-5 pt-5 pb-3 dark:bg-gray-800 dark:border-gray-700">
-              <div className="flex items-start justify-between mb-1.5">
+            <Card key={index} className='px-5 pt-5 pb-3 dark:bg-gray-800 dark:border-gray-700'>
+              <div className='flex items-start justify-between mb-1.5'>
                 <div className={`${stat.iconBg} w-10 h-10 rounded-lg flex items-center justify-center`}>
-                  <Icon className="w-5 h-5 text-white" />
+                  <Icon className='w-5 h-5 text-white' />
                 </div>
                 {stat.trend && (
-                  <span className={`text-sm ${stat.trendUp ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                  <span
+                    className={`text-sm ${stat.trendUp ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
+                  >
                     {stat.trend}
                   </span>
                 )}
               </div>
-              <div className="text-base font-semibold text-gray-600 dark:text-gray-400 mb-0.5">{stat.label}</div>
-              <div className="text-3xl dark:text-white mb-0.5">{stat.value}</div>
+              <div className='text-base font-semibold text-gray-600 dark:text-gray-400 mb-0.5'>{stat.label}</div>
+              <div className='text-3xl dark:text-white mb-0.5'>{stat.value}</div>
               {stat.showProgress ? (
-                <div className="flex items-center gap-2">
-                  <Progress value={stat.progress} className="h-1.5 w-[70%]" />
-                  <div className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">{stat.subtext}</div>
+                <div className='flex items-center gap-2'>
+                  <Progress value={stat.progress} className='h-1.5 w-[70%]' />
+                  <div className='text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap'>{stat.subtext}</div>
                 </div>
               ) : (
-                <div className="text-xs text-gray-500 dark:text-gray-400">{stat.subtext}</div>
+                <div className='text-xs text-gray-500 dark:text-gray-400'>{stat.subtext}</div>
               )}
             </Card>
           );
@@ -653,19 +733,19 @@ export function Dataset() {
       {/* Dataset List */}
       <div>
         {/* Action Buttons and Search - 与应用列表一致 */}
-        <div className="flex items-center justify-between gap-3 mb-4">
+        <div className='flex items-center justify-between gap-3 mb-4'>
           {/* Search Bar - 左侧390px */}
-          <div className="relative w-[390px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
+          <div className='relative w-[390px]'>
+            <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500' />
             <Input
-              type="text"
-              placeholder="搜索数据集名称、描述或类型..."
+              type='text'
+              placeholder='搜索数据集名称、描述或类型...'
               value={searchQuery}
-              onChange={(e) => {
+              onChange={e => {
                 setSearchQuery(e.target.value);
                 setCurrentPage(1); // 重置到第一页
               }}
-              className="pl-10 pr-10 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 focus-visible:border-blue-500 focus-visible:ring-blue-500/50"
+              className='pl-10 pr-10 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 focus-visible:border-blue-500 focus-visible:ring-blue-500/50'
             />
             {searchQuery && (
               <button
@@ -673,31 +753,35 @@ export function Dataset() {
                   setSearchQuery('');
                   setCurrentPage(1);
                 }}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors'
               >
-                <X className="w-4 h-4" />
+                <X className='w-4 h-4' />
               </button>
             )}
           </div>
 
           {/* Action Buttons - 右侧 */}
-          <div className="flex items-center gap-3">
+          <div className='flex items-center gap-3'>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300">
-                  <Filter className="w-4 h-4 mr-2" />
+                <Button
+                  variant='outline'
+                  size='sm'
+                  className='dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300'
+                >
+                  <Filter className='w-4 h-4 mr-2' />
                   筛选
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="dark:bg-gray-800 dark:border-gray-700">
-                <DropdownMenuItem className="dark:text-gray-300">默认排序</DropdownMenuItem>
-                <DropdownMenuItem className="dark:text-gray-300">按名称排序</DropdownMenuItem>
-                <DropdownMenuItem className="dark:text-gray-300">按时间排序</DropdownMenuItem>
-                <DropdownMenuItem className="dark:text-gray-300">按大小排序</DropdownMenuItem>
+              <DropdownMenuContent align='end' className='dark:bg-gray-800 dark:border-gray-700'>
+                <DropdownMenuItem className='dark:text-gray-300'>默认排序</DropdownMenuItem>
+                <DropdownMenuItem className='dark:text-gray-300'>按名称排序</DropdownMenuItem>
+                <DropdownMenuItem className='dark:text-gray-300'>按时间排序</DropdownMenuItem>
+                <DropdownMenuItem className='dark:text-gray-300'>按大小排序</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <div className="flex items-center gap-1 border border-gray-200 dark:border-gray-700 rounded-lg p-1">
+            <div className='flex items-center gap-1 border border-gray-200 dark:border-gray-700 rounded-lg p-1'>
               <button
                 onClick={() => setViewMode('grid')}
                 className={`p-1.5 rounded ${
@@ -706,7 +790,7 @@ export function Dataset() {
                     : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
                 }`}
               >
-                <Grid3x3 className="w-4 h-4" />
+                <Grid3x3 className='w-4 h-4' />
               </button>
               <button
                 onClick={() => setViewMode('table')}
@@ -716,16 +800,16 @@ export function Dataset() {
                     : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
                 }`}
               >
-                <List className="w-4 h-4" />
+                <List className='w-4 h-4' />
               </button>
             </div>
 
-            <Button 
-              size="sm" 
-              className="bg-blue-500 hover:bg-blue-600 text-white"
+            <Button
+              size='sm'
+              className='bg-blue-500 hover:bg-blue-600 text-white'
               onClick={() => setCreateDialogOpen(true)}
             >
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className='w-4 h-4 mr-2' />
               创建数据集
             </Button>
           </div>
@@ -733,10 +817,10 @@ export function Dataset() {
 
         {/* Empty State */}
         {filteredDatasets.length === 0 && (
-          <div className="text-center py-12">
-            <Database className="w-12 h-12 text-gray-400 dark:text-gray-600 mx-auto mb-3" />
-            <p className="text-gray-600 dark:text-gray-400">未找到匹配的数据集</p>
-            <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">
+          <div className='text-center py-12'>
+            <Database className='w-12 h-12 text-gray-400 dark:text-gray-600 mx-auto mb-3' />
+            <p className='text-gray-600 dark:text-gray-400'>未找到匹配的数据集</p>
+            <p className='text-sm text-gray-500 dark:text-gray-500 mt-1'>
               {searchQuery ? '尝试使用其他搜索词' : '暂无数据集'}
             </p>
           </div>
@@ -744,53 +828,56 @@ export function Dataset() {
 
         {/* Table View */}
         {viewMode === 'table' && filteredDatasets.length > 0 && (
-          <Card className="dark:bg-gray-800 dark:border-gray-700">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50 dark:bg-gray-900">
+          <Card className='dark:bg-gray-800 dark:border-gray-700'>
+            <div className='overflow-x-auto'>
+              <table className='w-full'>
+                <thead className='bg-gray-50 dark:bg-gray-900'>
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400">数据集名称</th>
-                    <th className="px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400">类型</th>
-                    <th className="px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400">文档数</th>
-                    <th className="px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400">状态</th>
-                    <th className="px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400">更新时间</th>
-                    <th className="px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400">操作</th>
+                    <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>数据集名称</th>
+                    <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>类型</th>
+                    <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>文档数</th>
+                    <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>状态</th>
+                    <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>更新时间</th>
+                    <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>操作</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                  {currentDatasets.map((dataset) => (
-                    <tr 
-                      key={dataset.id} 
+                <tbody className='divide-y divide-gray-200 dark:divide-gray-700'>
+                  {currentDatasets.map(dataset => (
+                    <tr
+                      key={dataset.id}
                       className={`hover:bg-gray-50 dark:hover:bg-gray-900 cursor-pointer ${
                         selectedDataset === dataset.id ? 'bg-blue-50 dark:bg-blue-900/20' : ''
                       }`}
                       onClick={() => setSelectedDataset(dataset.id)}
                     >
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className={`${dataset.iconBg} w-10 h-10 rounded-lg flex items-center justify-center text-xl`}>
+                      <td className='px-6 py-4'>
+                        <div className='flex items-center gap-3'>
+                          <div
+                            className={`${dataset.iconBg} w-10 h-10 rounded-lg flex items-center justify-center text-xl`}
+                          >
                             {dataset.icon}
                           </div>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className="text-sm dark:text-white">{dataset.name}</span>
-                              <Badge variant="outline" className="text-xs dark:border-gray-600">
-                                {dataset.visibility === 'private' ? '🔒 私有' : dataset.visibility === 'team' ? '👥 团队' : '🌐 公开'}
+                          <div className='flex-1'>
+                            <div className='flex items-center gap-2 mb-1'>
+                              <span className='text-sm dark:text-white'>{dataset.name}</span>
+                              <Badge variant='outline' className='text-xs dark:border-gray-600'>
+                                {dataset.visibility === 'private'
+                                  ? '🔒 私有'
+                                  : dataset.visibility === 'team'
+                                    ? '👥 团队'
+                                    : '🌐 公开'}
                               </Badge>
                               {dataset.tags && dataset.tags.length > 0 && (
-                                <div className="flex gap-1">
+                                <div className='flex gap-1'>
                                   {dataset.tags.slice(0, 2).map((tag, index) => (
-                                    <Badge
-                                      key={index}
-                                      className={`text-xs px-1.5 py-0 border-0 ${getTagColor(tag)}`}
-                                    >
+                                    <Badge key={index} className={`text-xs px-1.5 py-0 border-0 ${getTagColor(tag)}`}>
                                       {tag}
                                     </Badge>
                                   ))}
                                   {dataset.tags.length > 2 && (
                                     <Badge
-                                      variant="secondary"
-                                      className="text-xs px-1.5 py-0 bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 border-0"
+                                      variant='secondary'
+                                      className='text-xs px-1.5 py-0 bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 border-0'
                                     >
                                       +{dataset.tags.length - 2}
                                     </Badge>
@@ -798,39 +885,35 @@ export function Dataset() {
                                 </div>
                               )}
                             </div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400">
-                              {dataset.description}
-                            </div>
+                            <div className='text-xs text-gray-500 dark:text-gray-400'>{dataset.description}</div>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">{dataset.type}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">{dataset.dataCount}</td>
-                      <td className="px-6 py-4">
-                        <Badge className={`text-xs ${dataset.statusColor} border-0`}>
-                          {dataset.status}
-                        </Badge>
+                      <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{dataset.type}</td>
+                      <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{dataset.dataCount}</td>
+                      <td className='px-6 py-4'>
+                        <Badge className={`text-xs ${dataset.statusColor} border-0`}>{dataset.status}</Badge>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">{dataset.updateTime}</td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                          <button 
+                      <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{dataset.updateTime}</td>
+                      <td className='px-6 py-4'>
+                        <div className='flex items-center gap-2' onClick={e => e.stopPropagation()}>
+                          <button
                             onClick={() => handleView(dataset)}
-                            className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                            className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
                           >
-                            <Eye className="w-4 h-4 text-blue-500" />
+                            <Eye className='w-4 h-4 text-blue-500' />
                           </button>
-                          <button 
+                          <button
                             onClick={() => handleEdit(dataset)}
-                            className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                            className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
                           >
-                            <Edit className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                            <Edit className='w-4 h-4 text-gray-600 dark:text-gray-400' />
                           </button>
-                          <button 
+                          <button
                             onClick={() => handleDelete(dataset)}
-                            className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                            className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
                           >
-                            <Trash2 className="w-4 h-4 text-red-500" />
+                            <Trash2 className='w-4 h-4 text-red-500' />
                           </button>
                         </div>
                       </td>
@@ -842,30 +925,30 @@ export function Dataset() {
 
             {/* Pagination - 只在数据超过6条时显示 */}
             {shouldShowPagination && (
-              <div className="flex items-center justify-center px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+              <div className='flex items-center justify-center px-6 py-4 border-t border-gray-200 dark:border-gray-700'>
                 <Pagination>
                   <PaginationContent>
                     <PaginationItem>
-                      <PaginationPrevious 
+                      <PaginationPrevious
                         onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                         className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
                       >
                         上一页
                       </PaginationPrevious>
                     </PaginationItem>
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
                       <PaginationItem key={page}>
                         <PaginationLink
                           onClick={() => setCurrentPage(page)}
                           isActive={currentPage === page}
-                          className="cursor-pointer"
+                          className='cursor-pointer'
                         >
                           {page}
                         </PaginationLink>
                       </PaginationItem>
                     ))}
                     <PaginationItem>
-                      <PaginationNext 
+                      <PaginationNext
                         onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                         className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
                       >
@@ -882,72 +965,79 @@ export function Dataset() {
         {/* Grid View */}
         {viewMode === 'grid' && filteredDatasets.length > 0 && (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {currentDatasets.map((dataset) => (
-                <Card 
-                  key={dataset.id} 
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+              {currentDatasets.map(dataset => (
+                <Card
+                  key={dataset.id}
                   className={`p-4 dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow cursor-pointer ${
                     selectedDataset === dataset.id ? 'ring-2 ring-blue-500 dark:ring-blue-400' : ''
                   }`}
                   onClick={() => setSelectedDataset(dataset.id)}
                 >
-                  <div className="flex items-start justify-between gap-3 mb-3">
-                    <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <div className={`${dataset.iconBg} w-10 h-10 rounded-lg flex items-center justify-center text-xl shrink-0`}>
+                  <div className='flex items-start justify-between gap-3 mb-3'>
+                    <div className='flex items-center gap-2 flex-1 min-w-0'>
+                      <div
+                        className={`${dataset.iconBg} w-10 h-10 rounded-lg flex items-center justify-center text-xl shrink-0`}
+                      >
                         {dataset.icon}
                       </div>
-                      <div className="flex items-center gap-2 flex-1 min-w-0">
-                        <h3 className="dark:text-white truncate">{dataset.name}</h3>
-                        <Badge variant="outline" className="text-xs shrink-0 dark:border-gray-600">
-                          {dataset.visibility === 'private' ? '🔒 私有' : dataset.visibility === 'team' ? '👥 团队' : '🌐 公开'}
+                      <div className='flex items-center gap-2 flex-1 min-w-0'>
+                        <h3 className='dark:text-white truncate'>{dataset.name}</h3>
+                        <Badge variant='outline' className='text-xs shrink-0 dark:border-gray-600'>
+                          {dataset.visibility === 'private'
+                            ? '🔒 私有'
+                            : dataset.visibility === 'team'
+                              ? '👥 团队'
+                              : '🌐 公开'}
                         </Badge>
                       </div>
                     </div>
                     <DropdownMenu>
-                      <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                        <button className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors shrink-0">
-                          <MoreHorizontal className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                      <DropdownMenuTrigger asChild onClick={e => e.stopPropagation()}>
+                        <button className='p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors shrink-0'>
+                          <MoreHorizontal className='w-4 h-4 text-gray-600 dark:text-gray-400' />
                         </button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="dark:bg-gray-800 dark:border-gray-700">
-                        <DropdownMenuItem onClick={() => handleView(dataset)} className="dark:text-gray-300">
-                          <Eye className="w-4 h-4 mr-2" />
+                      <DropdownMenuContent align='end' className='dark:bg-gray-800 dark:border-gray-700'>
+                        <DropdownMenuItem onClick={() => handleView(dataset)} className='dark:text-gray-300'>
+                          <Eye className='w-4 h-4 mr-2' />
                           查看
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleEdit(dataset)} className="dark:text-gray-300">
-                          <Edit className="w-4 h-4 mr-2" />
+                        <DropdownMenuItem onClick={() => handleEdit(dataset)} className='dark:text-gray-300'>
+                          <Edit className='w-4 h-4 mr-2' />
                           编辑
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleAction('复制', dataset.name)} className="dark:text-gray-300">
-                          <Copy className="w-4 h-4 mr-2" />
+                        <DropdownMenuItem
+                          onClick={() => handleAction('复制', dataset.name)}
+                          className='dark:text-gray-300'
+                        >
+                          <Copy className='w-4 h-4 mr-2' />
                           复制
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleDelete(dataset)} className="text-red-600 dark:text-red-400">
-                          <Trash2 className="w-4 h-4 mr-2" />
+                        <DropdownMenuItem
+                          onClick={() => handleDelete(dataset)}
+                          className='text-red-600 dark:text-red-400'
+                        >
+                          <Trash2 className='w-4 h-4 mr-2' />
                           删除
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
 
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
-                    {dataset.description}
-                  </p>
+                  <p className='text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2'>{dataset.description}</p>
 
                   {dataset.tags && dataset.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mb-3">
+                    <div className='flex flex-wrap gap-1 mb-3'>
                       {dataset.tags.slice(0, 3).map((tag, index) => (
-                        <Badge
-                          key={index}
-                          className={`text-xs px-1.5 py-0 border-0 ${getTagColor(tag)}`}
-                        >
+                        <Badge key={index} className={`text-xs px-1.5 py-0 border-0 ${getTagColor(tag)}`}>
                           {tag}
                         </Badge>
                       ))}
                       {dataset.tags.length > 3 && (
                         <Badge
-                          variant="secondary"
-                          className="text-xs px-1.5 py-0 bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 border-0"
+                          variant='secondary'
+                          className='text-xs px-1.5 py-0 bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 border-0'
                         >
                           +{dataset.tags.length - 3}
                         </Badge>
@@ -955,15 +1045,13 @@ export function Dataset() {
                     </div>
                   )}
 
-                  <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-                    <div className="flex items-center gap-2">
+                  <div className='flex items-center justify-between text-xs text-gray-500 dark:text-gray-400'>
+                    <div className='flex items-center gap-2'>
                       <span>{dataset.dataCount} 文档</span>
                       <span>·</span>
                       <span>{dataset.size}</span>
                     </div>
-                    <Badge className={`text-xs ${dataset.statusColor} border-0`}>
-                      {dataset.status}
-                    </Badge>
+                    <Badge className={`text-xs ${dataset.statusColor} border-0`}>{dataset.status}</Badge>
                   </div>
                 </Card>
               ))}
@@ -971,30 +1059,30 @@ export function Dataset() {
 
             {/* Grid View Pagination */}
             {shouldShowPagination && (
-              <div className="flex items-center justify-center mt-4">
+              <div className='flex items-center justify-center mt-4'>
                 <Pagination>
                   <PaginationContent>
                     <PaginationItem>
-                      <PaginationPrevious 
+                      <PaginationPrevious
                         onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                         className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
                       >
                         上一页
                       </PaginationPrevious>
                     </PaginationItem>
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
                       <PaginationItem key={page}>
                         <PaginationLink
                           onClick={() => setCurrentPage(page)}
                           isActive={currentPage === page}
-                          className="cursor-pointer"
+                          className='cursor-pointer'
                         >
                           {page}
                         </PaginationLink>
                       </PaginationItem>
                     ))}
                     <PaginationItem>
-                      <PaginationNext 
+                      <PaginationNext
                         onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                         className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
                       >
@@ -1011,94 +1099,90 @@ export function Dataset() {
 
       {/* 文件/表格类型 - 文件上传区域 */}
       {selectedDS && (selectedDS.type === '文本' || selectedDS.type === '表格') && (
-        <div className="border-t-2 border-gray-200 dark:border-gray-700 pt-6">
-          <div className="mb-4">
-            <h2 className="text-xl dark:text-white mb-1">文件管理</h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+        <div className='border-t-2 border-gray-200 dark:border-gray-700 pt-6'>
+          <div className='mb-4'>
+            <h2 className='text-xl dark:text-white mb-1'>文件管理</h2>
+            <p className='text-sm text-gray-600 dark:text-gray-400'>
               {selectedDS.name} - 上传和管理{selectedDS.type}文件
             </p>
           </div>
 
           {/* Upload Area */}
-          <Card className="p-6 mb-4 dark:bg-gray-800 dark:border-gray-700">
-            <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center hover:border-blue-500 dark:hover:border-blue-400 transition-colors cursor-pointer">
-              <Upload className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
-              <Button 
-                className="bg-blue-500 hover:bg-blue-600 text-white mb-4"
+          <Card className='p-6 mb-4 dark:bg-gray-800 dark:border-gray-700'>
+            <div className='border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center hover:border-blue-500 dark:hover:border-blue-400 transition-colors cursor-pointer'>
+              <Upload className='w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-4' />
+              <Button
+                className='bg-blue-500 hover:bg-blue-600 text-white mb-4'
                 onClick={() => toast.success('文件上传功能')}
               >
-                <Upload className="w-4 h-4 mr-2" />
+                <Upload className='w-4 h-4 mr-2' />
                 选择文件
               </Button>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className='text-sm text-gray-600 dark:text-gray-400'>
                 拖拽文件到此处或点击选择文件 · 支持 CSV, JSON, Excel, TXT, PDF 格式，最大 100MB
               </p>
             </div>
           </Card>
 
           {/* Uploaded Files List */}
-          <div className="mb-4">
-            <h3 className="text-lg dark:text-white mb-3">已上传文件</h3>
+          <div className='mb-4'>
+            <h3 className='text-lg dark:text-white mb-3'>已上传文件</h3>
           </div>
 
-          <Card className="dark:bg-gray-800 dark:border-gray-700">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50 dark:bg-gray-900">
+          <Card className='dark:bg-gray-800 dark:border-gray-700'>
+            <div className='overflow-x-auto'>
+              <table className='w-full'>
+                <thead className='bg-gray-50 dark:bg-gray-900'>
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400">文件名称</th>
-                    <th className="px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400">类型</th>
-                    <th className="px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400">大小</th>
-                    <th className="px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400">记录数</th>
-                    <th className="px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400">状态</th>
-                    <th className="px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400">上传时间</th>
-                    <th className="px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400">操作</th>
+                    <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>文件名称</th>
+                    <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>类型</th>
+                    <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>大小</th>
+                    <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>记录数</th>
+                    <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>状态</th>
+                    <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>上传时间</th>
+                    <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>操作</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                  {dataFiles.map((file) => (
-                    <tr key={file.id} className="hover:bg-gray-50 dark:hover:bg-gray-900">
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <span className="text-xl">{file.typeIcon}</span>
-                          <span className="text-sm dark:text-white">{file.name}</span>
+                <tbody className='divide-y divide-gray-200 dark:divide-gray-700'>
+                  {dataFiles.map(file => (
+                    <tr key={file.id} className='hover:bg-gray-50 dark:hover:bg-gray-900'>
+                      <td className='px-6 py-4'>
+                        <div className='flex items-center gap-3'>
+                          <span className='text-xl'>{file.typeIcon}</span>
+                          <span className='text-sm dark:text-white'>{file.name}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
-                        <Badge className={`text-xs ${file.typeColor} border-0`}>
-                          {file.type}
-                        </Badge>
+                      <td className='px-6 py-4'>
+                        <Badge className={`text-xs ${file.typeColor} border-0`}>{file.type}</Badge>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">{file.size}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">{file.recordCount}</td>
-                      <td className="px-6 py-4">
-                        <Badge className={`text-xs ${file.statusColor} border-0`}>
-                          {file.status}
-                        </Badge>
+                      <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{file.size}</td>
+                      <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{file.recordCount}</td>
+                      <td className='px-6 py-4'>
+                        <Badge className={`text-xs ${file.statusColor} border-0`}>{file.status}</Badge>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">{file.uploadTime}</td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
-                          <button 
+                      <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{file.uploadTime}</td>
+                      <td className='px-6 py-4'>
+                        <div className='flex items-center gap-2'>
+                          <button
                             onClick={() => handleAction('下载', file.name)}
-                            className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-                            title="下载文件"
+                            className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
+                            title='下载文件'
                           >
-                            <Download className="w-4 h-4 text-blue-500" />
+                            <Download className='w-4 h-4 text-blue-500' />
                           </button>
-                          <button 
+                          <button
                             onClick={() => handleAction('查看', file.name)}
-                            className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-                            title="预览"
+                            className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
+                            title='预览'
                           >
-                            <Eye className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                            <Eye className='w-4 h-4 text-gray-600 dark:text-gray-400' />
                           </button>
-                          <button 
+                          <button
                             onClick={() => handleAction('删除', file.name)}
-                            className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-                            title="删除文件"
+                            className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
+                            title='删除文件'
                           >
-                            <Trash2 className="w-4 h-4 text-red-500" />
+                            <Trash2 className='w-4 h-4 text-red-500' />
                           </button>
                         </div>
                       </td>
@@ -1113,86 +1197,80 @@ export function Dataset() {
 
       {/* 数据源类型 - 数据库表管理区域 */}
       {selectedDS && selectedDS.type === '数据源' && (
-        <div className="border-t-2 border-gray-200 dark:border-gray-700 pt-6">
+        <div className='border-t-2 border-gray-200 dark:border-gray-700 pt-6'>
           {/* 数据库信息头部 */}
-          <div className="mb-6">
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center gap-4">
-                <div className="bg-blue-500 w-14 h-14 rounded-xl flex items-center justify-center text-3xl">
-                  🐬
-                </div>
+          <div className='mb-6'>
+            <div className='flex items-start justify-between mb-4'>
+              <div className='flex items-center gap-4'>
+                <div className='bg-blue-500 w-14 h-14 rounded-xl flex items-center justify-center text-3xl'>🐬</div>
                 <div>
-                  <h2 className="text-xl dark:text-white mb-1">MySQL生产库</h2>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <h2 className='text-xl dark:text-white mb-1'>MySQL生产库</h2>
+                  <p className='text-sm text-gray-600 dark:text-gray-400'>
                     jdbc:mysql://192.168.1.100:3306/production_db
                   </p>
-                  <div className="flex items-center gap-3 mt-2">
-                    <Badge className="text-xs bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-0">
+                  <div className='flex items-center gap-3 mt-2'>
+                    <Badge className='text-xs bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-0'>
                       已连接
                     </Badge>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                      最后同步: 2023-10-23 11:15
-                    </span>
+                    <span className='text-xs text-gray-500 dark:text-gray-400'>最后同步: 2023-10-23 11:15</span>
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Button 
-                  variant="outline"
-                  size="sm"
-                  className="dark:bg-gray-800 dark:border-gray-700"
+              <div className='flex items-center gap-2'>
+                <Button
+                  variant='outline'
+                  size='sm'
+                  className='dark:bg-gray-800 dark:border-gray-700'
                   onClick={() => toast.success('同步数据库')}
                 >
-                  <RefreshCw className="w-4 h-4 mr-2" />
+                  <RefreshCw className='w-4 h-4 mr-2' />
                   同步
                 </Button>
-                <Button 
-                  variant="outline"
-                  size="sm"
-                  className="dark:bg-gray-800 dark:border-gray-700"
+                <Button
+                  variant='outline'
+                  size='sm'
+                  className='dark:bg-gray-800 dark:border-gray-700'
                   onClick={() => setAddDataSourceOpen(true)}
                 >
-                  <Edit className="w-4 h-4 mr-2" />
+                  <Edit className='w-4 h-4 mr-2' />
                   编辑连接
                 </Button>
               </div>
             </div>
 
             {/* 数据库统计 */}
-            <div className="grid grid-cols-4 gap-4">
-              <Card className="p-4 dark:bg-gray-800 dark:border-gray-700">
-                <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">数据库大小</div>
-                <div className="text-2xl dark:text-white">125.6 MB</div>
+            <div className='grid grid-cols-4 gap-4'>
+              <Card className='p-4 dark:bg-gray-800 dark:border-gray-700'>
+                <div className='text-sm text-gray-600 dark:text-gray-400 mb-1'>数据库大小</div>
+                <div className='text-2xl dark:text-white'>125.6 MB</div>
               </Card>
-              <Card className="p-4 dark:bg-gray-800 dark:border-gray-700">
-                <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">表数量</div>
-                <div className="text-2xl dark:text-white">{databaseTables.length} 张</div>
+              <Card className='p-4 dark:bg-gray-800 dark:border-gray-700'>
+                <div className='text-sm text-gray-600 dark:text-gray-400 mb-1'>表数量</div>
+                <div className='text-2xl dark:text-white'>{databaseTables.length} 张</div>
               </Card>
-              <Card className="p-4 dark:bg-gray-800 dark:border-gray-700">
-                <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">总记录数</div>
-                <div className="text-2xl dark:text-white">3.2M</div>
+              <Card className='p-4 dark:bg-gray-800 dark:border-gray-700'>
+                <div className='text-sm text-gray-600 dark:text-gray-400 mb-1'>总记录数</div>
+                <div className='text-2xl dark:text-white'>3.2M</div>
               </Card>
-              <Card className="p-4 dark:bg-gray-800 dark:border-gray-700">
-                <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">连接状态</div>
-                <div className="text-2xl text-green-600 dark:text-green-400">正常</div>
+              <Card className='p-4 dark:bg-gray-800 dark:border-gray-700'>
+                <div className='text-sm text-gray-600 dark:text-gray-400 mb-1'>连接状态</div>
+                <div className='text-2xl text-green-600 dark:text-green-400'>正常</div>
               </Card>
             </div>
           </div>
 
           {/* 左右分栏：表列表（左）+ 记录预览（右） */}
-          <div className="grid grid-cols-5 gap-6">
+          <div className='grid grid-cols-5 gap-6'>
             {/* 左侧：表列表 */}
-            <div className="col-span-2">
-              <div className="mb-4">
-                <h3 className="text-lg dark:text-white mb-1">数据表</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  点击表名查看数据记录
-                </p>
+            <div className='col-span-2'>
+              <div className='mb-4'>
+                <h3 className='text-lg dark:text-white mb-1'>数据表</h3>
+                <p className='text-sm text-gray-600 dark:text-gray-400'>点击表名查看数据记录</p>
               </div>
 
-              <Card className="dark:bg-gray-800 dark:border-gray-700">
-                <div className="divide-y divide-gray-200 dark:divide-gray-700">
-                  {databaseTables.map((table) => (
+              <Card className='dark:bg-gray-800 dark:border-gray-700'>
+                <div className='divide-y divide-gray-200 dark:divide-gray-700'>
+                  {databaseTables.map(table => (
                     <div
                       key={table.id}
                       onClick={() => {
@@ -1205,13 +1283,17 @@ export function Dataset() {
                           : 'hover:bg-gray-50 dark:hover:bg-gray-800'
                       }`}
                     >
-                      <div className="flex items-center gap-3 mb-2">
-                        <Database className={`w-5 h-5 ${selectedTable?.id === table.id ? 'text-blue-500' : 'text-gray-400'}`} />
-                        <span className={`text-sm font-mono ${selectedTable?.id === table.id ? 'text-blue-600 dark:text-blue-400' : 'dark:text-white'}`}>
+                      <div className='flex items-center gap-3 mb-2'>
+                        <Database
+                          className={`w-5 h-5 ${selectedTable?.id === table.id ? 'text-blue-500' : 'text-gray-400'}`}
+                        />
+                        <span
+                          className={`text-sm font-mono ${selectedTable?.id === table.id ? 'text-blue-600 dark:text-blue-400' : 'dark:text-white'}`}
+                        >
                           {table.tableName}
                         </span>
                       </div>
-                      <div className="flex items-center gap-4 text-xs text-gray-600 dark:text-gray-400 ml-8">
+                      <div className='flex items-center gap-4 text-xs text-gray-600 dark:text-gray-400 ml-8'>
                         <span>{table.rowCount} 行</span>
                         <span>{table.size}</span>
                         <span>{table.description}</span>
@@ -1223,45 +1305,49 @@ export function Dataset() {
             </div>
 
             {/* 右侧：记录预览 */}
-            <div className="col-span-3">
+            <div className='col-span-3'>
               {selectedTable ? (
                 <>
-                  <div className="mb-4 flex items-center justify-between">
+                  <div className='mb-4 flex items-center justify-between'>
                     <div>
-                      <h3 className="text-lg dark:text-white mb-1">
-                        数据记录预览 - <span className="font-mono text-blue-600 dark:text-blue-400">{selectedTable.tableName}</span>
+                      <h3 className='text-lg dark:text-white mb-1'>
+                        数据记录预览 -{' '}
+                        <span className='font-mono text-blue-600 dark:text-blue-400'>{selectedTable.tableName}</span>
                       </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <p className='text-sm text-gray-600 dark:text-gray-400'>
                         共 {selectedTable.rowCount} 行记录，显示前 {totalTableRecords} 条
                       </p>
                     </div>
-                    <Button 
-                      variant="outline"
-                      size="sm"
-                      className="dark:bg-gray-800 dark:border-gray-700"
+                    <Button
+                      variant='outline'
+                      size='sm'
+                      className='dark:bg-gray-800 dark:border-gray-700'
                       onClick={() => setSelectedTable(null)}
                     >
                       关闭预览
                     </Button>
                   </div>
 
-                  <Card className="dark:bg-gray-800 dark:border-gray-700">
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-sm">
-                        <thead className="bg-gray-50 dark:bg-gray-900">
+                  <Card className='dark:bg-gray-800 dark:border-gray-700'>
+                    <div className='overflow-x-auto'>
+                      <table className='w-full text-sm'>
+                        <thead className='bg-gray-50 dark:bg-gray-900'>
                           <tr>
-                            {tableColumns.map((column) => (
-                              <th key={column} className="px-4 py-3 text-left text-xs text-gray-600 dark:text-gray-400 font-mono">
+                            {tableColumns.map(column => (
+                              <th
+                                key={column}
+                                className='px-4 py-3 text-left text-xs text-gray-600 dark:text-gray-400 font-mono'
+                              >
                                 {column}
                               </th>
                             ))}
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                        <tbody className='divide-y divide-gray-200 dark:divide-gray-700'>
                           {paginatedTableRecords.map((record, index) => (
-                            <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-900">
-                              {tableColumns.map((column) => (
-                                <td key={column} className="px-4 py-3 text-xs text-gray-700 dark:text-gray-300">
+                            <tr key={index} className='hover:bg-gray-50 dark:hover:bg-gray-900'>
+                              {tableColumns.map(column => (
+                                <td key={column} className='px-4 py-3 text-xs text-gray-700 dark:text-gray-300'>
                                   {String(record[column])}
                                 </td>
                               ))}
@@ -1273,32 +1359,36 @@ export function Dataset() {
 
                     {/* 表记录分页 */}
                     {totalTablePages > 1 && (
-                      <div className="flex items-center justify-center px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+                      <div className='flex items-center justify-center px-6 py-4 border-t border-gray-200 dark:border-gray-700'>
                         <Pagination>
                           <PaginationContent>
                             <PaginationItem>
-                              <PaginationPrevious 
+                              <PaginationPrevious
                                 onClick={() => setTableCurrentPage(prev => Math.max(1, prev - 1))}
                                 className={tableCurrentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
                               >
                                 上一页
                               </PaginationPrevious>
                             </PaginationItem>
-                            {Array.from({ length: totalTablePages }, (_, i) => i + 1).map((page) => (
+                            {Array.from({ length: totalTablePages }, (_, i) => i + 1).map(page => (
                               <PaginationItem key={page}>
                                 <PaginationLink
                                   onClick={() => setTableCurrentPage(page)}
                                   isActive={tableCurrentPage === page}
-                                  className="cursor-pointer"
+                                  className='cursor-pointer'
                                 >
                                   {page}
                                 </PaginationLink>
                               </PaginationItem>
                             ))}
                             <PaginationItem>
-                              <PaginationNext 
+                              <PaginationNext
                                 onClick={() => setTableCurrentPage(prev => Math.min(totalTablePages, prev + 1))}
-                                className={tableCurrentPage === totalTablePages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                                className={
+                                  tableCurrentPage === totalTablePages
+                                    ? 'pointer-events-none opacity-50'
+                                    : 'cursor-pointer'
+                                }
                               >
                                 下一页
                               </PaginationNext>
@@ -1310,11 +1400,9 @@ export function Dataset() {
                   </Card>
                 </>
               ) : (
-                <div className="flex flex-col items-center justify-center h-96 text-center">
-                  <Database className="w-16 h-16 text-gray-300 dark:text-gray-600 mb-4" />
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">
-                    选择左侧的数据表以查看记录预览
-                  </p>
+                <div className='flex flex-col items-center justify-center h-96 text-center'>
+                  <Database className='w-16 h-16 text-gray-300 dark:text-gray-600 mb-4' />
+                  <p className='text-gray-500 dark:text-gray-400 text-sm'>选择左侧的数据表以查看记录预览</p>
                 </div>
               )}
             </div>
@@ -1322,68 +1410,64 @@ export function Dataset() {
         </div>
       )}
 
-
       {/* View Dataset Dialog */}
       <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
-        <DialogContent className="max-w-2xl dark:bg-gray-900 dark:border-gray-700">
+        <DialogContent className='max-w-2xl dark:bg-gray-900 dark:border-gray-700'>
           <DialogHeader>
-            <DialogTitle className="text-xl dark:text-white">数据集详情</DialogTitle>
-            <DialogDescription className="text-sm text-gray-500 dark:text-gray-400">
+            <DialogTitle className='text-xl dark:text-white'>数据集详情</DialogTitle>
+            <DialogDescription className='text-sm text-gray-500 dark:text-gray-400'>
               查看数据集的详细信息
             </DialogDescription>
           </DialogHeader>
 
           {viewingDataset && (
-            <div className="space-y-4 py-4">
-              <div className="flex items-center gap-4 pb-4 border-b border-gray-200 dark:border-gray-700">
-                <div className={`${viewingDataset.iconBg} w-16 h-16 rounded-lg flex items-center justify-center text-3xl`}>
+            <div className='space-y-4 py-4'>
+              <div className='flex items-center gap-4 pb-4 border-b border-gray-200 dark:border-gray-700'>
+                <div
+                  className={`${viewingDataset.iconBg} w-16 h-16 rounded-lg flex items-center justify-center text-3xl`}
+                >
                   {viewingDataset.icon}
                 </div>
-                <div className="flex-1">
-                  <h3 className="text-lg dark:text-white mb-1">{viewingDataset.name}</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{viewingDataset.description}</p>
+                <div className='flex-1'>
+                  <h3 className='text-lg dark:text-white mb-1'>{viewingDataset.name}</h3>
+                  <p className='text-sm text-gray-600 dark:text-gray-400'>{viewingDataset.description}</p>
                 </div>
-                <Badge className={`text-xs ${viewingDataset.statusColor} border-0`}>
-                  {viewingDataset.status}
-                </Badge>
+                <Badge className={`text-xs ${viewingDataset.statusColor} border-0`}>{viewingDataset.status}</Badge>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className='grid grid-cols-2 gap-4'>
                 <div>
-                  <Label className="text-sm text-gray-600 dark:text-gray-400">数据类型</Label>
-                  <p className="text-sm dark:text-white mt-1">{viewingDataset.type}</p>
+                  <Label className='text-sm text-gray-600 dark:text-gray-400'>数据类型</Label>
+                  <p className='text-sm dark:text-white mt-1'>{viewingDataset.type}</p>
                 </div>
                 <div>
-                  <Label className="text-sm text-gray-600 dark:text-gray-400">文档数量</Label>
-                  <p className="text-sm dark:text-white mt-1">{viewingDataset.dataCount} 个文档</p>
+                  <Label className='text-sm text-gray-600 dark:text-gray-400'>文档数量</Label>
+                  <p className='text-sm dark:text-white mt-1'>{viewingDataset.dataCount} 个文档</p>
                 </div>
                 <div>
-                  <Label className="text-sm text-gray-600 dark:text-gray-400">数据量</Label>
-                  <p className="text-sm dark:text-white mt-1">{viewingDataset.size}</p>
+                  <Label className='text-sm text-gray-600 dark:text-gray-400'>数据量</Label>
+                  <p className='text-sm dark:text-white mt-1'>{viewingDataset.size}</p>
                 </div>
                 <div>
-                  <Label className="text-sm text-gray-600 dark:text-gray-400">创建者</Label>
-                  <p className="text-sm dark:text-white mt-1">{viewingDataset.creator}</p>
+                  <Label className='text-sm text-gray-600 dark:text-gray-400'>创建者</Label>
+                  <p className='text-sm dark:text-white mt-1'>{viewingDataset.creator}</p>
                 </div>
                 <div>
-                  <Label className="text-sm text-gray-600 dark:text-gray-400">创建时间</Label>
-                  <p className="text-sm dark:text-white mt-1">{viewingDataset.createdTime}</p>
+                  <Label className='text-sm text-gray-600 dark:text-gray-400'>创建时间</Label>
+                  <p className='text-sm dark:text-white mt-1'>{viewingDataset.createdTime}</p>
                 </div>
                 <div>
-                  <Label className="text-sm text-gray-600 dark:text-gray-400">最后更新</Label>
-                  <p className="text-sm dark:text-white mt-1">{viewingDataset.updateTime}</p>
+                  <Label className='text-sm text-gray-600 dark:text-gray-400'>最后更新</Label>
+                  <p className='text-sm dark:text-white mt-1'>{viewingDataset.updateTime}</p>
                 </div>
               </div>
 
               {viewingDataset.tags && viewingDataset.tags.length > 0 && (
                 <div>
-                  <Label className="text-sm text-gray-600 dark:text-gray-400 mb-2 block">标签</Label>
-                  <div className="flex flex-wrap gap-2">
+                  <Label className='text-sm text-gray-600 dark:text-gray-400 mb-2 block'>标签</Label>
+                  <div className='flex flex-wrap gap-2'>
                     {viewingDataset.tags.map((tag, index) => (
-                      <Badge
-                        key={index}
-                        className={`text-xs px-2 py-1 border-0 ${getTagColor(tag)}`}
-                      >
+                      <Badge key={index} className={`text-xs px-2 py-1 border-0 ${getTagColor(tag)}`}>
                         {tag}
                       </Badge>
                     ))}
@@ -1393,16 +1477,16 @@ export function Dataset() {
             </div>
           )}
 
-          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <Button 
-              variant="outline" 
+          <div className='flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700'>
+            <Button
+              variant='outline'
               onClick={() => setViewDialogOpen(false)}
-              className="dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300"
+              className='dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300'
             >
               关闭
             </Button>
-            <Button 
-              className="bg-blue-500 hover:bg-blue-600 text-white"
+            <Button
+              className='bg-blue-500 hover:bg-blue-600 text-white'
               onClick={() => {
                 setViewDialogOpen(false);
                 viewingDataset && handleAction('编辑', viewingDataset.name);
@@ -1415,17 +1499,10 @@ export function Dataset() {
       </Dialog>
 
       {/* Create Dataset Dialog */}
-      <CreateDatasetDialog 
-        open={createDialogOpen} 
-        onOpenChange={setCreateDialogOpen}
-      />
+      <CreateDatasetDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} />
 
       {/* Edit Dataset Dialog */}
-      <EditDatasetDialog
-        open={editDialogOpen}
-        onOpenChange={setEditDialogOpen}
-        dataset={editingDataset}
-      />
+      <EditDatasetDialog open={editDialogOpen} onOpenChange={setEditDialogOpen} dataset={editingDataset} />
 
       {/* Add Data Source Dialog */}
       <AddDataSourceDialog
@@ -1436,21 +1513,18 @@ export function Dataset() {
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent className="dark:bg-gray-900 dark:border-gray-700">
+        <AlertDialogContent className='dark:bg-gray-900 dark:border-gray-700'>
           <AlertDialogHeader>
-            <AlertDialogTitle className="dark:text-white">确认删除</AlertDialogTitle>
-            <AlertDialogDescription className="dark:text-gray-400">
+            <AlertDialogTitle className='dark:text-white'>确认删除</AlertDialogTitle>
+            <AlertDialogDescription className='dark:text-gray-400'>
               确定要删除数据集 "{deletingDataset?.name}" 吗？此操作无法撤销。
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300">
+            <AlertDialogCancel className='dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300'>
               取消
             </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={confirmDelete}
-              className="bg-red-600 hover:bg-red-700 text-white"
-            >
+            <AlertDialogAction onClick={confirmDelete} className='bg-red-600 hover:bg-red-700 text-white'>
               删除
             </AlertDialogAction>
           </AlertDialogFooter>

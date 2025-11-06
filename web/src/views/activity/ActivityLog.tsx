@@ -1,30 +1,6 @@
-import React,{ useState, useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import { useLanguage } from '@/ui/LanguageProvider';
-import { 
-  Activity, 
-  Search, 
-  Filter, 
-  Calendar,
-  User,
-  FileText,
-  Database,
-  Workflow,
-  Brain,
-  Settings,
-  Trash2,
-  Edit,
-  Plus,
-  Eye,
-  Share2,
-  Upload,
-  Download,
-  Clock,
-  ChevronRight,
-  AlertCircle,
-  CheckCircle,
-  XCircle,
-  Info
-} from 'lucide-react';
+import { Activity, Search, Filter, Calendar, User, FileText, Database, Workflow, Brain, Settings, Trash2, Edit, Plus, Eye, Share2, Upload, Download, Clock, ChevronRight, AlertCircle, CheckCircle, XCircle, Info, } from 'lucide-react';
 import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
 import { Badge } from '@/ui/badge';
@@ -34,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Avatar, AvatarFallback } from '@/ui/avatar';
 import { MyContext } from '@/ui/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/ui/tabs';
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/ui/pagination';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, } from '@/ui/pagination';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/ui/dialog';
 import { ScrollArea } from '@/ui/scroll-area';
 import { toast } from 'sonner';
@@ -267,24 +243,21 @@ export function ActivityLog() {
 
   // 筛选活动记录
   const filteredActivities = activities.filter(activity => {
-    const matchesSearch = 
+    const matchesSearch =
       activity.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       activity.targetName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       activity.description.toLowerCase().includes(searchQuery.toLowerCase());
-    
+
     const matchesUser = selectedUser === 'all' || activity.userId.toString() === selectedUser;
     const matchesTargetType = selectedTargetType === 'all' || activity.targetType === selectedTargetType;
     const matchesActionType = selectedActionType === 'all' || activity.actionType === selectedActionType;
-    
+
     return matchesSearch && matchesUser && matchesTargetType && matchesActionType;
   });
 
   // 分页
   const totalPages = Math.ceil(filteredActivities.length / itemsPerPage);
-  const paginatedActivities = filteredActivities.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const paginatedActivities = filteredActivities.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const handleViewDetail = (activity: ActivityRecord) => {
     setSelectedActivity(activity);
@@ -333,24 +306,24 @@ export function ActivityLog() {
   const getStatusBadge = (status?: string) => {
     if (!status || status === 'success') {
       return (
-        <Badge className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-0">
-          <CheckCircle className="w-3 h-3 mr-1" />
+        <Badge className='bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-0'>
+          <CheckCircle className='w-3 h-3 mr-1' />
           成功
         </Badge>
       );
     }
     if (status === 'failed') {
       return (
-        <Badge className="bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-0">
-          <XCircle className="w-3 h-3 mr-1" />
+        <Badge className='bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-0'>
+          <XCircle className='w-3 h-3 mr-1' />
           失败
         </Badge>
       );
     }
     if (status === 'warning') {
       return (
-        <Badge className="bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400 border-0">
-          <AlertCircle className="w-3 h-3 mr-1" />
+        <Badge className='bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400 border-0'>
+          <AlertCircle className='w-3 h-3 mr-1' />
           警告
         </Badge>
       );
@@ -359,90 +332,90 @@ export function ActivityLog() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className='space-y-6'>
       {/* Header */}
       <div>
-        <div className="flex items-center justify-between">
+        <div className='flex items-center justify-between'>
           <div>
-            <h1 className="text-2xl dark:text-white mb-1">活动记录</h1>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <h1 className='text-2xl dark:text-white mb-1'>活动记录</h1>
+            <p className='text-sm text-gray-600 dark:text-gray-400'>
               查看团队成员的所有操作活动记录 · 当前保留 {retentionDays} 天记录
             </p>
           </div>
           <Button
             onClick={handleOpenSettings}
-            variant="outline"
-            className="dark:bg-gray-900 dark:border-gray-700 dark:text-white"
+            variant='outline'
+            className='dark:bg-gray-900 dark:border-gray-700 dark:text-white'
           >
-            <Settings className="w-4 h-4 mr-2" />
+            <Settings className='w-4 h-4 mr-2' />
             记录设置
           </Button>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card className="p-6 dark:bg-gray-900 dark:border-gray-800">
-          <div className="flex items-center justify-between">
+      <div className='grid grid-cols-1 md:grid-cols-4 gap-6'>
+        <Card className='p-6 dark:bg-gray-900 dark:border-gray-800'>
+          <div className='flex items-center justify-between'>
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">今日活动</p>
-              <p className="text-2xl dark:text-white">156</p>
+              <p className='text-sm text-gray-600 dark:text-gray-400 mb-1'>今日活动</p>
+              <p className='text-2xl dark:text-white'>156</p>
             </div>
-            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
-              <Activity className="w-6 h-6 text-blue-500" />
+            <div className='w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center'>
+              <Activity className='w-6 h-6 text-blue-500' />
             </div>
           </div>
         </Card>
 
-        <Card className="p-6 dark:bg-gray-900 dark:border-gray-800">
-          <div className="flex items-center justify-between">
+        <Card className='p-6 dark:bg-gray-900 dark:border-gray-800'>
+          <div className='flex items-center justify-between'>
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">活跃用户</p>
-              <p className="text-2xl dark:text-white">8</p>
+              <p className='text-sm text-gray-600 dark:text-gray-400 mb-1'>活跃用户</p>
+              <p className='text-2xl dark:text-white'>8</p>
             </div>
-            <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
-              <User className="w-6 h-6 text-green-500" />
+            <div className='w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center'>
+              <User className='w-6 h-6 text-green-500' />
             </div>
           </div>
         </Card>
 
-        <Card className="p-6 dark:bg-gray-900 dark:border-gray-800">
-          <div className="flex items-center justify-between">
+        <Card className='p-6 dark:bg-gray-900 dark:border-gray-800'>
+          <div className='flex items-center justify-between'>
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">操作成功率</p>
-              <p className="text-2xl dark:text-white">98.5%</p>
+              <p className='text-sm text-gray-600 dark:text-gray-400 mb-1'>操作成功率</p>
+              <p className='text-2xl dark:text-white'>98.5%</p>
             </div>
-            <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
-              <CheckCircle className="w-6 h-6 text-purple-500" />
+            <div className='w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center'>
+              <CheckCircle className='w-6 h-6 text-purple-500' />
             </div>
           </div>
         </Card>
 
-        <Card className="p-6 dark:bg-gray-900 dark:border-gray-800">
-          <div className="flex items-center justify-between">
+        <Card className='p-6 dark:bg-gray-900 dark:border-gray-800'>
+          <div className='flex items-center justify-between'>
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">总记录数</p>
-              <p className="text-2xl dark:text-white">12,456</p>
+              <p className='text-sm text-gray-600 dark:text-gray-400 mb-1'>总记录数</p>
+              <p className='text-2xl dark:text-white'>12,456</p>
             </div>
-            <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center">
-              <FileText className="w-6 h-6 text-orange-500" />
+            <div className='w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center'>
+              <FileText className='w-6 h-6 text-orange-500' />
             </div>
           </div>
         </Card>
       </div>
 
       {/* Filters */}
-      <Card className="p-6 dark:bg-gray-900 dark:border-gray-800">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+      <Card className='p-6 dark:bg-gray-900 dark:border-gray-800'>
+        <div className='grid grid-cols-1 md:grid-cols-5 gap-4'>
           {/* Search */}
-          <div className="md:col-span-2">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <div className='md:col-span-2'>
+            <div className='relative'>
+              <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4' />
               <Input
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="搜索用户、目标或操作..."
-                className="pl-10 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                onChange={e => setSearchQuery(e.target.value)}
+                placeholder='搜索用户、目标或操作...'
+                className='pl-10 dark:bg-gray-800 dark:border-gray-700 dark:text-white'
               />
             </div>
           </div>
@@ -450,16 +423,28 @@ export function ActivityLog() {
           {/* User Filter */}
           <div>
             <Select value={selectedUser} onValueChange={setSelectedUser}>
-              <SelectTrigger className="dark:bg-gray-800 dark:border-gray-700 dark:text-white">
-                <SelectValue placeholder="所有用户" />
+              <SelectTrigger className='dark:bg-gray-800 dark:border-gray-700 dark:text-white'>
+                <SelectValue placeholder='所有用户' />
               </SelectTrigger>
-              <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                <SelectItem value="all" className="dark:text-white">所有用户</SelectItem>
-                <SelectItem value="1" className="dark:text-white">张伟</SelectItem>
-                <SelectItem value="2" className="dark:text-white">李娜</SelectItem>
-                <SelectItem value="3" className="dark:text-white">王芳</SelectItem>
-                <SelectItem value="4" className="dark:text-white">赵强</SelectItem>
-                <SelectItem value="5" className="dark:text-white">孙丽</SelectItem>
+              <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
+                <SelectItem value='all' className='dark:text-white'>
+                  所有用户
+                </SelectItem>
+                <SelectItem value='1' className='dark:text-white'>
+                  张伟
+                </SelectItem>
+                <SelectItem value='2' className='dark:text-white'>
+                  李娜
+                </SelectItem>
+                <SelectItem value='3' className='dark:text-white'>
+                  王芳
+                </SelectItem>
+                <SelectItem value='4' className='dark:text-white'>
+                  赵强
+                </SelectItem>
+                <SelectItem value='5' className='dark:text-white'>
+                  孙丽
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -467,17 +452,31 @@ export function ActivityLog() {
           {/* Target Type Filter */}
           <div>
             <Select value={selectedTargetType} onValueChange={setSelectedTargetType}>
-              <SelectTrigger className="dark:bg-gray-800 dark:border-gray-700 dark:text-white">
-                <SelectValue placeholder="所有类型" />
+              <SelectTrigger className='dark:bg-gray-800 dark:border-gray-700 dark:text-white'>
+                <SelectValue placeholder='所有类型' />
               </SelectTrigger>
-              <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                <SelectItem value="all" className="dark:text-white">所有类型</SelectItem>
-                <SelectItem value="APPLICATION" className="dark:text-white">应用</SelectItem>
-                <SelectItem value="WORKFLOW" className="dark:text-white">工作流</SelectItem>
-                <SelectItem value="KNOWLEDGE_BASE" className="dark:text-white">知识库</SelectItem>
-                <SelectItem value="DATASET" className="dark:text-white">数据集</SelectItem>
-                <SelectItem value="MODEL" className="dark:text-white">模型</SelectItem>
-                <SelectItem value="TEAM_MEMBER" className="dark:text-white">团队成员</SelectItem>
+              <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
+                <SelectItem value='all' className='dark:text-white'>
+                  所有类型
+                </SelectItem>
+                <SelectItem value='APPLICATION' className='dark:text-white'>
+                  应用
+                </SelectItem>
+                <SelectItem value='WORKFLOW' className='dark:text-white'>
+                  工作流
+                </SelectItem>
+                <SelectItem value='KNOWLEDGE_BASE' className='dark:text-white'>
+                  知识库
+                </SelectItem>
+                <SelectItem value='DATASET' className='dark:text-white'>
+                  数据集
+                </SelectItem>
+                <SelectItem value='MODEL' className='dark:text-white'>
+                  模型
+                </SelectItem>
+                <SelectItem value='TEAM_MEMBER' className='dark:text-white'>
+                  团队成员
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -485,31 +484,49 @@ export function ActivityLog() {
           {/* Action Type Filter */}
           <div>
             <Select value={selectedActionType} onValueChange={setSelectedActionType}>
-              <SelectTrigger className="dark:bg-gray-800 dark:border-gray-700 dark:text-white">
-                <SelectValue placeholder="所有操作" />
+              <SelectTrigger className='dark:bg-gray-800 dark:border-gray-700 dark:text-white'>
+                <SelectValue placeholder='所有操作' />
               </SelectTrigger>
-              <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                <SelectItem value="all" className="dark:text-white">所有操作</SelectItem>
-                <SelectItem value="CREATE" className="dark:text-white">创建</SelectItem>
-                <SelectItem value="UPDATE" className="dark:text-white">更新</SelectItem>
-                <SelectItem value="DELETE" className="dark:text-white">删除</SelectItem>
-                <SelectItem value="VIEW" className="dark:text-white">查看</SelectItem>
-                <SelectItem value="SHARE" className="dark:text-white">分享</SelectItem>
-                <SelectItem value="EXPORT" className="dark:text-white">导出</SelectItem>
-                <SelectItem value="IMPORT" className="dark:text-white">导入</SelectItem>
-                <SelectItem value="EXECUTE" className="dark:text-white">执行</SelectItem>
+              <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
+                <SelectItem value='all' className='dark:text-white'>
+                  所有操作
+                </SelectItem>
+                <SelectItem value='CREATE' className='dark:text-white'>
+                  创建
+                </SelectItem>
+                <SelectItem value='UPDATE' className='dark:text-white'>
+                  更新
+                </SelectItem>
+                <SelectItem value='DELETE' className='dark:text-white'>
+                  删除
+                </SelectItem>
+                <SelectItem value='VIEW' className='dark:text-white'>
+                  查看
+                </SelectItem>
+                <SelectItem value='SHARE' className='dark:text-white'>
+                  分享
+                </SelectItem>
+                <SelectItem value='EXPORT' className='dark:text-white'>
+                  导出
+                </SelectItem>
+                <SelectItem value='IMPORT' className='dark:text-white'>
+                  导入
+                </SelectItem>
+                <SelectItem value='EXECUTE' className='dark:text-white'>
+                  执行
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
         </div>
 
-        <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            找到 <span className="dark:text-white">{filteredActivities.length}</span> 条记录
+        <div className='flex items-center justify-between mt-4 pt-4 border-t border-gray-200 dark:border-gray-700'>
+          <p className='text-sm text-gray-600 dark:text-gray-400'>
+            找到 <span className='dark:text-white'>{filteredActivities.length}</span> 条记录
           </p>
           <Button
-            variant="ghost"
-            size="sm"
+            variant='ghost'
+            size='sm'
             onClick={() => {
               setSearchQuery('');
               setSelectedUser('all');
@@ -517,7 +534,7 @@ export function ActivityLog() {
               setSelectedActionType('all');
               setDateRange('all');
             }}
-            className="dark:text-gray-400 dark:hover:text-white"
+            className='dark:text-gray-400 dark:hover:text-white'
           >
             清除筛选
           </Button>
@@ -525,66 +542,64 @@ export function ActivityLog() {
       </Card>
 
       {/* Activity List */}
-      <Card className="dark:bg-gray-900 dark:border-gray-800">
-        <ScrollArea className="h-[600px]">
-          <div className="divide-y divide-gray-200 dark:divide-gray-800">
-            {paginatedActivities.map((activity) => {
+      <Card className='dark:bg-gray-900 dark:border-gray-800'>
+        <ScrollArea className='h-[600px]'>
+          <div className='divide-y divide-gray-200 dark:divide-gray-800'>
+            {paginatedActivities.map(activity => {
               const ActionIcon = getActionIcon(activity.actionType);
               const TargetIcon = getTargetIcon(activity.targetType);
-              
+
               return (
                 <div
                   key={activity.id}
-                  className="p-6 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors cursor-pointer"
+                  className='p-6 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors cursor-pointer'
                   onClick={() => handleViewDetail(activity)}
                 >
-                  <div className="flex items-start gap-4">
+                  <div className='flex items-start gap-4'>
                     {/* User Avatar */}
-                    <Avatar className="w-10 h-10 flex-shrink-0">
-                      <AvatarFallback className="bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+                    <Avatar className='w-10 h-10 flex-shrink-0'>
+                      <AvatarFallback className='bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'>
                         {activity.userAvatar}
                       </AvatarFallback>
                     </Avatar>
 
                     {/* Activity Content */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-4 mb-2">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="dark:text-white">{activity.userName}</span>
+                    <div className='flex-1 min-w-0'>
+                      <div className='flex items-start justify-between gap-4 mb-2'>
+                        <div className='flex items-center gap-2 flex-wrap'>
+                          <span className='dark:text-white'>{activity.userName}</span>
                           <ActionIcon className={`w-4 h-4 ${getActionColor(activity.actionType)}`} />
-                          <span className="text-sm text-gray-600 dark:text-gray-400">
+                          <span className='text-sm text-gray-600 dark:text-gray-400'>
                             {getActionLabel(activity.actionType)}
                           </span>
                           <TargetIcon className={`w-4 h-4 ${getTargetColor(activity.targetType)}`} />
-                          <Badge variant="secondary" className="dark:bg-gray-800 dark:text-gray-300">
+                          <Badge variant='secondary' className='dark:bg-gray-800 dark:text-gray-300'>
                             {getTargetLabel(activity.targetType)}
                           </Badge>
                           {activity.status && getStatusBadge(activity.status)}
                         </div>
-                        <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 flex-shrink-0">
-                          <Clock className="w-4 h-4" />
+                        <div className='flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 flex-shrink-0'>
+                          <Clock className='w-4 h-4' />
                           {activity.activityDate}
                         </div>
                       </div>
-                      
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                        {activity.description}
-                      </p>
-                      
-                      <div className="flex items-center gap-2 text-sm">
-                        <span className="text-gray-500 dark:text-gray-500">目标：</span>
-                        <span className="dark:text-white">{activity.targetName}</span>
+
+                      <p className='text-sm text-gray-600 dark:text-gray-400 mb-1'>{activity.description}</p>
+
+                      <div className='flex items-center gap-2 text-sm'>
+                        <span className='text-gray-500 dark:text-gray-500'>目标：</span>
+                        <span className='dark:text-white'>{activity.targetName}</span>
                       </div>
-                      
+
                       {activity.detail && (
-                        <div className="mt-2 flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400">
-                          <Info className="w-4 h-4" />
+                        <div className='mt-2 flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400'>
+                          <Info className='w-4 h-4' />
                           <span>点击查看详细信息</span>
                         </div>
                       )}
                     </div>
 
-                    <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-600 flex-shrink-0" />
+                    <ChevronRight className='w-5 h-5 text-gray-400 dark:text-gray-600 flex-shrink-0' />
                   </div>
                 </div>
               );
@@ -594,7 +609,7 @@ export function ActivityLog() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="p-4 border-t border-gray-200 dark:border-gray-800">
+          <div className='p-4 border-t border-gray-200 dark:border-gray-800'>
             <Pagination>
               <PaginationContent>
                 <PaginationItem>
@@ -614,13 +629,13 @@ export function ActivityLog() {
                   } else {
                     pageNumber = currentPage - 2 + i;
                   }
-                  
+
                   return (
                     <PaginationItem key={pageNumber}>
                       <PaginationLink
                         onClick={() => setCurrentPage(pageNumber)}
                         isActive={currentPage === pageNumber}
-                        className="cursor-pointer"
+                        className='cursor-pointer'
                       >
                         {pageNumber}
                       </PaginationLink>
@@ -641,90 +656,86 @@ export function ActivityLog() {
 
       {/* Detail Dialog */}
       <Dialog open={showDetailDialog} onOpenChange={setShowDetailDialog}>
-        <DialogContent className="max-w-2xl dark:bg-gray-900 dark:border-gray-700">
+        <DialogContent className='max-w-2xl dark:bg-gray-900 dark:border-gray-700'>
           <DialogHeader>
-            <DialogTitle className="dark:text-white">活动详情</DialogTitle>
-            <DialogDescription className="dark:text-gray-400">
-              查看活动记录的完整信息
-            </DialogDescription>
+            <DialogTitle className='dark:text-white'>活动详情</DialogTitle>
+            <DialogDescription className='dark:text-gray-400'>查看活动记录的完整信息</DialogDescription>
           </DialogHeader>
-          
+
           {selectedActivity && (
-            <div className="space-y-6">
+            <div className='space-y-6'>
               {/* User Info */}
-              <div className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <Avatar className="w-12 h-12">
-                  <AvatarFallback className="bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+              <div className='flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg'>
+                <Avatar className='w-12 h-12'>
+                  <AvatarFallback className='bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'>
                     {selectedActivity.userAvatar}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="dark:text-white">{selectedActivity.userName}</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    用户ID: {selectedActivity.userId}
-                  </p>
+                  <p className='dark:text-white'>{selectedActivity.userName}</p>
+                  <p className='text-sm text-gray-600 dark:text-gray-400'>用户ID: {selectedActivity.userId}</p>
                 </div>
               </div>
 
               {/* Activity Info */}
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+              <div className='space-y-4'>
+                <div className='grid grid-cols-2 gap-4'>
                   <div>
-                    <Label className="text-sm text-gray-600 dark:text-gray-400">操作类型</Label>
-                    <div className="flex items-center gap-2 mt-1">
+                    <Label className='text-sm text-gray-600 dark:text-gray-400'>操作类型</Label>
+                    <div className='flex items-center gap-2 mt-1'>
                       {(() => {
                         const ActionIcon = getActionIcon(selectedActivity.actionType);
                         return <ActionIcon className={`w-4 h-4 ${getActionColor(selectedActivity.actionType)}`} />;
                       })()}
-                      <span className="dark:text-white">{getActionLabel(selectedActivity.actionType)}</span>
+                      <span className='dark:text-white'>{getActionLabel(selectedActivity.actionType)}</span>
                     </div>
                   </div>
-                  
+
                   <div>
-                    <Label className="text-sm text-gray-600 dark:text-gray-400">目标类型</Label>
-                    <div className="flex items-center gap-2 mt-1">
+                    <Label className='text-sm text-gray-600 dark:text-gray-400'>目标类型</Label>
+                    <div className='flex items-center gap-2 mt-1'>
                       {(() => {
                         const TargetIcon = getTargetIcon(selectedActivity.targetType);
                         return <TargetIcon className={`w-4 h-4 ${getTargetColor(selectedActivity.targetType)}`} />;
                       })()}
-                      <span className="dark:text-white">{getTargetLabel(selectedActivity.targetType)}</span>
+                      <span className='dark:text-white'>{getTargetLabel(selectedActivity.targetType)}</span>
                     </div>
                   </div>
 
                   <div>
-                    <Label className="text-sm text-gray-600 dark:text-gray-400">目标名称</Label>
-                    <p className="dark:text-white mt-1">{selectedActivity.targetName}</p>
+                    <Label className='text-sm text-gray-600 dark:text-gray-400'>目标名称</Label>
+                    <p className='dark:text-white mt-1'>{selectedActivity.targetName}</p>
                   </div>
 
                   <div>
-                    <Label className="text-sm text-gray-600 dark:text-gray-400">目标ID</Label>
-                    <p className="dark:text-white mt-1">{selectedActivity.targetId}</p>
+                    <Label className='text-sm text-gray-600 dark:text-gray-400'>目标ID</Label>
+                    <p className='dark:text-white mt-1'>{selectedActivity.targetId}</p>
                   </div>
 
                   <div>
-                    <Label className="text-sm text-gray-600 dark:text-gray-400">活动时间</Label>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Clock className="w-4 h-4 text-gray-400" />
-                      <span className="dark:text-white">{selectedActivity.activityDate}</span>
+                    <Label className='text-sm text-gray-600 dark:text-gray-400'>活动时间</Label>
+                    <div className='flex items-center gap-2 mt-1'>
+                      <Clock className='w-4 h-4 text-gray-400' />
+                      <span className='dark:text-white'>{selectedActivity.activityDate}</span>
                     </div>
                   </div>
 
                   <div>
-                    <Label className="text-sm text-gray-600 dark:text-gray-400">状态</Label>
-                    <div className="mt-1">{getStatusBadge(selectedActivity.status)}</div>
+                    <Label className='text-sm text-gray-600 dark:text-gray-400'>状态</Label>
+                    <div className='mt-1'>{getStatusBadge(selectedActivity.status)}</div>
                   </div>
                 </div>
 
                 <div>
-                  <Label className="text-sm text-gray-600 dark:text-gray-400">描述</Label>
-                  <p className="dark:text-white mt-1">{selectedActivity.description}</p>
+                  <Label className='text-sm text-gray-600 dark:text-gray-400'>描述</Label>
+                  <p className='dark:text-white mt-1'>{selectedActivity.description}</p>
                 </div>
 
                 {selectedActivity.detail && (
                   <div>
-                    <Label className="text-sm text-gray-600 dark:text-gray-400">详细信息</Label>
-                    <div className="mt-2 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                      <p className="text-sm dark:text-gray-300">{selectedActivity.detail}</p>
+                    <Label className='text-sm text-gray-600 dark:text-gray-400'>详细信息</Label>
+                    <div className='mt-2 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg'>
+                      <p className='text-sm dark:text-gray-300'>{selectedActivity.detail}</p>
                     </div>
                   </div>
                 )}
@@ -734,9 +745,9 @@ export function ActivityLog() {
 
           <DialogFooter>
             <Button
-              variant="outline"
+              variant='outline'
               onClick={() => setShowDetailDialog(false)}
-              className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+              className='dark:bg-gray-800 dark:border-gray-700 dark:text-white'
             >
               关闭
             </Button>
@@ -746,49 +757,64 @@ export function ActivityLog() {
 
       {/* Settings Dialog */}
       <Dialog open={showSettingsDialog} onOpenChange={setShowSettingsDialog}>
-        <DialogContent className="dark:bg-gray-900 dark:border-gray-800 sm:max-w-[500px]">
+        <DialogContent className='dark:bg-gray-900 dark:border-gray-800 sm:max-w-[500px]'>
           <DialogHeader>
-            <DialogTitle className="dark:text-white">活动记录设置</DialogTitle>
-            <DialogDescription className="dark:text-gray-400">
+            <DialogTitle className='dark:text-white'>活动记录设置</DialogTitle>
+            <DialogDescription className='dark:text-gray-400'>
               配置活动记录的保留时间，超过保留期限的记录将被自动清理
             </DialogDescription>
           </DialogHeader>
 
-          <div className="py-6">
-            <div className="space-y-4">
+          <div className='py-6'>
+            <div className='space-y-4'>
               <div>
-                <Label className="dark:text-white">记录保留天数</Label>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 mb-3">
+                <Label className='dark:text-white'>记录保留天数</Label>
+                <p className='text-sm text-gray-600 dark:text-gray-400 mt-1 mb-3'>
                   设置活动记录的保留期限，建议保留30-180天
                 </p>
                 <Select
                   value={tempRetentionDays.toString()}
-                  onValueChange={(value) => setTempRetentionDays(parseInt(value))}
+                  onValueChange={value => setTempRetentionDays(parseInt(value))}
                 >
-                  <SelectTrigger className="dark:bg-gray-800 dark:border-gray-700 dark:text-white">
+                  <SelectTrigger className='dark:bg-gray-800 dark:border-gray-700 dark:text-white'>
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                    <SelectItem value="7" className="dark:text-white">7 天</SelectItem>
-                    <SelectItem value="15" className="dark:text-white">15 天</SelectItem>
-                    <SelectItem value="30" className="dark:text-white">30 天</SelectItem>
-                    <SelectItem value="60" className="dark:text-white">60 天</SelectItem>
-                    <SelectItem value="90" className="dark:text-white">90 天（推荐）</SelectItem>
-                    <SelectItem value="180" className="dark:text-white">180 天</SelectItem>
-                    <SelectItem value="365" className="dark:text-white">365 天</SelectItem>
+                  <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
+                    <SelectItem value='7' className='dark:text-white'>
+                      7 天
+                    </SelectItem>
+                    <SelectItem value='15' className='dark:text-white'>
+                      15 天
+                    </SelectItem>
+                    <SelectItem value='30' className='dark:text-white'>
+                      30 天
+                    </SelectItem>
+                    <SelectItem value='60' className='dark:text-white'>
+                      60 天
+                    </SelectItem>
+                    <SelectItem value='90' className='dark:text-white'>
+                      90 天（推荐）
+                    </SelectItem>
+                    <SelectItem value='180' className='dark:text-white'>
+                      180 天
+                    </SelectItem>
+                    <SelectItem value='365' className='dark:text-white'>
+                      365 天
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
-              <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                <div className="flex gap-3">
-                  <Info className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+              <div className='p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg'>
+                <div className='flex gap-3'>
+                  <Info className='w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5' />
                   <div>
-                    <p className="text-sm dark:text-white mb-1">说明</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      • 系统将定期清理超过保留期限的活动记录<br />
-                      • 较长的保留期限有助于审计和追踪历史操作<br />
-                      • 较短的保留期限可以节省存储空间
+                    <p className='text-sm dark:text-white mb-1'>说明</p>
+                    <p className='text-sm text-gray-600 dark:text-gray-400'>
+                      • 系统将定期清理超过保留期限的活动记录
+                      <br />
+                      • 较长的保留期限有助于审计和追踪历史操作
+                      <br />• 较短的保留期限可以节省存储空间
                     </p>
                   </div>
                 </div>
@@ -798,16 +824,13 @@ export function ActivityLog() {
 
           <DialogFooter>
             <Button
-              variant="outline"
+              variant='outline'
               onClick={() => setShowSettingsDialog(false)}
-              className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+              className='dark:bg-gray-800 dark:border-gray-700 dark:text-white'
             >
               取消
             </Button>
-            <Button
-              onClick={handleSaveSettings}
-              className="bg-blue-500 hover:bg-blue-600 text-white"
-            >
+            <Button onClick={handleSaveSettings} className='bg-blue-500 hover:bg-blue-600 text-white'>
               保存设置
             </Button>
           </DialogFooter>

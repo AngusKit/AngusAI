@@ -59,7 +59,7 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange }: CreateKnowledg
   const [selectedIcon, setSelectedIcon] = useState(0);
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
-  
+
   // 配置处理参数
   const [chunkSize, setChunkSize] = useState([512]);
   const [chunkOverlap, setChunkOverlap] = useState([50]);
@@ -73,11 +73,41 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange }: CreateKnowledg
 
   // 向量存储源列表（模拟数据）
   const vectorStores = [
-    { id: '1', name: 'Production Pinecone', type: 'PINECONE', status: 'connected', icon: '🌲' },
-    { id: '2', name: 'Dev Chroma DB', type: 'CHROMA', status: 'connected', icon: '🎨' },
-    { id: '3', name: 'Azure OpenSearch', type: 'OPENSEARCH', status: 'disconnected', icon: '🔎' },
-    { id: '4', name: 'Qdrant Cluster', type: 'QDRANT', status: 'connected', icon: '⚡' },
-    { id: '5', name: 'MongoDB Atlas Vector', type: 'MONGODB_ATLAS', status: 'connected', icon: '🍃' },
+    {
+      id: '1',
+      name: 'Production Pinecone',
+      type: 'PINECONE',
+      status: 'connected',
+      icon: '🌲',
+    },
+    {
+      id: '2',
+      name: 'Dev Chroma DB',
+      type: 'CHROMA',
+      status: 'connected',
+      icon: '🎨',
+    },
+    {
+      id: '3',
+      name: 'Azure OpenSearch',
+      type: 'OPENSEARCH',
+      status: 'disconnected',
+      icon: '🔎',
+    },
+    {
+      id: '4',
+      name: 'Qdrant Cluster',
+      type: 'QDRANT',
+      status: 'connected',
+      icon: '⚡',
+    },
+    {
+      id: '5',
+      name: 'MongoDB Atlas Vector',
+      type: 'MONGODB_ATLAS',
+      status: 'connected',
+      icon: '🍃',
+    },
   ];
 
   // 标签颜色映射
@@ -92,7 +122,7 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange }: CreateKnowledg
       'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400',
       'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
     ];
-    
+
     const index = tag.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
     return colors[index];
   };
@@ -101,24 +131,24 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange }: CreateKnowledg
     if (e.key === 'Enter' || e.key === ',') {
       e.preventDefault();
       const newTag = tagInput.trim();
-      
+
       if (!newTag) return;
-      
+
       if (newTag.length > 10) {
         toast.error('标签长度不能超过10个字符');
         return;
       }
-      
+
       if (tags.length >= 5) {
         toast.error('最多只能添加5个标签');
         return;
       }
-      
+
       if (tags.includes(newTag)) {
         toast.error('标签已存在');
         return;
       }
-      
+
       setTags([...tags, newTag]);
       setTagInput('');
     }
@@ -139,7 +169,7 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange }: CreateKnowledg
         return;
       }
     }
-    
+
     if (currentStep < 2) {
       setCurrentStep(currentStep + 1);
     } else {
@@ -152,11 +182,11 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange }: CreateKnowledg
         toast.error('分段重叠必须在0-200之间');
         return;
       }
-      
+
       // 创建知识库
       toast.success('知识库创建成功！');
       onOpenChange(false);
-      
+
       // 重置表单
       setCurrentStep(1);
       setKbName('');
@@ -179,72 +209,72 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange }: CreateKnowledg
   };
 
   const renderStep1 = () => (
-    <div className="py-6">
+    <div className='py-6'>
       {/* 名称和可见性在同一行 */}
-      <div className="grid grid-cols-2 gap-6">
+      <div className='grid grid-cols-2 gap-6'>
         <div>
-          <Label className="text-sm mb-2 block dark:text-gray-300">知识库名称</Label>
+          <Label className='text-sm mb-2 block dark:text-gray-300'>知识库名称</Label>
           <Input
             value={kbName}
-            onChange={(e) => setKbName(e.target.value)}
-            placeholder="请输入知识库名称"
-            className="dark:bg-gray-900 dark:border-gray-700 dark:text-white"
+            onChange={e => setKbName(e.target.value)}
+            placeholder='请输入知识库名称'
+            className='dark:bg-gray-900 dark:border-gray-700 dark:text-white'
           />
         </div>
 
         <div>
-          <Label className="text-sm mb-2 block dark:text-gray-300">可见性</Label>
+          <Label className='text-sm mb-2 block dark:text-gray-300'>可见性</Label>
           <Select value={visibility} onValueChange={setVisibility}>
-            <SelectTrigger className="dark:bg-gray-900 dark:border-gray-700 dark:text-white">
+            <SelectTrigger className='dark:bg-gray-900 dark:border-gray-700 dark:text-white'>
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-              <SelectItem value="private" className="dark:text-white">私有</SelectItem>
-              <SelectItem value="team" className="dark:text-white">团队可见</SelectItem>
-              <SelectItem value="public" className="dark:text-white">公开</SelectItem>
+            <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
+              <SelectItem value='private' className='dark:text-white'>
+                私有
+              </SelectItem>
+              <SelectItem value='team' className='dark:text-white'>
+                团队可见
+              </SelectItem>
+              <SelectItem value='public' className='dark:text-white'>
+                公开
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
       </div>
 
       {/* 描述 */}
-      <div className="mt-5">
-        <Label className="text-sm mb-2 block dark:text-gray-300">描述</Label>
+      <div className='mt-5'>
+        <Label className='text-sm mb-2 block dark:text-gray-300'>描述</Label>
         <Textarea
           value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="请输入知识库描述"
+          onChange={e => setDescription(e.target.value)}
+          placeholder='请输入知识库描述'
           rows={3}
-          className="dark:bg-gray-900 dark:border-gray-700 dark:text-white resize-none"
+          className='dark:bg-gray-900 dark:border-gray-700 dark:text-white resize-none'
         />
       </div>
 
       {/* 标签 */}
-      <div className="mt-5">
-        <Label className="text-sm mb-2 block dark:text-gray-300">
-          标签 <span className="text-gray-400">({tags.length}/5)</span>
+      <div className='mt-5'>
+        <Label className='text-sm mb-2 block dark:text-gray-300'>
+          标签 <span className='text-gray-400'>({tags.length}/5)</span>
         </Label>
         <Input
           value={tagInput}
-          onChange={(e) => setTagInput(e.target.value)}
+          onChange={e => setTagInput(e.target.value)}
           onKeyDown={handleAddTag}
-          placeholder="输入标签后按回车，最多5个，每个不超过10字符"
-          className="dark:bg-gray-900 dark:border-gray-700 dark:text-white"
+          placeholder='输入标签后按回车，最多5个，每个不超过10字符'
+          className='dark:bg-gray-900 dark:border-gray-700 dark:text-white'
           disabled={tags.length >= 5}
           maxLength={10}
         />
         {tags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mt-2">
-            {tags.map((tag) => (
-              <Badge
-                key={tag}
-                className={`border-0 ${getTagColor(tag)}`}
-              >
+          <div className='flex flex-wrap gap-2 mt-2'>
+            {tags.map(tag => (
+              <Badge key={tag} className={`border-0 ${getTagColor(tag)}`}>
                 {tag}
-                <button
-                  onClick={() => handleRemoveTag(tag)}
-                  className="ml-1 hover:opacity-70 transition-opacity"
-                >
+                <button onClick={() => handleRemoveTag(tag)} className='ml-1 hover:opacity-70 transition-opacity'>
                   ×
                 </button>
               </Badge>
@@ -254,17 +284,17 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange }: CreateKnowledg
       </div>
 
       {/* 图标 - 超过两排时可滚动 */}
-      <div className="mt-5">
-        <Label className="text-sm mb-2 block dark:text-gray-300">图标</Label>
-        <div className="max-h-[140px] overflow-y-auto pr-2 border border-gray-200 dark:border-gray-700 rounded-lg p-2">
-          <div className="grid grid-cols-8 gap-2">
+      <div className='mt-5'>
+        <Label className='text-sm mb-2 block dark:text-gray-300'>图标</Label>
+        <div className='max-h-[140px] overflow-y-auto pr-2 border border-gray-200 dark:border-gray-700 rounded-lg p-2'>
+          <div className='grid grid-cols-8 gap-2'>
             {iconOptions.map((option, index) => (
               <button
                 key={index}
                 onClick={() => setSelectedIcon(index)}
                 className={`${option.bg} w-12 h-12 rounded-lg flex items-center justify-center text-xl transition-all ${
-                  selectedIcon === index 
-                    ? 'ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-gray-900' 
+                  selectedIcon === index
+                    ? 'ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-gray-900'
                     : 'hover:scale-105'
                 }`}
                 title={option.label}
@@ -279,28 +309,34 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange }: CreateKnowledg
   );
 
   const renderStep2 = () => (
-    <div className="py-6">
-      <div className="space-y-6">
+    <div className='py-6'>
+      <div className='space-y-6'>
         {/* 向量存储源 */}
         <div>
-          <Label className="text-sm mb-3 block dark:text-gray-300">向量存储源</Label>
+          <Label className='text-sm mb-3 block dark:text-gray-300'>向量存储源</Label>
           <Select value={vectorStoreId} onValueChange={setVectorStoreId}>
-            <SelectTrigger className="dark:bg-gray-900 dark:border-gray-700 dark:text-white">
+            <SelectTrigger className='dark:bg-gray-900 dark:border-gray-700 dark:text-white'>
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-              {vectorStores.map((store) => (
-                <SelectItem key={store.id} value={store.id} className="dark:text-white">
-                  <div className="flex items-center gap-2">
+            <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
+              {vectorStores.map(store => (
+                <SelectItem key={store.id} value={store.id} className='dark:text-white'>
+                  <div className='flex items-center gap-2'>
                     <span>{store.icon}</span>
                     <span>{store.name}</span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">({store.type})</span>
+                    <span className='text-xs text-gray-500 dark:text-gray-400'>({store.type})</span>
                     {store.status === 'connected' ? (
-                      <Badge variant="outline" className="text-xs border-green-500 text-green-600 dark:text-green-400 ml-2">
+                      <Badge
+                        variant='outline'
+                        className='text-xs border-green-500 text-green-600 dark:text-green-400 ml-2'
+                      >
                         已连接
                       </Badge>
                     ) : (
-                      <Badge variant="outline" className="text-xs border-gray-400 text-gray-500 dark:text-gray-400 ml-2">
+                      <Badge
+                        variant='outline'
+                        className='text-xs border-gray-400 text-gray-500 dark:text-gray-400 ml-2'
+                      >
                         未连接
                       </Badge>
                     )}
@@ -309,77 +345,55 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange }: CreateKnowledg
               ))}
             </SelectContent>
           </Select>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-            选择用于存储向量数据的存储源
-          </p>
+          <p className='text-xs text-gray-500 dark:text-gray-400 mt-2'>选择用于存储向量数据的存储源</p>
         </div>
 
         {/* 分段大小 */}
         <div>
-          <div className="flex items-center justify-between mb-3">
-            <Label className="text-sm dark:text-gray-300">分段大小</Label>
-            <span className="text-sm dark:text-white">{chunkSize[0]}</span>
+          <div className='flex items-center justify-between mb-3'>
+            <Label className='text-sm dark:text-gray-300'>分段大小</Label>
+            <span className='text-sm dark:text-white'>{chunkSize[0]}</span>
           </div>
-          <Slider
-            value={chunkSize}
-            onValueChange={setChunkSize}
-            min={100}
-            max={2000}
-            step={1}
-            className="w-full"
-          />
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-            控制文本分块的大小，范围：100-2000 字符
-          </p>
+          <Slider value={chunkSize} onValueChange={setChunkSize} min={100} max={2000} step={1} className='w-full' />
+          <p className='text-xs text-gray-500 dark:text-gray-400 mt-2'>控制文本分块的大小，范围：100-2000 字符</p>
         </div>
 
         {/* 分段重叠 */}
         <div>
-          <div className="flex items-center justify-between mb-3">
-            <Label className="text-sm dark:text-gray-300">分段重叠</Label>
-            <span className="text-sm dark:text-white">{chunkOverlap[0]}</span>
+          <div className='flex items-center justify-between mb-3'>
+            <Label className='text-sm dark:text-gray-300'>分段重叠</Label>
+            <span className='text-sm dark:text-white'>{chunkOverlap[0]}</span>
           </div>
-          <Slider
-            value={chunkOverlap}
-            onValueChange={setChunkOverlap}
-            min={0}
-            max={200}
-            step={1}
-            className="w-full"
-          />
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-            控制相邻文本块的重叠字符数，范围：0-200 字符
-          </p>
+          <Slider value={chunkOverlap} onValueChange={setChunkOverlap} min={0} max={200} step={1} className='w-full' />
+          <p className='text-xs text-gray-500 dark:text-gray-400 mt-2'>控制相邻文本块的重叠字符数，范围：0-200 字符</p>
         </div>
 
         {/* 向量化模型 */}
         <div>
-          <Label className="text-sm mb-3 block dark:text-gray-300">向量化模型</Label>
+          <Label className='text-sm mb-3 block dark:text-gray-300'>向量化模型</Label>
           <Select value={embeddingModelId} onValueChange={setEmbeddingModelId}>
-            <SelectTrigger className="dark:bg-gray-900 dark:border-gray-700 dark:text-white">
+            <SelectTrigger className='dark:bg-gray-900 dark:border-gray-700 dark:text-white'>
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-              <SelectItem value="text-embedding-ada-002" className="dark:text-white">
+            <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
+              <SelectItem value='text-embedding-ada-002' className='dark:text-white'>
                 text-embedding-ada-002
               </SelectItem>
-              <SelectItem value="text-embedding-3-small" className="dark:text-white">
+              <SelectItem value='text-embedding-3-small' className='dark:text-white'>
                 text-embedding-3-small
               </SelectItem>
-              <SelectItem value="text-embedding-3-large" className="dark:text-white">
+              <SelectItem value='text-embedding-3-large' className='dark:text-white'>
                 text-embedding-3-large
               </SelectItem>
-              <SelectItem value="m3e-base" className="dark:text-white">
+              <SelectItem value='m3e-base' className='dark:text-white'>
                 m3e-base
               </SelectItem>
-              <SelectItem value="m3e-large" className="dark:text-white">
+              <SelectItem value='m3e-large' className='dark:text-white'>
                 m3e-large
               </SelectItem>
             </SelectContent>
           </Select>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-            选择用于文本向量化的模型
-          </p>
+          <p className='text-xs text-gray-500 dark:text-gray-400 mt-2'>选择用于文本向量化的模型</p>
         </div>
       </div>
     </div>
@@ -387,57 +401,51 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange }: CreateKnowledg
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[760px] !max-w-[90vw] max-h-[85vh] overflow-hidden p-0 dark:bg-gray-900 dark:border-gray-700 flex flex-col">
+      <DialogContent className='w-[760px] !max-w-[90vw] max-h-[85vh] overflow-hidden p-0 dark:bg-gray-900 dark:border-gray-700 flex flex-col'>
         {/* Header */}
-        <DialogHeader className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
-          <DialogTitle className="text-xl dark:text-white">创建知识库</DialogTitle>
-          <DialogDescription className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+        <DialogHeader className='px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0'>
+          <DialogTitle className='text-xl dark:text-white'>创建知识库</DialogTitle>
+          <DialogDescription className='text-sm text-gray-500 dark:text-gray-400 mt-1'>
             按照步骤创建和配置您的知识库
           </DialogDescription>
         </DialogHeader>
 
         {/* Main Content Area with Sidebar */}
-        <div className="flex flex-1 overflow-hidden">
+        <div className='flex flex-1 overflow-hidden'>
           {/* Left Sidebar - Step Indicator */}
-          <div className="w-56 border-r border-gray-200 dark:border-gray-700 p-6 flex-shrink-0">
-            <div className="space-y-4">
+          <div className='w-56 border-r border-gray-200 dark:border-gray-700 p-6 flex-shrink-0'>
+            <div className='space-y-4'>
               {steps.map((step, index) => (
                 <div key={step.number}>
-                  <div className="flex items-start gap-3">
-                    <div className="flex flex-col items-center">
+                  <div className='flex items-start gap-3'>
+                    <div className='flex flex-col items-center'>
                       <div
                         className={`w-9 h-9 rounded-full flex items-center justify-center transition-all shrink-0 ${
                           step.number === currentStep
                             ? 'bg-blue-500 text-white'
                             : step.number < currentStep
-                            ? 'bg-green-500 text-white'
-                            : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
+                              ? 'bg-green-500 text-white'
+                              : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
                         }`}
                       >
-                        {step.number < currentStep ? (
-                          <Check className="w-5 h-5" />
-                        ) : (
-                          <span>{step.number}</span>
-                        )}
+                        {step.number < currentStep ? <Check className='w-5 h-5' /> : <span>{step.number}</span>}
                       </div>
                       {index < steps.length - 1 && (
                         <div
                           className={`w-0.5 h-12 mt-2 transition-all ${
-                            step.number < currentStep
-                              ? 'bg-green-500'
-                              : 'bg-gray-200 dark:bg-gray-700'
+                            step.number < currentStep ? 'bg-green-500' : 'bg-gray-200 dark:bg-gray-700'
                           }`}
                         />
                       )}
                     </div>
-                    <div className="pt-1.5">
+                    <div className='pt-1.5'>
                       <div
                         className={`text-sm ${
                           step.number === currentStep
                             ? 'text-blue-500'
                             : step.number < currentStep
-                            ? 'text-green-500'
-                            : 'text-gray-500 dark:text-gray-400'
+                              ? 'text-green-500'
+                              : 'text-gray-500 dark:text-gray-400'
                         }`}
                       >
                         {step.title}
@@ -450,53 +458,57 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange }: CreateKnowledg
           </div>
 
           {/* Right Content Area */}
-          <div className="flex-1 overflow-y-auto px-8">
+          <div className='flex-1 overflow-y-auto px-8'>
             {currentStep === 1 && renderStep1()}
             {currentStep === 2 && renderStep2()}
           </div>
         </div>
 
         {/* Footer */}
-        <div className="px-8 py-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between flex-shrink-0">
+        <div className='px-8 py-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between flex-shrink-0'>
           <div>
             {currentStep === 2 && (
               <Button
-                variant="outline"
+                variant='outline'
                 onClick={() => {
                   toast.success('已保存为草稿');
                   onOpenChange(false);
                   setCurrentStep(1);
                 }}
-                className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                className='dark:bg-gray-800 dark:border-gray-700 dark:text-white'
               >
                 保存为草稿
               </Button>
             )}
           </div>
-          <div className="flex items-center gap-3">
+          <div className='flex items-center gap-3'>
             {currentStep > 1 ? (
               <Button
-                variant="outline"
+                variant='outline'
                 onClick={handleBack}
-                className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                className='dark:bg-gray-800 dark:border-gray-700 dark:text-white'
               >
                 上一步
               </Button>
             ) : (
               <Button
-                variant="outline"
+                variant='outline'
                 onClick={() => {
                   onOpenChange(false);
                   setCurrentStep(1);
                 }}
-                className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                className='dark:bg-gray-800 dark:border-gray-700 dark:text-white'
               >
                 取消
               </Button>
             )}
             <Button
               onClick={handleNext}
-              className={currentStep === 2 ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white'}
+              className={
+                currentStep === 2
+                  ? 'bg-green-600 hover:bg-green-700 text-white'
+                  : 'bg-blue-500 hover:bg-blue-600 text-white'
+              }
             >
               {currentStep === 2 ? '确认并创建' : '下一步'}
             </Button>

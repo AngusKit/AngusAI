@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Upload, Download, Search, Filter, Code2, FileJson, Globe, Settings, Trash2, Play, Book, ExternalLink, ChevronRight, Tag, Clock, Server, Shield, Eye, X, Database, Activity, Zap } from 'lucide-react';
+import { Plus, Upload, Download, Search, Filter, Code2, FileJson, Globe, Settings, Trash2, Play, Book, ExternalLink, ChevronRight, Tag, Clock, Server, Shield, Eye, X, Database, Activity, Zap, } from 'lucide-react';
 import { Button } from '@/ui/button';
 import { Input } from '@/ui/input';
 import { Badge } from '@/ui/badge';
@@ -193,9 +193,7 @@ export function APICollection() {
   };
 
   const updateCustomAuthParam = (id: string, field: keyof CustomAuthParam, value: string) => {
-    setCustomAuthParams(customAuthParams.map(param =>
-      param.id === id ? { ...param, [field]: value } : param
-    ));
+    setCustomAuthParams(customAuthParams.map(param => (param.id === id ? { ...param, [field]: value } : param)));
   };
 
   const getMethodColor = (method: string) => {
@@ -212,26 +210,26 @@ export function APICollection() {
   const getSourceIcon = (source: string) => {
     switch (source) {
       case 'openapi':
-        return <FileJson className="w-4 h-4" />;
+        return <FileJson className='w-4 h-4' />;
       case 'swagger':
-        return <Code2 className="w-4 h-4" />;
+        return <Code2 className='w-4 h-4' />;
       case 'postman':
-        return <Globe className="w-4 h-4" />;
+        return <Globe className='w-4 h-4' />;
       default:
-        return <Book className="w-4 h-4" />;
+        return <Book className='w-4 h-4' />;
     }
   };
 
   const getVisibilityIcon = (visibility: string) => {
     switch (visibility) {
       case 'private':
-        return <Shield className="w-3 h-3" />;
+        return <Shield className='w-3 h-3' />;
       case 'team':
-        return <Eye className="w-3 h-3" />;
+        return <Eye className='w-3 h-3' />;
       case 'public':
-        return <Globe className="w-3 h-3" />;
+        return <Globe className='w-3 h-3' />;
       default:
-        return <Shield className="w-3 h-3" />;
+        return <Shield className='w-3 h-3' />;
     }
   };
 
@@ -250,9 +248,14 @@ export function APICollection() {
       method: language === 'zh-CN' ? '方法' : 'Method',
       lastUsed: language === 'zh-CN' ? '最后使用' : 'Last Used',
     };
-    const orderLabel = sortOrder === 'asc' 
-      ? (language === 'zh-CN' ? '升序' : 'Ascending')
-      : (language === 'zh-CN' ? '降序' : 'Descending');
+    const orderLabel =
+      sortOrder === 'asc'
+        ? language === 'zh-CN'
+          ? '升序'
+          : 'Ascending'
+        : language === 'zh-CN'
+          ? '降序'
+          : 'Descending';
     return `${labels[sortBy]} (${orderLabel})`;
   };
 
@@ -277,7 +280,12 @@ export function APICollection() {
     setCollections([newCollection, ...collections]);
     toast.success(language === 'zh-CN' ? '接口集创建成功' : 'API Collection created successfully');
     setShowCreateDialog(false);
-    setFormData({ name: '', description: '', source: 'openapi', visibility: 'private' });
+    setFormData({
+      name: '',
+      description: '',
+      source: 'openapi',
+      visibility: 'private',
+    });
   };
 
   const handleImport = (type: string) => {
@@ -287,7 +295,7 @@ export function APICollection() {
 
   const handleImportWithStrategy = () => {
     toast.success(
-      language === 'zh-CN' 
+      language === 'zh-CN'
         ? `正在导入接口集（${importConflictStrategy === 'overwrite' ? '覆盖重复' : '忽略重复'}）...`
         : `Importing collection (${importConflictStrategy === 'overwrite' ? 'overwrite duplicates' : 'ignore duplicates'})...`
     );
@@ -295,25 +303,25 @@ export function APICollection() {
   };
 
   const toggleEndpointStatus = (endpointId: string) => {
-    setEndpoints(prev => prev.map(ep => 
-      ep.id === endpointId ? { ...ep, enabled: !ep.enabled } : ep
-    ));
+    setEndpoints(prev => prev.map(ep => (ep.id === endpointId ? { ...ep, enabled: !ep.enabled } : ep)));
   };
 
-  const filteredCollections = collections.filter(col =>
-    col.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    col.description.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredCollections = collections.filter(
+    col =>
+      col.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      col.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const filteredAndSortedEndpoints = endpoints
-    .filter(endpoint =>
-      endpoint.name.toLowerCase().includes(endpointSearchQuery.toLowerCase()) ||
-      endpoint.path.toLowerCase().includes(endpointSearchQuery.toLowerCase()) ||
-      endpoint.description.toLowerCase().includes(endpointSearchQuery.toLowerCase())
+    .filter(
+      endpoint =>
+        endpoint.name.toLowerCase().includes(endpointSearchQuery.toLowerCase()) ||
+        endpoint.path.toLowerCase().includes(endpointSearchQuery.toLowerCase()) ||
+        endpoint.description.toLowerCase().includes(endpointSearchQuery.toLowerCase())
     )
     .sort((a, b) => {
       let comparison = 0;
-      
+
       if (sortBy === 'name') {
         comparison = a.name.localeCompare(b.name);
       } else if (sortBy === 'method') {
@@ -323,13 +331,13 @@ export function APICollection() {
         const bTime = b.lastUsed?.getTime() || 0;
         comparison = aTime - bTime;
       }
-      
+
       return sortOrder === 'asc' ? comparison : -comparison;
     });
 
   const handleSort = (field: 'name' | 'method' | 'lastUsed') => {
     if (sortBy === field) {
-      setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
+      setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'));
     } else {
       setSortBy(field);
       setSortOrder('asc');
@@ -339,10 +347,10 @@ export function APICollection() {
   // OpenAPI 规范预览示例
   const generateOpenAPISpec = () => {
     const selectedCol = collections.find(c => c.id === selectedCollection);
-    
+
     const securitySchemes: any = {};
     const security: any[] = [];
-    
+
     if (securityConfig.type === 'apiKey') {
       securitySchemes.ApiKeyAuth = {
         type: 'apiKey',
@@ -379,7 +387,11 @@ export function APICollection() {
         flows: {
           clientCredentials: {
             tokenUrl: securityConfig.oauth2ClientTokenUrl,
-            scopes: securityConfig.oauth2ClientScope ? { [securityConfig.oauth2ClientScope]: securityConfig.oauth2ClientScope } : {},
+            scopes: securityConfig.oauth2ClientScope
+              ? {
+                  [securityConfig.oauth2ClientScope]: securityConfig.oauth2ClientScope,
+                }
+              : {},
           },
         },
       };
@@ -473,88 +485,92 @@ export function APICollection() {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className='space-y-6'>
       {/* Header */}
       <div>
-        <h1 className="text-2xl mb-1 dark:text-white">
+        <h1 className='text-2xl mb-1 dark:text-white'>
           {language === 'zh-CN' ? '接口集管理' : 'API Collection Management'}
         </h1>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          {language === 'zh-CN' 
-            ? '用于大模型集成外部API接口，支持OpenAPI、Swagger、Postman等规范' 
+        <p className='text-sm text-gray-600 dark:text-gray-400'>
+          {language === 'zh-CN'
+            ? '用于大模型集成外部API接口，支持OpenAPI、Swagger、Postman等规范'
             : 'For LLM integration with external APIs, support OpenAPI, Swagger, Postman, etc.'}
         </p>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4'>
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <Card key={index} className="px-5 pt-5 pb-3 dark:bg-gray-800 dark:border-gray-700">
-              <div className="flex items-start justify-between mb-1.5">
+            <Card key={index} className='px-5 pt-5 pb-3 dark:bg-gray-800 dark:border-gray-700'>
+              <div className='flex items-start justify-between mb-1.5'>
                 <div className={`${stat.iconBg} w-10 h-10 rounded-lg flex items-center justify-center`}>
-                  <Icon className="w-5 h-5 text-white" />
+                  <Icon className='w-5 h-5 text-white' />
                 </div>
                 {stat.trend && (
-                  <span className={`text-sm ${stat.trendUp ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                  <span
+                    className={`text-sm ${stat.trendUp ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
+                  >
                     {stat.trend}
                   </span>
                 )}
               </div>
-              <div className="text-base font-semibold text-gray-600 dark:text-gray-400 mb-0.5">{stat.label}</div>
-              <div className="text-3xl dark:text-white mb-0.5">{stat.value}</div>
-              <div className="text-xs text-gray-500 dark:text-gray-400">{stat.subtext}</div>
+              <div className='text-base font-semibold text-gray-600 dark:text-gray-400 mb-0.5'>{stat.label}</div>
+              <div className='text-3xl dark:text-white mb-0.5'>{stat.value}</div>
+              <div className='text-xs text-gray-500 dark:text-gray-400'>{stat.subtext}</div>
             </Card>
           );
         })}
       </div>
 
       {/* Search and Actions */}
-      <div className="flex items-center justify-between gap-3">
-        <div className="relative w-[390px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+      <div className='flex items-center justify-between gap-3'>
+        <div className='relative w-[390px]'>
+          <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
           <Input
             placeholder={language === 'zh-CN' ? '搜索接口集...' : 'Search collections...'}
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            className="pl-10 pr-10 dark:bg-gray-800 dark:border-gray-700"
+            className='pl-10 pr-10 dark:bg-gray-800 dark:border-gray-700'
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+              className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors'
             >
-              <X className="w-4 h-4" />
+              <X className='w-4 h-4' />
             </button>
           )}
         </div>
-        <div className="flex items-center gap-3">
-          <Button onClick={() => setShowImportDialog(true)} variant="outline" className="gap-2 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-750">
-            <Upload className="w-4 h-4" />
+        <div className='flex items-center gap-3'>
+          <Button
+            onClick={() => setShowImportDialog(true)}
+            variant='outline'
+            className='gap-2 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-750'
+          >
+            <Upload className='w-4 h-4' />
             {language === 'zh-CN' ? '导入' : 'Import'}
           </Button>
-          <Button onClick={() => setShowCreateDialog(true)} className="gap-2 dark:bg-blue-600 dark:hover:bg-blue-700">
-            <Plus className="w-4 h-4" />
+          <Button onClick={() => setShowCreateDialog(true)} className='gap-2 dark:bg-blue-600 dark:hover:bg-blue-700'>
+            <Plus className='w-4 h-4' />
             {language === 'zh-CN' ? '新建接口集' : 'New Collection'}
           </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
         {/* Collections List */}
-        <div className="lg:col-span-1">
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
-            <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-              <h2 className="dark:text-white">
-                {language === 'zh-CN' ? '接口集列表' : 'Collections'}
-              </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+        <div className='lg:col-span-1'>
+          <div className='bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg'>
+            <div className='p-4 border-b border-gray-200 dark:border-gray-700'>
+              <h2 className='dark:text-white'>{language === 'zh-CN' ? '接口集列表' : 'Collections'}</h2>
+              <p className='text-sm text-gray-500 dark:text-gray-400 mt-1'>
                 {filteredCollections.length} {language === 'zh-CN' ? '个接口集' : 'collections'}
               </p>
             </div>
-            <ScrollArea className="h-[600px]">
-              <div className="p-2 space-y-2">
+            <ScrollArea className='h-[600px]'>
+              <div className='p-2 space-y-2'>
                 {filteredCollections.map(collection => (
                   <button
                     key={collection.id}
@@ -566,30 +582,32 @@ export function APICollection() {
                         : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                     )}
                   >
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex items-center gap-2">
+                    <div className='flex items-start justify-between mb-2'>
+                      <div className='flex items-center gap-2'>
                         {getSourceIcon(collection.source)}
-                        <h3 className="text-sm dark:text-white">{collection.name}</h3>
+                        <h3 className='text-sm dark:text-white'>{collection.name}</h3>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <Badge variant="secondary" className="text-xs gap-1">
+                      <div className='flex items-center gap-1'>
+                        <Badge variant='secondary' className='text-xs gap-1'>
                           {getVisibilityIcon(collection.visibility)}
                           {getVisibilityLabel(collection.visibility)}
                         </Badge>
-                        <ChevronRight className={cn(
-                          'w-4 h-4 transition-transform',
-                          selectedCollection === collection.id && 'text-blue-600 dark:text-blue-400'
-                        )} />
+                        <ChevronRight
+                          className={cn(
+                            'w-4 h-4 transition-transform',
+                            selectedCollection === collection.id && 'text-blue-600 dark:text-blue-400'
+                          )}
+                        />
                       </div>
                     </div>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
+                    <p className='text-xs text-gray-600 dark:text-gray-400 mb-3 line-clamp-2'>
                       {collection.description}
                     </p>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-gray-500 dark:text-gray-400">
+                    <div className='flex items-center justify-between text-xs'>
+                      <span className='text-gray-500 dark:text-gray-400'>
                         {collection.endpointsCount} {language === 'zh-CN' ? '个接口' : 'APIs'}
                       </span>
-                      <Badge variant="secondary" className="text-xs">
+                      <Badge variant='secondary' className='text-xs'>
                         {collection.enabled}/{collection.endpointsCount} {language === 'zh-CN' ? '已启用' : 'enabled'}
                       </Badge>
                     </div>
@@ -601,163 +619,165 @@ export function APICollection() {
         </div>
 
         {/* API Endpoints Details */}
-        <div className="lg:col-span-2">
+        <div className='lg:col-span-2'>
           {selectedCollection ? (
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
-              <Tabs defaultValue="endpoints" className="w-full">
-                <div className="border-b border-gray-200 dark:border-gray-700 px-4">
-                  <TabsList className="bg-transparent">
-                    <TabsTrigger value="endpoints" className="gap-2">
-                      <Code2 className="w-4 h-4" />
+            <div className='bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg'>
+              <Tabs defaultValue='endpoints' className='w-full'>
+                <div className='border-b border-gray-200 dark:border-gray-700 px-4'>
+                  <TabsList className='bg-transparent'>
+                    <TabsTrigger value='endpoints' className='gap-2'>
+                      <Code2 className='w-4 h-4' />
                       {language === 'zh-CN' ? '接口列表' : 'Endpoints'}
                     </TabsTrigger>
-                    <TabsTrigger value="servers" className="gap-2">
-                      <Server className="w-4 h-4" />
+                    <TabsTrigger value='servers' className='gap-2'>
+                      <Server className='w-4 h-4' />
                       {language === 'zh-CN' ? '服务配置' : 'Servers'}
                     </TabsTrigger>
-                    <TabsTrigger value="security" className="gap-2">
-                      <Shield className="w-4 h-4" />
+                    <TabsTrigger value='security' className='gap-2'>
+                      <Shield className='w-4 h-4' />
                       {language === 'zh-CN' ? '安全配置' : 'Security'}
                     </TabsTrigger>
-                    <TabsTrigger value="settings" className="gap-2">
-                      <Settings className="w-4 h-4" />
+                    <TabsTrigger value='settings' className='gap-2'>
+                      <Settings className='w-4 h-4' />
                       {language === 'zh-CN' ? '设置' : 'Settings'}
                     </TabsTrigger>
                   </TabsList>
                 </div>
 
-                <TabsContent value="endpoints" className="p-0 m-0">
-                  <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                    <div className="flex items-center gap-3">
-                      <div className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <TabsContent value='endpoints' className='p-0 m-0'>
+                  <div className='p-4 border-b border-gray-200 dark:border-gray-700'>
+                    <div className='flex items-center gap-3'>
+                      <div className='relative flex-1'>
+                        <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
                         <Input
                           placeholder={language === 'zh-CN' ? '搜索接口...' : 'Search endpoints...'}
                           value={endpointSearchQuery}
                           onChange={e => setEndpointSearchQuery(e.target.value)}
-                          className="pl-10 pr-10 dark:bg-gray-800 dark:border-gray-700"
+                          className='pl-10 pr-10 dark:bg-gray-800 dark:border-gray-700'
                         />
                         {endpointSearchQuery && (
                           <button
                             onClick={() => setEndpointSearchQuery('')}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                            className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors'
                           >
-                            <X className="w-4 h-4" />
+                            <X className='w-4 h-4' />
                           </button>
                         )}
                       </div>
-                      
+
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="outline" size="sm" className="dark:bg-gray-800 dark:border-gray-700">
-                            <Filter className="w-4 h-4 mr-2" />
+                          <Button variant='outline' size='sm' className='dark:bg-gray-800 dark:border-gray-700'>
+                            <Filter className='w-4 h-4 mr-2' />
                             {language === 'zh-CN' ? '筛选' : 'Filter'}
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="dark:bg-gray-800 dark:border-gray-700">
-                          <DropdownMenuItem onClick={() => handleSort('name')} className="dark:text-gray-300">
+                        <DropdownMenuContent align='end' className='dark:bg-gray-800 dark:border-gray-700'>
+                          <DropdownMenuItem onClick={() => handleSort('name')} className='dark:text-gray-300'>
                             {language === 'zh-CN' ? '按名称排序' : 'Sort by Name'}
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleSort('method')} className="dark:text-gray-300">
+                          <DropdownMenuItem onClick={() => handleSort('method')} className='dark:text-gray-300'>
                             {language === 'zh-CN' ? '按方法排序' : 'Sort by Method'}
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleSort('lastUsed')} className="dark:text-gray-300">
+                          <DropdownMenuItem onClick={() => handleSort('lastUsed')} className='dark:text-gray-300'>
                             {language === 'zh-CN' ? '按最后使用排序' : 'Sort by Last Used'}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
 
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        className="gap-2 dark:bg-gray-800 dark:border-gray-700"
+                      <Button
+                        variant='outline'
+                        size='sm'
+                        className='gap-2 dark:bg-gray-800 dark:border-gray-700'
                         onClick={() => setShowOpenAPIPreview(true)}
                       >
-                        <FileJson className="w-4 h-4" />
+                        <FileJson className='w-4 h-4' />
                         {language === 'zh-CN' ? 'OpenAPI' : 'OpenAPI'}
                       </Button>
                     </div>
-                    
+
                     {(sortBy !== 'name' || sortOrder !== 'asc') && (
-                      <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                        {language === 'zh-CN' ? '当前排序：' : 'Current sort: '}{getSortLabel()}
+                      <div className='mt-2 text-xs text-gray-500 dark:text-gray-400'>
+                        {language === 'zh-CN' ? '当前排序：' : 'Current sort: '}
+                        {getSortLabel()}
                       </div>
                     )}
                   </div>
-                  
-                  <ScrollArea className="h-[520px]">
-                    <div className="p-4 space-y-3">
+
+                  <ScrollArea className='h-[520px]'>
+                    <div className='p-4 space-y-3'>
                       {filteredAndSortedEndpoints.map(endpoint => (
                         <div
                           key={endpoint.id}
-                          className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md transition-shadow"
+                          className='p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md transition-shadow'
                         >
-                          <div className="flex items-start justify-between mb-3">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-2">
+                          <div className='flex items-start justify-between mb-3'>
+                            <div className='flex-1'>
+                              <div className='flex items-center gap-2 mb-2'>
                                 <Badge className={cn('text-xs px-2', getMethodColor(endpoint.method))}>
                                   {endpoint.method}
                                 </Badge>
-                                <code className="text-sm text-gray-700 dark:text-gray-300 font-mono">
+                                <code className='text-sm text-gray-700 dark:text-gray-300 font-mono'>
                                   {endpoint.path}
                                 </code>
                               </div>
-                              <h3 className="dark:text-white mb-1">{endpoint.name}</h3>
-                              <p className="text-sm text-gray-600 dark:text-gray-400">
-                                {endpoint.description}
-                              </p>
+                              <h3 className='dark:text-white mb-1'>{endpoint.name}</h3>
+                              <p className='text-sm text-gray-600 dark:text-gray-400'>{endpoint.description}</p>
                             </div>
-                            <div className="flex items-center gap-2 ml-4">
+                            <div className='flex items-center gap-2 ml-4'>
                               <Switch
                                 checked={endpoint.enabled}
                                 onCheckedChange={() => toggleEndpointStatus(endpoint.id)}
                               />
-                              <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                                {endpoint.enabled 
-                                  ? (language === 'zh-CN' ? '已启用' : 'Enabled')
-                                  : (language === 'zh-CN' ? '已禁用' : 'Disabled')
-                                }
+                              <span className='text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap'>
+                                {endpoint.enabled
+                                  ? language === 'zh-CN'
+                                    ? '已启用'
+                                    : 'Enabled'
+                                  : language === 'zh-CN'
+                                    ? '已禁用'
+                                    : 'Disabled'}
                               </span>
                             </div>
                           </div>
 
-                          <div className="flex items-center justify-between">
-                            <div className="flex flex-wrap gap-1.5">
+                          <div className='flex items-center justify-between'>
+                            <div className='flex flex-wrap gap-1.5'>
                               {endpoint.tags.map((tag, index) => (
                                 <span
                                   key={index}
-                                  className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
+                                  className='inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
                                 >
-                                  <Tag className="w-3 h-3" />
+                                  <Tag className='w-3 h-3' />
                                   {tag}
                                 </span>
                               ))}
                               {endpoint.lastUsed && (
-                                <span className="inline-flex items-center gap-1 text-xs px-2 py-1 text-gray-500 dark:text-gray-400">
-                                  <Clock className="w-3 h-3" />
+                                <span className='inline-flex items-center gap-1 text-xs px-2 py-1 text-gray-500 dark:text-gray-400'>
+                                  <Clock className='w-3 h-3' />
                                   {endpoint.lastUsed.toLocaleDateString()}
                                 </span>
                               )}
                             </div>
-                            <div className="flex items-center gap-1">
+                            <div className='flex items-center gap-1'>
                               <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8"
+                                variant='ghost'
+                                size='icon'
+                                className='h-8 w-8'
                                 onClick={() => {
                                   setSelectedEndpoint(endpoint);
                                   setShowEndpointDialog(true);
                                 }}
                               >
-                                <ExternalLink className="w-4 h-4" />
+                                <ExternalLink className='w-4 h-4' />
                               </Button>
                               <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8"
+                                variant='ghost'
+                                size='icon'
+                                className='h-8 w-8'
                                 onClick={() => toast.success(language === 'zh-CN' ? '测试接口...' : 'Testing API...')}
                               >
-                                <Play className="w-4 h-4" />
+                                <Play className='w-4 h-4' />
                               </Button>
                             </div>
                           </div>
@@ -767,18 +787,18 @@ export function APICollection() {
                   </ScrollArea>
                 </TabsContent>
 
-                <TabsContent value="servers" className="p-6">
-                  <div className="space-y-6">
-                    <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                      <div className="flex items-start gap-3">
-                        <Server className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
+                <TabsContent value='servers' className='p-6'>
+                  <div className='space-y-6'>
+                    <div className='p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg'>
+                      <div className='flex items-start gap-3'>
+                        <Server className='w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5' />
                         <div>
-                          <h3 className="text-sm dark:text-white mb-1">
+                          <h3 className='text-sm dark:text-white mb-1'>
                             {language === 'zh-CN' ? '服务器配置' : 'Server Configuration'}
                           </h3>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
-                            {language === 'zh-CN' 
-                              ? '配置API服务器地址，对应OpenAPI Servers Schema规范' 
+                          <p className='text-sm text-gray-600 dark:text-gray-400'>
+                            {language === 'zh-CN'
+                              ? '配置API服务器地址，对应OpenAPI Servers Schema规范'
                               : 'Configure API server addresses, corresponding to OpenAPI Servers Schema'}
                           </p>
                         </div>
@@ -789,9 +809,14 @@ export function APICollection() {
                       <Label>{language === 'zh-CN' ? '服务器URL' : 'Server URL'}</Label>
                       <Input
                         value={serverConfig.url}
-                        onChange={e => setServerConfig(prev => ({ ...prev, url: e.target.value }))}
-                        placeholder="https://api.example.com"
-                        className="mt-2 dark:bg-gray-750 dark:border-gray-600"
+                        onChange={e =>
+                          setServerConfig(prev => ({
+                            ...prev,
+                            url: e.target.value,
+                          }))
+                        }
+                        placeholder='https://api.example.com'
+                        className='mt-2 dark:bg-gray-750 dark:border-gray-600'
                       />
                     </div>
 
@@ -799,31 +824,34 @@ export function APICollection() {
                       <Label>{language === 'zh-CN' ? '服务器描述' : 'Server Description'}</Label>
                       <Input
                         value={serverConfig.description}
-                        onChange={e => setServerConfig(prev => ({ ...prev, description: e.target.value }))}
+                        onChange={e =>
+                          setServerConfig(prev => ({
+                            ...prev,
+                            description: e.target.value,
+                          }))
+                        }
                         placeholder={language === 'zh-CN' ? '生产环境服务器' : 'Production server'}
-                        className="mt-2 dark:bg-gray-750 dark:border-gray-600"
+                        className='mt-2 dark:bg-gray-750 dark:border-gray-600'
                       />
                     </div>
 
-                    <Button className="w-full">
-                      {language === 'zh-CN' ? '保存服务配置' : 'Save Server Config'}
-                    </Button>
+                    <Button className='w-full'>{language === 'zh-CN' ? '保存服务配置' : 'Save Server Config'}</Button>
                   </div>
                 </TabsContent>
 
-                <TabsContent value="security" className="p-6">
-                  <ScrollArea className="h-[550px]">
-                    <div className="space-y-6 pr-4">
-                      <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                        <div className="flex items-start gap-3">
-                          <Shield className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
+                <TabsContent value='security' className='p-6'>
+                  <ScrollArea className='h-[550px]'>
+                    <div className='space-y-6 pr-4'>
+                      <div className='p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg'>
+                        <div className='flex items-start gap-3'>
+                          <Shield className='w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5' />
                           <div>
-                            <h3 className="text-sm dark:text-white mb-1">
+                            <h3 className='text-sm dark:text-white mb-1'>
                               {language === 'zh-CN' ? '安全配置' : 'Security Configuration'}
                             </h3>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                              {language === 'zh-CN' 
-                                ? '配置API认证方式，对应OpenAPI Security Schema规范' 
+                            <p className='text-sm text-gray-600 dark:text-gray-400'>
+                              {language === 'zh-CN'
+                                ? '配置API认证方式，对应OpenAPI Security Schema规范'
                                 : 'Configure API authentication, corresponding to OpenAPI Security Schema'}
                             </p>
                           </div>
@@ -832,20 +860,25 @@ export function APICollection() {
 
                       <div>
                         <Label>{language === 'zh-CN' ? '认证类型' : 'Authentication Type'}</Label>
-                        <Select 
-                          value={securityConfig.type} 
-                          onValueChange={(value: any) => setSecurityConfig(prev => ({ ...prev, type: value }))}
+                        <Select
+                          value={securityConfig.type}
+                          onValueChange={(value: any) =>
+                            setSecurityConfig(prev => ({
+                              ...prev,
+                              type: value,
+                            }))
+                          }
                         >
-                          <SelectTrigger className="dark:bg-gray-750 dark:border-gray-600 mt-2">
+                          <SelectTrigger className='dark:bg-gray-750 dark:border-gray-600 mt-2'>
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                            <SelectItem value="apiKey">API Key</SelectItem>
-                            <SelectItem value="httpBasic">HTTP Basic Authentication</SelectItem>
-                            <SelectItem value="bearer">Bearer Token</SelectItem>
-                            <SelectItem value="oauth2Password">OAuth 2.0 (Password)</SelectItem>
-                            <SelectItem value="oauth2Client">OAuth 2.0 (Client Credentials)</SelectItem>
-                            <SelectItem value="custom">{language === 'zh-CN' ? '自定义' : 'Custom'}</SelectItem>
+                          <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
+                            <SelectItem value='apiKey'>API Key</SelectItem>
+                            <SelectItem value='httpBasic'>HTTP Basic Authentication</SelectItem>
+                            <SelectItem value='bearer'>Bearer Token</SelectItem>
+                            <SelectItem value='oauth2Password'>OAuth 2.0 (Password)</SelectItem>
+                            <SelectItem value='oauth2Client'>OAuth 2.0 (Client Credentials)</SelectItem>
+                            <SelectItem value='custom'>{language === 'zh-CN' ? '自定义' : 'Custom'}</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -857,36 +890,51 @@ export function APICollection() {
                             <Label>{language === 'zh-CN' ? 'API Key 名称' : 'API Key Name'}</Label>
                             <Input
                               value={securityConfig.apiKeyName}
-                              onChange={e => setSecurityConfig(prev => ({ ...prev, apiKeyName: e.target.value }))}
-                              placeholder="X-API-Key"
-                              className="mt-2 dark:bg-gray-750 dark:border-gray-600"
+                              onChange={e =>
+                                setSecurityConfig(prev => ({
+                                  ...prev,
+                                  apiKeyName: e.target.value,
+                                }))
+                              }
+                              placeholder='X-API-Key'
+                              className='mt-2 dark:bg-gray-750 dark:border-gray-600'
                             />
                           </div>
 
                           <div>
                             <Label>{language === 'zh-CN' ? 'API Key 值' : 'API Key Value'}</Label>
                             <Input
-                              type="password"
+                              type='password'
                               value={securityConfig.apiKeyValue}
-                              onChange={e => setSecurityConfig(prev => ({ ...prev, apiKeyValue: e.target.value }))}
+                              onChange={e =>
+                                setSecurityConfig(prev => ({
+                                  ...prev,
+                                  apiKeyValue: e.target.value,
+                                }))
+                              }
                               placeholder={language === 'zh-CN' ? '输入API Key...' : 'Enter API Key...'}
-                              className="mt-2 dark:bg-gray-750 dark:border-gray-600"
+                              className='mt-2 dark:bg-gray-750 dark:border-gray-600'
                             />
                           </div>
 
                           <div>
                             <Label>{language === 'zh-CN' ? 'API Key 位置' : 'API Key Location'}</Label>
-                            <Select 
-                              value={securityConfig.apiKeyIn} 
-                              onValueChange={(value: any) => setSecurityConfig(prev => ({ ...prev, apiKeyIn: value }))}
+                            <Select
+                              value={securityConfig.apiKeyIn}
+                              onValueChange={(value: any) =>
+                                setSecurityConfig(prev => ({
+                                  ...prev,
+                                  apiKeyIn: value,
+                                }))
+                              }
                             >
-                              <SelectTrigger className="dark:bg-gray-750 dark:border-gray-600 mt-2">
+                              <SelectTrigger className='dark:bg-gray-750 dark:border-gray-600 mt-2'>
                                 <SelectValue />
                               </SelectTrigger>
-                              <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                                <SelectItem value="header">Header</SelectItem>
-                                <SelectItem value="query">Query Parameter</SelectItem>
-                                <SelectItem value="cookie">Cookie</SelectItem>
+                              <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
+                                <SelectItem value='header'>Header</SelectItem>
+                                <SelectItem value='query'>Query Parameter</SelectItem>
+                                <SelectItem value='cookie'>Cookie</SelectItem>
                               </SelectContent>
                             </Select>
                           </div>
@@ -900,20 +948,30 @@ export function APICollection() {
                             <Label>{language === 'zh-CN' ? '用户名' : 'Username'}</Label>
                             <Input
                               value={securityConfig.basicUsername}
-                              onChange={e => setSecurityConfig(prev => ({ ...prev, basicUsername: e.target.value }))}
+                              onChange={e =>
+                                setSecurityConfig(prev => ({
+                                  ...prev,
+                                  basicUsername: e.target.value,
+                                }))
+                              }
                               placeholder={language === 'zh-CN' ? '输入用户名...' : 'Enter username...'}
-                              className="mt-2 dark:bg-gray-750 dark:border-gray-600"
+                              className='mt-2 dark:bg-gray-750 dark:border-gray-600'
                             />
                           </div>
 
                           <div>
                             <Label>{language === 'zh-CN' ? '密码' : 'Password'}</Label>
                             <Input
-                              type="password"
+                              type='password'
                               value={securityConfig.basicPassword}
-                              onChange={e => setSecurityConfig(prev => ({ ...prev, basicPassword: e.target.value }))}
+                              onChange={e =>
+                                setSecurityConfig(prev => ({
+                                  ...prev,
+                                  basicPassword: e.target.value,
+                                }))
+                              }
                               placeholder={language === 'zh-CN' ? '输入密码...' : 'Enter password...'}
-                              className="mt-2 dark:bg-gray-750 dark:border-gray-600"
+                              className='mt-2 dark:bg-gray-750 dark:border-gray-600'
                             />
                           </div>
                         </>
@@ -924,11 +982,16 @@ export function APICollection() {
                         <div>
                           <Label>{language === 'zh-CN' ? 'Bearer Token' : 'Bearer Token'}</Label>
                           <Input
-                            type="password"
+                            type='password'
                             value={securityConfig.bearerToken}
-                            onChange={e => setSecurityConfig(prev => ({ ...prev, bearerToken: e.target.value }))}
+                            onChange={e =>
+                              setSecurityConfig(prev => ({
+                                ...prev,
+                                bearerToken: e.target.value,
+                              }))
+                            }
                             placeholder={language === 'zh-CN' ? '输入Bearer Token...' : 'Enter Bearer Token...'}
-                            className="mt-2 dark:bg-gray-750 dark:border-gray-600"
+                            className='mt-2 dark:bg-gray-750 dark:border-gray-600'
                           />
                         </div>
                       )}
@@ -940,9 +1003,14 @@ export function APICollection() {
                             <Label>{language === 'zh-CN' ? 'Token URL' : 'Token URL'}</Label>
                             <Input
                               value={securityConfig.oauth2TokenUrl}
-                              onChange={e => setSecurityConfig(prev => ({ ...prev, oauth2TokenUrl: e.target.value }))}
-                              placeholder="https://oauth.example.com/token"
-                              className="mt-2 dark:bg-gray-750 dark:border-gray-600"
+                              onChange={e =>
+                                setSecurityConfig(prev => ({
+                                  ...prev,
+                                  oauth2TokenUrl: e.target.value,
+                                }))
+                              }
+                              placeholder='https://oauth.example.com/token'
+                              className='mt-2 dark:bg-gray-750 dark:border-gray-600'
                             />
                           </div>
 
@@ -950,20 +1018,30 @@ export function APICollection() {
                             <Label>{language === 'zh-CN' ? 'Client ID' : 'Client ID'}</Label>
                             <Input
                               value={securityConfig.oauth2ClientId}
-                              onChange={e => setSecurityConfig(prev => ({ ...prev, oauth2ClientId: e.target.value }))}
+                              onChange={e =>
+                                setSecurityConfig(prev => ({
+                                  ...prev,
+                                  oauth2ClientId: e.target.value,
+                                }))
+                              }
                               placeholder={language === 'zh-CN' ? '输入Client ID...' : 'Enter Client ID...'}
-                              className="mt-2 dark:bg-gray-750 dark:border-gray-600"
+                              className='mt-2 dark:bg-gray-750 dark:border-gray-600'
                             />
                           </div>
 
                           <div>
                             <Label>{language === 'zh-CN' ? 'Client Secret' : 'Client Secret'}</Label>
                             <Input
-                              type="password"
+                              type='password'
                               value={securityConfig.oauth2ClientSecret}
-                              onChange={e => setSecurityConfig(prev => ({ ...prev, oauth2ClientSecret: e.target.value }))}
+                              onChange={e =>
+                                setSecurityConfig(prev => ({
+                                  ...prev,
+                                  oauth2ClientSecret: e.target.value,
+                                }))
+                              }
                               placeholder={language === 'zh-CN' ? '输入Client Secret...' : 'Enter Client Secret...'}
-                              className="mt-2 dark:bg-gray-750 dark:border-gray-600"
+                              className='mt-2 dark:bg-gray-750 dark:border-gray-600'
                             />
                           </div>
 
@@ -971,20 +1049,30 @@ export function APICollection() {
                             <Label>{language === 'zh-CN' ? '用户名' : 'Username'}</Label>
                             <Input
                               value={securityConfig.oauth2Username}
-                              onChange={e => setSecurityConfig(prev => ({ ...prev, oauth2Username: e.target.value }))}
+                              onChange={e =>
+                                setSecurityConfig(prev => ({
+                                  ...prev,
+                                  oauth2Username: e.target.value,
+                                }))
+                              }
                               placeholder={language === 'zh-CN' ? '输入用户名...' : 'Enter username...'}
-                              className="mt-2 dark:bg-gray-750 dark:border-gray-600"
+                              className='mt-2 dark:bg-gray-750 dark:border-gray-600'
                             />
                           </div>
 
                           <div>
                             <Label>{language === 'zh-CN' ? '密码' : 'Password'}</Label>
                             <Input
-                              type="password"
+                              type='password'
                               value={securityConfig.oauth2Password}
-                              onChange={e => setSecurityConfig(prev => ({ ...prev, oauth2Password: e.target.value }))}
+                              onChange={e =>
+                                setSecurityConfig(prev => ({
+                                  ...prev,
+                                  oauth2Password: e.target.value,
+                                }))
+                              }
                               placeholder={language === 'zh-CN' ? '输入密码...' : 'Enter password...'}
-                              className="mt-2 dark:bg-gray-750 dark:border-gray-600"
+                              className='mt-2 dark:bg-gray-750 dark:border-gray-600'
                             />
                           </div>
 
@@ -992,9 +1080,14 @@ export function APICollection() {
                             <Label>{language === 'zh-CN' ? 'Scope（可选）' : 'Scope (Optional)'}</Label>
                             <Input
                               value={securityConfig.oauth2Scope}
-                              onChange={e => setSecurityConfig(prev => ({ ...prev, oauth2Scope: e.target.value }))}
-                              placeholder="read write"
-                              className="mt-2 dark:bg-gray-750 dark:border-gray-600"
+                              onChange={e =>
+                                setSecurityConfig(prev => ({
+                                  ...prev,
+                                  oauth2Scope: e.target.value,
+                                }))
+                              }
+                              placeholder='read write'
+                              className='mt-2 dark:bg-gray-750 dark:border-gray-600'
                             />
                           </div>
                         </>
@@ -1007,9 +1100,14 @@ export function APICollection() {
                             <Label>{language === 'zh-CN' ? 'Token URL' : 'Token URL'}</Label>
                             <Input
                               value={securityConfig.oauth2ClientTokenUrl}
-                              onChange={e => setSecurityConfig(prev => ({ ...prev, oauth2ClientTokenUrl: e.target.value }))}
-                              placeholder="https://oauth.example.com/token"
-                              className="mt-2 dark:bg-gray-750 dark:border-gray-600"
+                              onChange={e =>
+                                setSecurityConfig(prev => ({
+                                  ...prev,
+                                  oauth2ClientTokenUrl: e.target.value,
+                                }))
+                              }
+                              placeholder='https://oauth.example.com/token'
+                              className='mt-2 dark:bg-gray-750 dark:border-gray-600'
                             />
                           </div>
 
@@ -1017,20 +1115,30 @@ export function APICollection() {
                             <Label>{language === 'zh-CN' ? 'Client ID' : 'Client ID'}</Label>
                             <Input
                               value={securityConfig.oauth2ClientCredentialsId}
-                              onChange={e => setSecurityConfig(prev => ({ ...prev, oauth2ClientCredentialsId: e.target.value }))}
+                              onChange={e =>
+                                setSecurityConfig(prev => ({
+                                  ...prev,
+                                  oauth2ClientCredentialsId: e.target.value,
+                                }))
+                              }
                               placeholder={language === 'zh-CN' ? '输入Client ID...' : 'Enter Client ID...'}
-                              className="mt-2 dark:bg-gray-750 dark:border-gray-600"
+                              className='mt-2 dark:bg-gray-750 dark:border-gray-600'
                             />
                           </div>
 
                           <div>
                             <Label>{language === 'zh-CN' ? 'Client Secret' : 'Client Secret'}</Label>
                             <Input
-                              type="password"
+                              type='password'
                               value={securityConfig.oauth2ClientCredentialsSecret}
-                              onChange={e => setSecurityConfig(prev => ({ ...prev, oauth2ClientCredentialsSecret: e.target.value }))}
+                              onChange={e =>
+                                setSecurityConfig(prev => ({
+                                  ...prev,
+                                  oauth2ClientCredentialsSecret: e.target.value,
+                                }))
+                              }
                               placeholder={language === 'zh-CN' ? '输入Client Secret...' : 'Enter Client Secret...'}
-                              className="mt-2 dark:bg-gray-750 dark:border-gray-600"
+                              className='mt-2 dark:bg-gray-750 dark:border-gray-600'
                             />
                           </div>
 
@@ -1038,9 +1146,14 @@ export function APICollection() {
                             <Label>{language === 'zh-CN' ? 'Scope（可选）' : 'Scope (Optional)'}</Label>
                             <Input
                               value={securityConfig.oauth2ClientScope}
-                              onChange={e => setSecurityConfig(prev => ({ ...prev, oauth2ClientScope: e.target.value }))}
-                              placeholder="read write"
-                              className="mt-2 dark:bg-gray-750 dark:border-gray-600"
+                              onChange={e =>
+                                setSecurityConfig(prev => ({
+                                  ...prev,
+                                  oauth2ClientScope: e.target.value,
+                                }))
+                              }
+                              placeholder='read write'
+                              className='mt-2 dark:bg-gray-750 dark:border-gray-600'
                             />
                           </div>
                         </>
@@ -1048,75 +1161,84 @@ export function APICollection() {
 
                       {/* Custom */}
                       {securityConfig.type === 'custom' && (
-                        <div className="space-y-4">
-                          <div className="flex items-center justify-between">
+                        <div className='space-y-4'>
+                          <div className='flex items-center justify-between'>
                             <Label>{language === 'zh-CN' ? '自定义认证参数' : 'Custom Auth Parameters'}</Label>
                             <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
+                              type='button'
+                              variant='outline'
+                              size='sm'
                               onClick={addCustomAuthParam}
-                              className="gap-2"
+                              className='gap-2'
                             >
-                              <Plus className="w-4 h-4" />
+                              <Plus className='w-4 h-4' />
                               {language === 'zh-CN' ? '添加参数' : 'Add Parameter'}
                             </Button>
                           </div>
 
-                          <div className="space-y-4">
+                          <div className='space-y-4'>
                             {customAuthParams.map((param, index) => (
-                              <div key={param.id} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg space-y-3">
-                                <div className="flex items-center justify-between mb-2">
-                                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                              <div
+                                key={param.id}
+                                className='p-4 border border-gray-200 dark:border-gray-700 rounded-lg space-y-3'
+                              >
+                                <div className='flex items-center justify-between mb-2'>
+                                  <span className='text-sm text-gray-600 dark:text-gray-400'>
                                     {language === 'zh-CN' ? '参数' : 'Parameter'} {index + 1}
                                   </span>
                                   {customAuthParams.length > 1 && (
                                     <Button
-                                      type="button"
-                                      variant="ghost"
-                                      size="sm"
+                                      type='button'
+                                      variant='ghost'
+                                      size='sm'
                                       onClick={() => removeCustomAuthParam(param.id)}
-                                      className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                                      className='h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20'
                                     >
-                                      <X className="w-4 h-4" />
+                                      <X className='w-4 h-4' />
                                     </Button>
                                   )}
                                 </div>
 
                                 <div>
-                                  <Label className="text-xs">{language === 'zh-CN' ? '参数名' : 'Parameter Name'}</Label>
+                                  <Label className='text-xs'>
+                                    {language === 'zh-CN' ? '参数名' : 'Parameter Name'}
+                                  </Label>
                                   <Input
                                     value={param.name}
                                     onChange={e => updateCustomAuthParam(param.id, 'name', e.target.value)}
-                                    placeholder="X-Custom-Auth"
-                                    className="mt-1 dark:bg-gray-750 dark:border-gray-600"
+                                    placeholder='X-Custom-Auth'
+                                    className='mt-1 dark:bg-gray-750 dark:border-gray-600'
                                   />
                                 </div>
 
                                 <div>
-                                  <Label className="text-xs">{language === 'zh-CN' ? '参数值' : 'Parameter Value'}</Label>
+                                  <Label className='text-xs'>
+                                    {language === 'zh-CN' ? '参数值' : 'Parameter Value'}
+                                  </Label>
                                   <Input
-                                    type="password"
+                                    type='password'
                                     value={param.value}
                                     onChange={e => updateCustomAuthParam(param.id, 'value', e.target.value)}
                                     placeholder={language === 'zh-CN' ? '输入参数值...' : 'Enter parameter value...'}
-                                    className="mt-1 dark:bg-gray-750 dark:border-gray-600"
+                                    className='mt-1 dark:bg-gray-750 dark:border-gray-600'
                                   />
                                 </div>
 
                                 <div>
-                                  <Label className="text-xs">{language === 'zh-CN' ? '参数配置' : 'Parameter Location'}</Label>
+                                  <Label className='text-xs'>
+                                    {language === 'zh-CN' ? '参数配置' : 'Parameter Location'}
+                                  </Label>
                                   <Select
                                     value={param.location}
                                     onValueChange={(value: any) => updateCustomAuthParam(param.id, 'location', value)}
                                   >
-                                    <SelectTrigger className="dark:bg-gray-750 dark:border-gray-600 mt-1">
+                                    <SelectTrigger className='dark:bg-gray-750 dark:border-gray-600 mt-1'>
                                       <SelectValue />
                                     </SelectTrigger>
-                                    <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                                      <SelectItem value="header">Header</SelectItem>
-                                      <SelectItem value="query">Query Parameter</SelectItem>
-                                      <SelectItem value="cookie">Cookie</SelectItem>
+                                    <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
+                                      <SelectItem value='header'>Header</SelectItem>
+                                      <SelectItem value='query'>Query Parameter</SelectItem>
+                                      <SelectItem value='cookie'>Cookie</SelectItem>
                                     </SelectContent>
                                   </Select>
                                 </div>
@@ -1126,20 +1248,20 @@ export function APICollection() {
                         </div>
                       )}
 
-                      <Button className="w-full">
+                      <Button className='w-full'>
                         {language === 'zh-CN' ? '保存安全配置' : 'Save Security Config'}
                       </Button>
                     </div>
                   </ScrollArea>
                 </TabsContent>
 
-                <TabsContent value="settings" className="p-6">
-                  <div className="space-y-6">
+                <TabsContent value='settings' className='p-6'>
+                  <div className='space-y-6'>
                     <div>
                       <Label>{language === 'zh-CN' ? '接口集名称' : 'Collection Name'}</Label>
-                      <Input 
+                      <Input
                         defaultValue={collections.find(c => c.id === selectedCollection)?.name}
-                        className="mt-2 dark:bg-gray-750 dark:border-gray-600"
+                        className='mt-2 dark:bg-gray-750 dark:border-gray-600'
                       />
                     </div>
 
@@ -1147,34 +1269,32 @@ export function APICollection() {
                       <Label>{language === 'zh-CN' ? '描述' : 'Description'}</Label>
                       <Textarea
                         defaultValue={collections.find(c => c.id === selectedCollection)?.description}
-                        className="mt-2 min-h-[100px] dark:bg-gray-750 dark:border-gray-600"
+                        className='mt-2 min-h-[100px] dark:bg-gray-750 dark:border-gray-600'
                       />
                     </div>
 
                     <div>
                       <Label>{language === 'zh-CN' ? '可见性' : 'Visibility'}</Label>
-                      <Select 
-                        defaultValue={collections.find(c => c.id === selectedCollection)?.visibility}
-                      >
-                        <SelectTrigger className="dark:bg-gray-750 dark:border-gray-600 mt-2">
+                      <Select defaultValue={collections.find(c => c.id === selectedCollection)?.visibility}>
+                        <SelectTrigger className='dark:bg-gray-750 dark:border-gray-600 mt-2'>
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                          <SelectItem value="private">
-                            <div className="flex items-center gap-2">
-                              <Shield className="w-4 h-4" />
+                        <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
+                          <SelectItem value='private'>
+                            <div className='flex items-center gap-2'>
+                              <Shield className='w-4 h-4' />
                               {language === 'zh-CN' ? '私有' : 'Private'}
                             </div>
                           </SelectItem>
-                          <SelectItem value="team">
-                            <div className="flex items-center gap-2">
-                              <Eye className="w-4 h-4" />
+                          <SelectItem value='team'>
+                            <div className='flex items-center gap-2'>
+                              <Eye className='w-4 h-4' />
                               {language === 'zh-CN' ? '团队可见' : 'Team'}
                             </div>
                           </SelectItem>
-                          <SelectItem value="public">
-                            <div className="flex items-center gap-2">
-                              <Globe className="w-4 h-4" />
+                          <SelectItem value='public'>
+                            <div className='flex items-center gap-2'>
+                              <Globe className='w-4 h-4' />
                               {language === 'zh-CN' ? '公开' : 'Public'}
                             </div>
                           </SelectItem>
@@ -1182,24 +1302,24 @@ export function APICollection() {
                       </Select>
                     </div>
 
-                    <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                      <Button 
-                        variant="outline" 
-                        className="w-full gap-2 mb-3"
+                    <div className='pt-4 border-t border-gray-200 dark:border-gray-700'>
+                      <Button
+                        variant='outline'
+                        className='w-full gap-2 mb-3'
                         onClick={() => setShowImportSettingsDialog(true)}
                       >
-                        <Upload className="w-4 h-4" />
+                        <Upload className='w-4 h-4' />
                         {language === 'zh-CN' ? '导入接口规范' : 'Import API Specification'}
                       </Button>
                     </div>
 
-                    <div className="flex gap-3">
-                      <Button variant="outline" className="flex-1 gap-2">
-                        <Download className="w-4 h-4" />
+                    <div className='flex gap-3'>
+                      <Button variant='outline' className='flex-1 gap-2'>
+                        <Download className='w-4 h-4' />
                         {language === 'zh-CN' ? '导出' : 'Export'}
                       </Button>
-                      <Button variant="outline" className="flex-1 gap-2 text-red-600 hover:text-red-700">
-                        <Trash2 className="w-4 h-4" />
+                      <Button variant='outline' className='flex-1 gap-2 text-red-600 hover:text-red-700'>
+                        <Trash2 className='w-4 h-4' />
                         {language === 'zh-CN' ? '删除' : 'Delete'}
                       </Button>
                     </div>
@@ -1208,10 +1328,10 @@ export function APICollection() {
               </Tabs>
             </div>
           ) : (
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg h-[660px] flex items-center justify-center">
-              <div className="text-center">
-                <Code2 className="w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" />
-                <p className="text-gray-500 dark:text-gray-400">
+            <div className='bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg h-[660px] flex items-center justify-center'>
+              <div className='text-center'>
+                <Code2 className='w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600' />
+                <p className='text-gray-500 dark:text-gray-400'>
                   {language === 'zh-CN' ? '选择一个接口集查看详情' : 'Select a collection to view details'}
                 </p>
               </div>
@@ -1222,77 +1342,90 @@ export function APICollection() {
 
       {/* Create Collection Dialog */}
       <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-        <DialogContent className="dark:bg-gray-800">
+        <DialogContent className='dark:bg-gray-800'>
           <DialogHeader>
-            <DialogTitle className="dark:text-white">
+            <DialogTitle className='dark:text-white'>
               {language === 'zh-CN' ? '新建接口集' : 'New API Collection'}
             </DialogTitle>
             <DialogDescription>
-              {language === 'zh-CN' ? '创建一个新的接口集来管理相关的API' : 'Create a new collection to manage related APIs'}
+              {language === 'zh-CN'
+                ? '创建一个新的接口集来管理相关的API'
+                : 'Create a new collection to manage related APIs'}
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4">
+          <div className='space-y-4'>
             <div>
-              <Label htmlFor="name">{language === 'zh-CN' ? '接口集名称' : 'Collection Name'}</Label>
+              <Label htmlFor='name'>{language === 'zh-CN' ? '接口集名称' : 'Collection Name'}</Label>
               <Input
-                id="name"
+                id='name'
                 value={formData.name}
                 onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
                 placeholder={language === 'zh-CN' ? '输入接口集名称...' : 'Enter collection name...'}
-                className="dark:bg-gray-750 dark:border-gray-600"
+                className='dark:bg-gray-750 dark:border-gray-600'
               />
             </div>
 
             <div>
-              <Label htmlFor="description">{language === 'zh-CN' ? '描述' : 'Description'}</Label>
+              <Label htmlFor='description'>{language === 'zh-CN' ? '描述' : 'Description'}</Label>
               <Textarea
-                id="description"
+                id='description'
                 value={formData.description}
-                onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                onChange={e =>
+                  setFormData(prev => ({
+                    ...prev,
+                    description: e.target.value,
+                  }))
+                }
                 placeholder={language === 'zh-CN' ? '输入接口集描述...' : 'Enter collection description...'}
-                className="dark:bg-gray-750 dark:border-gray-600 min-h-[100px]"
+                className='dark:bg-gray-750 dark:border-gray-600 min-h-[100px]'
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className='grid grid-cols-2 gap-4'>
               <div>
                 <Label>{language === 'zh-CN' ? '规范类型' : 'Specification Type'}</Label>
-                <Select value={formData.source} onValueChange={(value: any) => setFormData(prev => ({ ...prev, source: value }))}>
-                  <SelectTrigger className="dark:bg-gray-750 dark:border-gray-600">
+                <Select
+                  value={formData.source}
+                  onValueChange={(value: any) => setFormData(prev => ({ ...prev, source: value }))}
+                >
+                  <SelectTrigger className='dark:bg-gray-750 dark:border-gray-600'>
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                    <SelectItem value="openapi">OpenAPI 3.0</SelectItem>
-                    <SelectItem value="swagger">Swagger 2.0</SelectItem>
-                    <SelectItem value="postman">Postman Collection</SelectItem>
-                    <SelectItem value="manual">{language === 'zh-CN' ? '手动创建' : 'Manual'}</SelectItem>
+                  <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
+                    <SelectItem value='openapi'>OpenAPI 3.0</SelectItem>
+                    <SelectItem value='swagger'>Swagger 2.0</SelectItem>
+                    <SelectItem value='postman'>Postman Collection</SelectItem>
+                    <SelectItem value='manual'>{language === 'zh-CN' ? '手动创建' : 'Manual'}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div>
                 <Label>{language === 'zh-CN' ? '可见性' : 'Visibility'}</Label>
-                <Select value={formData.visibility} onValueChange={(value: any) => setFormData(prev => ({ ...prev, visibility: value }))}>
-                  <SelectTrigger className="dark:bg-gray-750 dark:border-gray-600">
+                <Select
+                  value={formData.visibility}
+                  onValueChange={(value: any) => setFormData(prev => ({ ...prev, visibility: value }))}
+                >
+                  <SelectTrigger className='dark:bg-gray-750 dark:border-gray-600'>
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                    <SelectItem value="private">
-                      <div className="flex items-center gap-2">
-                        <Shield className="w-4 h-4" />
+                  <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
+                    <SelectItem value='private'>
+                      <div className='flex items-center gap-2'>
+                        <Shield className='w-4 h-4' />
                         {language === 'zh-CN' ? '私有' : 'Private'}
                       </div>
                     </SelectItem>
-                    <SelectItem value="team">
-                      <div className="flex items-center gap-2">
-                        <Eye className="w-4 h-4" />
+                    <SelectItem value='team'>
+                      <div className='flex items-center gap-2'>
+                        <Eye className='w-4 h-4' />
                         {language === 'zh-CN' ? '团队可见' : 'Team'}
                       </div>
                     </SelectItem>
-                    <SelectItem value="public">
-                      <div className="flex items-center gap-2">
-                        <Globe className="w-4 h-4" />
+                    <SelectItem value='public'>
+                      <div className='flex items-center gap-2'>
+                        <Globe className='w-4 h-4' />
                         {language === 'zh-CN' ? '公开' : 'Public'}
                       </div>
                     </SelectItem>
@@ -1303,70 +1436,70 @@ export function APICollection() {
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowCreateDialog(false)}>
+            <Button variant='outline' onClick={() => setShowCreateDialog(false)}>
               {language === 'zh-CN' ? '取消' : 'Cancel'}
             </Button>
-            <Button onClick={handleCreateCollection}>
-              {language === 'zh-CN' ? '创建' : 'Create'}
-            </Button>
+            <Button onClick={handleCreateCollection}>{language === 'zh-CN' ? '创建' : 'Create'}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Import Dialog */}
       <Dialog open={showImportDialog} onOpenChange={setShowImportDialog}>
-        <DialogContent className="dark:bg-gray-800">
+        <DialogContent className='dark:bg-gray-800'>
           <DialogHeader>
-            <DialogTitle className="dark:text-white">
+            <DialogTitle className='dark:text-white'>
               {language === 'zh-CN' ? '导入接口规范' : 'Import API Specification'}
             </DialogTitle>
             <DialogDescription>
-              {language === 'zh-CN' ? '支持 OpenAPI、Swagger、Postman 等多种规范格式' : 'Support OpenAPI, Swagger, Postman and more'}
+              {language === 'zh-CN'
+                ? '支持 OpenAPI、Swagger、Postman 等多种规范格式'
+                : 'Support OpenAPI, Swagger, Postman and more'}
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-3">
+          <div className='space-y-4'>
+            <div className='grid grid-cols-2 gap-3'>
               <button
                 onClick={() => handleImport('OpenAPI')}
-                className="p-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 transition-colors group"
+                className='p-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 transition-colors group'
               >
-                <FileJson className="w-8 h-8 mx-auto mb-2 text-gray-400 group-hover:text-blue-500" />
-                <div className="text-sm dark:text-white">OpenAPI 3.0</div>
-                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">JSON / YAML</div>
+                <FileJson className='w-8 h-8 mx-auto mb-2 text-gray-400 group-hover:text-blue-500' />
+                <div className='text-sm dark:text-white'>OpenAPI 3.0</div>
+                <div className='text-xs text-gray-500 dark:text-gray-400 mt-1'>JSON / YAML</div>
               </button>
 
               <button
                 onClick={() => handleImport('Swagger')}
-                className="p-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 transition-colors group"
+                className='p-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 transition-colors group'
               >
-                <Code2 className="w-8 h-8 mx-auto mb-2 text-gray-400 group-hover:text-blue-500" />
-                <div className="text-sm dark:text-white">Swagger 2.0</div>
-                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">JSON / YAML</div>
+                <Code2 className='w-8 h-8 mx-auto mb-2 text-gray-400 group-hover:text-blue-500' />
+                <div className='text-sm dark:text-white'>Swagger 2.0</div>
+                <div className='text-xs text-gray-500 dark:text-gray-400 mt-1'>JSON / YAML</div>
               </button>
 
               <button
                 onClick={() => handleImport('Postman')}
-                className="p-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 transition-colors group"
+                className='p-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 transition-colors group'
               >
-                <Globe className="w-8 h-8 mx-auto mb-2 text-gray-400 group-hover:text-blue-500" />
-                <div className="text-sm dark:text-white">Postman</div>
-                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">Collection JSON</div>
+                <Globe className='w-8 h-8 mx-auto mb-2 text-gray-400 group-hover:text-blue-500' />
+                <div className='text-sm dark:text-white'>Postman</div>
+                <div className='text-xs text-gray-500 dark:text-gray-400 mt-1'>Collection JSON</div>
               </button>
 
               <button
                 onClick={() => handleImport('URL')}
-                className="p-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 transition-colors group"
+                className='p-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 transition-colors group'
               >
-                <ExternalLink className="w-8 h-8 mx-auto mb-2 text-gray-400 group-hover:text-blue-500" />
-                <div className="text-sm dark:text-white">{language === 'zh-CN' ? '从URL导入' : 'Import from URL'}</div>
-                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">API Schema URL</div>
+                <ExternalLink className='w-8 h-8 mx-auto mb-2 text-gray-400 group-hover:text-blue-500' />
+                <div className='text-sm dark:text-white'>{language === 'zh-CN' ? '从URL导入' : 'Import from URL'}</div>
+                <div className='text-xs text-gray-500 dark:text-gray-400 mt-1'>API Schema URL</div>
               </button>
             </div>
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowImportDialog(false)}>
+            <Button variant='outline' onClick={() => setShowImportDialog(false)}>
               {language === 'zh-CN' ? '取消' : 'Cancel'}
             </Button>
           </DialogFooter>
@@ -1375,9 +1508,9 @@ export function APICollection() {
 
       {/* Import Settings Dialog */}
       <Dialog open={showImportSettingsDialog} onOpenChange={setShowImportSettingsDialog}>
-        <DialogContent className="dark:bg-gray-800">
+        <DialogContent className='dark:bg-gray-800'>
           <DialogHeader>
-            <DialogTitle className="dark:text-white">
+            <DialogTitle className='dark:text-white'>
               {language === 'zh-CN' ? '导入接口规范' : 'Import API Specification'}
             </DialogTitle>
             <DialogDescription>
@@ -1385,37 +1518,37 @@ export function APICollection() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4">
+          <div className='space-y-4'>
             <div>
               <Label>{language === 'zh-CN' ? '重复处理策略' : 'Duplicate Handling Strategy'}</Label>
-              <RadioGroup 
-                value={importConflictStrategy} 
+              <RadioGroup
+                value={importConflictStrategy}
                 onValueChange={(value: any) => setImportConflictStrategy(value)}
-                className="mt-3 space-y-3"
+                className='mt-3 space-y-3'
               >
-                <div className="flex items-start space-x-3 p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors">
-                  <RadioGroupItem value="overwrite" id="overwrite" className="mt-0.5" />
-                  <div className="flex-1">
-                    <Label htmlFor="overwrite" className="cursor-pointer">
+                <div className='flex items-start space-x-3 p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors'>
+                  <RadioGroupItem value='overwrite' id='overwrite' className='mt-0.5' />
+                  <div className='flex-1'>
+                    <Label htmlFor='overwrite' className='cursor-pointer'>
                       {language === 'zh-CN' ? '覆盖重复' : 'Overwrite Duplicates'}
                     </Label>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                      {language === 'zh-CN' 
-                        ? '如果导入的接口已存在，将使用新数据覆盖原有数据' 
+                    <p className='text-sm text-gray-500 dark:text-gray-400 mt-1'>
+                      {language === 'zh-CN'
+                        ? '如果导入的接口已存在，将使用新数据覆盖原有数据'
                         : 'If an imported API already exists, it will be replaced with new data'}
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-start space-x-3 p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors">
-                  <RadioGroupItem value="ignore" id="ignore" className="mt-0.5" />
-                  <div className="flex-1">
-                    <Label htmlFor="ignore" className="cursor-pointer">
+                <div className='flex items-start space-x-3 p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors'>
+                  <RadioGroupItem value='ignore' id='ignore' className='mt-0.5' />
+                  <div className='flex-1'>
+                    <Label htmlFor='ignore' className='cursor-pointer'>
                       {language === 'zh-CN' ? '忽略重复' : 'Ignore Duplicates'}
                     </Label>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                      {language === 'zh-CN' 
-                        ? '如果导入的接口已存在，将跳过该接口，保留原有数据' 
+                    <p className='text-sm text-gray-500 dark:text-gray-400 mt-1'>
+                      {language === 'zh-CN'
+                        ? '如果导入的接口已存在，将跳过该接口，保留原有数据'
                         : 'If an imported API already exists, it will be skipped'}
                     </p>
                   </div>
@@ -1425,12 +1558,12 @@ export function APICollection() {
 
             <div>
               <Label>{language === 'zh-CN' ? '选择文件' : 'Select File'}</Label>
-              <div className="mt-2 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-blue-500 dark:hover:border-blue-500 transition-colors cursor-pointer">
-                <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+              <div className='mt-2 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-blue-500 dark:hover:border-blue-500 transition-colors cursor-pointer'>
+                <Upload className='w-8 h-8 mx-auto mb-2 text-gray-400' />
+                <p className='text-sm text-gray-600 dark:text-gray-400'>
                   {language === 'zh-CN' ? '点击选择文件或拖拽文件到此处' : 'Click to select file or drag and drop'}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                <p className='text-xs text-gray-500 dark:text-gray-500 mt-1'>
                   {language === 'zh-CN' ? '支持 JSON、YAML 格式' : 'Support JSON, YAML formats'}
                 </p>
               </div>
@@ -1438,40 +1571,40 @@ export function APICollection() {
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowImportSettingsDialog(false)}>
+            <Button variant='outline' onClick={() => setShowImportSettingsDialog(false)}>
               {language === 'zh-CN' ? '取消' : 'Cancel'}
             </Button>
-            <Button onClick={handleImportWithStrategy}>
-              {language === 'zh-CN' ? '开始导入' : 'Start Import'}
-            </Button>
+            <Button onClick={handleImportWithStrategy}>{language === 'zh-CN' ? '开始导入' : 'Start Import'}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* OpenAPI Preview Dialog */}
       <Dialog open={showOpenAPIPreview} onOpenChange={setShowOpenAPIPreview}>
-        <DialogContent className="max-w-[1200px] dark:bg-gray-800">
+        <DialogContent className='max-w-[1200px] dark:bg-gray-800'>
           <DialogHeader>
-            <DialogTitle className="dark:text-white flex items-center gap-2">
-              <FileJson className="w-5 h-5" />
+            <DialogTitle className='dark:text-white flex items-center gap-2'>
+              <FileJson className='w-5 h-5' />
               {language === 'zh-CN' ? 'OpenAPI 规范预览' : 'OpenAPI Specification Preview'}
             </DialogTitle>
             <DialogDescription>
-              {language === 'zh-CN' ? '查看当前接口集的OpenAPI规范脚本' : 'View OpenAPI specification for current collection'}
+              {language === 'zh-CN'
+                ? '查看当前接口集的OpenAPI规范脚本'
+                : 'View OpenAPI specification for current collection'}
             </DialogDescription>
           </DialogHeader>
 
-          <ScrollArea className="h-[500px]">
-            <pre className="p-4 bg-gray-50 dark:bg-gray-750 rounded-lg overflow-x-auto">
-              <code className="text-sm text-gray-700 dark:text-gray-300">
+          <ScrollArea className='h-[500px]'>
+            <pre className='p-4 bg-gray-50 dark:bg-gray-750 rounded-lg overflow-x-auto'>
+              <code className='text-sm text-gray-700 dark:text-gray-300'>
                 {JSON.stringify(generateOpenAPISpec(), null, 2)}
               </code>
             </pre>
           </ScrollArea>
 
           <DialogFooter>
-            <Button 
-              variant="outline" 
+            <Button
+              variant='outline'
               onClick={() => {
                 navigator.clipboard.writeText(JSON.stringify(generateOpenAPISpec(), null, 2));
                 toast.success(language === 'zh-CN' ? '已复制到剪贴板' : 'Copied to clipboard');
@@ -1479,8 +1612,8 @@ export function APICollection() {
             >
               {language === 'zh-CN' ? '复制' : 'Copy'}
             </Button>
-            <Button 
-              variant="outline"
+            <Button
+              variant='outline'
               onClick={() => {
                 const blob = new Blob([JSON.stringify(generateOpenAPISpec(), null, 2)], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
@@ -1491,98 +1624,97 @@ export function APICollection() {
                 toast.success(language === 'zh-CN' ? '已下载' : 'Downloaded');
               }}
             >
-              <Download className="w-4 h-4 mr-2" />
+              <Download className='w-4 h-4 mr-2' />
               {language === 'zh-CN' ? '下载' : 'Download'}
             </Button>
-            <Button onClick={() => setShowOpenAPIPreview(false)}>
-              {language === 'zh-CN' ? '关闭' : 'Close'}
-            </Button>
+            <Button onClick={() => setShowOpenAPIPreview(false)}>{language === 'zh-CN' ? '关闭' : 'Close'}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Endpoint Details Dialog */}
       <Dialog open={showEndpointDialog} onOpenChange={setShowEndpointDialog}>
-        <DialogContent className="max-w-3xl dark:bg-gray-800">
+        <DialogContent className='max-w-3xl dark:bg-gray-800'>
           <DialogHeader>
-            <DialogTitle className="dark:text-white flex items-center gap-2">
+            <DialogTitle className='dark:text-white flex items-center gap-2'>
               <Badge className={cn('text-xs px-2', selectedEndpoint && getMethodColor(selectedEndpoint.method))}>
                 {selectedEndpoint?.method}
               </Badge>
               {selectedEndpoint?.name}
             </DialogTitle>
             <DialogDescription>
-              <code className="text-xs">{selectedEndpoint?.path}</code>
+              <code className='text-xs'>{selectedEndpoint?.path}</code>
             </DialogDescription>
           </DialogHeader>
 
-          <Tabs defaultValue="details" className="w-full">
+          <Tabs defaultValue='details' className='w-full'>
             <TabsList>
-              <TabsTrigger value="details">{language === 'zh-CN' ? '详情' : 'Details'}</TabsTrigger>
-              <TabsTrigger value="request">{language === 'zh-CN' ? '请求' : 'Request'}</TabsTrigger>
-              <TabsTrigger value="response">{language === 'zh-CN' ? '响应' : 'Response'}</TabsTrigger>
-              <TabsTrigger value="test">{language === 'zh-CN' ? '测试' : 'Test'}</TabsTrigger>
+              <TabsTrigger value='details'>{language === 'zh-CN' ? '详情' : 'Details'}</TabsTrigger>
+              <TabsTrigger value='request'>{language === 'zh-CN' ? '请求' : 'Request'}</TabsTrigger>
+              <TabsTrigger value='response'>{language === 'zh-CN' ? '响应' : 'Response'}</TabsTrigger>
+              <TabsTrigger value='test'>{language === 'zh-CN' ? '测试' : 'Test'}</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="details" className="space-y-4 mt-4">
+            <TabsContent value='details' className='space-y-4 mt-4'>
               <div>
                 <Label>{language === 'zh-CN' ? '描述' : 'Description'}</Label>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-                  {selectedEndpoint?.description}
-                </p>
+                <p className='text-sm text-gray-600 dark:text-gray-400 mt-2'>{selectedEndpoint?.description}</p>
               </div>
               <div>
                 <Label>{language === 'zh-CN' ? '分类' : 'Category'}</Label>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-                  {selectedEndpoint?.category}
-                </p>
+                <p className='text-sm text-gray-600 dark:text-gray-400 mt-2'>{selectedEndpoint?.category}</p>
               </div>
               <div>
                 <Label>{language === 'zh-CN' ? '标签' : 'Tags'}</Label>
-                <div className="flex flex-wrap gap-2 mt-2">
+                <div className='flex flex-wrap gap-2 mt-2'>
                   {selectedEndpoint?.tags.map((tag, index) => (
-                    <Badge key={index} variant="secondary">{tag}</Badge>
+                    <Badge key={index} variant='secondary'>
+                      {tag}
+                    </Badge>
                   ))}
                 </div>
               </div>
               <div>
                 <Label>{language === 'zh-CN' ? '状态' : 'Status'}</Label>
-                <div className="flex items-center gap-2 mt-2">
+                <div className='flex items-center gap-2 mt-2'>
                   <Switch checked={selectedEndpoint?.enabled} />
-                  <span className="text-sm text-gray-600 dark:text-gray-400">
-                    {selectedEndpoint?.enabled 
-                      ? (language === 'zh-CN' ? '已启用' : 'Enabled')
-                      : (language === 'zh-CN' ? '已禁用' : 'Disabled')
-                    }
+                  <span className='text-sm text-gray-600 dark:text-gray-400'>
+                    {selectedEndpoint?.enabled
+                      ? language === 'zh-CN'
+                        ? '已启用'
+                        : 'Enabled'
+                      : language === 'zh-CN'
+                        ? '已禁用'
+                        : 'Disabled'}
                   </span>
                 </div>
               </div>
             </TabsContent>
 
-            <TabsContent value="request" className="mt-4">
-              <div className="p-4 bg-gray-50 dark:bg-gray-750 rounded-lg">
-                <code className="text-sm text-gray-700 dark:text-gray-300">
+            <TabsContent value='request' className='mt-4'>
+              <div className='p-4 bg-gray-50 dark:bg-gray-750 rounded-lg'>
+                <code className='text-sm text-gray-700 dark:text-gray-300'>
                   {language === 'zh-CN' ? '请求参数配置...' : 'Request parameters configuration...'}
                 </code>
               </div>
             </TabsContent>
 
-            <TabsContent value="response" className="mt-4">
-              <div className="p-4 bg-gray-50 dark:bg-gray-750 rounded-lg">
-                <code className="text-sm text-gray-700 dark:text-gray-300">
+            <TabsContent value='response' className='mt-4'>
+              <div className='p-4 bg-gray-50 dark:bg-gray-750 rounded-lg'>
+                <code className='text-sm text-gray-700 dark:text-gray-300'>
                   {language === 'zh-CN' ? '响应数据示例...' : 'Response data example...'}
                 </code>
               </div>
             </TabsContent>
 
-            <TabsContent value="test" className="mt-4">
-              <div className="space-y-4">
-                <Button className="w-full gap-2">
-                  <Play className="w-4 h-4" />
+            <TabsContent value='test' className='mt-4'>
+              <div className='space-y-4'>
+                <Button className='w-full gap-2'>
+                  <Play className='w-4 h-4' />
                   {language === 'zh-CN' ? '发送测试请求' : 'Send Test Request'}
                 </Button>
-                <div className="p-4 bg-gray-50 dark:bg-gray-750 rounded-lg">
-                  <code className="text-sm text-gray-700 dark:text-gray-300">
+                <div className='p-4 bg-gray-50 dark:bg-gray-750 rounded-lg'>
+                  <code className='text-sm text-gray-700 dark:text-gray-300'>
                     {language === 'zh-CN' ? '测试结果将显示在这里...' : 'Test results will be displayed here...'}
                   </code>
                 </div>
@@ -1591,12 +1723,10 @@ export function APICollection() {
           </Tabs>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowEndpointDialog(false)}>
+            <Button variant='outline' onClick={() => setShowEndpointDialog(false)}>
               {language === 'zh-CN' ? '关闭' : 'Close'}
             </Button>
-            <Button>
-              {language === 'zh-CN' ? '保存' : 'Save'}
-            </Button>
+            <Button>{language === 'zh-CN' ? '保存' : 'Save'}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

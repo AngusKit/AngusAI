@@ -21,7 +21,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const root = document.documentElement;
     root.classList.remove('light', 'dark');
     root.classList.add(theme);
-    
+
     // Save to localStorage
     localStorage.setItem('theme', theme);
   }, [theme]);
@@ -30,16 +30,15 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     setThemeState(newTheme);
   }, []);
 
-  const value = useMemo(() => ({
-    theme,
-    setTheme
-  }), [theme, setTheme]);
-
-  return (
-    <ThemeContext.Provider value={value}>
-      {children}
-    </ThemeContext.Provider>
+  const value = useMemo(
+    () => ({
+      theme,
+      setTheme,
+    }),
+    [theme, setTheme]
   );
+
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
 export function useTheme() {

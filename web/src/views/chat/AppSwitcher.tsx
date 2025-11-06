@@ -1,12 +1,6 @@
 import { Check, ChevronDown, Zap, Bot, MessageSquare, Sparkles } from 'lucide-react';
 import { Button } from '@/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-} from '@/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, } from '@/ui/dropdown-menu';
 import { Badge } from '@/ui/badge';
 import { cn } from '@/ui/utils';
 
@@ -92,18 +86,18 @@ export function AppSwitcher({ currentAppId, onAppChange }: AppSwitcherProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="gap-2 h-9">
-          <CurrentIcon className="w-4 h-4 text-blue-500" />
-          <span className="dark:text-white">{currentApp.name}</span>
-          <ChevronDown className="w-4 h-4 text-gray-400" />
+        <Button variant='ghost' className='gap-2 h-9'>
+          <CurrentIcon className='w-4 h-4 text-blue-500' />
+          <span className='dark:text-white'>{currentApp.name}</span>
+          <ChevronDown className='w-4 h-4 text-gray-400' />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-80 dark:bg-gray-800 dark:border-gray-700">
-        <div className="px-2 py-1.5">
-          <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">选择应用</p>
+      <DropdownMenuContent align='start' className='w-80 dark:bg-gray-800 dark:border-gray-700'>
+        <div className='px-2 py-1.5'>
+          <p className='text-xs text-gray-500 dark:text-gray-400 mb-2'>选择应用</p>
         </div>
-        <DropdownMenuSeparator className="dark:bg-gray-700" />
-        <div className="max-h-96 overflow-y-auto">
+        <DropdownMenuSeparator className='dark:bg-gray-700' />
+        <div className='max-h-96 overflow-y-auto'>
           {apps.map(app => {
             const Icon = app.icon;
             return (
@@ -132,29 +126,27 @@ export function AppSwitcher({ currentAppId, onAppChange }: AppSwitcherProps) {
                     )}
                   />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="dark:text-white truncate">{app.name}</span>
+                <div className='flex-1 min-w-0'>
+                  <div className='flex items-center gap-2 mb-1'>
+                    <span className='dark:text-white truncate'>{app.name}</span>
                     {currentAppId === app.id && (
-                      <Check className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                      <Check className='w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0' />
                     )}
                   </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                    {app.description}
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="secondary" className={cn('text-xs', getTypeBadgeClass(app.type))}>
+                  <p className='text-xs text-gray-500 dark:text-gray-400 mb-2'>{app.description}</p>
+                  <div className='flex items-center gap-2'>
+                    <Badge variant='secondary' className={cn('text-xs', getTypeBadgeClass(app.type))}>
                       {getTypeLabel(app.type)}
                     </Badge>
                     {app.isOnline ? (
-                      <div className="flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
-                        <span className="text-xs text-green-600 dark:text-green-400">在线</span>
+                      <div className='flex items-center gap-1'>
+                        <span className='w-1.5 h-1.5 bg-green-500 rounded-full'></span>
+                        <span className='text-xs text-green-600 dark:text-green-400'>在线</span>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 bg-gray-400 rounded-full"></span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">离线</span>
+                      <div className='flex items-center gap-1'>
+                        <span className='w-1.5 h-1.5 bg-gray-400 rounded-full'></span>
+                        <span className='text-xs text-gray-500 dark:text-gray-400'>离线</span>
                       </div>
                     )}
                   </div>
@@ -163,8 +155,8 @@ export function AppSwitcher({ currentAppId, onAppChange }: AppSwitcherProps) {
             );
           })}
         </div>
-        <DropdownMenuSeparator className="dark:bg-gray-700" />
-        <DropdownMenuItem className="text-blue-600 dark:text-blue-400 justify-center cursor-pointer">
+        <DropdownMenuSeparator className='dark:bg-gray-700' />
+        <DropdownMenuItem className='text-blue-600 dark:text-blue-400 justify-center cursor-pointer'>
           查看所有应用
         </DropdownMenuItem>
       </DropdownMenuContent>

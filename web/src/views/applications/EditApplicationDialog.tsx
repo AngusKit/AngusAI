@@ -7,14 +7,7 @@ import { Badge } from '@/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/ui/select';
 import { ScrollArea } from '@/ui/scroll-area';
 import { useState, useEffect, useRef } from 'react';
-import { 
-  MessageSquare, Sparkles, Database, Bot, Code, Zap, Heart, Star, 
-  Users, FileText, Calendar, Settings, Bell, Globe, Lock, Mail,
-  Phone, Camera, Image, Music, Video, BookOpen, Briefcase, Coffee,
-  ShoppingCart, CreditCard, Gift, Trophy, Target, Rocket, Lightbulb,
-  Brain, Cpu, Cloud, Server, Terminal, Package, Wrench, Shield,
-  ChevronLeft, ChevronRight
-} from 'lucide-react';
+import { MessageSquare, Sparkles, Database, Bot, Code, Zap, Heart, Star, Users, FileText, Calendar, Settings, Bell, Globe, Lock, Mail, Phone, Camera, Image, Music, Video, BookOpen, Briefcase, Coffee, ShoppingCart, CreditCard, Gift, Trophy, Target, Rocket, Lightbulb, Brain, Cpu, Cloud, Server, Terminal, Package, Wrench, Shield, ChevronLeft, ChevronRight, } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Application {
@@ -38,7 +31,12 @@ interface EditApplicationDialogProps {
 }
 
 const iconOptions = [
-  { id: 'message', icon: MessageSquare, label: '消息', bgColor: 'bg-purple-500' },
+  {
+    id: 'message',
+    icon: MessageSquare,
+    label: '消息',
+    bgColor: 'bg-purple-500',
+  },
   { id: 'sparkles', icon: Sparkles, label: '星星', bgColor: 'bg-purple-600' },
   { id: 'database', icon: Database, label: '数据库', bgColor: 'bg-green-500' },
   { id: 'bot', icon: Bot, label: '机器人', bgColor: 'bg-orange-500' },
@@ -60,10 +58,25 @@ const iconOptions = [
   { id: 'music', icon: Music, label: '音乐', bgColor: 'bg-pink-500' },
   { id: 'video', icon: Video, label: '视频', bgColor: 'bg-red-600' },
   { id: 'bookopen', icon: BookOpen, label: '书籍', bgColor: 'bg-orange-600' },
-  { id: 'briefcase', icon: Briefcase, label: '公文包', bgColor: 'bg-brown-500' },
+  {
+    id: 'briefcase',
+    icon: Briefcase,
+    label: '公文包',
+    bgColor: 'bg-brown-500',
+  },
   { id: 'coffee', icon: Coffee, label: '咖啡', bgColor: 'bg-amber-700' },
-  { id: 'shoppingcart', icon: ShoppingCart, label: '购物车', bgColor: 'bg-lime-500' },
-  { id: 'creditcard', icon: CreditCard, label: '信用卡', bgColor: 'bg-blue-600' },
+  {
+    id: 'shoppingcart',
+    icon: ShoppingCart,
+    label: '购物车',
+    bgColor: 'bg-lime-500',
+  },
+  {
+    id: 'creditcard',
+    icon: CreditCard,
+    label: '信用卡',
+    bgColor: 'bg-blue-600',
+  },
   { id: 'gift', icon: Gift, label: '礼物', bgColor: 'bg-pink-600' },
   { id: 'trophy', icon: Trophy, label: '奖杯', bgColor: 'bg-yellow-600' },
   { id: 'target', icon: Target, label: '目标', bgColor: 'bg-red-700' },
@@ -131,13 +144,14 @@ export function EditApplicationDialog({ open, onOpenChange, application, onSave 
   const scrollIcons = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
       const scrollAmount = 240; // 约4个图标的宽度 (56px * 4 + 12px gap * 3)
-      const newScrollLeft = direction === 'left' 
-        ? scrollContainerRef.current.scrollLeft - scrollAmount
-        : scrollContainerRef.current.scrollLeft + scrollAmount;
-      
+      const newScrollLeft =
+        direction === 'left'
+          ? scrollContainerRef.current.scrollLeft - scrollAmount
+          : scrollContainerRef.current.scrollLeft + scrollAmount;
+
       scrollContainerRef.current.scrollTo({
         left: newScrollLeft,
-        behavior: 'smooth'
+        behavior: 'smooth',
       });
     }
   };
@@ -146,50 +160,54 @@ export function EditApplicationDialog({ open, onOpenChange, application, onSave 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto dark:bg-gray-800 dark:border-gray-700">
+      <DialogContent className='max-w-2xl max-h-[90vh] overflow-y-auto dark:bg-gray-800 dark:border-gray-700'>
         <DialogHeader>
-          <DialogTitle className="dark:text-white">编辑应用</DialogTitle>
-          <DialogDescription className="dark:text-gray-400">
-            修改应用的基本信息和配置
-          </DialogDescription>
+          <DialogTitle className='dark:text-white'>编辑应用</DialogTitle>
+          <DialogDescription className='dark:text-gray-400'>修改应用的基本信息和配置</DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6 py-4 overflow-x-hidden">
+        <div className='space-y-6 py-4 overflow-x-hidden'>
           {/* 应用名称 */}
-          <div className="space-y-2">
-            <Label htmlFor="name" className="dark:text-gray-300">应用名称</Label>
+          <div className='space-y-2'>
+            <Label htmlFor='name' className='dark:text-gray-300'>
+              应用名称
+            </Label>
             <Input
-              id="name"
+              id='name'
               value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="请输入应用名称"
-              className="dark:bg-gray-900 dark:border-gray-700 dark:text-white"
+              onChange={e => setName(e.target.value)}
+              placeholder='请输入应用名称'
+              className='dark:bg-gray-900 dark:border-gray-700 dark:text-white'
             />
           </div>
 
           {/* 应用描述 */}
-          <div className="space-y-2">
-            <Label htmlFor="description" className="dark:text-gray-300">应用描述</Label>
+          <div className='space-y-2'>
+            <Label htmlFor='description' className='dark:text-gray-300'>
+              应用描述
+            </Label>
             <Textarea
-              id="description"
+              id='description'
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="请输入应用描述"
+              onChange={e => setDescription(e.target.value)}
+              placeholder='请输入应用描述'
               rows={4}
-              className="dark:bg-gray-900 dark:border-gray-700 dark:text-white resize-none"
+              className='dark:bg-gray-900 dark:border-gray-700 dark:text-white resize-none'
             />
           </div>
 
           {/* 应用分类 */}
-          <div className="space-y-2">
-            <Label htmlFor="category" className="dark:text-gray-300">应用分类</Label>
+          <div className='space-y-2'>
+            <Label htmlFor='category' className='dark:text-gray-300'>
+              应用分类
+            </Label>
             <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger className="dark:bg-gray-900 dark:border-gray-700 dark:text-white">
-                <SelectValue placeholder="选择分类" />
+              <SelectTrigger className='dark:bg-gray-900 dark:border-gray-700 dark:text-white'>
+                <SelectValue placeholder='选择分类' />
               </SelectTrigger>
-              <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                {categories.map((cat) => (
-                  <SelectItem key={cat.value} value={cat.value} className="dark:text-gray-300">
+              <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
+                {categories.map(cat => (
+                  <SelectItem key={cat.value} value={cat.value} className='dark:text-gray-300'>
                     {cat.label}
                   </SelectItem>
                 ))}
@@ -198,29 +216,29 @@ export function EditApplicationDialog({ open, onOpenChange, application, onSave 
           </div>
 
           {/* 应用图标 */}
-          <div className="space-y-2">
-            <Label className="dark:text-gray-300">应用图标</Label>
-            <div className="relative group">
+          <div className='space-y-2'>
+            <Label className='dark:text-gray-300'>应用图标</Label>
+            <div className='relative group'>
               {/* 左箭头 */}
               <button
-                type="button"
+                type='button'
                 onClick={() => scrollIcons('left')}
-                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-white dark:bg-gray-700 rounded-full shadow-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-gray-50 dark:hover:bg-gray-600"
+                className='absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-white dark:bg-gray-700 rounded-full shadow-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-gray-50 dark:hover:bg-gray-600'
               >
-                <ChevronLeft className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+                <ChevronLeft className='w-5 h-5 text-gray-700 dark:text-gray-300' />
               </button>
 
               {/* 图标滚动容器 */}
-              <div 
+              <div
                 ref={scrollContainerRef}
-                className="flex gap-3 overflow-x-auto scrollbar-hide pl-9 pr-9"
+                className='flex gap-3 overflow-x-auto scrollbar-hide pl-9 pr-9'
                 style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
               >
-                {iconOptions.map((option) => {
+                {iconOptions.map(option => {
                   const IconComp = option.icon;
                   return (
                     <button
-                      type="button"
+                      type='button'
                       key={option.id}
                       onClick={() => setSelectedIconId(option.id)}
                       className={`w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 transition-all ${
@@ -230,7 +248,9 @@ export function EditApplicationDialog({ open, onOpenChange, application, onSave 
                       }`}
                       title={option.label}
                     >
-                      <IconComp className={`w-6 h-6 ${selectedIconId === option.id ? 'text-white' : 'text-gray-600 dark:text-gray-300'}`} />
+                      <IconComp
+                        className={`w-6 h-6 ${selectedIconId === option.id ? 'text-white' : 'text-gray-600 dark:text-gray-300'}`}
+                      />
                     </button>
                   );
                 })}
@@ -238,46 +258,50 @@ export function EditApplicationDialog({ open, onOpenChange, application, onSave 
 
               {/* 右箭头 */}
               <button
-                type="button"
+                type='button'
                 onClick={() => scrollIcons('right')}
-                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-white dark:bg-gray-700 rounded-full shadow-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-gray-50 dark:hover:bg-gray-600"
+                className='absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-white dark:bg-gray-700 rounded-full shadow-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-gray-50 dark:hover:bg-gray-600'
               >
-                <ChevronRight className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+                <ChevronRight className='w-5 h-5 text-gray-700 dark:text-gray-300' />
               </button>
             </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-              悬停显示箭头按钮，点击滚动查看更多图标
-            </p>
+            <p className='text-xs text-gray-500 dark:text-gray-400 mt-2'>悬停显示箭头按钮，点击滚动查看更多图标</p>
           </div>
 
           {/* 应用状态信息 */}
-          <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-between">
+          <div className='p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700'>
+            <div className='flex items-center justify-between'>
               <div>
-                <div className="text-sm dark:text-gray-300 mb-1">当前状态</div>
-                <Badge className={
-                  application.status === '已发布' 
-                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                    : application.status === '已暂停'
-                    ? 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400'
-                    : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
-                }>
+                <div className='text-sm dark:text-gray-300 mb-1'>当前状态</div>
+                <Badge
+                  className={
+                    application.status === '已发布'
+                      ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                      : application.status === '已暂停'
+                        ? 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400'
+                        : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+                  }
+                >
                   {application.status}
                 </Badge>
               </div>
               <div>
-                <div className="text-sm dark:text-gray-300 mb-1">调用次数</div>
-                <div className="dark:text-white">{application.visits || '暂无数据'}</div>
+                <div className='text-sm dark:text-gray-300 mb-1'>调用次数</div>
+                <div className='dark:text-white'>{application.visits || '暂无数据'}</div>
               </div>
             </div>
           </div>
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} className="dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300">
+          <Button
+            variant='outline'
+            onClick={() => onOpenChange(false)}
+            className='dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300'
+          >
             取消
           </Button>
-          <Button onClick={handleSave} className="bg-blue-500 hover:bg-blue-600 text-white">
+          <Button onClick={handleSave} className='bg-blue-500 hover:bg-blue-600 text-white'>
             保存更改
           </Button>
         </DialogFooter>

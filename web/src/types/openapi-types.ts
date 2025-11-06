@@ -1,6 +1,6 @@
 export type AuthType = 'basic' | 'bearer' | 'apiKey' | 'oauth2';
 export type ApiKeyIn = 'header' | 'query';
-export type ParameterIn = 'query' | 'path' |  'cookie' | 'header';
+export type ParameterIn = 'query' | 'path' | 'cookie' | 'header';
 export type AuthFlowKey = 'authorizationCode' | 'password' | 'implicit' | 'clientCredentials';
 export type ApiServerSource = 'CURRENT_REQUEST' | 'API_SERVERS' | 'PARENT_SERVERS' | 'MOCK_SERVICE';
 
@@ -97,7 +97,7 @@ export enum SchemaType {
   number = 'number',
   string = 'string',
   integer = 'integer',
-  array = 'array'
+  array = 'array',
 }
 
 export enum SchemaFormat {
@@ -111,7 +111,7 @@ export enum SchemaFormat {
   password = 'password',
   uuid = 'uuid',
   xml = 'xml',
-  json = 'json'
+  json = 'json',
 }
 
 /**
@@ -123,7 +123,7 @@ export const API_EXTENSION_KEYS = {
   valueKey: 'x-xc-value', // Value
   enabledKey: 'x-xc-enabled', // Enable/disable
   statusKey: 'x-xc-status', // Data status
-  contentEncoding : 'x-xc-contentEncoding', // Content encoding
+  contentEncoding: 'x-xc-contentEncoding', // Content encoding
   exportVariableKey: 'x-xc-exportVariable', // Whether to set as variable
   requestSettingKey: 'x-xc-requestSetting', // Request settings like timeout, object
   serverNameKey: 'x-xc-serverName', // Server URL name
@@ -142,15 +142,12 @@ export const API_EXTENSION_KEYS = {
   oAuth2ClientAuthTypeKey: 'x-xc-oauth2-clientAuthType', // OAuth2 client auth type
   formContentTypeKey: 'x-xc-contentType',
   basicAuthKey: 'x-xc-basicAuth',
-  wsMessageKey: 'x-wsMessage'
+  wsMessageKey: 'x-wsMessage',
 };
 
 /* tslint:disable:no-namespace no-empty-interface */
 export namespace OpenAPI {
-  export type Document<T extends {} = {}> =
-    | OpenAPIV2.Document<T>
-    | OpenAPIV3.Document<T>
-    | OpenAPIV3_1.Document<T>;
+  export type Document<T extends {} = {}> = OpenAPIV2.Document<T> | OpenAPIV3.Document<T> | OpenAPIV3_1.Document<T>;
   export type Operation<T extends {} = {}> =
     | OpenAPIV2.OperationObject<T>
     | OpenAPIV3.OperationObject<T>
@@ -191,12 +188,9 @@ export namespace OpenAPIV3_1 {
       jsonSchemaDialect?: string;
       servers?: ServerObject[];
     } & (
-    | (Pick<PathsWebhooksComponents<T>, 'paths'> &
-    Omit<Partial<PathsWebhooksComponents<T>>, 'paths'>)
-    | (Pick<PathsWebhooksComponents<T>, 'webhooks'> &
-    Omit<Partial<PathsWebhooksComponents<T>>, 'webhooks'>)
-    | (Pick<PathsWebhooksComponents<T>, 'components'> &
-    Omit<Partial<PathsWebhooksComponents<T>>, 'components'>)
+      | (Pick<PathsWebhooksComponents<T>, 'paths'> & Omit<Partial<PathsWebhooksComponents<T>>, 'paths'>)
+      | (Pick<PathsWebhooksComponents<T>, 'webhooks'> & Omit<Partial<PathsWebhooksComponents<T>>, 'webhooks'>)
+      | (Pick<PathsWebhooksComponents<T>, 'components'> & Omit<Partial<PathsWebhooksComponents<T>>, 'components'>)
     )
   >;
 
@@ -225,7 +219,7 @@ export namespace OpenAPIV3_1 {
       variables?: Record<string, ServerVariableObject>;
       // vendor extension stored under dynamic key
       [API_EXTENSION_KEYS.idKey]: string;
-      [API_EXTENSION_KEYS.serverSourceKey]: ApiServerSource
+      [API_EXTENSION_KEYS.serverSourceKey]: ApiServerSource;
     }
   >;
 
@@ -236,10 +230,7 @@ export namespace OpenAPIV3_1 {
     }
   >;
 
-  export type PathsObject<T extends {} = {}, P extends {} = {}> = Record<
-    string,
-    (PathItemObject<T> & P) | undefined
-  >;
+  export type PathsObject<T extends {} = {}, P extends {} = {}> = Record<string, (PathItemObject<T> & P) | undefined>;
 
   export type HttpMethods = OpenAPIV3.HttpMethods;
 
@@ -249,10 +240,9 @@ export namespace OpenAPIV3_1 {
       servers?: ServerObject[];
       parameters?: (ReferenceObject | ParameterObject)[];
     }
-  > &
-    {
-      [method in HttpMethods]?: OperationObject<T>;
-    };
+  > & {
+    [method in HttpMethods]?: OperationObject<T>;
+  };
 
   export type OperationObject<T extends {} = {}> = Modify<
     OpenAPIV3.OperationObject<T>,
@@ -274,9 +264,7 @@ export namespace OpenAPIV3_1 {
 
   export type ParameterBaseObject = OpenAPIV3.ParameterBaseObject;
 
-  export type NonArraySchemaObjectType =
-    | OpenAPIV3.NonArraySchemaObjectType
-    | 'null';
+  export type NonArraySchemaObjectType = OpenAPIV3.NonArraySchemaObjectType | 'null';
 
   export type ArraySchemaObjectType = OpenAPIV3.ArraySchemaObjectType;
 
@@ -285,11 +273,7 @@ export namespace OpenAPIV3_1 {
    * 'items' will be always visible as optional
    * Casting schema object to ArraySchemaObject or NonArraySchemaObject will work fine
    */
-  export type SchemaObject =
-    | ArraySchemaObject
-    | NonArraySchemaObject
-    | MixedSchemaObject
-    | boolean;
+  export type SchemaObject = ArraySchemaObject | NonArraySchemaObject | MixedSchemaObject | boolean;
 
   export interface ArraySchemaObject extends BaseSchemaObject {
     type: ArraySchemaObjectType;
@@ -359,10 +343,7 @@ export namespace OpenAPIV3_1 {
     }
   >;
 
-  export type ResponsesObject = Record<
-    string,
-    ReferenceObject | ResponseObject
-  >;
+  export type ResponsesObject = Record<string, ReferenceObject | ResponseObject>;
 
   export type ResponseObject = Modify<
     OpenAPIV3.ResponseObject,
@@ -429,7 +410,7 @@ export namespace OpenAPIV3 {
     'x-express-openapi-additional-middleware'?: (
       | ((request: any, response: any, next: any) => Promise<void>)
       | ((request: any, response: any, next: any) => void)
-      )[];
+    )[];
     'x-express-openapi-validation-strict'?: boolean;
   }
 
@@ -546,12 +527,7 @@ export namespace OpenAPIV3 {
     // vendor extension stored under dynamic key
     [API_EXTENSION_KEYS.valueKey]: any;
   }
-  export type NonArraySchemaObjectType =
-    | 'boolean'
-    | 'object'
-    | 'number'
-    | 'string'
-    | 'integer';
+  export type NonArraySchemaObjectType = 'boolean' | 'object' | 'number' | 'string' | 'integer';
   export type ArraySchemaObjectType = 'array';
   export type SchemaObject = ArraySchemaObject | NonArraySchemaObject;
 
@@ -706,13 +682,11 @@ export namespace OpenAPIV3 {
     callbacks?: { [key: string]: ReferenceObject | CallbackObject };
   }
 
-
   export type SecuritySchemeObject =
     | HttpSecurityScheme
     | ApiKeySecurityScheme
     | OAuth2SecurityScheme
     | OpenIdSecurityScheme;
-
 
   export interface HttpSecurityScheme {
     type: 'http';
@@ -754,19 +728,19 @@ export namespace OpenAPIV3 {
         refreshUrl?: string;
         scopes: { [scope: string]: string };
         extensions?: Record<string, any>;
-        [API_EXTENSION_KEYS.oAuth2ClientAuthTypeKey]?: string,
-        [API_EXTENSION_KEYS.oAuth2ClientIdKey]?: string,
-        [API_EXTENSION_KEYS.oAuth2ClientSecretKey]?: string,
-        [API_EXTENSION_KEYS.oAuth2UsernameKey]?: string,
-        [API_EXTENSION_KEYS.oAuth2PasswordKey]?: string,
+        [API_EXTENSION_KEYS.oAuth2ClientAuthTypeKey]?: string;
+        [API_EXTENSION_KEYS.oAuth2ClientIdKey]?: string;
+        [API_EXTENSION_KEYS.oAuth2ClientSecretKey]?: string;
+        [API_EXTENSION_KEYS.oAuth2UsernameKey]?: string;
+        [API_EXTENSION_KEYS.oAuth2PasswordKey]?: string;
       };
       clientCredentials?: {
         tokenUrl: string;
         refreshUrl?: string;
         scopes: { [scope: string]: string };
         extensions?: Record<string, any>;
-        [API_EXTENSION_KEYS.oAuth2ClientIdKey]?: string,
-        [API_EXTENSION_KEYS.oAuth2ClientSecretKey]?: string,
+        [API_EXTENSION_KEYS.oAuth2ClientIdKey]?: string;
+        [API_EXTENSION_KEYS.oAuth2ClientSecretKey]?: string;
       };
       authorizationCode?: {
         authorizationUrl: string;
@@ -818,7 +792,7 @@ export namespace OpenAPIV2 {
     'x-express-openapi-additional-middleware'?: (
       | ((request: any, response: any, next: any) => Promise<void>)
       | ((request: any, response: any, next: any) => void)
-      )[];
+    )[];
     'x-express-openapi-validation-strict'?: boolean;
   }
 
@@ -861,35 +835,28 @@ export namespace OpenAPIV2 {
     scopes: ScopesObject;
   }
 
-  export interface SecuritySchemeOauth2Implicit
-    extends SecuritySchemeOauth2Base {
+  export interface SecuritySchemeOauth2Implicit extends SecuritySchemeOauth2Base {
     flow: 'implicit';
     authorizationUrl: string;
   }
 
-  export interface SecuritySchemeOauth2AccessCode
-    extends SecuritySchemeOauth2Base {
+  export interface SecuritySchemeOauth2AccessCode extends SecuritySchemeOauth2Base {
     flow: 'accessCode';
     authorizationUrl: string;
     tokenUrl: string;
   }
 
-  export interface SecuritySchemeOauth2Password
-    extends SecuritySchemeOauth2Base {
+  export interface SecuritySchemeOauth2Password extends SecuritySchemeOauth2Base {
     flow: 'password';
     tokenUrl: string;
   }
 
-  export interface SecuritySchemeOauth2Application
-    extends SecuritySchemeOauth2Base {
+  export interface SecuritySchemeOauth2Application extends SecuritySchemeOauth2Base {
     flow: 'application';
     tokenUrl: string;
   }
 
-  export type SecuritySchemeObject =
-    | SecuritySchemeBasic
-    | SecuritySchemeApiKey
-    | SecuritySchemeOauth2;
+  export type SecuritySchemeObject = SecuritySchemeBasic | SecuritySchemeApiKey | SecuritySchemeOauth2;
 
   export interface SecurityDefinitionsObject {
     [index: string]: SecuritySchemeObject;

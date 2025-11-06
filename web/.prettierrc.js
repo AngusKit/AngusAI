@@ -1,4 +1,7 @@
 module.exports = {
+  // Prettier 插件
+  plugins: ['prettier-plugin-one-line-imports'],
+
   // 基本配置
   semi: true, // 语句末尾添加分号
   singleQuote: true, // 使用单引号而不是双引号
@@ -6,7 +9,7 @@ module.exports = {
   trailingComma: 'es5', // 在ES5中有效的尾随逗号（对象、数组等）
   tabWidth: 2, // 缩进空格数
   useTabs: false, // 使用空格而不是制表符
-  printWidth: 80, // 行长度限制
+  printWidth: 120, // 行长度限制（增大以允许更多导入项在同一行）
   endOfLine: 'lf', // 行尾序列
 
   // JSX配置

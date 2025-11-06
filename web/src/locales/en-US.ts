@@ -53,8 +53,7 @@ export const enUS: TranslationKeys = {
     billing: 'Billing & Subscription',
     teamSettings: 'Team Settings',
     plugins: 'Plugin Market',
-    activityLog: 'Activity Log'
-    
+    activityLog: 'Activity Log',
   },
 
   // Welcome Banner
@@ -494,7 +493,8 @@ export const enUS: TranslationKeys = {
     cannotEditSystem: 'System templates cannot be edited, please duplicate and modify',
     cannotDeleteSystem: 'System templates cannot be deleted',
     deleteCategory: 'Delete Category',
-    confirmDeleteCategory: 'Are you sure you want to delete this category? Prompts in this category will be moved to "Coding" category. This action cannot be undone.',
+    confirmDeleteCategory:
+      'Are you sure you want to delete this category? Prompts in this category will be moved to "Coding" category. This action cannot be undone.',
     cannotDeleteSystemCategory: 'System categories cannot be deleted',
     categoryDeleted: 'Category deleted',
   },

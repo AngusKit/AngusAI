@@ -23,22 +23,24 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     setLanguageState(lang);
   }, []);
 
-  const t = useCallback((key: string): string => {
-    const translations = languages[language].translations;
-    return getNestedTranslation(translations, key);
-  }, [language]);
-
-  const value = useMemo(() => ({
-    language,
-    setLanguage,
-    t
-  }), [language, setLanguage, t]);
-
-  return (
-    <LanguageContext.Provider value={value}>
-      {children}
-    </LanguageContext.Provider>
+  const t = useCallback(
+    (key: string): string => {
+      const translations = languages[language].translations;
+      return getNestedTranslation(translations, key);
+    },
+    [language]
   );
+
+  const value = useMemo(
+    () => ({
+      language,
+      setLanguage,
+      t,
+    }),
+    [language, setLanguage, t]
+  );
+
+  return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
 }
 
 export function useLanguage() {
