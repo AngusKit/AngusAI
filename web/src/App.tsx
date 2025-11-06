@@ -1,9 +1,9 @@
-import { Sidebar, Header, RecentApplications, WelcomeBanner, StatsCards, UsageDetails, CreateApplication, MyApplications, Workflow, WorkflowDesignPage, KnowledgeBase, Dataset, APICollection, PluginMarket, ModelManagement, VectorStore, TeamMembers, ResourceSharing, TeamSettings, AppSettingsPage, UsageAnalytics, APIKeys, BillingSubscription, PromptLibraryPage, Chat, ActivityLog, } from './views';
+import { Sidebar, Header, RecentApplications, WelcomeBanner, StatsCards, UsageDetails, CreateApplication, MyApplications, Workflow, WorkflowDesignPage, KnowledgeBase, Dataset, APICollection, PluginMarket, ModelManagement, VectorStore, TeamMembers, ResourceSharing, TeamSettings, AppSettingsPage, UsageAnalytics, APIKeys, BillingSubscription, PromptLibraryPage, Chat, ActivityLog, } from './pages';
 import { appContext, eventQueue } from '@xcan-angus/infra';
-import { ThemeProvider } from '@/ui/ThemeProvider';
-import { LanguageProvider } from '@/ui/LanguageProvider';
-import { Toaster } from '@/ui/sonner';
-import { MyContext } from '@/ui/utils';
+import { ThemeProvider } from '@/components/ui/ThemeProvider';
+import { LanguageProvider } from '@/components/ui/LanguageProvider';
+import { Toaster } from '@/components/ui/sonner';
+import { MyContext } from '@/components/ui/utils';
 import { useState } from 'react';
 import { toast } from 'sonner';
 

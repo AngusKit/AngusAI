@@ -1,4 +1,4 @@
-import httpClient from '../api/HttpClient';
+import httpClient from '../services/HttpClient';
 
 import { appContext, APP_CODE_MAP, PageQuery, routerUtils, AppOrServiceRoute, cookieUtils, CLIENT_ID_KEY, app, } from '@xcan-angus/infra';
 
