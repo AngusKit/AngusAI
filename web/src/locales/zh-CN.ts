@@ -1,3 +1,5 @@
+import { enumTranslations } from '../enums/locale/zh-CN';
+
 export const zhCN = {
   // 通用
   common: {
@@ -490,6 +492,9 @@ export const zhCN = {
     costs: '成本分析',
     trends: '趋势分析',
   },
+
+  // 枚举国际化
+  enum: enumTranslations,
 };
 
 export type TranslationKeys = typeof zhCN;

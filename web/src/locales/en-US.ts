@@ -1,4 +1,5 @@
 import { TranslationKeys } from './zh-CN';
+import { enumTranslations } from '../enums/locale/en-US';
 
 export const enUS: TranslationKeys = {
   // Common
@@ -111,12 +112,6 @@ export const enUS: TranslationKeys = {
     title: 'Recent Applications',
     subtitle: 'Quick access to recently used apps',
     lastUsed: 'Last used',
-    viewAll: 'View All',
-  },
-
-  // Recent Apps
-  recentApps: {
-    title: 'Recent Applications',
     viewAll: 'View All',
   },
 
@@ -388,20 +383,9 @@ export const enUS: TranslationKeys = {
     featured: 'Featured',
     allCategories: 'All Categories',
     downloads: 'Downloads',
-    rating: 'Rating',
     install: 'Install',
     installed: 'Installed',
     viewDetails: 'View Details',
-  },
-
-  // Analytics
-  analytics: {
-    title: 'Usage Analytics',
-    overview: 'Overview',
-    apiCalls: 'API Calls',
-    performance: 'Performance',
-    costs: 'Cost Analysis',
-    trends: 'Trend Analysis',
   },
 
   // Knowledge Base File Upload
@@ -509,4 +493,7 @@ export const enUS: TranslationKeys = {
     costs: 'Cost Analysis',
     trends: 'Trends',
   },
+
+  // Enum translations
+  enum: enumTranslations,
 };
