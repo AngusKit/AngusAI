@@ -179,10 +179,10 @@ deploy_private_edition() {
 # Build web module
 npm_build () {
   echo "INFO: npm install start"
-  npm install --omit=optional --legacy-peer-deps
+  npm install
 
   if [ $? -ne 0 ]; then
-    echo "ERROR: 'npm install --no-optional --legacy-peer-deps' failed, exiting script"
+    echo "ERROR: 'npm install' failed, exiting script"
     exit 1
   fi
   echo "INFO: npm install end"
