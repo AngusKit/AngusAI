@@ -1,22 +1,22 @@
 import {ApiLocaleResult, PageQuery} from '@xcan-angus/infra';
 import {
     ApiCollectionCreateDto,
+    ApiCollectionDetailResult,
     ApiCollectionImportDto,
     ApiCollectionListParamsOrderByEnum,
+    ApiCollectionListResult,
+    ApiCollectionStatisticsResult,
     ApiCollectionUpdateDto,
     ApiEndpointCreateDto,
-    ApiEndpointListParamsOrderByEnum,
-    ApiEndpointTestDto,
-    ApiEndpointUpdateDto,
-    ApiCollectionDetailResult,
-    ApiCollectionStatisticsResult,
     ApiEndpointDetailResult,
-    ApiEndpointTestResult,
+    ApiEndpointListParamsOrderByEnum,
     ApiEndpointResult,
-    ApiCollectionListResult,
+    ApiEndpointTestDto,
+    ApiEndpointTestResult,
+    ApiEndpointUpdateDto,
     ResultApiEndpointVo
-} from "./DataContracts";
-import {ContentType, HttpClient, RequestParams} from "./HttpClient";
+} from "./ApiCollectionsTypes.ts";
+import {ContentType, HttpClient, RequestParams} from "./HttpClient.ts";
 import {ApiCollectionSourceEnum, HttpMethodEnum, VisibilityEnum} from "@/enums/enums.ts";
 
 export class ApiCollections<SecurityDataType = unknown> {
