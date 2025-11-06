@@ -8,9 +8,9 @@ import { Badge } from '@/ui/badge';
 import { useContext, useState } from 'react';
 import { useTheme } from '@/ui/ThemeProvider';
 import { useLanguage } from '@/ui/LanguageProvider';
-import { languages, Language } from '../../lib/i18n';
+import { languages, Language } from '@/lib/i18n';
 import { toast } from 'sonner';
-import { copyToClipboard } from '../../lib/clipboard';
+import { copyToClipboard } from '@/lib/clipboard';
 import { MyContext } from '@/ui/utils';
 
 export function Header() {
@@ -24,12 +24,6 @@ export function Header() {
   const [searchQuery, setSearchQuery] = useState('');
   const { userInfo } = useContext(MyContext);
 
-  // const userInfo = {
-  //   name: '柳小龙',
-  //   id: '100001',
-  //   avatar: 'https://images.unsplash.com/photo-1652795385761-7ac287d0cd03?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBhdmF0YXIlMjBjYXJ0b29ufGVufDF8fHx8MTc2MTEwMTExNXww&ixlib=rb-4.1.0&q=80&w=1080',
-  //   verified: true,
-  // };
 
   const notifications = [
     {
@@ -613,7 +607,7 @@ export function Header() {
                 </Avatar>
               </button>
             </PopoverTrigger>
-            <PopoverContent className='w-56 p-0 dark:bg-gray-800 dark:border-gray-700' align='end'>
+            <PopoverContent className='w-60 p-0 dark:bg-gray-800 dark:border-gray-700' align='end'>
               {/* Header */}
               <div className='p-4 border-b dark:border-gray-700'>
                 <h3 className='text-sm text-gray-500 dark:text-gray-400 mb-3'>个人中心</h3>
