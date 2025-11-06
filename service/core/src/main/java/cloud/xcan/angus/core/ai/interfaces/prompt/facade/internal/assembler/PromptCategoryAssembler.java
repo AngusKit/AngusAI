@@ -38,9 +38,6 @@ public class PromptCategoryAssembler {
   }
 
   public static PromptCategoryVo toVo(PromptCategory category) {
-    if (category == null) {
-      return null;
-    }
     PromptCategoryVo vo = new PromptCategoryVo();
     vo.setId(category.getId());
     vo.setName(category.getName());
@@ -50,6 +47,13 @@ public class PromptCategoryAssembler {
     vo.setIsSystem(category.getIsSystem());
     vo.setOrderNum(category.getOrderNum());
     vo.setPromptCount(category.getPromptCount());
+
+    // 设置审计信息
+    vo.setTenantId(category.getTenantId());
+    vo.setCreatedBy(category.getCreatedBy());
+    vo.setCreatedDate(category.getCreatedDate());
+    vo.setModifiedBy(category.getModifiedBy());
+    vo.setModifiedDate(category.getModifiedDate());
     return vo;
   }
 

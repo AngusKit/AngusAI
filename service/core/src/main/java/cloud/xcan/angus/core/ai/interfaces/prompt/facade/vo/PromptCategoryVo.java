@@ -1,12 +1,15 @@
 package cloud.xcan.angus.core.ai.interfaces.prompt.facade.vo;
 
+import cloud.xcan.angus.remote.vo.TenantAuditingVo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Schema(description = "分类详情")
-public class PromptCategoryVo {
+public class PromptCategoryVo  extends TenantAuditingVo {
 
   @Schema(description = "ID")
   private Long id;
