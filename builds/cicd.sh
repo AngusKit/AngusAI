@@ -11,8 +11,8 @@ SERVICE_DIR="service"
 WEB_DIR="web"
 
 REMOTE_APP_DIR="/data/apps/AngusAI"
-REMOTE_APP_PLUGINS_DIR_NAME="plugins"
-REMOTE_APP_PLUGINS_DIR="${REMOTE_APP_DIR}/${REMOTE_APP_PLUGINS_DIR_NAME}"
+#REMOTE_APP_PLUGINS_DIR_NAME="plugins"
+#REMOTE_APP_PLUGINS_DIR="${REMOTE_APP_DIR}/${REMOTE_APP_PLUGINS_DIR_NAME}"
 REMOTE_APP_CONF_DIR="/data/apps/conf/ai"
 
 REMOTE_APP_STATIC_DIR_NAME="statics"
@@ -125,12 +125,12 @@ deploy_service() {
   scp -rp "${SERVICE_DIR}/boot/target"/* "${host}:${REMOTE_APP_DIR}/" || {
     echo "ERROR: Failed to copy service files"; exit 1
   }
-  ssh "$host" "mkdir -p ${REMOTE_APP_PLUGINS_DIR}" || {
-    echo "ERROR: Failed to init plugins directory"; exit 1
-  }
-  scp -rp "${SERVICE_DIR}/extension/dist"/* "${host}:${REMOTE_APP_PLUGINS_DIR}/" || {
-    echo "ERROR: Failed to copy plugin files"; exit 1
-  }
+#  ssh "$host" "mkdir -p ${REMOTE_APP_PLUGINS_DIR}" || {
+#    echo "ERROR: Failed to init plugins directory"; exit 1
+#  }
+#  scp -rp "${SERVICE_DIR}/extension/dist"/* "${host}:${REMOTE_APP_PLUGINS_DIR}/" || {
+#    echo "ERROR: Failed to copy plugin files"; exit 1
+#  }
   ssh "$host" "cd ${REMOTE_APP_DIR} && mkdir -p conf && mv classes/spring-logback.xml conf/ai-logback.xml" || {
     echo "ERROR: Failed to rename logback file"; exit 1
   }
