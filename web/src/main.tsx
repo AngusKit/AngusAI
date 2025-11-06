@@ -9,6 +9,6 @@ start();
 
 async function start() {
   await app.initEnvironment();
-  await initAfterAuthentication({ code: AppOrServiceRoute.gm });
+  await initAfterAuthentication({ code: AppOrServiceRoute.ai });
   createRoot(document.getElementById('root')!).render(<App />);
 }
