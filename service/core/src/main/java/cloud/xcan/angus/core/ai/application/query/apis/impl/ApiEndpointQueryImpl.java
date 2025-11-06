@@ -39,6 +39,12 @@ public class ApiEndpointQueryImpl implements ApiEndpointQuery {
   }
 
   @Override
+  public ApiEndpoint findAndCheck(Long collectionId, Long endpointId) {
+    return apiEndpointRepo.findByIdAndCollectionId(endpointId, collectionId)
+        .orElseThrow(() -> ResourceNotFound.of("接口端点未找到", new Object[]{}));
+  }
+
+  @Override
   public Page<ApiEndpoint> find(GenericSpecification<ApiEndpoint> spec, Pageable pageable,
       boolean fullTextSearch, String[] match) {
     return new BizTemplate<Page<ApiEndpoint>>() {

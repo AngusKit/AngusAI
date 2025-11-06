@@ -74,8 +74,8 @@ public class ApiEndpointFacadeImpl implements ApiEndpointFacade {
 
   @NameJoin
   @Override
-  public ApiEndpointDetailVo getDetail(Long id) {
-    ApiEndpoint saved = apiEndpointQuery.findAndCheck(id);
+  public ApiEndpointDetailVo getDetail(Long collectionId, Long endpointId) {
+    ApiEndpoint saved = apiEndpointQuery.findAndCheck(collectionId, endpointId);
     return ApiEndpointAssembler.toDetailVo(saved);
   }
 

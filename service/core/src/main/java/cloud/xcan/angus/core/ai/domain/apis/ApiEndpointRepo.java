@@ -3,6 +3,7 @@ package cloud.xcan.angus.core.ai.domain.apis;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
 import io.swagger.v3.oas.models.PathItem.HttpMethod;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.NoRepositoryBean;
@@ -10,6 +11,8 @@ import org.springframework.data.repository.query.Param;
 
 @NoRepositoryBean
 public interface ApiEndpointRepo extends BaseRepository<ApiEndpoint, Long> {
+
+  Optional<ApiEndpoint> findByIdAndCollectionId(Long id, Long collectionId);
 
   @Query("SELECT COUNT(e) FROM ApiEndpoint e WHERE e.collectionId = :collectionId")
   Long countByCollectionId(@Param("collectionId") Long collectionId);
@@ -42,4 +45,5 @@ public interface ApiEndpointRepo extends BaseRepository<ApiEndpoint, Long> {
 
   @Modifying
   void deleteByCollectionId(Long id);
+
 }
