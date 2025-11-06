@@ -26,17 +26,28 @@ import {
   Chat,
   ActivityLog
 } from './views';
-import { appContext } from '@xcan-angus/infra';
+import { appContext, eventQueue } from '@xcan-angus/infra';
 import { ThemeProvider } from '@/ui/ThemeProvider';
 import { LanguageProvider } from '@/ui/LanguageProvider';
 import { Toaster } from '@/ui/sonner';
 import { MyContext } from '@/ui/utils';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 
 export default function App() {
+  eventQueue.register('http_error', (msg: string) => {
+    toast.error(msg);
+  });
   const [activePage, setActivePage] = useState('home');
-  const [userInfo, setUserInfo] = useState(appContext.getUser());
+  const appUserInfo = appContext.getUser();
+  const [userInfo, setUserInfo] = useState(appUserInfo?.id ? appUserInfo : {
+    fullName: '柳小龙',
+    id: '100001',
+    avatar: 'https://images.unsplash.com/photo-1652795385761-7ac287d0cd03?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBhdmF0YXIlMjBjYXJ0b29ufGVufDF8fHx8MTc2MTEwMTExNXww&ixlib=rb-4.1.0&q=80&w=1080',
+    verified: true,
+  });
+  
   const [selectedWorkflowForDesign, setSelectedWorkflowForDesign] = useState<{
     id: number;
     name: string;
