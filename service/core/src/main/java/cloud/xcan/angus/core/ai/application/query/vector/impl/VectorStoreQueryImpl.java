@@ -55,8 +55,6 @@ public class VectorStoreQueryImpl implements VectorStoreQuery {
     }.execute();
   }
 
-  // --- Statistics query methods (encapsulated from repos) ---
-
   /**
    * 统计存储源总数
    */
@@ -88,7 +86,8 @@ public class VectorStoreQueryImpl implements VectorStoreQuery {
   /**
    * 获取热门存储源（按查询次数）
    */
-  public List<Object[]> getTopStoresByQueryCount(LocalDateTime start, LocalDateTime end, int limit) {
+  public List<Object[]> getTopStoresByQueryCount(LocalDateTime start, LocalDateTime end,
+      int limit) {
     return vectorStoreAccessLogRepo.topStoresByQueryCount(start, end, limit);
   }
 

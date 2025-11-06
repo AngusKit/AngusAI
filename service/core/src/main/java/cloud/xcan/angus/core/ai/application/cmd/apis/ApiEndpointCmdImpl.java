@@ -8,8 +8,8 @@ import cloud.xcan.angus.core.ai.domain.apis.ApiEndpointRepo;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
-import cloud.xcan.angus.core.utils.CoreUtils;
 import cloud.xcan.angus.remote.message.http.ResourceExisted;
+import io.swagger.v3.oas.models.PathItem.HttpMethod;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +34,7 @@ public class ApiEndpointCmdImpl extends CommCmd<ApiEndpoint, Long> implements Ap
         boolean exists = apiEndpointRepo.existsByCollectionIdAndMethodAndPath(
             apiEndpoint.getCollectionId(), apiEndpoint.getMethod(), apiEndpoint.getPath());
         if (exists) {
-          throw ResourceExisted.of("端点「{0} {1}」已存在", 
+          throw ResourceExisted.of("端点「{0} {1}」已存在",
               new Object[]{apiEndpoint.getMethod(), apiEndpoint.getPath()});
         }
       }
@@ -59,18 +59,36 @@ public class ApiEndpointCmdImpl extends CommCmd<ApiEndpoint, Long> implements Ap
 
         // 检查同一集合下是否存在相同方法和路径的端点（排除自己）
         String actualPath = nullSafe(apiEndpoint.getPath(), apiEndpointDb.getPath());
-        ApiEndpoint.HttpMethod actualMethod = nullSafe(apiEndpoint.getMethod(), apiEndpointDb.getMethod());
+        HttpMethod actualMethod = nullSafe(apiEndpoint.getMethod(), apiEndpointDb.getMethod());
         boolean exists = apiEndpointRepo.existsByCollectionIdAndMethodAndPathAndIdNot(
             apiEndpointDb.getCollectionId(), actualMethod, actualPath, apiEndpoint.getId());
         if (exists) {
-          throw ResourceExisted.of("端点「{0} {1}」已存在", 
+          throw ResourceExisted.of("端点「{0} {1}」已存在",
               new Object[]{actualMethod, actualPath});
         }
       }
 
       @Override
       protected ApiEndpoint process() {
-        CoreUtils.copyPropertiesIgnoreNull(apiEndpoint, apiEndpointDb);
+        update(apiEndpoint, apiEndpointDb);
+        return apiEndpointDb;
+      }
+    }.execute();
+  }
+
+  @Override
+  public ApiEndpoint toggleEnabled(Long id, Boolean enabled) {
+    return new BizTemplate<ApiEndpoint>() {
+      ApiEndpoint apiEndpointDb;
+
+      @Override
+      protected void checkParams() {
+        apiEndpointDb = apiEndpointQuery.findAndCheck(id);
+      }
+
+      @Override
+      protected ApiEndpoint process() {
+        apiEndpointDb.setEnabled(enabled);
         return apiEndpointRepo.save(apiEndpointDb);
       }
     }.execute();
@@ -93,21 +111,8 @@ public class ApiEndpointCmdImpl extends CommCmd<ApiEndpoint, Long> implements Ap
   }
 
   @Override
-  public ApiEndpoint toggleEnabled(Long id, Boolean enabled) {
-    return new BizTemplate<ApiEndpoint>() {
-      ApiEndpoint apiEndpointDb;
-
-      @Override
-      protected void checkParams() {
-        apiEndpointDb = apiEndpointQuery.findAndCheck(id);
-      }
-
-      @Override
-      protected ApiEndpoint process() {
-        apiEndpointDb.setEnabled(enabled);
-        return apiEndpointRepo.save(apiEndpointDb);
-      }
-    }.execute();
+  public void deleteByCollectionId(Long id) {
+    apiEndpointRepo.deleteByCollectionId(id);
   }
 
   @Override

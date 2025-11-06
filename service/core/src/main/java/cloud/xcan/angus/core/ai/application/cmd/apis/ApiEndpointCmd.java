@@ -18,13 +18,18 @@ public interface ApiEndpointCmd {
   ApiEndpoint update(ApiEndpoint apiEndpoint);
 
   /**
+   * 切换启用状态
+   */
+  ApiEndpoint toggleEnabled(Long id, Boolean enabled);
+
+  /**
    * 删除接口端点
    */
   void delete(Long id);
 
   /**
-   * 切换启用状态
+   * 根据接口集ID删除所有端点
    */
-  ApiEndpoint toggleEnabled(Long id, Boolean enabled);
+  void deleteByCollectionId(Long id);
 }
 

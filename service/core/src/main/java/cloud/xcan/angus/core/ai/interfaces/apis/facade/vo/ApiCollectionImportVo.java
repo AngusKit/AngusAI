@@ -27,6 +27,7 @@ public class ApiCollectionImportVo {
   @Data
   @Schema(description = "导入统计")
   public static class ImportStats {
+
     @Schema(description = "总端点数")
     private Long totalEndpoints;
 
@@ -43,6 +44,7 @@ public class ApiCollectionImportVo {
   @Data
   @Schema(description = "导入详情")
   public static class ImportDetail {
+
     @Schema(description = "端点")
     private String endpoint;
 

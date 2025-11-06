@@ -6,11 +6,12 @@ import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.parseStartDate;
 import static cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder.getMatchSearchFields;
 import static cloud.xcan.angus.core.utils.CoreUtils.buildVoPageResult;
 
+import cloud.xcan.angus.core.ai.application.cmd.vector.VectorStoreCmd;
 import cloud.xcan.angus.core.ai.application.query.vector.VectorStoreQuery;
 import cloud.xcan.angus.core.ai.application.query.vector.impl.VectorStoreQueryImpl;
-import cloud.xcan.angus.core.ai.application.cmd.vector.VectorStoreCmd;
 import cloud.xcan.angus.core.ai.domain.vector.VectorStore;
 import cloud.xcan.angus.core.ai.domain.vector.VectorStoreRepo;
+import cloud.xcan.angus.core.ai.infra.ai.vector.VectorStoreType;
 import cloud.xcan.angus.core.ai.interfaces.team.facade.dto.ActivityStatisticsDto;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.VectorStoreFacade;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.ConnectionTestDto;
@@ -21,7 +22,7 @@ import cloud.xcan.angus.core.ai.interfaces.vector.facade.internal.assembler.Vect
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.vo.ConnectionTestVo;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.vo.VectorStoreStatisticsVo;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.vo.VectorStoreVo;
-import cloud.xcan.angus.core.ai.infra.ai.vector.VectorStoreType;
+import cloud.xcan.angus.core.biz.NameJoin;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.PageResult;
 import jakarta.annotation.Resource;
@@ -58,6 +59,7 @@ public class VectorStoreFacadeImpl implements VectorStoreFacade {
   private static final int TOP_N = 10;
   private static final int DEFAULT_MONTHS = 1; // 默认统计近一月
 
+  @NameJoin
   @Override
   public VectorStoreVo create(VectorStoreCreateDto dto) {
     VectorStore vectorStore = VectorStoreAssembler.toCreateDomain(dto);
@@ -65,6 +67,7 @@ public class VectorStoreFacadeImpl implements VectorStoreFacade {
     return VectorStoreAssembler.toVo(saved);
   }
 
+  @NameJoin
   @Override
   public VectorStoreVo update(Long id, VectorStoreUpdateDto dto) {
     VectorStore vectorStore = VectorStoreAssembler.toUpdateDomain(id, dto);
@@ -72,6 +75,7 @@ public class VectorStoreFacadeImpl implements VectorStoreFacade {
     return VectorStoreAssembler.toVo(saved);
   }
 
+  @NameJoin
   @Override
   public VectorStoreVo toggleEnabled(Long id, Boolean enabled) {
     VectorStore saved = vectorStoreCmd.toggleEnabled(id, enabled);
@@ -89,12 +93,14 @@ public class VectorStoreFacadeImpl implements VectorStoreFacade {
     vectorStoreCmd.delete(id, force != null ? force : false);
   }
 
+  @NameJoin
   @Override
   public VectorStoreVo getDetail(Long id) {
     VectorStore vectorStore = vectorStoreQuery.findAndCheck(id);
     return VectorStoreAssembler.toVo(vectorStore);
   }
 
+  @NameJoin
   @Override
   public PageResult<VectorStoreVo> list(VectorStoreFindDto dto) {
     GenericSpecification<VectorStore> spec = VectorStoreAssembler.getSpecification(dto);
@@ -188,12 +194,13 @@ public class VectorStoreFacadeImpl implements VectorStoreFacade {
   }
 
   /**
-   * 构建使用率排行
-   * 优化：批量查询存储源，避免N+1查询问题
+   * 构建使用率排行 优化：批量查询存储源，避免N+1查询问题
    */
-  private List<VectorStoreStatisticsVo.TopStore> buildTopStores(LocalDateTime start, LocalDateTime end) {
+  private List<VectorStoreStatisticsVo.TopStore> buildTopStores(LocalDateTime start,
+      LocalDateTime end) {
     // 获取查询次数和平均响应时间数据
-    List<Object[]> queryCountRows = vectorStoreQueryImpl.getTopStoresByQueryCount(start, end, TOP_N);
+    List<Object[]> queryCountRows = vectorStoreQueryImpl.getTopStoresByQueryCount(start, end,
+        TOP_N);
     List<Object[]> avgResponseTimeRows = vectorStoreQueryImpl.getAvgResponseTimeByStore(start, end);
 
     if (queryCountRows == null || queryCountRows.isEmpty()) {
@@ -250,7 +257,8 @@ public class VectorStoreFacadeImpl implements VectorStoreFacade {
   /**
    * 构建性能趋势
    */
-  private List<VectorStoreStatisticsVo.PerformanceTrend> buildPerformanceTrend(LocalDateTime start, LocalDateTime end) {
+  private List<VectorStoreStatisticsVo.PerformanceTrend> buildPerformanceTrend(LocalDateTime start,
+      LocalDateTime end) {
     List<Object[]> rows = vectorStoreQueryImpl.getPerformanceTrendByDay(start, end);
     List<VectorStoreStatisticsVo.PerformanceTrend> trends = new ArrayList<>();
     if (rows == null) {

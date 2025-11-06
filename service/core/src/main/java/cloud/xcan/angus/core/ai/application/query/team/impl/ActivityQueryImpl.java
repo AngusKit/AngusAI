@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
  *
  * @author XiaoLong Liu
  */
-@Service                                                                                                                                                                                                                             
+@Service
 public class ActivityQueryImpl implements ActivityQuery {
 
   @Resource

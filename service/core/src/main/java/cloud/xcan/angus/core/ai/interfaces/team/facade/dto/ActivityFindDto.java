@@ -1,20 +1,15 @@
 package cloud.xcan.angus.core.ai.interfaces.team.facade.dto;
 
 import static cloud.xcan.angus.spec.SpecConstant.DateFormat.DATE_FMT;
-import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_NAME_LENGTH_X2;
 
 import cloud.xcan.angus.api.commonlink.FullResourceType;
 import cloud.xcan.angus.core.ai.domain.team.activity.ActionType;
 import cloud.xcan.angus.core.ai.domain.team.activity.ActivityStatus;
 import cloud.xcan.angus.remote.PageQuery;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.Column;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.hibernate.validator.constraints.Length;
 import org.springframework.format.annotation.DateTimeFormat;
 
 @EqualsAndHashCode(callSuper = true)

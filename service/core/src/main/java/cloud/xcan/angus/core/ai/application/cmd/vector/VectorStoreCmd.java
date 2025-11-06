@@ -2,7 +2,6 @@ package cloud.xcan.angus.core.ai.application.cmd.vector;
 
 import cloud.xcan.angus.core.ai.domain.vector.VectorStore;
 import cloud.xcan.angus.core.ai.domain.vector.VectorStoreConfig;
-import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.ConnectionTestDto;
 
 /**
  * 向量存储源命令服务

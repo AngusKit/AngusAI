@@ -16,6 +16,7 @@ public class ActivityStatisticsVo {
 
   @Data
   public static class Overview {
+
     private Long totalActivities;
     private Long todayActivities;
     private Long activeUsers;
@@ -24,6 +25,7 @@ public class ActivityStatisticsVo {
 
   @Data
   public static class ActionTypeDistribution {
+
     private String actionType;
     private String actionTypeLabel;
     private Long count;
@@ -32,6 +34,7 @@ public class ActivityStatisticsVo {
 
   @Data
   public static class ResourceTypeDistribution {
+
     private String resourceType;
     private String resourceTypeLabel;
     private Long count;
@@ -40,6 +43,7 @@ public class ActivityStatisticsVo {
 
   @Data
   public static class StatusDistribution {
+
     private Long success;
     private Long failed;
     private Long warning;
@@ -47,6 +51,7 @@ public class ActivityStatisticsVo {
 
   @Data
   public static class TopUser {
+
     private Long userId;
     private String userName;
     private String userAvatar;
@@ -56,6 +61,7 @@ public class ActivityStatisticsVo {
 
   @Data
   public static class TimeTrend {
+
     private Long timestamp;
     private String date; // 按天或小时格式
     private Long count;
@@ -65,6 +71,7 @@ public class ActivityStatisticsVo {
 
   @Data
   public static class TopResource {
+
     private Long resourceId;
     private String resourceType;
     private String resourceName;

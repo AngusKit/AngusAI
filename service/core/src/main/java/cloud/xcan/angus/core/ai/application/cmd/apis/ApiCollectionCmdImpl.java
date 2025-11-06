@@ -6,16 +6,12 @@ import cloud.xcan.angus.core.ai.application.query.apis.ApiCollectionQuery;
 import cloud.xcan.angus.core.ai.domain.apis.ApiCollection;
 import cloud.xcan.angus.core.ai.domain.apis.ApiCollectionRepo;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionImportDto;
-import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.SecurityConfigDto;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
-import cloud.xcan.angus.core.utils.CoreUtils;
 import cloud.xcan.angus.remote.message.ProtocolException;
 import cloud.xcan.angus.remote.message.http.ResourceExisted;
 import jakarta.annotation.Resource;
-import java.util.HashMap;
-import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,6 +27,9 @@ public class ApiCollectionCmdImpl extends CommCmd<ApiCollection, Long> implement
   @Resource
   private ApiCollectionQuery apiCollectionQuery;
 
+  @Resource
+  private ApiEndpointCmd apiEndpointCmd;
+
   @Override
   public ApiCollection create(ApiCollection apiCollection) {
     return new BizTemplate<ApiCollection>() {
@@ -45,10 +44,6 @@ public class ApiCollectionCmdImpl extends CommCmd<ApiCollection, Long> implement
 
       @Override
       protected ApiCollection process() {
-        // 设置默认来源为手动创建
-        if (apiCollection.getSource() == null) {
-          apiCollection.setSource(cloud.xcan.angus.core.ai.domain.apis.ApiCollectionSource.MANUAL);
-        }
         insert(apiCollection);
         return apiCollection;
       }
@@ -67,16 +62,15 @@ public class ApiCollectionCmdImpl extends CommCmd<ApiCollection, Long> implement
 
         // 检查名称是否重复（排除自己）
         String actualName = nullSafe(apiCollection.getName(), apiCollectionDb.getName());
-        boolean exists = apiCollectionRepo.existsByNameAndIdNot(actualName, apiCollection.getId());
-        if (exists) {
+        if (apiCollectionRepo.existsByNameAndIdNot(actualName, apiCollection.getId())) {
           throw ResourceExisted.of("接口集名称「{0}」已存在", new Object[]{actualName});
         }
       }
 
       @Override
       protected ApiCollection process() {
-        CoreUtils.copyPropertiesIgnoreNull(apiCollection, apiCollectionDb);
-        return apiCollectionRepo.save(apiCollectionDb);
+        update(apiCollection, apiCollectionDb);
+        return apiCollectionDb;
       }
     }.execute();
   }
@@ -99,6 +93,7 @@ public class ApiCollectionCmdImpl extends CommCmd<ApiCollection, Long> implement
       @Override
       protected Void process() {
         apiCollectionRepo.deleteById(id);
+        apiEndpointCmd.deleteByCollectionId(id);
         return null;
       }
     }.execute();
@@ -122,7 +117,8 @@ public class ApiCollectionCmdImpl extends CommCmd<ApiCollection, Long> implement
 
         // 验证文件类型
         String fileName = file.getOriginalFilename();
-        if (fileName == null || (!fileName.endsWith(".json") && !fileName.endsWith(".yaml") && !fileName.endsWith(".yml"))) {
+        if (!fileName.endsWith(".json") && !fileName.endsWith(".yaml") && !fileName.endsWith(
+            ".yml")) {
           throw ProtocolException.of("不支持的文件格式", new Object[]{});
         }
       }
@@ -131,37 +127,15 @@ public class ApiCollectionCmdImpl extends CommCmd<ApiCollection, Long> implement
       protected ApiCollection process() {
         // TODO: 实际解析OpenAPI/Swagger/Postman文件
         // 这里先创建空集合，后续实现导入逻辑
-        
+
         ApiCollection collection = new ApiCollection();
         collection.setName(dto.getName() != null ? dto.getName() : "导入的接口集");
         collection.setSource(dto.getType());
-        collection.setVisibility(dto.getVisibility() != null ? dto.getVisibility() : cloud.xcan.angus.core.ai.domain.Visibility.PRIVATE);
-        
+        collection.setVisibility(dto.getVisibility() != null ? dto.getVisibility()
+            : cloud.xcan.angus.core.ai.domain.Visibility.PRIVATE);
+
         insert(collection);
         return collection;
-      }
-    }.execute();
-  }
-
-  @Override
-  public ApiCollection updateSecurity(Long id, SecurityConfigDto dto) {
-    return new BizTemplate<ApiCollection>() {
-      ApiCollection apiCollectionDb;
-
-      @Override
-      protected void checkParams() {
-        apiCollectionDb = apiCollectionQuery.findAndCheck(id);
-      }
-
-      @Override
-      protected ApiCollection process() {
-        // 构建安全配置
-        Map<String, Object> securityConfig = new HashMap<>();
-        securityConfig.put("type", dto.getType());
-        securityConfig.put("config", dto.getConfig());
-        
-        apiCollectionDb.setSecurityConfig(securityConfig);
-        return apiCollectionRepo.save(apiCollectionDb);
       }
     }.execute();
   }

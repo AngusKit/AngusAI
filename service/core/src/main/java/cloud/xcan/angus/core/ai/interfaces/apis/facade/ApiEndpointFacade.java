@@ -4,6 +4,7 @@ import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiEndpointCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiEndpointFindDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiEndpointTestDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiEndpointUpdateDto;
+import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiEndpointDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiEndpointTestVo;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiEndpointVo;
 import cloud.xcan.angus.remote.PageResult;
@@ -37,6 +38,11 @@ public interface ApiEndpointFacade {
    * 删除端点
    */
   void deleteEndpoint(Long collectionId, Long endpointId);
+
+  /**
+   * 获取端点详情
+   */
+  ApiEndpointDetailVo getDetail(Long id);
 
   /**
    * 获取端点列表

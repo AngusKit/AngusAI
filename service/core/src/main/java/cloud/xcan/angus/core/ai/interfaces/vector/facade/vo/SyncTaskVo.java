@@ -10,7 +10,8 @@ public class SyncTaskVo {
   @Schema(description = "任务ID")
   private String taskId;
 
-  @Schema(description = "任务状态", allowableValues = {"pending", "processing", "completed", "failed"})
+  @Schema(description = "任务状态", allowableValues = {"pending", "processing", "completed",
+      "failed"})
   private String status;
 
   @Schema(description = "预计完成时间（秒）")
