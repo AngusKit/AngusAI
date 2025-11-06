@@ -18,7 +18,7 @@ public class PromptCategoryCreateDto {
   @Schema(description = "图标名称")
   private String icon;
 
-  @Length(max = 20)
+  @Length(max = 100)
   @Schema(description = "颜色类名")
   private String color;
 

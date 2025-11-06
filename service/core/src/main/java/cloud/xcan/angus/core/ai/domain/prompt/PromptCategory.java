@@ -25,7 +25,7 @@ public class PromptCategory extends TenantAuditingEntity<PromptCategory, Long> {
   @Column(name = "icon", length = 50)
   private String icon;
 
-  @Column(name = "color", length = 20)
+  @Column(name = "color", length = 100)
   private String color;
 
   @Column(name = "parent_id")
