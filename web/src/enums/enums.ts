@@ -1,9 +1,3 @@
-// Node Related Enums
-export enum NodeSource {
-  OWN_NODE = 'OWN_NODE',
-  ONLINE_BUY = 'ONLINE_BUY',
-}
-
 /** 工作流类型 */
 export enum WorkflowTypeEnum {
   SINGLE_TASK = 'SINGLE_TASK',
@@ -369,4 +363,44 @@ export enum VectorStoreTypeEnum {
   WEAVIATE = 'WEAVIATE',
 }
 
-export const enumNamespaceMap = new Map<any, string>([[NodeSource, 'xcm.enum.NodeSource']]);
+export const enumNamespaceMap = new Map<any, string>([
+  [WorkflowTypeEnum, 'enum.WorkflowTypeEnum'],
+  [WorkflowStatusEnum, 'enum.WorkflowStatusEnum'],
+  [TeamScaleEnum, 'enum.TeamScaleEnum'],
+  [IndustryEnum, 'enum.IndustryEnum'],
+  [MemberPermissionEnum, 'enum.MemberPermissionEnum'],
+  [ResourceTypeEnum, 'enum.ResourceTypeEnum'],
+  [SharedWithEnum, 'enum.SharedWithEnum'],
+  [PluginCategoryEnum, 'enum.PluginCategoryEnum'],
+  [PluginStatusEnum, 'enum.PluginStatusEnum'],
+  [PluginTypeEnum, 'enum.PluginTypeEnum'],
+  [ModelTypeEnum, 'enum.ModelTypeEnum'],
+  [ModelProviderEnum, 'enum.ModelProviderEnum'],
+  [ModelFeaturesEnum, 'enum.ModelFeaturesEnum'],
+  [ModelStatusEnum, 'enum.ModelStatusEnum'],
+  [VisibilityEnum, 'enum.VisibilityEnum'],
+  [KnowledgeBaseDocTypeEnum, 'enum.KnowledgeBaseDocTypeEnum'],
+  [KnowledgeBaseDocStatusEnum, 'enum.KnowledgeBaseDocStatusEnum'],
+  [DatasetTypeEnum, 'enum.DatasetTypeEnum'],
+  [DatasetStatusEnum, 'enum.DatasetStatusEnum'],
+  [DatasourceTypeEnum, 'enum.DatasourceTypeEnum'],
+  [ApplicationCategoryEnum, 'enum.ApplicationCategoryEnum'],
+  [ApplicationStatusEnum, 'enum.ApplicationStatusEnum'],
+  [ApiKeyPermissionsEnum, 'enum.ApiKeyPermissionsEnum'],
+  [ApiKeyStatusEnum, 'enum.ApiKeyStatusEnum'],
+  [DatasetDataTypeEnum, 'enum.DatasetDataTypeEnum'],
+  [DatasetDataStatusEnum, 'enum.DatasetDataStatusEnum'],
+  [SyncDataStatusEnum, 'enum.SyncDataStatusEnum'],
+  [MessageRoleEnum, 'enum.MessageRoleEnum'],
+  [MetricTrendEnum, 'enum.MetricTrendEnum'],
+  [StatisticsPeriodEnum, 'enum.StatisticsPeriodEnum'],
+  [TimeRangeEnum, 'enum.TimeRangeEnum'],
+  [GranularityEnum, 'enum.GranularityEnum'],
+  [ApiCollectionSourceEnum, 'enum.ApiCollectionSourceEnum'],
+  [HttpMethodEnum, 'enum.HttpMethodEnum'],
+  [ApiCollectionImportTypeEnum, 'enum.ApiCollectionImportTypeEnum'],
+  [ConflictStrategyEnum, 'enum.ConflictStrategyEnum'],
+  [ImportStatusEnum, 'enum.ImportStatusEnum'],
+  [ConnectionStatusEnum, 'enum.ConnectionStatusEnum'],
+  [VectorStoreTypeEnum, 'enum.VectorStoreTypeEnum'],
+]);
