@@ -5,12 +5,13 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Popover, PopoverContent, PopoverTrigger } from '@/ui/popover';
 import { Separator } from '@/ui/separator';
 import { Badge } from '@/ui/badge';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useTheme } from '@/ui/ThemeProvider';
 import { useLanguage } from '@/ui/LanguageProvider';
 import { languages, Language } from '../../lib/i18n';
 import { toast } from 'sonner';
 import { copyToClipboard } from '../../lib/clipboard';
+import { MyContext } from '@/ui/utils';
 
 export function Header() {
   const { language, setLanguage, t } = useLanguage();
@@ -21,13 +22,14 @@ export function Header() {
   const [helpOpen, setHelpOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const { userInfo } = useContext(MyContext);
 
-  const userInfo = {
-    name: '柳小龙',
-    id: '100001',
-    avatar: 'https://images.unsplash.com/photo-1652795385761-7ac287d0cd03?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBhdmF0YXIlMjBjYXJ0b29ufGVufDF8fHx8MTc2MTEwMTExNXww&ixlib=rb-4.1.0&q=80&w=1080',
-    verified: true,
-  };
+  // const userInfo = {
+  //   name: '柳小龙',
+  //   id: '100001',
+  //   avatar: 'https://images.unsplash.com/photo-1652795385761-7ac287d0cd03?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBhdmF0YXIlMjBjYXJ0b29ufGVufDF8fHx8MTc2MTEwMTExNXww&ixlib=rb-4.1.0&q=80&w=1080',
+  //   verified: true,
+  // };
 
   const notifications = [
     {
@@ -207,7 +209,7 @@ export function Header() {
         <div className="flex items-center gap-2 text-sm">
           <span className="text-gray-600 dark:text-gray-300">工作台</span>
           <span className="text-gray-400 dark:text-gray-500">/</span>
-          <span className="text-gray-600 dark:text-gray-300">欢迎回来，张三</span>
+          <span className="text-gray-600 dark:text-gray-300">欢迎回来，{userInfo.fullName}</span>
         </div>
 
         {/* Right Section */}
@@ -556,9 +558,9 @@ export function Header() {
             <PopoverTrigger asChild>
               <button className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
                 <Avatar className="w-8 h-8 ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-gray-800">
-                  <AvatarImage src={userInfo.avatar} alt={userInfo.name} />
+                  <AvatarImage src={userInfo.avatar} alt={userInfo.fullName} />
                   <AvatarFallback className="bg-blue-500 text-white">
-                    {userInfo.name.slice(0, 2)}
+                    {userInfo.fullName.slice(0, 2)}
                   </AvatarFallback>
                 </Avatar>
               </button>
@@ -569,14 +571,14 @@ export function Header() {
                 <h3 className="text-sm text-gray-500 dark:text-gray-400 mb-3">个人中心</h3>
                 <div className="flex items-start gap-5">
                   <Avatar className="w-12 h-12 ring-2 ring-blue-500">
-                    <AvatarImage src={userInfo.avatar} alt={userInfo.name} />
+                    <AvatarImage src={userInfo.avatar} alt={userInfo.fullName} />
                     <AvatarFallback className="bg-blue-500 text-white">
-                      {userInfo.name.slice(0, 2)}
+                      {userInfo.fullName.slice(0, 2)}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="dark:text-white">{userInfo.name}</span>
+                      <span className="dark:text-white">{userInfo.fullName}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                       <span>ID: {userInfo.id}</span>
