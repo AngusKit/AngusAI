@@ -13,6 +13,7 @@ module.exports = {
     'plugin:jsx-a11y/recommended',
     'plugin:import/recommended',
     'plugin:import/typescript',
+    'plugin:prettier/recommended', // 必须放在最后，覆盖其他配置
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
@@ -23,7 +24,7 @@ module.exports = {
     sourceType: 'module',
     project: './tsconfig.json',
   },
-  plugins: ['react', 'react-hooks', '@typescript-eslint', 'jsx-a11y', 'import'],
+  plugins: ['react', 'react-hooks', '@typescript-eslint', 'jsx-a11y', 'import', 'prettier'],
   rules: {
     // React相关规则
     'react/react-in-jsx-scope': 'off', // React 17+ 不需要导入React
@@ -88,6 +89,9 @@ module.exports = {
     'jsx-a11y/anchor-is-valid': 'off', // 与Next.js Link冲突
     'jsx-a11y/click-events-have-key-events': 'warn',
     'jsx-a11y/no-static-element-interactions': 'warn',
+
+    // Prettier 规则
+    'prettier/prettier': 'error', // 将 Prettier 规则作为 ESLint 错误显示
   },
   settings: {
     react: {
