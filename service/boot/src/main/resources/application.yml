@@ -69,7 +69,7 @@ spring:
   profiles:
     active: '@profile.active@'
   messages:
-    basename: i18n/messages-infra-spec,i18n/messages-infra-remote,i18n/messages-ai-api,i18n/messages-ai-core,i18n/messages-ai-commercial,i18n/messages-gm-api,i18n/messages-ess-api,i18n/messages-storage-api
+    basename: i18n/messages-infra-spec,i18n/messages-infra-remote,i18n/messages-ai-api,i18n/messages-ai-core,i18n/messages-gm-api,i18n/messages-ess-api,i18n/messages-storage-api
   jackson:
     defaultPropertyInclusion: always
     dateFormat: ${JACKSON_DATE_FORMAT:yyyy-MM-dd HH:mm:ss}

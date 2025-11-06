@@ -98,10 +98,11 @@ public class ApiEndpointRest {
       @ApiResponse(responseCode = "200", description = "查询成功"),
       @ApiResponse(responseCode = "404", description = "端点不存在")
   })
-  @GetMapping("/{id}")
+  @GetMapping("/{collectionId}/endpoints/{endpointId}")
   public ApiLocaleResult<ApiEndpointDetailVo> getDetail(
-      @Parameter(description = "端点ID", required = true) @PathVariable Long id) {
-    return ApiLocaleResult.success(apiEndpointFacade.getDetail(id));
+      @Parameter(description = "接口集ID", required = true) @PathVariable Long collectionId,
+      @Parameter(description = "端点ID", required = true) @PathVariable Long endpointId) {
+    return ApiLocaleResult.success(apiEndpointFacade.getDetail(collectionId, endpointId));
   }
 
   @Operation(operationId = "apiEndpointList", summary = "获取端点列表", description = "获取接口集的端点列表")

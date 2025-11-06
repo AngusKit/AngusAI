@@ -18,6 +18,11 @@ public interface ApiEndpointQuery {
   ApiEndpoint findAndCheck(Long id);
 
   /**
+   * 根据接口集ID和端点ID查询端点
+   */
+  ApiEndpoint findAndCheck(Long collectionId, Long endpointId);
+
+  /**
    * 分页查询端点
    */
   Page<ApiEndpoint> find(GenericSpecification<ApiEndpoint> spec, Pageable pageable,
@@ -57,5 +62,6 @@ public interface ApiEndpointQuery {
    * 批量根据ID查询端点 返回 Map<endpointId, ApiEndpoint>
    */
   Map<Long, ApiEndpoint> findByIds(List<Long> endpointIds);
+
 }
 

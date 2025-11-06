@@ -39,6 +39,12 @@ public class ApiEndpointQueryImpl implements ApiEndpointQuery {
   }
 
   @Override
+  public ApiEndpoint findAndCheck(Long collectionId, Long endpointId) {
+    return apiEndpointRepo.findByIdAndCollectionId(endpointId, collectionId)
+        .orElseThrow(() -> ResourceNotFound.of("接口端点未找到", new Object[]{}));
+  }
+
+  @Override
   public Page<ApiEndpoint> find(GenericSpecification<ApiEndpoint> spec, Pageable pageable,
       boolean fullTextSearch, String[] match) {
     return new BizTemplate<Page<ApiEndpoint>>() {
@@ -93,40 +99,25 @@ public class ApiEndpointQueryImpl implements ApiEndpointQuery {
 
   @Override
   public Long countTotalEndpoints() {
-    return new BizTemplate<Long>() {
-      @Override
-      protected Long process() {
-        return apiEndpointRepo.count();
-      }
-    }.execute();
+    return apiEndpointRepo.count();
   }
 
   @Override
   public Long countTotalEnabledEndpoints() {
-    return new BizTemplate<Long>() {
-      @Override
-      protected Long process() {
-        return apiEndpointRepo.countEnabled();
-      }
-    }.execute();
+    return apiEndpointRepo.countEnabled();
   }
 
   @Override
   public Map<Long, ApiEndpoint> findByIds(List<Long> endpointIds) {
-    return new BizTemplate<Map<Long, ApiEndpoint>>() {
-      @Override
-      protected Map<Long, ApiEndpoint> process() {
-        if (endpointIds == null || endpointIds.isEmpty()) {
-          return new HashMap<>();
-        }
-        List<ApiEndpoint> endpoints = apiEndpointRepo.findAllById(endpointIds);
-        Map<Long, ApiEndpoint> endpointMap = new HashMap<>();
-        for (ApiEndpoint endpoint : endpoints) {
-          endpointMap.put(endpoint.getId(), endpoint);
-        }
-        return endpointMap;
-      }
-    }.execute();
+    if (endpointIds == null || endpointIds.isEmpty()) {
+      return new HashMap<>();
+    }
+    List<ApiEndpoint> endpoints = apiEndpointRepo.findAllById(endpointIds);
+    Map<Long, ApiEndpoint> endpointMap = new HashMap<>();
+    for (ApiEndpoint endpoint : endpoints) {
+      endpointMap.put(endpoint.getId(), endpoint);
+    }
+    return endpointMap;
   }
 
 }

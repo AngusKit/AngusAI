@@ -42,7 +42,7 @@ public interface ApiEndpointFacade {
   /**
    * 获取端点详情
    */
-  ApiEndpointDetailVo getDetail(Long id);
+  ApiEndpointDetailVo getDetail(Long collectionId, Long endpointId);
 
   /**
    * 获取端点列表
