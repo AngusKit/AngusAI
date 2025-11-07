@@ -1,4 +1,4 @@
-import { ApiLocaleResult } from '@xcan-angus/infra';
+import { ApiLocaleResult, AI } from '@xcan-angus/infra';
 import { ListPromptCategoryResult, PromptCategoryCreateDto, PromptCategoryResult, PromptCategoryUpdateDto, } from './PromptsTypes.ts';
 import http, { ContentType, HttpClient, RequestParams } from './HttpClient.ts';
 
@@ -20,7 +20,7 @@ export class PromptCategories<SecurityDataType = unknown> {
    */
   createPromptCategory = (data: PromptCategoryCreateDto, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
-      path: `/api/v1/prompt-categories`,
+      path: `${AI}/prompt-categories`,
       method: 'POST',
       body: data,
       secure: true,
@@ -38,7 +38,7 @@ export class PromptCategories<SecurityDataType = unknown> {
    */
   getPromptCategoryDetail = (id: number, params: RequestParams = {}) =>
     this.http.request<PromptCategoryResult, ApiLocaleResult>({
-      path: `/api/v1/prompt-categories/${id}`,
+      path: `${AI}/prompt-categories/${id}`,
       method: 'GET',
       secure: true,
       ...params,
@@ -54,7 +54,7 @@ export class PromptCategories<SecurityDataType = unknown> {
    */
   deletePromptCategory = (id: number, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
-      path: `/api/v1/prompt-categories/${id}`,
+      path: `${AI}/prompt-categories/${id}`,
       method: 'DELETE',
       secure: true,
       ...params,
@@ -70,7 +70,7 @@ export class PromptCategories<SecurityDataType = unknown> {
    */
   updatePromptCategory = (id: number, data: PromptCategoryUpdateDto, params: RequestParams = {}) =>
     this.http.request<PromptCategoryResult, ApiLocaleResult>({
-      path: `/api/v1/prompt-categories/${id}`,
+      path: `${AI}/prompt-categories/${id}`,
       method: 'PATCH',
       body: data,
       secure: true,
@@ -98,7 +98,7 @@ export class PromptCategories<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<PromptCategoryResult, ApiLocaleResult>({
-      path: `/api/v1/prompt-categories/${id}/order`,
+      path: `${AI}/prompt-categories/${id}/order`,
       method: 'PATCH',
       query: query,
       secure: true,
@@ -115,7 +115,7 @@ export class PromptCategories<SecurityDataType = unknown> {
    */
   getPromptCategoryTree = (params: RequestParams = {}) =>
     this.http.request<ListPromptCategoryResult, ApiLocaleResult>({
-      path: `/api/v1/prompt-categories/tree`,
+      path: `${AI}/prompt-categories/tree`,
       method: 'GET',
       secure: true,
       ...params,
@@ -137,7 +137,7 @@ export class PromptCategories<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
-      path: `/api/v1/prompt-categories/batch`,
+      path: `${AI}/prompt-categories/batch`,
       method: 'DELETE',
       query: query,
       secure: true,

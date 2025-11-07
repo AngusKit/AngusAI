@@ -1,4 +1,4 @@
-import { ApiLocaleResult, PageQuery } from '@xcan-angus/infra';
+import { ApiLocaleResult, PageQuery, AI } from '@xcan-angus/infra';
 import { GetPromptListParamsOrderByEnum, PagePromptListResult, PromptCreateDto, PromptDetailResult, PromptUpdateDto, } from './PromptsTypes.ts';
 import http, { ContentType, HttpClient, RequestParams } from './HttpClient.ts';
 
@@ -35,7 +35,7 @@ export class Prompts<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<PagePromptListResult, ApiLocaleResult>({
-      path: `/api/v1/prompts`,
+      path: `${AI}/prompts`,
       method: 'GET',
       query: query,
       secure: true,
@@ -52,7 +52,7 @@ export class Prompts<SecurityDataType = unknown> {
    */
   createPrompt = (data: PromptCreateDto, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
-      path: `/api/v1/prompts`,
+      path: `${AI}/prompts`,
       method: 'POST',
       body: data,
       secure: true,
@@ -70,7 +70,7 @@ export class Prompts<SecurityDataType = unknown> {
    */
   usePrompt = (id: number, params: RequestParams = {}) =>
     this.http.request<PromptDetailResult, ApiLocaleResult>({
-      path: `/api/v1/prompts/${id}/use`,
+      path: `${AI}/prompts/${id}/use`,
       method: 'POST',
       secure: true,
       ...params,
@@ -93,7 +93,7 @@ export class Prompts<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<PromptDetailResult, ApiLocaleResult>({
-      path: `/api/v1/prompts/${id}/favorite`,
+      path: `${AI}/prompts/${id}/favorite`,
       method: 'POST',
       query: query,
       secure: true,
@@ -117,7 +117,7 @@ export class Prompts<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
-      path: `/api/v1/prompts/${id}/duplicate`,
+      path: `${AI}/prompts/${id}/duplicate`,
       method: 'POST',
       query: query,
       secure: true,
@@ -134,7 +134,7 @@ export class Prompts<SecurityDataType = unknown> {
    */
   getPromptDetail = (id: number, params: RequestParams = {}) =>
     this.http.request<PromptDetailResult, ApiLocaleResult>({
-      path: `/api/v1/prompts/${id}`,
+      path: `${AI}/prompts/${id}`,
       method: 'GET',
       secure: true,
       ...params,
@@ -150,7 +150,7 @@ export class Prompts<SecurityDataType = unknown> {
    */
   deletePrompt = (id: number, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
-      path: `/api/v1/prompts/${id}`,
+      path: `${AI}/prompts/${id}`,
       method: 'DELETE',
       secure: true,
       ...params,
@@ -166,7 +166,7 @@ export class Prompts<SecurityDataType = unknown> {
    */
   updatePrompt = (id: number, data: PromptUpdateDto, params: RequestParams = {}) =>
     this.http.request<PromptDetailResult, ApiLocaleResult>({
-      path: `/api/v1/prompts/${id}`,
+      path: `${AI}/prompts/${id}`,
       method: 'PATCH',
       body: data,
       secure: true,

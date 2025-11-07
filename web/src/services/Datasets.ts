@@ -1,4 +1,4 @@
-import { ApiLocaleResult, PageQuery } from '@xcan-angus/infra';
+import { ApiLocaleResult, PageQuery, AI } from '@xcan-angus/infra';
 import { DatasetCreateDto, DatasetDataBatchDeleteDto, DatasetDetailResult, DatasetStatisticsResult, DatasetUpdateDto, DatasourceConnectionTestDto, DatasourceConnectionTestResult, DatasourceTableDataPreviewResult, DataSourceUpdateDto, GetDatasetDataListOrderByEnum, GetDatasetListOrderByEnum, ListSyncDataResult, PageDatasetDataListResult, PageDatasetListResult, } from './DatasetsTypes.ts';
 import http, { ContentType, HttpClient, RequestParams } from './HttpClient.ts';
 import { DatasetDataStatusEnum, DatasetDataTypeEnum, DatasetTypeEnum, VisibilityEnum } from '@/enums/enums.ts';
@@ -28,7 +28,7 @@ export class Datasets<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<DatasetDetailResult, ApiLocaleResult>({
-      path: `/api/v1/datasets/${id}/visibility`,
+      path: `${AI}/datasets/${id}/visibility`,
       method: 'PUT',
       query: query,
       secure: true,
@@ -45,7 +45,7 @@ export class Datasets<SecurityDataType = unknown> {
    */
   modifyDataSource = (id: number, data: DataSourceUpdateDto, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
-      path: `/api/v1/datasets/${id}/datasource`,
+      path: `${AI}/datasets/${id}/datasource`,
       method: 'PUT',
       body: data,
       secure: true,
@@ -63,7 +63,7 @@ export class Datasets<SecurityDataType = unknown> {
    */
   deleteDataSource = (id: number, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
-      path: `/api/v1/datasets/${id}/datasource`,
+      path: `${AI}/datasets/${id}/datasource`,
       method: 'DELETE',
       secure: true,
       ...params,
@@ -101,7 +101,7 @@ export class Datasets<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<PageDatasetListResult, ApiLocaleResult>({
-      path: `/api/v1/datasets`,
+      path: `${AI}/datasets`,
       method: 'GET',
       query: query,
       secure: true,
@@ -118,7 +118,7 @@ export class Datasets<SecurityDataType = unknown> {
    */
   createDataset = (data: DatasetCreateDto, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
-      path: `/api/v1/datasets`,
+      path: `${AI}/datasets`,
       method: 'POST',
       body: data,
       secure: true,
@@ -143,7 +143,7 @@ export class Datasets<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
-      path: `/api/v1/datasets/${id}/data/upload`,
+      path: `${AI}/datasets/${id}/data/upload`,
       method: 'POST',
       query: query,
       secure: true,
@@ -167,7 +167,7 @@ export class Datasets<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<ListSyncDataResult, ApiLocaleResult>({
-      path: `/api/v1/datasets/${id}/data/sync`,
+      path: `${AI}/datasets/${id}/data/sync`,
       method: 'POST',
       query: query,
       secure: true,
@@ -184,7 +184,7 @@ export class Datasets<SecurityDataType = unknown> {
    */
   testDataSourceConnection = (data: DatasourceConnectionTestDto, params: RequestParams = {}) =>
     this.http.request<DatasourceConnectionTestResult, ApiLocaleResult>({
-      path: `/api/v1/datasets/datasource/test`,
+      path: `${AI}/datasets/datasource/test`,
       method: 'POST',
       body: data,
       secure: true,
@@ -202,7 +202,7 @@ export class Datasets<SecurityDataType = unknown> {
    */
   getDatasetDetail = (id: number, params: RequestParams = {}) =>
     this.http.request<DatasetDetailResult, ApiLocaleResult>({
-      path: `/api/v1/datasets/${id}`,
+      path: `${AI}/datasets/${id}`,
       method: 'GET',
       secure: true,
       ...params,
@@ -218,7 +218,7 @@ export class Datasets<SecurityDataType = unknown> {
    */
   deleteDataset = (id: number, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
-      path: `/api/v1/datasets/${id}`,
+      path: `${AI}/datasets/${id}`,
       method: 'DELETE',
       secure: true,
       ...params,
@@ -234,7 +234,7 @@ export class Datasets<SecurityDataType = unknown> {
    */
   updateDataset = (id: number, data: DatasetUpdateDto, params: RequestParams = {}) =>
     this.http.request<DatasetDetailResult, ApiLocaleResult>({
-      path: `/api/v1/datasets/${id}`,
+      path: `${AI}/datasets/${id}`,
       method: 'PATCH',
       body: data,
       secure: true,
@@ -271,7 +271,7 @@ export class Datasets<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<DatasourceTableDataPreviewResult, ApiLocaleResult>({
-      path: `/api/v1/datasets/${id}/datasource/preview`,
+      path: `${AI}/datasets/${id}/datasource/preview`,
       method: 'GET',
       query: query,
       secure: true,
@@ -309,7 +309,7 @@ export class Datasets<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<PageDatasetDataListResult, ApiLocaleResult>({
-      path: `/api/v1/datasets/${id}/data`,
+      path: `${AI}/datasets/${id}/data`,
       method: 'GET',
       query: query,
       secure: true,
@@ -335,7 +335,7 @@ export class Datasets<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<DatasetStatisticsResult, ApiLocaleResult>({
-      path: `/api/v1/datasets/statistics`,
+      path: `${AI}/datasets/statistics`,
       method: 'GET',
       query: query,
       secure: true,
@@ -352,7 +352,7 @@ export class Datasets<SecurityDataType = unknown> {
    */
   batchDeleteData = (id: number, data: DatasetDataBatchDeleteDto, params: RequestParams = {}) =>
     this.http.request<void, ApiLocaleResult>({
-      path: `/api/v1/datasets/${id}/data/batch-delete`,
+      path: `${AI}/datasets/${id}/data/batch-delete`,
       method: 'DELETE',
       body: data,
       secure: true,

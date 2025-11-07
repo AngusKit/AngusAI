@@ -1,4 +1,4 @@
-import { ApiLocaleResult, PageQuery } from '@xcan-angus/infra';
+import { ApiLocaleResult, PageQuery, AI } from '@xcan-angus/infra';
 import { ApplicationConfig, ApplicationCreateDto, ApplicationDetailResult, ApplicationDuplicateDto, ApplicationShareDto, ApplicationStatisticsResult, ApplicationUpdateDto, GetApplicationListOrderByEnum, } from './ApplicationsTypes.ts';
 import http, { ContentType, HttpClient, RequestParams } from './HttpClient.ts';
 import { ApplicationCategoryEnum, ApplicationStatusEnum } from '@/enums/enums.ts';
@@ -28,7 +28,7 @@ export class Applications<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<ApplicationDetailResult, ApiLocaleResult>({
-      path: `/api/v1/applications/${id}/status`,
+      path: `${AI}/applications/${id}/status`,
       method: 'PUT',
       query: query,
       secure: true,
@@ -45,7 +45,7 @@ export class Applications<SecurityDataType = unknown> {
    */
   updateApplicationConfig = (id: number, data: ApplicationConfig, params: RequestParams = {}) =>
     this.http.request<ApplicationDetailResult, ApiLocaleResult>({
-      path: `/api/v1/applications/${id}/config`,
+      path: `${AI}/applications/${id}/config`,
       method: 'PUT',
       body: data,
       secure: true,
@@ -84,7 +84,7 @@ export class Applications<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
-      path: `/api/v1/applications`,
+      path: `${AI}/applications`,
       method: 'GET',
       query: query,
       secure: true,
@@ -101,7 +101,7 @@ export class Applications<SecurityDataType = unknown> {
    */
   createApplication = (data: ApplicationCreateDto, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
-      path: `/api/v1/applications`,
+      path: `${AI}/applications`,
       method: 'POST',
       body: data,
       secure: true,
@@ -119,7 +119,7 @@ export class Applications<SecurityDataType = unknown> {
    */
   shareApplication = (id: number, data: ApplicationShareDto, params: RequestParams = {}) =>
     this.http.request<ApplicationDetailResult, ApiLocaleResult>({
-      path: `/api/v1/applications/${id}/share`,
+      path: `${AI}/applications/${id}/share`,
       method: 'POST',
       body: data,
       secure: true,
@@ -137,7 +137,7 @@ export class Applications<SecurityDataType = unknown> {
    */
   duplicateApplication = (id: number, data: ApplicationDuplicateDto, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
-      path: `/api/v1/applications/${id}/duplicate`,
+      path: `${AI}/applications/${id}/duplicate`,
       method: 'POST',
       body: data,
       secure: true,
@@ -155,7 +155,7 @@ export class Applications<SecurityDataType = unknown> {
    */
   getApplicationDetail = (id: number, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
-      path: `/api/v1/applications/${id}`,
+      path: `${AI}/applications/${id}`,
       method: 'GET',
       secure: true,
       ...params,
@@ -171,7 +171,7 @@ export class Applications<SecurityDataType = unknown> {
    */
   deleteApplication = (id: number, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
-      path: `/api/v1/applications/${id}`,
+      path: `${AI}/applications/${id}`,
       method: 'DELETE',
       secure: true,
       ...params,
@@ -187,7 +187,7 @@ export class Applications<SecurityDataType = unknown> {
    */
   updateApplication = (id: number, data: ApplicationUpdateDto, params: RequestParams = {}) =>
     this.http.request<ApplicationDetailResult, ApiLocaleResult>({
-      path: `/api/v1/applications/${id}`,
+      path: `${AI}/applications/${id}`,
       method: 'PATCH',
       body: data,
       secure: true,
@@ -216,7 +216,7 @@ export class Applications<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<ApplicationStatisticsResult, ApiLocaleResult>({
-      path: `/api/v1/applications/${id}/statistics`,
+      path: `${AI}/applications/${id}/statistics`,
       method: 'GET',
       query: query,
       secure: true,

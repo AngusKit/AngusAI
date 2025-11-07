@@ -1,4 +1,4 @@
-import { ApiLocaleResult, PageQuery } from '@xcan-angus/infra';
+import { ApiLocaleResult, PageQuery, AI } from '@xcan-angus/infra';
 import { GetModelListParamsOrderByEnum, ModelConfig, ModelCreateDto, ModelDetailResult, ModelStatisticsResult, ModelTestDto, ModelUpdateDto, PageResultModelListResult, } from './ModelsTypes.ts';
 import http, { ContentType, HttpClient, RequestParams } from './HttpClient.ts';
 import { ModelProviderEnum, ModelStatusEnum, ModelTypeEnum, StatisticsPeriodEnum } from '@/enums/enums.ts';
@@ -21,7 +21,7 @@ export class Models<SecurityDataType = unknown> {
    */
   updateModelConfig = (id: number, data: ModelConfig, params: RequestParams = {}) =>
     this.http.request<ModelDetailResult, ApiLocaleResult>({
-      path: `/api/v1/models/${id}/config`,
+      path: `${AI}/models/${id}/config`,
       method: 'PUT',
       body: data,
       secure: true,
@@ -61,7 +61,7 @@ export class Models<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<PageResultModelListResult, ApiLocaleResult>({
-      path: `/api/v1/models`,
+      path: `${AI}/models`,
       method: 'GET',
       query: query,
       secure: true,
@@ -78,7 +78,7 @@ export class Models<SecurityDataType = unknown> {
    */
   createModel = (data: ModelCreateDto, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
-      path: `/api/v1/models`,
+      path: `${AI}/models`,
       method: 'POST',
       body: data,
       secure: true,
@@ -96,7 +96,7 @@ export class Models<SecurityDataType = unknown> {
    */
   testModel = (id: number, data: ModelTestDto, params: RequestParams = {}) =>
     this.http.request<ModelDetailResult, ApiLocaleResult>({
-      path: `/api/v1/models/${id}/test`,
+      path: `${AI}/models/${id}/test`,
       method: 'POST',
       body: data,
       secure: true,
@@ -124,7 +124,7 @@ export class Models<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<ModelDetailResult, ApiLocaleResult>({
-      path: `/api/v1/models/${id}/stop`,
+      path: `${AI}/models/${id}/stop`,
       method: 'POST',
       query: query,
       secure: true,
@@ -141,7 +141,7 @@ export class Models<SecurityDataType = unknown> {
    */
   startModel = (id: number, params: RequestParams = {}) =>
     this.http.request<ModelDetailResult, ApiLocaleResult>({
-      path: `/api/v1/models/${id}/start`,
+      path: `${AI}/models/${id}/start`,
       method: 'POST',
       secure: true,
       ...params,
@@ -157,7 +157,7 @@ export class Models<SecurityDataType = unknown> {
    */
   restartModel = (id: number, params: RequestParams = {}) =>
     this.http.request<ModelDetailResult, ApiLocaleResult>({
-      path: `/api/v1/models/${id}/restart`,
+      path: `${AI}/models/${id}/restart`,
       method: 'POST',
       secure: true,
       ...params,
@@ -173,7 +173,7 @@ export class Models<SecurityDataType = unknown> {
    */
   getModelDetail = (id: number, params: RequestParams = {}) =>
     this.http.request<ModelDetailResult, ApiLocaleResult>({
-      path: `/api/v1/models/${id}`,
+      path: `${AI}/models/${id}`,
       method: 'GET',
       secure: true,
       ...params,
@@ -189,7 +189,7 @@ export class Models<SecurityDataType = unknown> {
    */
   deleteModel = (id: number, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
-      path: `/api/v1/models/${id}`,
+      path: `${AI}/models/${id}`,
       method: 'DELETE',
       secure: true,
       ...params,
@@ -205,7 +205,7 @@ export class Models<SecurityDataType = unknown> {
    */
   updateModel = (id: number, data: ModelUpdateDto, params: RequestParams = {}) =>
     this.http.request<ModelDetailResult, ApiLocaleResult>({
-      path: `/api/v1/models/${id}`,
+      path: `${AI}/models/${id}`,
       method: 'PATCH',
       body: data,
       secure: true,
@@ -229,7 +229,7 @@ export class Models<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<ModelStatisticsResult, ApiLocaleResult>({
-      path: `/api/v1/models/statistics`,
+      path: `${AI}/models/statistics`,
       method: 'GET',
       query: query,
       secure: true,

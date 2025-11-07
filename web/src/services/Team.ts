@@ -1,4 +1,4 @@
-import { ApiLocaleResult } from '@xcan-angus/infra';
+import { ApiLocaleResult, AI } from '@xcan-angus/infra';
 import { TeamSettingsDto, TeamSettingsResult } from './TeamTypes.ts';
 import http, { ContentType, HttpClient, RequestParams } from './HttpClient.ts';
 
@@ -20,7 +20,7 @@ export class Team<SecurityDataType = unknown> {
    */
   getTeamSettingsDetail = (params: RequestParams = {}) =>
     this.http.request<TeamSettingsResult, ApiLocaleResult>({
-      path: `/api/v1/team/settings`,
+      path: `${AI}/team/settings`,
       method: 'GET',
       secure: true,
       ...params,
@@ -36,7 +36,7 @@ export class Team<SecurityDataType = unknown> {
    */
   updateTeamSettings = (data: TeamSettingsDto, params: RequestParams = {}) =>
     this.http.request<TeamSettingsResult, ApiLocaleResult>({
-      path: `/api/v1/team/settings`,
+      path: `${AI}/team/settings`,
       method: 'PUT',
       body: data,
       secure: true,
