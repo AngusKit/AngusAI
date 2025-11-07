@@ -28,9 +28,6 @@ public class Prompt extends TenantAuditingEntity<Prompt, Long> {
   @Column(name = "content", nullable = false, columnDefinition = "TEXT")
   private String content;
 
-  @Column(name = "description", length = 500)
-  private String description;
-
   @Column(name = "category_id", nullable = false)
   private Long categoryId;
 
@@ -64,7 +61,6 @@ public class Prompt extends TenantAuditingEntity<Prompt, Long> {
     return Objects.equals(id, prompt.id)
         && Objects.equals(title, prompt.title)
         && Objects.equals(content, prompt.content)
-        && Objects.equals(description, prompt.description)
         && Objects.equals(categoryId, prompt.categoryId)
         && Objects.equals(tags, prompt.tags)
         && Objects.equals(usageCount, prompt.usageCount);
@@ -72,6 +68,6 @@ public class Prompt extends TenantAuditingEntity<Prompt, Long> {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, title, content, description, categoryId, tags, usageCount);
+    return Objects.hash(id, title, content, categoryId, tags, usageCount);
   }
 }

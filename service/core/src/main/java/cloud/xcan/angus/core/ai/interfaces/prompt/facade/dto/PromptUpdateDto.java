@@ -17,10 +17,6 @@ public class PromptUpdateDto {
   @Schema(description = "提示词内容")
   private String content;
 
-  @Length(max = 500)
-  @Schema(description = "描述")
-  private String description;
-
   @Schema(description = "分类ID")
   private Long categoryId;
 

@@ -57,28 +57,36 @@ public class PromptQueryImpl implements PromptQuery {
       @Override
       protected Page<Prompt> process() {
         // 查询收藏的提示词
-        assembleFavoriteCriteria();
+        if (!assembleFavoriteCriteria()){
+          return Page.empty();
+        };
 
         Page<Prompt> page = fullTextSearch
             ? promptSearchRepo.find(spec.getCriteria(), pageable, Prompt.class, match)
             : promptRepo.findAll(spec, pageable);
-        
+
         // 设置收藏数量
-        if (page != null && page.getContent() != null && !page.getContent().isEmpty()) {
-          setFavoritesCount(page.getContent());
-        }
-        
+        setFavoritesCount(page.getContent());
         return page;
       }
 
-      private void assembleFavoriteCriteria() {
+      /**
+       * 只有查询收藏且有收藏记录时组装查询条件
+       *
+       * @return 是否执行后续查询
+       */
+      private boolean assembleFavoriteCriteria() {
         String isFavorite = findFirstValueAndRemove(spec.getCriteria(), "isFavorite");
         if (Boolean.parseBoolean(isFavorite)) {
           Set<Long> favoritePromptIds = promptFavoritesRepo.findAllIdByCreatedBy(getUserId());
           if (!favoritePromptIds.isEmpty()) {
             spec.getCriteria().add(SearchCriteria.in("id", favoritePromptIds));
+            return true;
           }
+          // 查询收藏却没有收藏记录
+          return false;
         }
+        return true;
       }
     }.execute();
   }
@@ -130,7 +138,6 @@ public class PromptQueryImpl implements PromptQuery {
         favoritesCountMap.put(promptId, count);
       }
     }
-
     // 设置收藏数量到每个提示词对象
     for (Prompt prompt : prompts) {
       if (prompt != null && prompt.getId() != null) {
@@ -139,5 +146,4 @@ public class PromptQueryImpl implements PromptQuery {
       }
     }
   }
-  
 }

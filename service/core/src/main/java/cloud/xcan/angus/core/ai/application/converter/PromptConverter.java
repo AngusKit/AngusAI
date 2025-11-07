@@ -12,7 +12,6 @@ public class PromptConverter {
     newPrompt.setId(null);
     newPrompt.setTitle(isEmpty(title) ? sourcePrompt.getTitle() + "的副本" : title);
     newPrompt.setContent(sourcePrompt.getContent());
-    newPrompt.setDescription(sourcePrompt.getDescription());
     newPrompt.setCategoryId(sourcePrompt.getCategoryId());
     newPrompt.setTags(sourcePrompt.getTags());
     newPrompt.setUsageCount(0L);
