@@ -79,6 +79,11 @@ export interface KnowledgeBaseDocStatusVo {
    */
   status?: KnowledgeBaseDocStatusEnum;
   /**
+   * 是否启用
+   * @example true
+   */
+  enabled?: boolean;
+  /**
    * 处理进度
    * @format int32
    * @example 75

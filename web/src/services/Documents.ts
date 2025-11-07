@@ -16,7 +16,7 @@ export class Documents<SecurityDataType = unknown> {
    * @tags KnowledgeBaseDoc
    * @name ToggleDocument
    * @summary 切换文档状态
-   * @request PUT:/api/v1/documents/{documentId}/knowledge-bases/{knowledgeBaseId}/toggle
+   * @request PUT:/api/v1/knowledge-bases/{knowledgeBaseId}/documents/{documentId}/toggle
    * @secure
    */
   toggleDocument = (
@@ -26,7 +26,7 @@ export class Documents<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<KnowledgeBaseDocLisResult, ApiLocaleResult>({
-      path: `${AI}/documents/${documentId}/knowledge-bases/${knowledgeBaseId}/toggle`,
+      path: `${AI}/knowledge-bases/${knowledgeBaseId}/documents/${documentId}/toggle`,
       method: 'PUT',
       body: data,
       secure: true,
@@ -39,12 +39,12 @@ export class Documents<SecurityDataType = unknown> {
    * @tags KnowledgeBaseDoc
    * @name ReprocessDocument
    * @summary 重新处理文档
-   * @request POST:/api/v1/documents/{documentId}/knowledge-bases/{knowledgeBaseId}/reprocess
+   * @request POST:/api/v1/knowledge-bases/{knowledgeBaseId}/documents/{documentId}/reprocess
    * @secure
    */
   reprocessDocument = (documentId: number, knowledgeBaseId: number, params: RequestParams = {}) =>
     this.http.request<KnowledgeBaseDocStatusResult, ApiLocaleResult>({
-      path: `${AI}/documents/${documentId}/knowledge-bases/${knowledgeBaseId}/reprocess`,
+      path: `${AI}/knowledge-bases/${knowledgeBaseId}/documents/${documentId}/reprocess`,
       method: 'POST',
       secure: true,
       ...params,
@@ -55,7 +55,7 @@ export class Documents<SecurityDataType = unknown> {
    * @tags KnowledgeBaseDoc
    * @name GetDocumentList
    * @summary 获取文档列表
-   * @request GET:/api/v1/documents/knowledge-bases/{knowledgeBaseId}
+   * @request GET:/api/v1/knowledge-bases/{knowledgeBaseId}/documents
    * @secure
    */
   getDocumentList = (
@@ -73,7 +73,7 @@ export class Documents<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<PageKnowledgeBaseDocListResult, ApiLocaleResult>({
-      path: `${AI}/documents/knowledge-bases/${knowledgeBaseId}`,
+      path: `${AI}/knowledge-bases/${knowledgeBaseId}/documents`,
       method: 'GET',
       query: query,
       secure: true,
@@ -83,21 +83,21 @@ export class Documents<SecurityDataType = unknown> {
    * @description 上传文档到知识库
    *
    * @tags KnowledgeBaseDoc
-   * @name UploadDocuments
+   * @name uploadDocument
    * @summary 上传文档
-   * @request POST:/api/v1/documents/knowledge-bases/{knowledgeBaseId}
+   * @request POST:/api/v1/knowledge-bases/{knowledgeBaseId}/documents
    * @secure
    */
-  uploadDocuments = (
+  uploadDocument = (
     knowledgeBaseId: number,
     query: {
       /** 文件列表 */
-      files: File[];
+      file: File;
     },
     params: RequestParams = {}
   ) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
-      path: `${AI}/documents/knowledge-bases/${knowledgeBaseId}`,
+      path: `${AI}/knowledge-bases/${knowledgeBaseId}/documents/upload`,
       method: 'POST',
       query: query,
       secure: true,
@@ -109,12 +109,12 @@ export class Documents<SecurityDataType = unknown> {
    * @tags KnowledgeBaseDoc
    * @name SearchDocuments
    * @summary 搜索文档
-   * @request POST:/api/v1/documents/knowledge-bases/{knowledgeBaseId}/search
+   * @request POST:/api/v1/knowledge-bases/{knowledgeBaseId}/documents/search
    * @secure
    */
   searchDocuments = (knowledgeBaseId: number, data: KnowledgeBaseDocSearchDto, params: RequestParams = {}) =>
     this.http.request<ListKnowledgeBaseDocSearchResult, ApiLocaleResult>({
-      path: `${AI}/documents/knowledge-bases/${knowledgeBaseId}/search`,
+      path: `${AI}/knowledge-bases/${knowledgeBaseId}/documents/search`,
       method: 'POST',
       body: data,
       secure: true,
@@ -127,12 +127,12 @@ export class Documents<SecurityDataType = unknown> {
    * @tags KnowledgeBaseDoc
    * @name BatchDeleteDocuments
    * @summary 批量删除文档
-   * @request POST:/api/v1/documents/knowledge-bases/{knowledgeBaseId}/batch-delete
+   * @request POST:/api/v1/knowledge-bases/{knowledgeBaseId}/documents/batch-delete
    * @secure
    */
   batchDeleteDocuments = (knowledgeBaseId: number, data: KnowledgeBaseDocBatchDeleteDto, params: RequestParams = {}) =>
     this.http.request<void, ApiLocaleResult>({
-      path: `${AI}/documents/knowledge-bases/${knowledgeBaseId}/batch-delete`,
+      path: `${AI}/knowledge-bases/${knowledgeBaseId}/documents/batch-delete`,
       method: 'POST',
       body: data,
       secure: true,
@@ -145,12 +145,12 @@ export class Documents<SecurityDataType = unknown> {
    * @tags KnowledgeBaseDoc
    * @name DeleteDocument
    * @summary 删除文档
-   * @request DELETE:/api/v1/documents/{documentId}/knowledge-bases/{knowledgeBaseId}
+   * @request DELETE:/api/v1/knowledge-bases/{knowledgeBaseId}/documents/{documentId}
    * @secure
    */
   deleteDocument = (documentId: number, knowledgeBaseId: number, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
-      path: `${AI}/documents/${documentId}/knowledge-bases/${knowledgeBaseId}`,
+      path: `${AI}/knowledge-bases/${knowledgeBaseId}/documents/${documentId}`,
       method: 'DELETE',
       secure: true,
       ...params,
