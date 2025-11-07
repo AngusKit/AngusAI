@@ -383,6 +383,9 @@ export function PromptLibraryPage() {
             cat.children.forEach(processCategory);
           }
         };
+        const {totalPrompts = 0, totalFavorites = 0} = response.extensions || {};
+        setFavoriteCount(Number(totalFavorites));
+        setTotalCount(Number(totalPrompts));
         response.data.forEach(processCategory);
         setCategories(prev => {
           const allCategory = prev.find(c => c.id === 'all');
@@ -426,13 +429,9 @@ export function PromptLibraryPage() {
       const response = await Prompts.getPromptList(query);
       console.log('API响应数据:', response); // 调试日志
       
-      const {data, extensions} = response || {};
+      const { data } = response || {};
       const list = data?.list || [];
       const total = Number(data?.total) || 0;
-      const {totalPrompts = 0, totalFavorites = 0} = extensions || {};
-
-      setFavoriteCount(Number(totalFavorites));
-      setTotalCount(Number(totalPrompts));
 
 
       setPageParam((pre) => ({
@@ -445,9 +444,6 @@ export function PromptLibraryPage() {
         setPrompts(convertedPrompts);
       } else {
         setPrompts([]);
-      }
-      if (!query.isFavorite && !query.categoryId && !query.keyword) {
-        setFavoriteCount(prompts.filter(item => item.isFavorite).length);
       }
     } catch (error: any) {
       console.error('加载提示词失败:', error);
@@ -745,10 +741,7 @@ export function PromptLibraryPage() {
         color: 'text-blue-600 dark:text-blue-400',
         parentId: 'none',
       });
-    } catch (error: any) {
-      console.error('创建分类失败:', error);
-      toast.error(error?.message || (language === 'zh-CN' ? '创建分类失败' : 'Failed to create category'));
-    }
+    } catch{}
   };
 
   // 获取分类的层级路径（用于显示）
