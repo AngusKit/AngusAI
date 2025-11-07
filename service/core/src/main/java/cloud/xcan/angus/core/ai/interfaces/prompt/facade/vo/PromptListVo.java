@@ -37,4 +37,6 @@ public class PromptListVo extends TenantAuditingVo {
   @Schema(description = "是否为系统模板")
   private Boolean isSystem;
 
+  @Schema(description = "统计信息")
+  private PromptStatsVo stats;
 }

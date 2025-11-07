@@ -108,6 +108,8 @@ export interface PromptListVo extends TenantAuditingVo {
   isFavorite?: boolean;
   /** 是否为系统模板 */
   isSystem?: boolean;
+  /** 统计信息 */
+  stats?: PromptStatsVo;  
 }
 
 export interface PageResultPromptListVo {

@@ -76,6 +76,12 @@ public class PromptAssembler {
     vo.setIsFavorite(prompt.getIsFavorite());
     vo.setIsSystem(prompt.getIsSystem());
 
+    // 设置统计信息
+    PromptStatsVo statsVo = new PromptStatsVo();
+    statsVo.setFavorites(prompt.getFavorites());
+    statsVo.setTotalUses(prompt.getTotalUses());
+    vo.setStats(statsVo);
+
     // 设置审计信息
     vo.setTenantId(prompt.getTenantId());
     vo.setCreatedBy(prompt.getCreatedBy());

@@ -1,4 +1,68 @@
-import { Search, Star, Copy, Plus, Trash2, Edit, Sparkles, BookOpen, Code, MessageSquare, TrendingUp, FolderPlus, Check, Shield, } from 'lucide-react';
+import {
+  Search,
+  Star,
+  Copy,
+  Plus,
+  Trash2,
+  Edit,
+  Sparkles,
+  BookOpen,
+  Code,
+  MessageSquare,
+  TrendingUp,
+  FolderPlus,
+  Shield,
+  Home,
+  Settings,
+  User,
+  FileText,
+  Image,
+  Video,
+  Music,
+  Calendar,
+  Clock,
+  Mail,
+  Phone,
+  MapPin,
+  Globe,
+  Link,
+  Download,
+  Upload,
+  Share2,
+  Heart,
+  ThumbsUp,
+  ThumbsDown,
+  Eye,
+  EyeOff,
+  Lock,
+  Unlock,
+  Key,
+  Bell,
+  AlertCircle,
+  Info,
+  CheckCircle,
+  XCircle,
+  Zap,
+  Rocket,
+  Database,
+  Server,
+  Cloud,
+  Wifi,
+  Battery,
+  Camera,
+  Mic,
+  Headphones,
+  Gamepad,
+  ShoppingCart,
+  CreditCard,
+  Wallet,
+  Gift,
+  Award,
+  Trophy,
+  Target,
+  Flag,
+  Compass,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -8,21 +72,25 @@ import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, } from '@/components/ui/alert-dialog';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
 import { cn } from '@/components/ui/utils';
 import { useLanguage } from '@/components/ui/LanguageProvider';
 import { copyToClipboard } from '../../lib/clipboard';
+import Prompts from '../../services/Prompts';
+import PromptCategories from '../../services/PromptCategories';
+import { PromptListVo, PromptCategoryVo } from '../../services/PromptsTypes';
 
 interface Prompt {
   id: string;
   title: string;
   content: string;
   category: string;
+  categoryId?: number;
   tags: { label: string; color: string }[];
   isFavorite: boolean;
   usageCount: number;
-  isSystem?: boolean; // 是否为系统模板
+  isSystem?: boolean;
 }
 
 interface Category {
@@ -31,9 +99,72 @@ interface Category {
   nameEn: string;
   icon: any;
   color: string;
-  isSystem?: boolean; // 是否为系统分类
-  parentId?: string; // 父分组ID
+  isSystem?: boolean;
+  parentId?: string;
+  promptCount?: number;
 }
+
+// 图标名称到组件的映射
+const ICON_MAP: Record<string, any> = {
+  Sparkles,
+  Star,
+  BookOpen,
+  Code,
+  MessageSquare,
+  TrendingUp,
+  FolderPlus,
+  Shield,
+  Home,
+  Settings,
+  User,
+  FileText,
+  Image,
+  Video,
+  Music,
+  Calendar,
+  Clock,
+  Mail,
+  Phone,
+  MapPin,
+  Globe,
+  Link,
+  Download,
+  Upload,
+  Share2,
+  Heart,
+  ThumbsUp,
+  ThumbsDown,
+  Eye,
+  EyeOff,
+  Lock,
+  Unlock,
+  Key,
+  Bell,
+  AlertCircle,
+  Info,
+  CheckCircle,
+  XCircle,
+  Zap,
+  Rocket,
+  Database,
+  Server,
+  Cloud,
+  Wifi,
+  Battery,
+  Camera,
+  Mic,
+  Headphones,
+  Gamepad,
+  ShoppingCart,
+  CreditCard,
+  Wallet,
+  Gift,
+  Award,
+  Trophy,
+  Target,
+  Flag,
+  Compass,
+};
 
 const TAG_COLORS = [
   {
@@ -88,6 +219,75 @@ const TAG_COLORS = [
   },
 ];
 
+// 50个常用图标列表
+const AVAILABLE_ICONS = [
+  { name: 'Sparkles', component: Sparkles, label: '火花' },
+  { name: 'Star', component: Star, label: '星星' },
+  { name: 'BookOpen', component: BookOpen, label: '书本' },
+  { name: 'Code', component: Code, label: '代码' },
+  { name: 'MessageSquare', component: MessageSquare, label: '消息' },
+  { name: 'TrendingUp', component: TrendingUp, label: '趋势上升' },
+  { name: 'FolderPlus', component: FolderPlus, label: '文件夹' },
+  { name: 'Shield', component: Shield, label: '盾牌' },
+  { name: 'Home', component: Home, label: '首页' },
+  { name: 'Settings', component: Settings, label: '设置' },
+  { name: 'User', component: User, label: '用户' },
+  { name: 'FileText', component: FileText, label: '文档' },
+  { name: 'Image', component: Image, label: '图片' },
+  { name: 'Video', component: Video, label: '视频' },
+  { name: 'Music', component: Music, label: '音乐' },
+  { name: 'Calendar', component: Calendar, label: '日历' },
+  { name: 'Clock', component: Clock, label: '时钟' },
+  { name: 'Mail', component: Mail, label: '邮件' },
+  { name: 'Phone', component: Phone, label: '电话' },
+  { name: 'MapPin', component: MapPin, label: '位置' },
+  { name: 'Globe', component: Globe, label: '地球' },
+  { name: 'Link', component: Link, label: '链接' },
+  { name: 'Download', component: Download, label: '下载' },
+  { name: 'Upload', component: Upload, label: '上传' },
+  { name: 'Share2', component: Share2, label: '分享' },
+  { name: 'Heart', component: Heart, label: '心形' },
+  { name: 'ThumbsUp', component: ThumbsUp, label: '点赞' },
+  { name: 'ThumbsDown', component: ThumbsDown, label: '点踩' },
+  { name: 'Eye', component: Eye, label: '眼睛' },
+  { name: 'EyeOff', component: EyeOff, label: '闭眼' },
+  { name: 'Lock', component: Lock, label: '锁定' },
+  { name: 'Unlock', component: Unlock, label: '解锁' },
+  { name: 'Key', component: Key, label: '钥匙' },
+  { name: 'Bell', component: Bell, label: '铃铛' },
+  { name: 'AlertCircle', component: AlertCircle, label: '警告' },
+  { name: 'Info', component: Info, label: '信息' },
+  { name: 'CheckCircle', component: CheckCircle, label: '成功' },
+  { name: 'XCircle', component: XCircle, label: '错误' },
+  { name: 'Zap', component: Zap, label: '闪电' },
+  { name: 'Rocket', component: Rocket, label: '火箭' },
+  { name: 'Database', component: Database, label: '数据库' },
+  { name: 'Server', component: Server, label: '服务器' },
+  { name: 'Cloud', component: Cloud, label: '云' },
+  { name: 'Wifi', component: Wifi, label: 'WiFi' },
+  { name: 'Battery', component: Battery, label: '电池' },
+  { name: 'Camera', component: Camera, label: '相机' },
+  { name: 'Mic', component: Mic, label: '麦克风' },
+  { name: 'Headphones', component: Headphones, label: '耳机' },
+  { name: 'Gamepad', component: Gamepad, label: '游戏手柄' },
+  { name: 'ShoppingCart', component: ShoppingCart, label: '购物车' },
+  { name: 'CreditCard', component: CreditCard, label: '信用卡' },
+  { name: 'Wallet', component: Wallet, label: '钱包' },
+  { name: 'Gift', component: Gift, label: '礼物' },
+  { name: 'Award', component: Award, label: '奖章' },
+  { name: 'Trophy', component: Trophy, label: '奖杯' },
+  { name: 'Target', component: Target, label: '目标' },
+  { name: 'Flag', component: Flag, label: '旗帜' },
+  { name: 'Compass', component: Compass, label: '指南针' },
+];
+
+// 获取标签颜色（根据标签名称循环分配）
+const getTagColor = (index: number): string => {
+  if (TAG_COLORS.length === 0) return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400';
+  const color = TAG_COLORS[index % TAG_COLORS.length];
+  return color?.value || TAG_COLORS[0]?.value || 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400';
+};
+
 export function PromptLibraryPage() {
   const { t, language } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
@@ -109,224 +309,10 @@ export function PromptLibraryPage() {
       color: 'text-yellow-600 dark:text-yellow-500',
       isSystem: true,
     },
-    {
-      id: 'coding',
-      name: '编程开发',
-      nameEn: 'Coding',
-      icon: Code,
-      color: 'text-blue-600 dark:text-blue-400',
-      isSystem: true,
-    },
-    {
-      id: 'coding-frontend',
-      name: '前端开发',
-      nameEn: 'Frontend',
-      icon: Code,
-      color: 'text-blue-500 dark:text-blue-300',
-      isSystem: true,
-      parentId: 'coding',
-    },
-    {
-      id: 'coding-backend',
-      name: '后端开发',
-      nameEn: 'Backend',
-      icon: Code,
-      color: 'text-blue-500 dark:text-blue-300',
-      isSystem: true,
-      parentId: 'coding',
-    },
-    {
-      id: 'writing',
-      name: '写作',
-      nameEn: 'Writing',
-      icon: BookOpen,
-      color: 'text-green-600 dark:text-green-400',
-      isSystem: true,
-    },
-    {
-      id: 'marketing',
-      name: '营销',
-      nameEn: 'Marketing',
-      icon: TrendingUp,
-      color: 'text-purple-600 dark:text-purple-400',
-      isSystem: true,
-    },
-    {
-      id: 'productivity',
-      name: '生产力',
-      nameEn: 'Productivity',
-      icon: MessageSquare,
-      color: 'text-orange-600 dark:text-orange-400',
-      isSystem: true,
-    },
-    {
-      id: 'custom-1',
-      name: '我的自定义分类',
-      nameEn: 'My Custom Category',
-      icon: BookOpen,
-      color: 'text-pink-600 dark:text-pink-400',
-      isSystem: false,
-    },
   ]);
-
-  const [prompts, setPrompts] = useState<Prompt[]>([
-    {
-      id: '1',
-      title: '代码审查助手',
-      content: '请帮我审查以下代码，指出潜在的问题、性能优化点和最佳实践建议：\n\n[粘贴代码]',
-      category: 'coding',
-      tags: [
-        {
-          label: '代码',
-          color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-        },
-        {
-          label: '审查',
-          color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
-        },
-        {
-          label: '优化',
-          color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-        },
-      ],
-      isFavorite: true,
-      usageCount: 156,
-      isSystem: true,
-    },
-    {
-      id: '2',
-      title: '文章摘要生成',
-      content: '请为以下文章生成一个简洁的摘要，突出关键要点（不超过150字）：\n\n[粘贴文章]',
-      category: 'writing',
-      tags: [
-        {
-          label: '写作',
-          color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-        },
-        {
-          label: '摘要',
-          color: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400',
-        },
-        {
-          label: '总结',
-          color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
-        },
-      ],
-      isFavorite: false,
-      usageCount: 89,
-      isSystem: true,
-    },
-    {
-      id: '3',
-      title: 'SQL 查询优化',
-      content: '请帮我优化以下 SQL 查询，提升查询性能，并解释优化原理：\n\n[粘贴SQL]',
-      category: 'coding',
-      tags: [
-        {
-          label: 'SQL',
-          color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-        },
-        {
-          label: '数据库',
-          color: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
-        },
-        {
-          label: '优化',
-          color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-        },
-      ],
-      isFavorite: true,
-      usageCount: 203,
-      isSystem: true,
-    },
-    {
-      id: '4',
-      title: '营销文案创作',
-      content:
-        '请为 [产品名称] 创作一段吸引人的营销文案，要求：\n- 突出产品核心卖点\n- 语言简洁有力\n- 包含行动号召\n\n产品信息：[填写产品信息]',
-      category: 'marketing',
-      tags: [
-        {
-          label: '营销',
-          color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
-        },
-        {
-          label: '文案',
-          color: 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400',
-        },
-        {
-          label: '创意',
-          color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
-        },
-      ],
-      isFavorite: false,
-      usageCount: 124,
-      isSystem: true,
-    },
-    {
-      id: '5',
-      title: 'Bug 分析助手',
-      content:
-        '我遇到了一个问题，以下是错误信息和相关代码：\n\n错误信息：[粘贴错误]\n\n相关代码：[粘贴代码]\n\n请帮我分析问题原因并提供解决方案。',
-      category: 'coding',
-      tags: [
-        {
-          label: '调试',
-          color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-        },
-        {
-          label: 'Bug',
-          color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
-        },
-        {
-          label: '问题解决',
-          color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-        },
-      ],
-      isFavorite: true,
-      usageCount: 267,
-      isSystem: true,
-    },
-    {
-      id: '6',
-      title: '会议纪要整理',
-      content:
-        '请根据以下会议记录，整理成结构化的会议纪要，包括：\n- 会议主题\n- 关键讨论点\n- 决策事项\n- 行动项和负责人\n\n会议记录：[粘贴记录]',
-      category: 'productivity',
-      tags: [
-        {
-          label: '会议',
-          color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
-        },
-        {
-          label: '纪要',
-          color: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400',
-        },
-        {
-          label: '整理',
-          color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-        },
-      ],
-      isFavorite: false,
-      usageCount: 78,
-      isSystem: true,
-    },
-    {
-      id: '7',
-      title: '我的自定义提示词',
-      content: '这是一个用户创建的自定义提示词示例。用户可以自由编辑和删除此类提示词。',
-      category: 'productivity',
-      tags: [
-        {
-          label: '自定义',
-          color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-        },
-      ],
-      isFavorite: false,
-      usageCount: 5,
-      isSystem: false,
-    },
-  ]);
+  const [prompts, setPrompts] = useState<Prompt[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [categoriesLoading, setCategoriesLoading] = useState(false);
 
   // 对话框状态
   const [showPromptDialog, setShowPromptDialog] = useState(false);
@@ -337,6 +323,119 @@ export function PromptLibraryPage() {
   const [deletingPrompt, setDeletingPrompt] = useState<Prompt | null>(null);
   const [deletingCategory, setDeletingCategory] = useState<Category | null>(null);
 
+  // 将API返回的分类转换为页面使用的格式
+  const convertCategoryVoToCategory = useCallback((vo: PromptCategoryVo): Category => {
+    const iconName = vo.icon || 'BookOpen';
+    const IconComponent = ICON_MAP[iconName] || BookOpen;
+    return {
+      id: String(vo.id || ''),
+      name: vo.name || '',
+      nameEn: vo.name || '', // API没有提供英文名称，使用中文名称
+      icon: IconComponent,
+      color: vo.color || 'text-blue-600 dark:text-blue-400',
+      isSystem: vo.isSystem,
+      parentId: vo.parentId ? String(vo.parentId) : undefined,
+      promptCount: vo.promptCount,
+    };
+  }, []);
+
+  // 将API返回的提示词转换为页面使用的格式
+  const convertPromptVoToPrompt = useCallback((vo: PromptListVo): Prompt => {
+    return {
+      id: String(vo.id || ''),
+      title: vo.title || '',
+      content: vo.content || '',
+      category: vo.categoryId ? String(vo.categoryId) : '',
+      categoryId: vo.categoryId,
+      tags: (vo.tags || []).map((tag, index) => ({
+        label: tag,
+        color: getTagColor(index),
+      })),
+      isFavorite: vo.isFavorite || false,
+      usageCount: vo.stats?.totalUses || 0,
+      isSystem: vo.isSystem,
+    };
+  }, []);
+
+  // 加载分类树
+  const loadCategories = useCallback(async () => {
+    setCategoriesLoading(true);
+    try {
+      const response = await PromptCategories.getPromptCategoryTree();
+      if (response.data && Array.isArray(response.data)) {
+        // 扁平化处理children
+        const flattenCategories: Category[] = [];
+        const processCategory = (cat: PromptCategoryVo) => {
+          const converted = convertCategoryVoToCategory(cat);
+          flattenCategories.push(converted);
+          if (cat.children && cat.children.length > 0) {
+            cat.children.forEach(processCategory);
+          }
+        };
+        response.data.forEach(processCategory);
+        setCategories(prev => {
+          const allCategory = prev.find(c => c.id === 'all');
+          const favoritesCategory = prev.find(c => c.id === 'favorites');
+          const result: Category[] = [];
+          if (allCategory) result.push(allCategory);
+          if (favoritesCategory) result.push(favoritesCategory);
+          result.push(...flattenCategories);
+          return result;
+        });
+      }
+    } catch (error: any) {
+      console.error('加载分类失败:', error);
+      toast.error(error?.message || (language === 'zh-CN' ? '加载分类失败' : 'Failed to load categories'));
+    } finally {
+      setCategoriesLoading(false);
+    }
+  }, [convertCategoryVoToCategory, language]);
+
+  // 加载提示词列表
+  const loadPrompts = useCallback(async () => {
+    setLoading(true);
+    try {
+      const query: any = {
+        page: 1,
+        size: 1000, // 加载所有数据
+      };
+
+      // 根据选中的分类设置筛选条件
+      if (selectedCategory === 'favorites') {
+        query.isFavorite = true;
+      } else if (selectedCategory !== 'all') {
+        query.categoryId = Number(selectedCategory);
+      }
+
+      // 搜索条件
+      if (searchQuery.trim()) {
+        query.title = searchQuery.trim();
+      }
+
+      const response = await Prompts.getPromptList(query);
+      if (response.data?.data?.list) {
+        const convertedPrompts = response.data.data.list.map(convertPromptVoToPrompt);
+        setPrompts(convertedPrompts);
+      } else {
+        setPrompts([]);
+      }
+    } catch (error: any) {
+      console.error('加载提示词失败:', error);
+      toast.error(error?.message || (language === 'zh-CN' ? '加载提示词失败' : 'Failed to load prompts'));
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedCategory, searchQuery, convertPromptVoToPrompt, language]);
+
+  // 初始化加载数据
+  useEffect(() => {
+    loadCategories();
+  }, [loadCategories]);
+
+  useEffect(() => {
+    loadPrompts();
+  }, [loadPrompts]);
+
   // 表单状态
   const [promptForm, setPromptForm] = useState({
     title: '',
@@ -345,26 +444,28 @@ export function PromptLibraryPage() {
     tags: [] as { label: string; color: string }[],
   });
   const [newTagLabel, setNewTagLabel] = useState('');
-  const [newTagColor, setNewTagColor] = useState(TAG_COLORS[0].value);
+  const [newTagColor, setNewTagColor] = useState(TAG_COLORS[0]?.value || 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400');
 
   const [categoryForm, setCategoryForm] = useState({
     name: '',
-    nameEn: '',
-    icon: 'BookOpen',
+    icon: BookOpen,
     color: 'text-blue-600 dark:text-blue-400',
     parentId: 'none',
   });
 
+  // 客户端过滤（如果API不支持搜索，则在这里过滤）
   const filteredPrompts = prompts.filter(prompt => {
-    const matchesSearch =
-      prompt.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      prompt.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      prompt.tags.some(tag => tag.label.toLowerCase().includes(searchQuery.toLowerCase()));
-    const matchesCategory =
-      selectedCategory === 'all' ||
-      (selectedCategory === 'favorites' && prompt.isFavorite) ||
-      prompt.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+    // 如果API已经根据searchQuery过滤了，这里就不需要再过滤
+    // 但为了保险起见，还是做一次客户端过滤
+    if (searchQuery.trim()) {
+      const matchesSearch =
+        prompt.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        prompt.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        prompt.tags.some(tag => tag.label.toLowerCase().includes(searchQuery.toLowerCase()));
+      if (!matchesSearch) return false;
+    }
+    // 分类过滤已经在API调用时处理了
+    return true;
   });
 
   const getCategoryCount = (categoryId: string) => {
@@ -374,7 +475,10 @@ export function PromptLibraryPage() {
     // 统计该分类及其子分类的提示词数量
     const childCategories = categories.filter(c => c.parentId === categoryId);
     const childIds = childCategories.map(c => c.id);
-    return prompts.filter(p => p.category === categoryId || childIds.includes(p.category)).length;
+    const categoryNumId = Number(categoryId);
+    return prompts.filter(
+      p => p.categoryId === categoryNumId || (p.category === categoryId || childIds.includes(p.category))
+    ).length;
   };
 
   // 获取顶层分类（无父分类的分类）
@@ -387,14 +491,36 @@ export function PromptLibraryPage() {
     return categories.filter(c => c.parentId === parentId);
   };
 
-  // 获取可用作父分组的分类（排除系统分类中的"全部"和"收藏"）
-  const getParentCategoryOptions = () => {
-    return categories.filter(c => c.id !== 'all' && c.id !== 'favorites' && !c.parentId);
+  // 构建多级树形结构的分类选项（递归）
+  const buildCategoryTree = (parentId: string | undefined, level: number = 0, excludeId?: string): Category[] => {
+    const result: Category[] = [];
+    const children = categories.filter(
+      c => c.parentId === parentId && c.id !== 'all' && c.id !== 'favorites' && c.id !== excludeId
+    );
+
+    for (const category of children) {
+      result.push(category);
+      // 递归获取子分类
+      const subCategories = buildCategoryTree(category.id, level + 1, excludeId);
+      result.push(...subCategories);
+    }
+
+    return result;
   };
 
-  const toggleFavorite = (id: string) => {
-    setPrompts(prev => prev.map(p => (p.id === id ? { ...p, isFavorite: !p.isFavorite } : p)));
-    toast.success(language === 'zh-CN' ? '已更新收藏状态' : 'Favorite status updated');
+  const toggleFavorite = async (id: string) => {
+    const prompt = prompts.find(p => p.id === id);
+    if (!prompt) return;
+
+    const newFavoriteStatus = !prompt.isFavorite;
+    try {
+      await Prompts.toggleFavoritePrompt(Number(id), { isFavorite: newFavoriteStatus });
+      setPrompts(prev => prev.map(p => (p.id === id ? { ...p, isFavorite: newFavoriteStatus } : p)));
+      toast.success(language === 'zh-CN' ? '已更新收藏状态' : 'Favorite status updated');
+    } catch (error: any) {
+      console.error('更新收藏状态失败:', error);
+      toast.error(error?.message || (language === 'zh-CN' ? '更新收藏状态失败' : 'Failed to update favorite status'));
+    }
   };
 
   const copyPrompt = async (content: string) => {
@@ -406,30 +532,42 @@ export function PromptLibraryPage() {
     }
   };
 
-  const usePrompt = (prompt: Prompt) => {
-    setPrompts(prev => prev.map(p => (p.id === prompt.id ? { ...p, usageCount: p.usageCount + 1 } : p)));
-    copyPrompt(prompt.content);
-    toast.success(language === 'zh-CN' ? '提示词已复制' : 'Prompt copied');
+  const usePrompt = async (prompt: Prompt) => {
+    try {
+      await Prompts.usePrompt(Number(prompt.id));
+      // 重新加载提示词以获取最新的使用次数
+      await loadPrompts();
+      copyPrompt(prompt.content);
+      toast.success(language === 'zh-CN' ? '提示词已复制' : 'Prompt copied');
+    } catch (error: any) {
+      console.error('使用提示词失败:', error);
+      // 即使API调用失败，也复制内容
+      copyPrompt(prompt.content);
+      toast.error(error?.message || (language === 'zh-CN' ? '使用提示词失败' : 'Failed to use prompt'));
+    }
   };
 
-  const duplicatePrompt = (prompt: Prompt) => {
-    const newPrompt: Prompt = {
-      ...prompt,
-      id: Date.now().toString(),
-      title: `${prompt.title} ${language === 'zh-CN' ? '(副本)' : '(Copy)'}`,
-      usageCount: 0,
-      isSystem: false, // 复制的提示词不是系统模板
-    };
-    setPrompts(prev => [newPrompt, ...prev]);
-    toast.success(language === 'zh-CN' ? '已复制提示词' : 'Prompt duplicated');
+  const duplicatePrompt = async (prompt: Prompt) => {
+    try {
+      await Prompts.duplicatePrompt(Number(prompt.id), {
+        title: `${prompt.title} ${language === 'zh-CN' ? '(副本)' : '(Copy)'}`,
+      });
+      await loadPrompts(); // 重新加载列表
+      toast.success(language === 'zh-CN' ? '已复制提示词' : 'Prompt duplicated');
+    } catch (error: any) {
+      console.error('复制提示词失败:', error);
+      toast.error(error?.message || (language === 'zh-CN' ? '复制提示词失败' : 'Failed to duplicate prompt'));
+    }
   };
 
   const openCreateDialog = () => {
     setEditingPrompt(null);
+    // 找到第一个非系统分类作为默认分类
+    const defaultCategory = categories.find(c => c.id !== 'all' && c.id !== 'favorites');
     setPromptForm({
       title: '',
       content: '',
-      category: selectedCategory === 'all' || selectedCategory === 'favorites' ? 'coding' : selectedCategory,
+      category: selectedCategory === 'all' || selectedCategory === 'favorites' ? (defaultCategory?.id || '') : selectedCategory,
       tags: [],
     });
     setShowPromptDialog(true);
@@ -455,45 +593,66 @@ export function PromptLibraryPage() {
     setShowPromptDialog(true);
   };
 
-  const handleSavePrompt = () => {
+  const handleSavePrompt = async () => {
     if (!promptForm.title.trim() || !promptForm.content.trim()) {
       toast.error(language === 'zh-CN' ? '请填写标题和内容' : 'Please fill in title and content');
       return;
     }
 
-    if (editingPrompt) {
-      // 编辑
-      setPrompts(prev => prev.map(p => (p.id === editingPrompt.id ? { ...p, ...promptForm } : p)));
-      toast.success(language === 'zh-CN' ? '提示词已更新' : 'Prompt updated');
-    } else {
-      // 新建
-      const newPrompt: Prompt = {
-        id: Date.now().toString(),
-        ...promptForm,
-        isFavorite: false,
-        usageCount: 0,
-        isSystem: false, // 用户创建的提示词不是系统模板
-      };
-      setPrompts(prev => [newPrompt, ...prev]);
-      toast.success(language === 'zh-CN' ? '提示词已创建' : 'Prompt created');
+    const categoryId = Number(promptForm.category);
+    if (!categoryId || isNaN(categoryId)) {
+      toast.error(language === 'zh-CN' ? '请选择分类' : 'Please select a category');
+      return;
     }
 
-    setShowPromptDialog(false);
+    try {
+      if (editingPrompt) {
+        // 编辑
+        await Prompts.updatePrompt(Number(editingPrompt.id), {
+          title: promptForm.title,
+          content: promptForm.content,
+          categoryId: categoryId,
+          tags: promptForm.tags.map(t => t.label),
+        });
+        toast.success(language === 'zh-CN' ? '提示词已更新' : 'Prompt updated');
+      } else {
+        // 新建
+        await Prompts.createPrompt({
+          title: promptForm.title,
+          content: promptForm.content,
+          categoryId: categoryId,
+          tags: promptForm.tags.map(t => t.label),
+        });
+        toast.success(language === 'zh-CN' ? '提示词已创建' : 'Prompt created');
+      }
+      await loadPrompts(); // 重新加载列表
+      setShowPromptDialog(false);
+    } catch (error: any) {
+      console.error('保存提示词失败:', error);
+      toast.error(error?.message || (language === 'zh-CN' ? '保存提示词失败' : 'Failed to save prompt'));
+    }
   };
 
-  const handleDeletePrompt = () => {
-    if (deletingPrompt) {
-      // 检查是否为系统模板
-      if (deletingPrompt.isSystem) {
-        toast.error(language === 'zh-CN' ? '系统模板不可删除' : 'System templates cannot be deleted');
-        setShowDeleteDialog(false);
-        setDeletingPrompt(null);
-        return;
-      }
-      setPrompts(prev => prev.filter(p => p.id !== deletingPrompt.id));
+  const handleDeletePrompt = async () => {
+    if (!deletingPrompt) return;
+
+    // 检查是否为系统模板
+    if (deletingPrompt.isSystem) {
+      toast.error(language === 'zh-CN' ? '系统模板不可删除' : 'System templates cannot be deleted');
+      setShowDeleteDialog(false);
+      setDeletingPrompt(null);
+      return;
+    }
+
+    try {
+      await Prompts.deletePrompt(Number(deletingPrompt.id));
+      await loadPrompts(); // 重新加载列表
       toast.success(language === 'zh-CN' ? '提示词已删除' : 'Prompt deleted');
       setShowDeleteDialog(false);
       setDeletingPrompt(null);
+    } catch (error: any) {
+      console.error('删除提示词失败:', error);
+      toast.error(error?.message || (language === 'zh-CN' ? '删除提示词失败' : 'Failed to delete prompt'));
     }
   };
 
@@ -511,7 +670,7 @@ export function PromptLibraryPage() {
       tags: [...prev.tags, { label: newTagLabel.trim(), color: newTagColor }],
     }));
     setNewTagLabel('');
-    setNewTagColor(TAG_COLORS[0].value);
+    setNewTagColor(TAG_COLORS[0]?.value || 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400');
   };
 
   const removeTag = (index: number) => {
@@ -521,64 +680,88 @@ export function PromptLibraryPage() {
     }));
   };
 
-  const handleCreateCategory = () => {
+  const handleCreateCategory = async () => {
     if (!categoryForm.name.trim()) {
       toast.error(language === 'zh-CN' ? '请输入分类名称' : 'Please enter category name');
       return;
     }
-    const newCategory: Category = {
-      id: `custom-${Date.now()}`,
-      name: categoryForm.name,
-      nameEn: categoryForm.nameEn || categoryForm.name,
-      icon: BookOpen,
-      color: categoryForm.color,
-      isSystem: false, // 用户创建的分类不是系统分类
-      parentId: categoryForm.parentId === 'none' ? undefined : categoryForm.parentId,
-    };
-    setCategories(prev => [...prev, newCategory]);
-    toast.success(language === 'zh-CN' ? '分类已创建' : 'Category created');
-    setShowCategoryDialog(false);
-    setCategoryForm({
-      name: '',
-      nameEn: '',
-      icon: 'BookOpen',
-      color: 'text-blue-600 dark:text-blue-400',
-      parentId: 'none',
-    });
+
+    try {
+      // 找到图标名称
+      const iconName = AVAILABLE_ICONS.find(icon => icon.component === categoryForm.icon)?.name || 'BookOpen';
+      
+      await PromptCategories.createPromptCategory({
+        name: categoryForm.name,
+        icon: iconName,
+        color: categoryForm.color,
+        parentId: categoryForm.parentId === 'none' ? undefined : Number(categoryForm.parentId),
+      });
+      
+      await loadCategories(); // 重新加载分类树
+      toast.success(language === 'zh-CN' ? '分类已创建' : 'Category created');
+      setShowCategoryDialog(false);
+      setCategoryForm({
+        name: '',
+        icon: BookOpen,
+        color: 'text-blue-600 dark:text-blue-400',
+        parentId: 'none',
+      });
+    } catch (error: any) {
+      console.error('创建分类失败:', error);
+      toast.error(error?.message || (language === 'zh-CN' ? '创建分类失败' : 'Failed to create category'));
+    }
   };
 
-  const handleDeleteCategory = () => {
-    if (deletingCategory) {
-      // 检查是否为系统分类
-      if (deletingCategory.isSystem) {
-        toast.error(language === 'zh-CN' ? '系统分类不可删除' : 'System categories cannot be deleted');
-        setShowDeleteCategoryDialog(false);
-        setDeletingCategory(null);
-        return;
-      }
+  // 获取分类的层级路径（用于显示）
+  const getCategoryPath = (categoryId: string): string[] => {
+    const path: string[] = [];
+    let currentId: string | undefined = categoryId;
 
+    while (currentId) {
+      const category = categories.find(c => c.id === currentId);
+      if (category) {
+        path.unshift(category.name);
+        currentId = category.parentId;
+      } else {
+        break;
+      }
+    }
+
+    return path;
+  };
+
+  const handleDeleteCategory = async () => {
+    if (!deletingCategory) return;
+
+    // 检查是否为系统分类
+    if (deletingCategory.isSystem) {
+      toast.error(language === 'zh-CN' ? '系统分类不可删除' : 'System categories cannot be deleted');
+      setShowDeleteCategoryDialog(false);
+      setDeletingCategory(null);
+      return;
+    }
+
+    try {
       // 获取所有子分类
       const childCategories = categories.filter(c => c.parentId === deletingCategory.id);
-      const allCategoryIds = [deletingCategory.id, ...childCategories.map(c => c.id)];
+      const allCategoryIds = [Number(deletingCategory.id), ...childCategories.map(c => Number(c.id))];
 
-      // 检查分类及其子分类下是否有提示词
-      const promptsInCategory = prompts.filter(p => allCategoryIds.includes(p.category));
-      if (promptsInCategory.length > 0) {
-        // 将该分类下的提示词移动到"编程开发"分类
-        setPrompts(prev => prev.map(p => (allCategoryIds.includes(p.category) ? { ...p, category: 'coding' } : p)));
-      }
-
-      // 删除分类及其所有子分类
-      setCategories(prev => prev.filter(c => !allCategoryIds.includes(c.id)));
+      // 批量删除分类及其所有子分类
+      await PromptCategories.batchDeletePromptCategories({ ids: allCategoryIds });
 
       // 如果当前选中的是被删除的分类，切换到"全部"
       if (selectedCategory === deletingCategory.id) {
         setSelectedCategory('all');
       }
 
+      await loadCategories(); // 重新加载分类树
+      await loadPrompts(); // 重新加载提示词列表
       toast.success(language === 'zh-CN' ? '分类已删除' : 'Category deleted');
       setShowDeleteCategoryDialog(false);
       setDeletingCategory(null);
+    } catch (error: any) {
+      console.error('删除分类失败:', error);
+      toast.error(error?.message || (language === 'zh-CN' ? '删除分类失败' : 'Failed to delete category'));
     }
   };
 
@@ -599,7 +782,14 @@ export function PromptLibraryPage() {
         {/* Categories Sidebar */}
         <div className='w-64 shrink-0'>
           <div className='bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4'>
-            <div className='space-y-1'>
+            {categoriesLoading ? (
+              <div className='text-center py-8'>
+                <p className='text-sm text-gray-500 dark:text-gray-400'>
+                  {language === 'zh-CN' ? '加载中...' : 'Loading...'}
+                </p>
+              </div>
+            ) : (
+              <div className='space-y-1'>
               {getTopLevelCategories().map(category => {
                 const Icon = category.icon;
                 const count = getCategoryCount(category.id);
@@ -663,7 +853,6 @@ export function PromptLibraryPage() {
                     {childCategories.length > 0 && (
                       <div className='ml-6 mt-1 space-y-1'>
                         {childCategories.map(childCategory => {
-                          const ChildIcon = childCategory.icon;
                           const childCount = getCategoryCount(childCategory.id);
 
                           return (
@@ -721,7 +910,8 @@ export function PromptLibraryPage() {
                   </div>
                 );
               })}
-            </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -752,7 +942,14 @@ export function PromptLibraryPage() {
 
           <ScrollArea className='h-[calc(100vh-280px)]'>
             <div className='space-y-4'>
-              {filteredPrompts.length === 0 ? (
+              {loading ? (
+                <div className='text-center py-20 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg'>
+                  <Sparkles className='w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600 animate-pulse' />
+                  <p className='text-gray-500 dark:text-gray-400'>
+                    {language === 'zh-CN' ? '加载中...' : 'Loading...'}
+                  </p>
+                </div>
+              ) : filteredPrompts.length === 0 ? (
                 <div className='text-center py-20 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg'>
                   <Sparkles className='w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600' />
                   <p className='text-gray-500 dark:text-gray-400'>
@@ -900,6 +1097,11 @@ export function PromptLibraryPage() {
                         {getCategoryName(cat)}
                       </SelectItem>
                     ))}
+                  {categories.filter(cat => cat.id !== 'all' && cat.id !== 'favorites').length === 0 && (
+                    <SelectItem value='' disabled>
+                      {language === 'zh-CN' ? '暂无分类' : 'No categories'}
+                    </SelectItem>
+                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -983,30 +1185,10 @@ export function PromptLibraryPage() {
                 id='categoryName'
                 value={categoryForm.name}
                 onChange={e => setCategoryForm(prev => ({ ...prev, name: e.target.value }))}
-                placeholder={language === 'zh-CN' ? '输入中文分组名称...' : 'Enter category name...'}
+                placeholder={language === 'zh-CN' ? '输入分组名称...' : 'Enter category name...'}
                 className='dark:bg-gray-900 dark:border-gray-700'
               />
             </div>
-
-            {language === 'zh-CN' && (
-              <div>
-                <Label htmlFor='categoryNameEn'>
-                  {language === 'zh-CN' ? '英文名称（可选）' : 'English Name (Optional)'}
-                </Label>
-                <Input
-                  id='categoryNameEn'
-                  value={categoryForm.nameEn}
-                  onChange={e =>
-                    setCategoryForm(prev => ({
-                      ...prev,
-                      nameEn: e.target.value,
-                    }))
-                  }
-                  placeholder='Enter English name...'
-                  className='dark:bg-gray-900 dark:border-gray-700'
-                />
-              </div>
-            )}
 
             <div>
               <Label htmlFor='parentCategory'>
@@ -1024,67 +1206,116 @@ export function PromptLibraryPage() {
                 <SelectTrigger className='dark:bg-gray-900 dark:border-gray-700'>
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
+                <SelectContent className='dark:bg-gray-800 dark:border-gray-700 max-h-[300px]'>
                   <SelectItem value='none'>
                     {language === 'zh-CN' ? '无（作为顶层分组）' : 'None (Top-level category)'}
                   </SelectItem>
-                  {getParentCategoryOptions().map(cat => (
-                    <SelectItem key={cat.id} value={cat.id}>
-                      {getCategoryName(cat)}
-                    </SelectItem>
-                  ))}
+                  {buildCategoryTree(undefined).map(cat => {
+                    const path = getCategoryPath(cat.id);
+                    const level = path.length - 1;
+                    return (
+                      <SelectItem key={cat.id} value={cat.id}>
+                        <div className='flex items-center gap-2'>
+                          {level > 0 && (
+                            <div className='flex items-center gap-1'>
+                              {Array.from({ length: level }).map((_, i) => (
+                                <div key={i} className='w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500' />
+                              ))}
+                            </div>
+                          )}
+                          <span>{cat.name}</span>
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             </div>
 
-            <div>
-              <Label htmlFor='categoryColor'>{language === 'zh-CN' ? '颜色' : 'Color'}</Label>
-              <Select
-                value={categoryForm.color}
-                onValueChange={value => setCategoryForm(prev => ({ ...prev, color: value }))}
-              >
-                <SelectTrigger className='dark:bg-gray-900 dark:border-gray-700'>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
-                  <SelectItem value='text-blue-600 dark:text-blue-400'>
-                    <div className='flex items-center gap-2'>
-                      <div className='w-3 h-3 rounded bg-blue-500' />
-                      {language === 'zh-CN' ? '蓝色' : 'Blue'}
-                    </div>
-                  </SelectItem>
-                  <SelectItem value='text-green-600 dark:text-green-400'>
-                    <div className='flex items-center gap-2'>
-                      <div className='w-3 h-3 rounded bg-green-500' />
-                      {language === 'zh-CN' ? '绿色' : 'Green'}
-                    </div>
-                  </SelectItem>
-                  <SelectItem value='text-purple-600 dark:text-purple-400'>
-                    <div className='flex items-center gap-2'>
-                      <div className='w-3 h-3 rounded bg-purple-500' />
-                      {language === 'zh-CN' ? '紫色' : 'Purple'}
-                    </div>
-                  </SelectItem>
-                  <SelectItem value='text-orange-600 dark:text-orange-400'>
-                    <div className='flex items-center gap-2'>
-                      <div className='w-3 h-3 rounded bg-orange-500' />
-                      {language === 'zh-CN' ? '橙色' : 'Orange'}
-                    </div>
-                  </SelectItem>
-                  <SelectItem value='text-red-600 dark:text-red-400'>
-                    <div className='flex items-center gap-2'>
-                      <div className='w-3 h-3 rounded bg-red-500' />
-                      {language === 'zh-CN' ? '红色' : 'Red'}
-                    </div>
-                  </SelectItem>
-                  <SelectItem value='text-pink-600 dark:text-pink-400'>
-                    <div className='flex items-center gap-2'>
-                      <div className='w-3 h-3 rounded bg-pink-500' />
-                      {language === 'zh-CN' ? '粉色' : 'Pink'}
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+            <div className='grid grid-cols-2 gap-4'>
+              <div>
+                <Label htmlFor='categoryIcon'>{language === 'zh-CN' ? '图标' : 'Icon'}</Label>
+                <Select
+                  value={AVAILABLE_ICONS.find(icon => icon.component === categoryForm.icon)?.name || 'BookOpen'}
+                  onValueChange={value => {
+                    const selectedIcon = AVAILABLE_ICONS.find(icon => icon.name === value);
+                    if (selectedIcon) {
+                      setCategoryForm(prev => ({ ...prev, icon: selectedIcon.component }));
+                    }
+                  }}
+                >
+                  <SelectTrigger className='dark:bg-gray-900 dark:border-gray-700'>
+                    <SelectValue placeholder={language === 'zh-CN' ? '选择图标' : 'Select icon'} />
+                  </SelectTrigger>
+                  <SelectContent className='dark:bg-gray-800 dark:border-gray-700 max-h-[300px]'>
+                    <ScrollArea className='h-[250px]'>
+                      <div className='grid grid-cols-2 gap-1 p-2'>
+                        {AVAILABLE_ICONS.map(icon => {
+                          const IconComponent = icon.component;
+                          return (
+                            <SelectItem key={icon.name} value={icon.name} className='cursor-pointer'>
+                              <div className='flex items-center gap-2'>
+                                <IconComponent className='w-4 h-4' />
+                                <span>{icon.label}</span>
+                              </div>
+                            </SelectItem>
+                          );
+                        })}
+                      </div>
+                    </ScrollArea>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor='categoryColor'>{language === 'zh-CN' ? '颜色' : 'Color'}</Label>
+                <Select
+                  value={categoryForm.color}
+                  onValueChange={value => setCategoryForm(prev => ({ ...prev, color: value }))}
+                >
+                  <SelectTrigger className='dark:bg-gray-900 dark:border-gray-700'>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
+                    <SelectItem value='text-blue-600 dark:text-blue-400'>
+                      <div className='flex items-center gap-2'>
+                        <div className='w-3 h-3 rounded bg-blue-500' />
+                        {language === 'zh-CN' ? '蓝色' : 'Blue'}
+                      </div>
+                    </SelectItem>
+                    <SelectItem value='text-green-600 dark:text-green-400'>
+                      <div className='flex items-center gap-2'>
+                        <div className='w-3 h-3 rounded bg-green-500' />
+                        {language === 'zh-CN' ? '绿色' : 'Green'}
+                      </div>
+                    </SelectItem>
+                    <SelectItem value='text-purple-600 dark:text-purple-400'>
+                      <div className='flex items-center gap-2'>
+                        <div className='w-3 h-3 rounded bg-purple-500' />
+                        {language === 'zh-CN' ? '紫色' : 'Purple'}
+                      </div>
+                    </SelectItem>
+                    <SelectItem value='text-orange-600 dark:text-orange-400'>
+                      <div className='flex items-center gap-2'>
+                        <div className='w-3 h-3 rounded bg-orange-500' />
+                        {language === 'zh-CN' ? '橙色' : 'Orange'}
+                      </div>
+                    </SelectItem>
+                    <SelectItem value='text-red-600 dark:text-red-400'>
+                      <div className='flex items-center gap-2'>
+                        <div className='w-3 h-3 rounded bg-red-500' />
+                        {language === 'zh-CN' ? '红色' : 'Red'}
+                      </div>
+                    </SelectItem>
+                    <SelectItem value='text-pink-600 dark:text-pink-400'>
+                      <div className='flex items-center gap-2'>
+                        <div className='w-3 h-3 rounded bg-pink-500' />
+                        {language === 'zh-CN' ? '粉色' : 'Pink'}
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
 
