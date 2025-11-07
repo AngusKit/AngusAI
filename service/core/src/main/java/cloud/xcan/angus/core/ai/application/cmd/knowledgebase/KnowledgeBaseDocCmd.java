@@ -1,7 +1,6 @@
 package cloud.xcan.angus.core.ai.application.cmd.knowledgebase;
 
 import cloud.xcan.angus.core.ai.domain.knowledgebase.KnowledgeBaseDoc;
-import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo.KnowledgeBaseDocListVo;
 import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -10,12 +9,12 @@ public interface KnowledgeBaseDocCmd {
   /**
    * 上传文档
    */
-  List<KnowledgeBaseDocListVo> uploadDocuments(Long knowledgeBaseId, MultipartFile[] files);
+  KnowledgeBaseDoc uploadDocument(Long knowledgeBaseId, MultipartFile file);
 
   /**
    * 切换文档状态
    */
-  KnowledgeBaseDocListVo toggleDocument(Long knowledgeBaseId, Long documentId, Boolean enabled);
+  KnowledgeBaseDoc toggleDocument(Long knowledgeBaseId, Long documentId, Boolean enabled);
 
   /**
    * 重新处理文档

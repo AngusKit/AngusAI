@@ -27,6 +27,8 @@ public interface Constants {
 
   // ==================== 知识库相关字段长度常量 ====================
 
+  String KNOWLEDGE_DOC_UPLOAD_BIZ_KEY = "angusai-knowledge-base";
+
   /**
    * 知识库名称最大长度
    */

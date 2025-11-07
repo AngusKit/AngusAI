@@ -12,7 +12,7 @@ import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBas
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBaseDocSearchDto;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBaseDocToggleDto;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.internal.assembler.KnowledgeBaseDocAssembler;
-import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo.KnowledgeBaseDocListVo;
+import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo.KnowledgeBaseDocVo;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo.KnowledgeBaseDocSearchResultVo;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo.KnowledgeBaseDocStatusVo;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
@@ -35,8 +35,9 @@ public class KnowledgeBaseDocFacadeImpl implements KnowledgeBaseDocFacade {
   private KnowledgeBaseDocQuery documentQuery;
 
   @Override
-  public List<KnowledgeBaseDocListVo> uploadDocuments(Long knowledgeBaseId, MultipartFile[] files) {
-    return documentCmd.uploadDocuments(knowledgeBaseId, files);
+  public KnowledgeBaseDocVo uploadDocument(Long knowledgeBaseId, MultipartFile file) {
+    KnowledgeBaseDoc doc = documentCmd.uploadDocument(knowledgeBaseId, file);
+    return KnowledgeBaseDocAssembler.toDocumentListVo(doc);
   }
 
   @Override
@@ -46,9 +47,11 @@ public class KnowledgeBaseDocFacadeImpl implements KnowledgeBaseDocFacade {
   }
 
   @Override
-  public KnowledgeBaseDocListVo toggleDocument(Long knowledgeBaseId, Long documentId,
+  public KnowledgeBaseDocStatusVo toggleDocument(Long knowledgeBaseId, Long documentId,
       KnowledgeBaseDocToggleDto dto) {
-    return documentCmd.toggleDocument(knowledgeBaseId, documentId, dto.getEnabled());
+    KnowledgeBaseDoc document = documentCmd.toggleDocument(knowledgeBaseId, documentId,
+        dto.getEnabled());
+    return KnowledgeBaseDocAssembler.toDocumentStatusVo(document);
   }
 
   @Override
@@ -62,7 +65,7 @@ public class KnowledgeBaseDocFacadeImpl implements KnowledgeBaseDocFacade {
   }
 
   @Override
-  public PageResult<KnowledgeBaseDocListVo> getDocumentList(Long knowledgeBaseId,
+  public PageResult<KnowledgeBaseDocVo> getDocumentList(Long knowledgeBaseId,
       KnowledgeBaseDocFindDto dto) {
     GenericSpecification<KnowledgeBaseDoc> spec = KnowledgeBaseDocAssembler.getSpecification(dto);
     spec.getCriteria().add(SearchCriteria.equal("knowledgeBaseId", knowledgeBaseId));

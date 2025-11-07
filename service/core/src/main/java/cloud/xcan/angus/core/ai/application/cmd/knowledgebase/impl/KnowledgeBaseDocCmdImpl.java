@@ -1,23 +1,30 @@
 package cloud.xcan.angus.core.ai.application.cmd.knowledgebase.impl;
 
+import static cloud.xcan.angus.core.ai.application.converter.KnowledgeBaseConverter.toUploadDomain;
+import static cloud.xcan.angus.core.ai.domain.Constants.KNOWLEDGE_DOC_UPLOAD_BIZ_KEY;
+
+import cloud.xcan.angus.api.storage.file.FileRemote;
+import cloud.xcan.angus.api.storage.file.vo.FileUploadVo;
 import cloud.xcan.angus.core.ai.application.cmd.knowledgebase.KnowledgeBaseDocCmd;
 import cloud.xcan.angus.core.ai.application.query.knowledgebase.KnowledgeBaseDocQuery;
 import cloud.xcan.angus.core.ai.application.query.knowledgebase.KnowledgeBaseQuery;
 import cloud.xcan.angus.core.ai.domain.knowledgebase.DocumentStatus;
 import cloud.xcan.angus.core.ai.domain.knowledgebase.KnowledgeBaseDoc;
 import cloud.xcan.angus.core.ai.domain.knowledgebase.KnowledgeBaseDocRepo;
-import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.internal.assembler.KnowledgeBaseDocAssembler;
-import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo.KnowledgeBaseDocListVo;
 import cloud.xcan.angus.core.biz.BizTemplate;
+import cloud.xcan.angus.core.biz.cmd.CommCmd;
+import cloud.xcan.angus.core.jpa.repository.BaseRepository;
 import cloud.xcan.angus.remote.message.ProtocolException;
 import jakarta.annotation.Resource;
 import java.util.List;
+import org.springframework.boot.autoconfigure.web.servlet.MultipartProperties;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
-public class KnowledgeBaseDocCmdImpl implements KnowledgeBaseDocCmd {
+public class KnowledgeBaseDocCmdImpl extends CommCmd<KnowledgeBaseDoc, Long> implements
+    KnowledgeBaseDocCmd {
 
   @Resource
   private KnowledgeBaseDocRepo knowledgeBaseDocRepo;
@@ -28,26 +35,41 @@ public class KnowledgeBaseDocCmdImpl implements KnowledgeBaseDocCmd {
   @Resource
   private KnowledgeBaseQuery knowledgeBaseQuery;
 
+  @Resource
+  private FileRemote fileRemote;
+
+  @Resource
+  private MultipartProperties multipartProperties;
+
   @Override
   @Transactional
-  public List<KnowledgeBaseDocListVo> uploadDocuments(Long knowledgeBaseId, MultipartFile[] files) {
-    return new BizTemplate<List<KnowledgeBaseDocListVo>>() {
+  public KnowledgeBaseDoc uploadDocument(Long knowledgeBaseId, MultipartFile file) {
+    return new BizTemplate<KnowledgeBaseDoc>() {
       @Override
       protected void checkParams() {
         // 获取源知识库并检查是否存在
         knowledgeBaseQuery.findAndCheck(knowledgeBaseId);
+
+        // 检查文件大小限制
+        long maxFileSize = multipartProperties.getMaxFileSize().toBytes();
+        if (file.getSize() > maxFileSize) {
+          throw ProtocolException.of(String.format("文件[%s]超过大小限制，最大允许上传%s",
+              file.getOriginalFilename(), multipartProperties.getMaxFileSize().toString()));
+        }
       }
 
       @Override
-      protected List<KnowledgeBaseDocListVo> process() {
-        // TODO: 实现文件上传逻辑
-        // 1. 验证文件类型和大小
-        // 2. 保存文件到存储
-        // 3. 创建文档记录
-        // 4. 启动异步处理任务（包括分段记录-KnowledgeBaseDocChunkRepo和向量化）
+      protected KnowledgeBaseDoc process() {
+        // TODO: 启动异步处理任务（包括分段记录-KnowledgeBaseDocChunkRepo和向量化）
 
-        // 暂时返回空列表
-        return List.of();
+        // 上传文件到文件存储服务
+        List<FileUploadVo> uploadResult = fileRemote.upload(
+            new MultipartFile[]{file}, KNOWLEDGE_DOC_UPLOAD_BIZ_KEY,
+            file.getOriginalFilename(), null).orElseContentThrow();
+
+        KnowledgeBaseDoc doc = toUploadDomain(knowledgeBaseId, file, uploadResult);
+        insert(doc);
+        return doc;
       }
     }.execute();
   }
@@ -71,13 +93,13 @@ public class KnowledgeBaseDocCmdImpl implements KnowledgeBaseDocCmd {
 
       @Override
       protected KnowledgeBaseDoc process() {
+        // TODO: 重新加入处理队列
+
         // 重置状态为处理中
-        documentDb.setStatus(DocumentStatus.PROCESSING);
+        documentDb.setStatus(DocumentStatus.PENDING);
         documentDb.setProcessingProgress(0);
         documentDb.setErrorMessage(null);
-        documentDb = knowledgeBaseDocRepo.save(documentDb);
-
-        // TODO: 重新加入处理队列
+        knowledgeBaseDocRepo.save(documentDb);
         return documentDb;
       }
     }.execute();
@@ -85,9 +107,8 @@ public class KnowledgeBaseDocCmdImpl implements KnowledgeBaseDocCmd {
 
   @Override
   @Transactional
-  public KnowledgeBaseDocListVo toggleDocument(Long knowledgeBaseId, Long documentId,
-      Boolean enabled) {
-    return new BizTemplate<KnowledgeBaseDocListVo>() {
+  public KnowledgeBaseDoc toggleDocument(Long knowledgeBaseId, Long documentId, Boolean enabled) {
+    return new BizTemplate<KnowledgeBaseDoc>() {
       KnowledgeBaseDoc documentDb;
 
       @Override
@@ -102,14 +123,14 @@ public class KnowledgeBaseDocCmdImpl implements KnowledgeBaseDocCmd {
       }
 
       @Override
-      protected KnowledgeBaseDocListVo process() {
+      protected KnowledgeBaseDoc process() {
         // TODO 如果切换成禁用，更新向量数据库状态或删除；如果切换成启用，更新向量数据库状态或插入
 
         // 更新启用状态
         documentDb.setEnabled(enabled);
         knowledgeBaseDocRepo.save(documentDb);
 
-        return KnowledgeBaseDocAssembler.toDocumentListVo(documentDb);
+        return documentDb;
       }
     }.execute();
   }
@@ -155,5 +176,10 @@ public class KnowledgeBaseDocCmdImpl implements KnowledgeBaseDocCmd {
         return null;
       }
     }.execute();
+  }
+
+  @Override
+  protected BaseRepository<KnowledgeBaseDoc, Long> getRepository() {
+    return this.knowledgeBaseDocRepo;
   }
 }

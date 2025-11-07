@@ -173,7 +173,7 @@ export enum KnowledgeBaseDocTypeEnum {
  * @example "COMPLETED"
  */
 export enum KnowledgeBaseDocStatusEnum {
-  UPLOADING = 'UPLOADING',
+  PENDING = 'PENDING',
   PROCESSING = 'PROCESSING',
   COMPLETED = 'COMPLETED',
   FAILED = 'FAILED',
@@ -238,7 +238,7 @@ export enum DatasetDataTypeEnum {
 
 /** 状态 */
 export enum DatasetDataStatusEnum {
-  UPLOADING = 'UPLOADING',
+  PENDING = 'PENDING',
   PROCESSING = 'PROCESSING',
   COMPLETED = 'COMPLETED',
   FAILED = 'FAILED',

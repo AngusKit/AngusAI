@@ -5,9 +5,9 @@ import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBas
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBaseDocFindDto;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBaseDocSearchDto;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBaseDocToggleDto;
-import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo.KnowledgeBaseDocListVo;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo.KnowledgeBaseDocSearchResultVo;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo.KnowledgeBaseDocStatusVo;
+import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo.KnowledgeBaseDocVo;
 import cloud.xcan.angus.remote.ApiLocaleResult;
 import cloud.xcan.angus.remote.PageResult;
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,16 +42,16 @@ public class KnowledgeBaseDocRest {
   @Resource
   private KnowledgeBaseDocFacade documentFacade;
 
-  @Operation(operationId = "uploadDocuments", summary = "上传文档", description = "上传文档到知识库")
+  @Operation(operationId = "uploadDocument", summary = "上传文档", description = "上传文档到知识库")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "201", description = "文档上传成功")
   })
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping("/knowledge-bases/{knowledgeBaseId}")
-  public ApiLocaleResult<List<KnowledgeBaseDocListVo>> uploadDocuments(
+  public ApiLocaleResult<KnowledgeBaseDocVo> uploadDocument(
       @Parameter(description = "知识库ID") @PathVariable Long knowledgeBaseId,
-      @Parameter(description = "文件列表") @RequestParam("files") MultipartFile[] files) {
-    return ApiLocaleResult.success(documentFacade.uploadDocuments(knowledgeBaseId, files));
+      @Parameter(description = "文件列表") @RequestParam("files") MultipartFile file) {
+    return ApiLocaleResult.success(documentFacade.uploadDocument(knowledgeBaseId, file));
   }
 
   @Operation(operationId = "reprocessDocument", summary = "重新处理文档", description = "重新处理失败的文档")
@@ -72,7 +72,7 @@ public class KnowledgeBaseDocRest {
   })
   @ResponseStatus(HttpStatus.OK)
   @PutMapping("/{documentId}/knowledge-bases/{knowledgeBaseId}/toggle")
-  public ApiLocaleResult<KnowledgeBaseDocListVo> toggleDocument(
+  public ApiLocaleResult<KnowledgeBaseDocStatusVo> toggleDocument(
       @Parameter(description = "文档ID") @PathVariable Long documentId,
       @Parameter(description = "知识库ID") @PathVariable Long knowledgeBaseId,
       @Valid @RequestBody KnowledgeBaseDocToggleDto dto) {
@@ -108,7 +108,7 @@ public class KnowledgeBaseDocRest {
       @ApiResponse(responseCode = "200", description = "文档列表获取成功")
   })
   @GetMapping("/knowledge-bases/{knowledgeBaseId}")
-  public ApiLocaleResult<PageResult<KnowledgeBaseDocListVo>> getDocumentList(
+  public ApiLocaleResult<PageResult<KnowledgeBaseDocVo>> getDocumentList(
       @Parameter(description = "知识库ID") @PathVariable Long knowledgeBaseId,
       @Valid @ParameterObject KnowledgeBaseDocFindDto dto) {
     return ApiLocaleResult.success(documentFacade.getDocumentList(knowledgeBaseId, dto));

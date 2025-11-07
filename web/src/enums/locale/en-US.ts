@@ -133,7 +133,7 @@ export const enumTranslations = {
     HTML: 'HTML Document',
   },
   KnowledgeBaseDocStatusEnum: {
-    UPLOADING: 'Uploading',
+    PENDING: 'Pending',
     PROCESSING: 'Processing',
     COMPLETED: 'Completed',
     FAILED: 'Failed',
@@ -181,7 +181,7 @@ export const enumTranslations = {
     TABLE: 'Table',
   },
   DatasetDataStatusEnum: {
-    UPLOADING: 'Uploading',
+    PENDING: 'Pending',
     PROCESSING: 'Processing',
     COMPLETED: 'Completed',
     FAILED: 'Failed',

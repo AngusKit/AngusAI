@@ -1,9 +1,16 @@
 package cloud.xcan.angus.core.ai.infra.util;
 
+import cloud.xcan.angus.core.ai.domain.knowledgebase.DocumentType;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
+import org.springframework.web.multipart.MultipartFile;
 
 public class CommonUtils {
 
@@ -135,6 +142,77 @@ public class CommonUtils {
       case 504 -> "Gateway Timeout";
       default -> "Error " + statusCode;
     };
+  }
+
+  /**
+   * 根据文件名计算文件类型
+   * @param filename 文件名
+   * @return 文件类型，如果无法识别则返回 TXT
+   */
+  public static DocumentType calculateFileType(String filename) {
+    if (filename == null || filename.isEmpty()) {
+      return DocumentType.TXT;
+    }
+
+    String lowerFilename = filename.toLowerCase(Locale.ROOT);
+
+    // 根据文件扩展名判断类型
+    if (lowerFilename.endsWith(".pdf")) {
+      return DocumentType.PDF;
+    } else if (lowerFilename.endsWith(".docx") || lowerFilename.endsWith(".doc")) {
+      return DocumentType.DOCX;
+    } else if (lowerFilename.endsWith(".md") || lowerFilename.endsWith(".markdown")) {
+      return DocumentType.MD;
+    } else if (lowerFilename.endsWith(".html") || lowerFilename.endsWith(".htm")) {
+      return DocumentType.HTML;
+    } else if (lowerFilename.endsWith(".txt") || lowerFilename.endsWith(".text")) {
+      return DocumentType.TXT;
+    }
+    // 默认返回 TXT
+    return DocumentType.TXT;
+  }
+
+  /**
+   * 计算文件内容的哈希值（使用 SHA-256）
+   * @param file 文件
+   * @return 文件内容的 SHA-256 哈希值（十六进制字符串），如果计算失败返回 null
+   */
+  public static String calculateContentHash(MultipartFile file) {
+    if (file == null || file.isEmpty()) {
+      return null;
+    }
+
+    try {
+      MessageDigest digest = MessageDigest.getInstance("SHA-256");
+
+      // 读取文件内容并计算哈希值
+      try (InputStream inputStream = file.getInputStream()) {
+        byte[] buffer = new byte[8192];
+        int bytesRead;
+        while ((bytesRead = inputStream.read(buffer)) != -1) {
+          digest.update(buffer, 0, bytesRead);
+        }
+      }
+
+      // 转换为十六进制字符串
+      byte[] hashBytes = digest.digest();
+      StringBuilder hexString = new StringBuilder();
+      for (byte b : hashBytes) {
+        String hex = Integer.toHexString(0xff & b);
+        if (hex.length() == 1) {
+          hexString.append('0');
+        }
+        hexString.append(hex);
+      }
+
+      return hexString.toString();
+    } catch (NoSuchAlgorithmException e) {
+      // SHA-256 算法应该总是可用，但如果不可用则返回 null
+      return null;
+    } catch (IOException e) {
+      // 文件读取失败，返回 null
+      return null;
+    }
   }
 
 }

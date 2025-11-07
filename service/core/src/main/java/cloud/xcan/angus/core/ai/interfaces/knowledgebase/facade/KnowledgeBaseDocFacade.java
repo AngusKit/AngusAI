@@ -4,7 +4,7 @@ import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBas
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBaseDocFindDto;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBaseDocSearchDto;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBaseDocToggleDto;
-import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo.KnowledgeBaseDocListVo;
+import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo.KnowledgeBaseDocVo;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo.KnowledgeBaseDocSearchResultVo;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo.KnowledgeBaseDocStatusVo;
 import cloud.xcan.angus.remote.PageResult;
@@ -16,12 +16,12 @@ public interface KnowledgeBaseDocFacade {
   /**
    * 上传文档
    */
-  List<KnowledgeBaseDocListVo> uploadDocuments(Long knowledgeBaseId, MultipartFile[] files);
+  KnowledgeBaseDocVo uploadDocument(Long knowledgeBaseId, MultipartFile file);
 
   /**
    * 切换文档状态
    */
-  KnowledgeBaseDocListVo toggleDocument(Long knowledgeBaseId, Long documentId,
+  KnowledgeBaseDocStatusVo toggleDocument(Long knowledgeBaseId, Long documentId,
       KnowledgeBaseDocToggleDto dto);
 
   /**
@@ -42,7 +42,7 @@ public interface KnowledgeBaseDocFacade {
   /**
    * 获取文档列表
    */
-  PageResult<KnowledgeBaseDocListVo> getDocumentList(Long knowledgeBaseId,
+  PageResult<KnowledgeBaseDocVo> getDocumentList(Long knowledgeBaseId,
       KnowledgeBaseDocFindDto dto);
 
   /**

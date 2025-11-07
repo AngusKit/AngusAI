@@ -10,7 +10,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Schema(description = "文档列表视图对象")
-public class KnowledgeBaseDocListVo extends TenantAuditingVo {
+public class KnowledgeBaseDocVo extends TenantAuditingVo {
 
   @Schema(description = "文档ID", example = "1")
   private Long id;
@@ -34,7 +34,7 @@ public class KnowledgeBaseDocListVo extends TenantAuditingVo {
   private Integer chunks;
 
   @Schema(description = "处理进度", example = "100")
-  private Integer processingProgress;
+  private Double processingProgress = 0D;
 
   @Schema(description = "错误信息")
   private String errorMessage;

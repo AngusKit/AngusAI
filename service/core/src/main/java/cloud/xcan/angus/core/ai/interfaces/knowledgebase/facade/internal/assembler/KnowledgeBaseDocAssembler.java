@@ -5,7 +5,7 @@ import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatFileSize;
 import cloud.xcan.angus.core.ai.domain.knowledgebase.KnowledgeBaseDoc;
 import cloud.xcan.angus.core.ai.domain.knowledgebase.KnowledgeBaseDocSearchResult;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBaseDocFindDto;
-import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo.KnowledgeBaseDocListVo;
+import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo.KnowledgeBaseDocVo;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo.KnowledgeBaseDocSearchResultVo;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo.KnowledgeBaseDocStatusVo;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
@@ -15,8 +15,8 @@ import java.util.Set;
 
 public class KnowledgeBaseDocAssembler {
 
-  public static KnowledgeBaseDocListVo toDocumentListVo(KnowledgeBaseDoc document) {
-    KnowledgeBaseDocListVo vo = new KnowledgeBaseDocListVo();
+  public static KnowledgeBaseDocVo toDocumentListVo(KnowledgeBaseDoc document) {
+    KnowledgeBaseDocVo vo = new KnowledgeBaseDocVo();
     vo.setId(document.getId());
     vo.setName(document.getName());
     vo.setType(document.getType());
