@@ -298,7 +298,7 @@ export class HttpClient<SecurityDataType = unknown> {
     format,
     body,
     ...params
-  }: FullRequestParams): Promise<AxiosResponse<T>['data']> => {
+  }: FullRequestParams): Promise<AxiosResponse<T>['data'] | {message?: string, data?: null}> => {
     const secureParams =
       ((typeof secure === 'boolean' ? secure : this.secure) &&
         this.securityWorker &&
@@ -331,10 +331,13 @@ export class HttpClient<SecurityDataType = unknown> {
     } catch (err) {
       if (requestParams.method !== 'get') {
         eventQueue.commit('http_error', err?.message || SYSTEM_ERROR_MESSAGE);
+        throw err;
+      } else {
+        return {
+          ...(err || {}),
+          data: null
+        };
       }
-      return {
-        ...(err || {})
-      };
     }
   };
 }
