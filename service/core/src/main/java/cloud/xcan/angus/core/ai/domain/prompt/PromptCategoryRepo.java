@@ -15,6 +15,7 @@ public interface PromptCategoryRepo extends BaseRepository<PromptCategory, Long>
 
   long countByParentId(Long parentId);
 
+  @Query(value = "SELECT orderNum FROM PromptCategory WHERE parentId = ?1 ORDER BY orderNum LIMIT 1")
   Integer findMaxOrderByParentId(Long parentId);
 
   boolean existsByNameAndParentId(String name, Long parentId);
