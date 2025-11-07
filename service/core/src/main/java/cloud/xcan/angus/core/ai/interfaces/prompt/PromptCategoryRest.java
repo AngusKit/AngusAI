@@ -5,6 +5,7 @@ import cloud.xcan.angus.core.ai.interfaces.prompt.facade.dto.PromptCategoryCreat
 import cloud.xcan.angus.core.ai.interfaces.prompt.facade.dto.PromptCategoryUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.prompt.facade.vo.PromptCategoryVo;
 import cloud.xcan.angus.remote.ApiLocaleResult;
+import cloud.xcan.angus.spec.principal.PrincipalContext;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -111,7 +112,10 @@ public class PromptCategoryRest {
   @ResponseStatus(HttpStatus.OK)
   @GetMapping("/tree")
   public ApiLocaleResult<List<PromptCategoryVo>> getTree() {
-    return ApiLocaleResult.success(promptCategoryFacade.getTree());
+    ApiLocaleResult<List<PromptCategoryVo>> result = ApiLocaleResult.success(
+        promptCategoryFacade.getTree());
+    result.addExtensions(PrincipalContext.get().getExtensions());
+    return result;
   }
 
 }

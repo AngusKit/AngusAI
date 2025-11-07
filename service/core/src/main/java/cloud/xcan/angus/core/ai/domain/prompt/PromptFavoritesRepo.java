@@ -14,6 +14,8 @@ public interface PromptFavoritesRepo extends BaseRepository<PromptFavorites, Lon
   @Query("SELECT pf.promptId FROM PromptFavorites pf WHERE pf.createdBy = ?1")
   Set<Long> findAllIdByCreatedBy(Long userId);
 
+  int countByCreatedBy(Long userId);
+
   @Modifying
   void deleteByPromptIdAndCreatedBy(Long id, Long userId);
 
@@ -25,4 +27,5 @@ public interface PromptFavoritesRepo extends BaseRepository<PromptFavorites, Lon
    */
   @Query("select pf.promptId, count(pf) from PromptFavorites pf where pf.promptId in :ids group by pf.promptId")
   List<Object[]> countByPromptIds(@Param("ids") List<Long> ids);
+
 }
