@@ -60,12 +60,12 @@ public class KnowledgeBase extends TenantAuditingEntity<KnowledgeBase, Long> {
   private Integer totalChunks = 0;
 
   @Type(JsonType.class)
-  @Column(columnDefinition = "json", name = "config")
-  private KnowledgeBaseConfig config;
-
-  @Type(JsonType.class)
   @Column(columnDefinition = "json", name = "tags")
   private List<String> tags;
+
+  @Type(JsonType.class)
+  @Column(columnDefinition = "json", name = "config")
+  private KnowledgeBaseConfig config;
 
   @Transient
   private String totalSizeFormatted;
