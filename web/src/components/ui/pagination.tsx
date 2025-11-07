@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon, MoreHorizontalIcon } from 'lucide-react';
 
 import { cn } from './utils';
@@ -89,6 +90,76 @@ function PaginationEllipsis({ className, ...props }: React.ComponentProps<'span'
   );
 }
 
+type XcanPage = {
+  className?: string,
+  pageSize: number;
+  pageNo: number;
+  total: number;
+  onChange: (value: {pageSize: number, pageNo: number})=>void;
+}
+
+function XcanPagination (props: XcanPage) {
+
+  const [currentPage, setCurrentPage] = useState(props.pageNo || 1);
+  const [totalPages, setTotalPages] = useState<number>(0);
+
+  useEffect(() => {
+    const _totalPages = Math.ceil(props.total/(props.pageSize || 5));
+    setTotalPages(_totalPages);
+  }, [props.total, props.pageSize]);
+
+  useEffect(() => {
+    setCurrentPage(props.pageNo || 1);
+  }, [props.pageNo]);
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    props.onChange({
+      pageNo: newPage,
+      pageSize: props.pageSize
+    });
+  };
+
+  return (
+    <Pagination>
+      <PaginationContent>
+        <PaginationItem>
+          <PaginationPrevious
+            onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+            className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+          >
+            上一页
+          </PaginationPrevious>
+        </PaginationItem>
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+          <PaginationItem key={page}>
+            <PaginationLink
+              onClick={() => handlePageChange(page)}
+              isActive={currentPage === page}
+              className='cursor-pointer'
+            >
+              {page}
+            </PaginationLink>
+          </PaginationItem>
+        ))}
+        <PaginationItem>
+          <PaginationNext
+            onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+            className={
+              currentPage === totalPages
+                ? 'pointer-events-none opacity-50'
+                : 'cursor-pointer'
+            }
+          >
+            下一页
+          </PaginationNext>
+        </PaginationItem>
+      </PaginationContent>
+    </Pagination>
+  )
+
+}
+
 export {
   Pagination,
   PaginationContent,
@@ -97,4 +168,5 @@ export {
   PaginationPrevious,
   PaginationNext,
   PaginationEllipsis,
+  XcanPagination,
 };
