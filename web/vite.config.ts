@@ -29,6 +29,10 @@ export default defineConfig({
       '/storage/': {
         target: 'http://dev-files.xcan.cloud',
         changeOrigin: true
+      },
+      '/ai': {
+        target: 'http://dev-apis.xcan.cloud',
+        changeOrigin: true
       }
     }
   },

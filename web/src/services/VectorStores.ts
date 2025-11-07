@@ -1,4 +1,4 @@
-import { ApiLocaleResult, PageQuery } from '@xcan-angus/infra';
+import { ApiLocaleResult, PageQuery, AI } from '@xcan-angus/infra';
 import { ConnectionTestDto, ConnectionTestResult, PageResultVectorStoreResult, VectorStoreCreateDto, VectorStoreListParamsOrderByEnum, VectorStoreResult, VectorStoreStatisticsResult, VectorStoreUpdateDto, } from './VectorStoresTypes.ts';
 import { ContentType, HttpClient, RequestParams } from './HttpClient.ts';
 import { ConnectionStatusEnum, VectorStoreTypeEnum } from '@/enums/enums.ts';
@@ -33,7 +33,7 @@ export class VectorStores<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<PageResultVectorStoreResult, ApiLocaleResult>({
-      path: `/api/v1/vector-stores`,
+      path: `${AI}/vector-stores`,
       method: 'GET',
       query: query,
       secure: true,
@@ -50,7 +50,7 @@ export class VectorStores<SecurityDataType = unknown> {
    */
   vectorStoreCreate = (data: VectorStoreCreateDto, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
-      path: `/api/v1/vector-stores`,
+      path: `${AI}/vector-stores`,
       method: 'POST',
       body: data,
       secure: true,
@@ -78,7 +78,7 @@ export class VectorStores<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<ConnectionTestResult, ApiLocaleResult>({
-      path: `/api/v1/vector-stores/test`,
+      path: `${AI}/vector-stores/test`,
       method: 'POST',
       query: query,
       body: data,
@@ -97,7 +97,7 @@ export class VectorStores<SecurityDataType = unknown> {
    */
   vectorStoreGetDetail = (id: number, params: RequestParams = {}) =>
     this.http.request<VectorStoreResult, ApiLocaleResult>({
-      path: `/api/v1/vector-stores/${id}`,
+      path: `${AI}/vector-stores/${id}`,
       method: 'GET',
       secure: true,
       ...params,
@@ -120,7 +120,7 @@ export class VectorStores<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
-      path: `/api/v1/vector-stores/${id}`,
+      path: `${AI}/vector-stores/${id}`,
       method: 'DELETE',
       query: query,
       secure: true,
@@ -137,7 +137,7 @@ export class VectorStores<SecurityDataType = unknown> {
    */
   vectorStoreUpdate = (id: number, data: VectorStoreUpdateDto, params: RequestParams = {}) =>
     this.http.request<VectorStoreResult, ApiLocaleResult>({
-      path: `/api/v1/vector-stores/${id}`,
+      path: `${AI}/vector-stores/${id}`,
       method: 'PATCH',
       body: data,
       secure: true,
@@ -162,7 +162,7 @@ export class VectorStores<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<VectorStoreResult, ApiLocaleResult>({
-      path: `/api/v1/vector-stores/${id}/toggle`,
+      path: `${AI}/vector-stores/${id}/toggle`,
       method: 'PATCH',
       query: query,
       secure: true,
@@ -193,7 +193,7 @@ export class VectorStores<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<VectorStoreStatisticsResult, ApiLocaleResult>({
-      path: `/api/v1/vector-stores/statistics`,
+      path: `${AI}/vector-stores/statistics`,
       method: 'GET',
       query: query,
       secure: true,

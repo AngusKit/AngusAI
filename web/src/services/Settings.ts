@@ -1,4 +1,4 @@
-import { ApiLocaleResult } from '@xcan-angus/infra';
+import { ApiLocaleResult, AI } from '@xcan-angus/infra';
 import { ApiKeyCreateDto, ApiKeyDetailResult, ApiKeyRevokeDto, ListApiKeyResult } from './SettingsTypes.ts';
 import http, { ContentType, HttpClient, RequestParams } from './HttpClient.ts';
 
@@ -20,7 +20,7 @@ export class Settings<SecurityDataType = unknown> {
    */
   listApiKeys = (params: RequestParams = {}) =>
     this.http.request<ListApiKeyResult, ApiLocaleResult>({
-      path: `/api/v1/settings/api-keys`,
+      path: `${AI}/settings/api-keys`,
       method: 'GET',
       secure: true,
       ...params,
@@ -36,7 +36,7 @@ export class Settings<SecurityDataType = unknown> {
    */
   createApiKey = (data: ApiKeyCreateDto, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
-      path: `/api/v1/settings/api-keys`,
+      path: `${AI}/settings/api-keys`,
       method: 'POST',
       body: data,
       secure: true,
@@ -54,7 +54,7 @@ export class Settings<SecurityDataType = unknown> {
    */
   revokeApiKey = (id: number, data: ApiKeyRevokeDto, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
-      path: `/api/v1/settings/api-keys/${id}/revoke`,
+      path: `${AI}/settings/api-keys/${id}/revoke`,
       method: 'POST',
       body: data,
       secure: true,
@@ -72,7 +72,7 @@ export class Settings<SecurityDataType = unknown> {
    */
   getApiKeyDetail = (id: number, params: RequestParams = {}) =>
     this.http.request<ApiKeyDetailResult, ApiLocaleResult>({
-      path: `/api/v1/settings/api-keys/${id}`,
+      path: `${AI}/settings/api-keys/${id}`,
       method: 'GET',
       secure: true,
       ...params,
@@ -88,7 +88,7 @@ export class Settings<SecurityDataType = unknown> {
    */
   deleteApiKey = (id: number, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
-      path: `/api/v1/settings/api-keys/${id}`,
+      path: `${AI}/settings/api-keys/${id}`,
       method: 'DELETE',
       secure: true,
       ...params,

@@ -35,7 +35,7 @@ const initAfterAuthentication = async ({
     },
   });
   if (response?.data?.message) {
-    throw new Error(response?.data?.message);
+    return {};
   }
 
   const userInfo = response.data;

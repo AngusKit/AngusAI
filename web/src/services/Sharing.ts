@@ -1,4 +1,4 @@
-import { ApiLocaleResult, PageQuery } from '@xcan-angus/infra';
+import { ApiLocaleResult, PageQuery, AI } from '@xcan-angus/infra';
 import { GetResourceSharingListOrderByEnum, ResourceAccessCheckResult, ResourceInfoListSharePermissionResult, ResourceSharingCreateDto, ResourceSharingDetailResult, ResourceSharingListResult, ResourceSharingStatisticsResult, ResourceSharingToggleDto, ResourceSharingUpdateDto, } from './SharingTypes.ts';
 import http, { ContentType, HttpClient, RequestParams } from './HttpClient.ts';
 import { MemberPermissionEnum, ResourceTypeEnum, SharedWithEnum, StatisticsPeriodEnum } from '@/enums/enums.ts';
@@ -21,7 +21,7 @@ export class Sharing<SecurityDataType = unknown> {
    */
   toggleResourceSharingStatus = (id: number, data: ResourceSharingToggleDto, params: RequestParams = {}) =>
     this.http.request<ResourceSharingDetailResult, ApiLocaleResult>({
-      path: `/api/v1/sharing/${id}/toggle`,
+      path: `${AI}/sharing/${id}/toggle`,
       method: 'PUT',
       body: data,
       secure: true,
@@ -39,7 +39,7 @@ export class Sharing<SecurityDataType = unknown> {
    */
   getResourceSharingDetail = (id: number, params: RequestParams = {}) =>
     this.http.request<ResourceSharingDetailResult, ApiLocaleResult>({
-      path: `/api/v1/sharing/resources/${id}`,
+      path: `${AI}/sharing/resources/${id}`,
       method: 'GET',
       secure: true,
       ...params,
@@ -55,7 +55,7 @@ export class Sharing<SecurityDataType = unknown> {
    */
   updateResourceSharing = (id: number, data: ResourceSharingUpdateDto, params: RequestParams = {}) =>
     this.http.request<ResourceSharingDetailResult, ApiLocaleResult>({
-      path: `/api/v1/sharing/resources/${id}`,
+      path: `${AI}/sharing/resources/${id}`,
       method: 'PUT',
       body: data,
       secure: true,
@@ -73,7 +73,7 @@ export class Sharing<SecurityDataType = unknown> {
    */
   deleteResourceSharing = (id: number, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
-      path: `/api/v1/sharing/resources/${id}`,
+      path: `${AI}/sharing/resources/${id}`,
       method: 'DELETE',
       secure: true,
       ...params,
@@ -106,7 +106,7 @@ export class Sharing<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<ResourceSharingListResult, ApiLocaleResult>({
-      path: `/api/v1/sharing/resources`,
+      path: `${AI}/sharing/resources`,
       method: 'GET',
       query: query,
       secure: true,
@@ -123,7 +123,7 @@ export class Sharing<SecurityDataType = unknown> {
    */
   createResourceSharing = (data: ResourceSharingCreateDto, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
-      path: `/api/v1/sharing/resources`,
+      path: `${AI}/sharing/resources`,
       method: 'POST',
       body: data,
       secure: true,
@@ -148,7 +148,7 @@ export class Sharing<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<ResourceSharingStatisticsResult, ApiLocaleResult>({
-      path: `/api/v1/sharing/resources/${id}/statistics`,
+      path: `${AI}/sharing/resources/${id}/statistics`,
       method: 'GET',
       query: query,
       secure: true,
@@ -176,7 +176,7 @@ export class Sharing<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<ResourceAccessCheckResult, ApiLocaleResult>({
-      path: `/api/v1/sharing/check-access`,
+      path: `${AI}/sharing/check-access`,
       method: 'GET',
       query: query,
       secure: true,
@@ -204,7 +204,7 @@ export class Sharing<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<ResourceInfoListSharePermissionResult, ApiLocaleResult>({
-      path: `/api/v1/sharing/access-permissions`,
+      path: `${AI}/sharing/access-permissions`,
       method: 'GET',
       query: query,
       secure: true,

@@ -1,4 +1,4 @@
-import { ApiLocaleResult } from '@xcan-angus/infra';
+import { ApiLocaleResult, AI } from '@xcan-angus/infra';
 import { AnalyticsOverviewResult, ApiCallsTrendResult, AppDistributionResult, ErrorAnalysisResult, ModelDistributionResult, ResponseTimeAnalysisResult, TokenUsageTrendResult, TopEndpointsResult, } from './AnalyticsTypes.ts';
 
 import http, { HttpClient, RequestParams } from './HttpClient.ts';
@@ -49,7 +49,7 @@ export class Analytics<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<TopEndpointsResult, ApiLocaleResult>({
-      path: `/api/v1/analytics/top-endpoints`,
+      path: `${AI}/analytics/top-endpoints`,
       method: 'GET',
       query: query,
       secure: true,
@@ -82,7 +82,7 @@ export class Analytics<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<TokenUsageTrendResult, ApiLocaleResult>({
-      path: `/api/v1/analytics/token-usage`,
+      path: `${AI}/analytics/token-usage`,
       method: 'GET',
       query: query,
       secure: true,
@@ -115,7 +115,7 @@ export class Analytics<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<ResponseTimeAnalysisResult, ApiLocaleResult>({
-      path: `/api/v1/analytics/response-time`,
+      path: `${AI}/analytics/response-time`,
       method: 'GET',
       query: query,
       secure: true,
@@ -148,7 +148,7 @@ export class Analytics<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<AnalyticsOverviewResult, ApiLocaleResult>({
-      path: `/api/v1/analytics/overview`,
+      path: `${AI}/analytics/overview`,
       method: 'GET',
       query: query,
       secure: true,
@@ -181,7 +181,7 @@ export class Analytics<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<ModelDistributionResult, ApiLocaleResult>({
-      path: `/api/v1/analytics/model-distribution`,
+      path: `${AI}/analytics/model-distribution`,
       method: 'GET',
       query: query,
       secure: true,
@@ -214,7 +214,7 @@ export class Analytics<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<ErrorAnalysisResult, ApiLocaleResult>({
-      path: `/api/v1/analytics/errors`,
+      path: `${AI}/analytics/errors`,
       method: 'GET',
       query: query,
       secure: true,
@@ -253,7 +253,7 @@ export class Analytics<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<AppDistributionResult, ApiLocaleResult>({
-      path: `/api/v1/analytics/app-distribution`,
+      path: `${AI}/analytics/app-distribution`,
       method: 'GET',
       query: query,
       secure: true,
@@ -286,7 +286,7 @@ export class Analytics<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<ApiCallsTrendResult, ApiLocaleResult>({
-      path: `/api/v1/analytics/api-calls`,
+      path: `${AI}/analytics/api-calls`,
       method: 'GET',
       query: query,
       secure: true,
