@@ -13,6 +13,10 @@ import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import cloud.xcan.angus.remote.search.SearchCriteria;
 import jakarta.annotation.Resource;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -38,8 +42,10 @@ public class PromptQueryImpl implements PromptQuery {
     return new BizTemplate<Prompt>() {
       @Override
       protected Prompt process() {
-        return promptRepo.findById(id)
+        Prompt prompt = promptRepo.findById(id)
             .orElseThrow(() -> ResourceNotFound.of("提示词未找到", new Object[]{}));
+        setFavoritesCount(List.of(prompt));
+        return prompt;
       }
     }.execute();
   }
@@ -53,9 +59,16 @@ public class PromptQueryImpl implements PromptQuery {
         // 查询收藏的提示词
         assembleFavoriteCriteria();
 
-        return fullTextSearch
+        Page<Prompt> page = fullTextSearch
             ? promptSearchRepo.find(spec.getCriteria(), pageable, Prompt.class, match)
             : promptRepo.findAll(spec, pageable);
+        
+        // 设置收藏数量
+        if (page != null && page.getContent() != null && !page.getContent().isEmpty()) {
+          setFavoritesCount(page.getContent());
+        }
+        
+        return page;
       }
 
       private void assembleFavoriteCriteria() {
@@ -79,4 +92,52 @@ public class PromptQueryImpl implements PromptQuery {
   public boolean existsByTitleAndIdNot(String title, Long id) {
     return promptRepo.existsByTitleAndIdNot(title, id);
   }
+
+  @Override
+  public void setFavoritesCount(List<Prompt> prompts) {
+    if (prompts == null || prompts.isEmpty()) {
+      return;
+    }
+
+    // 收集所有提示词ID
+    List<Long> promptIds = new ArrayList<>();
+    for (Prompt prompt : prompts) {
+      if (prompt != null && prompt.getId() != null) {
+        promptIds.add(prompt.getId());
+      }
+    }
+
+    if (promptIds.isEmpty()) {
+      // 如果没有有效的ID，将所有提示词的收藏数设置为0
+      for (Prompt prompt : prompts) {
+        if (prompt != null) {
+          prompt.setFavorites(0L);
+        }
+      }
+      return;
+    }
+
+    // 批量查询收藏数量
+    List<Object[]> rows = promptFavoritesRepo.countByPromptIds(promptIds);
+    Map<Long, Long> favoritesCountMap = new HashMap<>();
+    if (rows != null) {
+      for (Object[] row : rows) {
+        if (row == null || row.length < 2) {
+          continue;
+        }
+        Long promptId = ((Number) row[0]).longValue();
+        Long count = ((Number) row[1]).longValue();
+        favoritesCountMap.put(promptId, count);
+      }
+    }
+
+    // 设置收藏数量到每个提示词对象
+    for (Prompt prompt : prompts) {
+      if (prompt != null && prompt.getId() != null) {
+        Long count = favoritesCountMap.getOrDefault(prompt.getId(), 0L);
+        prompt.setFavorites(count);
+      }
+    }
+  }
+  
 }

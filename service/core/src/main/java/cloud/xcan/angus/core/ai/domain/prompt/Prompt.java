@@ -46,8 +46,6 @@ public class Prompt extends TenantAuditingEntity<Prompt, Long> {
   @Transient
   private Boolean isSystem;
   @Transient
-  private Long totalUses;
-  @Transient
   private Long favorites;
 
   @Override

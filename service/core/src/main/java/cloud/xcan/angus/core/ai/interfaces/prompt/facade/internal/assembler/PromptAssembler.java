@@ -1,5 +1,7 @@
 package cloud.xcan.angus.core.ai.interfaces.prompt.facade.internal.assembler;
 
+import static cloud.xcan.angus.spec.utils.ObjectUtils.nullSafe;
+
 import cloud.xcan.angus.core.ai.domain.prompt.Prompt;
 import cloud.xcan.angus.core.ai.interfaces.prompt.facade.dto.PromptCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.prompt.facade.dto.PromptFindDto;
@@ -51,8 +53,8 @@ public class PromptAssembler {
 
     // 设置统计信息
     PromptStatsVo statsVo = new PromptStatsVo();
-    statsVo.setFavorites(prompt.getFavorites());
-    statsVo.setTotalUses(prompt.getTotalUses());
+    statsVo.setFavorites(nullSafe(prompt.getFavorites(), 0L));
+    statsVo.setTotalUses(nullSafe(prompt.getUsageCount(), 0L));
     vo.setStats(statsVo);
 
     // 设置审计信息
@@ -78,8 +80,8 @@ public class PromptAssembler {
 
     // 设置统计信息
     PromptStatsVo statsVo = new PromptStatsVo();
-    statsVo.setFavorites(prompt.getFavorites());
-    statsVo.setTotalUses(prompt.getTotalUses());
+    statsVo.setFavorites(nullSafe(prompt.getFavorites(), 0L));
+    statsVo.setTotalUses(nullSafe(prompt.getUsageCount(), 0L));
     vo.setStats(statsVo);
 
     // 设置审计信息

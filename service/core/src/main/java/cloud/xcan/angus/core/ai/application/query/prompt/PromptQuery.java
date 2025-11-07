@@ -2,6 +2,7 @@ package cloud.xcan.angus.core.ai.application.query.prompt;
 
 import cloud.xcan.angus.core.ai.domain.prompt.Prompt;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -27,5 +28,10 @@ public interface PromptQuery {
    * 检查标题是否存在（排除指定ID）
    */
   boolean existsByTitleAndIdNot(String title, Long id);
+
+    /**
+   * 设置提示词数量
+   */
+  void setFavoritesCount(List<Prompt> prompts);
 
 }
