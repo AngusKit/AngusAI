@@ -72,7 +72,7 @@ import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, } from '@/components/ui/alert-dialog';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { toast } from 'sonner';
 import { cn } from '@/components/ui/utils';
 import { useLanguage } from '@/components/ui/LanguageProvider';
@@ -291,6 +291,8 @@ const getTagColor = (index: number): string => {
 export function PromptLibraryPage() {
   const { t, language } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [categories, setCategories] = useState<Category[]>([
     {
@@ -408,15 +410,25 @@ export function PromptLibraryPage() {
       }
 
       // 搜索条件
-      if (searchQuery.trim()) {
-        query.title = searchQuery.trim();
+      if (debouncedSearchQuery.trim()) {
+        query.keyword = debouncedSearchQuery.trim();
       }
 
       const response = await Prompts.getPromptList(query);
-      if (response.data?.data?.list) {
-        const convertedPrompts = response.data.data.list.map(convertPromptVoToPrompt);
+      console.log('API响应数据:', response); // 调试日志
+      
+      // HttpClient的响应拦截器会展开response.data，所以实际结构可能是 response.data.list
+      // 但根据类型定义 PagePromptListResult，应该是 response.data.data.list
+      // 为了兼容两种情况，先尝试 response.data.data.list，再尝试 response.data.list
+      const responseData = response.data as any;
+      const list = responseData?.data?.list || responseData?.list;
+      
+      if (list && Array.isArray(list)) {
+        console.log('找到提示词列表，数量:', list.length); // 调试日志
+        const convertedPrompts = list.map(convertPromptVoToPrompt);
         setPrompts(convertedPrompts);
       } else {
+        console.log('未找到提示词列表，响应结构:', responseData); // 调试日志
         setPrompts([]);
       }
     } catch (error: any) {
@@ -425,7 +437,27 @@ export function PromptLibraryPage() {
     } finally {
       setLoading(false);
     }
-  }, [selectedCategory, searchQuery, convertPromptVoToPrompt, language]);
+  }, [selectedCategory, debouncedSearchQuery, convertPromptVoToPrompt, language]);
+
+  // 搜索防抖处理
+  useEffect(() => {
+    // 清除之前的定时器
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    // 设置新的定时器
+    searchTimeoutRef.current = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 300); // 300ms 防抖延迟
+
+    // 清理函数
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, [searchQuery]);
 
   // 初始化加载数据
   useEffect(() => {
@@ -454,19 +486,54 @@ export function PromptLibraryPage() {
   });
 
   // 客户端过滤（如果API不支持搜索，则在这里过滤）
-  const filteredPrompts = prompts.filter(prompt => {
-    // 如果API已经根据searchQuery过滤了，这里就不需要再过滤
-    // 但为了保险起见，还是做一次客户端过滤
-    if (searchQuery.trim()) {
-      const matchesSearch =
-        prompt.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        prompt.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        prompt.tags.some(tag => tag.label.toLowerCase().includes(searchQuery.toLowerCase()));
-      if (!matchesSearch) return false;
-    }
-    // 分类过滤已经在API调用时处理了
-    return true;
-  });
+  const filteredPrompts = useMemo(() => {
+    console.log('开始过滤提示词，总数:', prompts.length, '选中分类:', selectedCategory, '搜索关键词:', debouncedSearchQuery);
+    
+    const filtered = prompts.filter(prompt => {
+      // 如果API已经根据debouncedSearchQuery过滤了，这里就不需要再过滤
+      // 但为了保险起见，还是做一次客户端过滤
+      if (debouncedSearchQuery.trim()) {
+        const matchesSearch =
+          prompt.title.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+          prompt.content.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+          prompt.tags.some(tag => tag.label.toLowerCase().includes(debouncedSearchQuery.toLowerCase()));
+        if (!matchesSearch) {
+          return false;
+        }
+      }
+      
+      // 分类过滤：确保提示词属于选中的分类或其子分类
+      if (selectedCategory === 'all') {
+        return true;
+      }
+      if (selectedCategory === 'favorites') {
+        return prompt.isFavorite === true;
+      }
+      
+      // 检查是否属于选中的分类
+      const selectedCategoryId = Number(selectedCategory);
+      if (isNaN(selectedCategoryId)) {
+        console.warn('无效的分类ID:', selectedCategory);
+        return false;
+      }
+      
+      if (prompt.categoryId === selectedCategoryId) {
+        return true;
+      }
+      
+      // 检查是否属于选中分类的子分类
+      const childCategories = categories.filter(c => c.parentId === selectedCategory);
+      const childCategoryIds = childCategories.map(c => Number(c.id)).filter(id => !isNaN(id));
+      if (prompt.categoryId && childCategoryIds.includes(prompt.categoryId)) {
+        return true;
+      }
+      
+      return false;
+    });
+    
+    console.log('过滤后的提示词数量:', filtered.length);
+    return filtered;
+  }, [prompts, selectedCategory, debouncedSearchQuery, categories]);
 
   const getCategoryCount = (categoryId: string) => {
     if (categoryId === 'all') return prompts.length;
@@ -918,8 +985,8 @@ export function PromptLibraryPage() {
         {/* Prompts List */}
         <div className='flex-1 space-y-4'>
           {/* Search and Actions */}
-          <div className='flex items-center gap-3'>
-            <div className='relative flex-1'>
+          <div className='flex items-center justify-between gap-3'>
+            <div className='relative w-[350px]'>
               <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
               <Input
                 placeholder={t('prompts.search')}
@@ -953,7 +1020,7 @@ export function PromptLibraryPage() {
                 <div className='text-center py-20 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg'>
                   <Sparkles className='w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600' />
                   <p className='text-gray-500 dark:text-gray-400'>
-                    {searchQuery ? t('prompts.noResults') : t('prompts.noPrompts')}
+                    {debouncedSearchQuery ? t('prompts.noResults') : t('prompts.noPrompts')}
                   </p>
                 </div>
               ) : (

@@ -1,12 +1,12 @@
 import { ApiLocaleResult, PageQuery, AI } from '@xcan-angus/infra';
 import { GetPromptListParamsOrderByEnum, PagePromptListResult, PromptCreateDto, PromptDetailResult, PromptUpdateDto, } from './PromptsTypes.ts';
-import http, { ContentType, HttpClient, RequestParams } from './HttpClient.ts';
+import httpClient, { ContentType, HttpClient, RequestParams } from './HttpClient.ts';
 
 export class Prompts<SecurityDataType = unknown> {
-  http: HttpClient<SecurityDataType>;
+  httpClient: HttpClient<SecurityDataType>;
 
-  constructor(http: HttpClient<SecurityDataType>) {
-    this.http = http;
+  constructor(httpClient: HttpClient<SecurityDataType>) {
+    this.httpClient = httpClient;
   }
 
   /**
@@ -15,13 +15,15 @@ export class Prompts<SecurityDataType = unknown> {
    * @tags Prompt
    * @name GetPromptList
    * @summary 获取提示词列表
-   * @request GET:/api/v1/prompts
+   * @request GET:${AI}/prompts
    * @secure
    */
   getPromptList = (
     query?: PageQuery & {
       /** 提示词标题 */
       title?: string;
+      /** 搜索关键词 */
+      keyword?: string;
       /**
        * 分类ID
        * @format int64
@@ -34,7 +36,7 @@ export class Prompts<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<PagePromptListResult, ApiLocaleResult>({
+    this.httpClient.request<PagePromptListResult, ApiLocaleResult>({
       path: `${AI}/prompts`,
       method: 'GET',
       query: query,
@@ -47,11 +49,11 @@ export class Prompts<SecurityDataType = unknown> {
    * @tags Prompt
    * @name CreatePrompt
    * @summary 创建提示词
-   * @request POST:/api/v1/prompts
+   * @request POST:${AI}/prompts
    * @secure
    */
   createPrompt = (data: PromptCreateDto, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResult, ApiLocaleResult>({
+    this.httpClient.request<ApiLocaleResult, ApiLocaleResult>({
       path: `${AI}/prompts`,
       method: 'POST',
       body: data,
@@ -65,11 +67,11 @@ export class Prompts<SecurityDataType = unknown> {
    * @tags Prompt
    * @name UsePrompt
    * @summary 使用提示词
-   * @request POST:/api/v1/prompts/{id}/use
+   * @request POST:${AI}/prompts/{id}/use
    * @secure
    */
   usePrompt = (id: number, params: RequestParams = {}) =>
-    this.http.request<PromptDetailResult, ApiLocaleResult>({
+    this.httpClient.request<PromptDetailResult, ApiLocaleResult>({
       path: `${AI}/prompts/${id}/use`,
       method: 'POST',
       secure: true,
@@ -81,7 +83,7 @@ export class Prompts<SecurityDataType = unknown> {
    * @tags Prompt
    * @name ToggleFavoritePrompt
    * @summary 收藏/取消收藏
-   * @request POST:/api/v1/prompts/{id}/favorite
+   * @request POST:${AI}/prompts/{id}/favorite
    * @secure
    */
   toggleFavoritePrompt = (
@@ -92,7 +94,7 @@ export class Prompts<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<PromptDetailResult, ApiLocaleResult>({
+    this.httpClient.request<PromptDetailResult, ApiLocaleResult>({
       path: `${AI}/prompts/${id}/favorite`,
       method: 'POST',
       query: query,
@@ -105,7 +107,7 @@ export class Prompts<SecurityDataType = unknown> {
    * @tags Prompt
    * @name DuplicatePrompt
    * @summary 复制提示词
-   * @request POST:/api/v1/prompts/{id}/duplicate
+   * @request POST:${AI}/prompts/{id}/duplicate
    * @secure
    */
   duplicatePrompt = (
@@ -116,7 +118,7 @@ export class Prompts<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<ApiLocaleResult, ApiLocaleResult>({
+    this.httpClient.request<ApiLocaleResult, ApiLocaleResult>({
       path: `${AI}/prompts/${id}/duplicate`,
       method: 'POST',
       query: query,
@@ -129,11 +131,11 @@ export class Prompts<SecurityDataType = unknown> {
    * @tags Prompt
    * @name GetPromptDetail
    * @summary 获取提示词详情
-   * @request GET:/api/v1/prompts/{id}
+   * @request GET:${AI}/prompts/{id}
    * @secure
    */
   getPromptDetail = (id: number, params: RequestParams = {}) =>
-    this.http.request<PromptDetailResult, ApiLocaleResult>({
+    this.httpClient.request<PromptDetailResult, ApiLocaleResult>({
       path: `${AI}/prompts/${id}`,
       method: 'GET',
       secure: true,
@@ -145,11 +147,11 @@ export class Prompts<SecurityDataType = unknown> {
    * @tags Prompt
    * @name DeletePrompt
    * @summary 删除提示词
-   * @request DELETE:/api/v1/prompts/{id}
+   * @request DELETE:${AI}/prompts/{id}
    * @secure
    */
   deletePrompt = (id: number, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResult, ApiLocaleResult>({
+    this.httpClient.request<ApiLocaleResult, ApiLocaleResult>({
       path: `${AI}/prompts/${id}`,
       method: 'DELETE',
       secure: true,
@@ -161,11 +163,11 @@ export class Prompts<SecurityDataType = unknown> {
    * @tags Prompt
    * @name UpdatePrompt
    * @summary 更新提示词
-   * @request PATCH:/api/v1/prompts/{id}
+   * @request PATCH:${AI}/prompts/{id}
    * @secure
    */
   updatePrompt = (id: number, data: PromptUpdateDto, params: RequestParams = {}) =>
-    this.http.request<PromptDetailResult, ApiLocaleResult>({
+    this.httpClient.request<PromptDetailResult, ApiLocaleResult>({
       path: `${AI}/prompts/${id}`,
       method: 'PATCH',
       body: data,
@@ -175,4 +177,4 @@ export class Prompts<SecurityDataType = unknown> {
     });
 }
 
-export default new Prompts(http);
+export default new Prompts(httpClient);
