@@ -28,6 +28,7 @@ public class PromptCategoryFacadeImpl implements PromptCategoryFacade {
   public PromptCategoryVo create(PromptCategoryCreateDto dto) {
     PromptCategory category = PromptCategoryAssembler.toCreateDomain(dto);
     PromptCategory saved = promptCategoryCmd.create(category);
+    promptCategoryQuery.setPromptCount(List.of(saved));
     return PromptCategoryAssembler.toVo(saved);
   }
 
@@ -40,8 +41,7 @@ public class PromptCategoryFacadeImpl implements PromptCategoryFacade {
 
   @Override
   public PromptCategoryVo updateOrder(Long id, Integer newPosition) {
-    promptCategoryCmd.updateOrder(id, newPosition);
-    PromptCategory category = promptCategoryQuery.findAndCheck(id);
+    PromptCategory category = promptCategoryCmd.updateOrder(id, newPosition);
     return PromptCategoryAssembler.toVo(category);
   }
 

@@ -22,7 +22,7 @@ public interface PromptCategoryCmd {
   /**
    * 调整分类顺序
    */
-  void updateOrder(Long id, Integer newPosition);
+  PromptCategory updateOrder(Long id, Integer newPosition);
 
   /**
    * 删除提示词分类

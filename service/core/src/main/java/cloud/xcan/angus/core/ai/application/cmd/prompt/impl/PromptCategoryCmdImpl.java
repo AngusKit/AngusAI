@@ -112,14 +112,16 @@ public class PromptCategoryCmdImpl extends CommCmd<PromptCategory, Long>
           Integer maxOrder = promptCategoryRepo.findMaxOrderByParentId(category.getParentId());
           categoryDb.setOrderNum(maxOrder != null ? maxOrder + 1 : 0);
         }
-        return promptCategoryRepo.save(categoryDb);
+
+        promptCategoryRepo.save(categoryDb);
+        return categoryDb;
       }
     }.execute();
   }
 
   @Override
-  public void updateOrder(Long id, Integer newPosition) {
-    new BizTemplate<Void>() {
+  public PromptCategory updateOrder(Long id, Integer newPosition) {
+   return new BizTemplate<PromptCategory>() {
       PromptCategory categoryDb;
 
       @Override
@@ -134,7 +136,7 @@ public class PromptCategoryCmdImpl extends CommCmd<PromptCategory, Long>
       }
 
       @Override
-      protected Void process() {
+      protected PromptCategory process() {
         Integer oldPosition = categoryDb.getOrderNum();
         Long parentId = categoryDb.getParentId();
 
@@ -167,7 +169,7 @@ public class PromptCategoryCmdImpl extends CommCmd<PromptCategory, Long>
         // 更新当前分类的位置
         categoryDb.setOrderNum(newPosition);
         promptCategoryRepo.save(categoryDb);
-        return null;
+        return categoryDb;
       }
     }.execute();
   }

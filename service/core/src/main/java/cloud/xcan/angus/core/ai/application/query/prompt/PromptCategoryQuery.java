@@ -23,6 +23,9 @@ public interface PromptCategoryQuery {
    */
   boolean exists(Long id);
 
+  /**
+   * 设置提示词数量
+   */
   void setPromptCount(List<PromptCategory> categories);
 }
 
