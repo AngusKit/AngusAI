@@ -1,8 +1,11 @@
 package cloud.xcan.angus.core.ai.application.query.prompt.impl;
 
+import static cloud.xcan.angus.spec.principal.PrincipalContext.getUserId;
+
 import cloud.xcan.angus.core.ai.application.query.prompt.PromptCategoryQuery;
 import cloud.xcan.angus.core.ai.domain.prompt.PromptCategory;
 import cloud.xcan.angus.core.ai.domain.prompt.PromptCategoryRepo;
+import cloud.xcan.angus.core.ai.domain.prompt.PromptFavoritesRepo;
 import cloud.xcan.angus.core.ai.domain.prompt.PromptRepo;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
@@ -29,6 +32,9 @@ public class PromptCategoryQueryImpl implements PromptCategoryQuery {
   @Resource
   private PromptRepo promptRepo;
 
+  @Resource
+  private PromptFavoritesRepo promptFavoritesRepo;
+
   @Override
   public PromptCategory findAndCheck(Long id) {
     return new BizTemplate<PromptCategory>() {
@@ -48,8 +54,12 @@ public class PromptCategoryQueryImpl implements PromptCategoryQuery {
       @Override
       protected List<PromptCategory> process() {
         List<PromptCategory> categories = promptCategoryRepo.findAllSystemAndCreatedBy(
-            PrincipalContext.getUserId());
+            getUserId());
         setPromptCount(categories);
+
+        PrincipalContext.addExtension("totalPrompts", promptRepo.count());
+        PrincipalContext.addExtension("totalFavorites",
+            promptFavoritesRepo.countByCreatedBy(getUserId()));
         return categories;
       }
     }.execute();
@@ -61,6 +71,19 @@ public class PromptCategoryQueryImpl implements PromptCategoryQuery {
   }
 
   @Override
+  public int calculateCategoryLevel(Long parentId) {
+    if (parentId == null) {
+      return 1; // 第一级
+    }
+
+    PromptCategory parent = promptCategoryRepo.findById(parentId)
+        .orElseThrow(() -> ResourceNotFound.of("父分类不存在", new Object[]{}));
+
+    // 递归计算父分类的层级深度
+    return calculateCategoryLevel(parent.getParentId()) + 1;
+  }
+
+  @Override
   public void setPromptCount(List<PromptCategory> categories) {
     if (categories == null || categories.isEmpty()) {
       return;
@@ -68,7 +91,7 @@ public class PromptCategoryQueryImpl implements PromptCategoryQuery {
 
     // Load all categories the user can see (system + createdBy)
     List<PromptCategory> accessible = promptCategoryRepo.findAllSystemAndCreatedBy(
-        PrincipalContext.getUserId());
+        getUserId());
     if (accessible == null || accessible.isEmpty()) {
       for (PromptCategory c : categories) {
         if (c != null) {

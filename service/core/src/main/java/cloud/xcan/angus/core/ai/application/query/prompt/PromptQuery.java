@@ -29,7 +29,9 @@ public interface PromptQuery {
    */
   boolean existsByTitleAndIdNot(String title, Long id);
 
-    /**
+  void setIsSystemFlag(List<Prompt> prompts);
+
+  /**
    * 设置提示词数量
    */
   void setFavoritesCount(List<Prompt> prompts);

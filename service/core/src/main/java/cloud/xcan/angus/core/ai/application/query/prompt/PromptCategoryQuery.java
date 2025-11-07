@@ -24,6 +24,13 @@ public interface PromptCategoryQuery {
   boolean exists(Long id);
 
   /**
+   * 计算分类的层级深度
+   * @param parentId 父分类ID，如果为null表示是第一级
+   * @return 层级深度，从1开始（第一级为1，第二级为2，第三级为3）
+   */
+  int calculateCategoryLevel(Long parentId);
+
+  /**
    * 设置提示词数量
    */
   void setPromptCount(List<PromptCategory> categories);

@@ -8,6 +8,7 @@ import cloud.xcan.angus.core.ai.application.cmd.prompt.PromptFavoritesCmd;
 import cloud.xcan.angus.core.ai.application.query.prompt.PromptCategoryQuery;
 import cloud.xcan.angus.core.ai.application.query.prompt.PromptQuery;
 import cloud.xcan.angus.core.ai.domain.prompt.Prompt;
+import cloud.xcan.angus.core.ai.domain.prompt.PromptCategory;
 import cloud.xcan.angus.core.ai.domain.prompt.PromptFavorites;
 import cloud.xcan.angus.core.ai.domain.prompt.PromptRepo;
 import cloud.xcan.angus.core.biz.BizTemplate;
@@ -49,12 +50,13 @@ public class PromptCmdImpl extends CommCmd<Prompt, Long> implements PromptCmd {
           throw ResourceExisted.of("提示词标题「{0}」已存在", new Object[]{prompt.getTitle()});
         }
 
-        // 如果指定了分类，检查分类是否存在
-        if (prompt.getCategoryId() != null && !promptCategoryQuery.exists(prompt.getCategoryId())) {
-          throw ResourceNotFound.of("分类不存在", new Object[]{});
+        // 检查分类是否存在，且不是系统分组
+        PromptCategory category = promptCategoryQuery.findAndCheck(prompt.getCategoryId());
+        if (category.getIsSystem()){
+          throw ProtocolException.of("不允许添加提示词到系统分组", new Object[]{});
         }
 
-        // TODO 限制每个用户总共最多创建2000个提示词
+        // TODO 限制每个租户总共最多创建2000个提示词
       }
 
       @Override
@@ -76,20 +78,18 @@ public class PromptCmdImpl extends CommCmd<Prompt, Long> implements PromptCmd {
         // 获取提示词并验证是否存在
         promptDb = promptQuery.findAndCheck(prompt.getId());
 
-        // 检查是否为系统模板
-        if (promptDb.getIsSystem()) {
-          throw ProtocolException.of("系统模板不可编辑", new Object[]{});
+        // 如果更新了分类，检查新分类是否存在
+        if (prompt.getCategoryId() != null) {
+          PromptCategory category = promptCategoryQuery.findAndCheck(prompt.getCategoryId());
+          if (category.getIsSystem()){
+            throw ProtocolException.of("不允许添加提示词到系统分组", new Object[]{});
+          }
         }
 
         // 检查标题是否已存在（排除当前提示词）
         if (ObjectUtils.isNotEmpty(prompt.getTitle())
             && promptQuery.existsByTitleAndIdNot(prompt.getTitle(), promptDb.getId())) {
           throw ResourceExisted.of("提示词标题「{0}」已存在", new Object[]{prompt.getTitle()});
-        }
-
-        // 如果更新了分类，检查新分类是否存在
-        if (prompt.getCategoryId() != null && !promptCategoryQuery.exists(prompt.getCategoryId())) {
-          throw ResourceNotFound.of("分类不存在", new Object[]{});
         }
       }
 
@@ -139,6 +139,12 @@ public class PromptCmdImpl extends CommCmd<Prompt, Long> implements PromptCmd {
       protected void checkParams() {
         // 获取提示词并验证是否存在
         sourcePrompt = promptQuery.findAndCheck(id);
+
+        // 检查分类是否存在，且不是系统分组
+        PromptCategory category = promptCategoryQuery.findAndCheck(sourcePrompt.getCategoryId());
+        if (category.getIsSystem()){
+          throw ProtocolException.of("不允许复制系统分组", new Object[]{});
+        }
       }
 
       @Override
@@ -182,8 +188,10 @@ public class PromptCmdImpl extends CommCmd<Prompt, Long> implements PromptCmd {
         promptDb = promptQuery.findAndCheck(id);
 
         // 检查是否为系统模板
-        if (promptDb.getIsSystem()) {
-          throw ResourceExisted.of("系统模板不可删除", new Object[]{});
+        // 检查分类是否存在，且不是系统分组
+        PromptCategory category = promptCategoryQuery.findAndCheck(promptDb.getCategoryId());
+        if (category.getIsSystem()){
+          throw ProtocolException.of("不允许系统分组", new Object[]{});
         }
       }
 
