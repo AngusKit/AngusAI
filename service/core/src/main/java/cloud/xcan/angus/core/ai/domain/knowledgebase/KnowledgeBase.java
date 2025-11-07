@@ -69,6 +69,8 @@ public class KnowledgeBase extends TenantAuditingEntity<KnowledgeBase, Long> {
 
   @Transient
   private String totalSizeFormatted;
+  @Transient
+  private Integer activeDocuments; // 已启用文档数
 
   @Override
   public Long identity() {

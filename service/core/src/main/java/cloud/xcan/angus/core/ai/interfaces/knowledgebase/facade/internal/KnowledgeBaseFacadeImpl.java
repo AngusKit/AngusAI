@@ -15,6 +15,7 @@ import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBas
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.internal.assembler.KnowledgeBaseAssembler;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo.KnowledgeBaseDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo.KnowledgeBaseListVo;
+import cloud.xcan.angus.core.biz.NameJoin;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.PageResult;
 import jakarta.annotation.Resource;
@@ -30,6 +31,7 @@ public class KnowledgeBaseFacadeImpl implements KnowledgeBaseFacade {
   @Resource
   private KnowledgeBaseQuery knowledgeBaseQuery;
 
+  @NameJoin
   @Override
   public KnowledgeBaseDetailVo create(KnowledgeBaseCreateDto dto) {
     KnowledgeBase knowledgeBase = KnowledgeBaseAssembler.toCreateDomain(dto);
@@ -37,6 +39,7 @@ public class KnowledgeBaseFacadeImpl implements KnowledgeBaseFacade {
     return KnowledgeBaseAssembler.toDetailVo(saved);
   }
 
+  @NameJoin
   @Override
   public KnowledgeBaseDetailVo update(Long id, KnowledgeBaseUpdateDto dto) {
     KnowledgeBase knowledgeBase = KnowledgeBaseAssembler.toUpdateDomain(id, dto);
@@ -44,12 +47,14 @@ public class KnowledgeBaseFacadeImpl implements KnowledgeBaseFacade {
     return KnowledgeBaseAssembler.toDetailVo(saved);
   }
 
+  @NameJoin
   @Override
   public KnowledgeBaseDetailVo toggle(Long id, KnowledgeBaseToggleDto dto) {
     KnowledgeBase knowledgeBase = knowledgeBaseCmd.toggle(id, dto.getEnabled());
     return KnowledgeBaseAssembler.toDetailVo(knowledgeBase);
   }
 
+  @NameJoin
   @Override
   public KnowledgeBaseDetailVo modifyVisibility(Long id, Visibility visibility) {
     KnowledgeBase knowledgeBase = knowledgeBaseCmd.modifyVisibility(id, visibility);
@@ -61,12 +66,14 @@ public class KnowledgeBaseFacadeImpl implements KnowledgeBaseFacade {
     knowledgeBaseCmd.delete(id);
   }
 
+  @NameJoin
   @Override
   public KnowledgeBaseDetailVo getDetail(Long id) {
     KnowledgeBase knowledgeBase = knowledgeBaseQuery.findAndCheck(id);
     return KnowledgeBaseAssembler.toDetailVo(knowledgeBase);
   }
 
+  @NameJoin
   @Override
   public PageResult<KnowledgeBaseListVo> list(KnowledgeBaseFindDto dto) {
     GenericSpecification<KnowledgeBase> spec = KnowledgeBaseAssembler.getSpecification(dto);

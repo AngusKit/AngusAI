@@ -1,27 +1,6 @@
 import { ApiLocaleResult, TenantAuditingVo } from '@xcan-angus/infra';
 import { VisibilityEnum } from '@/enums/enums.ts';
 
-/** 知识库配置信息 */
-export interface KnowledgeBaseConfigVo {
-  /**
-   * 分段大小
-   * @format int32
-   * @example 512
-   */
-  chunkSize?: number;
-  /**
-   * 分段重叠
-   * @format int32
-   * @example 50
-   */
-  chunkOverlap?: number;
-  /**
-   * 向量化模型
-   * @example "text-embedding-ada-002"
-   */
-  embeddingModel?: string;
-}
-
 /** 知识库统计信息 */
 export interface KnowledgeBaseStatsVo {
   /**
@@ -107,7 +86,7 @@ export interface KnowledgeBaseDetailVo extends TenantAuditingVo {
   /** 统计信息 */
   stats?: KnowledgeBaseStatsVo;
   /** 配置信息 */
-  config?: KnowledgeBaseConfigVo;
+  config?: KnowledgeBaseConfig;
 }
 
 /** The API response result of supporting international message. */
@@ -158,28 +137,28 @@ export interface KnowledgeBaseCreateDto {
    */
   tags?: string[];
   /** 配置信息 */
-  config?: KnowledgeBaseConfigDto;
+  config?: KnowledgeBaseConfig;
 }
 
 /** 知识库配置 */
-export interface KnowledgeBaseConfigDto {
+export interface KnowledgeBaseConfig {
   /**
    * 分段大小
    * @format int32
    * @example 512
    */
-  chunkSize?: number;
+  chunkSize: number;
   /**
    * 分段重叠
    * @format int32
    * @example 50
    */
-  chunkOverlap?: number;
+  chunkOverlap: number;
   /**
    * 向量化模型
    * @example "text-embedding-ada-002"
    */
-  embeddingModel?: string;
+  embeddingModelId: string;
 }
 
 /** 更新知识库请求参数 */
@@ -215,7 +194,7 @@ export interface KnowledgeBaseUpdateDto {
    */
   tags?: string[];
   /** 配置信息 */
-  config?: KnowledgeBaseConfigDto;
+  config?: KnowledgeBaseConfig;
 }
 
 /** 知识库列表视图对象 */

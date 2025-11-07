@@ -2,6 +2,7 @@ package cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto;
 
 import cloud.xcan.angus.core.ai.domain.Constants;
 import cloud.xcan.angus.core.ai.domain.Visibility;
+import cloud.xcan.angus.core.ai.domain.knowledgebase.KnowledgeBaseConfig;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -40,8 +41,7 @@ public class KnowledgeBaseCreateDto {
   @Schema(description = "标签", example = "[\"产品\", \"文档\"]")
   private List<String> tags;
 
-  // TODO 前端对应配置页面缺失
   @Valid
   @Schema(description = "配置信息")
-  private KnowledgeBaseConfigDto config;
+  private KnowledgeBaseConfig config;
 }
