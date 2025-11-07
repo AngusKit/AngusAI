@@ -14,6 +14,9 @@ public class KnowledgeBaseDocStatusVo {
   @Schema(description = "处理状态", example = "PROCESSING")
   private DocumentStatus status;
 
+  @Schema(description = "是否启用", example = "true")
+  private Boolean enabled;
+
   @Schema(description = "处理进度", example = "75")
   private Double processingProgress;
 

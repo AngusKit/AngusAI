@@ -40,6 +40,7 @@ public class KnowledgeBaseDocAssembler {
     KnowledgeBaseDocStatusVo vo = new KnowledgeBaseDocStatusVo();
     vo.setId(document.getId());
     vo.setStatus(document.getStatus());
+    vo.setEnabled(document.getEnabled());
     vo.setProcessingProgress(document.getProcessingProgress());
     vo.setChunks(document.getChunks());
     vo.setErrorMessage(document.getErrorMessage());
