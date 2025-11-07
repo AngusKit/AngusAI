@@ -155,10 +155,9 @@ export interface KnowledgeBaseConfig {
    */
   chunkOverlap: number;
   /**
-   * 向量化模型
-   * @example "text-embedding-ada-002"
+   * 向量化模型ID
    */
-  embeddingModelId: string;
+  embeddingModelId: number;
 }
 
 /** 更新知识库请求参数 */
