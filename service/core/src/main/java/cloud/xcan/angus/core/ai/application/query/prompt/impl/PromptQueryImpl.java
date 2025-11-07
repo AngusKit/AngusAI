@@ -5,6 +5,8 @@ import static cloud.xcan.angus.spec.principal.PrincipalContext.getUserId;
 
 import cloud.xcan.angus.core.ai.application.query.prompt.PromptQuery;
 import cloud.xcan.angus.core.ai.domain.prompt.Prompt;
+import cloud.xcan.angus.core.ai.domain.prompt.PromptCategory;
+import cloud.xcan.angus.core.ai.domain.prompt.PromptCategoryRepo;
 import cloud.xcan.angus.core.ai.domain.prompt.PromptFavoritesRepo;
 import cloud.xcan.angus.core.ai.domain.prompt.PromptRepo;
 import cloud.xcan.angus.core.ai.domain.prompt.PromptSearchRepo;
@@ -18,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -37,6 +40,9 @@ public class PromptQueryImpl implements PromptQuery {
   @Resource
   private PromptFavoritesRepo promptFavoritesRepo;
 
+  @Resource
+  private PromptCategoryRepo promptCategoryRepo;
+
   @Override
   public Prompt findAndCheck(Long id) {
     return new BizTemplate<Prompt>() {
@@ -44,6 +50,11 @@ public class PromptQueryImpl implements PromptQuery {
       protected Prompt process() {
         Prompt prompt = promptRepo.findById(id)
             .orElseThrow(() -> ResourceNotFound.of("提示词未找到", new Object[]{}));
+
+        // 设置系统标志
+        setIsSystemFlag(List.of(prompt));
+
+        // 设置收藏数量
         setFavoritesCount(List.of(prompt));
         return prompt;
       }
@@ -57,13 +68,16 @@ public class PromptQueryImpl implements PromptQuery {
       @Override
       protected Page<Prompt> process() {
         // 查询收藏的提示词
-        if (!assembleFavoriteCriteria()){
+        if (!assembleFavoriteCriteria()) {
           return Page.empty();
-        };
+        }
 
         Page<Prompt> page = fullTextSearch
             ? promptSearchRepo.find(spec.getCriteria(), pageable, Prompt.class, match)
             : promptRepo.findAll(spec, pageable);
+
+        // 设置系统标志
+        setIsSystemFlag(page.getContent());
 
         // 设置收藏数量
         setFavoritesCount(page.getContent());
@@ -99,6 +113,17 @@ public class PromptQueryImpl implements PromptQuery {
   @Override
   public boolean existsByTitleAndIdNot(String title, Long id) {
     return promptRepo.existsByTitleAndIdNot(title, id);
+  }
+
+  @Override
+  public void setIsSystemFlag(List<Prompt> prompts) {
+    List<Long> categoryIds = prompts.stream().map(Prompt::getCategoryId)
+        .collect(Collectors.toList());
+    Map<Long, Boolean> categoryIsSystemMap = promptCategoryRepo.findAllById(categoryIds).stream()
+        .collect(Collectors.toMap(PromptCategory::getId, PromptCategory::getIsSystem));
+    prompts.forEach(prompt -> {
+      prompt.setIsSystem(categoryIsSystemMap.getOrDefault(prompt.getCategoryId(), false));
+    });
   }
 
   @Override

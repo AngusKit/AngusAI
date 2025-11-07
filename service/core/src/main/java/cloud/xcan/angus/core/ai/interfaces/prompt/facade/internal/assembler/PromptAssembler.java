@@ -46,7 +46,7 @@ public class PromptAssembler {
 
     // 设置关联状态
     vo.setIsFavorite(prompt.getIsFavorite());
-    vo.setIsSystem(prompt.getIsSystem());
+    vo.setIsSystem(nullSafe(prompt.getIsSystem(), false));
 
     // 设置统计信息
     PromptStatsVo statsVo = new PromptStatsVo();
