@@ -1,4 +1,4 @@
-import { Database, Plus, Upload, MoreHorizontal, Eye, Trash2, Download, FileText, File, Search, X, Filter, Grid3x3, List, Edit, FolderOpen, Files, Check, RefreshCw, } from 'lucide-react';
+import { Database, Plus, Upload, MoreHorizontal, Eye, Trash2, Download, FileText, File, Search, X, Filter, Grid3x3, List, Edit, FolderOpen, Files, Check, RefreshCw, FileX, } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -14,6 +14,11 @@ import { useLanguage } from '@/components/ui/LanguageProvider';
 import { toast } from 'sonner';
 import { EditKnowledgeBaseDialog } from './EditKnowledgeBaseDialog';
 import { CreateKnowledgeBaseDialog } from './CreateKnowledgeBaseDialog';
+import KnowledgeBases from '@/services/KnowledgeBases';
+import Documents from '@/services/Documents';
+import { VisibilityEnum, KnowledgeBaseDocStatusEnum, KnowledgeBaseDocTypeEnum } from '@/enums/enums';
+import type { KnowledgeBaseListVo, KnowledgeBaseDetailVo } from '@/services/KnowledgeBasesTypes';
+import type { KnowledgeBaseDocListVo } from '@/services/DocumentsTypes';
 
 interface KnowledgeBaseItem {
   id: number;
@@ -31,19 +36,9 @@ interface KnowledgeBaseItem {
   creator?: string;
   updateTime?: string;
   tags?: string[];
-}
-
-interface DocumentItem {
-  id: number;
-  name: string;
-  type: 'PDF' | 'Word' | 'Text';
-  typeColor: string;
-  typeIcon: string;
-  size: string;
-  status: '已启用' | '禁用' | '处理中';
-  statusColor: string;
-  enabled: boolean;
-  uploadTime: string;
+  chunkSize?: number;
+  chunkOverlap?: number;
+  embeddingModelId?: number;
 }
 
 interface UploadFile {
@@ -59,6 +54,8 @@ interface UploadFile {
 export function KnowledgeBase() {
   const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
   const [selectedKnowledgeBase, setSelectedKnowledgeBase] = useState<number | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
@@ -70,6 +67,8 @@ export function KnowledgeBase() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [documentPage, setDocumentPage] = useState(1);
   const documentsPerPage = 6;
+  const [loading, setLoading] = useState(false);
+  const [documentsLoading, setDocumentsLoading] = useState(false);
 
   // 文件上传相关状态
   const [uploadFiles, setUploadFiles] = useState<UploadFile[]>([]);
@@ -85,6 +84,27 @@ export function KnowledgeBase() {
       uploadIntervalsRef.current.clear();
     };
   }, []);
+
+  // 搜索防抖处理
+  useEffect(() => {
+    // 清除之前的定时器
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    // 设置新的定时器
+    searchTimeoutRef.current = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+      setCurrentPage(1); // 搜索时重置到第一页
+    }, 300); // 300ms 防抖延迟
+
+    // 清理函数
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, [searchQuery]);
 
   // 标签颜色映射
   const getTagColor = (tag: string): string => {
@@ -150,393 +170,397 @@ export function KnowledgeBase() {
     toast.success(`${action}: ${name}`);
   };
 
-  // 知识库启用/禁用处理
-  const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeBaseItem[]>([
-    {
-      id: 1,
-      name: '产品文档',
-      description: '公司所有产品的使用说明和技术文档',
-      icon: '📘',
-      iconBg: 'bg-blue-50 dark:bg-blue-900/20',
-      documentCount: '24',
-      size: '456 MB',
-      status: '已启用',
-      statusColor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-      enabled: true,
-      visibility: 'team',
-      createdTime: '2023-08-15 10:30',
-      creator: '张三',
-      updateTime: '2023-10-20',
-      tags: ['产品', '文档', '技术'],
-    },
-    {
-      id: 2,
-      name: '培训资料',
-      description: '新员工培训及各类培训资料汇总',
-      icon: '📚',
-      iconBg: 'bg-green-50 dark:bg-green-900/20',
-      documentCount: '13',
-      size: '312 MB',
-      status: '已启用',
-      statusColor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-      enabled: true,
-      visibility: 'private',
-      createdTime: '2023-09-01 14:20',
-      creator: '李四',
-      updateTime: '2023-10-18',
-      tags: ['培训', '入职'],
-    },
-    {
-      id: 3,
-      name: '市场分析',
-      description: '市场调研报告和竞品分析文档',
-      icon: '📊',
-      iconBg: 'bg-orange-50 dark:bg-orange-900/20',
-      documentCount: '7',
-      size: '703 MB',
-      status: '禁用',
-      statusColor: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
-      enabled: false,
-      visibility: 'public',
-      createdTime: '2023-07-20 09:15',
-      creator: '王五',
-      updateTime: '2023-10-15',
-      tags: ['市场', '分析', '竞品'],
-    },
-    {
-      id: 4,
-      name: '客户服务手册',
-      description: '客服团队使用的标准操作流程和常见问题',
-      icon: '💬',
-      iconBg: 'bg-purple-50 dark:bg-purple-900/20',
-      documentCount: '18',
-      size: '285 MB',
-      status: '已启用',
-      statusColor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-      enabled: true,
-      visibility: 'team',
-      createdTime: '2023-08-05 11:00',
-      creator: '赵六',
-      updateTime: '2023-10-22',
-      tags: ['客服', '流程'],
-    },
-    {
-      id: 5,
-      name: '技术规范',
-      description: '开发团队的编码规范和技术标准文档',
-      icon: '⚙️',
-      iconBg: 'bg-cyan-50 dark:bg-cyan-900/20',
-      documentCount: '31',
-      size: '520 MB',
-      status: '已启用',
-      statusColor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-      enabled: true,
-      visibility: 'private',
-      createdTime: '2023-07-10 15:45',
-      creator: '孙七',
-      updateTime: '2023-10-21',
-      tags: ['技术', '编码', '规范', '标准'],
-    },
-    {
-      id: 6,
-      name: '财务制度',
-      description: '公司财务管理制度和报销流程',
-      icon: '💰',
-      iconBg: 'bg-yellow-50 dark:bg-yellow-900/20',
-      documentCount: '9',
-      size: '156 MB',
-      status: '已启用',
-      statusColor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-      enabled: true,
-      visibility: 'team',
-      createdTime: '2023-06-25 13:30',
-      creator: '周八',
-      updateTime: '2023-10-10',
-      tags: ['财务', '报销'],
-    },
-    {
-      id: 7,
-      name: '法律合规',
-      description: '法律法规和合规性要求文档',
-      icon: '⚖️',
-      iconBg: 'bg-red-50 dark:bg-red-900/20',
-      documentCount: '15',
-      size: '428 MB',
-      status: '已启用',
-      statusColor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-      enabled: true,
-      visibility: 'private',
-      createdTime: '2023-08-20 16:00',
-      creator: '吴九',
-      updateTime: '2023-10-19',
-      tags: ['法律', '合规'],
-    },
-    {
-      id: 8,
-      name: '行业研究',
-      description: '行业趋势分析和研究报告',
-      icon: '📈',
-      iconBg: 'bg-indigo-50 dark:bg-indigo-900/20',
-      documentCount: '42',
-      size: '1.2 GB',
-      status: '已启用',
-      statusColor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-      enabled: true,
-      visibility: 'public',
-      createdTime: '2023-09-10 10:15',
-      creator: '郑十',
-      updateTime: '2023-10-23',
-      tags: ['行业', '研究', '趋势'],
-    },
-    {
-      id: 9,
-      name: '安全规范',
-      description: '信息安全和数据保护相关文档',
-      icon: '🔒',
-      iconBg: 'bg-pink-50 dark:bg-pink-900/20',
-      documentCount: '21',
-      size: '380 MB',
-      status: '禁用',
-      statusColor: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
-      enabled: false,
-      visibility: 'private',
-      createdTime: '2023-07-05 14:30',
-      creator: '钱十一',
-      updateTime: '2023-10-16',
-      tags: ['安全', '数据保护'],
-    },
-    {
-      id: 10,
-      name: '项目案例',
-      description: '成功项目案例和最佳实践分享',
-      icon: '🎯',
-      iconBg: 'bg-teal-50 dark:bg-teal-900/20',
-      documentCount: '54',
-      size: '890 MB',
-      status: '已启用',
-      statusColor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-      enabled: true,
-      visibility: 'team',
-      createdTime: '2023-09-25 09:45',
-      creator: '孙十二',
-      updateTime: '2023-10-24',
-      tags: ['项目', '案例', '实践'],
-    },
-  ]);
+  // 知识库列表
+  const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeBaseItem[]>([]);
 
-  const handleToggleKB = (id: number) => {
-    setKnowledgeBases(prev =>
-      prev.map(kb => {
-        if (kb.id === id) {
-          const newEnabled = !kb.enabled;
-          return {
-            ...kb,
-            enabled: newEnabled,
-            status: newEnabled ? '已启用' : '禁用',
-            statusColor: newEnabled
-              ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-              : 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
-          };
-        }
-        return kb;
-      })
-    );
+  // 加载知识库列表
+  const loadKnowledgeBases = async () => {
+    setLoading(true);
+    try {
+      const response = await KnowledgeBases.getKnowledgeBaseList({
+        keyword: debouncedSearchQuery.trim() || undefined,
+        pageNo: currentPage,
+        pageSize: itemsPerPage,
+      });
+      
+      // 处理响应结构
+      const responseData = (response as any).data;
+      let listData: KnowledgeBaseListVo[] | undefined;
+      
+      // 尝试多种可能的响应结构
+      if (Array.isArray(responseData?.list)) {
+        // 情况1: response.data.list 直接是数组
+        listData = responseData.list;
+      } else if (Array.isArray(responseData?.data?.list)) {
+        // 情况2: response.data.data.list 是数组
+        listData = responseData.data.list;
+      } else if (Array.isArray((response as any).list)) {
+        // 情况3: response.list 直接是数组
+        listData = (response as any).list;
+      }
+      
+      if (Array.isArray(listData)) {
+        const mappedList: KnowledgeBaseItem[] = listData.map((kb: KnowledgeBaseListVo) => ({
+          id: kb.id || 0,
+          name: kb.name || '',
+          description: kb.description || '',
+          icon: kb.icon || '📚',
+          iconBg: kb.iconBg || 'bg-blue-50 dark:bg-blue-900/20',
+          documentCount: String(kb.documentsCount || 0),
+          size: kb.totalSize || '0 MB',
+          status: (kb.enabled ? '已启用' : '禁用') as '已启用' | '禁用',
+          statusColor: kb.enabled
+            ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+            : 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
+          enabled: kb.enabled || false,
+          visibility: kb.visibility,
+          createdTime: kb.createdDate,
+          updateTime: kb.modifiedDate,
+          tags: kb.tags,
+        }));
+        setKnowledgeBases(mappedList);
+      } else {
+        setKnowledgeBases([]);
+      }
+    } catch (error: any) {
+      console.error('加载知识库列表失败:', error);
+      toast.error(error?.data?.message || error?.message || '加载知识库列表失败');
+      setKnowledgeBases([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadKnowledgeBases();
+  }, [currentPage, debouncedSearchQuery]);
+
+  // 旧的模拟数据已移除，现在使用API加载
+
+  const handleToggleKB = async (id: number) => {
+    const kb = knowledgeBases.find(k => k.id === id);
+    if (!kb) return;
+
+    const newEnabled = !kb.enabled;
+    try {
+      await KnowledgeBases.toggleKnowledgeStatus(id, { enabled: newEnabled });
+      
+      setKnowledgeBases(prev =>
+        prev.map(k => {
+          if (k.id === id) {
+            return {
+              ...k,
+              enabled: newEnabled,
+              status: newEnabled ? '已启用' : '禁用',
+              statusColor: newEnabled
+                ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                : 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
+            };
+          }
+          return k;
+        })
+      );
+      toast.success(newEnabled ? '知识库已启用' : '知识库已禁用');
+    } catch (error: any) {
+      toast.error(error?.data?.message || '切换知识库状态失败');
+    }
   };
 
   // 文档列表状态
-  const [documents, setDocuments] = useState<DocumentItem[]>([
-    {
-      id: 1,
-      name: '产品功能说明书.pdf',
-      type: 'PDF',
-      typeColor: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-      typeIcon: '📄',
-      size: '2.4 MB',
-      status: '已启用',
-      statusColor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-      enabled: true,
-      uploadTime: '2023-10-15 16:30',
-    },
-    {
-      id: 2,
-      name: '用户使用指南.docx',
-      type: 'Word',
-      typeColor: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-      typeIcon: '📘',
-      size: '1.8 MB',
-      status: '处理中',
-      statusColor: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
-      enabled: false,
-      uploadTime: '2023-10-14 08:45',
-    },
-    {
-      id: 3,
-      name: 'API接口文档.pdf',
-      type: 'PDF',
-      typeColor: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-      typeIcon: '📄',
-      size: '3.1 MB',
-      status: '已启用',
-      statusColor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-      enabled: true,
-      uploadTime: '2023-10-13 11:20',
-    },
-    {
-      id: 4,
-      name: '安装配置手册.pdf',
-      type: 'PDF',
-      typeColor: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-      typeIcon: '📄',
-      size: '1.5 MB',
-      status: '已启用',
-      statusColor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-      enabled: true,
-      uploadTime: '2023-10-12 14:15',
-    },
-    {
-      id: 5,
-      name: '常见问题FAQ.docx',
-      type: 'Word',
-      typeColor: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-      typeIcon: '📘',
-      size: '980 KB',
-      status: '禁用',
-      statusColor: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
-      enabled: false,
-      uploadTime: '2023-10-11 10:30',
-    },
-    {
-      id: 6,
-      name: '开发者指南.pdf',
-      type: 'PDF',
-      typeColor: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-      typeIcon: '📄',
-      size: '4.2 MB',
-      status: '已启用',
-      statusColor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-      enabled: true,
-      uploadTime: '2023-10-10 09:00',
-    },
-    {
-      id: 7,
-      name: '系统架构说明.pdf',
-      type: 'PDF',
-      typeColor: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-      typeIcon: '📄',
-      size: '3.6 MB',
-      status: '已启用',
-      statusColor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-      enabled: true,
-      uploadTime: '2023-10-09 16:45',
-    },
-    {
-      id: 8,
-      name: '数据库设计文档.txt',
-      type: 'Text',
-      typeColor: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
-      typeIcon: '📝',
-      size: '256 KB',
-      status: '处理中',
-      statusColor: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
-      enabled: false,
-      uploadTime: '2023-10-08 13:20',
-    },
-    {
-      id: 9,
-      name: '版本更新日志.txt',
-      type: 'Text',
-      typeColor: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
-      typeIcon: '📝',
-      size: '128 KB',
-      status: '已启用',
-      statusColor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-      enabled: true,
-      uploadTime: '2023-10-07 11:10',
-    },
-    {
-      id: 10,
-      name: '性能测试报告.docx',
-      type: 'Word',
-      typeColor: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-      typeIcon: '📘',
-      size: '2.1 MB',
-      status: '禁用',
-      statusColor: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
-      enabled: false,
-      uploadTime: '2023-10-06 15:00',
-    },
-  ]);
+  const [documents, setDocuments] = useState<any[]>([]);
 
-  // 文档启用/禁用处理
-  const handleToggleDocument = (id: number) => {
-    setDocuments(prev =>
-      prev.map(doc => {
-        if (doc.id === id && doc.status !== '处理中') {
-          const newEnabled = !doc.enabled;
-          return {
-            ...doc,
-            enabled: newEnabled,
-            status: newEnabled ? '已启用' : '禁用',
-            statusColor: newEnabled
-              ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-              : 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
+  // 加载文档列表
+  const loadDocuments = async (knowledgeBaseId: number) => {
+    if (!knowledgeBaseId) return;
+    
+    setDocumentsLoading(true);
+    try {
+      const response = await Documents.getDocumentList(knowledgeBaseId, {
+        pageNo: documentPage,
+        pageSize: documentsPerPage,
+      } as any);
+      
+      const responseData = (response as any).data;
+      let listData: KnowledgeBaseDocListVo[] | undefined;
+      
+      // 尝试多种可能的响应结构
+      if (Array.isArray(responseData?.list)) {
+        // 情况1: response.data.list 直接是数组
+        listData = responseData.list;
+      } else if (Array.isArray(responseData?.data?.list)) {
+        // 情况2: response.data.data.list 是数组
+        listData = responseData.data.list;
+      } else if (Array.isArray((response as any).list)) {
+        // 情况3: response.list 直接是数组
+        listData = (response as any).list;
+      }
+      
+      if (Array.isArray(listData)) {
+        const mappedDocs = listData.map((doc: KnowledgeBaseDocListVo) => {
+          const statusMap: Record<string, { text: string; color: string }> = {
+            [KnowledgeBaseDocStatusEnum.PENDING]: {
+              text: '待处理',
+              color: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
+            },
+            [KnowledgeBaseDocStatusEnum.PROCESSING]: {
+              text: '处理中',
+              color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
+            },
+            [KnowledgeBaseDocStatusEnum.COMPLETED]: {
+              text: '已完成',
+              color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+            },
+            [KnowledgeBaseDocStatusEnum.FAILED]: {
+              text: '失败',
+              color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+            },
           };
-        }
-        return doc;
-      })
-    );
+
+          const typeMap: Record<string, { text: string; icon: string; color: string }> = {
+            [KnowledgeBaseDocTypeEnum.PDF]: {
+              text: 'PDF',
+              icon: '📄',
+              color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+            },
+            [KnowledgeBaseDocTypeEnum.DOCX]: {
+              text: 'Word',
+              icon: '📘',
+              color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+            },
+            [KnowledgeBaseDocTypeEnum.TXT]: {
+              text: 'Text',
+              icon: '📝',
+              color: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
+            },
+            [KnowledgeBaseDocTypeEnum.MD]: {
+              text: 'Markdown',
+              icon: '📝',
+              color: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
+            },
+            [KnowledgeBaseDocTypeEnum.HTML]: {
+              text: 'HTML',
+              icon: '🌐',
+              color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+            },
+          };
+
+          const status = doc.status || KnowledgeBaseDocStatusEnum.PENDING;
+          const type = doc.type || KnowledgeBaseDocTypeEnum.TXT;
+          const statusInfo = statusMap[status] || statusMap[KnowledgeBaseDocStatusEnum.PENDING];
+          const typeInfo = typeMap[type] || typeMap[KnowledgeBaseDocTypeEnum.TXT];
+
+          return {
+            id: typeof doc.id === 'string' ? Number(doc.id) : (doc.id || 0),
+            name: doc.name || '',
+            type: typeInfo.text,
+            typeColor: typeInfo.color,
+            typeIcon: typeInfo.icon,
+            size: doc.size || '0 MB',
+            status: statusInfo.text,
+            statusColor: statusInfo.color,
+            enabled: doc.enabled || false,
+            uploadTime: doc.createdDate || '',
+            processingProgress: doc.processingProgress,
+            chunks: doc.chunks,
+            errorMessage: doc.errorMessage,
+            statusEnum: status,
+          };
+        });
+        setDocuments(mappedDocs);
+      } else {
+        setDocuments([]);
+      }
+    } catch (error: any) {
+      console.error('加载文档列表失败:', error);
+      toast.error(error?.data?.message || error?.message || '加载文档列表失败');
+      setDocuments([]);
+    } finally {
+      setDocumentsLoading(false);
+    }
   };
 
-  // 重新解析文档
-  const handleReparse = (doc: DocumentItem) => {
-    toast.info(`正在重新解析文档: ${doc.name}`);
-    setDocuments(prev =>
-      prev.map(d => {
-        if (d.id === doc.id) {
-          return {
-            ...d,
-            status: '处理中',
-            statusColor: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
-            enabled: false,
-          };
-        }
-        return d;
-      })
-    );
+  useEffect(() => {
+    // 切换知识库时，立即清空文档列表
+    setDocuments([]);
+    
+    if (selectedKnowledgeBase) {
+      // 重置到第一页
+      setDocumentPage(1);
+      loadDocuments(selectedKnowledgeBase);
+    }
+  }, [selectedKnowledgeBase]);
 
-    // 模拟处理完成
-    setTimeout(() => {
+  // 当文档页码改变时，重新加载当前知识库的文档
+  useEffect(() => {
+    if (selectedKnowledgeBase) {
+      loadDocuments(selectedKnowledgeBase);
+    }
+  }, [documentPage]);
+
+  // 旧的模拟数据已移除，现在使用API加载
+
+  // 文档启用/禁用处理
+  const handleToggleDocument = async (id: number) => {
+    if (!selectedKnowledgeBase) return;
+    
+    const doc = documents.find(d => d.id === id);
+    if (!doc || doc.statusEnum === KnowledgeBaseDocStatusEnum.PROCESSING) return;
+
+    const newEnabled = !doc.enabled;
+    try {
+      await Documents.toggleDocument(id, selectedKnowledgeBase, { enabled: newEnabled });
+      
       setDocuments(prev =>
         prev.map(d => {
-          if (d.id === doc.id) {
+          if (d.id === id) {
             return {
               ...d,
-              status: '已启用',
-              statusColor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-              enabled: true,
+              enabled: newEnabled,
+              status: newEnabled ? '已完成' : '禁用',
+              statusColor: newEnabled
+                ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                : 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
             };
           }
           return d;
         })
       );
-      toast.success(`文档 ${doc.name} 解析完成`);
-    }, 3000);
+      toast.success(newEnabled ? '文档已启用' : '文档已禁用');
+    } catch (error: any) {
+      toast.error(error?.data?.message || '切换文档状态失败');
+    }
+  };
+
+  // 重新解析文档
+  const handleReparse = async (doc: any) => {
+    if (!selectedKnowledgeBase) return;
+    
+    try {
+      toast.info(`正在重新处理文档: ${doc.name}`);
+      
+      const response = await Documents.reprocessDocument(doc.id, selectedKnowledgeBase);
+      
+      const responseData = (response as any).data;
+      const statusData = responseData?.data;
+      
+      if (statusData) {
+        setDocuments(prev =>
+          prev.map(d => {
+            if (d.id === doc.id) {
+              const statusMap: Record<string, { text: string; color: string }> = {
+                [KnowledgeBaseDocStatusEnum.PENDING]: {
+                  text: '待处理',
+                  color: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
+                },
+                [KnowledgeBaseDocStatusEnum.PROCESSING]: {
+                  text: '处理中',
+                  color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
+                },
+                [KnowledgeBaseDocStatusEnum.COMPLETED]: {
+                  text: '已完成',
+                  color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+                },
+                [KnowledgeBaseDocStatusEnum.FAILED]: {
+                  text: '失败',
+                  color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+                },
+              };
+              
+              const status = statusData.status || KnowledgeBaseDocStatusEnum.PROCESSING;
+              const statusInfo = statusMap[status] || statusMap[KnowledgeBaseDocStatusEnum.PROCESSING];
+              
+              return {
+                ...d,
+                status: statusInfo.text,
+                statusColor: statusInfo.color,
+                enabled: statusData.enabled || false,
+                processingProgress: statusData.processingProgress,
+                chunks: statusData.chunks,
+                errorMessage: statusData.errorMessage,
+                statusEnum: status,
+              };
+            }
+            return d;
+          })
+        );
+        
+        if (statusData.status === KnowledgeBaseDocStatusEnum.COMPLETED) {
+          toast.success(`文档 ${doc.name} 处理完成`);
+        } else if (statusData.status === KnowledgeBaseDocStatusEnum.PROCESSING) {
+          toast.info(`文档 ${doc.name} 正在处理中...`);
+        }
+      }
+    } catch (error: any) {
+      toast.error(error?.data?.message || '重新处理文档失败');
+    }
   };
 
   // 删除文档
-  const handleDeleteDocument = (doc: DocumentItem) => {
-    setDocuments(prev => prev.filter(d => d.id !== doc.id));
-    toast.success(`已删除文档: ${doc.name}`);
+  const handleDeleteDocument = async (doc: any) => {
+    if (!selectedKnowledgeBase) return;
+    
+    if (!confirm(`确定要删除文档 "${doc.name}" 吗？`)) return;
+    
+    try {
+      await Documents.deleteDocument(doc.id, selectedKnowledgeBase);
+      setDocuments(prev => prev.filter(d => d.id !== doc.id));
+      toast.success(`已删除文档: ${doc.name}`);
+      loadDocuments(selectedKnowledgeBase); // 重新加载列表
+    } catch (error: any) {
+      toast.error(error?.data?.message || '删除文档失败');
+    }
   };
 
-  const handleView = (kb: KnowledgeBaseItem) => {
-    setViewingKB(kb);
-    setViewDialogOpen(true);
+  const handleView = async (kb: KnowledgeBaseItem) => {
+    try {
+      const response = await KnowledgeBases.getKnowledgeBaseDetail(kb.id);
+      const responseData = (response as any).data;
+      const detail = responseData?.data;
+      
+      if (detail) {
+        const mappedKB: KnowledgeBaseItem = {
+          ...kb,
+          description: detail.description || kb.description,
+          documentCount: String(detail.documentsCount || 0),
+          size: detail.totalSize || kb.size,
+          tags: detail.tags,
+          visibility: detail.visibility,
+          chunkSize: detail.config?.chunkSize,
+          chunkOverlap: detail.config?.chunkOverlap,
+          embeddingModelId: detail.config?.embeddingModelId,
+        };
+        setViewingKB(mappedKB);
+        setViewDialogOpen(true);
+      } else {
+        setViewingKB(kb);
+        setViewDialogOpen(true);
+      }
+    } catch (error: any) {
+      toast.error(error?.data?.message || '获取知识库详情失败');
+      // 失败时仍显示基本信息
+      setViewingKB(kb);
+      setViewDialogOpen(true);
+    }
   };
 
   const handleEdit = (kb: KnowledgeBaseItem) => {
     setEditingKB(kb);
     setEditDialogOpen(true);
+  };
+
+  const handleDeleteKB = async (kb: KnowledgeBaseItem) => {
+    if (!confirm(`确定要删除知识库 "${kb.name}" 吗？此操作不可恢复。`)) return;
+    
+    try {
+      await KnowledgeBases.deleteKnowledgeBase(kb.id);
+      toast.success(`已删除知识库: ${kb.name}`);
+      loadKnowledgeBases(); // 重新加载列表
+      if (selectedKnowledgeBase === kb.id) {
+        setSelectedKnowledgeBase(null);
+      }
+    } catch (error: any) {
+      toast.error(error?.data?.message || '删除知识库失败');
+    }
   };
 
   // 文件上传处理函数
@@ -550,7 +574,7 @@ export function KnowledgeBase() {
 
   const handleFiles = (files: FileList | File[]) => {
     const fileArray = Array.from(files);
-    const maxSize = 100 * 1024 * 1024; // 100MB
+    const maxSize = 50 * 1024 * 1024; // 50MB
     const allowedTypes = [
       'application/pdf',
       'application/msword',
@@ -562,7 +586,7 @@ export function KnowledgeBase() {
       .filter(file => {
         if (file.size > maxSize) {
           toast.error(
-            `${t('knowledgeUpload.fileAdded')} ${file.name} ${t('knowledgeUpload.fileSizeExceeded')} (100MB)`
+            `${t('knowledgeUpload.fileAdded')} ${file.name} ${t('knowledgeUpload.fileSizeExceeded')} (50MB)`
           );
           return false;
         }
@@ -585,40 +609,64 @@ export function KnowledgeBase() {
       setUploadFiles(prev => [...prev, ...newFiles]);
       toast.success(`${t('knowledgeUpload.fileAdded')} ${newFiles.length} ${t('knowledgeUpload.filesCount')}`);
 
-      // 自动开始上传 - 传递文件名用于成功提示
+      // 自动开始上传 - 传递文件名和文件对象用于成功提示
       newFiles.forEach(uploadFile => {
-        simulateUpload(uploadFile.id, uploadFile.name);
+        simulateUpload(uploadFile.id, uploadFile.name, uploadFile.file);
       });
     }
   };
 
-  const simulateUpload = (fileId: string, fileName: string) => {
+  const simulateUpload = async (fileId: string, fileName: string, file: File) => {
+    if (!selectedKnowledgeBase) {
+      toast.error('请先选择知识库');
+      return;
+    }
+
     setUploadFiles(prev => prev.map(f => (f.id === fileId ? { ...f, status: 'uploading' as const } : f)));
 
-    let progress = 0;
-    const interval = setInterval(() => {
-      progress += Math.random() * 30;
-      if (progress >= 100) {
-        progress = 100;
-        const currentInterval = uploadIntervalsRef.current.get(fileId);
-        if (currentInterval) {
-          clearInterval(currentInterval);
-          uploadIntervalsRef.current.delete(fileId);
-        }
+    try {
+      // 创建FormData
+      const formData = new FormData();
+      formData.append('file', file);
 
-        setUploadFiles(prev =>
-          prev.map(f => (f.id === fileId ? { ...f, progress: 100, status: 'success' as const } : f))
-        );
+      // 调用上传API - 注意：根据API定义，file在query中，但实际文件上传应该使用FormData
+      // 这里需要根据实际API实现调整
+      await Documents.uploadDocument(selectedKnowledgeBase, { file }, {
+        body: formData,
+        // 移除ContentType，让浏览器自动设置multipart/form-data
+        type: undefined as any,
+      });
 
-        // 使用传入的文件名，避免闭包问题
-        toast.success(`${fileName} ${t('knowledgeUpload.uploadSuccess')}`);
-      } else {
-        setUploadFiles(prev => prev.map(f => (f.id === fileId ? { ...f, progress } : f)));
+      // 上传成功
+      const currentInterval = uploadIntervalsRef.current.get(fileId);
+      if (currentInterval) {
+        clearInterval(currentInterval);
+        uploadIntervalsRef.current.delete(fileId);
       }
-    }, 500);
 
-    // 保存 interval 引用以便清理
-    uploadIntervalsRef.current.set(fileId, interval);
+      setUploadFiles(prev =>
+        prev.map(f => (f.id === fileId ? { ...f, progress: 100, status: 'success' as const } : f))
+      );
+
+      toast.success(`${fileName} ${t('knowledgeUpload.uploadSuccess')}`);
+      
+      // 重新加载文档列表
+      setTimeout(() => {
+        loadDocuments(selectedKnowledgeBase);
+      }, 1000);
+    } catch (error: any) {
+      const currentInterval = uploadIntervalsRef.current.get(fileId);
+      if (currentInterval) {
+        clearInterval(currentInterval);
+        uploadIntervalsRef.current.delete(fileId);
+      }
+
+      setUploadFiles(prev =>
+        prev.map(f => (f.id === fileId ? { ...f, status: 'error' as const, error: error?.data?.message || '上传失败' } : f))
+      );
+
+      toast.error(`${fileName} 上传失败: ${error?.data?.message || '未知错误'}`);
+    }
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -746,14 +794,18 @@ export function KnowledgeBase() {
               value={searchQuery}
               onChange={e => {
                 setSearchQuery(e.target.value);
-                setCurrentPage(1);
               }}
               className='pl-10 pr-10 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 focus-visible:border-blue-500 focus-visible:ring-blue-500/50'
             />
             {searchQuery && (
               <button
                 onClick={() => {
+                  // 清除防抖定时器
+                  if (searchTimeoutRef.current) {
+                    clearTimeout(searchTimeoutRef.current);
+                  }
                   setSearchQuery('');
+                  setDebouncedSearchQuery('');
                   setCurrentPage(1);
                 }}
                 className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors'
@@ -889,7 +941,7 @@ export function KnowledgeBase() {
                         导出
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        onClick={() => handleAction('删除', kb.name)}
+                        onClick={() => handleDeleteKB(kb)}
                         className='text-red-600 dark:text-red-400'
                       >
                         <Trash2 className='w-4 h-4 mr-2' />
@@ -899,11 +951,11 @@ export function KnowledgeBase() {
                   </DropdownMenu>
                 </div>
 
-                <p className='text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2'>{kb.description}</p>
+                <p className='text-sm text-gray-600 dark:text-gray-400 mb-1 line-clamp-2'>{kb.description}</p>
 
                 {/* 标签 */}
                 {kb.tags && kb.tags.length > 0 && (
-                  <div className='flex flex-wrap gap-2 mb-4'>
+                  <div className='flex flex-wrap gap-2 mb-0.5'>
                     {kb.tags.map((tag, index) => (
                       <Badge key={index} variant='secondary' className={`${getTagColor(tag)} text-xs`}>
                         {tag}
@@ -912,7 +964,7 @@ export function KnowledgeBase() {
                   </div>
                 )}
 
-                <div className='grid grid-cols-2 gap-4 pt-4 border-t border-gray-100 dark:border-gray-700'>
+                <div className='grid grid-cols-2 gap-4 pt-2 border-t border-gray-100 dark:border-gray-700'>
                   <div>
                     <div className='text-xs text-gray-500 dark:text-gray-400 mb-1'>文档数</div>
                     <div className='dark:text-white'>{kb.documentCount}</div>
@@ -925,7 +977,7 @@ export function KnowledgeBase() {
 
                 {/* 附加信息 */}
                 {kb.visibility && (
-                  <div className='mt-3 pt-3 border-t border-gray-100 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400'>
+                  <div className='mt-0.5 pt-3 border-t border-gray-100 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400'>
                     <div className='flex items-center justify-between'>
                       <span>
                         可见性: {kb.visibility === 'team' ? '团队' : kb.visibility === 'private' ? '私有' : '公开'}
@@ -1167,7 +1219,7 @@ export function KnowledgeBase() {
                     {isDragging ? t('knowledgeUpload.dragDropActive') : t('knowledgeUpload.dragDropHint')}
                   </p>
                   <p className='text-xs text-gray-500 dark:text-gray-500 mt-2'>
-                    {t('knowledgeUpload.supportedFormats')} · {t('knowledgeUpload.maxFileSize')}
+                    支持 PDF、Word、TXT、Markdown、HTML 格式 · 单文件限制 50MB
                   </p>
 
                   {/* 隐藏的文件输入 */}
@@ -1276,75 +1328,89 @@ export function KnowledgeBase() {
                   </div>
                 </div>
 
-                <div className='divide-y divide-gray-100 dark:divide-gray-700'>
-                  {documents.slice((documentPage - 1) * documentsPerPage, documentPage * documentsPerPage).map(doc => (
-                    <div key={doc.id} className='p-5 hover:bg-gray-50 dark:hover:bg-gray-700/50'>
-                      <div className='flex items-center justify-between'>
-                        <div className='flex items-center gap-3 flex-1 min-w-0'>
-                          <div className='text-2xl flex-shrink-0'>{doc.typeIcon}</div>
-                          <div className='min-w-0 flex-1'>
-                            <div className='flex items-center gap-2 mb-1'>
-                              <h4 className='dark:text-white truncate'>{doc.name}</h4>
-                              <Badge variant='secondary' className={`${doc.typeColor} text-xs flex-shrink-0`}>
-                                {doc.type}
-                              </Badge>
-                              <Badge variant='secondary' className={`${doc.statusColor} text-xs flex-shrink-0`}>
-                                {doc.status}
-                              </Badge>
-                            </div>
-                            <div className='flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400'>
-                              <span>{doc.size}</span>
-                              <span>{doc.uploadTime}</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className='flex items-center gap-2 flex-shrink-0'>
-                          <Switch
-                            checked={doc.enabled}
-                            onCheckedChange={() => handleToggleDocument(doc.id)}
-                            disabled={doc.status === '处理中'}
-                            className='data-[state=checked]:bg-blue-500'
-                          />
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant='ghost' size='sm' className='dark:text-gray-400'>
-                                <MoreHorizontal className='w-4 h-4' />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align='end' className='dark:bg-gray-800 dark:border-gray-700'>
-                              <DropdownMenuItem
-                                onClick={() => handleAction('查看', doc.name)}
-                                className='dark:text-gray-300'
-                              >
-                                <Eye className='w-4 h-4 mr-2' />
-                                查看
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleReparse(doc)} className='dark:text-gray-300'>
-                                <RefreshCw className='w-4 h-4 mr-2' />
-                                重新解析
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => handleAction('下载', doc.name)}
-                                className='dark:text-gray-300'
-                              >
-                                <Download className='w-4 h-4 mr-2' />
-                                下载
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => handleDeleteDocument(doc)}
-                                className='text-red-600 dark:text-red-400'
-                              >
-                                <Trash2 className='w-4 h-4 mr-2' />
-                                删除
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
+                {!documents || documents.length === 0 ? (
+                  <div className='flex flex-col items-center justify-center py-16 px-5'>
+                    <div className='mb-4'>
+                      <div className='w-20 h-20 rounded-full bg-gray-100 dark:bg-gray-700/50 flex items-center justify-center'>
+                        <FileX className='w-10 h-10 text-gray-400 dark:text-gray-500' />
                       </div>
                     </div>
-                  ))}
-                </div>
+                    <h4 className='text-lg font-medium text-gray-900 dark:text-white mb-2'>暂无文档</h4>
+                    <p className='text-sm text-gray-500 dark:text-gray-400 text-center max-w-sm mb-4'>
+                      还没有上传任何文档，点击上方上传区域开始添加文档
+                    </p>
+                  </div>
+                ) : (
+                  <div className='divide-y divide-gray-100 dark:divide-gray-700'>
+                    {documents.slice((documentPage - 1) * documentsPerPage, documentPage * documentsPerPage).map(doc => (
+                      <div key={doc.id} className='p-5 hover:bg-gray-50 dark:hover:bg-gray-700/50'>
+                        <div className='flex items-center justify-between'>
+                          <div className='flex items-center gap-3 flex-1 min-w-0'>
+                            <div className='text-2xl flex-shrink-0'>{doc.typeIcon}</div>
+                            <div className='min-w-0 flex-1'>
+                              <div className='flex items-center gap-2 mb-1'>
+                                <h4 className='dark:text-white truncate'>{doc.name}</h4>
+                                <Badge variant='secondary' className={`${doc.typeColor} text-xs flex-shrink-0`}>
+                                  {doc.type}
+                                </Badge>
+                                <Badge variant='secondary' className={`${doc.statusColor} text-xs flex-shrink-0`}>
+                                  {doc.status}
+                                </Badge>
+                              </div>
+                              <div className='flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400'>
+                                <span>{doc.size}</span>
+                                <span>{doc.uploadTime}</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className='flex items-center gap-2 flex-shrink-0'>
+                            <Switch
+                              checked={doc.enabled}
+                              onCheckedChange={() => handleToggleDocument(doc.id)}
+                              disabled={doc.statusEnum === KnowledgeBaseDocStatusEnum.PROCESSING}
+                              className='data-[state=checked]:bg-blue-500'
+                            />
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant='ghost' size='sm' className='dark:text-gray-400'>
+                                  <MoreHorizontal className='w-4 h-4' />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align='end' className='dark:bg-gray-800 dark:border-gray-700'>
+                                <DropdownMenuItem
+                                  onClick={() => handleAction('查看', doc.name)}
+                                  className='dark:text-gray-300'
+                                >
+                                  <Eye className='w-4 h-4 mr-2' />
+                                  查看
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleReparse(doc)} className='dark:text-gray-300'>
+                                  <RefreshCw className='w-4 h-4 mr-2' />
+                                  重新解析
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => handleAction('下载', doc.name)}
+                                  className='dark:text-gray-300'
+                                >
+                                  <Download className='w-4 h-4 mr-2' />
+                                  下载
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => handleDeleteDocument(doc)}
+                                  className='text-red-600 dark:text-red-400'
+                                >
+                                  <Trash2 className='w-4 h-4 mr-2' />
+                                  删除
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 {/* Document Pagination */}
                 {documents.length > documentsPerPage && (
@@ -1482,9 +1548,15 @@ export function KnowledgeBase() {
         open={editDialogOpen}
         onOpenChange={setEditDialogOpen}
         knowledgeBase={editingKB}
-        onSave={updated => {
-          setKnowledgeBases(prev => prev.map(kb => (kb.id === updated.id ? updated : kb)));
-          toast.success('知识库更新成功');
+        onSuccess={() => {
+          loadKnowledgeBases();
+          if (editingKB) {
+            // 更新当前选中的知识库信息
+            const updatedKB = knowledgeBases.find(kb => kb.id === editingKB.id);
+            if (updatedKB && selectedKnowledgeBase === editingKB.id) {
+              loadDocuments(editingKB.id);
+            }
+          }
         }}
       />
 
@@ -1492,9 +1564,8 @@ export function KnowledgeBase() {
       <CreateKnowledgeBaseDialog
         open={createDialogOpen}
         onOpenChange={setCreateDialogOpen}
-        onSave={newKB => {
-          setKnowledgeBases(prev => [...prev, newKB]);
-          toast.success('知识库创建成功');
+        onSuccess={() => {
+          loadKnowledgeBases();
         }}
       />
     </div>

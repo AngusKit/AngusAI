@@ -9,6 +9,8 @@ import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import KnowledgeBases from '@/services/KnowledgeBases';
+import { VisibilityEnum } from '@/enums/enums';
 
 interface EditKnowledgeBaseDialogProps {
   open: boolean;
@@ -23,8 +25,9 @@ interface EditKnowledgeBaseDialogProps {
     tags?: string[];
     chunkSize?: number;
     chunkOverlap?: number;
-    embeddingModelId?: string;
+    embeddingModelId?: number;
   } | null;
+  onSuccess?: () => void;
 }
 
 // 扩展的图标选项 - 32个图标
@@ -63,7 +66,7 @@ const iconOptions = [
   { emoji: '🌺', bg: 'bg-pink-100 dark:bg-pink-900/30', label: '花朵' },
 ];
 
-export function EditKnowledgeBaseDialog({ open, onOpenChange, knowledgeBase }: EditKnowledgeBaseDialogProps) {
+export function EditKnowledgeBaseDialog({ open, onOpenChange, knowledgeBase, onSuccess }: EditKnowledgeBaseDialogProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [kbName, setKbName] = useState('');
   const [description, setDescription] = useState('');
@@ -75,8 +78,9 @@ export function EditKnowledgeBaseDialog({ open, onOpenChange, knowledgeBase }: E
   // 配置处理参数
   const [chunkSize, setChunkSize] = useState([512]);
   const [chunkOverlap, setChunkOverlap] = useState([50]);
-  const [embeddingModelId, setEmbeddingModelId] = useState('text-embedding-ada-002');
+  const [embeddingModelId, setEmbeddingModelId] = useState<number | undefined>(undefined);
   const [vectorStoreId, setVectorStoreId] = useState('1'); // 默认选择第一个
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const steps = [
     { number: 1, title: '基本信息' },
@@ -181,7 +185,7 @@ export function EditKnowledgeBaseDialog({ open, onOpenChange, knowledgeBase }: E
       // 配置处理参数
       setChunkSize([knowledgeBase.chunkSize || 512]);
       setChunkOverlap([knowledgeBase.chunkOverlap || 50]);
-      setEmbeddingModelId(knowledgeBase.embeddingModelId || 'text-embedding-ada-002');
+      setEmbeddingModelId(knowledgeBase.embeddingModelId);
 
       // 根据icon找到对应的索引
       if (knowledgeBase.icon) {
@@ -219,9 +223,50 @@ export function EditKnowledgeBaseDialog({ open, onOpenChange, knowledgeBase }: E
       }
 
       // 更新知识库
+      handleUpdateKnowledgeBase();
+    }
+  };
+
+  const handleUpdateKnowledgeBase = async () => {
+    if (!knowledgeBase || isSubmitting) return;
+    
+    setIsSubmitting(true);
+    try {
+      const selectedIconOption = iconOptions[selectedIcon];
+      const visibilityMap: Record<string, VisibilityEnum> = {
+        private: VisibilityEnum.PRIVATE,
+        team: VisibilityEnum.TEAM,
+        public: VisibilityEnum.PUBLIC,
+      };
+
+      const updateData: any = {
+        name: kbName.trim(),
+        icon: selectedIconOption.emoji,
+        iconBg: selectedIconOption.bg,
+        description: description.trim(),
+        visibility: visibilityMap[visibility] || VisibilityEnum.PRIVATE,
+        tags: tags.length > 0 ? tags : undefined,
+      };
+
+      // 如果配置了向量化模型，添加config
+      if (embeddingModelId) {
+        updateData.config = {
+          chunkSize: chunkSize[0],
+          chunkOverlap: chunkOverlap[0],
+          embeddingModelId: embeddingModelId,
+        };
+      }
+
+      await KnowledgeBases.toggleKnowledge(knowledgeBase.id, updateData);
+      
       toast.success('知识库更新成功！');
       onOpenChange(false);
+      onSuccess?.();
       setCurrentStep(1);
+    } catch (error: any) {
+      toast.error(error?.data?.message || '更新知识库失败，请重试');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -331,96 +376,125 @@ export function EditKnowledgeBaseDialog({ open, onOpenChange, knowledgeBase }: E
     </div>
   );
 
-  const renderStep2 = () => (
-    <div className='py-6'>
-      <div className='space-y-6'>
-        {/* 向量存储源 */}
-        <div>
-          <Label className='text-sm mb-3 block dark:text-gray-300'>向量存储源</Label>
-          <Select value={vectorStoreId} onValueChange={setVectorStoreId}>
-            <SelectTrigger className='dark:bg-gray-900 dark:border-gray-700 dark:text-white'>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
-              {vectorStores.map(store => (
-                <SelectItem key={store.id} value={store.id} className='dark:text-white'>
-                  <div className='flex items-center gap-2'>
-                    <span>{store.icon}</span>
-                    <span>{store.name}</span>
-                    <span className='text-xs text-gray-500 dark:text-gray-400'>({store.type})</span>
-                    {store.status === 'connected' ? (
-                      <Badge
-                        variant='outline'
-                        className='text-xs border-green-500 text-green-600 dark:text-green-400 ml-2'
-                      >
-                        已连接
-                      </Badge>
-                    ) : (
-                      <Badge
-                        variant='outline'
-                        className='text-xs border-gray-400 text-gray-500 dark:text-gray-400 ml-2'
-                      >
-                        未连接
-                      </Badge>
-                    )}
-                  </div>
+  const renderStep2 = () => {
+    // 确保 chunkSize 和 chunkOverlap 始终是有效的数组
+    const safeChunkSize = Array.isArray(chunkSize) && chunkSize.length > 0 ? chunkSize : [512];
+    const safeChunkOverlap = Array.isArray(chunkOverlap) && chunkOverlap.length > 0 ? chunkOverlap : [50];
+    const currentChunkSize = safeChunkSize[0];
+    const currentChunkOverlap = safeChunkOverlap[0];
+    
+    return (
+      <div className='py-6'>
+        <div className='space-y-6'>
+          {/* 向量存储源 */}
+          <div>
+            <Label className='text-sm mb-3 block dark:text-gray-300'>向量存储源</Label>
+            <Select value={vectorStoreId} onValueChange={setVectorStoreId}>
+              <SelectTrigger className='dark:bg-gray-900 dark:border-gray-700 dark:text-white'>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
+                {vectorStores.map(store => (
+                  <SelectItem key={store.id} value={store.id} className='dark:text-white'>
+                    <div className='flex items-center gap-2'>
+                      <span>{store.icon}</span>
+                      <span>{store.name}</span>
+                      <span className='text-xs text-gray-500 dark:text-gray-400'>({store.type})</span>
+                      {store.status === 'connected' ? (
+                        <Badge
+                          variant='outline'
+                          className='text-xs border-green-500 text-green-600 dark:text-green-400 ml-2'
+                        >
+                          已连接
+                        </Badge>
+                      ) : (
+                        <Badge
+                          variant='outline'
+                          className='text-xs border-gray-400 text-gray-500 dark:text-gray-400 ml-2'
+                        >
+                          未连接
+                        </Badge>
+                      )}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className='text-xs text-gray-500 dark:text-gray-400 mt-2'>选择用于存储向量数据的存储源</p>
+          </div>
+
+          {/* 分段大小 */}
+          <div>
+            <div className='flex items-center justify-between mb-3'>
+              <Label className='text-sm dark:text-gray-300'>分段大小</Label>
+              <span className='text-sm dark:text-white'>{currentChunkSize}</span>
+            </div>
+            <Slider 
+              value={safeChunkSize} 
+              onValueChange={setChunkSize} 
+              min={100} 
+              max={2000} 
+              step={1} 
+              className='w-full' 
+            />
+            <p className='text-xs text-gray-500 dark:text-gray-400 mt-2'>控制文本分块的大小，范围：100-2000 字符</p>
+          </div>
+
+          {/* 分段重叠 */}
+          <div>
+            <div className='flex items-center justify-between mb-3'>
+              <Label className='text-sm dark:text-gray-300'>分段重叠</Label>
+              <span className='text-sm dark:text-white'>{currentChunkOverlap}</span>
+            </div>
+            <Slider 
+              value={safeChunkOverlap} 
+              onValueChange={setChunkOverlap} 
+              min={0} 
+              max={200} 
+              step={1} 
+              className='w-full' 
+            />
+            <p className='text-xs text-gray-500 dark:text-gray-400 mt-2'>控制相邻文本块的重叠字符数，范围：0-200 字符</p>
+          </div>
+
+          {/* 向量化模型 */}
+          <div>
+            <Label className='text-sm mb-3 block dark:text-gray-300'>向量化模型（可选）</Label>
+            <Select 
+              value={embeddingModelId?.toString() || ''} 
+              onValueChange={(value) => setEmbeddingModelId(value ? Number(value) : undefined)}
+            >
+              <SelectTrigger className='dark:bg-gray-900 dark:border-gray-700 dark:text-white'>
+                <SelectValue placeholder='不指定时使用默认模型' />
+              </SelectTrigger>
+              <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
+                <SelectItem value='' className='dark:text-white'>
+                  使用默认模型
                 </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <p className='text-xs text-gray-500 dark:text-gray-400 mt-2'>选择用于存储向量数据的存储源</p>
-        </div>
-
-        {/* 分段大小 */}
-        <div>
-          <div className='flex items-center justify-between mb-3'>
-            <Label className='text-sm dark:text-gray-300'>分段大小</Label>
-            <span className='text-sm dark:text-white'>{chunkSize[0]}</span>
+                {/* 注意：这里需要根据实际的模型ID列表来填充，目前使用示例ID */}
+                <SelectItem value='1' className='dark:text-white'>
+                  text-embedding-ada-002
+                </SelectItem>
+                <SelectItem value='2' className='dark:text-white'>
+                  text-embedding-3-small
+                </SelectItem>
+                <SelectItem value='3' className='dark:text-white'>
+                  text-embedding-3-large
+                </SelectItem>
+                <SelectItem value='4' className='dark:text-white'>
+                  m3e-base
+                </SelectItem>
+                <SelectItem value='5' className='dark:text-white'>
+                  m3e-large
+                </SelectItem>
+              </SelectContent>
+            </Select>
+            <p className='text-xs text-gray-500 dark:text-gray-400 mt-2'>选择用于文本向量化的模型，不指定时使用默认模型</p>
           </div>
-          <Slider value={chunkSize} onValueChange={setChunkSize} min={100} max={2000} step={1} className='w-full' />
-          <p className='text-xs text-gray-500 dark:text-gray-400 mt-2'>控制文本分块的大小，范围：100-2000 字符</p>
-        </div>
-
-        {/* 分段重叠 */}
-        <div>
-          <div className='flex items-center justify-between mb-3'>
-            <Label className='text-sm dark:text-gray-300'>分段重叠</Label>
-            <span className='text-sm dark:text-white'>{chunkOverlap[0]}</span>
-          </div>
-          <Slider value={chunkOverlap} onValueChange={setChunkOverlap} min={0} max={200} step={1} className='w-full' />
-          <p className='text-xs text-gray-500 dark:text-gray-400 mt-2'>控制相邻文本块的重叠字符数，范围：0-200 字符</p>
-        </div>
-
-        {/* 向量化模型 */}
-        <div>
-          <Label className='text-sm mb-3 block dark:text-gray-300'>向量化模型</Label>
-          <Select value={embeddingModelId} onValueChange={setEmbeddingModelId}>
-            <SelectTrigger className='dark:bg-gray-900 dark:border-gray-700 dark:text-white'>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
-              <SelectItem value='text-embedding-ada-002' className='dark:text-white'>
-                text-embedding-ada-002
-              </SelectItem>
-              <SelectItem value='text-embedding-3-small' className='dark:text-white'>
-                text-embedding-3-small
-              </SelectItem>
-              <SelectItem value='text-embedding-3-large' className='dark:text-white'>
-                text-embedding-3-large
-              </SelectItem>
-              <SelectItem value='m3e-base' className='dark:text-white'>
-                m3e-base
-              </SelectItem>
-              <SelectItem value='m3e-large' className='dark:text-white'>
-                m3e-large
-              </SelectItem>
-            </SelectContent>
-          </Select>
-          <p className='text-xs text-gray-500 dark:text-gray-400 mt-2'>选择用于文本向量化的模型</p>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -513,13 +587,14 @@ export function EditKnowledgeBaseDialog({ open, onOpenChange, knowledgeBase }: E
             )}
             <Button
               onClick={handleNext}
+              disabled={isSubmitting}
               className={
                 currentStep === 2
                   ? 'bg-green-600 hover:bg-green-700 text-white'
                   : 'bg-blue-500 hover:bg-blue-600 text-white'
               }
             >
-              {currentStep === 2 ? '保存更新' : '下一步'}
+              {isSubmitting ? '保存中...' : currentStep === 2 ? '保存更新' : '下一步'}
             </Button>
           </div>
         </div>

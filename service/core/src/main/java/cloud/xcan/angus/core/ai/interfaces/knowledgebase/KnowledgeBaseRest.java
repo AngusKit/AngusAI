@@ -120,4 +120,6 @@ public class KnowledgeBaseRest {
       @Valid @ParameterObject KnowledgeBaseFindDto dto) {
     return ApiLocaleResult.success(knowledgeBaseFacade.list(dto));
   }
+
+  // TODO 统计接口
 }
