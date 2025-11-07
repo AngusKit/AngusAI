@@ -8,8 +8,8 @@ import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-@Data
 @EqualsAndHashCode(callSuper = true)
+@Data
 @Schema(description = "知识库详情视图对象")
 public class KnowledgeBaseDetailVo extends TenantAuditingVo {
 

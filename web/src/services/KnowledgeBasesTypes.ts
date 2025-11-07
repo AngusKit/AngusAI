@@ -155,7 +155,7 @@ export interface KnowledgeBaseConfig {
    */
   chunkOverlap: number;
   /**
-   * 向量化模型ID
+   * 向量化模型ID，不指定时使用默认模型
    */
   embeddingModelId: number;
 }

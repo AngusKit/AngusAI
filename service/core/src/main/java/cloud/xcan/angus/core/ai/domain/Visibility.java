@@ -1,10 +1,6 @@
 package cloud.xcan.angus.core.ai.domain;
 
-import cloud.xcan.angus.spec.experimental.EndpointRegister;
-import cloud.xcan.angus.spec.locale.EnumMessage;
-
-@EndpointRegister
-public enum Visibility implements EnumMessage<String> {
+public enum Visibility {
   PRIVATE,      // 私有
   TEAM,         // 团队
   PUBLIC;       // 公开

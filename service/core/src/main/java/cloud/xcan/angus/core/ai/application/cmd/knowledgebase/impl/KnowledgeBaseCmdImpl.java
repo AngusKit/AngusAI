@@ -33,6 +33,8 @@ public class KnowledgeBaseCmdImpl extends CommCmd<KnowledgeBase, Long> implement
         if (existing != null) {
           throw ResourceExisted.of("知识库名称「{0}」已存在", new Object[]{knowledgeBase.getName()});
         }
+
+        // TODO 检查如果配置了向量模型是否存在
       }
 
       @Override
@@ -62,6 +64,8 @@ public class KnowledgeBaseCmdImpl extends CommCmd<KnowledgeBase, Long> implement
             throw ResourceExisted.of("知识库「{0}」已存在", new Object[]{knowledgeBase.getName()});
           }
         }
+
+        // TODO 检查如果配置了向量模型是否存在
       }
 
       @Override

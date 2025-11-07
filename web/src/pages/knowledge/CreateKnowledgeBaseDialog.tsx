@@ -63,7 +63,7 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange }: CreateKnowledg
   // 配置处理参数
   const [chunkSize, setChunkSize] = useState([512]);
   const [chunkOverlap, setChunkOverlap] = useState([50]);
-  const [embeddingModelId, setEmbeddingModelId] = useState('text-embedding-ada-002');
+  const [embeddingModelId, setEmbeddingModelId] = useState('');
   const [vectorStoreId, setVectorStoreId] = useState('1'); // 默认选择第一个
 
   const steps = [
@@ -197,7 +197,7 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange }: CreateKnowledg
       setTagInput('');
       setChunkSize([512]);
       setChunkOverlap([50]);
-      setEmbeddingModelId('text-embedding-ada-002');
+      setEmbeddingModelId('');
       setVectorStoreId('1');
     }
   };

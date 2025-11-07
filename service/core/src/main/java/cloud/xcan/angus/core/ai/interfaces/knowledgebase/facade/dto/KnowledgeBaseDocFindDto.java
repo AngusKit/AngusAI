@@ -22,13 +22,13 @@ public class KnowledgeBaseDocFindDto extends PageQuery {
   @Schema(description = "启用状态筛选")
   private Boolean enabled;
 
-  @Schema(description = "所属租户ID", example = "1")
+  @Schema(description = "所属租户ID")
   private Long tenantId;
 
-  @Schema(description = "创建人ID", example = "1")
+  @Schema(description = "创建人ID")
   private Long createdBy;
 
-  @Schema(description = "创建时间", example = "2024-10-12 00:00:00")
+  @Schema(description = "创建时间")
   private LocalDateTime createdDate;
 
   @Schema(description = "排序字段", allowableValues = {"id", "createdDate", "name", "size"})

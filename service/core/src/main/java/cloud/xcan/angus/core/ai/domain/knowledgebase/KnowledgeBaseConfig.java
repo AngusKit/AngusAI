@@ -23,8 +23,7 @@ public class KnowledgeBaseConfig {
   @Schema(description = "分段重叠", example = "50")
   private Integer chunkOverlap = 50;
 
-  @NotNull
-  @Schema(description = "向量化模型ID")
+  @Schema(description = "向量化模型ID，不指定时使用默认模型")
   private Long embeddingModelId;
 
 }
