@@ -109,7 +109,7 @@ export interface PromptListVo extends TenantAuditingVo {
   /** 是否为系统模板 */
   isSystem?: boolean;
   /** 统计信息 */
-  stats?: PromptStatsVo;  
+  stats?: PromptStatsVo;
 }
 
 export interface PageResultPromptListVo {
@@ -212,4 +212,9 @@ export interface PromptCategoryUpdateDto {
 export type ListPromptCategoryResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: PromptCategoryVo[];
+
+  extensions?: {
+    totalPrompts: number,
+    totalFavorites: number
+  };
 };
