@@ -53,6 +53,12 @@ public class PromptCategoryCmdImpl extends CommCmd<PromptCategory, Long>
               .orElseThrow(() -> ResourceNotFound.of("父分类不存在", new Object[]{}));
         }
 
+        // 检查层级深度：最多支持三级
+        int newCategoryLevel = promptCategoryQuery.calculateCategoryLevel(category.getParentId());
+        if (newCategoryLevel > 3) {
+          throw ProtocolException.of("分类层级最多支持三级，无法创建", new Object[]{});
+        }
+
         // TODO 限制每个用户总共最多500个分组
       }
 

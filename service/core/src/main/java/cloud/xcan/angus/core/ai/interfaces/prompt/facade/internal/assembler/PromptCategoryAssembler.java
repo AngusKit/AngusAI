@@ -17,7 +17,7 @@ public class PromptCategoryAssembler {
   public static PromptCategory toCreateDomain(PromptCategoryCreateDto dto) {
     PromptCategory category = new PromptCategory();
     category.setName(dto.getName());
-    category.setName(dto.getIcon());
+    category.setIcon(dto.getIcon());
     category.setColor(dto.getColor());
     category.setParentId(dto.getParentId());
     category.setIsSystem(false); // 默认非系统分类
@@ -29,7 +29,7 @@ public class PromptCategoryAssembler {
     PromptCategory category = new PromptCategory();
     category.setId(id);
     category.setName(dto.getName());
-    category.setName(dto.getIcon());
+    category.setIcon(dto.getIcon());
     category.setColor(dto.getColor());
     category.setParentId(dto.getParentId());
     category.setIsSystem(false); // 默认非系统分类

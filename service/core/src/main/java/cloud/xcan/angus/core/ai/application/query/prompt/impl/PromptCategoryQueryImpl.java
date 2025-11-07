@@ -61,6 +61,19 @@ public class PromptCategoryQueryImpl implements PromptCategoryQuery {
   }
 
   @Override
+  public int calculateCategoryLevel(Long parentId) {
+    if (parentId == null) {
+      return 1; // 第一级
+    }
+
+    PromptCategory parent = promptCategoryRepo.findById(parentId)
+        .orElseThrow(() -> ResourceNotFound.of("父分类不存在", new Object[]{}));
+
+    // 递归计算父分类的层级深度
+    return calculateCategoryLevel(parent.getParentId()) + 1;
+  }
+
+  @Override
   public void setPromptCount(List<PromptCategory> categories) {
     if (categories == null || categories.isEmpty()) {
       return;
