@@ -5,6 +5,7 @@ import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBas
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBaseDocFindDto;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBaseDocSearchDto;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBaseDocToggleDto;
+import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBaseDocUploadDto;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo.KnowledgeBaseDocSearchResultVo;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo.KnowledgeBaseDocStatusVo;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo.KnowledgeBaseDocVo;
@@ -12,6 +13,8 @@ import cloud.xcan.angus.remote.ApiLocaleResult;
 import cloud.xcan.angus.remote.PageResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,6 +23,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,15 +32,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "KnowledgeBaseDoc", description = "文档管理 - 文档的上传、编辑、删除、状态管理等功能")
 @Validated
 @RestController
-@RequestMapping("/api/v1/documents")
+@RequestMapping("/api/v1/knowledge-bases")
 public class KnowledgeBaseDocRest {
 
   @Resource
@@ -47,11 +49,12 @@ public class KnowledgeBaseDocRest {
       @ApiResponse(responseCode = "201", description = "文档上传成功")
   })
   @ResponseStatus(HttpStatus.CREATED)
-  @PostMapping("/knowledge-bases/{knowledgeBaseId}")
+  @PostMapping(value = "/{knowledgeBaseId}/documents/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ApiLocaleResult<KnowledgeBaseDocVo> uploadDocument(
       @Parameter(description = "知识库ID") @PathVariable Long knowledgeBaseId,
-      @Parameter(description = "文件列表") @RequestParam("files") MultipartFile file) {
-    return ApiLocaleResult.success(documentFacade.uploadDocument(knowledgeBaseId, file));
+      @Parameter(description = "文件列表", content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE), schema = @Schema(type = "object"))
+      KnowledgeBaseDocUploadDto dto) {
+    return ApiLocaleResult.success(documentFacade.uploadDocument(knowledgeBaseId, dto));
   }
 
   @Operation(operationId = "reprocessDocument", summary = "重新处理文档", description = "重新处理失败的文档")
@@ -59,10 +62,10 @@ public class KnowledgeBaseDocRest {
       @ApiResponse(responseCode = "200", description = "已加入处理队列")
   })
   @ResponseStatus(HttpStatus.OK)
-  @PostMapping("/{documentId}/knowledge-bases/{knowledgeBaseId}/reprocess")
+  @PostMapping("/{knowledgeBaseId}/documents/{documentId}/reprocess")
   public ApiLocaleResult<KnowledgeBaseDocStatusVo> reprocessDocument(
-      @Parameter(description = "文档ID") @PathVariable Long documentId,
-      @Parameter(description = "知识库ID") @PathVariable Long knowledgeBaseId) {
+      @Parameter(description = "知识库ID") @PathVariable Long knowledgeBaseId,
+      @Parameter(description = "文档ID") @PathVariable Long documentId) {
     return ApiLocaleResult.success(documentFacade.reprocessDocument(knowledgeBaseId, documentId));
   }
 
@@ -71,10 +74,10 @@ public class KnowledgeBaseDocRest {
       @ApiResponse(responseCode = "200", description = "状态切换成功")
   })
   @ResponseStatus(HttpStatus.OK)
-  @PutMapping("/{documentId}/knowledge-bases/{knowledgeBaseId}/toggle")
+  @PutMapping("{knowledgeBaseId}/documents/{documentId}/toggle")
   public ApiLocaleResult<KnowledgeBaseDocStatusVo> toggleDocument(
-      @Parameter(description = "文档ID") @PathVariable Long documentId,
       @Parameter(description = "知识库ID") @PathVariable Long knowledgeBaseId,
+      @Parameter(description = "文档ID") @PathVariable Long documentId,
       @Valid @RequestBody KnowledgeBaseDocToggleDto dto) {
     return ApiLocaleResult.success(documentFacade.toggleDocument(knowledgeBaseId, documentId, dto));
   }
@@ -84,10 +87,10 @@ public class KnowledgeBaseDocRest {
       @ApiResponse(responseCode = "204", description = "删除成功")
   })
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  @DeleteMapping("/{documentId}/knowledge-bases/{knowledgeBaseId}")
+  @DeleteMapping("/{knowledgeBaseId}/documents/{documentId}")
   public void deleteDocument(
-      @Parameter(description = "文档ID") @PathVariable Long documentId,
-      @Parameter(description = "知识库ID") @PathVariable Long knowledgeBaseId) {
+      @Parameter(description = "知识库ID") @PathVariable Long knowledgeBaseId,
+      @Parameter(description = "文档ID") @PathVariable Long documentId) {
     documentFacade.deleteDocument(knowledgeBaseId, documentId);
   }
 
@@ -96,7 +99,7 @@ public class KnowledgeBaseDocRest {
       @ApiResponse(responseCode = "200", description = "批量删除成功")
   })
   @ResponseStatus(HttpStatus.OK)
-  @PostMapping("/knowledge-bases/{knowledgeBaseId}/batch-delete")
+  @PostMapping("/{knowledgeBaseId}/documents/batch-delete")
   public void batchDeleteDocuments(
       @Parameter(description = "知识库ID") @PathVariable Long knowledgeBaseId,
       @Valid @RequestBody KnowledgeBaseDocBatchDeleteDto dto) {
@@ -107,7 +110,7 @@ public class KnowledgeBaseDocRest {
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "文档列表获取成功")
   })
-  @GetMapping("/knowledge-bases/{knowledgeBaseId}")
+  @GetMapping("/{knowledgeBaseId}/documents")
   public ApiLocaleResult<PageResult<KnowledgeBaseDocVo>> getDocumentList(
       @Parameter(description = "知识库ID") @PathVariable Long knowledgeBaseId,
       @Valid @ParameterObject KnowledgeBaseDocFindDto dto) {
@@ -119,7 +122,7 @@ public class KnowledgeBaseDocRest {
       @ApiResponse(responseCode = "200", description = "检索成功")
   })
   @ResponseStatus(HttpStatus.OK)
-  @PostMapping("/knowledge-bases/{knowledgeBaseId}/search")
+  @PostMapping("/{knowledgeBaseId}/documents/search")
   public ApiLocaleResult<List<KnowledgeBaseDocSearchResultVo>> searchDocuments(
       @Parameter(description = "知识库ID") @PathVariable Long knowledgeBaseId,
       @Valid @RequestBody KnowledgeBaseDocSearchDto dto) {

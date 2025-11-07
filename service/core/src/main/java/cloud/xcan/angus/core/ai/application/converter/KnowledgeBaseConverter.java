@@ -21,7 +21,7 @@ public class KnowledgeBaseConverter {
     doc.setSize(file.getSize());
     doc.setStatus(DocumentStatus.PENDING);
     doc.setEnabled(true);
-    doc.setProcessingProgress(0);
+    doc.setProcessingProgress(0D);
     doc.setErrorMessage(null);
     doc.setFilePath(uploadResult.get(0).getUrl());
     doc.setContentHash(calculateContentHash(file));

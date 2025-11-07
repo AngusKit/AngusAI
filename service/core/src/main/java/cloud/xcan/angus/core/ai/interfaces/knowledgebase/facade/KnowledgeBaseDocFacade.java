@@ -4,19 +4,19 @@ import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBas
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBaseDocFindDto;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBaseDocSearchDto;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBaseDocToggleDto;
-import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo.KnowledgeBaseDocVo;
+import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBaseDocUploadDto;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo.KnowledgeBaseDocSearchResultVo;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo.KnowledgeBaseDocStatusVo;
+import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo.KnowledgeBaseDocVo;
 import cloud.xcan.angus.remote.PageResult;
 import java.util.List;
-import org.springframework.web.multipart.MultipartFile;
 
 public interface KnowledgeBaseDocFacade {
 
   /**
    * 上传文档
    */
-  KnowledgeBaseDocVo uploadDocument(Long knowledgeBaseId, MultipartFile file);
+  KnowledgeBaseDocVo uploadDocument(Long knowledgeBaseId, KnowledgeBaseDocUploadDto dto);
 
   /**
    * 切换文档状态

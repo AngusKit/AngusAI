@@ -15,7 +15,7 @@ public class KnowledgeBaseDocStatusVo {
   private DocumentStatus status;
 
   @Schema(description = "处理进度", example = "75")
-  private Integer processingProgress;
+  private Double processingProgress;
 
   @Schema(description = "分段数量", example = "8")
   private Integer chunks;

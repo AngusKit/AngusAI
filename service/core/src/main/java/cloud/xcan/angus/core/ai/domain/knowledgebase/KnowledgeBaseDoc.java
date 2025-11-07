@@ -51,7 +51,7 @@ public class KnowledgeBaseDoc extends TenantAuditingEntity<KnowledgeBaseDoc, Lon
   private Integer chunks = 0;
 
   @Column(name = "processing_progress")
-  private Integer processingProgress = 0;
+  private Double processingProgress = 0D;
 
   @Column(name = "error_message", length = Constants.DOCUMENT_ERROR_MESSAGE_MAX_LENGTH)
   private String errorMessage;

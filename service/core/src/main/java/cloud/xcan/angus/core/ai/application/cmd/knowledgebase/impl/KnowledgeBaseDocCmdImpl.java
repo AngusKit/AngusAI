@@ -64,8 +64,8 @@ public class KnowledgeBaseDocCmdImpl extends CommCmd<KnowledgeBaseDoc, Long> imp
 
         // 上传文件到文件存储服务
         List<FileUploadVo> uploadResult = fileRemote.upload(
-            new MultipartFile[]{file}, KNOWLEDGE_DOC_UPLOAD_BIZ_KEY,
-            file.getOriginalFilename(), null).orElseContentThrow();
+            new MultipartFile[]{file}, null, KNOWLEDGE_DOC_UPLOAD_BIZ_KEY,
+            null).orElseContentThrow();
 
         KnowledgeBaseDoc doc = toUploadDomain(knowledgeBaseId, file, uploadResult);
         insert(doc);
@@ -97,7 +97,7 @@ public class KnowledgeBaseDocCmdImpl extends CommCmd<KnowledgeBaseDoc, Long> imp
 
         // 重置状态为处理中
         documentDb.setStatus(DocumentStatus.PENDING);
-        documentDb.setProcessingProgress(0);
+        documentDb.setProcessingProgress(0D);
         documentDb.setErrorMessage(null);
         knowledgeBaseDocRepo.save(documentDb);
         return documentDb;

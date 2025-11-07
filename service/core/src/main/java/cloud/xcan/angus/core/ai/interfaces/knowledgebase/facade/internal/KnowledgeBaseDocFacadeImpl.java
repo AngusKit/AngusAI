@@ -11,10 +11,12 @@ import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBas
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBaseDocFindDto;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBaseDocSearchDto;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBaseDocToggleDto;
+import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBaseDocUploadDto;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.internal.assembler.KnowledgeBaseDocAssembler;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo.KnowledgeBaseDocVo;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo.KnowledgeBaseDocSearchResultVo;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo.KnowledgeBaseDocStatusVo;
+import cloud.xcan.angus.core.biz.NameJoin;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.PageResult;
 import cloud.xcan.angus.remote.search.SearchCriteria;
@@ -34,18 +36,21 @@ public class KnowledgeBaseDocFacadeImpl implements KnowledgeBaseDocFacade {
   @Resource
   private KnowledgeBaseDocQuery documentQuery;
 
+  @NameJoin
   @Override
-  public KnowledgeBaseDocVo uploadDocument(Long knowledgeBaseId, MultipartFile file) {
-    KnowledgeBaseDoc doc = documentCmd.uploadDocument(knowledgeBaseId, file);
+  public KnowledgeBaseDocVo uploadDocument(Long knowledgeBaseId, KnowledgeBaseDocUploadDto dto) {
+    KnowledgeBaseDoc doc = documentCmd.uploadDocument(knowledgeBaseId, dto.getFile());
     return KnowledgeBaseDocAssembler.toDocumentListVo(doc);
   }
 
+  @NameJoin
   @Override
   public KnowledgeBaseDocStatusVo reprocessDocument(Long knowledgeBaseId, Long documentId) {
     KnowledgeBaseDoc document = documentCmd.reprocessDocument(knowledgeBaseId, documentId);
     return KnowledgeBaseDocAssembler.toDocumentStatusVo(document);
   }
 
+  @NameJoin
   @Override
   public KnowledgeBaseDocStatusVo toggleDocument(Long knowledgeBaseId, Long documentId,
       KnowledgeBaseDocToggleDto dto) {
@@ -64,6 +69,7 @@ public class KnowledgeBaseDocFacadeImpl implements KnowledgeBaseDocFacade {
     documentCmd.batchDeleteDocuments(knowledgeBaseId, dto.getDocumentIds());
   }
 
+  @NameJoin
   @Override
   public PageResult<KnowledgeBaseDocVo> getDocumentList(Long knowledgeBaseId,
       KnowledgeBaseDocFindDto dto) {
