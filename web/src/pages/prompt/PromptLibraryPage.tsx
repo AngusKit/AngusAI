@@ -63,6 +63,7 @@ import {
   Flag,
   Compass,
 } from 'lucide-react';
+import { XcanPagination } from '@/components/ui/pagination';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -316,6 +317,12 @@ export function PromptLibraryPage() {
   const [loading, setLoading] = useState(false);
   const [categoriesLoading, setCategoriesLoading] = useState(false);
 
+  const [pageParam, setPageParam] = useState({
+    pageSize: 10,
+    pageNo: 1,
+    total: 0
+  });
+
   // 对话框状态
   const [showPromptDialog, setShowPromptDialog] = useState(false);
   const [showCategoryDialog, setShowCategoryDialog] = useState(false);
@@ -398,8 +405,8 @@ export function PromptLibraryPage() {
     setLoading(true);
     try {
       const query: any = {
-        page: 1,
-        size: 1000, // 加载所有数据
+        pageNo: pageParam.pageNo,
+        pageSize: pageParam.pageSize, // 加载所有数据
       };
 
       // 根据选中的分类设置筛选条件
@@ -422,6 +429,12 @@ export function PromptLibraryPage() {
       // 为了兼容两种情况，先尝试 response.data.data.list，再尝试 response.data.list
       const responseData = response.data as any;
       const list = responseData?.data?.list || responseData?.list;
+      const total = Number(responseData?.total) || 0;
+
+      setPageParam((pre) => ({
+        ...pre,
+        total
+      }));
       
       if (list && Array.isArray(list)) {
         console.log('找到提示词列表，数量:', list.length); // 调试日志
@@ -437,7 +450,12 @@ export function PromptLibraryPage() {
     } finally {
       setLoading(false);
     }
-  }, [selectedCategory, debouncedSearchQuery, convertPromptVoToPrompt, language]);
+  }, [selectedCategory, debouncedSearchQuery, convertPromptVoToPrompt, language, pageParam.pageNo, pageParam.pageSize]);
+
+  const handlePageChange = (page: {pageSize: number, pageNo: number}) => {
+    setPageParam((pre) => ({...pre, ...page}));
+  }
+
 
   // 搜索防抖处理
   useEffect(() => {
@@ -1103,7 +1121,17 @@ export function PromptLibraryPage() {
               )}
             </div>
           </ScrollArea>
+
+          {
+            pageParam.total > pageParam.pageSize && <XcanPagination
+            {...pageParam}
+            onChange={handlePageChange}
+          />
+        }
         </div>
+
+        
+        
       </div>
 
       {/* 新建/编辑提示词对话框 */}
