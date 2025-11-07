@@ -28,7 +28,7 @@ export class Prompts<SecurityDataType = unknown> {
        * 分类ID
        * @format int64
        */
-      categoryId?: number;
+      categoryId?: string;
       /** 是否收藏 */
       isFavorite?: boolean;
       /** 排序字段 */
@@ -70,7 +70,7 @@ export class Prompts<SecurityDataType = unknown> {
    * @request POST:${AI}/prompts/{id}/use
    * @secure
    */
-  usePrompt = (id: number, params: RequestParams = {}) =>
+  usePrompt = (id: string, params: RequestParams = {}) =>
     this.httpClient.request<PromptDetailResult, ApiLocaleResult>({
       path: `${AI}/prompts/${id}/use`,
       method: 'POST',
@@ -87,7 +87,7 @@ export class Prompts<SecurityDataType = unknown> {
    * @secure
    */
   toggleFavoritePrompt = (
-    id: number,
+    id: string,
     query: {
       /** 是否收藏 */
       isFavorite: boolean;
@@ -111,7 +111,7 @@ export class Prompts<SecurityDataType = unknown> {
    * @secure
    */
   duplicatePrompt = (
-    id: number,
+    id: string,
     query?: {
       /** 新标题 */
       title?: string;
@@ -134,7 +134,7 @@ export class Prompts<SecurityDataType = unknown> {
    * @request GET:${AI}/prompts/{id}
    * @secure
    */
-  getPromptDetail = (id: number, params: RequestParams = {}) =>
+  getPromptDetail = (id: string, params: RequestParams = {}) =>
     this.httpClient.request<PromptDetailResult, ApiLocaleResult>({
       path: `${AI}/prompts/${id}`,
       method: 'GET',
@@ -150,7 +150,7 @@ export class Prompts<SecurityDataType = unknown> {
    * @request DELETE:${AI}/prompts/{id}
    * @secure
    */
-  deletePrompt = (id: number, params: RequestParams = {}) =>
+  deletePrompt = (id: string, params: RequestParams = {}) =>
     this.httpClient.request<ApiLocaleResult, ApiLocaleResult>({
       path: `${AI}/prompts/${id}`,
       method: 'DELETE',
@@ -166,7 +166,7 @@ export class Prompts<SecurityDataType = unknown> {
    * @request PATCH:${AI}/prompts/{id}
    * @secure
    */
-  updatePrompt = (id: number, data: PromptUpdateDto, params: RequestParams = {}) =>
+  updatePrompt = (id: string, data: PromptUpdateDto, params: RequestParams = {}) =>
     this.httpClient.request<PromptDetailResult, ApiLocaleResult>({
       path: `${AI}/prompts/${id}`,
       method: 'PATCH',

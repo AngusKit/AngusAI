@@ -1129,6 +1129,10 @@
     height: 660px;
   }
 
+  .h-\[calc\(100vh-102px\)\] {
+    height: calc(100vh - 102px);
+  }
+
   .h-\[calc\(100\%-1px\)\] {
     height: calc(100% - 1px);
   }

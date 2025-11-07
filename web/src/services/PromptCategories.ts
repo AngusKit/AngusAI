@@ -132,7 +132,7 @@ export class PromptCategories<SecurityDataType = unknown> {
   batchDeletePromptCategories = (
     query: {
       /** 分类ID数组 */
-      ids: number[];
+      ids: string[];
     },
     params: RequestParams = {}
   ) =>

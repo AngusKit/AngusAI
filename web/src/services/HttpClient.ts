@@ -298,7 +298,7 @@ export class HttpClient<SecurityDataType = unknown> {
     format,
     body,
     ...params
-  }: FullRequestParams): Promise<AxiosResponse<T>> => {
+  }: FullRequestParams): Promise<AxiosResponse<T>['data']> => {
     const secureParams =
       ((typeof secure === 'boolean' ? secure : this.secure) &&
         this.securityWorker &&

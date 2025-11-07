@@ -20,7 +20,7 @@ export interface PromptDetailVo extends TenantAuditingVo {
    * ID
    * @format int64
    */
-  id?: number;
+  id?: string;
   /** 标题 */
   title?: string;
   /** 内容 */
@@ -31,7 +31,7 @@ export interface PromptDetailVo extends TenantAuditingVo {
    * 分类ID
    * @format int64
    */
-  categoryId?: number;
+  categoryId?: string;
   /** 分类名称 */
   categoryName?: string;
   /** 标签 */
@@ -62,7 +62,7 @@ export interface PromptCreateDto {
    * 分类ID
    * @format int64
    */
-  categoryId: number;
+  categoryId: string;
   /** 标签 */
   tags?: string[];
 }
@@ -79,7 +79,7 @@ export interface PromptUpdateDto {
    * 分类ID
    * @format int64
    */
-  categoryId?: number;
+  categoryId?: string;
   /** 标签 */
   tags?: string[];
 }
@@ -90,7 +90,7 @@ export interface PromptListVo extends TenantAuditingVo {
    * ID
    * @format int64
    */
-  id?: number;
+  id?: string;
   /** 标题 */
   title?: string;
   /** 内容 */
@@ -99,7 +99,7 @@ export interface PromptListVo extends TenantAuditingVo {
    * 分类ID
    * @format int64
    */
-  categoryId?: number;
+  categoryId?: string;
   /** 分类名称 */
   categoryName?: string;
   /** 标签 */
@@ -127,6 +127,8 @@ export interface PageResultPromptListVo {
 export type PagePromptListResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: PageResultPromptListVo;
+  
+  extensions?: {[key: string]: any}
 };
 
 /** 排序字段 */
@@ -144,7 +146,7 @@ export interface PromptCategoryVo {
    * ID
    * @format int64
    */
-  id?: number;
+  id?: string;
   /** 分类名称 */
   name?: string;
   /** 图标名称 */
@@ -155,7 +157,7 @@ export interface PromptCategoryVo {
    * 父分类ID
    * @format int64
    */
-  parentId?: number;
+  parentId?: string;
   /** 是否为系统分类 */
   isSystem?: boolean;
   /**
@@ -190,7 +192,7 @@ export interface PromptCategoryCreateDto {
    * 父分类ID（可选，为空表示根分类）
    * @format int64
    */
-  parentId?: number;
+  parentId?: string;
 }
 
 /** 更新分类请求参数 */
@@ -205,7 +207,7 @@ export interface PromptCategoryUpdateDto {
    * 父分类ID（可选）
    * @format int64
    */
-  parentId?: number;
+  parentId?: string;
 }
 
 /** The API response result of supporting international message. */

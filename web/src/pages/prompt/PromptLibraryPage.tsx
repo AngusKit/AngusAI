@@ -87,7 +87,7 @@ interface Prompt {
   title: string;
   content: string;
   category: string;
-  categoryId?: number;
+  categoryId?: string;
   tags: { label: string; color: string }[];
   isFavorite: boolean;
   usageCount: number;
@@ -316,6 +316,8 @@ export function PromptLibraryPage() {
   const [prompts, setPrompts] = useState<Prompt[]>([]);
   const [loading, setLoading] = useState(false);
   const [categoriesLoading, setCategoriesLoading] = useState(false);
+  const [favoriteCount, setFavoriteCount] = useState(0);
+  const [totalCount, setTotalCount] = useState(0)
 
   const [pageParam, setPageParam] = useState({
     pageSize: 10,
@@ -351,7 +353,7 @@ export function PromptLibraryPage() {
   // 将API返回的提示词转换为页面使用的格式
   const convertPromptVoToPrompt = useCallback((vo: PromptListVo): Prompt => {
     return {
-      id: String(vo.id || ''),
+      id: vo.id,
       title: vo.title || '',
       content: vo.content || '',
       category: vo.categoryId ? String(vo.categoryId) : '',
@@ -413,7 +415,7 @@ export function PromptLibraryPage() {
       if (selectedCategory === 'favorites') {
         query.isFavorite = true;
       } else if (selectedCategory !== 'all') {
-        query.categoryId = Number(selectedCategory);
+        query.categoryId = selectedCategory;
       }
 
       // 搜索条件
@@ -424,12 +426,14 @@ export function PromptLibraryPage() {
       const response = await Prompts.getPromptList(query);
       console.log('API响应数据:', response); // 调试日志
       
-      // HttpClient的响应拦截器会展开response.data，所以实际结构可能是 response.data.list
-      // 但根据类型定义 PagePromptListResult，应该是 response.data.data.list
-      // 为了兼容两种情况，先尝试 response.data.data.list，再尝试 response.data.list
-      const responseData = response.data as any;
-      const list = responseData?.data?.list || responseData?.list;
-      const total = Number(responseData?.total) || 0;
+      const {data, extensions} = response || {};
+      const list = data?.list || [];
+      const total = Number(data?.total) || 0;
+      const {totalPrompts = 0, totalFavorites = 0} = extensions || {};
+
+      setFavoriteCount(Number(totalFavorites));
+      setTotalCount(Number(totalPrompts));
+
 
       setPageParam((pre) => ({
         ...pre,
@@ -437,12 +441,13 @@ export function PromptLibraryPage() {
       }));
       
       if (list && Array.isArray(list)) {
-        console.log('找到提示词列表，数量:', list.length); // 调试日志
         const convertedPrompts = list.map(convertPromptVoToPrompt);
         setPrompts(convertedPrompts);
       } else {
-        console.log('未找到提示词列表，响应结构:', responseData); // 调试日志
         setPrompts([]);
+      }
+      if (!query.isFavorite && !query.categoryId && !query.keyword) {
+        setFavoriteCount(prompts.filter(item => item.isFavorite).length);
       }
     } catch (error: any) {
       console.error('加载提示词失败:', error);
@@ -503,67 +508,16 @@ export function PromptLibraryPage() {
     parentId: 'none',
   });
 
-  // 客户端过滤（如果API不支持搜索，则在这里过滤）
-  const filteredPrompts = useMemo(() => {
-    console.log('开始过滤提示词，总数:', prompts.length, '选中分类:', selectedCategory, '搜索关键词:', debouncedSearchQuery);
-    
-    const filtered = prompts.filter(prompt => {
-      // 如果API已经根据debouncedSearchQuery过滤了，这里就不需要再过滤
-      // 但为了保险起见，还是做一次客户端过滤
-      if (debouncedSearchQuery.trim()) {
-        const matchesSearch =
-          prompt.title.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
-          prompt.content.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
-          prompt.tags.some(tag => tag.label.toLowerCase().includes(debouncedSearchQuery.toLowerCase()));
-        if (!matchesSearch) {
-          return false;
-        }
-      }
-      
-      // 分类过滤：确保提示词属于选中的分类或其子分类
-      if (selectedCategory === 'all') {
-        return true;
-      }
-      if (selectedCategory === 'favorites') {
-        return prompt.isFavorite === true;
-      }
-      
-      // 检查是否属于选中的分类
-      const selectedCategoryId = Number(selectedCategory);
-      if (isNaN(selectedCategoryId)) {
-        console.warn('无效的分类ID:', selectedCategory);
-        return false;
-      }
-      
-      if (prompt.categoryId === selectedCategoryId) {
-        return true;
-      }
-      
-      // 检查是否属于选中分类的子分类
-      const childCategories = categories.filter(c => c.parentId === selectedCategory);
-      const childCategoryIds = childCategories.map(c => Number(c.id)).filter(id => !isNaN(id));
-      if (prompt.categoryId && childCategoryIds.includes(prompt.categoryId)) {
-        return true;
-      }
-      
-      return false;
-    });
-    
-    console.log('过滤后的提示词数量:', filtered.length);
-    return filtered;
-  }, [prompts, selectedCategory, debouncedSearchQuery, categories]);
 
   const getCategoryCount = (categoryId: string) => {
-    if (categoryId === 'all') return prompts.length;
-    if (categoryId === 'favorites') return prompts.filter(p => p.isFavorite).length;
+    if (categoryId === 'all') {
+      return totalCount;
+    };
 
-    // 统计该分类及其子分类的提示词数量
-    const childCategories = categories.filter(c => c.parentId === categoryId);
-    const childIds = childCategories.map(c => c.id);
-    const categoryNumId = Number(categoryId);
-    return prompts.filter(
-      p => p.categoryId === categoryNumId || (p.category === categoryId || childIds.includes(p.category))
-    ).length;
+    if (categoryId === 'favorites') {
+      return favoriteCount;
+    }
+    return undefined;
   };
 
   // 获取顶层分类（无父分类的分类）
@@ -599,12 +553,12 @@ export function PromptLibraryPage() {
 
     const newFavoriteStatus = !prompt.isFavorite;
     try {
-      await Prompts.toggleFavoritePrompt(Number(id), { isFavorite: newFavoriteStatus });
+      await Prompts.toggleFavoritePrompt(id, { isFavorite: newFavoriteStatus });
       setPrompts(prev => prev.map(p => (p.id === id ? { ...p, isFavorite: newFavoriteStatus } : p)));
       toast.success(language === 'zh-CN' ? '已更新收藏状态' : 'Favorite status updated');
     } catch (error: any) {
-      console.error('更新收藏状态失败:', error);
-      toast.error(error?.message || (language === 'zh-CN' ? '更新收藏状态失败' : 'Failed to update favorite status'));
+      // console.error('更新收藏状态失败:', error);
+      // toast.error(error?.message || (language === 'zh-CN' ? '更新收藏状态失败' : 'Failed to update favorite status'));
     }
   };
 
@@ -619,7 +573,7 @@ export function PromptLibraryPage() {
 
   const usePrompt = async (prompt: Prompt) => {
     try {
-      await Prompts.usePrompt(Number(prompt.id));
+      await Prompts.usePrompt(prompt.id);
       // 重新加载提示词以获取最新的使用次数
       await loadPrompts();
       copyPrompt(prompt.content);
@@ -634,7 +588,7 @@ export function PromptLibraryPage() {
 
   const duplicatePrompt = async (prompt: Prompt) => {
     try {
-      await Prompts.duplicatePrompt(Number(prompt.id), {
+      await Prompts.duplicatePrompt(prompt.id, {
         title: `${prompt.title} ${language === 'zh-CN' ? '(副本)' : '(Copy)'}`,
       });
       await loadPrompts(); // 重新加载列表
@@ -684,8 +638,8 @@ export function PromptLibraryPage() {
       return;
     }
 
-    const categoryId = Number(promptForm.category);
-    if (!categoryId || isNaN(categoryId)) {
+    const categoryId = promptForm.category;
+    if (!categoryId) {
       toast.error(language === 'zh-CN' ? '请选择分类' : 'Please select a category');
       return;
     }
@@ -693,10 +647,10 @@ export function PromptLibraryPage() {
     try {
       if (editingPrompt) {
         // 编辑
-        await Prompts.updatePrompt(Number(editingPrompt.id), {
+        await Prompts.updatePrompt(editingPrompt.id, {
           title: promptForm.title,
           content: promptForm.content,
-          categoryId: categoryId,
+          categoryId,
           tags: promptForm.tags.map(t => t.label),
         });
         toast.success(language === 'zh-CN' ? '提示词已更新' : 'Prompt updated');
@@ -705,7 +659,7 @@ export function PromptLibraryPage() {
         await Prompts.createPrompt({
           title: promptForm.title,
           content: promptForm.content,
-          categoryId: categoryId,
+          categoryId,
           tags: promptForm.tags.map(t => t.label),
         });
         toast.success(language === 'zh-CN' ? '提示词已创建' : 'Prompt created');
@@ -730,7 +684,7 @@ export function PromptLibraryPage() {
     }
 
     try {
-      await Prompts.deletePrompt(Number(deletingPrompt.id));
+      await Prompts.deletePrompt(deletingPrompt.id);
       await loadPrompts(); // 重新加载列表
       toast.success(language === 'zh-CN' ? '提示词已删除' : 'Prompt deleted');
       setShowDeleteDialog(false);
@@ -779,7 +733,7 @@ export function PromptLibraryPage() {
         name: categoryForm.name,
         icon: iconName,
         color: categoryForm.color,
-        parentId: categoryForm.parentId === 'none' ? undefined : Number(categoryForm.parentId),
+        parentId: categoryForm.parentId === 'none' ? undefined : categoryForm.parentId,
       });
       
       await loadCategories(); // 重新加载分类树
@@ -829,7 +783,7 @@ export function PromptLibraryPage() {
     try {
       // 获取所有子分类
       const childCategories = categories.filter(c => c.parentId === deletingCategory.id);
-      const allCategoryIds = [Number(deletingCategory.id), ...childCategories.map(c => Number(c.id))];
+      const allCategoryIds = [deletingCategory.id, ...childCategories.map(c => c.id)];
 
       // 批量删除分类及其所有子分类
       await PromptCategories.batchDeletePromptCategories({ ids: allCategoryIds });
@@ -854,7 +808,7 @@ export function PromptLibraryPage() {
   const getTagColorName = (color: (typeof TAG_COLORS)[0]) => (language === 'zh-CN' ? color.name : color.nameEn);
 
   return (
-    <div className='space-y-6'>
+    <div className='space-y-6 h-[calc(100vh-102px)] flex flex-col'>
       {/* Header */}
       <div>
         <h1 className='text-2xl mb-1 dark:text-white'>{t('prompts.title')}</h1>
@@ -863,10 +817,10 @@ export function PromptLibraryPage() {
         </p>
       </div>
 
-      <div className='flex gap-6'>
+      <div className='flex gap-6 flex-1 min-h-[200px]'>
         {/* Categories Sidebar */}
-        <div className='w-64 shrink-0'>
-          <div className='bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4'>
+        <div className='w-64 shrink-0 h-full'>
+          <div className='bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 overflow-y-auto h-full pb-4'>
             {categoriesLoading ? (
               <div className='text-center py-8'>
                 <p className='text-sm text-gray-500 dark:text-gray-400'>
@@ -892,7 +846,7 @@ export function PromptLibraryPage() {
                       )}
                     >
                       <button
-                        onClick={() => setSelectedCategory(category.id)}
+                        onClick={() => {setSelectedCategory(category.id), setPageParam((pre) => ({...pre, pageNo: 1}))}}
                         className='flex-1 flex items-center justify-between'
                       >
                         <div className='flex items-center gap-2'>
@@ -915,7 +869,7 @@ export function PromptLibraryPage() {
                           </span>
                         </div>
                         <Badge variant='secondary' className='text-xs'>
-                          {count}
+                          {category.promptCount || count}
                         </Badge>
                       </button>
                       {!category.isSystem && (
@@ -1034,7 +988,7 @@ export function PromptLibraryPage() {
                     {language === 'zh-CN' ? '加载中...' : 'Loading...'}
                   </p>
                 </div>
-              ) : filteredPrompts.length === 0 ? (
+              ) : prompts.length === 0 ? (
                 <div className='text-center py-20 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg'>
                   <Sparkles className='w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600' />
                   <p className='text-gray-500 dark:text-gray-400'>
@@ -1042,7 +996,7 @@ export function PromptLibraryPage() {
                   </p>
                 </div>
               ) : (
-                filteredPrompts.map(prompt => (
+                prompts.map(prompt => (
                   <div
                     key={prompt.id}
                     className='p-5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md transition-shadow'
@@ -1130,8 +1084,6 @@ export function PromptLibraryPage() {
         }
         </div>
 
-        
-        
       </div>
 
       {/* 新建/编辑提示词对话框 */}
