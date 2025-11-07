@@ -1,16 +1,15 @@
 package cloud.xcan.angus.core.ai.interfaces.prompt.facade.internal.assembler;
 
-import static cloud.xcan.angus.spec.experimental.BizConstant.DEFAULT_ROOT_PID;
-import static cloud.xcan.angus.spec.utils.ObjectUtils.nullSafe;
-
 import cloud.xcan.angus.core.ai.domain.prompt.PromptCategory;
 import cloud.xcan.angus.core.ai.interfaces.prompt.facade.dto.PromptCategoryCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.prompt.facade.dto.PromptCategoryUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.prompt.facade.vo.PromptCategoryVo;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class PromptCategoryAssembler {
 
@@ -60,7 +59,7 @@ public class PromptCategoryAssembler {
   public static List<PromptCategoryVo> buildTree(List<PromptCategory> categories) {
     // 转换为 VO
     List<PromptCategoryVo> vos = categories.stream()
-        .map(PromptCategoryAssembler::toVo).toList();
+        .map(PromptCategoryAssembler::toVo).collect(Collectors.toList());
 
     // 按 parentId 分组
     Map<Long, List<PromptCategoryVo>> groupByParent = new HashMap<>();
@@ -69,7 +68,17 @@ public class PromptCategoryAssembler {
       groupByParent.computeIfAbsent(parentId, k -> new ArrayList<>()).add(vo);
     }
 
-    // 为每个节点设置 children
+    // 定义排序规则：先按 isSystem 排序（true 靠前），再按 orderNum 排序（越小越靠前）
+    Comparator<PromptCategoryVo> comparator = Comparator
+        .comparing((PromptCategoryVo vo) -> Boolean.TRUE.equals(vo.getIsSystem()), Comparator.reverseOrder())
+        .thenComparing(vo -> vo.getOrderNum() != null ? vo.getOrderNum() : Integer.MAX_VALUE);
+
+    // 对每个分组内的节点进行排序
+    for (List<PromptCategoryVo> group : groupByParent.values()) {
+      group.sort(comparator);
+    }
+
+    // 为每个节点设置 children（children 已经排序）
     for (PromptCategoryVo vo : vos) {
       List<PromptCategoryVo> children = groupByParent.get(vo.getId());
       if (children != null) {
@@ -77,7 +86,7 @@ public class PromptCategoryAssembler {
       }
     }
 
-    // 返回根节点
+    // 返回根节点（已排序）
     return groupByParent.getOrDefault(null, new ArrayList<>());
   }
 
