@@ -1,6 +1,7 @@
 package cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo;
 
 import cloud.xcan.angus.core.ai.domain.Visibility;
+import cloud.xcan.angus.core.ai.domain.knowledgebase.KnowledgeBaseConfig;
 import cloud.xcan.angus.remote.vo.TenantAuditingVo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
@@ -46,5 +47,5 @@ public class KnowledgeBaseDetailVo extends TenantAuditingVo {
   private KnowledgeBaseStatsVo stats;
 
   @Schema(description = "配置信息")
-  private KnowledgeBaseConfigVo config;
+  private KnowledgeBaseConfig config;
 }
