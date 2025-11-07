@@ -124,6 +124,19 @@ export function KnowledgeBase() {
     return colors[index];
   };
 
+  // 格式化日期，只显示日期部分（YYYY-MM-DD）
+  const formatDateOnly = (dateString?: string): string => {
+    if (!dateString) return '';
+    const date = dateString.trim();
+    // 如果包含时间部分（有空格），则只取日期部分
+    const spaceIndex = date.indexOf(' ');
+    if (spaceIndex > 0) {
+      return date.substring(0, spaceIndex);
+    }
+    // 如果已经是日期格式，直接返回
+    return date;
+  };
+
   // 统计数据
   const stats = [
     {
@@ -268,6 +281,7 @@ export function KnowledgeBase() {
 
   // 文档列表状态
   const [documents, setDocuments] = useState<any[]>([]);
+  const [totalDocuments, setTotalDocuments] = useState<number>(0);
 
   // 加载文档列表
   const loadDocuments = async (knowledgeBaseId: number) => {
@@ -282,17 +296,32 @@ export function KnowledgeBase() {
       
       const responseData = (response as any).data;
       let listData: KnowledgeBaseDocListVo[] | undefined;
+      let total: number = 0;
       
       // 尝试多种可能的响应结构
-      if (Array.isArray(responseData?.list)) {
-        // 情况1: response.data.list 直接是数组
-        listData = responseData.list;
-      } else if (Array.isArray(responseData?.data?.list)) {
-        // 情况2: response.data.data.list 是数组
-        listData = responseData.data.list;
-      } else if (Array.isArray((response as any).list)) {
-        // 情况3: response.list 直接是数组
-        listData = (response as any).list;
+      if (responseData) {
+        // 情况1: response.data 是 PageKnowledgeBaseDocListVo 类型，包含 list 和 total
+        if (responseData.list && Array.isArray(responseData.list)) {
+          listData = responseData.list;
+          total = responseData.total || 0;
+        } 
+        // 情况2: response.data.data 包含 list 和 total
+        else if (responseData.data?.list && Array.isArray(responseData.data.list)) {
+          listData = responseData.data.list;
+          total = responseData.data.total || 0;
+        }
+        // 情况3: response.data.list 直接是数组（兼容旧格式）
+        else if (Array.isArray(responseData.list)) {
+          const list = responseData.list;
+          listData = list;
+          total = responseData.total || list.length;
+        }
+        // 情况4: response.list 直接是数组（兼容旧格式）
+        else if (Array.isArray((response as any).list)) {
+          const list = (response as any).list;
+          listData = list;
+          total = (response as any).total || list.length;
+        }
       }
       
       if (Array.isArray(listData)) {
@@ -367,13 +396,16 @@ export function KnowledgeBase() {
           };
         });
         setDocuments(mappedDocs);
+        setTotalDocuments(total);
       } else {
         setDocuments([]);
+        setTotalDocuments(0);
       }
     } catch (error: any) {
       console.error('加载文档列表失败:', error);
       toast.error(error?.data?.message || error?.message || '加载文档列表失败');
       setDocuments([]);
+      setTotalDocuments(0);
     } finally {
       setDocumentsLoading(false);
     }
@@ -382,6 +414,7 @@ export function KnowledgeBase() {
   useEffect(() => {
     // 切换知识库时，立即清空文档列表
     setDocuments([]);
+    setTotalDocuments(0);
     
     if (selectedKnowledgeBase) {
       // 重置到第一页
@@ -982,7 +1015,7 @@ export function KnowledgeBase() {
                       <span>
                         可见性: {kb.visibility === 'team' ? '团队' : kb.visibility === 'private' ? '私有' : '公开'}
                       </span>
-                      <span>{kb.updateTime}</span>
+                      <span>{formatDateOnly(kb.updateTime)}</span>
                     </div>
                     {kb.creator && <div className='mt-1'>创建者: {kb.creator}</div>}
                   </div>
@@ -1068,7 +1101,7 @@ export function KnowledgeBase() {
                         </div>
                       </td>
                       <td className='px-5 py-4'>
-                        <div className='text-sm text-gray-600 dark:text-gray-400'>{kb.updateTime}</div>
+                        <div className='text-sm text-gray-600 dark:text-gray-400'>{formatDateOnly(kb.updateTime)}</div>
                       </td>
                       <td className='px-5 py-4 text-right' onClick={e => e.stopPropagation()}>
                         <DropdownMenu>
@@ -1324,7 +1357,10 @@ export function KnowledgeBase() {
                 <div className='p-5 border-b border-gray-200 dark:border-gray-700'>
                   <div className='flex items-center justify-between'>
                     <h4 className='dark:text-white'>已上传文档</h4>
-                    <span className='text-sm text-gray-500 dark:text-gray-400'>{documents.length} 个文档</span>
+                    <span className='text-sm text-gray-500 dark:text-gray-400'>
+                      {totalDocuments > 0 ? `共 ${totalDocuments} 个文档` : '暂无文档'}
+                      {totalDocuments > 0 && ` (第 ${documentPage} 页，每页 ${documentsPerPage} 个)`}
+                    </span>
                   </div>
                 </div>
 
@@ -1342,7 +1378,7 @@ export function KnowledgeBase() {
                   </div>
                 ) : (
                   <div className='divide-y divide-gray-100 dark:divide-gray-700'>
-                    {documents.slice((documentPage - 1) * documentsPerPage, documentPage * documentsPerPage).map(doc => (
+                    {documents.map(doc => (
                       <div key={doc.id} className='p-5 hover:bg-gray-50 dark:hover:bg-gray-700/50'>
                         <div className='flex items-center justify-between'>
                           <div className='flex items-center gap-3 flex-1 min-w-0'>
@@ -1413,7 +1449,7 @@ export function KnowledgeBase() {
                 )}
 
                 {/* Document Pagination */}
-                {documents.length > documentsPerPage && (
+                {totalDocuments > documentsPerPage && (
                   <div className='p-4 border-t border-gray-200 dark:border-gray-700'>
                     <Pagination>
                       <PaginationContent>
@@ -1425,7 +1461,7 @@ export function KnowledgeBase() {
                         </PaginationItem>
                         {Array.from(
                           {
-                            length: Math.ceil(documents.length / documentsPerPage),
+                            length: Math.ceil(totalDocuments / documentsPerPage),
                           },
                           (_, i) => i + 1
                         ).map(page => (
@@ -1443,11 +1479,11 @@ export function KnowledgeBase() {
                           <PaginationNext
                             onClick={() =>
                               setDocumentPage(prev =>
-                                Math.min(Math.ceil(documents.length / documentsPerPage), prev + 1)
+                                Math.min(Math.ceil(totalDocuments / documentsPerPage), prev + 1)
                               )
                             }
                             className={
-                              documentPage === Math.ceil(documents.length / documentsPerPage)
+                              documentPage === Math.ceil(totalDocuments / documentsPerPage)
                                 ? 'pointer-events-none opacity-50'
                                 : 'cursor-pointer'
                             }
@@ -1521,7 +1557,7 @@ export function KnowledgeBase() {
                   </div>
                   <div>
                     <label className='text-sm text-gray-600 dark:text-gray-400'>更新时间</label>
-                    <p className='text-sm dark:text-white mt-1'>{viewingKB.updateTime}</p>
+                    <p className='text-sm dark:text-white mt-1'>{formatDateOnly(viewingKB.updateTime)}</p>
                   </div>
                 </div>
 
