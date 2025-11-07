@@ -19,7 +19,6 @@ public class PromptAssembler {
   public static Prompt toCreateDomain(PromptCreateDto dto) {
     Prompt prompt = new Prompt();
     prompt.setTitle(dto.getTitle());
-    prompt.setDescription(dto.getDescription());
     prompt.setContent(dto.getContent());
     prompt.setCategoryId(dto.getCategoryId());
     prompt.setTags(dto.getTags());
@@ -31,7 +30,6 @@ public class PromptAssembler {
     Prompt prompt = new Prompt();
     prompt.setId(id);
     prompt.setTitle(dto.getTitle());
-    prompt.setDescription(dto.getDescription());
     prompt.setContent(dto.getContent());
     prompt.setCategoryId(dto.getCategoryId());
     prompt.setTags(dto.getTags());
@@ -42,7 +40,6 @@ public class PromptAssembler {
     PromptDetailVo vo = new PromptDetailVo();
     vo.setId(prompt.getId());
     vo.setTitle(prompt.getTitle());
-    vo.setDescription(prompt.getDescription());
     vo.setContent(prompt.getContent());
     vo.setCategoryId(prompt.getCategoryId());
     vo.setTags(prompt.getTags());

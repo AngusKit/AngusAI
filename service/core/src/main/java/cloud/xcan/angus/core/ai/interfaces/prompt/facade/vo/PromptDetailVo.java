@@ -21,9 +21,6 @@ public class PromptDetailVo extends TenantAuditingVo {
   @Schema(description = "内容")
   private String content;
 
-  @Schema(description = "描述")
-  private String description;
-
   @Schema(description = "分类ID")
   private Long categoryId;
 

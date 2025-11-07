@@ -19,7 +19,7 @@ public class PromptCategoryAssembler {
     category.setName(dto.getName());
     category.setName(dto.getIcon());
     category.setColor(dto.getColor());
-    category.setParentId(nullSafe(dto.getParentId(), DEFAULT_ROOT_PID));
+    category.setParentId(dto.getParentId());
     category.setIsSystem(false); // 默认非系统分类
     category.setOrderNum(0); // 默认排序为0，实际创建时会调整
     return category;

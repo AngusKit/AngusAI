@@ -22,10 +22,6 @@ public class PromptCreateDto {
   @Schema(description = "提示词内容", requiredMode = RequiredMode.REQUIRED)
   private String content;
 
-  @Size(max = 500)
-  @Schema(description = "描述")
-  private String description;
-
   @NotNull
   @Schema(description = "分类ID", requiredMode = RequiredMode.REQUIRED)
   private Long categoryId;

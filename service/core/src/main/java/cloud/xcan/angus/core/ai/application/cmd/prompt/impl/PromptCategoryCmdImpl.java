@@ -1,6 +1,5 @@
 package cloud.xcan.angus.core.ai.application.cmd.prompt.impl;
 
-import static cloud.xcan.angus.spec.experimental.BizConstant.DEFAULT_ROOT_PID;
 import static cloud.xcan.angus.spec.utils.ObjectUtils.nullSafe;
 
 import cloud.xcan.angus.core.ai.application.cmd.prompt.PromptCategoryCmd;
@@ -49,7 +48,7 @@ public class PromptCategoryCmdImpl extends CommCmd<PromptCategory, Long>
         }
 
         // 如果指定了父分类，检查父分类是否存在
-        if (category.getParentId() != DEFAULT_ROOT_PID) {
+        if (category.getParentId() != null) {
           promptCategoryRepo.findById(category.getParentId())
               .orElseThrow(() -> ResourceNotFound.of("父分类不存在", new Object[]{}));
         }
@@ -94,7 +93,7 @@ public class PromptCategoryCmdImpl extends CommCmd<PromptCategory, Long>
         }
 
         // 如果指定了父分类，检查父分类是否存在且不是自己或自己的子分类
-        if (category.getParentId() != DEFAULT_ROOT_PID) {
+        if (category.getParentId() != null) {
           promptCategoryRepo.findById(category.getParentId())
               .orElseThrow(() -> ResourceNotFound.of("父分类不存在", new Object[]{}));
 
@@ -107,7 +106,7 @@ public class PromptCategoryCmdImpl extends CommCmd<PromptCategory, Long>
         CoreUtils.copyPropertiesIgnoreNull(category, categoryDb);
 
         // 如果父分类发生变化，重新计算排序
-        if (category.getParentId() != DEFAULT_ROOT_PID
+        if (category.getParentId() != null
             && !Objects.equals(categoryDb.getParentId(), category.getParentId())) {
           Integer maxOrder = promptCategoryRepo.findMaxOrderByParentId(category.getParentId());
           categoryDb.setOrderNum(maxOrder != null ? maxOrder + 1 : 0);
