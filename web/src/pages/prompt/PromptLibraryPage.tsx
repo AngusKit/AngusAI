@@ -378,7 +378,7 @@ export function PromptLibraryPage() {
       <div className='flex gap-6 flex-1 min-h-[200px]'>
         {/* Categories Sidebar */}
         <div className='w-[296px] shrink-0 h-full'>
-          <div className='bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 overflow-y-auto h-full pb-4'>
+          <div className='bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 overflow-y-auto h-full pb-4 scrollbar-hide'>
             {isLoadingCategories ? (
               <div className='text-center py-8'>
                 <p className='text-sm text-gray-500 dark:text-gray-400'>
