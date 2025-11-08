@@ -42,4 +42,12 @@ public interface KnowledgeBaseDocChunkRepo extends BaseRepository<KnowledgeBaseD
    */
   void deleteByDocumentId(Long documentId);
 
+  /**
+   * 批量统计知识库的分段数量 返回 List<Object[]>，其中 [0]=knowledgeBaseId (Long), [1]=count (Long)
+   */
+  @Query("SELECT d.knowledgeBaseId, COUNT(dc) FROM KnowledgeBaseDocChunk dc " +
+      "JOIN KnowledgeBaseDoc d ON dc.documentId = d.id " +
+      "WHERE d.knowledgeBaseId IN :knowledgeBaseIds GROUP BY d.knowledgeBaseId")
+  List<Object[]> countByKnowledgeBaseIds(@Param("knowledgeBaseIds") List<Long> knowledgeBaseIds);
+
 }

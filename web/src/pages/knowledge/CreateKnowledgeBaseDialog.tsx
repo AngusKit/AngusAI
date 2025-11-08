@@ -11,6 +11,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import KnowledgeBases from '@/services/KnowledgeBases';
 import { VisibilityEnum } from '@/enums/enums';
+import { getTagColor } from '@/utils';
 
 interface CreateKnowledgeBaseDialogProps {
   open: boolean;
@@ -113,23 +114,6 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange, onSuccess }: Cre
       icon: '🍃',
     },
   ];
-
-  // 标签颜色映射
-  const getTagColor = (tag: string): string => {
-    const colors = [
-      'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-      'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-      'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
-      'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
-      'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400',
-      'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
-      'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400',
-      'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
-    ];
-
-    const index = tag.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
-    return colors[index] ?? colors[0] ?? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400';
-  };
 
   const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' || e.key === ',') {

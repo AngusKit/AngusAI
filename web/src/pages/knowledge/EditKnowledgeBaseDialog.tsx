@@ -11,6 +11,7 @@ import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import KnowledgeBases from '@/services/KnowledgeBases';
 import { VisibilityEnum } from '@/enums/enums';
+import { getTagColor } from '@/utils';
 
 interface EditKnowledgeBaseDialogProps {
   open: boolean;
@@ -131,23 +132,6 @@ export function EditKnowledgeBaseDialog({
     },
   ];
 
-  // 标签颜色映射
-  const getTagColor = (tag: string): string => {
-    const colors = [
-      'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-      'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-      'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
-      'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
-      'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400',
-      'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
-      'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400',
-      'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
-    ];
-
-    const index = tag.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
-    return colors[index];
-  };
-
   const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' || e.key === ',') {
       e.preventDefault();
@@ -218,11 +202,14 @@ export function EditKnowledgeBaseDialog({
       setCurrentStep(currentStep + 1);
     } else {
       // 验证配置处理参数
-      if (chunkSize[0] < 100 || chunkSize[0] > 2000) {
+      const currentChunkSize = chunkSize[0] ?? 512;
+      const currentChunkOverlap = chunkOverlap[0] ?? 50;
+      
+      if (currentChunkSize < 100 || currentChunkSize > 2000) {
         toast.error('分段大小必须在100-2000之间');
         return;
       }
-      if (chunkOverlap[0] < 0 || chunkOverlap[0] > 200) {
+      if (currentChunkOverlap < 0 || currentChunkOverlap > 200) {
         toast.error('分段重叠必须在0-200之间');
         return;
       }
@@ -237,7 +224,7 @@ export function EditKnowledgeBaseDialog({
 
     setIsSubmitting(true);
     try {
-      const selectedIconOption = iconOptions[selectedIcon];
+      const selectedIconOption = iconOptions[selectedIcon] ?? iconOptions[0]!;
       const visibilityMap: Record<string, VisibilityEnum> = {
         private: VisibilityEnum.PRIVATE,
         team: VisibilityEnum.TEAM,
@@ -256,8 +243,8 @@ export function EditKnowledgeBaseDialog({
       // 如果配置了向量化模型，添加config
       if (embeddingModelId) {
         updateData.config = {
-          chunkSize: chunkSize[0],
-          chunkOverlap: chunkOverlap[0],
+          chunkSize: chunkSize[0] ?? 512,
+          chunkOverlap: chunkOverlap[0] ?? 50,
           embeddingModelId: embeddingModelId,
         };
       }

@@ -7,7 +7,9 @@ import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBas
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBaseUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo.KnowledgeBaseDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo.KnowledgeBaseListVo;
+import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo.KnowledgeBaseStatisticsVo;
 import cloud.xcan.angus.remote.PageResult;
+import cloud.xcan.angus.remote.dto.SimpleStatisticsDto;
 
 public interface KnowledgeBaseFacade {
 
@@ -46,4 +48,8 @@ public interface KnowledgeBaseFacade {
    */
   PageResult<KnowledgeBaseListVo> list(KnowledgeBaseFindDto dto);
 
+  /**
+   * 获取知识库统计信息
+   */
+  KnowledgeBaseStatisticsVo getStatistics(SimpleStatisticsDto dto);
 }

@@ -8,6 +8,10 @@ import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import jakarta.annotation.Resource;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -41,6 +45,41 @@ public class KnowledgeBaseQueryImpl implements KnowledgeBaseQuery {
         return fullTextSearch
             ? knowledgeBaseSearchRepo.find(spec.getCriteria(), pageable, KnowledgeBase.class, match)
             : knowledgeBaseRepo.findAll(spec, pageable);
+      }
+    }.execute();
+  }
+
+  @Override
+  public Long countTotalKnowledgeBases() {
+    return new BizTemplate<Long>() {
+      @Override
+      protected Long process() {
+        return knowledgeBaseRepo.countTotalKnowledgeBases();
+      }
+    }.execute();
+  }
+
+  @Override
+  public Long countActiveKnowledgeBases() {
+    return new BizTemplate<Long>() {
+      @Override
+      protected Long process() {
+        return knowledgeBaseRepo.countActiveKnowledgeBases();
+      }
+    }.execute();
+  }
+
+  @Override
+  public Map<Long, KnowledgeBase> findByIds(List<Long> knowledgeBaseIds) {
+    return new BizTemplate<Map<Long, KnowledgeBase>>() {
+      @Override
+      protected Map<Long, KnowledgeBase> process() {
+        if (knowledgeBaseIds == null || knowledgeBaseIds.isEmpty()) {
+          return new HashMap<>();
+        }
+        List<KnowledgeBase> knowledgeBases = knowledgeBaseRepo.findAllById(knowledgeBaseIds);
+        return knowledgeBases.stream()
+            .collect(Collectors.toMap(KnowledgeBase::getId, kb -> kb));
       }
     }.execute();
   }

@@ -18,6 +18,7 @@ import Documents from '@/services/Documents';
 import { KnowledgeBaseDocStatusEnum, KnowledgeBaseDocTypeEnum } from '@/enums/enums';
 import type { KnowledgeBaseListVo } from '@/services/KnowledgeBasesTypes';
 import type { KnowledgeBaseDocListVo } from '@/services/DocumentsTypes';
+import { getTagColor, formatDateOnly, formatFileSize } from '@/utils';
 
 interface KnowledgeBaseItem {
   id: number;
@@ -105,36 +106,67 @@ export function KnowledgeBase() {
     };
   }, [searchQuery]);
 
-  // 标签颜色映射
-  const getTagColor = (tag: string): string => {
-    const colors = [
-      'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-      'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-      'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
-      'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
-      'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400',
-      'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
-      'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400',
-      'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
-    ];
-
-    // 根据标签内容生成一个稳定的索引
-    const index = tag.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
-    return colors[index];
+  /**
+   * 文档状态映射
+   */
+  const DOCUMENT_STATUS_MAP: Record<string, { text: string; color: string }> = {
+    [KnowledgeBaseDocStatusEnum.PENDING]: {
+      text: '待处理',
+      color: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
+    },
+    [KnowledgeBaseDocStatusEnum.PROCESSING]: {
+      text: '处理中',
+      color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
+    },
+    [KnowledgeBaseDocStatusEnum.COMPLETED]: {
+      text: '已完成',
+      color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+    },
+    [KnowledgeBaseDocStatusEnum.FAILED]: {
+      text: '失败',
+      color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+    },
   };
 
-  // 格式化日期，只显示日期部分（YYYY-MM-DD）
-  const formatDateOnly = (dateString?: string): string => {
-    if (!dateString) return '';
-    const date = dateString.trim();
-    // 如果包含时间部分（有空格），则只取日期部分
-    const spaceIndex = date.indexOf(' ');
-    if (spaceIndex > 0) {
-      return date.substring(0, spaceIndex);
-    }
-    // 如果已经是日期格式，直接返回
-    return date;
+  /**
+   * 文档类型映射
+   */
+  const DOCUMENT_TYPE_MAP: Record<string, { text: string; icon: string; color: string }> = {
+    [KnowledgeBaseDocTypeEnum.PDF]: {
+      text: 'PDF',
+      icon: '📄',
+      color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+    },
+    [KnowledgeBaseDocTypeEnum.DOCX]: {
+      text: 'Word',
+      icon: '📘',
+      color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+    },
+    [KnowledgeBaseDocTypeEnum.TXT]: {
+      text: 'Text',
+      icon: '📝',
+      color: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
+    },
+    [KnowledgeBaseDocTypeEnum.MD]: {
+      text: 'Markdown',
+      icon: '📝',
+      color: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
+    },
+    [KnowledgeBaseDocTypeEnum.HTML]: {
+      text: 'HTML',
+      icon: '🌐',
+      color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+    },
   };
+
+  /**
+   * 知识库状态颜色
+   */
+  const KNOWLEDGE_BASE_STATUS_COLORS = {
+    enabled: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+    disabled: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
+  } as const;
+
 
   // 统计数据
   const stats = [
@@ -159,7 +191,7 @@ export function KnowledgeBase() {
     {
       label: '今日查询',
       value: '298',
-      subtext: '相较昨日增长 12%',
+      subtext: '累计查询数 2418 次',
       icon: Eye,
       iconBg: 'bg-orange-500',
       trend: '+12%',
@@ -198,17 +230,8 @@ export function KnowledgeBase() {
       // 处理响应结构
       const responseData = (response as any).data;
       let listData: KnowledgeBaseListVo[] | undefined;
-
-      // 尝试多种可能的响应结构
-      if (Array.isArray(responseData?.list)) {
-        // 情况1: response.data.list 直接是数组
+      if (responseData) {
         listData = responseData.list;
-      } else if (Array.isArray(responseData?.data?.list)) {
-        // 情况2: response.data.data.list 是数组
-        listData = responseData.data.list;
-      } else if (Array.isArray((response as any).list)) {
-        // 情况3: response.list 直接是数组
-        listData = (response as any).list;
       }
 
       if (Array.isArray(listData)) {
@@ -221,9 +244,7 @@ export function KnowledgeBase() {
           documentCount: String(kb.documentsCount || 0),
           size: kb.totalSize || '0 MB',
           status: (kb.enabled ? '已启用' : '禁用') as '已启用' | '禁用',
-          statusColor: kb.enabled
-            ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-            : 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
+          statusColor: kb.enabled ? KNOWLEDGE_BASE_STATUS_COLORS.enabled : KNOWLEDGE_BASE_STATUS_COLORS.disabled,
           enabled: kb.enabled || false,
           visibility: kb.visibility,
           createdTime: kb.createdDate,
@@ -264,9 +285,7 @@ export function KnowledgeBase() {
               ...k,
               enabled: newEnabled,
               status: newEnabled ? '已启用' : '禁用',
-              statusColor: newEnabled
-                ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                : 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
+              statusColor: newEnabled ? KNOWLEDGE_BASE_STATUS_COLORS.enabled : KNOWLEDGE_BASE_STATUS_COLORS.disabled,
             };
           }
           return k;
@@ -297,85 +316,17 @@ export function KnowledgeBase() {
       let listData: KnowledgeBaseDocListVo[] | undefined;
       let total: number = 0;
 
-      // 尝试多种可能的响应结构
       if (responseData) {
-        // 情况1: response.data 是 PageKnowledgeBaseDocListVo 类型，包含 list 和 total
-        if (responseData.list && Array.isArray(responseData.list)) {
-          listData = responseData.list;
-          total = responseData.total || 0;
-        }
-        // 情况2: response.data.data 包含 list 和 total
-        else if (responseData.data?.list && Array.isArray(responseData.data.list)) {
-          listData = responseData.data.list;
-          total = responseData.data.total || 0;
-        }
-        // 情况3: response.data.list 直接是数组（兼容旧格式）
-        else if (Array.isArray(responseData.list)) {
-          const list = responseData.list;
-          listData = list;
-          total = responseData.total || list.length;
-        }
-        // 情况4: response.list 直接是数组（兼容旧格式）
-        else if (Array.isArray((response as any).list)) {
-          const list = (response as any).list;
-          listData = list;
-          total = (response as any).total || list.length;
-        }
+        listData = responseData.list;
+        total = responseData.total || 0;
       }
 
       if (Array.isArray(listData)) {
         const mappedDocs = listData.map((doc: KnowledgeBaseDocListVo) => {
-          const statusMap: Record<string, { text: string; color: string }> = {
-            [KnowledgeBaseDocStatusEnum.PENDING]: {
-              text: '待处理',
-              color: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
-            },
-            [KnowledgeBaseDocStatusEnum.PROCESSING]: {
-              text: '处理中',
-              color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
-            },
-            [KnowledgeBaseDocStatusEnum.COMPLETED]: {
-              text: '已完成',
-              color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-            },
-            [KnowledgeBaseDocStatusEnum.FAILED]: {
-              text: '失败',
-              color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-            },
-          };
-
-          const typeMap: Record<string, { text: string; icon: string; color: string }> = {
-            [KnowledgeBaseDocTypeEnum.PDF]: {
-              text: 'PDF',
-              icon: '📄',
-              color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-            },
-            [KnowledgeBaseDocTypeEnum.DOCX]: {
-              text: 'Word',
-              icon: '📘',
-              color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-            },
-            [KnowledgeBaseDocTypeEnum.TXT]: {
-              text: 'Text',
-              icon: '📝',
-              color: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
-            },
-            [KnowledgeBaseDocTypeEnum.MD]: {
-              text: 'Markdown',
-              icon: '📝',
-              color: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
-            },
-            [KnowledgeBaseDocTypeEnum.HTML]: {
-              text: 'HTML',
-              icon: '🌐',
-              color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
-            },
-          };
-
           const status = doc.status || KnowledgeBaseDocStatusEnum.PENDING;
           const type = doc.type || KnowledgeBaseDocTypeEnum.TXT;
-          const statusInfo = statusMap[status] || statusMap[KnowledgeBaseDocStatusEnum.PENDING];
-          const typeInfo = typeMap[type] || typeMap[KnowledgeBaseDocTypeEnum.TXT];
+          const statusInfo = DOCUMENT_STATUS_MAP[status] || DOCUMENT_STATUS_MAP[KnowledgeBaseDocStatusEnum.PENDING]!;
+          const typeInfo = DOCUMENT_TYPE_MAP[type] || DOCUMENT_TYPE_MAP[KnowledgeBaseDocTypeEnum.TXT]!;
 
           return {
             id: typeof doc.id === 'string' ? Number(doc.id) : doc.id || 0,
@@ -449,9 +400,7 @@ export function KnowledgeBase() {
               ...d,
               enabled: newEnabled,
               status: newEnabled ? '已完成' : '禁用',
-              statusColor: newEnabled
-                ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                : 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
+              statusColor: newEnabled ? DOCUMENT_STATUS_MAP[KnowledgeBaseDocStatusEnum.COMPLETED].color : KNOWLEDGE_BASE_STATUS_COLORS.disabled,
             };
           }
           return d;
@@ -479,27 +428,8 @@ export function KnowledgeBase() {
         setDocuments(prev =>
           prev.map(d => {
             if (d.id === doc.id) {
-              const statusMap: Record<string, { text: string; color: string }> = {
-                [KnowledgeBaseDocStatusEnum.PENDING]: {
-                  text: '待处理',
-                  color: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
-                },
-                [KnowledgeBaseDocStatusEnum.PROCESSING]: {
-                  text: '处理中',
-                  color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
-                },
-                [KnowledgeBaseDocStatusEnum.COMPLETED]: {
-                  text: '已完成',
-                  color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-                },
-                [KnowledgeBaseDocStatusEnum.FAILED]: {
-                  text: '失败',
-                  color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-                },
-              };
-
               const status = statusData.status || KnowledgeBaseDocStatusEnum.PROCESSING;
-              const statusInfo = statusMap[status] || statusMap[KnowledgeBaseDocStatusEnum.PROCESSING];
+              const statusInfo = DOCUMENT_STATUS_MAP[status] || DOCUMENT_STATUS_MAP[KnowledgeBaseDocStatusEnum.PROCESSING]!;
 
               return {
                 ...d,
@@ -595,14 +525,6 @@ export function KnowledgeBase() {
     }
   };
 
-  // 文件上传处理函数
-  const formatFileSize = (bytes: number): string => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
-  };
 
   const handleFiles = (files: FileList | File[]) => {
     const fileArray = Array.from(files);
@@ -656,9 +578,9 @@ export function KnowledgeBase() {
       prev.map(f =>
         f.id === fileId
           ? {
-              ...f,
-              status: 'uploading' as const,
-            }
+            ...f,
+            status: 'uploading' as const,
+          }
           : f
       )
     );
@@ -677,7 +599,7 @@ export function KnowledgeBase() {
           body: formData,
           // 移除ContentType，让浏览器自动设置multipart/form-data
           type: undefined as any,
-        }
+        } as any
       );
 
       // 上传成功
@@ -708,10 +630,10 @@ export function KnowledgeBase() {
         prev.map(f =>
           f.id === fileId
             ? {
-                ...f,
-                status: 'error' as const,
-                error: error?.data?.message || '上传失败',
-              }
+              ...f,
+              status: 'error' as const,
+              error: error?.data?.message || '上传失败',
+            }
             : f
         )
       );
@@ -841,7 +763,7 @@ export function KnowledgeBase() {
             <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500' />
             <Input
               type='text'
-              placeholder='搜索知识库名称、描述或文档...'
+              placeholder='搜索知识库名称、描述...'
               value={searchQuery}
               onChange={e => {
                 setSearchQuery(e.target.value);
@@ -890,21 +812,19 @@ export function KnowledgeBase() {
             <div className='flex items-center gap-1 border border-gray-200 dark:border-gray-700 rounded-lg p-1'>
               <button
                 onClick={() => setViewMode('grid')}
-                className={`p-1.5 rounded ${
-                  viewMode === 'grid'
+                className={`p-1.5 rounded ${viewMode === 'grid'
                     ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
                     : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-                }`}
+                  }`}
               >
                 <Grid3x3 className='w-4 h-4' />
               </button>
               <button
                 onClick={() => setViewMode('table')}
-                className={`p-1.5 rounded ${
-                  viewMode === 'table'
+                className={`p-1.5 rounded ${viewMode === 'table'
                     ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
                     : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-                }`}
+                  }`}
               >
                 <List className='w-4 h-4' />
               </button>
@@ -938,11 +858,10 @@ export function KnowledgeBase() {
             {currentKnowledgeBases.map(kb => (
               <Card
                 key={kb.id}
-                className={`p-5 hover:shadow-md transition-all cursor-pointer ${
-                  selectedKnowledgeBase === kb.id
+                className={`p-5 hover:shadow-md transition-all cursor-pointer ${selectedKnowledgeBase === kb.id
                     ? 'ring-2 ring-blue-500 dark:ring-blue-400 shadow-lg bg-blue-50/50 dark:bg-blue-900/10'
                     : 'dark:bg-gray-800'
-                } dark:border-gray-700`}
+                  } dark:border-gray-700`}
                 onClick={() => setSelectedKnowledgeBase(selectedKnowledgeBase === kb.id ? null : kb.id)}
               >
                 <div className='flex items-start justify-between mb-4'>
@@ -1061,11 +980,10 @@ export function KnowledgeBase() {
                   {currentKnowledgeBases.map(kb => (
                     <tr
                       key={kb.id}
-                      className={`cursor-pointer transition-colors ${
-                        selectedKnowledgeBase === kb.id
+                      className={`cursor-pointer transition-colors ${selectedKnowledgeBase === kb.id
                           ? 'bg-blue-50 dark:bg-blue-900/10 hover:bg-blue-100 dark:hover:bg-blue-900/20'
                           : 'hover:bg-gray-50 dark:hover:bg-gray-700/50'
-                      }`}
+                        }`}
                       onClick={() => setSelectedKnowledgeBase(selectedKnowledgeBase === kb.id ? null : kb.id)}
                     >
                       <td className='px-5 py-4'>
@@ -1233,19 +1151,17 @@ export function KnowledgeBase() {
               </h3>
               <Card className='p-6 dark:bg-gray-800 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm'>
                 <div
-                  className={`border-2 border-dashed rounded-lg p-8 text-center transition-all ${
-                    isDragging
+                  className={`border-2 border-dashed rounded-lg p-8 text-center transition-all ${isDragging
                       ? 'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-900/20'
                       : 'border-gray-300 dark:border-gray-600 hover:border-blue-400 dark:hover:border-blue-500'
-                  }`}
+                    }`}
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
                 >
                   <Upload
-                    className={`w-12 h-12 mx-auto mb-4 ${
-                      isDragging ? 'text-blue-500 dark:text-blue-400' : 'text-gray-400 dark:text-gray-500'
-                    }`}
+                    className={`w-12 h-12 mx-auto mb-4 ${isDragging ? 'text-blue-500 dark:text-blue-400' : 'text-gray-400 dark:text-gray-500'
+                      }`}
                   />
 
                   <div className='flex items-center justify-center gap-3 mb-4'>

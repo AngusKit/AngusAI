@@ -1,0 +1,82 @@
+package cloud.xcan.angus.core.ai.domain.knowledgebase;
+
+import cloud.xcan.angus.core.jpa.multitenancy.TenantEntity;
+import cloud.xcan.angus.core.jpa.multitenancy.TenantListener;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+
+/**
+ * 知识库文档使用记录实体 用于记录知识库文档的查询访问记录，包括查询时间、响应时间、状态等信息
+ */
+@Entity
+@Table(name = "knowledge_base_doc_usage_log")
+@EntityListeners({TenantListener.class})
+@Setter
+@Getter
+@Accessors(chain = true)
+public class KnowledgeBaseDocUsageLog extends TenantEntity<KnowledgeBaseDocUsageLog, Long> {
+
+  @Id
+  private Long id;
+
+  /**
+   * 知识库ID
+   */
+  @Column(name = "knowledge_base_id", nullable = false)
+  private Long knowledgeBaseId;
+
+  /**
+   * 文档ID（可选）
+   */
+  @Column(name = "document_id")
+  private Long documentId;
+
+  /**
+   * 查询时间
+   */
+  @Column(name = "query_date", nullable = false)
+  private LocalDateTime queryDate;
+
+  /**
+   * 响应时间（毫秒）
+   */
+  @Column(name = "response_time_ms")
+  private Long responseTimeMs;
+
+  /**
+   * 查询状态：SUCCESS-成功，FAILED-失败
+   */
+  @Column(name = "status", nullable = false, length = 20)
+  private String status;
+
+  /**
+   * 用户ID（可选）
+   */
+  @Column(name = "user_id")
+  private Long userId;
+
+  /**
+   * 错误信息（失败时记录）
+   */
+  @Column(name = "error_message", length = 1000)
+  private String errorMessage;
+
+  /**
+   * IP地址
+   */
+  @Column(name = "ip_address", length = 50)
+  private String ipAddress;
+
+  @Override
+  public Long identity() {
+    return this.id;
+  }
+}
+

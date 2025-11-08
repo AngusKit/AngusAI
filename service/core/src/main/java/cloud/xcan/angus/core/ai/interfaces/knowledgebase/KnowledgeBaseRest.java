@@ -1,6 +1,8 @@
 package cloud.xcan.angus.core.ai.interfaces.knowledgebase;
 
 import cloud.xcan.angus.core.ai.domain.Visibility;
+import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionStatisticsDto;
+import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionStatisticsVo;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.KnowledgeBaseFacade;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBaseCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBaseFindDto;
@@ -8,8 +10,10 @@ import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBas
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBaseUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo.KnowledgeBaseDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo.KnowledgeBaseListVo;
+import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo.KnowledgeBaseStatisticsVo;
 import cloud.xcan.angus.remote.ApiLocaleResult;
 import cloud.xcan.angus.remote.PageResult;
+import cloud.xcan.angus.remote.dto.SimpleStatisticsDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -121,5 +125,11 @@ public class KnowledgeBaseRest {
     return ApiLocaleResult.success(knowledgeBaseFacade.list(dto));
   }
 
-  // TODO 统计接口
+  @Operation(operationId = "knowledgeBaseGetStatistics", summary = "获取统计信息", description = "获取接口集的统计数据，包括总体统计、使用率排行、性能趋势等")
+  @GetMapping("/statistics")
+  public ApiLocaleResult<KnowledgeBaseStatisticsVo> getStatistics(
+      @ParameterObject SimpleStatisticsDto dto) {
+    return ApiLocaleResult.success(knowledgeBaseFacade.getStatistics(dto));
+  }
+
 }

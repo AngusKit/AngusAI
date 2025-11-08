@@ -108,9 +108,9 @@ export function Dataset() {
       trendUp: true,
     },
     {
-      label: '已启用',
-      value: '18',
-      subtext: '本周调用数 1024 次',
+      label: '今日查询',
+      value: '128',
+      subtext: '累计查询数 2418 次',
       icon: Eye,
       iconBg: 'bg-orange-500',
       trend: '+5%',
