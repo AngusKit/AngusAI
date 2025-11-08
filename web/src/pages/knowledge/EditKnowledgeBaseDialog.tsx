@@ -1,4 +1,4 @@
-import { Check } from 'lucide-react';
+import { Check, Loader2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
@@ -9,6 +9,7 @@ import { ICON_OPTIONS, FORM_STEPS, CONFIG_CONSTANTS } from './constants';
 import { validateBasicInfoStep, validateConfigurationStep } from './utils';
 import { useKnowledgeBaseForm } from './hooks/useKnowledgeBaseForm';
 import { BasicInfoStep, ConfigurationStep } from './components/KnowledgeBaseFormSteps';
+import { KnowledgeBaseDetailResult } from '@/types/api-types';
 
 interface EditKnowledgeBaseDialogProps {
   open: boolean;
@@ -36,6 +37,7 @@ export function EditKnowledgeBaseDialog({
 }: EditKnowledgeBaseDialogProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingDetail, setIsLoadingDetail] = useState(false);
 
   const {
     formData,
@@ -47,25 +49,77 @@ export function EditKnowledgeBaseDialog({
     setSelectedIconByEmoji,
   } = useKnowledgeBaseForm();
 
-  // 当knowledgeBase变化时，更新表单
+  // 加载知识库详情
   useEffect(() => {
-    if (knowledgeBase) {
-      updateField('name', knowledgeBase.name);
-      updateField('description', knowledgeBase.description);
-      updateField('visibility', (knowledgeBase.visibility || 'private') as any);
-      updateField('tags', knowledgeBase.tags || []);
-
-      // 配置处理参数
-      updateField('chunkSize', [knowledgeBase.chunkSize || CONFIG_CONSTANTS.CHUNK_SIZE.DEFAULT]);
-      updateField('chunkOverlap', [knowledgeBase.chunkOverlap || CONFIG_CONSTANTS.CHUNK_OVERLAP.DEFAULT]);
-      updateField('embeddingModelId', knowledgeBase.embeddingModelId);
-
-      // 根据icon找到对应的索引
-      if (knowledgeBase.icon) {
-        setSelectedIconByEmoji(knowledgeBase.icon);
+    const loadKnowledgeBaseDetail = async () => {
+      if (!open || !knowledgeBase?.id) {
+        // 弹窗关闭时重置状态
+        if (!open) {
+          setCurrentStep(1);
+          setIsLoadingDetail(false);
+        }
+        return;
       }
-    }
-  }, [knowledgeBase, updateField, setSelectedIconByEmoji]);
+
+      setIsLoadingDetail(true);
+      setCurrentStep(1); // 重置到第一步
+      
+      try {
+        const response = await KnowledgeBases.getKnowledgeBaseDetail(knowledgeBase.id);
+        const detail = (response as KnowledgeBaseDetailResult)?.data;
+
+        if (detail) {
+          // 更新表单数据
+          updateField('name', detail.name || '');
+          updateField('description', detail.description || '');
+          
+          // 将 VisibilityEnum 转换为小写字符串（PRIVATE -> private）
+          const visibilityValue = detail.visibility
+            ? detail.visibility.toLowerCase() as 'private' | 'team' | 'public'
+            : 'private';
+          updateField('visibility', visibilityValue);
+          
+          updateField('tags', detail.tags || []);
+
+          // 配置处理参数
+          const chunkSize = detail.config?.chunkSize || CONFIG_CONSTANTS.CHUNK_SIZE.DEFAULT;
+          const chunkOverlap = detail.config?.chunkOverlap || CONFIG_CONSTANTS.CHUNK_OVERLAP.DEFAULT;
+          updateField('chunkSize', [chunkSize]);
+          updateField('chunkOverlap', [chunkOverlap]);
+          updateField('embeddingModelId', detail.config?.embeddingModelId);
+
+          // 根据icon找到对应的索引
+          if (detail.icon) {
+            setSelectedIconByEmoji(detail.icon);
+          }
+        }
+      } catch (error: any) {
+        console.error('加载知识库详情失败:', error);
+        toast.error(error?.data?.message || '加载知识库详情失败，请重试');
+        // 如果加载失败，使用传入的基础数据
+        if (knowledgeBase) {
+          updateField('name', knowledgeBase.name);
+          updateField('description', knowledgeBase.description);
+          const visibilityValue = knowledgeBase.visibility
+            ? knowledgeBase.visibility.toLowerCase() as 'private' | 'team' | 'public'
+            : 'private';
+          updateField('visibility', visibilityValue);
+          updateField('tags', knowledgeBase.tags || []);
+          updateField('chunkSize', [knowledgeBase.chunkSize || CONFIG_CONSTANTS.CHUNK_SIZE.DEFAULT]);
+          updateField('chunkOverlap', [knowledgeBase.chunkOverlap || CONFIG_CONSTANTS.CHUNK_OVERLAP.DEFAULT]);
+          updateField('embeddingModelId', knowledgeBase.embeddingModelId);
+          if (knowledgeBase.icon) {
+            setSelectedIconByEmoji(knowledgeBase.icon);
+          }
+        }
+      } finally {
+        setIsLoadingDetail(false);
+      }
+    };
+
+    loadKnowledgeBaseDetail();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, knowledgeBase?.id]);
 
   // 可见性映射
   const visibilityMap: Record<string, VisibilityEnum> = {
@@ -114,12 +168,17 @@ export function EditKnowledgeBaseDialog({
         tags: formData.tags.length > 0 ? formData.tags : undefined,
       };
 
-      // 如果配置了向量化模型，添加config
-      if (formData.embeddingModelId) {
+      // 添加config配置（与创建逻辑保持一致：只要有chunkSize和chunkOverlap就添加config）
+      const currentChunkSize = formData.chunkSize[0] ?? CONFIG_CONSTANTS.CHUNK_SIZE.DEFAULT;
+      const currentChunkOverlap = formData.chunkOverlap[0] ?? CONFIG_CONSTANTS.CHUNK_OVERLAP.DEFAULT;
+      
+      // 只要有chunkSize和chunkOverlap就添加config，embeddingModelId可选
+      if (currentChunkSize && currentChunkOverlap !== undefined) {
         updateData.config = {
-          chunkSize: formData.chunkSize[0] ?? CONFIG_CONSTANTS.CHUNK_SIZE.DEFAULT,
-          chunkOverlap: formData.chunkOverlap[0] ?? CONFIG_CONSTANTS.CHUNK_OVERLAP.DEFAULT,
-          embeddingModelId: formData.embeddingModelId,
+          chunkSize: currentChunkSize,
+          chunkOverlap: currentChunkOverlap,
+          // 如果embeddingModelId存在则添加，否则使用0作为默认值（后端会使用默认模型）
+          embeddingModelId: formData.embeddingModelId ?? 0,
         };
       }
 
@@ -209,21 +268,32 @@ export function EditKnowledgeBaseDialog({
 
           {/* Right Content Area */}
           <div className='flex-1 overflow-y-auto px-8'>
-            {currentStep === 1 && (
-              <BasicInfoStep
-                formData={formData}
-                tagInput={tagInput}
-                onFieldChange={updateField}
-                onTagInputChange={setTagInput}
-                onTagInputKeyDown={handleTagInputKeyDown}
-                onRemoveTag={removeTag}
-              />
-            )}
-            {currentStep === 2 && (
-              <ConfigurationStep
-                formData={formData}
-                onFieldChange={updateField}
-              />
+            {isLoadingDetail ? (
+              <div className='flex items-center justify-center py-12'>
+                <div className='flex flex-col items-center gap-3'>
+                  <Loader2 className='w-8 h-8 animate-spin text-blue-500' />
+                  <p className='text-sm text-gray-500 dark:text-gray-400'>加载知识库详情中...</p>
+                </div>
+              </div>
+            ) : (
+              <>
+                {currentStep === 1 && (
+                  <BasicInfoStep
+                    formData={formData}
+                    tagInput={tagInput}
+                    onFieldChange={updateField}
+                    onTagInputChange={setTagInput}
+                    onTagInputKeyDown={handleTagInputKeyDown}
+                    onRemoveTag={removeTag}
+                  />
+                )}
+                {currentStep === 2 && (
+                  <ConfigurationStep
+                    formData={formData}
+                    onFieldChange={updateField}
+                  />
+                )}
+              </>
             )}
           </div>
         </div>
@@ -251,14 +321,14 @@ export function EditKnowledgeBaseDialog({
             )}
             <Button
               onClick={handleNextStep}
-              disabled={isSubmitting}
+              disabled={isSubmitting || isLoadingDetail}
               className={
                 currentStep === 2
                   ? 'bg-green-600 hover:bg-green-700 text-white'
                   : 'bg-blue-500 hover:bg-blue-600 text-white'
               }
             >
-              {isSubmitting ? '保存中...' : currentStep === 2 ? '保存更新' : '下一步'}
+              {isSubmitting ? '保存中...' : isLoadingDetail ? '加载中...' : currentStep === 2 ? '保存更新' : '下一步'}
             </Button>
           </div>
         </div>
