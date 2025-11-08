@@ -276,3 +276,140 @@ export enum GetKnowledgeBaseListOrderByEnum {
   Name = 'name',
   DocumentsCount = 'documentsCount',
 }
+
+/** 知识库统计概览 */
+export interface KnowledgeBaseStatisticsOverview {
+  /**
+   * 总知识库数
+   * @format int64
+   */
+  totalKnowledgeBases?: number;
+  /**
+   * 活跃（被引用）知识库数
+   * @format int64
+   */
+  activeKnowledgeBases?: number;
+  /**
+   * 总文件数
+   * @format int64
+   */
+  totalFiles?: number;
+  /**
+   * 活跃（被引用）文件数
+   * @format int64
+   */
+  activeFiles?: number;
+  /**
+   * 总分段数
+   * @format int32
+   * @example 120
+   */
+  totalChunks?: number;
+  /**
+   * 平均分段大小
+   * @format int32
+   * @example 512
+   */
+  avgChunkSize?: number;
+  /**
+   * 总查询次数
+   * @format int64
+   */
+  totalQueryCount?: number;
+  /**
+   * 今日查询次数
+   * @format int64
+   */
+  todayQueryCount?: number;
+  /**
+   * 已使用存储空间大小
+   */
+  usedStoreSize?: string;
+  /**
+   * 授权的存储空间大小，自定义数据源返回空
+   */
+  totalStoreSize?: string;
+  /**
+   * 已使用存储空间占比，自定义数据源返回空
+   */
+  usedStoreRate?: string;
+}
+
+/** 使用率排行 */
+export interface KnowledgeBaseTopKnowledgeBase {
+  /**
+   * 知识库ID
+   * @format int64
+   */
+  id?: number;
+  /**
+   * 知识库名称
+   */
+  name?: string;
+  /**
+   * 查询次数
+   * @format int64
+   */
+  queryCount?: number;
+  /**
+   * 文件数
+   * @format int64
+   */
+  fileCount?: number;
+  /**
+   * 分段数
+   * @format int64
+   */
+  chunkCount?: number;
+}
+
+/** 查询趋势 */
+export interface KnowledgeBaseQueryTrend {
+  /**
+   * 时间戳
+   * @format int64
+   */
+  timestamp?: number;
+  /**
+   * 日期
+   */
+  date?: string;
+  /**
+   * 总查询次数
+   * @format int64
+   */
+  totalQueries?: number;
+  /**
+   * 平均响应时间（毫秒）
+   * @format int64
+   */
+  avgResponseTime?: number;
+  /**
+   * 错误数
+   * @format int64
+   */
+  errors?: number;
+  /**
+   * 错误率（百分比）
+   * @format double
+   */
+  errorRate?: number;
+}
+
+/** 知识库统计响应 */
+export interface KnowledgeBaseStatisticsVo {
+  /** 总体统计 */
+  overview?: KnowledgeBaseStatisticsOverview;
+  /** 近一月趋势 */
+  lastMonthGrowthTrend?: KnowledgeBaseStatisticsOverview;
+  /** 使用率排行 */
+  topKnowledgeBases?: KnowledgeBaseTopKnowledgeBase[];
+  /** 查询趋势 */
+  queryTrend?: KnowledgeBaseQueryTrend[];
+}
+
+/** The API response result of supporting international message. */
+export type KnowledgeBaseStatisticsResult = ApiLocaleResult & {
+  /** Actual response data or error details. */
+  data?: KnowledgeBaseStatisticsVo;
+};

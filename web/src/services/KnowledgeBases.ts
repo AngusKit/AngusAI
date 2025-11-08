@@ -1,5 +1,5 @@
 import { ApiLocaleResult, PageQuery, AI } from '@xcan-angus/infra';
-import { GetKnowledgeBaseListOrderByEnum, KnowledgeBaseCreateDto, KnowledgeBaseDetailResult, KnowledgeBaseToggleDto, KnowledgeBaseUpdateDto, PageResultKnowledgeBaseListResult, } from './KnowledgeBasesTypes.ts';
+import { GetKnowledgeBaseListOrderByEnum, KnowledgeBaseCreateDto, KnowledgeBaseDetailResult, KnowledgeBaseStatisticsResult, KnowledgeBaseToggleDto, KnowledgeBaseUpdateDto, PageResultKnowledgeBaseListResult, } from './KnowledgeBasesTypes.ts';
 import http, { ContentType, HttpClient, RequestParams } from './HttpClient.ts';
 import { VisibilityEnum } from '@/enums/enums.ts';
 
@@ -170,6 +170,37 @@ export class KnowledgeBases<SecurityDataType = unknown> {
       body: data,
       secure: true,
       type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * @description 获取知识库的统计数据，包括总体统计、使用率排行、性能趋势等
+   *
+   * @tags KnowledgeBase
+   * @name GetKnowledgeBaseStatistics
+   * @summary 获取统计信息
+   * @request GET:/api/v1/knowledge-bases/statistics
+   * @secure
+   */
+  getKnowledgeBaseStatistics = (
+    query?: {
+      /**
+       * 统计开始日期，可选，格式: yyyy-MM-dd 或 yyyy-MM-dd HH:mm:ss
+       * @example "2024-11-01"
+       */
+      startDate?: string;
+      /**
+       * 统计结束日期，可选，格式: yyyy-MM-dd 或 yyyy-MM-dd HH:mm:ss
+       * @example "2024-11-30"
+       */
+      endDate?: string;
+    },
+    params: RequestParams = {}
+  ) =>
+    this.http.request<KnowledgeBaseStatisticsResult, ApiLocaleResult>({
+      path: `${AI}/knowledge-bases/statistics`,
+      method: 'GET',
+      query: query,
+      secure: true,
       ...params,
     });
 }

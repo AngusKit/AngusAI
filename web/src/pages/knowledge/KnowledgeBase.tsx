@@ -1,4 +1,4 @@
-import { Check, Database, Download, Edit, Eye, File, Files, FileText, FileX, Filter, FolderOpen, Grid3x3, List, MoreHorizontal, Plus, RefreshCw, Search, Trash2, Upload, X, } from 'lucide-react';
+import { Check, Database, Download, Edit, Eye, Files, FileText, FileX, Filter, FolderOpen, Grid3x3, List, MoreHorizontal, Plus, RefreshCw, Search, Trash2, Upload, X, } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -16,7 +16,7 @@ import { CreateKnowledgeBaseDialog } from './CreateKnowledgeBaseDialog';
 import KnowledgeBases from '@/services/KnowledgeBases';
 import Documents from '@/services/Documents';
 import { KnowledgeBaseDocStatusEnum, KnowledgeBaseDocTypeEnum } from '@/enums/enums';
-import type { KnowledgeBaseListVo } from '@/services/KnowledgeBasesTypes';
+import type { KnowledgeBaseListVo, KnowledgeBaseStatisticsVo } from '@/services/KnowledgeBasesTypes';
 import type { KnowledgeBaseDocListVo } from '@/services/DocumentsTypes';
 import { getTagColor, formatDateOnly, formatFileSize } from '@/utils';
 
@@ -69,6 +69,8 @@ export function KnowledgeBase() {
   const documentsPerPage = 6;
   const [loading, setLoading] = useState(false);
   const [documentsLoading, setDocumentsLoading] = useState(false);
+  const [statistics, setStatistics] = useState<KnowledgeBaseStatisticsVo | null>(null);
+  const [statisticsLoading, setStatisticsLoading] = useState(false);
 
   // 文件上传相关状态
   const [uploadFiles, setUploadFiles] = useState<UploadFile[]>([]);
@@ -168,47 +170,116 @@ export function KnowledgeBase() {
   } as const;
 
 
-  // 统计数据
-  const stats = [
-    {
-      label: '知识库数量',
-      value: '10',
-      subtext: '累计创建数 15个',
-      icon: Database,
-      iconBg: 'bg-blue-500',
-      trend: '+25%',
-      trendUp: true,
-    },
-    {
-      label: '文档总量',
-      value: '234',
-      subtext: '总大小：4.8 GB',
-      icon: FileText,
-      iconBg: 'bg-green-500',
-      trend: '+30%',
-      trendUp: true,
-    },
-    {
-      label: '今日查询',
-      value: '298',
-      subtext: '累计查询数 2418 次',
-      icon: Eye,
-      iconBg: 'bg-orange-500',
-      trend: '+12%',
-      trendUp: true,
-    },
-    {
-      label: '存储空间',
-      value: '4.8GB / 100GB',
-      subtext: '已使用 4.8%',
-      icon: Database,
-      iconBg: 'bg-purple-500',
-      progress: 4.8,
-      showProgress: true,
-      trend: '+520.3MB',
-      trendUp: true,
-    },
-  ];
+  // 加载统计数据
+  const loadStatistics = async () => {
+    setStatisticsLoading(true);
+    try {
+      const response = await KnowledgeBases.getKnowledgeBaseStatistics();
+      const responseData = (response as any).data;
+      const statsData = responseData?.data;
+      if (statsData) {
+        setStatistics(statsData);
+      }
+    } catch (error: any) {
+      console.error('加载统计数据失败:', error);
+      // 不显示错误提示，避免影响用户体验
+    } finally {
+      setStatisticsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadStatistics();
+  }, []);
+
+  // 统计数据映射
+  const stats = statistics
+    ? [
+        {
+          label: '知识库数量',
+          value: String(statistics.overview?.totalKnowledgeBases || 0),
+          subtext: `活跃知识库 ${statistics.overview?.activeKnowledgeBases || 0} 个`,
+          icon: Database,
+          iconBg: 'bg-blue-500',
+          trend: undefined,
+          trendUp: undefined,
+        },
+        {
+          label: '文档总量',
+          value: String(statistics.overview?.totalFiles || 0),
+          subtext: `活跃文件 ${statistics.overview?.activeFiles || 0} 个 · 总大小：${statistics.overview?.usedStoreSize || '0 MB'}`,
+          icon: FileText,
+          iconBg: 'bg-green-500',
+          trend: undefined,
+          trendUp: undefined,
+        },
+        {
+          label: '今日查询',
+          value: String(statistics.overview?.todayQueryCount || 0),
+          subtext: `累计查询数 ${statistics.overview?.totalQueryCount || 0} 次`,
+          icon: Eye,
+          iconBg: 'bg-orange-500',
+          trend: undefined,
+          trendUp: undefined,
+        },
+        {
+          label: '存储空间',
+          value: statistics.overview?.totalStoreSize
+            ? `${statistics.overview?.usedStoreSize || '0 MB'} / ${statistics.overview.totalStoreSize}`
+            : `${statistics.overview?.usedStoreSize || '0 MB'} / --`,
+          subtext: statistics.overview?.totalStoreSize
+            ? `已使用 ${statistics.overview.usedStoreRate || '0%'}`
+            : '未授权存储空间',
+          icon: Database,
+          iconBg: 'bg-purple-500',
+          progress: statistics.overview?.usedStoreRate
+            ? parseFloat(statistics.overview.usedStoreRate.replace('%', '')) || 0
+            : 0,
+          showProgress: !!statistics.overview?.totalStoreSize,
+          trend: undefined,
+          trendUp: undefined,
+        },
+      ]
+    : [
+        {
+          label: '知识库数量',
+          value: '--',
+          subtext: '加载中...',
+          icon: Database,
+          iconBg: 'bg-blue-500',
+          trend: undefined,
+          trendUp: undefined,
+        },
+        {
+          label: '文档总量',
+          value: '--',
+          subtext: '加载中...',
+          icon: FileText,
+          iconBg: 'bg-green-500',
+          trend: undefined,
+          trendUp: undefined,
+        },
+        {
+          label: '今日查询',
+          value: '--',
+          subtext: '加载中...',
+          icon: Eye,
+          iconBg: 'bg-orange-500',
+          trend: undefined,
+          trendUp: undefined,
+        },
+        {
+          label: '存储空间',
+          value: '--',
+          subtext: '加载中...',
+          icon: Database,
+          iconBg: 'bg-purple-500',
+          progress: 0,
+          showProgress: false,
+          trend: undefined,
+          trendUp: undefined,
+        },
+      ];
 
   const handleAction = (action: string, name: string) => {
     toast.success(`${action}: ${name}`);
@@ -396,11 +467,12 @@ export function KnowledgeBase() {
       setDocuments(prev =>
         prev.map(d => {
           if (d.id === id) {
+            const completedStatus = DOCUMENT_STATUS_MAP[KnowledgeBaseDocStatusEnum.COMPLETED];
             return {
               ...d,
               enabled: newEnabled,
               status: newEnabled ? '已完成' : '禁用',
-              statusColor: newEnabled ? DOCUMENT_STATUS_MAP[KnowledgeBaseDocStatusEnum.COMPLETED].color : KNOWLEDGE_BASE_STATUS_COLORS.disabled,
+              statusColor: newEnabled ? (completedStatus?.color || KNOWLEDGE_BASE_STATUS_COLORS.enabled) : KNOWLEDGE_BASE_STATUS_COLORS.disabled,
             };
           }
           return d;
