@@ -10,6 +10,7 @@ import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, } from '@/components/ui/alert-dialog';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { useState } from 'react';
 import { useLanguage } from '@/components/ui/LanguageProvider';
 import { toast } from 'sonner';
@@ -26,8 +27,9 @@ interface DatasetItem {
   type: '文本' | '表格' | '数据源';
   dataCount: string;
   size: string;
-  status: '已激活' | '已停用' | '正准备';
+  status: '已启用' | '禁用';
   statusColor: string;
+  enabled: boolean;
   visibility?: string;
   updateTime: string;
   createdTime: string;
@@ -69,6 +71,14 @@ export function Dataset() {
   const [dataSourcePage, setDataSourcePage] = useState(1);
   const dataSourcesPerPage = 6;
 
+  /**
+   * 数据集状态颜色
+   */
+  const DATASET_STATUS_COLORS = {
+    enabled: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+    disabled: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
+  } as const;
+
   // 标签颜色映射
   const getTagColor = (tag: string): string => {
     const colors = [
@@ -84,7 +94,7 @@ export function Dataset() {
 
     // 根据标签内容生成一个稳定的索引
     const index = tag.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
-    return colors[index];
+    return colors[index]!;
   };
 
   // 统计数据
@@ -130,7 +140,7 @@ export function Dataset() {
   ];
 
   // 数据集列表 - 扩展到10条
-  const datasets: DatasetItem[] = [
+  const [datasets, setDatasets] = useState<DatasetItem[]>([
     {
       id: 1,
       name: '客户对话数据集',
@@ -140,8 +150,9 @@ export function Dataset() {
       type: '文本',
       dataCount: '24',
       size: '12.5K 条',
-      status: '已激活',
-      statusColor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+      status: '已启用',
+      statusColor: DATASET_STATUS_COLORS.enabled,
+      enabled: true,
       visibility: 'team',
       updateTime: '2023-10-12',
       createdTime: '2023-09-01 10:30',
@@ -157,8 +168,9 @@ export function Dataset() {
       type: '表格',
       dataCount: '8',
       size: '5.2K 条',
-      status: '已激活',
-      statusColor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+      status: '已启用',
+      statusColor: DATASET_STATUS_COLORS.enabled,
+      enabled: true,
       visibility: 'private',
       updateTime: '2023-10-10',
       createdTime: '2023-08-15 14:20',
@@ -174,8 +186,9 @@ export function Dataset() {
       type: '文本',
       dataCount: '42',
       size: '18.7K 条',
-      status: '正准备',
-      statusColor: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
+      status: '禁用',
+      statusColor: DATASET_STATUS_COLORS.disabled,
+      enabled: false,
       visibility: 'public',
       updateTime: '2023-10-18',
       createdTime: '2023-10-01 09:15',
@@ -191,8 +204,9 @@ export function Dataset() {
       type: '数据源',
       dataCount: '3',
       size: '45.6K 条',
-      status: '已激活',
-      statusColor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+      status: '已启用',
+      statusColor: DATASET_STATUS_COLORS.enabled,
+      enabled: true,
       visibility: 'team',
       updateTime: '2023-10-20',
       createdTime: '2023-07-20 16:45',
@@ -208,8 +222,9 @@ export function Dataset() {
       type: '文本',
       dataCount: '67',
       size: '22.3K 条',
-      status: '已激活',
-      statusColor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+      status: '已启用',
+      statusColor: DATASET_STATUS_COLORS.enabled,
+      enabled: true,
       visibility: 'team',
       updateTime: '2023-10-05',
       createdTime: '2023-08-10 11:00',
@@ -225,8 +240,9 @@ export function Dataset() {
       type: '数据源',
       dataCount: '2',
       size: '128.4K 条',
-      status: '已激活',
-      statusColor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+      status: '已启用',
+      statusColor: DATASET_STATUS_COLORS.enabled,
+      enabled: true,
       visibility: 'private',
       updateTime: '2023-10-12',
       createdTime: '2023-09-05 13:30',
@@ -242,8 +258,9 @@ export function Dataset() {
       type: '文本',
       dataCount: '35',
       size: '15.2K 条',
-      status: '已激活',
-      statusColor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+      status: '已启用',
+      statusColor: DATASET_STATUS_COLORS.enabled,
+      enabled: true,
       visibility: 'public',
       updateTime: '2023-10-08',
       createdTime: '2023-08-25 15:20',
@@ -259,8 +276,9 @@ export function Dataset() {
       type: '表格',
       dataCount: '89',
       size: '28.9K 条',
-      status: '已激活',
-      statusColor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+      status: '已启用',
+      statusColor: DATASET_STATUS_COLORS.enabled,
+      enabled: true,
       visibility: 'team',
       updateTime: '2023-10-15',
       createdTime: '2023-09-10 10:00',
@@ -276,8 +294,9 @@ export function Dataset() {
       type: '数据源',
       dataCount: '1',
       size: '8.2K 条',
-      status: '正准备',
-      statusColor: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
+      status: '禁用',
+      statusColor: DATASET_STATUS_COLORS.disabled,
+      enabled: false,
       visibility: 'private',
       updateTime: '2023-10-19',
       createdTime: '2023-10-05 14:30',
@@ -293,15 +312,16 @@ export function Dataset() {
       type: '文本',
       dataCount: '120',
       size: '35.6K 条',
-      status: '已激活',
-      statusColor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+      status: '已启用',
+      statusColor: DATASET_STATUS_COLORS.enabled,
+      enabled: true,
       visibility: 'public',
       updateTime: '2023-10-21',
       createdTime: '2023-09-20 09:45',
       creator: '孙十二',
       tags: ['社交', '媒体', '用户行为'],
     },
-  ];
+  ]);
 
   // 文件上传列表 - 用于文本和表格类型的数据集
   interface DataFileItem {
@@ -661,6 +681,27 @@ export function Dataset() {
     setDeleteDialogOpen(true);
   };
 
+  const handleToggleDatasetStatus = (id: number) => {
+    const dataset = datasets.find(ds => ds.id === id);
+    if (!dataset) return;
+
+    const newEnabled = !dataset.enabled;
+    setDatasets(prev =>
+      prev.map(ds => {
+        if (ds.id === id) {
+          return {
+            ...ds,
+            enabled: newEnabled,
+            status: newEnabled ? '已启用' : '禁用',
+            statusColor: newEnabled ? DATASET_STATUS_COLORS.enabled : DATASET_STATUS_COLORS.disabled,
+          };
+        }
+        return ds;
+      })
+    );
+    toast.success(newEnabled ? '数据集已启用' : '数据集已禁用');
+  };
+
   const confirmDelete = () => {
     if (deletingDataset) {
       toast.success(`数据集 "${deletingDataset.name}" 已删除`);
@@ -892,7 +933,14 @@ export function Dataset() {
                       <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{dataset.type}</td>
                       <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{dataset.dataCount}</td>
                       <td className='px-6 py-4'>
-                        <Badge className={`text-xs ${dataset.statusColor} border-0`}>{dataset.status}</Badge>
+                        <div className='flex items-center gap-2' onClick={e => e.stopPropagation()}>
+                          <Badge className={`text-xs ${dataset.statusColor} border-0`}>{dataset.status}</Badge>
+                          <Switch
+                            checked={dataset.enabled}
+                            onCheckedChange={() => handleToggleDatasetStatus(dataset.id)}
+                            className='data-[state=checked]:bg-blue-500'
+                          />
+                        </div>
                       </td>
                       <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{dataset.updateTime}</td>
                       <td className='px-6 py-4'>
@@ -990,6 +1038,14 @@ export function Dataset() {
                               ? '👥 团队'
                               : '🌐 公开'}
                         </Badge>
+                        <Switch
+                          checked={dataset.enabled}
+                          onCheckedChange={() => {
+                            handleToggleDatasetStatus(dataset.id);
+                          }}
+                          onClick={e => e.stopPropagation()}
+                          className='data-[state=checked]:bg-blue-500'
+                        />
                       </div>
                     </div>
                     <DropdownMenu>
