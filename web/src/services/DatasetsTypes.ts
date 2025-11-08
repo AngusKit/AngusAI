@@ -25,7 +25,7 @@ export interface DatasetDetailVo extends TenantAuditingVo {
    * 数据集ID
    * @format int64
    */
-  id?: number;
+  id?: string;
   /** 数据集名称 */
   name?: string;
   /** 数据集描述 */
@@ -170,7 +170,7 @@ export interface DatasetDataListVo extends TenantAuditingVo {
    * 数据ID
    * @format int64
    */
-  id?: number;
+  id?: string;
   /** 数据集数据名称 */
   name?: string;
   /** 数据类型 */
@@ -208,7 +208,7 @@ export interface DatasourceConnectionTestDto {
    * 已保存数据集ID
    * @format int64
    */
-  datasetId?: number;
+  datasetId?: string;
   /** 数据源类型 */
   databaseType?: DatasourceTypeEnum;
   /** 数据库 */
@@ -256,7 +256,7 @@ export interface DatasetListVo extends TenantAuditingVo {
    * 数据集ID
    * @format int64
    */
-  id?: number;
+  id?: string;
   /** 数据集名称 */
   name?: string;
   /** 数据集描述 */

@@ -20,7 +20,7 @@ export class Plugins<SecurityDataType = unknown> {
    * @secure
    */
   modifyPluginStatus = (
-    id: number,
+    id: string,
     query: {
       /** 插件状态 */
       status: PluginStatusEnum;
@@ -49,7 +49,7 @@ export class Plugins<SecurityDataType = unknown> {
        * 插件ID
        * @format int64
        */
-      id?: number;
+      id?: string;
       /** 插件名称 */
       name?: string;
       /** 分类筛选 */
@@ -132,7 +132,7 @@ export class Plugins<SecurityDataType = unknown> {
    * @request GET:/api/v1/plugins/{pluginId}/reviews
    * @secure
    */
-  listPluginReviews = (pluginId: number, params: RequestParams = {}) =>
+  listPluginReviews = (pluginId: string, params: RequestParams = {}) =>
     this.http.request<ListPluginReviewResult, ApiLocaleResult>({
       path: `${AI}/plugins/${pluginId}/reviews`,
       method: 'GET',
@@ -148,7 +148,7 @@ export class Plugins<SecurityDataType = unknown> {
    * @request POST:/api/v1/plugins/{pluginId}/reviews
    * @secure
    */
-  createPluginReview = (pluginId: number, data: PluginReviewCreateDto, params: RequestParams = {}) =>
+  createPluginReview = (pluginId: string, data: PluginReviewCreateDto, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `${AI}/plugins/${pluginId}/reviews`,
       method: 'POST',
@@ -166,7 +166,7 @@ export class Plugins<SecurityDataType = unknown> {
    * @request POST:/api/v1/plugins/{id}/use
    * @secure
    */
-  usePlugin = (id: number, params: RequestParams = {}) =>
+  usePlugin = (id: string, params: RequestParams = {}) =>
     this.http.request<PluginDetailResult, ApiLocaleResult>({
       path: `${AI}/plugins/${id}/use`,
       method: 'POST',
@@ -182,7 +182,7 @@ export class Plugins<SecurityDataType = unknown> {
    * @request POST:/api/v1/plugins/{id}/uninstall
    * @secure
    */
-  uninstallPlugin = (id: number, params: RequestParams = {}) =>
+  uninstallPlugin = (id: string, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `${AI}/plugins/${id}/uninstall`,
       method: 'POST',
@@ -198,7 +198,7 @@ export class Plugins<SecurityDataType = unknown> {
    * @request POST:/api/v1/plugins/{id}/publish
    * @secure
    */
-  publishPlugin = (id: number, params: RequestParams = {}) =>
+  publishPlugin = (id: string, params: RequestParams = {}) =>
     this.http.request<PluginDetailResult, ApiLocaleResult>({
       path: `${AI}/plugins/${id}/publish`,
       method: 'POST',
@@ -214,7 +214,7 @@ export class Plugins<SecurityDataType = unknown> {
    * @request POST:/api/v1/plugins/{id}/install
    * @secure
    */
-  installPlugin = (id: number, params: RequestParams = {}) =>
+  installPlugin = (id: string, params: RequestParams = {}) =>
     this.http.request<PluginDetailResult, ApiLocaleResult>({
       path: `${AI}/plugins/${id}/install`,
       method: 'POST',
@@ -248,7 +248,7 @@ export class Plugins<SecurityDataType = unknown> {
    * @request GET:/api/v1/plugins/{id}
    * @secure
    */
-  getPluginDetail = (id: number, params: RequestParams = {}) =>
+  getPluginDetail = (id: string, params: RequestParams = {}) =>
     this.http.request<PluginDetailResult, ApiLocaleResult>({
       path: `${AI}/plugins/${id}`,
       method: 'GET',
@@ -264,7 +264,7 @@ export class Plugins<SecurityDataType = unknown> {
    * @request DELETE:/api/v1/plugins/{id}
    * @secure
    */
-  deletePlugin = (id: number, params: RequestParams = {}) =>
+  deletePlugin = (id: string, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `${AI}/plugins/${id}`,
       method: 'DELETE',
@@ -280,7 +280,7 @@ export class Plugins<SecurityDataType = unknown> {
    * @request PATCH:/api/v1/plugins/{id}
    * @secure
    */
-  updatePlugin = (id: number, data: PluginUpdateDto, params: RequestParams = {}) =>
+  updatePlugin = (id: string, data: PluginUpdateDto, params: RequestParams = {}) =>
     this.http.request<PluginDetailResult, ApiLocaleResult>({
       path: `${AI}/plugins/${id}`,
       method: 'PATCH',

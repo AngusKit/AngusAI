@@ -19,7 +19,7 @@ export class Sharing<SecurityDataType = unknown> {
    * @request PUT:/api/v1/sharing/{id}/toggle
    * @secure
    */
-  toggleResourceSharingStatus = (id: number, data: ResourceSharingToggleDto, params: RequestParams = {}) =>
+  toggleResourceSharingStatus = (id: string, data: ResourceSharingToggleDto, params: RequestParams = {}) =>
     this.http.request<ResourceSharingDetailResult, ApiLocaleResult>({
       path: `${AI}/sharing/${id}/toggle`,
       method: 'PUT',
@@ -37,7 +37,7 @@ export class Sharing<SecurityDataType = unknown> {
    * @request GET:/api/v1/sharing/resources/{id}
    * @secure
    */
-  getResourceSharingDetail = (id: number, params: RequestParams = {}) =>
+  getResourceSharingDetail = (id: string, params: RequestParams = {}) =>
     this.http.request<ResourceSharingDetailResult, ApiLocaleResult>({
       path: `${AI}/sharing/resources/${id}`,
       method: 'GET',
@@ -53,7 +53,7 @@ export class Sharing<SecurityDataType = unknown> {
    * @request PUT:/api/v1/sharing/resources/{id}
    * @secure
    */
-  updateResourceSharing = (id: number, data: ResourceSharingUpdateDto, params: RequestParams = {}) =>
+  updateResourceSharing = (id: string, data: ResourceSharingUpdateDto, params: RequestParams = {}) =>
     this.http.request<ResourceSharingDetailResult, ApiLocaleResult>({
       path: `${AI}/sharing/resources/${id}`,
       method: 'PUT',
@@ -71,7 +71,7 @@ export class Sharing<SecurityDataType = unknown> {
    * @request DELETE:/api/v1/sharing/resources/{id}
    * @secure
    */
-  deleteResourceSharing = (id: number, params: RequestParams = {}) =>
+  deleteResourceSharing = (id: string, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `${AI}/sharing/resources/${id}`,
       method: 'DELETE',
@@ -93,7 +93,7 @@ export class Sharing<SecurityDataType = unknown> {
        * 共享ID
        * @format int64
        */
-      id?: number;
+      id?: string;
       /** 资源类型筛选 */
       type?: ResourceTypeEnum;
       /** 权限筛选 */
@@ -140,7 +140,7 @@ export class Sharing<SecurityDataType = unknown> {
    * @secure
    */
   getResourceSharingStatistics = (
-    id: number,
+    id: string,
     query?: {
       /** 统计周期 */
       period?: StatisticsPeriodEnum;
@@ -169,7 +169,7 @@ export class Sharing<SecurityDataType = unknown> {
        * 资源ID
        * @format int64
        */
-      resourceId: number;
+      resourceId: string;
       /** 资源类型 */
       resourceType: ResourceTypeEnum;
     },
@@ -197,7 +197,7 @@ export class Sharing<SecurityDataType = unknown> {
        * 资源ID
        * @format int64
        */
-      resourceId: number;
+      resourceId: string;
       /** 资源类型 */
       resourceType: ResourceTypeEnum;
     },

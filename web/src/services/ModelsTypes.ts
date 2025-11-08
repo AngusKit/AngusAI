@@ -179,7 +179,7 @@ export interface ModelDetailVo extends TenantAuditingVo {
    * 模型ID
    * @format int64
    */
-  id?: number;
+  id?: string;
   /** 模型名称 */
   name?: string;
   /** 模型描述 */
@@ -303,7 +303,7 @@ export interface ModelListVo extends TenantAuditingVo {
    * 模型ID
    * @format int64
    */
-  id?: number;
+  id?: string;
   /** 模型名称 */
   name?: string;
   /** 模型描述 */

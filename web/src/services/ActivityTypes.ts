@@ -3,13 +3,13 @@ import { ApiLocaleResult } from '@xcan-angus/infra';
 /** Activity详情 */
 export interface ActivityDetailVo {
   /** @format int64 */
-  id?: number;
+  id?: string;
   /** @format int64 */
-  userId?: number;
+  userId?: string;
   userName?: string;
   userAvatar?: string;
   /** @format int64 */
-  targetId?: number;
+  targetId?: string;
   targetType?: string;
   targetName?: string;
   /** @format date-time */

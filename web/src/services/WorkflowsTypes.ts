@@ -22,7 +22,7 @@ export interface WorkflowDetailVo extends TenantAuditingVo {
    * 工作流ID
    * @format int64
    */
-  id?: number;
+  id?: string;
   /** 工作流名称 */
   name?: string;
   /** 工作流描述 */
@@ -134,7 +134,7 @@ export interface WorkflowListVo extends TenantAuditingVo {
    * 工作流ID
    * @format int64
    */
-  id?: number;
+  id?: string;
   /** 工作流名称 */
   name?: string;
   /** 工作流描述 */
@@ -203,7 +203,7 @@ export interface ExecutionDetailVo {
    * 工作流ID
    * @format int64
    */
-  workflowId?: number;
+  workflowId?: string;
   /** 工作流名称 */
   workflowName?: string;
   /** 执行状态 */
@@ -245,14 +245,14 @@ export interface ExecutionLogVo {
    * 日志ID
    * @format int64
    */
-  id?: number;
+  id?: string;
   /** 执行ID */
   executionId?: string;
   /**
    * 工作流ID
    * @format int64
    */
-  workflowId?: number;
+  workflowId?: string;
   /** 工作流名称 */
   workflowName?: string;
   /** 活动描述 */

@@ -12,7 +12,7 @@ export interface AuthorizedResource {
    * 资源ID列表（空数组表示全部）
    * @example []
    */
-  ids?: number[];
+  ids?: string[];
 }
 
 /** 授权资源 */
@@ -20,7 +20,7 @@ export interface AuthorizedResourceVo {
   /** 资源类型 */
   type?: ResourceTypeEnum;
   /** 资源ID列表 */
-  ids?: number[];
+  ids?: string[];
   /** 资源名称列表 */
   names?: string[];
 }
@@ -55,7 +55,7 @@ export interface ApiKeyDetailVo extends TenantAuditingVo {
    * 密钥ID
    * @format int64
    */
-  id?: number;
+  id?: string;
   /** 密钥名称 */
   name?: string;
   /** 密钥前缀（用于部分显示）sk-abc123 */
@@ -174,7 +174,7 @@ export interface ApiKeyListVo extends TenantAuditingVo {
    * 密钥ID
    * @format int64
    */
-  id?: number;
+  id?: string;
   /** 密钥名称 */
   name?: string;
   /** 密钥前缀 */

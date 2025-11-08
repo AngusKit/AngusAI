@@ -19,7 +19,7 @@ export class Models<SecurityDataType = unknown> {
    * @request PUT:/api/v1/models/{id}/config
    * @secure
    */
-  updateModelConfig = (id: number, data: ModelConfig, params: RequestParams = {}) =>
+  updateModelConfig = (id: string, data: ModelConfig, params: RequestParams = {}) =>
     this.http.request<ModelDetailResult, ApiLocaleResult>({
       path: `${AI}/models/${id}/config`,
       method: 'PUT',
@@ -43,7 +43,7 @@ export class Models<SecurityDataType = unknown> {
        * 模型ID
        * @format int64
        */
-      id?: number;
+      id?: string;
       /**
        * 模型名称
        * @example "GPT-4"
@@ -94,7 +94,7 @@ export class Models<SecurityDataType = unknown> {
    * @request POST:/api/v1/models/{id}/test
    * @secure
    */
-  testModel = (id: number, data: ModelTestDto, params: RequestParams = {}) =>
+  testModel = (id: string, data: ModelTestDto, params: RequestParams = {}) =>
     this.http.request<ModelDetailResult, ApiLocaleResult>({
       path: `${AI}/models/${id}/test`,
       method: 'POST',
@@ -113,7 +113,7 @@ export class Models<SecurityDataType = unknown> {
    * @secure
    */
   stopModel = (
-    id: number,
+    id: string,
     query?: {
       /**
        * 优雅停止
@@ -139,7 +139,7 @@ export class Models<SecurityDataType = unknown> {
    * @request POST:/api/v1/models/{id}/start
    * @secure
    */
-  startModel = (id: number, params: RequestParams = {}) =>
+  startModel = (id: string, params: RequestParams = {}) =>
     this.http.request<ModelDetailResult, ApiLocaleResult>({
       path: `${AI}/models/${id}/start`,
       method: 'POST',
@@ -155,7 +155,7 @@ export class Models<SecurityDataType = unknown> {
    * @request POST:/api/v1/models/{id}/restart
    * @secure
    */
-  restartModel = (id: number, params: RequestParams = {}) =>
+  restartModel = (id: string, params: RequestParams = {}) =>
     this.http.request<ModelDetailResult, ApiLocaleResult>({
       path: `${AI}/models/${id}/restart`,
       method: 'POST',
@@ -171,7 +171,7 @@ export class Models<SecurityDataType = unknown> {
    * @request GET:/api/v1/models/{id}
    * @secure
    */
-  getModelDetail = (id: number, params: RequestParams = {}) =>
+  getModelDetail = (id: string, params: RequestParams = {}) =>
     this.http.request<ModelDetailResult, ApiLocaleResult>({
       path: `${AI}/models/${id}`,
       method: 'GET',
@@ -187,7 +187,7 @@ export class Models<SecurityDataType = unknown> {
    * @request DELETE:/api/v1/models/{id}
    * @secure
    */
-  deleteModel = (id: number, params: RequestParams = {}) =>
+  deleteModel = (id: string, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `${AI}/models/${id}`,
       method: 'DELETE',
@@ -203,7 +203,7 @@ export class Models<SecurityDataType = unknown> {
    * @request PATCH:/api/v1/models/{id}
    * @secure
    */
-  updateModel = (id: number, data: ModelUpdateDto, params: RequestParams = {}) =>
+  updateModel = (id: string, data: ModelUpdateDto, params: RequestParams = {}) =>
     this.http.request<ModelDetailResult, ApiLocaleResult>({
       path: `${AI}/models/${id}`,
       method: 'PATCH',

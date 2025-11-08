@@ -16,7 +16,7 @@ export interface MemberVo {
    * 用户ID
    * @format int64
    */
-  userId?: number;
+  userId?: string;
   /** 用户名 */
   userName?: string;
   /** 头像 */
@@ -46,7 +46,7 @@ export interface OwnerVo {
    * 用户ID
    * @format int64
    */
-  userId?: number;
+  userId?: string;
   /** 用户名 */
   userName?: string;
   /** 头像 */
@@ -59,12 +59,12 @@ export interface ResourceSharingDetailVo extends TenantAuditingVo {
    * 共享ID
    * @format int64
    */
-  id?: number;
+  id?: string;
   /**
    * 资源ID
    * @format int64
    */
-  resourceId?: number;
+  resourceId?: string;
   /** 资源名称 */
   resourceName?: string;
   /** 资源类型 */
@@ -99,7 +99,7 @@ export interface ResourceSharingUpdateDto {
   /** 权限 */
   permission: MemberPermissionEnum;
   /** 成员ID列表 */
-  memberIds?: number[];
+  memberIds?: string[];
 }
 
 /** 创建资源共享请求参数 */
@@ -108,7 +108,7 @@ export interface ResourceSharingCreateDto {
    * 资源ID
    * @format int64
    */
-  resourceId: number;
+  resourceId: string;
   /** 资源类型 */
   resourceType: ResourceTypeEnum;
   /** 共享范围（all-全体成员，specific-指定成员） */
@@ -116,7 +116,7 @@ export interface ResourceSharingCreateDto {
   /** 权限（view-查看，edit-编辑，manage-管理） */
   permission: MemberPermissionEnum;
   /** 指定成员ID列表（sharedWith为specific时必填） */
-  memberIds?: number[];
+  memberIds?: string[];
 }
 
 /** 资源共享列表项 */
@@ -125,12 +125,12 @@ export interface ResourceSharingListVo extends TenantAuditingVo {
    * 共享ID
    * @format int64
    */
-  id?: number;
+  id?: string;
   /**
    * 资源ID
    * @format int64
    */
-  resourceId?: number;
+  resourceId?: string;
   /** 资源名称 */
   resourceName?: string;
   /** 资源类型 */
@@ -141,7 +141,7 @@ export interface ResourceSharingListVo extends TenantAuditingVo {
    * 所有者ID
    * @format int64
    */
-  ownerId?: number;
+  ownerId?: string;
   /** 所有者姓名 */
   ownerName?: string;
   /** 所有者邮箱 */
@@ -267,7 +267,7 @@ export interface ResourceAccessCheckVo {
    * 授权用户ID
    * @format int64
    */
-  userId?: number;
+  userId?: string;
   /** 授权用户名称 */
   userName?: string;
 }

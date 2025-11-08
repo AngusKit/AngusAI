@@ -58,12 +58,12 @@ export interface SessionCreateDto {
    * 关联的应用ID
    * @format int64
    */
-  appId: number;
+  appId: string;
   /**
    * 使用的模型ID
    * @format int64
    */
-  modelId?: number;
+  modelId?: string;
   /** 会话配置 */
   config?: SessionConfig;
 }
@@ -74,21 +74,21 @@ export interface SessionDetailVo extends TenantAuditingVo {
    * 会话ID
    * @format int64
    */
-  id?: number;
+  id?: string;
   /** 会话标题 */
   title?: string;
   /**
    * 关联的应用ID
    * @format int64
    */
-  appId?: number;
+  appId?: string;
   /** 应用名称 */
   appName?: string;
   /**
    * 使用的模型ID
    * @format int64
    */
-  modelId?: number;
+  modelId?: string;
   /** 模型名称 */
   modelName?: string;
   /** 会话配置 */
@@ -111,7 +111,7 @@ export type SessionDetailResult = ApiLocaleResult & {
 /** 消息附件 */
 export interface MessageAttachment {
   /** @format int64 */
-  id?: number;
+  id?: string;
   name?: string;
   type?: string;
   /** @format int64 */
@@ -136,12 +136,12 @@ export interface MessageVo {
    * 消息ID
    * @format int64
    */
-  id?: number;
+  id?: string;
   /**
    * 会话ID
    * @format int64
    */
-  sessionId?: number;
+  sessionId?: string;
   /** 消息角色 */
   role?: MessageRoleEnum;
   /** 消息内容 */
@@ -177,7 +177,7 @@ export interface MessageSendDto {
    * 应用的提示词ID，用于统计分析
    * @format int64
    */
-  promptId?: number;
+  promptId?: string;
 }
 
 /** 消息反馈请求 */
@@ -200,7 +200,7 @@ export interface SessionBatchDeleteDto {
    * 会话ID列表
    * @uniqueItems true
    */
-  sessionIds: number[];
+  sessionIds: string[];
 }
 
 /** 切换模型请求 */
@@ -209,7 +209,7 @@ export interface SessionSwitchModelDto {
    * 新模型ID
    * @format int64
    */
-  modelId: number;
+  modelId: string;
 }
 
 /** 切换应用请求 */
@@ -218,7 +218,7 @@ export interface SessionSwitchAppDto {
    * 新应用ID
    * @format int64
    */
-  appId: number;
+  appId: string;
 }
 
 /** 收藏会话请求 */
@@ -254,21 +254,21 @@ export interface SessionListVo extends TenantAuditingVo {
    * 会话ID
    * @format int64
    */
-  id?: number;
+  id?: string;
   /** 会话标题 */
   title?: string;
   /**
    * 关联的应用ID
    * @format int64
    */
-  appId?: number;
+  appId?: string;
   /** 应用名称 */
   appName?: string;
   /**
    * 使用的模型ID
    * @format int64
    */
-  modelId?: number;
+  modelId?: string;
   /** 模型名称 */
   modelName?: string;
   /** 最后一条消息 */

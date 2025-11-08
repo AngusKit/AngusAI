@@ -36,7 +36,7 @@ export class PromptCategories<SecurityDataType = unknown> {
    * @request GET:/api/v1/prompt-categories/{id}
    * @secure
    */
-  getPromptCategoryDetail = (id: number, params: RequestParams = {}) =>
+  getPromptCategoryDetail = (id: string, params: RequestParams = {}) =>
     this.http.request<PromptCategoryResult, ApiLocaleResult>({
       path: `${AI}/prompt-categories/${id}`,
       method: 'GET',
@@ -52,7 +52,7 @@ export class PromptCategories<SecurityDataType = unknown> {
    * @request DELETE:/api/v1/prompt-categories/{id}
    * @secure
    */
-  deletePromptCategory = (id: number, params: RequestParams = {}) =>
+  deletePromptCategory = (id: string, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `${AI}/prompt-categories/${id}`,
       method: 'DELETE',
@@ -68,7 +68,7 @@ export class PromptCategories<SecurityDataType = unknown> {
    * @request PATCH:/api/v1/prompt-categories/{id}
    * @secure
    */
-  updatePromptCategory = (id: number, data: PromptCategoryUpdateDto, params: RequestParams = {}) =>
+  updatePromptCategory = (id: string, data: PromptCategoryUpdateDto, params: RequestParams = {}) =>
     this.http.request<PromptCategoryResult, ApiLocaleResult>({
       path: `${AI}/prompt-categories/${id}`,
       method: 'PATCH',
@@ -87,7 +87,7 @@ export class PromptCategories<SecurityDataType = unknown> {
    * @secure
    */
   updatePromptCategoryOrder = (
-    id: number,
+    id: string,
     query: {
       /**
        * 新位置（从0开始）

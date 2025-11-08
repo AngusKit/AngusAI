@@ -20,7 +20,7 @@ export class Workflows<SecurityDataType = unknown> {
    * @secure
    */
   modifyWorkflowVisibility = (
-    id: number,
+    id: string,
     query: {
       /** 可见性 */
       visibility: VisibilityEnum;
@@ -43,7 +43,7 @@ export class Workflows<SecurityDataType = unknown> {
    * @request PUT:/api/v1/workflows/{id}/config
    * @secure
    */
-  updateWorkflowConfig = (id: number, data: WorkflowConfigUpdateDto, params: RequestParams = {}) =>
+  updateWorkflowConfig = (id: string, data: WorkflowConfigUpdateDto, params: RequestParams = {}) =>
     this.http.request<WorkflowDetailResult, ApiLocaleResult>({
       path: `${AI}/workflows/${id}/config`,
       method: 'PUT',
@@ -116,7 +116,7 @@ export class Workflows<SecurityDataType = unknown> {
    * @request POST:/api/v1/workflows/{id}/stop
    * @secure
    */
-  stopWorkflow = (id: number, params: RequestParams = {}) =>
+  stopWorkflow = (id: string, params: RequestParams = {}) =>
     this.http.request<WorkflowDetailResult, ApiLocaleResult>({
       path: `${AI}/workflows/${id}/stop`,
       method: 'POST',
@@ -132,7 +132,7 @@ export class Workflows<SecurityDataType = unknown> {
    * @request POST:/api/v1/workflows/{id}/start
    * @secure
    */
-  startWorkflow = (id: number, params: RequestParams = {}) =>
+  startWorkflow = (id: string, params: RequestParams = {}) =>
     this.http.request<WorkflowDetailResult, ApiLocaleResult>({
       path: `${AI}/workflows/${id}/start`,
       method: 'POST',
@@ -148,7 +148,7 @@ export class Workflows<SecurityDataType = unknown> {
    * @request POST:/api/v1/workflows/{id}/execute
    * @secure
    */
-  executeWorkflow = (id: number, data: WorkflowExecuteDto, params: RequestParams = {}) =>
+  executeWorkflow = (id: string, data: WorkflowExecuteDto, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `${AI}/workflows/${id}/execute`,
       method: 'POST',
@@ -166,7 +166,7 @@ export class Workflows<SecurityDataType = unknown> {
    * @request GET:/api/v1/workflows/{id}
    * @secure
    */
-  getWorkflowDetail = (id: number, params: RequestParams = {}) =>
+  getWorkflowDetail = (id: string, params: RequestParams = {}) =>
     this.http.request<WorkflowDetailResult, ApiLocaleResult>({
       path: `${AI}/workflows/${id}`,
       method: 'GET',
@@ -182,7 +182,7 @@ export class Workflows<SecurityDataType = unknown> {
    * @request DELETE:/api/v1/workflows/{id}
    * @secure
    */
-  deleteWorkflow = (id: number, params: RequestParams = {}) =>
+  deleteWorkflow = (id: string, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `${AI}/workflows/${id}`,
       method: 'DELETE',
@@ -198,7 +198,7 @@ export class Workflows<SecurityDataType = unknown> {
    * @request PATCH:/api/v1/workflows/{id}
    * @secure
    */
-  updateWorkflow = (id: number, data: WorkflowUpdateDto, params: RequestParams = {}) =>
+  updateWorkflow = (id: string, data: WorkflowUpdateDto, params: RequestParams = {}) =>
     this.http.request<WorkflowDetailResult, ApiLocaleResult>({
       path: `${AI}/workflows/${id}`,
       method: 'PATCH',
@@ -261,7 +261,7 @@ export class Workflows<SecurityDataType = unknown> {
        * 工作流ID
        * @format int64
        */
-      workflowId?: number;
+      workflowId?: string;
       /** 工作流名称 */
       workflowName?: string;
       /** 状态筛选 */

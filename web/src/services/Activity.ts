@@ -23,19 +23,19 @@ export class Activity<SecurityDataType = unknown> {
        * Activity record identifier
        * @format int64
        */
-      id?: number;
+      id?: string;
       /**
        * Target resource identifier
        * @format int64
        */
-      resourceId?: number;
+      resourceId?: string;
       /** Target resource type for activity categorization */
       resourceType?: string;
       /**
        * User identifier who performed the operation
        * @format int64
        */
-      userId?: number;
+      userId?: string;
       /** Activity detail content for full-text search */
       detail?: string;
       /**

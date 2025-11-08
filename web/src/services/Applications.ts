@@ -20,7 +20,7 @@ export class Applications<SecurityDataType = unknown> {
    * @secure
    */
   modifyApplicationStatus = (
-    id: number,
+    id: string,
     query: {
       /** 应用状态 */
       status: ApplicationStatusEnum;
@@ -43,7 +43,7 @@ export class Applications<SecurityDataType = unknown> {
    * @request PUT:/api/v1/applications/{id}/config
    * @secure
    */
-  updateApplicationConfig = (id: number, data: ApplicationConfig, params: RequestParams = {}) =>
+  updateApplicationConfig = (id: string, data: ApplicationConfig, params: RequestParams = {}) =>
     this.http.request<ApplicationDetailResult, ApiLocaleResult>({
       path: `${AI}/applications/${id}/config`,
       method: 'PUT',
@@ -117,7 +117,7 @@ export class Applications<SecurityDataType = unknown> {
    * @request POST:/api/v1/applications/{id}/share
    * @secure
    */
-  shareApplication = (id: number, data: ApplicationShareDto, params: RequestParams = {}) =>
+  shareApplication = (id: string, data: ApplicationShareDto, params: RequestParams = {}) =>
     this.http.request<ApplicationDetailResult, ApiLocaleResult>({
       path: `${AI}/applications/${id}/share`,
       method: 'POST',
@@ -135,7 +135,7 @@ export class Applications<SecurityDataType = unknown> {
    * @request POST:/api/v1/applications/{id}/duplicate
    * @secure
    */
-  duplicateApplication = (id: number, data: ApplicationDuplicateDto, params: RequestParams = {}) =>
+  duplicateApplication = (id: string, data: ApplicationDuplicateDto, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `${AI}/applications/${id}/duplicate`,
       method: 'POST',
@@ -153,7 +153,7 @@ export class Applications<SecurityDataType = unknown> {
    * @request GET:/api/v1/applications/{id}
    * @secure
    */
-  getApplicationDetail = (id: number, params: RequestParams = {}) =>
+  getApplicationDetail = (id: string, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `${AI}/applications/${id}`,
       method: 'GET',
@@ -169,7 +169,7 @@ export class Applications<SecurityDataType = unknown> {
    * @request DELETE:/api/v1/applications/{id}
    * @secure
    */
-  deleteApplication = (id: number, params: RequestParams = {}) =>
+  deleteApplication = (id: string, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `${AI}/applications/${id}`,
       method: 'DELETE',
@@ -185,7 +185,7 @@ export class Applications<SecurityDataType = unknown> {
    * @request PATCH:/api/v1/applications/{id}
    * @secure
    */
-  updateApplication = (id: number, data: ApplicationUpdateDto, params: RequestParams = {}) =>
+  updateApplication = (id: string, data: ApplicationUpdateDto, params: RequestParams = {}) =>
     this.http.request<ApplicationDetailResult, ApiLocaleResult>({
       path: `${AI}/applications/${id}`,
       method: 'PATCH',
@@ -204,7 +204,7 @@ export class Applications<SecurityDataType = unknown> {
    * @secure
    */
   getApplicationStatistics = (
-    id: number,
+    id: string,
     query?: {
       /** 开始日期 */
       startDate?: string;

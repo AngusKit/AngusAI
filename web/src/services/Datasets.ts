@@ -20,7 +20,7 @@ export class Datasets<SecurityDataType = unknown> {
    * @secure
    */
   modifyDatasetVisibility = (
-    id: number,
+    id: string,
     query: {
       /** 可见性 */
       visibility: VisibilityEnum;
@@ -43,7 +43,7 @@ export class Datasets<SecurityDataType = unknown> {
    * @request PUT:/api/v1/datasets/{id}/datasource
    * @secure
    */
-  modifyDataSource = (id: number, data: DataSourceUpdateDto, params: RequestParams = {}) =>
+  modifyDataSource = (id: string, data: DataSourceUpdateDto, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `${AI}/datasets/${id}/datasource`,
       method: 'PUT',
@@ -61,7 +61,7 @@ export class Datasets<SecurityDataType = unknown> {
    * @request DELETE:/api/v1/datasets/{id}/datasource
    * @secure
    */
-  deleteDataSource = (id: number, params: RequestParams = {}) =>
+  deleteDataSource = (id: string, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `${AI}/datasets/${id}/datasource`,
       method: 'DELETE',
@@ -83,7 +83,7 @@ export class Datasets<SecurityDataType = unknown> {
        * 数据集ID
        * @format int64
        */
-      id?: number;
+      id?: string;
       /** 数据集名称 */
       name?: string;
       /** 数据集类型 */
@@ -135,7 +135,7 @@ export class Datasets<SecurityDataType = unknown> {
    * @secure
    */
   uploadDatasetFiles = (
-    id: number,
+    id: string,
     query: {
       /** 文件列表 */
       files: File[];
@@ -159,7 +159,7 @@ export class Datasets<SecurityDataType = unknown> {
    * @secure
    */
   syncDatasetData = (
-    id: number,
+    id: string,
     query?: {
       /** 同步文件或表名 */
       names?: string[];
@@ -200,7 +200,7 @@ export class Datasets<SecurityDataType = unknown> {
    * @request GET:/api/v1/datasets/{id}
    * @secure
    */
-  getDatasetDetail = (id: number, params: RequestParams = {}) =>
+  getDatasetDetail = (id: string, params: RequestParams = {}) =>
     this.http.request<DatasetDetailResult, ApiLocaleResult>({
       path: `${AI}/datasets/${id}`,
       method: 'GET',
@@ -216,7 +216,7 @@ export class Datasets<SecurityDataType = unknown> {
    * @request DELETE:/api/v1/datasets/{id}
    * @secure
    */
-  deleteDataset = (id: number, params: RequestParams = {}) =>
+  deleteDataset = (id: string, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `${AI}/datasets/${id}`,
       method: 'DELETE',
@@ -232,7 +232,7 @@ export class Datasets<SecurityDataType = unknown> {
    * @request PATCH:/api/v1/datasets/{id}
    * @secure
    */
-  updateDataset = (id: number, data: DatasetUpdateDto, params: RequestParams = {}) =>
+  updateDataset = (id: string, data: DatasetUpdateDto, params: RequestParams = {}) =>
     this.http.request<DatasetDetailResult, ApiLocaleResult>({
       path: `${AI}/datasets/${id}`,
       method: 'PATCH',
@@ -251,7 +251,7 @@ export class Datasets<SecurityDataType = unknown> {
    * @secure
    */
   previewDatasourceData = (
-    id: number,
+    id: string,
     query: {
       /** 预览表名称 */
       tableName: string;
@@ -287,7 +287,7 @@ export class Datasets<SecurityDataType = unknown> {
    * @secure
    */
   getDatasetDataList = (
-    id: number,
+    id: string,
     query?: PageQuery & {
       /** 数据名称（文件名或表名） */
       name?: string;
@@ -330,7 +330,7 @@ export class Datasets<SecurityDataType = unknown> {
        * 数据集ID
        * @format int64
        */
-      id?: number;
+      id?: string;
     },
     params: RequestParams = {}
   ) =>
@@ -350,7 +350,7 @@ export class Datasets<SecurityDataType = unknown> {
    * @request DELETE:/api/v1/datasets/{id}/data/batch-delete
    * @secure
    */
-  batchDeleteData = (id: number, data: DatasetDataBatchDeleteDto, params: RequestParams = {}) =>
+  batchDeleteData = (id: string, data: DatasetDataBatchDeleteDto, params: RequestParams = {}) =>
     this.http.request<void, ApiLocaleResult>({
       path: `${AI}/datasets/${id}/data/batch-delete`,
       method: 'DELETE',

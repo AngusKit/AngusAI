@@ -72,7 +72,7 @@ export class VectorStores<SecurityDataType = unknown> {
        * 存储源ID
        * @format int64
        */
-      id: number;
+      id: string;
     },
     data: ConnectionTestDto,
     params: RequestParams = {}
@@ -95,7 +95,7 @@ export class VectorStores<SecurityDataType = unknown> {
    * @request GET:/api/v1/vector-stores/{id}
    * @secure
    */
-  vectorStoreGetDetail = (id: number, params: RequestParams = {}) =>
+  vectorStoreGetDetail = (id: string, params: RequestParams = {}) =>
     this.http.request<VectorStoreResult, ApiLocaleResult>({
       path: `${AI}/vector-stores/${id}`,
       method: 'GET',
@@ -112,7 +112,7 @@ export class VectorStores<SecurityDataType = unknown> {
    * @secure
    */
   vectorStoreDelete = (
-    id: number,
+    id: string,
     query?: {
       /** 强制删除（即使被引用） */
       force?: boolean;
@@ -135,7 +135,7 @@ export class VectorStores<SecurityDataType = unknown> {
    * @request PATCH:/api/v1/vector-stores/{id}
    * @secure
    */
-  vectorStoreUpdate = (id: number, data: VectorStoreUpdateDto, params: RequestParams = {}) =>
+  vectorStoreUpdate = (id: string, data: VectorStoreUpdateDto, params: RequestParams = {}) =>
     this.http.request<VectorStoreResult, ApiLocaleResult>({
       path: `${AI}/vector-stores/${id}`,
       method: 'PATCH',
@@ -154,7 +154,7 @@ export class VectorStores<SecurityDataType = unknown> {
    * @secure
    */
   vectorStoreToggleEnabled = (
-    id: number,
+    id: string,
     query: {
       /** 目标状态 */
       enabled: boolean;

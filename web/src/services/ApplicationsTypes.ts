@@ -7,7 +7,7 @@ export interface ApplicationDetailVo extends TenantAuditingVo {
    * 应用ID
    * @format int64
    */
-  id?: number;
+  id?: string;
   /** 应用名称 */
   name?: string;
   /** 应用图标 */
@@ -94,21 +94,21 @@ export interface ResourcesConfigVo {
    * 关联的知识库ID
    * @format int64
    */
-  knowledgeBaseId?: number;
+  knowledgeBaseId?: string;
   /** 关联的知识库名称 */
   knowledgeBaseName?: string;
   /**
    * 关联的数据集ID
    * @format int64
    */
-  datasetId?: number;
+  datasetId?: string;
   /** 关联的数据集名称 */
   datasetName?: string;
   /**
    * 关联的工作流ID
    * @format int64
    */
-  workflowId?: number;
+  workflowId?: string;
   /** 关联的工作流名称 */
   workflowName?: string;
 }
@@ -241,17 +241,17 @@ export interface ResourcesConfig {
    * 关联的知识库ID
    * @format int64
    */
-  knowledgeBaseId?: number;
+  knowledgeBaseId?: string;
   /**
    * 关联的数据集ID
    * @format int64
    */
-  datasetId?: number;
+  datasetId?: string;
   /**
    * 关联的工作流ID
    * @format int64
    */
-  workflowId?: number;
+  workflowId?: string;
 }
 
 /** 安全设置 */
@@ -483,7 +483,7 @@ export interface TopUserVo {
    * 用户ID
    * @format int64
    */
-  userId?: number;
+  userId?: string;
   /** 用户名 */
   username?: string;
   /**

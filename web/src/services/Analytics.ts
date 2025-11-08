@@ -26,7 +26,7 @@ export class Analytics<SecurityDataType = unknown> {
        * 应用ID筛选
        * @format int64
        */
-      appId?: number;
+      appId?: string;
       /**
        * 时间范围
        * @example "7days"
@@ -70,7 +70,7 @@ export class Analytics<SecurityDataType = unknown> {
        * 应用ID筛选
        * @format int64
        */
-      appId?: number;
+      appId?: string;
       /**
        * 时间范围
        * @example "7days"
@@ -103,7 +103,7 @@ export class Analytics<SecurityDataType = unknown> {
        * 应用ID筛选
        * @format int64
        */
-      appId?: number;
+      appId?: string;
       /**
        * 时间范围
        * @example "7days"
@@ -136,7 +136,7 @@ export class Analytics<SecurityDataType = unknown> {
        * 应用ID筛选
        * @format int64
        */
-      appId?: number;
+      appId?: string;
       /**
        * 时间范围
        * @example "7days"
@@ -169,7 +169,7 @@ export class Analytics<SecurityDataType = unknown> {
        * 应用ID筛选
        * @format int64
        */
-      appId?: number;
+      appId?: string;
       /**
        * 时间范围
        * @example "7days"
@@ -202,7 +202,7 @@ export class Analytics<SecurityDataType = unknown> {
        * 应用ID筛选
        * @format int64
        */
-      appId?: number;
+      appId?: string;
       /**
        * 时间范围
        * @example "7days"
@@ -235,7 +235,7 @@ export class Analytics<SecurityDataType = unknown> {
        * 应用ID筛选
        * @format int64
        */
-      appId?: number;
+      appId?: string;
       /**
        * 时间范围
        * @example "7days"
@@ -274,7 +274,7 @@ export class Analytics<SecurityDataType = unknown> {
        * 应用ID筛选
        * @format int64
        */
-      appId?: number;
+      appId?: string;
       /**
        * 时间范围
        * @example "7days"

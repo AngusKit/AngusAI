@@ -19,7 +19,7 @@ export class ApiCollections<SecurityDataType = unknown> {
    * @request GET:/api/v1/api-collections/{collectionId}/endpoints/{endpointId}
    * @secure
    */
-  apiEndpointGetDetail = (collectionId: number, endpointId: number, params: RequestParams = {}) =>
+  apiEndpointGetDetail = (collectionId: string, endpointId: string, params: RequestParams = {}) =>
     this.http.request<ApiEndpointDetailResult, ApiLocaleResult>({
       path: `${AI}/api-collections/${collectionId}/endpoints/${endpointId}`,
       method: 'GET',
@@ -36,8 +36,8 @@ export class ApiCollections<SecurityDataType = unknown> {
    * @secure
    */
   apiEndpointUpdate = (
-    collectionId: number,
-    endpointId: number,
+    collectionId: string,
+    endpointId: string,
     data: ApiEndpointUpdateDto,
     params: RequestParams = {}
   ) =>
@@ -58,7 +58,7 @@ export class ApiCollections<SecurityDataType = unknown> {
    * @request DELETE:/api/v1/api-collections/{collectionId}/endpoints/{endpointId}
    * @secure
    */
-  apiEndpointDelete = (collectionId: number, endpointId: number, params: RequestParams = {}) =>
+  apiEndpointDelete = (collectionId: string, endpointId: string, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `${AI}/api-collections/${collectionId}/endpoints/${endpointId}`,
       method: 'DELETE',
@@ -80,7 +80,7 @@ export class ApiCollections<SecurityDataType = unknown> {
        * 接口集ID
        * @format int64
        */
-      id?: number;
+      id?: string;
       /** 接口集名称，支持模糊查询 */
       name?: string;
       /** 来源筛选：OPENAPI-OpenAPI 3.0，SWAGGER-Swagger 2.0，POSTMAN-Postman Collection，MANUAL-手动创建 */
@@ -127,7 +127,7 @@ export class ApiCollections<SecurityDataType = unknown> {
    * @secure
    */
   apiCollectionExportOpenApi = (
-    id: number,
+    id: string,
     query?: {
       /**
        * 导出格式
@@ -159,13 +159,13 @@ export class ApiCollections<SecurityDataType = unknown> {
    * @secure
    */
   apiEndpointList = (
-    collectionId: number,
+    collectionId: string,
     query?: PageQuery & {
       /**
        * 端点ID
        * @format int64
        */
-      id?: number;
+      id?: string;
       /** 端点名称，支持模糊查询 */
       name?: string;
       /** 操作标识符，用于OpenAPI规范解析的唯一标识 */
@@ -197,7 +197,7 @@ export class ApiCollections<SecurityDataType = unknown> {
    * @request POST:/api/v1/api-collections/{collectionId}/endpoints
    * @secure
    */
-  apiEndpointCreate = (collectionId: number, data: ApiEndpointCreateDto, params: RequestParams = {}) =>
+  apiEndpointCreate = (collectionId: string, data: ApiEndpointCreateDto, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `${AI}/api-collections/${collectionId}/endpoints`,
       method: 'POST',
@@ -215,7 +215,7 @@ export class ApiCollections<SecurityDataType = unknown> {
    * @request POST:/api/v1/api-collections/{collectionId}/endpoints/{endpointId}/test
    * @secure
    */
-  apiEndpointTest = (collectionId: number, endpointId: number, data: ApiEndpointTestDto, params: RequestParams = {}) =>
+  apiEndpointTest = (collectionId: string, endpointId: string, data: ApiEndpointTestDto, params: RequestParams = {}) =>
     this.http.request<ApiEndpointTestResult, ApiLocaleResult>({
       path: `${AI}/api-collections/${collectionId}/endpoints/${endpointId}/test`,
       method: 'POST',
@@ -251,7 +251,7 @@ export class ApiCollections<SecurityDataType = unknown> {
    * @request GET:/api/v1/api-collections/{id}
    * @secure
    */
-  apiCollectionGetDetail = (id: number, params: RequestParams = {}) =>
+  apiCollectionGetDetail = (id: string, params: RequestParams = {}) =>
     this.http.request<ApiCollectionDetailResult, ApiLocaleResult>({
       path: `${AI}/api-collections/${id}`,
       method: 'GET',
@@ -268,7 +268,7 @@ export class ApiCollections<SecurityDataType = unknown> {
    * @secure
    */
   apiCollectionDelete = (
-    id: number,
+    id: string,
     query?: {
       /** 强制删除（即使被引用） */
       force?: boolean;
@@ -291,7 +291,7 @@ export class ApiCollections<SecurityDataType = unknown> {
    * @request PATCH:/api/v1/api-collections/{id}
    * @secure
    */
-  apiCollectionUpdate = (id: number, data: ApiCollectionUpdateDto, params: RequestParams = {}) =>
+  apiCollectionUpdate = (id: string, data: ApiCollectionUpdateDto, params: RequestParams = {}) =>
     this.http.request<ApiCollectionDetailResult, ApiLocaleResult>({
       path: `${AI}/api-collections/${id}`,
       method: 'PATCH',
@@ -310,8 +310,8 @@ export class ApiCollections<SecurityDataType = unknown> {
    * @secure
    */
   apiEndpointToggle = (
-    collectionId: number,
-    endpointId: number,
+    collectionId: string,
+    endpointId: string,
     query: {
       /** 目标状态 */
       enabled: boolean;

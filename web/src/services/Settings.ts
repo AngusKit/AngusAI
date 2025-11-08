@@ -52,7 +52,7 @@ export class Settings<SecurityDataType = unknown> {
    * @request POST:/api/v1/settings/api-keys/{id}/revoke
    * @secure
    */
-  revokeApiKey = (id: number, data: ApiKeyRevokeDto, params: RequestParams = {}) =>
+  revokeApiKey = (id: string, data: ApiKeyRevokeDto, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `${AI}/settings/api-keys/${id}/revoke`,
       method: 'POST',
@@ -70,7 +70,7 @@ export class Settings<SecurityDataType = unknown> {
    * @request GET:/api/v1/settings/api-keys/{id}
    * @secure
    */
-  getApiKeyDetail = (id: number, params: RequestParams = {}) =>
+  getApiKeyDetail = (id: string, params: RequestParams = {}) =>
     this.http.request<ApiKeyDetailResult, ApiLocaleResult>({
       path: `${AI}/settings/api-keys/${id}`,
       method: 'GET',
@@ -86,7 +86,7 @@ export class Settings<SecurityDataType = unknown> {
    * @request DELETE:/api/v1/settings/api-keys/{id}
    * @secure
    */
-  deleteApiKey = (id: number, params: RequestParams = {}) =>
+  deleteApiKey = (id: string, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `${AI}/settings/api-keys/${id}`,
       method: 'DELETE',

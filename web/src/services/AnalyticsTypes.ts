@@ -250,7 +250,7 @@ export interface DistributionItemVo {
    * 模型ID
    * @format int64
    */
-  modelId?: number;
+  modelId?: string;
   /**
    * 模型名称
    * @example "GPT-4"

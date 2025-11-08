@@ -25,7 +25,7 @@ export interface ApiCollectionDetailVo extends TenantAuditingVo {
    * 接口集ID
    * @format int64
    */
-  id?: number;
+  id?: string;
   /** 名称 */
   name?: string;
   /** 描述 */
@@ -207,7 +207,7 @@ export interface ApiCollectionListVo extends TenantAuditingVo {
    * 接口集ID
    * @format int64
    */
-  id?: number;
+  id?: string;
   /** 名称 */
   name?: string;
   /** 描述 */
@@ -273,12 +273,12 @@ export interface ApiEndpointVo extends TenantAuditingVo {
    * 端点ID
    * @format int64
    */
-  id?: number;
+  id?: string;
   /**
    * 接口集ID
    * @format int64
    */
-  collectionId?: number;
+  collectionId?: string;
   /** 端点名称 */
   name?: string;
   /** HTTP方法 */
@@ -324,12 +324,12 @@ export interface ApiEndpointDetailVo extends TenantAuditingVo {
    * 端点ID
    * @format int64
    */
-  id?: number;
+  id?: string;
   /**
    * 接口集ID
    * @format int64
    */
-  collectionId?: number;
+  collectionId?: string;
   /** 端点名称 */
   name?: string;
   /** HTTP方法 */
@@ -391,7 +391,7 @@ export interface ApiCollectionTopStore {
   /**
    * 端点ID
    */
-  id: number;
+  id: string;
   /**
    * 端点名称
    */

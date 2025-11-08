@@ -103,7 +103,7 @@ export interface VectorStoreVo extends TenantAuditingVo {
    * 存储源ID
    * @format int64
    */
-  id?: number;
+  id?: string;
   /** 名称 */
   name?: string;
   /** 数据库类型 */
@@ -263,7 +263,7 @@ export interface VectorStoreTopStore {
    * 存储源ID
    * @format int64
    */
-  id?: number;
+  id?: string;
   /** 名称 */
   name?: string;
   /** 类型 */

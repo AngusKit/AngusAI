@@ -24,12 +24,12 @@ export class Chat<SecurityDataType = unknown> {
        * 筛选指定应用
        * @format int64
        */
-      appId?: number;
+      appId?: string;
       /**
        * 筛选使用的模型
        * @format int64
        */
-      modelId?: number;
+      modelId?: string;
       /** 是否已归档 */
       isArchived?: boolean;
       /** 是否已收藏（星标） */
@@ -73,7 +73,7 @@ export class Chat<SecurityDataType = unknown> {
    * @request POST:/api/v1/chat/sessions/{sessionId}/stop
    * @secure
    */
-  stopGeneration = (sessionId: number, params: RequestParams = {}) =>
+  stopGeneration = (sessionId: string, params: RequestParams = {}) =>
     this.http.request<MessageResult, ApiLocaleResult>({
       path: `${AI}/chat/sessions/${sessionId}/stop`,
       method: 'POST',
@@ -90,7 +90,7 @@ export class Chat<SecurityDataType = unknown> {
    * @secure
    */
   getMessageHistory = (
-    sessionId: number,
+    sessionId: string,
     query?: {
       /**
        * 页码
@@ -108,12 +108,12 @@ export class Chat<SecurityDataType = unknown> {
        * 获取指定消息之前的消息
        * @format int64
        */
-      beforeId?: number;
+      beforeId?: string;
       /**
        * 获取指定消息之后的消息
        * @format int64
        */
-      afterId?: number;
+      afterId?: string;
     },
     params: RequestParams = {}
   ) =>
@@ -133,7 +133,7 @@ export class Chat<SecurityDataType = unknown> {
    * @request POST:/api/v1/chat/sessions/{sessionId}/messages
    * @secure
    */
-  sendMessage = (sessionId: number, data: MessageSendDto, params: RequestParams = {}) =>
+  sendMessage = (sessionId: string, data: MessageSendDto, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `${AI}/chat/sessions/${sessionId}/messages`,
       method: 'POST',
@@ -151,7 +151,7 @@ export class Chat<SecurityDataType = unknown> {
    * @request DELETE:/api/v1/chat/sessions/{sessionId}/messages
    * @secure
    */
-  clearMessages = (sessionId: number, params: RequestParams = {}) =>
+  clearMessages = (sessionId: string, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `${AI}/chat/sessions/${sessionId}/messages`,
       method: 'DELETE',
@@ -167,7 +167,7 @@ export class Chat<SecurityDataType = unknown> {
    * @request POST:/api/v1/chat/sessions/{sessionId}/messages/{messageId}/regenerate
    * @secure
    */
-  regenerateMessage = (sessionId: number, messageId: number, params: RequestParams = {}) =>
+  regenerateMessage = (sessionId: string, messageId: string, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `${AI}/chat/sessions/${sessionId}/messages/${messageId}/regenerate`,
       method: 'POST',
@@ -183,7 +183,7 @@ export class Chat<SecurityDataType = unknown> {
    * @request POST:/api/v1/chat/sessions/{sessionId}/messages/{messageId}/feedback
    * @secure
    */
-  feedbackMessage = (sessionId: number, messageId: number, data: MessageFeedbackDto, params: RequestParams = {}) =>
+  feedbackMessage = (sessionId: string, messageId: string, data: MessageFeedbackDto, params: RequestParams = {}) =>
     this.http.request<MessageResult, ApiLocaleResult>({
       path: `${AI}/chat/sessions/${sessionId}/messages/${messageId}/feedback`,
       method: 'POST',
@@ -201,7 +201,7 @@ export class Chat<SecurityDataType = unknown> {
    * @request POST:/api/v1/chat/sessions/{sessionId}/messages/stream
    * @secure
    */
-  sendMessageStream = (sessionId: number, data: MessageSendDto, params: RequestParams = {}) =>
+  sendMessageStream = (sessionId: string, data: MessageSendDto, params: RequestParams = {}) =>
     this.http.request<SseEmitter, ApiLocaleResult>({
       path: `${AI}/chat/sessions/${sessionId}/messages/stream`,
       method: 'POST',
@@ -282,7 +282,7 @@ export class Chat<SecurityDataType = unknown> {
        * 关联会话ID
        * @format int64
        */
-      sessionId?: number;
+      sessionId?: string;
     },
     params: RequestParams = {}
   ) =>
@@ -304,7 +304,7 @@ export class Chat<SecurityDataType = unknown> {
    * @request PATCH:/api/v1/chat/sessions/{sessionId}/switch-model
    * @secure
    */
-  switchModel = (sessionId: number, data: SessionSwitchModelDto, params: RequestParams = {}) =>
+  switchModel = (sessionId: string, data: SessionSwitchModelDto, params: RequestParams = {}) =>
     this.http.request<SessionDetailResult, ApiLocaleResult>({
       path: `${AI}/chat/sessions/${sessionId}/switch-model`,
       method: 'PATCH',
@@ -322,7 +322,7 @@ export class Chat<SecurityDataType = unknown> {
    * @request PATCH:/api/v1/chat/sessions/{sessionId}/switch-app
    * @secure
    */
-  switchApp = (sessionId: number, data: SessionSwitchAppDto, params: RequestParams = {}) =>
+  switchApp = (sessionId: string, data: SessionSwitchAppDto, params: RequestParams = {}) =>
     this.http.request<SessionDetailResult, ApiLocaleResult>({
       path: `${AI}/chat/sessions/${sessionId}/switch-app`,
       method: 'PATCH',
@@ -340,7 +340,7 @@ export class Chat<SecurityDataType = unknown> {
    * @request PATCH:/api/v1/chat/sessions/{sessionId}/star
    * @secure
    */
-  starSession = (sessionId: number, data: SessionStarDto, params: RequestParams = {}) =>
+  starSession = (sessionId: string, data: SessionStarDto, params: RequestParams = {}) =>
     this.http.request<SessionDetailResult, ApiLocaleResult>({
       path: `${AI}/chat/sessions/${sessionId}/star`,
       method: 'PATCH',
@@ -358,7 +358,7 @@ export class Chat<SecurityDataType = unknown> {
    * @request GET:/api/v1/chat/sessions/{id}
    * @secure
    */
-  getSessionDetail = (id: number, params: RequestParams = {}) =>
+  getSessionDetail = (id: string, params: RequestParams = {}) =>
     this.http.request<SessionDetailResult, ApiLocaleResult>({
       path: `${AI}/chat/sessions/${id}`,
       method: 'GET',
@@ -374,7 +374,7 @@ export class Chat<SecurityDataType = unknown> {
    * @request DELETE:/api/v1/chat/sessions/{id}
    * @secure
    */
-  deleteSession = (id: number, params: RequestParams = {}) =>
+  deleteSession = (id: string, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `${AI}/chat/sessions/${id}`,
       method: 'DELETE',
@@ -390,7 +390,7 @@ export class Chat<SecurityDataType = unknown> {
    * @request PATCH:/api/v1/chat/sessions/{id}
    * @secure
    */
-  updateSession = (id: number, data: SessionUpdateDto, params: RequestParams = {}) =>
+  updateSession = (id: string, data: SessionUpdateDto, params: RequestParams = {}) =>
     this.http.request<SessionDetailResult, ApiLocaleResult>({
       path: `${AI}/chat/sessions/${id}`,
       method: 'PATCH',
@@ -409,7 +409,7 @@ export class Chat<SecurityDataType = unknown> {
    * @secure
    */
   exportSession = (
-    sessionId: number,
+    sessionId: string,
     query?: {
       /**
        * 导出格式
@@ -461,7 +461,7 @@ export class Chat<SecurityDataType = unknown> {
    * @request DELETE:/api/v1/chat/sessions/attachments/{id}
    * @secure
    */
-  deleteAttachment = (id: number, params: RequestParams = {}) =>
+  deleteAttachment = (id: string, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `${AI}/chat/sessions/attachments/${id}`,
       method: 'DELETE',

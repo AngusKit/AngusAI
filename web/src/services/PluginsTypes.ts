@@ -8,7 +8,7 @@ export interface PluginDetailVo extends TenantAuditingVo {
    * 插件ID
    * @format int64
    */
-  id?: number;
+  id?: string;
   /** 插件名称 */
   name?: string;
   /** 插件图标 */
@@ -201,9 +201,9 @@ export interface PluginReviewCreateDto {
 /** 插件评级记录 */
 export interface PluginReviewVo {
   /** @format int64 */
-  id?: number;
+  id?: string;
   /** @format int64 */
-  pluginId?: number;
+  pluginId?: string;
   /** @format int32 */
   rating?: number;
   content?: string;
@@ -211,7 +211,7 @@ export interface PluginReviewVo {
    * 创建者ID
    * @format int64
    */
-  createdBy?: number;
+  createdBy?: string;
   /** 创建者姓名 */
   creator?: string;
   /**
@@ -298,7 +298,7 @@ export interface PluginListVo extends TenantAuditingVo {
    * 插件ID
    * @format int64
    */
-  id?: number;
+  id?: string;
   /** 插件名称 */
   name?: string;
   /** 插件图标 */
@@ -404,7 +404,7 @@ export interface TrendingPlugin {
    * 插件ID
    * @format int64
    */
-  id?: number;
+  id?: string;
   /** 插件名称 */
   name?: string;
   /** 插件图标 */

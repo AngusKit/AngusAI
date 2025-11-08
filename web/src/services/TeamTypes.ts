@@ -6,7 +6,7 @@ export interface TeamSettingsVo extends TenantAuditingVo {
    * 团队ID
    * @format int64
    */
-  id?: number;
+  id?: string;
   /** 团队头像 */
   teamAvatar?: string;
   /** 团队名称 */
