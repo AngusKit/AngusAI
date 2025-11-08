@@ -20,16 +20,16 @@ export class DatasetsData<SecurityDataType = unknown> {
    * @description 上传数据文件到指定数据集
    *
    * @tags Dataset
-   * @name UploadDatasetFiles
+   * @name uploadDatasetFile
    * @summary 上传数据集文件
    * @request POST:/api/v1/datasets/{id}/data/upload
    * @secure
    */
-  uploadDatasetFiles = (
+  uploadDatasetFile = (
     id: string,
     query: {
       /** 文件列表 */
-      files: File[];
+      file: File;
     },
     params: RequestParams = {}
   ) =>

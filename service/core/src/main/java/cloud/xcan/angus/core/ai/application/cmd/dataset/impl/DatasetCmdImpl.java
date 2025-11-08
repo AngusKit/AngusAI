@@ -195,16 +195,6 @@ public class DatasetCmdImpl extends CommCmd<Dataset, Long> implements DatasetCmd
   }
 
   @Override
-  public void recordAccess(Long id) {
-    Optional<Dataset> datasetDb = datasetRepo.findById(id);
-    if (datasetDb.isPresent()) {
-      datasetDb.get().setAccessCount(datasetDb.get().getAccessCount() + 1);
-      datasetDb.get().setLastAccessTime(System.currentTimeMillis());
-      datasetRepo.save(datasetDb.get());
-    }
-  }
-
-  @Override
   protected BaseRepository<Dataset, Long> getRepository() {
     return datasetRepo;
   }

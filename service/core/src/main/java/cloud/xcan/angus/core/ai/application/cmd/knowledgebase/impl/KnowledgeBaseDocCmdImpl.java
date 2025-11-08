@@ -2,6 +2,7 @@ package cloud.xcan.angus.core.ai.application.cmd.knowledgebase.impl;
 
 import static cloud.xcan.angus.core.ai.application.converter.KnowledgeBaseConverter.toUploadDomain;
 import static cloud.xcan.angus.core.ai.domain.Constants.KNOWLEDGE_DOC_UPLOAD_BIZ_KEY;
+import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.calculateDocumentType;
 
 import cloud.xcan.angus.api.storage.file.FileRemote;
 import cloud.xcan.angus.api.storage.file.vo.FileUploadVo;
@@ -50,6 +51,11 @@ public class KnowledgeBaseDocCmdImpl extends CommCmd<KnowledgeBaseDoc, Long> imp
         // 获取源知识库并检查是否存在
         knowledgeBaseQuery.findAndCheck(knowledgeBaseId);
 
+        // 检查文件格式
+        if (calculateDocumentType(file.getOriginalFilename(), null) == null){
+          throw ProtocolException.of(String.format("不支持的文件格式：%s",file.getOriginalFilename()));
+        }
+
         // 检查文件大小限制
         long maxFileSize = multipartProperties.getMaxFileSize().toBytes();
         if (file.getSize() > maxFileSize) {
@@ -67,7 +73,7 @@ public class KnowledgeBaseDocCmdImpl extends CommCmd<KnowledgeBaseDoc, Long> imp
             new MultipartFile[]{file}, null, KNOWLEDGE_DOC_UPLOAD_BIZ_KEY,
             null).orElseContentThrow();
 
-        KnowledgeBaseDoc doc = toUploadDomain(knowledgeBaseId, file, uploadResult);
+        KnowledgeBaseDoc doc = toUploadDomain(knowledgeBaseId, file, uploadResult.get(0));
         insert(doc);
         return doc;
       }

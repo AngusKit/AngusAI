@@ -1,5 +1,6 @@
 package cloud.xcan.angus.core.ai.domain.dataset;
 
+import cloud.xcan.angus.core.ai.domain.Constants;
 import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,6 +38,12 @@ public class DatasetData extends TenantAuditingEntity<DatasetData, Long> {
   @Enumerated(EnumType.STRING)
   @Column(name = "status", nullable = false)
   private DatasetDataStatus status;
+
+  @Column(name = "file_path", length = Constants.DOCUMENT_FILE_PATH_MAX_LENGTH)
+  private String filePath;
+
+  @Column(name = "content_hash", length = Constants.DOCUMENT_CONTENT_HASH_MAX_LENGTH)
+  private String contentHash;
 
   @Column(name = "data_count")
   private Long dataCount;

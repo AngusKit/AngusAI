@@ -130,4 +130,36 @@ public interface Constants {
    */
   int DATASET_TAGS_MAX_COUNT = 5;
 
+  // ==================== 数据源相关字段长度常量 ====================
+
+  /**
+   * 数据源名称最大长度
+   */
+  int DATASOURCE_NAME_MAX_LENGTH = 50;
+
+  /**
+   * 数据库名称最大长度
+   */
+  int DATASOURCE_DATABASE_MAX_LENGTH = 255;
+
+  /**
+   * JDBC URL最大长度
+   */
+  int DATASOURCE_JDBC_URL_MAX_LENGTH = 500;
+
+  /**
+   * 数据库主机名或IP最大长度
+   */
+  int DATASOURCE_HOST_MAX_LENGTH = 255;
+
+  /**
+   * 数据库用户名最大长度
+   */
+  int DATASOURCE_USERNAME_MAX_LENGTH = 255;
+
+  /**
+   * 数据库密码最大长度
+   */
+  int DATASOURCE_PASSWORD_MAX_LENGTH = 4096;
+
 }

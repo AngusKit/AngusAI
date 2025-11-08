@@ -1,5 +1,6 @@
 package cloud.xcan.angus.core.ai.infra.util;
 
+import cloud.xcan.angus.core.ai.domain.dataset.DatasetDataType;
 import cloud.xcan.angus.core.ai.domain.knowledgebase.DocumentType;
 import java.io.IOException;
 import java.io.InputStream;
@@ -150,27 +151,54 @@ public class CommonUtils {
    * @param filename 文件名
    * @return 文件类型，如果无法识别则返回 TXT
    */
-  public static DocumentType calculateFileType(String filename) {
+  public static DocumentType calculateDocumentType(String filename, DocumentType defaultType) {
     if (filename == null || filename.isEmpty()) {
       return DocumentType.TXT;
     }
 
     String lowerFilename = filename.toLowerCase(Locale.ROOT);
-
     // 根据文件扩展名判断类型
     if (lowerFilename.endsWith(".pdf")) {
       return DocumentType.PDF;
     } else if (lowerFilename.endsWith(".docx") || lowerFilename.endsWith(".doc")) {
       return DocumentType.DOCX;
     } else if (lowerFilename.endsWith(".md") || lowerFilename.endsWith(".markdown")) {
-      return DocumentType.MD;
+      return DocumentType.MARKDOWN;
     } else if (lowerFilename.endsWith(".html") || lowerFilename.endsWith(".htm")) {
       return DocumentType.HTML;
     } else if (lowerFilename.endsWith(".txt") || lowerFilename.endsWith(".text")) {
       return DocumentType.TXT;
+    } else if (lowerFilename.endsWith(".json")) {
+      return DocumentType.JSON;
+    } else if (lowerFilename.endsWith(".xml")) {
+      return DocumentType.XML;
     }
-    // 默认返回 TXT
-    return DocumentType.TXT;
+    ;
+    // 默认返回
+    return defaultType;
+  }
+
+  /**
+   * 根据文件名计算文件类型
+   *
+   * @param filename 文件名
+   * @return 文件类型，如果无法识别则返回 TXT
+   */
+  public static DatasetDataType calculateDatasetType(String filename, DatasetDataType defaultType) {
+    if (filename == null || filename.isEmpty()) {
+      return DatasetDataType.EXCEL;
+    }
+    String lowerFilename = filename.toLowerCase(Locale.ROOT);
+    // 根据文件扩展名判断类型
+    if (lowerFilename.endsWith(".xlsx") || lowerFilename.endsWith(".xls")) {
+      return DatasetDataType.EXCEL;
+    } else if (lowerFilename.endsWith(".csv")) {
+      return DatasetDataType.CSV;
+    } else if (lowerFilename.endsWith(".json")) {
+      return DatasetDataType.JSON;
+    }
+    // 默认返回
+    return defaultType;
   }
 
   /**

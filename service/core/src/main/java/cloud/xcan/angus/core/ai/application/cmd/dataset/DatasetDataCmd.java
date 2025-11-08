@@ -8,14 +8,14 @@ import org.springframework.web.multipart.MultipartFile;
 public interface DatasetDataCmd {
 
   /**
+   * 上传数据文件到数据集
+   */
+  DatasetData uploadDatasetData(Long datasetId, MultipartFile file);
+
+  /**
    * 同步文件数据到关系数据库或同步表信息
    */
   List<SyncDataResult> syncDatasetData(Long datasetId, List<String> filenames);
-
-  /**
-   * 上传数据文件到数据集
-   */
-  List<DatasetData> uploadDatasetData(Long datasetId, MultipartFile[] files);
 
   /**
    * 批量删除文件或表

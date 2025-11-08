@@ -11,6 +11,7 @@ import cloud.xcan.angus.core.ai.infra.util.DatasourceUtils.TableDataResult;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.DatasetDataFacade;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetDataBatchDeleteDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetDataFindDto;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetFileUploadDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.internal.assembler.DatasetDataAssembler;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetDataListVo;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasourceTableDataPreviewVo;
@@ -23,7 +24,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
 @Component
 public class DatasetDataFacadeImpl implements DatasetDataFacade {
@@ -35,38 +35,37 @@ public class DatasetDataFacadeImpl implements DatasetDataFacade {
   private DatasetDataCmd datasetDataCmd;
 
   @Override
-  public List<SyncDataVo> syncDatasetData(Long id, List<String> names) {
-    List<SyncDataResult> results = datasetDataCmd.syncDatasetData(id, names);
+  public DatasetDataListVo uploadDatasetFile(Long datasetId, DatasetFileUploadDto dto) {
+    DatasetData data = datasetDataCmd.uploadDatasetData(datasetId, dto.getFile());
+    return DatasetDataAssembler.toDataListVo(data);
+  }
+
+  @Override
+  public List<SyncDataVo> syncDatasetData(Long datasetId, List<String> names) {
+    List<SyncDataResult> results = datasetDataCmd.syncDatasetData(datasetId, names);
     return results.stream().map(DatasetDataAssembler::toSyncDataVo)
         .collect(Collectors.toList());
   }
 
   @Override
-  public List<DatasetDataListVo> uploadDatasetData(Long datasetId, MultipartFile[] files) {
-    List<DatasetData> data = datasetDataCmd.uploadDatasetData(datasetId, files);
-    return data.stream().map(DatasetDataAssembler::toDataListVo)
-        .collect(Collectors.toList());
+  public void batchDeleteData(Long datasetId, DatasetDataBatchDeleteDto dto) {
+    datasetDataCmd.batchDeleteData(datasetId, dto.getNames());
   }
 
   @Override
-  public void batchDeleteData(Long id, DatasetDataBatchDeleteDto dto) {
-    datasetDataCmd.batchDeleteData(id, dto.getNames());
-  }
-
-  @Override
-  public PageResult<DatasetDataListVo> listData(Long id, DatasetDataFindDto dto) {
+  public PageResult<DatasetDataListVo> listData(Long datasetId, DatasetDataFindDto dto) {
     GenericSpecification<DatasetData> spec = DatasetDataAssembler.getSpecification(dto);
-    spec.getCriteria().add(SearchCriteria.equal("datasetId", id));
+    spec.getCriteria().add(SearchCriteria.equal("datasetId", datasetId));
     Page<DatasetData> page = datasetDataQuery.find(spec, dto.tranPage(),
         dto.fullTextSearch, getMatchSearchFields(dto.getClass()));
     return buildVoPageResult(page, DatasetDataAssembler::toDataListVo);
   }
 
   @Override
-  public DatasourceTableDataPreviewVo previewDatasourceData(Long id, String tableName,
+  public DatasourceTableDataPreviewVo previewDatasourceData(Long datasetId, String tableName,
       Integer pageNo, Integer pageSize) {
     TableDataResult result = datasetDataQuery.previewDatasourceData(
-        id, tableName, pageNo, pageSize);
+        datasetId, tableName, pageNo, pageSize);
     return DatasetDataAssembler.toTableDataPreviewVo(result);
   }
 }

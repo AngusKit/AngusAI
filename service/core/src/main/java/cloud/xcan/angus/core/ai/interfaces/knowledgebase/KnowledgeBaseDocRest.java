@@ -44,7 +44,7 @@ public class KnowledgeBaseDocRest {
   @Resource
   private KnowledgeBaseDocFacade documentFacade;
 
-  @Operation(operationId = "uploadDocument", summary = "上传文档", description = "上传文档到知识库")
+  @Operation(operationId = "uploadDocument", summary = "上传文档", description = "上传文档到知识库，支持格式： TXT,  PDF,  DOCX,  MD,  MARKDOWN, HTML, JSON, XML")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "201", description = "文档上传成功")
   })
@@ -52,7 +52,7 @@ public class KnowledgeBaseDocRest {
   @PostMapping(value = "/{knowledgeBaseId}/documents/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ApiLocaleResult<KnowledgeBaseDocVo> uploadDocument(
       @Parameter(description = "知识库ID") @PathVariable Long knowledgeBaseId,
-      @Parameter(description = "文件列表", content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE), schema = @Schema(type = "object"))
+      @Parameter(description = "文件", content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE), schema = @Schema(type = "object"))
       KnowledgeBaseDocUploadDto dto) {
     return ApiLocaleResult.success(documentFacade.uploadDocument(knowledgeBaseId, dto));
   }

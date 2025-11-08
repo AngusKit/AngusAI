@@ -7,6 +7,7 @@ import cloud.xcan.angus.spec.locale.EnumMessage;
 public enum DatasetDataType implements EnumMessage<String> {
   EXCEL,   // Excel文件
   CSV,  // CSV文件
+  JSON, // JSON文件
   TABLE;   // 数据表
 
   public String getValue() {

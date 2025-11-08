@@ -42,8 +42,4 @@ public interface DatasetCmd {
    */
   void delete(Long id);
 
-  /**
-   * 记录数据集访问
-   */
-  void recordAccess(Long id);
 }
