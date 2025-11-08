@@ -257,7 +257,7 @@ export function CategoryDialog({
 
         <div className='space-y-4'>
           <div>
-            <Label htmlFor='categoryName'>{t('prompts.categoryName')}</Label>
+            <Label htmlFor='categoryName' className='mb-1'>{t('prompts.categoryName')}</Label>
             <Input
               id='categoryName'
               value={categoryForm.name}
@@ -268,7 +268,7 @@ export function CategoryDialog({
           </div>
 
           <div>
-            <Label htmlFor='parentCategory'>
+            <Label htmlFor='parentCategory' className='mb-1'>
               {language === 'zh-CN' ? '父分组（可选）' : 'Parent Category (Optional)'}
             </Label>
             <Select
@@ -311,7 +311,7 @@ export function CategoryDialog({
 
           <div className='grid grid-cols-2 gap-4'>
             <div>
-              <Label htmlFor='categoryIcon'>{language === 'zh-CN' ? '图标' : 'Icon'}</Label>
+              <Label htmlFor='categoryIcon' className='mb-1'>{language === 'zh-CN' ? '图标' : 'Icon'}</Label>
               <Select
                 value={AVAILABLE_ICONS.find(icon => icon.component === categoryForm.icon)?.name || 'BookOpen'}
                 onValueChange={value => {
@@ -345,7 +345,7 @@ export function CategoryDialog({
             </div>
 
             <div>
-              <Label htmlFor='categoryColor'>{language === 'zh-CN' ? '颜色' : 'Color'}</Label>
+              <Label htmlFor='categoryColor' className='mb-1'>{language === 'zh-CN' ? '颜色' : 'Color'}</Label>
               <Select
                 value={categoryForm.color}
                 onValueChange={value => setCategoryForm(prev => ({ ...prev, color: value }))}

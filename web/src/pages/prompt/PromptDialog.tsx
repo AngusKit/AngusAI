@@ -223,7 +223,7 @@ export function PromptDialog({
 
         <div className='space-y-4'>
           <div>
-            <Label htmlFor='title'>{t('prompts.promptTitle')}</Label>
+            <Label htmlFor='title' className='mb-1'>{t('prompts.promptTitle')}</Label>
             <Input
               id='title'
               value={promptForm.title}
@@ -234,7 +234,7 @@ export function PromptDialog({
           </div>
 
           <div>
-            <Label htmlFor='content'>{t('prompts.promptContent')}</Label>
+            <Label htmlFor='content' className='mb-1'>{t('prompts.promptContent')}</Label>
             <Textarea
               id='content'
               value={promptForm.content}
@@ -245,7 +245,7 @@ export function PromptDialog({
           </div>
 
           <div>
-            <Label htmlFor='category'>{t('prompts.category')}</Label>
+            <Label htmlFor='category' className='mb-1'>{t('prompts.category')}</Label>
             <Select
               value={promptForm.category}
               onValueChange={value => setPromptForm(prev => ({ ...prev, category: value }))}
@@ -271,8 +271,8 @@ export function PromptDialog({
           </div>
 
           <div>
-            <Label>{t('prompts.tags')}</Label>
-            <div className='flex flex-wrap gap-2 mb-2'>
+            <Label className='mb-1'>{t('prompts.tags')}</Label>
+            <div className='flex flex-wrap gap-2'>
               {promptForm.tags.map((tag, index) => (
                 <span key={index} className={cn('text-xs px-2 py-1 rounded-md flex items-center gap-1', tag.color)}>
                   {tag.label}
