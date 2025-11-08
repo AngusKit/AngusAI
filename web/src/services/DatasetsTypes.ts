@@ -1,5 +1,5 @@
 import { ApiLocaleResult, TenantAuditingVo } from '@xcan-angus/infra';
-import { DatasetStatusEnum, DatasetTypeEnum, DatasourceTypeEnum, VisibilityEnum } from '@/enums/enums.ts';
+import { DatasetTypeEnum, DatasourceTypeEnum, VisibilityEnum } from '@/enums/enums.ts';
 
 /** 数据集数据统计响应 */
 export interface DatasetDataStatisticsVo {
@@ -41,8 +41,10 @@ export interface DatasetDetailVo extends TenantAuditingVo {
   description?: string;
   /** 数据集类型 */
   type?: DatasetTypeEnum;
-  /** 数据集状态 */
-  status?: DatasetStatusEnum;
+  /**
+   * 是否启用
+   */
+  enabled?: boolean;
   /** 可见性 */
   visibility?: VisibilityEnum;
   /** 图标emoji */
@@ -230,8 +232,10 @@ export interface DatasetListVo extends TenantAuditingVo {
   description?: string;
   /** 数据集类型 */
   type?: DatasetTypeEnum;
-  /** 数据集状态 */
-  status?: DatasetStatusEnum;
+  /**
+   * 是否启用
+   */
+  enabled?: boolean;
   /** 可见性 */
   visibility?: VisibilityEnum;
   /** 图标emoji */
@@ -332,7 +336,6 @@ export type DatasetStatisticsResult = ApiLocaleResult & {
 export enum GetDatasetListOrderByEnum {
   Name = 'name',
   Type = 'type',
-  Status = 'status',
   CreatedDate = 'createdDate',
   ModifiedDate = 'modifiedDate',
 }

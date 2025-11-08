@@ -142,11 +142,6 @@ export const enumTranslations = {
     FILE: 'File',
     DATASOURCE: 'Datasource',
   },
-  DatasetStatusEnum: {
-    ACTIVE: 'Active',
-    INACTIVE: 'Inactive',
-    PREPARING: 'Preparing',
-  },
   DatasourceTypeEnum: {
     MySQL: 'MySQL',
     SQLServer: 'SQL Server',

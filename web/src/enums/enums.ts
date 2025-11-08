@@ -185,13 +185,6 @@ export enum DatasetTypeEnum {
   DATASOURCE = 'DATASOURCE',
 }
 
-/** 数据集状态 */
-export enum DatasetStatusEnum {
-  ACTIVE = 'ACTIVE',
-  INACTIVE = 'INACTIVE',
-  PREPARING = 'PREPARING',
-}
-
 /** 数据库类型 */
 export enum DatasourceTypeEnum {
   MySQL = 'MySQL',
@@ -382,7 +375,6 @@ export const enumNamespaceMap = new Map<any, string>([
   [KnowledgeBaseDocTypeEnum, 'enum.KnowledgeBaseDocTypeEnum'],
   [KnowledgeBaseDocStatusEnum, 'enum.KnowledgeBaseDocStatusEnum'],
   [DatasetTypeEnum, 'enum.DatasetTypeEnum'],
-  [DatasetStatusEnum, 'enum.DatasetStatusEnum'],
   [DatasourceTypeEnum, 'enum.DatasourceTypeEnum'],
   [ApplicationCategoryEnum, 'enum.ApplicationCategoryEnum'],
   [ApplicationStatusEnum, 'enum.ApplicationStatusEnum'],
