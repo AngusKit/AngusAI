@@ -1,5 +1,8 @@
 package cloud.xcan.angus.core.ai.domain.dataset;
 
+import static cloud.xcan.angus.core.ai.domain.Constants.DATASET_DESCRIPTION_MAX_LENGTH;
+import static cloud.xcan.angus.core.ai.domain.Constants.DATASET_NAME_MAX_LENGTH;
+
 import cloud.xcan.angus.core.ai.domain.Visibility;
 import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
@@ -30,10 +33,10 @@ public class Dataset extends TenantAuditingEntity<Dataset, Long> {
   @Id
   private Long id;
 
-  @Column(name = "name", nullable = false, length = 50)
+  @Column(name = "name", nullable = false, length = DATASET_NAME_MAX_LENGTH)
   private String name;
 
-  @Column(name = "description", nullable = false, length = 500)
+  @Column(name = "description", nullable = false, length = DATASET_DESCRIPTION_MAX_LENGTH)
   private String description;
 
   @Enumerated(EnumType.STRING)

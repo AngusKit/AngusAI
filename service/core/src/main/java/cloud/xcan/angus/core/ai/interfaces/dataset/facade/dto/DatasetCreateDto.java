@@ -1,5 +1,9 @@
 package cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto;
 
+import static cloud.xcan.angus.core.ai.domain.Constants.DATASET_DESCRIPTION_MAX_LENGTH;
+import static cloud.xcan.angus.core.ai.domain.Constants.DATASET_NAME_MAX_LENGTH;
+import static cloud.xcan.angus.core.ai.domain.Constants.DATASET_TAGS_MAX_COUNT;
+
 import cloud.xcan.angus.core.ai.domain.Visibility;
 import cloud.xcan.angus.core.ai.domain.dataset.DatasetType;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -16,12 +20,12 @@ import org.hibernate.validator.constraints.Length;
 public class DatasetCreateDto {
 
   @NotBlank
-  @Length(max = 50)
+  @Length(max = DATASET_NAME_MAX_LENGTH)
   @Schema(description = "数据集名称", example = "用户行为数据", requiredMode = RequiredMode.REQUIRED)
   private String name;
 
   @NotBlank
-  @Length(max = 500)
+  @Length(max = DATASET_DESCRIPTION_MAX_LENGTH)
   @Schema(description = "数据集描述", example = "用户行为分析数据集", requiredMode = RequiredMode.REQUIRED)
   private String description;
 
@@ -39,7 +43,7 @@ public class DatasetCreateDto {
   @Schema(description = "背景色", example = "bg-blue-500")
   private String iconBg;
 
-  @Size(max = 5)
+  @Size(max = DATASET_TAGS_MAX_COUNT)
   @Schema(description = "标签，最多5个")
   private List<String> tags;
 }

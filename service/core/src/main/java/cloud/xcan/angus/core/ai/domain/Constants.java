@@ -113,4 +113,21 @@ public interface Constants {
    */
   double SIMILARITY_THRESHOLD_MAX_VALUE = 1.0;
 
+  // ==================== 数据集相关字段长度常量 ====================
+
+  /**
+   * 数据集名称最大长度
+   */
+  int DATASET_NAME_MAX_LENGTH = 50;
+
+  /**
+   * 数据集描述最大长度
+   */
+  int DATASET_DESCRIPTION_MAX_LENGTH = 500;
+
+  /**
+   * 数据集标签最大数量
+   */
+  int DATASET_TAGS_MAX_COUNT = 5;
+
 }
