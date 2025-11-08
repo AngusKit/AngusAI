@@ -12,7 +12,7 @@ import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetFindDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasourceConnectionTestDto;
-import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetDataStatisticsVo;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetDataStatsVo;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetListVo;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetStatisticsVo;
@@ -152,21 +152,8 @@ public class DatasetAssembler {
     return vo;
   }
 
-  public static DatasetStatisticsVo toDatasetStatisticsVo(DatasetStatistics stats) {
-    DatasetStatisticsVo vo = new DatasetStatisticsVo();
-    vo.setTotalDatasets(stats.getTotalDatasets());
-    vo.setActiveDatasets(stats.getActiveDatasets());
-    vo.setTotalFilesOrTables(stats.getTotalFilesOrTables());
-    vo.setTotalRecords(stats.getTotalRecords());
-    vo.setTotalRecordsSize(stats.getTotalRecordsSize());
-    vo.setUsedStoreSize(formatFileSize(stats.getUsedStoreSize()));
-    vo.setTotalStoreSize(formatFileSize(stats.getTotalStoreSize()));
-    vo.setUsedStoreRate(stats.getUsedStoreRate());
-    return vo;
-  }
-
-  public static DatasetDataStatisticsVo toDatasetDataStatisticsVo(Dataset dataset) {
-    DatasetDataStatisticsVo vo = new DatasetDataStatisticsVo();
+  public static DatasetDataStatsVo toDatasetDataStatisticsVo(Dataset dataset) {
+    DatasetDataStatsVo vo = new DatasetDataStatsVo();
     vo.setTotalFilesOrTables(dataset.getTotalFilesOrTables());
     vo.setTotalRecords(dataset.getTotalRecords());
     vo.setTotalRecordsSize(formatFileSize(dataset.getTotalRecordsSize()));

@@ -99,7 +99,6 @@ public class DatasetFacadeImpl implements DatasetFacade {
 
   @Override
   public DatasetStatisticsVo getStatistics(Long id) {
-    DatasetStatistics stats = datasetQuery.getStatistics(id);
-    return DatasetAssembler.toDatasetStatisticsVo(stats);
+    return null;
   }
 }

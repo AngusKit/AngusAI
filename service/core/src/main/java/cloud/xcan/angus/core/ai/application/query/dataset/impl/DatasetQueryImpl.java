@@ -12,9 +12,9 @@ import jakarta.annotation.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.lang.Nullable;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service
 public class DatasetQueryImpl implements DatasetQuery {
 
   @Resource
@@ -43,16 +43,6 @@ public class DatasetQueryImpl implements DatasetQuery {
         return fullTextSearch
             ? datasetSearchRepo.find(spec.getCriteria(), pageable, Dataset.class, match)
             : datasetRepo.findAll(spec, pageable);
-      }
-    }.execute();
-  }
-
-  @Override
-  public DatasetStatistics getStatistics(@Nullable Long id) {
-    return new BizTemplate<DatasetStatistics>() {
-      @Override
-      protected DatasetStatistics process() {
-        return null;
       }
     }.execute();
   }

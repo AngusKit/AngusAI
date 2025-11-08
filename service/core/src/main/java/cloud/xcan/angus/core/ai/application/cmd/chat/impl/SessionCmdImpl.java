@@ -22,12 +22,12 @@ import cloud.xcan.angus.core.utils.CoreUtils;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import java.util.List;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 /**
  * 会话命令实现
  */
-@Component
+@Service
 public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd {
 
   @Resource

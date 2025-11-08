@@ -13,12 +13,12 @@ import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import java.util.List;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 /**
  * 消息命令实现
  */
-@Component
+@Service
 public class MessageCmdImpl extends CommCmd<Message, Long> implements MessageCmd {
 
   @Resource

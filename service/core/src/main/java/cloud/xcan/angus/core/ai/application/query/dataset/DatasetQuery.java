@@ -20,11 +20,6 @@ public interface DatasetQuery {
       boolean fullTextSearch, String[] match);
 
   /**
-   * 查询数据集统计
-   */
-  DatasetStatistics getStatistics(Long id);
-
-  /**
    * 检查数据集名称是否存在
    */
   boolean existsByName(String name);

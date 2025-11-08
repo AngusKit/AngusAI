@@ -26,9 +26,9 @@ import java.util.Set;
 import lombok.Getter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service
 public class ModelQueryImpl implements ModelQuery {
 
   @Resource
