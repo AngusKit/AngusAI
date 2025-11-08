@@ -127,8 +127,8 @@ export interface PageResultPromptListVo {
 export type PagePromptListResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: PageResultPromptListVo;
-  
-  extensions?: {[key: string]: any}
+
+  extensions?: { [key: string]: any };
 };
 
 /** 排序字段 */
@@ -216,7 +216,7 @@ export type ListPromptCategoryResult = ApiLocaleResult & {
   data?: PromptCategoryVo[];
 
   extensions?: {
-    totalPrompts: number,
-    totalFavorites: number
+    totalPrompts: number;
+    totalFavorites: number;
   };
 };

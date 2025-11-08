@@ -91,20 +91,19 @@ function PaginationEllipsis({ className, ...props }: React.ComponentProps<'span'
 }
 
 type XcanPage = {
-  className?: string,
+  className?: string;
   pageSize: number;
   pageNo: number;
   total: number;
-  onChange: (value: {pageSize: number, pageNo: number})=>void;
-}
+  onChange: (value: { pageSize: number; pageNo: number }) => void;
+};
 
-function XcanPagination (props: XcanPage) {
-
+function XcanPagination(props: XcanPage) {
   const [currentPage, setCurrentPage] = useState(props.pageNo || 1);
   const [totalPages, setTotalPages] = useState<number>(0);
 
   useEffect(() => {
-    const _totalPages = Math.ceil(props.total/(props.pageSize || 5));
+    const _totalPages = Math.ceil(props.total / (props.pageSize || 5));
     setTotalPages(_totalPages);
   }, [props.total, props.pageSize]);
 
@@ -116,7 +115,7 @@ function XcanPagination (props: XcanPage) {
     setCurrentPage(newPage);
     props.onChange({
       pageNo: newPage,
-      pageSize: props.pageSize
+      pageSize: props.pageSize,
     });
   };
 
@@ -145,19 +144,14 @@ function XcanPagination (props: XcanPage) {
         <PaginationItem>
           <PaginationNext
             onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-            className={
-              currentPage === totalPages
-                ? 'pointer-events-none opacity-50'
-                : 'cursor-pointer'
-            }
+            className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
           >
             下一页
           </PaginationNext>
         </PaginationItem>
       </PaginationContent>
     </Pagination>
-  )
-
+  );
 }
 
 export {

@@ -1,23 +1,22 @@
-import { Database, Plus, Upload, MoreHorizontal, Eye, Trash2, Download, FileText, File, Search, X, Filter, Grid3x3, List, Edit, FolderOpen, Files, Check, RefreshCw, FileX, } from 'lucide-react';
+import { Check, Database, Download, Edit, Eye, File, Files, FileText, FileX, Filter, FolderOpen, Grid3x3, List, MoreHorizontal, Plus, RefreshCw, Search, Trash2, Upload, X, } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, } from '@/components/ui/pagination';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch';
-import { useState, useRef, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLanguage } from '@/components/ui/LanguageProvider';
 import { toast } from 'sonner';
 import { EditKnowledgeBaseDialog } from './EditKnowledgeBaseDialog';
 import { CreateKnowledgeBaseDialog } from './CreateKnowledgeBaseDialog';
 import KnowledgeBases from '@/services/KnowledgeBases';
 import Documents from '@/services/Documents';
-import { VisibilityEnum, KnowledgeBaseDocStatusEnum, KnowledgeBaseDocTypeEnum } from '@/enums/enums';
-import type { KnowledgeBaseListVo, KnowledgeBaseDetailVo } from '@/services/KnowledgeBasesTypes';
+import { KnowledgeBaseDocStatusEnum, KnowledgeBaseDocTypeEnum } from '@/enums/enums';
+import type { KnowledgeBaseListVo } from '@/services/KnowledgeBasesTypes';
 import type { KnowledgeBaseDocListVo } from '@/services/DocumentsTypes';
 
 interface KnowledgeBaseItem {
@@ -195,11 +194,11 @@ export function KnowledgeBase() {
         pageNo: currentPage,
         pageSize: itemsPerPage,
       });
-      
+
       // 处理响应结构
       const responseData = (response as any).data;
       let listData: KnowledgeBaseListVo[] | undefined;
-      
+
       // 尝试多种可能的响应结构
       if (Array.isArray(responseData?.list)) {
         // 情况1: response.data.list 直接是数组
@@ -211,7 +210,7 @@ export function KnowledgeBase() {
         // 情况3: response.list 直接是数组
         listData = (response as any).list;
       }
-      
+
       if (Array.isArray(listData)) {
         const mappedList: KnowledgeBaseItem[] = listData.map((kb: KnowledgeBaseListVo) => ({
           id: kb.id || 0,
@@ -257,7 +256,7 @@ export function KnowledgeBase() {
     const newEnabled = !kb.enabled;
     try {
       await KnowledgeBases.toggleKnowledgeStatus(id, { enabled: newEnabled });
-      
+
       setKnowledgeBases(prev =>
         prev.map(k => {
           if (k.id === id) {
@@ -286,25 +285,25 @@ export function KnowledgeBase() {
   // 加载文档列表
   const loadDocuments = async (knowledgeBaseId: number) => {
     if (!knowledgeBaseId) return;
-    
+
     setDocumentsLoading(true);
     try {
       const response = await Documents.getDocumentList(knowledgeBaseId, {
         pageNo: documentPage,
         pageSize: documentsPerPage,
       } as any);
-      
+
       const responseData = (response as any).data;
       let listData: KnowledgeBaseDocListVo[] | undefined;
       let total: number = 0;
-      
+
       // 尝试多种可能的响应结构
       if (responseData) {
         // 情况1: response.data 是 PageKnowledgeBaseDocListVo 类型，包含 list 和 total
         if (responseData.list && Array.isArray(responseData.list)) {
           listData = responseData.list;
           total = responseData.total || 0;
-        } 
+        }
         // 情况2: response.data.data 包含 list 和 total
         else if (responseData.data?.list && Array.isArray(responseData.data.list)) {
           listData = responseData.data.list;
@@ -323,7 +322,7 @@ export function KnowledgeBase() {
           total = (response as any).total || list.length;
         }
       }
-      
+
       if (Array.isArray(listData)) {
         const mappedDocs = listData.map((doc: KnowledgeBaseDocListVo) => {
           const statusMap: Record<string, { text: string; color: string }> = {
@@ -379,7 +378,7 @@ export function KnowledgeBase() {
           const typeInfo = typeMap[type] || typeMap[KnowledgeBaseDocTypeEnum.TXT];
 
           return {
-            id: typeof doc.id === 'string' ? Number(doc.id) : (doc.id || 0),
+            id: typeof doc.id === 'string' ? Number(doc.id) : doc.id || 0,
             name: doc.name || '',
             type: typeInfo.text,
             typeColor: typeInfo.color,
@@ -415,7 +414,7 @@ export function KnowledgeBase() {
     // 切换知识库时，立即清空文档列表
     setDocuments([]);
     setTotalDocuments(0);
-    
+
     if (selectedKnowledgeBase) {
       // 重置到第一页
       setDocumentPage(1);
@@ -435,14 +434,14 @@ export function KnowledgeBase() {
   // 文档启用/禁用处理
   const handleToggleDocument = async (id: number) => {
     if (!selectedKnowledgeBase) return;
-    
+
     const doc = documents.find(d => d.id === id);
     if (!doc || doc.statusEnum === KnowledgeBaseDocStatusEnum.PROCESSING) return;
 
     const newEnabled = !doc.enabled;
     try {
       await Documents.toggleDocument(id, selectedKnowledgeBase, { enabled: newEnabled });
-      
+
       setDocuments(prev =>
         prev.map(d => {
           if (d.id === id) {
@@ -467,15 +466,15 @@ export function KnowledgeBase() {
   // 重新解析文档
   const handleReparse = async (doc: any) => {
     if (!selectedKnowledgeBase) return;
-    
+
     try {
       toast.info(`正在重新处理文档: ${doc.name}`);
-      
+
       const response = await Documents.reprocessDocument(doc.id, selectedKnowledgeBase);
-      
+
       const responseData = (response as any).data;
       const statusData = responseData?.data;
-      
+
       if (statusData) {
         setDocuments(prev =>
           prev.map(d => {
@@ -498,10 +497,10 @@ export function KnowledgeBase() {
                   color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
                 },
               };
-              
+
               const status = statusData.status || KnowledgeBaseDocStatusEnum.PROCESSING;
               const statusInfo = statusMap[status] || statusMap[KnowledgeBaseDocStatusEnum.PROCESSING];
-              
+
               return {
                 ...d,
                 status: statusInfo.text,
@@ -516,7 +515,7 @@ export function KnowledgeBase() {
             return d;
           })
         );
-        
+
         if (statusData.status === KnowledgeBaseDocStatusEnum.COMPLETED) {
           toast.success(`文档 ${doc.name} 处理完成`);
         } else if (statusData.status === KnowledgeBaseDocStatusEnum.PROCESSING) {
@@ -531,9 +530,9 @@ export function KnowledgeBase() {
   // 删除文档
   const handleDeleteDocument = async (doc: any) => {
     if (!selectedKnowledgeBase) return;
-    
+
     if (!confirm(`确定要删除文档 "${doc.name}" 吗？`)) return;
-    
+
     try {
       await Documents.deleteDocument(doc.id, selectedKnowledgeBase);
       setDocuments(prev => prev.filter(d => d.id !== doc.id));
@@ -549,7 +548,7 @@ export function KnowledgeBase() {
       const response = await KnowledgeBases.getKnowledgeBaseDetail(kb.id);
       const responseData = (response as any).data;
       const detail = responseData?.data;
-      
+
       if (detail) {
         const mappedKB: KnowledgeBaseItem = {
           ...kb,
@@ -583,7 +582,7 @@ export function KnowledgeBase() {
 
   const handleDeleteKB = async (kb: KnowledgeBaseItem) => {
     if (!confirm(`确定要删除知识库 "${kb.name}" 吗？此操作不可恢复。`)) return;
-    
+
     try {
       await KnowledgeBases.deleteKnowledgeBase(kb.id);
       toast.success(`已删除知识库: ${kb.name}`);
@@ -618,9 +617,7 @@ export function KnowledgeBase() {
     const newFiles: UploadFile[] = fileArray
       .filter(file => {
         if (file.size > maxSize) {
-          toast.error(
-            `${t('knowledgeUpload.fileAdded')} ${file.name} ${t('knowledgeUpload.fileSizeExceeded')} (50MB)`
-          );
+          toast.error(`${t('knowledgeUpload.fileAdded')} ${file.name} ${t('knowledgeUpload.fileSizeExceeded')} (50MB)`);
           return false;
         }
         if (!allowedTypes.includes(file.type)) {
@@ -655,7 +652,16 @@ export function KnowledgeBase() {
       return;
     }
 
-    setUploadFiles(prev => prev.map(f => (f.id === fileId ? { ...f, status: 'uploading' as const } : f)));
+    setUploadFiles(prev =>
+      prev.map(f =>
+        f.id === fileId
+          ? {
+              ...f,
+              status: 'uploading' as const,
+            }
+          : f
+      )
+    );
 
     try {
       // 创建FormData
@@ -664,11 +670,15 @@ export function KnowledgeBase() {
 
       // 调用上传API - 注意：根据API定义，file在query中，但实际文件上传应该使用FormData
       // 这里需要根据实际API实现调整
-      await Documents.uploadDocument(selectedKnowledgeBase, { file }, {
-        body: formData,
-        // 移除ContentType，让浏览器自动设置multipart/form-data
-        type: undefined as any,
-      });
+      await Documents.uploadDocument(
+        selectedKnowledgeBase,
+        { file },
+        {
+          body: formData,
+          // 移除ContentType，让浏览器自动设置multipart/form-data
+          type: undefined as any,
+        }
+      );
 
       // 上传成功
       const currentInterval = uploadIntervalsRef.current.get(fileId);
@@ -682,7 +692,7 @@ export function KnowledgeBase() {
       );
 
       toast.success(`${fileName} ${t('knowledgeUpload.uploadSuccess')}`);
-      
+
       // 重新加载文档列表
       setTimeout(() => {
         loadDocuments(selectedKnowledgeBase);
@@ -695,7 +705,15 @@ export function KnowledgeBase() {
       }
 
       setUploadFiles(prev =>
-        prev.map(f => (f.id === fileId ? { ...f, status: 'error' as const, error: error?.data?.message || '上传失败' } : f))
+        prev.map(f =>
+          f.id === fileId
+            ? {
+                ...f,
+                status: 'error' as const,
+                error: error?.data?.message || '上传失败',
+              }
+            : f
+        )
       );
 
       toast.error(`${fileName} 上传失败: ${error?.data?.message || '未知错误'}`);
@@ -973,10 +991,7 @@ export function KnowledgeBase() {
                         <Download className='w-4 h-4 mr-2' />
                         导出
                       </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => handleDeleteKB(kb)}
-                        className='text-red-600 dark:text-red-400'
-                      >
+                      <DropdownMenuItem onClick={() => handleDeleteKB(kb)} className='text-red-600 dark:text-red-400'>
                         <Trash2 className='w-4 h-4 mr-2' />
                         删除
                       </DropdownMenuItem>
@@ -1478,9 +1493,7 @@ export function KnowledgeBase() {
                         <PaginationItem>
                           <PaginationNext
                             onClick={() =>
-                              setDocumentPage(prev =>
-                                Math.min(Math.ceil(totalDocuments / documentsPerPage), prev + 1)
-                              )
+                              setDocumentPage(prev => Math.min(Math.ceil(totalDocuments / documentsPerPage), prev + 1))
                             }
                             className={
                               documentPage === Math.ceil(totalDocuments / documentsPerPage)

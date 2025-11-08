@@ -1,6 +1,6 @@
-import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, HeadersDefaults, ResponseType, AxiosError, InternalAxiosRequestConfig } from 'axios';
+import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, HeadersDefaults, ResponseType, AxiosError, InternalAxiosRequestConfig, } from 'axios';
 import axios from 'axios';
-import { routerUtils as RouterUtils, API_SERVER_ERROR_CODE, API_SUCCESS_CODE, ApiType, ApiLocaleResult, app, appContext, cookieUtils, DomainManager, eventQueue, httpUtils, LockUtils, REFRESH_TOKEN_AUTH_KEY, SYSTEM_ERROR_MESSAGE, typeUtils, IFRAME_ACCESS_TOKEN_NAME, IFRAME_EXPIRES_IN_NAME, IFRAME_REFRESH_TOKEN_NAME, IFRAME_REQUEST_AUTH_TIME_NAME, AppOrServiceRoute, DEFAULT_API_VERSION } from '@xcan-angus/infra';
+import { routerUtils as RouterUtils, API_SERVER_ERROR_CODE, API_SUCCESS_CODE, ApiType, ApiLocaleResult, app, appContext, cookieUtils, DomainManager, eventQueue, httpUtils, LockUtils, REFRESH_TOKEN_AUTH_KEY, SYSTEM_ERROR_MESSAGE, typeUtils, IFRAME_ACCESS_TOKEN_NAME, IFRAME_EXPIRES_IN_NAME, IFRAME_REFRESH_TOKEN_NAME, IFRAME_REQUEST_AUTH_TIME_NAME, AppOrServiceRoute, DEFAULT_API_VERSION, } from '@xcan-angus/infra';
 
 export type QueryParamsType = Record<string | number, any>;
 
@@ -8,7 +8,7 @@ export type QueryParamsType = Record<string | number, any>;
 let filePaths: string[] = [
   `/${ApiType.API}/${DEFAULT_API_VERSION}/file/upload`, // Upload file endpoint
   `/${ApiType.API}/${DEFAULT_API_VERSION}/file`, // Download file endpoint
-  `/${ApiType.PUB_API}/${DEFAULT_API_VERSION}/file` // Download file endpoint
+  `/${ApiType.PUB_API}/${DEFAULT_API_VERSION}/file`, // Download file endpoint
 ];
 
 export interface FullRequestParams extends Omit<AxiosRequestConfig, 'data' | 'params' | 'url' | 'responseType'> {
@@ -149,34 +149,32 @@ export class HttpClient<SecurityDataType = unknown> {
     const hasDomainInUrl = /^(https?:|\/\/)/.test(config.url);
 
     if (!hasDomainInUrl) {
-        let isFile = filePaths.some(item => (config.url as string).includes(item));
-        const domain = isPrivateEdition || !isFile
-            ? domainManager.getApiDomain()
-            : domainManager.getFileApiDomain()
-        config.url = domain + config.url;
+      let isFile = filePaths.some(item => (config.url as string).includes(item));
+      const domain = isPrivateEdition || !isFile ? domainManager.getApiDomain() : domainManager.getFileApiDomain();
+      config.url = domain + config.url;
     }
 
     // Private edition: adjust URL based on route
     if (isPrivateEdition) {
-        const route: AppOrServiceRoute | null = RouterUtils.getRouteByUrl(config.url);
-        if (!route) {
-            return config;
-        }
+      const route: AppOrServiceRoute | null = RouterUtils.getRouteByUrl(config.url);
+      if (!route) {
+        return config;
+      }
 
-        const {pathname, origin, search} = new URL(config.url);
-        let _origin: string;
-        let domainManager = DomainManager.getInstance(appContext.getProfile());
-        switch (route) {
-            case AppOrServiceRoute.tester: {
-                _origin = domainManager.getApiDomain(AppOrServiceRoute.tester);
-                break;
-            }
-            default: {
-                _origin = domainManager.getApiDomain(AppOrServiceRoute.gm);
-            }
+      const { pathname, origin, search } = new URL(config.url);
+      let _origin: string;
+      let domainManager = DomainManager.getInstance(appContext.getProfile());
+      switch (route) {
+        case AppOrServiceRoute.tester: {
+          _origin = domainManager.getApiDomain(AppOrServiceRoute.tester);
+          break;
         }
-        let _pathname = pathname.replace('/' + route, '');
-        config.url = _origin + _pathname + search;
+        default: {
+          _origin = domainManager.getApiDomain(AppOrServiceRoute.gm);
+        }
+      }
+      let _pathname = pathname.replace('/' + route, '');
+      config.url = _origin + _pathname + search;
     }
     return config;
   };
@@ -298,7 +296,7 @@ export class HttpClient<SecurityDataType = unknown> {
     format,
     body,
     ...params
-  }: FullRequestParams): Promise<AxiosResponse<T>['data'] | {message?: string, data?: null}> => {
+  }: FullRequestParams): Promise<AxiosResponse<T>['data'] | { message?: string; data?: null }> => {
     const secureParams =
       ((typeof secure === 'boolean' ? secure : this.secure) &&
         this.securityWorker &&
@@ -335,7 +333,7 @@ export class HttpClient<SecurityDataType = unknown> {
       } else {
         return {
           ...(err || {}),
-          data: null
+          data: null,
         };
       }
     }

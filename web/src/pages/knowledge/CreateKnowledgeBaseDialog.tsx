@@ -180,7 +180,7 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange, onSuccess }: Cre
       // 验证配置处理参数
       const currentChunkSize = chunkSize[0];
       const currentChunkOverlap = chunkOverlap[0];
-      
+
       if (!currentChunkSize || currentChunkSize < 100 || currentChunkSize > 2000) {
         toast.error('分段大小必须在100-2000之间');
         return;
@@ -197,7 +197,7 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange, onSuccess }: Cre
 
   const handleCreateKnowledgeBase = async () => {
     if (isSubmitting) return;
-    
+
     setIsSubmitting(true);
     try {
       const selectedIconOption = iconOptions[selectedIcon];
@@ -232,7 +232,7 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange, onSuccess }: Cre
       }
 
       await KnowledgeBases.createKnowledgeBase(createData);
-      
+
       toast.success('知识库创建成功！');
       onOpenChange(false);
       onSuccess?.();
@@ -368,7 +368,7 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange, onSuccess }: Cre
     const safeChunkOverlap = Array.isArray(chunkOverlap) && chunkOverlap.length > 0 ? chunkOverlap : [50];
     const currentChunkSize = safeChunkSize[0];
     const currentChunkOverlap = safeChunkOverlap[0];
-    
+
     return (
       <div className='py-6'>
         <div className='space-y-6'>
@@ -415,13 +415,13 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange, onSuccess }: Cre
               <Label className='text-sm dark:text-gray-300'>分段大小</Label>
               <span className='text-sm dark:text-white'>{currentChunkSize}</span>
             </div>
-            <Slider 
-              value={safeChunkSize} 
-              onValueChange={setChunkSize} 
-              min={100} 
-              max={2000} 
-              step={1} 
-              className='w-full' 
+            <Slider
+              value={safeChunkSize}
+              onValueChange={setChunkSize}
+              min={100}
+              max={2000}
+              step={1}
+              className='w-full'
             />
             <p className='text-xs text-gray-500 dark:text-gray-400 mt-2'>控制文本分块的大小，范围：100-2000 字符</p>
           </div>
@@ -432,23 +432,25 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange, onSuccess }: Cre
               <Label className='text-sm dark:text-gray-300'>分段重叠</Label>
               <span className='text-sm dark:text-white'>{currentChunkOverlap}</span>
             </div>
-            <Slider 
-              value={safeChunkOverlap} 
-              onValueChange={setChunkOverlap} 
-              min={0} 
-              max={200} 
-              step={1} 
-              className='w-full' 
+            <Slider
+              value={safeChunkOverlap}
+              onValueChange={setChunkOverlap}
+              min={0}
+              max={200}
+              step={1}
+              className='w-full'
             />
-            <p className='text-xs text-gray-500 dark:text-gray-400 mt-2'>控制相邻文本块的重叠字符数，范围：0-200 字符</p>
+            <p className='text-xs text-gray-500 dark:text-gray-400 mt-2'>
+              控制相邻文本块的重叠字符数，范围：0-200 字符
+            </p>
           </div>
 
           {/* 向量化模型 */}
           <div>
             <Label className='text-sm mb-3 block dark:text-gray-300'>向量化模型（可选）</Label>
-            <Select 
-              value={embeddingModelId?.toString() || ''} 
-              onValueChange={(value) => setEmbeddingModelId(value ? Number(value) : undefined)}
+            <Select
+              value={embeddingModelId?.toString() || ''}
+              onValueChange={value => setEmbeddingModelId(value ? Number(value) : undefined)}
             >
               <SelectTrigger className='dark:bg-gray-900 dark:border-gray-700 dark:text-white'>
                 <SelectValue placeholder='不指定时使用默认模型' />
@@ -475,7 +477,9 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange, onSuccess }: Cre
                 </SelectItem>
               </SelectContent>
             </Select>
-            <p className='text-xs text-gray-500 dark:text-gray-400 mt-2'>选择用于文本向量化的模型，不指定时使用默认模型</p>
+            <p className='text-xs text-gray-500 dark:text-gray-400 mt-2'>
+              选择用于文本向量化的模型，不指定时使用默认模型
+            </p>
           </div>
         </div>
       </div>
@@ -545,9 +549,7 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange, onSuccess }: Cre
             {currentStep === 1 && renderStep1()}
             {currentStep === 2 && renderStep2()}
             {currentStep !== 1 && currentStep !== 2 && (
-              <div className='py-6 text-center text-gray-500 dark:text-gray-400'>
-                未知步骤: {currentStep}
-              </div>
+              <div className='py-6 text-center text-gray-500 dark:text-gray-400'>未知步骤: {currentStep}</div>
             )}
           </div>
         </div>

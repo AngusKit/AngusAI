@@ -1,7 +1,7 @@
 import { Search, Bell, HelpCircle, Languages, Sun, Moon, User, Shield, Key, MessageSquare, Copy, Check, LogOut, FileText, Sparkles, AlertCircle, CheckCircle, Info, ExternalLink, BookOpen, Video, FileQuestion, Clock, TrendingUp, Zap, Database, GitBranch, X, } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from '@/components/ui/dropdown-menu';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
@@ -23,7 +23,6 @@ export function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const { userInfo } = useContext(MyContext);
-
 
   const notifications = [
     {

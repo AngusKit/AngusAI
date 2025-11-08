@@ -1,73 +1,9 @@
-import {
-  Search,
-  Star,
-  Copy,
-  Plus,
-  Trash2,
-  Edit,
-  Sparkles,
-  BookOpen,
-  Code,
-  MessageSquare,
-  TrendingUp,
-  FolderPlus,
-  Shield,
-  Home,
-  Settings,
-  User,
-  FileText,
-  Image,
-  Video,
-  Music,
-  Calendar,
-  Clock,
-  Mail,
-  Phone,
-  MapPin,
-  Globe,
-  Link,
-  Download,
-  Upload,
-  Share2,
-  Heart,
-  ThumbsUp,
-  ThumbsDown,
-  Eye,
-  EyeOff,
-  Lock,
-  Unlock,
-  Key,
-  Bell,
-  AlertCircle,
-  Info,
-  CheckCircle,
-  XCircle,
-  Zap,
-  Rocket,
-  Database,
-  Server,
-  Cloud,
-  Wifi,
-  Battery,
-  Camera,
-  Mic,
-  Headphones,
-  Gamepad,
-  ShoppingCart,
-  CreditCard,
-  Wallet,
-  Gift,
-  Award,
-  Trophy,
-  Target,
-  Flag,
-  Compass,
-} from 'lucide-react';
+import { Search, Star, Copy, Plus, Trash2, Edit, Sparkles, BookOpen, Code, MessageSquare, TrendingUp, FolderPlus, Shield, Home, Settings, User, FileText, Image, Video, Music, Calendar, Clock, Mail, Phone, MapPin, Globe, Link, Download, Upload, Share2, Heart, ThumbsUp, ThumbsDown, Eye, EyeOff, Lock, Unlock, Key, Bell, AlertCircle, Info, CheckCircle, XCircle, Zap, Rocket, Database, Server, Cloud, Wifi, Battery, Camera, Mic, Headphones, Gamepad, ShoppingCart, CreditCard, Wallet, Gift, Award, Trophy, Target, Flag, Compass, } from 'lucide-react';
 import { XcanPagination } from '@/components/ui/pagination';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
@@ -317,12 +253,12 @@ export function PromptLibraryPage() {
   const [loading, setLoading] = useState(false);
   const [categoriesLoading, setCategoriesLoading] = useState(false);
   const [favoriteCount, setFavoriteCount] = useState(0);
-  const [totalCount, setTotalCount] = useState(0)
+  const [totalCount, setTotalCount] = useState(0);
 
   const [pageParam, setPageParam] = useState({
     pageSize: 10,
     pageNo: 1,
-    total: 0
+    total: 0,
   });
 
   // 对话框状态
@@ -383,7 +319,7 @@ export function PromptLibraryPage() {
             cat.children.forEach(processCategory);
           }
         };
-        const {totalPrompts = 0, totalFavorites = 0} = response.extensions || {};
+        const { totalPrompts = 0, totalFavorites = 0 } = response.extensions || {};
         setFavoriteCount(Number(totalFavorites));
         setTotalCount(Number(totalPrompts));
         response.data.forEach(processCategory);
@@ -428,17 +364,16 @@ export function PromptLibraryPage() {
 
       const response = await Prompts.getPromptList(query);
       console.log('API响应数据:', response); // 调试日志
-      
+
       const { data } = response || {};
       const list = data?.list || [];
       const total = Number(data?.total) || 0;
 
-
-      setPageParam((pre) => ({
+      setPageParam(pre => ({
         ...pre,
-        total
+        total,
       }));
-      
+
       if (list && Array.isArray(list)) {
         const convertedPrompts = list.map(convertPromptVoToPrompt);
         setPrompts(convertedPrompts);
@@ -453,10 +388,9 @@ export function PromptLibraryPage() {
     }
   }, [selectedCategory, debouncedSearchQuery, convertPromptVoToPrompt, language, pageParam.pageNo, pageParam.pageSize]);
 
-  const handlePageChange = (page: {pageSize: number, pageNo: number}) => {
-    setPageParam((pre) => ({...pre, ...page}));
-  }
-
+  const handlePageChange = (page: { pageSize: number; pageNo: number }) => {
+    setPageParam(pre => ({ ...pre, ...page }));
+  };
 
   // 搜索防抖处理
   useEffect(() => {
@@ -495,7 +429,9 @@ export function PromptLibraryPage() {
     tags: [] as { label: string; color: string }[],
   });
   const [newTagLabel, setNewTagLabel] = useState('');
-  const [newTagColor, setNewTagColor] = useState(TAG_COLORS[0]?.value || 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400');
+  const [newTagColor, setNewTagColor] = useState(
+    TAG_COLORS[0]?.value || 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+  );
 
   const [categoryForm, setCategoryForm] = useState({
     name: '',
@@ -504,11 +440,10 @@ export function PromptLibraryPage() {
     parentId: 'none',
   });
 
-
   const getCategoryCount = (categoryId: string) => {
     if (categoryId === 'all') {
       return totalCount;
-    };
+    }
 
     if (categoryId === 'favorites') {
       return favoriteCount;
@@ -602,7 +537,8 @@ export function PromptLibraryPage() {
     setPromptForm({
       title: '',
       content: '',
-      category: selectedCategory === 'all' || selectedCategory === 'favorites' ? (defaultCategory?.id || '') : selectedCategory,
+      category:
+        selectedCategory === 'all' || selectedCategory === 'favorites' ? defaultCategory?.id || '' : selectedCategory,
       tags: [],
     });
     setShowPromptDialog(true);
@@ -724,14 +660,14 @@ export function PromptLibraryPage() {
     try {
       // 找到图标名称
       const iconName = AVAILABLE_ICONS.find(icon => icon.component === categoryForm.icon)?.name || 'BookOpen';
-      
+
       await PromptCategories.createPromptCategory({
         name: categoryForm.name,
         icon: iconName,
         color: categoryForm.color,
         parentId: categoryForm.parentId === 'none' ? undefined : categoryForm.parentId,
       });
-      
+
       await loadCategories(); // 重新加载分类树
       toast.success(language === 'zh-CN' ? '分类已创建' : 'Category created');
       setShowCategoryDialog(false);
@@ -741,7 +677,7 @@ export function PromptLibraryPage() {
         color: 'text-blue-600 dark:text-blue-400',
         parentId: 'none',
       });
-    } catch{}
+    } catch {}
   };
 
   // 获取分类的层级路径（用于显示）
@@ -822,126 +758,128 @@ export function PromptLibraryPage() {
               </div>
             ) : (
               <div className='space-y-1'>
-              {getTopLevelCategories().map(category => {
-                const Icon = category.icon;
-                const count = getCategoryCount(category.id);
-                const childCategories = getChildCategories(category.id);
+                {getTopLevelCategories().map(category => {
+                  const Icon = category.icon;
+                  const count = getCategoryCount(category.id);
+                  const childCategories = getChildCategories(category.id);
 
-                return (
-                  <div key={category.id}>
-                    {/* 父分类 */}
-                    <div
-                      className={cn(
-                        'group w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors',
-                        selectedCategory === category.id
-                          ? 'bg-blue-50 dark:bg-blue-900/20'
-                          : 'hover:bg-gray-100 dark:hover:bg-gray-750'
-                      )}
-                    >
-                      <button
-                        onClick={() => {setSelectedCategory(category.id), setPageParam((pre) => ({...pre, pageNo: 1}))}}
-                        className='flex-1 flex items-center justify-between'
+                  return (
+                    <div key={category.id}>
+                      {/* 父分类 */}
+                      <div
+                        className={cn(
+                          'group w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors',
+                          selectedCategory === category.id
+                            ? 'bg-blue-50 dark:bg-blue-900/20'
+                            : 'hover:bg-gray-100 dark:hover:bg-gray-750'
+                        )}
                       >
-                        <div className='flex items-center gap-2'>
-                          <Icon
-                            className={cn(
-                              'w-4 h-4',
-                              category.color,
-                              selectedCategory === category.id && 'text-blue-600 dark:text-blue-400'
-                            )}
-                          />
-                          <span
-                            className={cn(
-                              'text-sm',
-                              selectedCategory === category.id
-                                ? 'text-blue-600 dark:text-blue-400'
-                                : 'text-gray-700 dark:text-gray-300'
-                            )}
-                          >
-                            {getCategoryName(category)}
-                          </span>
-                        </div>
-                        <Badge variant='secondary' className='text-xs'>
-                          {category.promptCount || count}
-                        </Badge>
-                      </button>
-                      {!category.isSystem && (
-                        <Button
-                          variant='ghost'
-                          size='icon'
-                          className='h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity ml-1'
-                          onClick={e => {
-                            e.stopPropagation();
-                            setDeletingCategory(category);
-                            setShowDeleteCategoryDialog(true);
+                        <button
+                          onClick={() => {
+                            (setSelectedCategory(category.id), setPageParam(pre => ({ ...pre, pageNo: 1 })));
                           }}
+                          className='flex-1 flex items-center justify-between'
                         >
-                          <Trash2 className='w-3 h-3 text-red-600' />
-                        </Button>
-                      )}
-                    </div>
-
-                    {/* 子分类 */}
-                    {childCategories.length > 0 && (
-                      <div className='ml-6 mt-1 space-y-1'>
-                        {childCategories.map(childCategory => {
-                          const childCount = getCategoryCount(childCategory.id);
-
-                          return (
-                            <div
-                              key={childCategory.id}
+                          <div className='flex items-center gap-2'>
+                            <Icon
                               className={cn(
-                                'group w-full flex items-center justify-between px-3 py-1.5 rounded-lg transition-colors',
-                                selectedCategory === childCategory.id
-                                  ? 'bg-blue-50 dark:bg-blue-900/20'
-                                  : 'hover:bg-gray-100 dark:hover:bg-gray-750'
+                                'w-4 h-4',
+                                category.color,
+                                selectedCategory === category.id && 'text-blue-600 dark:text-blue-400'
+                              )}
+                            />
+                            <span
+                              className={cn(
+                                'text-sm',
+                                selectedCategory === category.id
+                                  ? 'text-blue-600 dark:text-blue-400'
+                                  : 'text-gray-700 dark:text-gray-300'
                               )}
                             >
-                              <button
-                                onClick={() => setSelectedCategory(childCategory.id)}
-                                className='flex-1 flex items-center justify-between'
-                              >
-                                <div className='flex items-center gap-2'>
-                                  <div className='w-4 h-4 flex items-center justify-center'>
-                                    <div className='w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500' />
-                                  </div>
-                                  <span
-                                    className={cn(
-                                      'text-sm',
-                                      selectedCategory === childCategory.id
-                                        ? 'text-blue-600 dark:text-blue-400'
-                                        : 'text-gray-600 dark:text-gray-400'
-                                    )}
-                                  >
-                                    {getCategoryName(childCategory)}
-                                  </span>
-                                </div>
-                                <Badge variant='secondary' className='text-xs'>
-                                  {childCount}
-                                </Badge>
-                              </button>
-                              {!childCategory.isSystem && (
-                                <Button
-                                  variant='ghost'
-                                  size='icon'
-                                  className='h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity ml-1'
-                                  onClick={e => {
-                                    e.stopPropagation();
-                                    setDeletingCategory(childCategory);
-                                    setShowDeleteCategoryDialog(true);
-                                  }}
-                                >
-                                  <Trash2 className='w-3 h-3 text-red-600' />
-                                </Button>
-                              )}
-                            </div>
-                          );
-                        })}
+                              {getCategoryName(category)}
+                            </span>
+                          </div>
+                          <Badge variant='secondary' className='text-xs'>
+                            {category.promptCount || count}
+                          </Badge>
+                        </button>
+                        {!category.isSystem && (
+                          <Button
+                            variant='ghost'
+                            size='icon'
+                            className='h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity ml-1'
+                            onClick={e => {
+                              e.stopPropagation();
+                              setDeletingCategory(category);
+                              setShowDeleteCategoryDialog(true);
+                            }}
+                          >
+                            <Trash2 className='w-3 h-3 text-red-600' />
+                          </Button>
+                        )}
                       </div>
-                    )}
-                  </div>
-                );
-              })}
+
+                      {/* 子分类 */}
+                      {childCategories.length > 0 && (
+                        <div className='ml-6 mt-1 space-y-1'>
+                          {childCategories.map(childCategory => {
+                            const childCount = getCategoryCount(childCategory.id);
+
+                            return (
+                              <div
+                                key={childCategory.id}
+                                className={cn(
+                                  'group w-full flex items-center justify-between px-3 py-1.5 rounded-lg transition-colors',
+                                  selectedCategory === childCategory.id
+                                    ? 'bg-blue-50 dark:bg-blue-900/20'
+                                    : 'hover:bg-gray-100 dark:hover:bg-gray-750'
+                                )}
+                              >
+                                <button
+                                  onClick={() => setSelectedCategory(childCategory.id)}
+                                  className='flex-1 flex items-center justify-between'
+                                >
+                                  <div className='flex items-center gap-2'>
+                                    <div className='w-4 h-4 flex items-center justify-center'>
+                                      <div className='w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500' />
+                                    </div>
+                                    <span
+                                      className={cn(
+                                        'text-sm',
+                                        selectedCategory === childCategory.id
+                                          ? 'text-blue-600 dark:text-blue-400'
+                                          : 'text-gray-600 dark:text-gray-400'
+                                      )}
+                                    >
+                                      {getCategoryName(childCategory)}
+                                    </span>
+                                  </div>
+                                  <Badge variant='secondary' className='text-xs'>
+                                    {childCount}
+                                  </Badge>
+                                </button>
+                                {!childCategory.isSystem && (
+                                  <Button
+                                    variant='ghost'
+                                    size='icon'
+                                    className='h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity ml-1'
+                                    onClick={e => {
+                                      e.stopPropagation();
+                                      setDeletingCategory(childCategory);
+                                      setShowDeleteCategoryDialog(true);
+                                    }}
+                                  >
+                                    <Trash2 className='w-3 h-3 text-red-600' />
+                                  </Button>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
@@ -1069,14 +1007,8 @@ export function PromptLibraryPage() {
             </div>
           </ScrollArea>
 
-          {
-            pageParam.total > pageParam.pageSize && <XcanPagination
-            {...pageParam}
-            onChange={handlePageChange}
-          />
-        }
+          {pageParam.total > pageParam.pageSize && <XcanPagination {...pageParam} onChange={handlePageChange} />}
         </div>
-
       </div>
 
       {/* 新建/编辑提示词对话框 */}

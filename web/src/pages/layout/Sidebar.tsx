@@ -2,7 +2,7 @@ import { Home, FileText, Workflow, BookOpen, Package, Database, Settings, Users,
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AngusAILogo } from './AngusAILogo';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from '@/components/ui/dropdown-menu';
 import { useState } from 'react';
 import { useLanguage } from '@/components/ui/LanguageProvider';
 import { toast } from 'sonner';

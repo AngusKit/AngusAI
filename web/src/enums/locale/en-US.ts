@@ -274,4 +274,3 @@ export const enumTranslations = {
     WEAVIATE: 'Weaviate',
   },
 };
-

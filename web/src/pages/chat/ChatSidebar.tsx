@@ -2,7 +2,7 @@ import { MessageSquare, Plus, Trash2, MoreVertical, ChevronLeft, Search, Clock, 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from '@/components/ui/dropdown-menu';
 import { useState } from 'react';
 import { cn } from '@/components/ui/utils';
 
