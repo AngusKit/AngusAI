@@ -55,6 +55,8 @@ public class PromptCategoryQueryImpl implements PromptCategoryQuery {
       protected List<PromptCategory> process() {
         List<PromptCategory> categories = promptCategoryRepo.findAllSystemAndCreatedBy(
             getUserId());
+
+        // 设置提示词数
         setPromptCount(categories);
 
         PrincipalContext.addExtension("totalPrompts", promptRepo.count());
