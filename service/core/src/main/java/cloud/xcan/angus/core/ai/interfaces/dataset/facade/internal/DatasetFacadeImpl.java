@@ -230,19 +230,14 @@ public class DatasetFacadeImpl implements DatasetFacade {
     // 提取数据集ID列表
     List<Long> datasetIds = new ArrayList<>();
     Map<Long, Long> queryCountMap = new HashMap<>();
-    Map<Long, Long> avgResponseTimeMap = new HashMap<>();
 
     for (Object[] r : queryCountRows) {
       Long datasetId = r[0] == null ? null : ((Number) r[0]).longValue();
       Long count = r[1] == null ? 0L : ((Number) r[1]).longValue();
-      Double avgTime = r[2] == null ? null : ((Number) r[2]).doubleValue();
 
       if (datasetId != null) {
         datasetIds.add(datasetId);
         queryCountMap.put(datasetId, count);
-        if (avgTime != null) {
-          avgResponseTimeMap.put(datasetId, avgTime.longValue());
-        }
       }
     }
 

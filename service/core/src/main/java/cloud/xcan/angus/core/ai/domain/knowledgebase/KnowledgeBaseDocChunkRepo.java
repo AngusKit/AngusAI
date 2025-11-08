@@ -10,44 +10,14 @@ import org.springframework.data.repository.query.Param;
 public interface KnowledgeBaseDocChunkRepo extends BaseRepository<KnowledgeBaseDocChunk, Long> {
 
   /**
-   * 根据文档ID查找分段
+   * 统计总分段数
    */
-  List<KnowledgeBaseDocChunk> findByDocumentId(Long documentId);
+  @Query("SELECT COUNT(dc) FROM KnowledgeBaseDocChunk dc")
+  Long countTotalChunks();
 
   /**
-   * 根据文档ID和分段索引查找分段
+   * 计算平均分段大小
    */
-  KnowledgeBaseDocChunk findByDocumentIdAndChunkIndex(Long documentId, Integer chunkIndex);
-
-  /**
-   * 根据知识库ID查找所有分段
-   */
-  @Query("SELECT dc FROM KnowledgeBaseDocChunk dc JOIN KnowledgeBaseDoc d ON dc.documentId = d.id WHERE d.knowledgeBaseId = :knowledgeBaseId")
-  List<KnowledgeBaseDocChunk> findByKnowledgeBaseId(@Param("knowledgeBaseId") Long knowledgeBaseId);
-
-  /**
-   * 统计文档的分段数量
-   */
-  @Query("SELECT COUNT(dc) FROM KnowledgeBaseDocChunk dc WHERE dc.documentId = :documentId")
-  Long countByDocumentId(@Param("documentId") Long documentId);
-
-  /**
-   * 根据知识库ID统计总分段数
-   */
-  @Query("SELECT COUNT(dc) FROM KnowledgeBaseDocChunk dc JOIN KnowledgeBaseDoc d ON dc.documentId = d.id WHERE d.knowledgeBaseId = :knowledgeBaseId")
-  Long countByKnowledgeBaseId(@Param("knowledgeBaseId") Long knowledgeBaseId);
-
-  /**
-   * 根据文档ID删除分段
-   */
-  void deleteByDocumentId(Long documentId);
-
-  /**
-   * 批量统计知识库的分段数量 返回 List<Object[]>，其中 [0]=knowledgeBaseId (Long), [1]=count (Long)
-   */
-  @Query("SELECT d.knowledgeBaseId, COUNT(dc) FROM KnowledgeBaseDocChunk dc " +
-      "JOIN KnowledgeBaseDoc d ON dc.documentId = d.id " +
-      "WHERE d.knowledgeBaseId IN :knowledgeBaseIds GROUP BY d.knowledgeBaseId")
-  List<Object[]> countByKnowledgeBaseIds(@Param("knowledgeBaseIds") List<Long> knowledgeBaseIds);
-
+  @Query("SELECT AVG(LENGTH(dc.content)) FROM KnowledgeBaseDocChunk dc WHERE dc.content IS NOT NULL")
+  Double getAvgChunkSize();
 }

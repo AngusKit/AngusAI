@@ -51,36 +51,21 @@ public class KnowledgeBaseQueryImpl implements KnowledgeBaseQuery {
 
   @Override
   public Long countTotalKnowledgeBases() {
-    return new BizTemplate<Long>() {
-      @Override
-      protected Long process() {
-        return knowledgeBaseRepo.countTotalKnowledgeBases();
-      }
-    }.execute();
+    return knowledgeBaseRepo.countTotalKnowledgeBases();
   }
 
   @Override
   public Long countActiveKnowledgeBases() {
-    return new BizTemplate<Long>() {
-      @Override
-      protected Long process() {
-        return knowledgeBaseRepo.countActiveKnowledgeBases();
-      }
-    }.execute();
+    return knowledgeBaseRepo.countActiveKnowledgeBases();
   }
 
   @Override
   public Map<Long, KnowledgeBase> findByIds(List<Long> knowledgeBaseIds) {
-    return new BizTemplate<Map<Long, KnowledgeBase>>() {
-      @Override
-      protected Map<Long, KnowledgeBase> process() {
-        if (knowledgeBaseIds == null || knowledgeBaseIds.isEmpty()) {
-          return new HashMap<>();
-        }
-        List<KnowledgeBase> knowledgeBases = knowledgeBaseRepo.findAllById(knowledgeBaseIds);
-        return knowledgeBases.stream()
-            .collect(Collectors.toMap(KnowledgeBase::getId, kb -> kb));
-      }
-    }.execute();
+    if (knowledgeBaseIds == null || knowledgeBaseIds.isEmpty()) {
+      return new HashMap<>();
+    }
+    List<KnowledgeBase> knowledgeBases = knowledgeBaseRepo.findAllById(knowledgeBaseIds);
+    return knowledgeBases.stream()
+        .collect(Collectors.toMap(KnowledgeBase::getId, kb -> kb));
   }
 }

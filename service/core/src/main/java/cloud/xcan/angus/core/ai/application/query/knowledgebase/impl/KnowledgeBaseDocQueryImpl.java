@@ -2,6 +2,7 @@ package cloud.xcan.angus.core.ai.application.query.knowledgebase.impl;
 
 import cloud.xcan.angus.core.ai.application.query.knowledgebase.KnowledgeBaseDocQuery;
 import cloud.xcan.angus.core.ai.domain.knowledgebase.KnowledgeBaseDoc;
+import cloud.xcan.angus.core.ai.domain.knowledgebase.KnowledgeBaseDocChunkRepo;
 import cloud.xcan.angus.core.ai.domain.knowledgebase.KnowledgeBaseDocRepo;
 import cloud.xcan.angus.core.ai.domain.knowledgebase.KnowledgeBaseDocSearchRepo;
 import cloud.xcan.angus.core.ai.domain.knowledgebase.KnowledgeBaseDocSearchResult;
@@ -22,6 +23,9 @@ public class KnowledgeBaseDocQueryImpl implements KnowledgeBaseDocQuery {
 
   @Resource
   private KnowledgeBaseDocSearchRepo knowledgeBaseDocSearchRepo;
+
+  @Resource
+  private KnowledgeBaseDocChunkRepo knowledgeBaseDocChunkRepo;
 
   @Override
   public KnowledgeBaseDoc findAndCheck(Long id) {
@@ -60,5 +64,35 @@ public class KnowledgeBaseDocQueryImpl implements KnowledgeBaseDocQuery {
         return List.of();
       }
     }.execute();
+  }
+
+  @Override
+  public List<Object[]> countByKnowledgeBaseIds(List<Long> knowledgeBaseIds) {
+    return List.of();
+  }
+
+  @Override
+  public Long sumTotalStoreSize() {
+    return knowledgeBaseDocRepo.sumTotalStoreSize();
+  }
+
+  @Override
+  public Double getAvgChunkSize() {
+    return knowledgeBaseDocChunkRepo.getAvgChunkSize();
+  }
+
+  @Override
+  public Long countTotalChunks() {
+    return knowledgeBaseDocChunkRepo.countTotalChunks();
+  }
+
+  @Override
+  public Long countActiveFiles() {
+    return knowledgeBaseDocRepo.countActiveFiles();
+  }
+
+  @Override
+  public Long countTotalFiles() {
+    return knowledgeBaseDocRepo.countTotalFiles();
   }
 }

@@ -8,6 +8,7 @@ import static cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder.getMatchS
 import static cloud.xcan.angus.core.utils.CoreUtils.buildVoPageResult;
 
 import cloud.xcan.angus.core.ai.application.cmd.knowledgebase.KnowledgeBaseCmd;
+import cloud.xcan.angus.core.ai.application.query.knowledgebase.KnowledgeBaseDocQuery;
 import cloud.xcan.angus.core.ai.application.query.knowledgebase.KnowledgeBaseDocUsageLogQuery;
 import cloud.xcan.angus.core.ai.application.query.knowledgebase.KnowledgeBaseQuery;
 import cloud.xcan.angus.core.ai.domain.Visibility;
@@ -53,10 +54,7 @@ public class KnowledgeBaseFacadeImpl implements KnowledgeBaseFacade {
   private KnowledgeBaseDocUsageLogQuery knowledgeBaseDocUsageLogQuery;
 
   @Resource
-  private KnowledgeBaseDocRepo knowledgeBaseDocRepo;
-
-  @Resource
-  private KnowledgeBaseDocChunkRepo knowledgeBaseDocChunkRepo;
+  private KnowledgeBaseDocQuery knowledgeBaseDocQuery;
 
   private static final int TOP_N = 10;
   private static final int DEFAULT_MONTHS = 1; // 默认统计近一月
@@ -171,19 +169,19 @@ public class KnowledgeBaseFacadeImpl implements KnowledgeBaseFacade {
     overview.setActiveKnowledgeBases(activeKnowledgeBases != null ? activeKnowledgeBases : 0L);
 
     // 总文件数
-    Long totalFiles = knowledgeBaseDocRepo.countTotalFiles();
+    Long totalFiles = knowledgeBaseDocQuery.countTotalFiles();
     overview.setTotalFiles(totalFiles != null ? totalFiles : 0L);
 
     // 活跃（被引用）文件数
-    Long activeFiles = knowledgeBaseDocRepo.countActiveFiles();
+    Long activeFiles = knowledgeBaseDocQuery.countActiveFiles();
     overview.setActiveFiles(activeFiles != null ? activeFiles : 0L);
 
     // 总分段数
-    Long totalChunks = knowledgeBaseDocRepo.countTotalChunks();
+    Long totalChunks = knowledgeBaseDocQuery.countTotalChunks();
     overview.setTotalChunks(totalChunks != null ? totalChunks.intValue() : 0);
 
     // 平均分段大小
-    Double avgChunkSize = knowledgeBaseDocRepo.getAvgChunkSize();
+    Double avgChunkSize = knowledgeBaseDocQuery.getAvgChunkSize();
     overview.setAvgChunkSize(avgChunkSize != null ? avgChunkSize.intValue() : 0);
 
     // 总查询次数（时间范围内的所有查询）
@@ -198,7 +196,7 @@ public class KnowledgeBaseFacadeImpl implements KnowledgeBaseFacade {
     overview.setTodayQueryCount(todayQueryCount != null ? todayQueryCount : 0L);
 
     // 已使用存储空间大小
-    Long usedStoreSize = knowledgeBaseDocRepo.sumTotalStoreSize();
+    Long usedStoreSize = knowledgeBaseDocQuery.sumTotalStoreSize();
     overview.setUsedStoreSize(formatFileSize(usedStoreSize != null ? usedStoreSize : 0L));
 
     // 授权的存储空间大小，自定义数据源返回空
@@ -227,7 +225,6 @@ public class KnowledgeBaseFacadeImpl implements KnowledgeBaseFacade {
     // 提取知识库ID列表
     List<Long> knowledgeBaseIds = new ArrayList<>();
     Map<Long, Long> queryCountMap = new HashMap<>();
-    Map<Long, Long> avgResponseTimeMap = new HashMap<>();
 
     for (Object[] r : queryCountRows) {
       Long knowledgeBaseId = r[0] == null ? null : ((Number) r[0]).longValue();
@@ -237,9 +234,6 @@ public class KnowledgeBaseFacadeImpl implements KnowledgeBaseFacade {
       if (knowledgeBaseId != null) {
         knowledgeBaseIds.add(knowledgeBaseId);
         queryCountMap.put(knowledgeBaseId, count);
-        if (avgTime != null) {
-          avgResponseTimeMap.put(knowledgeBaseId, avgTime.longValue());
-        }
       }
     }
 
@@ -251,7 +245,7 @@ public class KnowledgeBaseFacadeImpl implements KnowledgeBaseFacade {
     Map<Long, Long> chunkCountMap = new HashMap<>();
 
     // 批量查询文件数
-    List<Object[]> fileCountRows = knowledgeBaseDocRepo.countByKnowledgeBaseIds(knowledgeBaseIds);
+    List<Object[]> fileCountRows = knowledgeBaseDocQuery.countByKnowledgeBaseIds(knowledgeBaseIds);
     if (fileCountRows != null) {
       for (Object[] row : fileCountRows) {
         Long knowledgeBaseId = row[0] == null ? null : ((Number) row[0]).longValue();
@@ -263,7 +257,7 @@ public class KnowledgeBaseFacadeImpl implements KnowledgeBaseFacade {
     }
 
     // 批量查询分段数
-    List<Object[]> chunkCountRows = knowledgeBaseDocChunkRepo.countByKnowledgeBaseIds(
+    List<Object[]> chunkCountRows = knowledgeBaseDocQuery.countByKnowledgeBaseIds(
         knowledgeBaseIds);
     if (chunkCountRows != null) {
       for (Object[] row : chunkCountRows) {

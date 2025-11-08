@@ -73,18 +73,6 @@ public interface KnowledgeBaseDocRepo extends BaseRepository<KnowledgeBaseDoc, L
   Long countActiveFiles();
 
   /**
-   * 统计总分段数
-   */
-  @Query("SELECT COUNT(dc) FROM KnowledgeBaseDocChunk dc")
-  Long countTotalChunks();
-
-  /**
-   * 计算平均分段大小
-   */
-  @Query("SELECT AVG(LENGTH(dc.content)) FROM KnowledgeBaseDocChunk dc WHERE dc.content IS NOT NULL")
-  Double getAvgChunkSize();
-
-  /**
    * 统计总存储空间大小（字节）
    */
   @Query("SELECT COALESCE(SUM(d.size), 0) FROM KnowledgeBaseDoc d")

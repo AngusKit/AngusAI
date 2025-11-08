@@ -25,4 +25,34 @@ public interface KnowledgeBaseDocQuery {
    */
   List<KnowledgeBaseDocSearchResult> searchDocuments(Long knowledgeBaseId, String keyword,
       Integer limit, Double threshold);
+
+  /**
+   * 批量根据知识库ID统计文档数 返回 List<Object[]> [knowledgeBaseId, docCount]
+   */
+  List<Object[]> countByKnowledgeBaseIds(List<Long> knowledgeBaseIds);
+
+  /**
+   * 统计存储总大小
+   */
+  Long sumTotalStoreSize();
+
+  /**
+   * 统计平均块大小
+   */
+  Double getAvgChunkSize();
+
+  /**
+   * 统计活跃块数
+   */
+  Long countTotalChunks();
+
+  /**
+   * 统计活跃文件数
+   */
+  Long countActiveFiles();
+
+  /**
+   * 统计总文件数
+   */
+  Long countTotalFiles();
 }
