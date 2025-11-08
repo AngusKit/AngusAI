@@ -694,7 +694,7 @@ export function Dataset() {
       {/* Header */}
       <div>
         <h1 className='text-2xl mb-1 dark:text-white'>数据集</h1>
-        <p className='text-sm text-gray-600 dark:text-gray-400'>数据集作为数据管理工具，用于AI模型应用和知识补充</p>
+        <p className='text-sm text-gray-600 dark:text-gray-400'>数据集是关系型数据组织与管理工具，用于AI模型应用知识补充和数据分析</p>
       </div>
 
       {/* Stats Cards */}

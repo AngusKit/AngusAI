@@ -61,6 +61,7 @@ public class DatasetFacadeImpl implements DatasetFacade {
   private static final int TOP_N = 10;
   private static final int DEFAULT_MONTHS = 1; // 默认统计近一月
 
+  @NameJoin
   @Override
   public DatasetDetailVo create(DatasetCreateDto dto) {
     Dataset dataset = DatasetAssembler.toCreateDomain(dto);
@@ -68,6 +69,7 @@ public class DatasetFacadeImpl implements DatasetFacade {
     return DatasetAssembler.toDetailVo(saved);
   }
 
+  @NameJoin
   @Override
   public DatasetDetailVo update(Long id, DatasetUpdateDto dto) {
     Dataset dataset = DatasetAssembler.toUpdateDomain(id, dto);
@@ -75,6 +77,7 @@ public class DatasetFacadeImpl implements DatasetFacade {
     return DatasetAssembler.toDetailVo(saved);
   }
 
+  @NameJoin
   @Override
   public DatasetDetailVo modifyVisibility(Long id, Visibility visibility) {
     Dataset saved = datasetCmd.modifyVisibility(id, visibility);
@@ -205,10 +208,10 @@ public class DatasetFacadeImpl implements DatasetFacade {
     overview.setUsedStoreSize(formatFileSize(totalRecordsSize != null ? totalRecordsSize : 0L));
 
     // 授权的存储空间大小，自定义数据源返回空
-    overview.setTotalStoreSize(null);
+    overview.setTotalStoreSize(null); // TODO
 
     // 已使用存储空间占比，自定义数据源返回空
-    overview.setUsedStoreRate(null);
+    overview.setUsedStoreRate(null); // TODO
 
     return overview;
   }

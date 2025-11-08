@@ -75,8 +75,7 @@ public class DatasetQueryImpl implements DatasetQuery {
       return new HashMap<>();
     }
     List<Dataset> datasets = datasetRepo.findAllById(datasetIds);
-    return datasets.stream()
-        .collect(Collectors.toMap(Dataset::getId, ds -> ds));
+    return datasets.stream().collect(Collectors.toMap(Dataset::getId, ds -> ds));
   }
 
 }

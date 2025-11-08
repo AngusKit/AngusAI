@@ -37,7 +37,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "Dataset", description = "数据集管理 - 数据集的创建、管理、数据导入、数据源连接等功能")
+@Tag(name = "数据集", description = "数据集管理 - 数据集的创建、管理、数据导入、数据源连接等功能")
 @Validated
 @RestController
 @RequestMapping("/api/v1/datasets")

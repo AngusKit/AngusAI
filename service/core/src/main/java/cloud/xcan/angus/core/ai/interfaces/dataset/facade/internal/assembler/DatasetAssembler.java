@@ -1,6 +1,7 @@
 package cloud.xcan.angus.core.ai.interfaces.dataset.facade.internal.assembler;
 
 import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatFileSize;
+import static cloud.xcan.angus.spec.utils.ObjectUtils.isNull;
 
 import cloud.xcan.angus.core.ai.domain.dataset.Dataset;
 import cloud.xcan.angus.core.ai.domain.dataset.DatasetStatus;
@@ -68,6 +69,9 @@ public class DatasetAssembler {
 
   public static DatasourceConfigVo toDatasourceConfigVo(DatasourceConfig config) {
     DatasourceConfigVo vo = new DatasourceConfigVo();
+    if (isNull(config)){
+      return vo;
+    }
     vo.setName(config.getName());
     vo.setDatabaseType(config.getDatabaseType());
     vo.setDatabase(config.getDatabase());

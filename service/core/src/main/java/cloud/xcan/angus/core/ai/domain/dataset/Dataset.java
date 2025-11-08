@@ -71,9 +71,6 @@ public class Dataset extends TenantAuditingEntity<Dataset, Long> {
   @Column(name = "access_count")
   private Long accessCount = 0L;
 
-  @Column(name = "last_access_time")
-  private Long lastAccessTime;
-
   // 同步相关
   @Column(name = "last_sync_time")
   private Long lastSyncTime;

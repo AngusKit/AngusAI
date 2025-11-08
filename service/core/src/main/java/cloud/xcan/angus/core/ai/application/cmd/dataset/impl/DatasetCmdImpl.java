@@ -112,6 +112,11 @@ public class DatasetCmdImpl extends CommCmd<Dataset, Long> implements DatasetCmd
         // 获取数据集并检查是否存在
         datasetDb = datasetQuery.findAndCheck(id);
 
+        // 检查是否数据源类型
+        if(!datasetDb.getType().isDatasource()){
+          throw ProtocolException.of("不是数据源类型数据集");
+        }
+
         // TODO 检查数据源配置有效性
       }
 

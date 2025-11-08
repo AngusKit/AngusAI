@@ -1,10 +1,6 @@
 package cloud.xcan.angus.core.ai.domain.dataset;
 
-import cloud.xcan.angus.spec.experimental.EndpointRegister;
-import cloud.xcan.angus.spec.locale.EnumValueMessage;
-
-@EndpointRegister
-public enum DatabaseType implements EnumValueMessage<String> {
+public enum DatabaseType {
   MySQL,
   SQLServer,
   DB2,

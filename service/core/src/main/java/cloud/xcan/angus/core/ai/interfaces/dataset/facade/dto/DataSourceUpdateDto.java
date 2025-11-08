@@ -14,17 +14,18 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.Range;
 
 @Data
 @Schema(description = "添加数据源请求参数")
 public class DataSourceUpdateDto {
 
-  @NotBlank(message = "数据源名称不能为空")
+  @NotBlank
   @Length(max = DATASOURCE_NAME_MAX_LENGTH)
   @Schema(description = "数据源名称", example = "MySQL数据库", requiredMode = RequiredMode.REQUIRED)
   private String name;
 
-  @NotNull(message = "数据源类型不能为空")
+  @NotNull
   @Schema(description = "数据源类型", example = "database", requiredMode = RequiredMode.REQUIRED)
   private DatabaseType databaseType;
 
@@ -40,6 +41,7 @@ public class DataSourceUpdateDto {
   @Schema(description = "数据库主机名或IP")
   private String host;
 
+  @Range(min = 1, max = 65535)
   @Schema(description = "数据库端口")
   private Integer port;
 
