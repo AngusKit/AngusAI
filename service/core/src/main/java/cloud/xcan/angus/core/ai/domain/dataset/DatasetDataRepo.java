@@ -24,7 +24,7 @@ public interface DatasetDataRepo extends BaseRepository<DatasetData, Long> {
   /**
    * 统计总记录数
    */
-  @Query("SELECT COALESCE(SUM(dd.recordCount), 0) FROM DatasetData dd")
+  @Query("SELECT COALESCE(SUM(dd.dataCount), 0) FROM DatasetData dd")
   Long sumTotalRecords();
 
   /**
@@ -42,7 +42,7 @@ public interface DatasetDataRepo extends BaseRepository<DatasetData, Long> {
   /**
    * 批量统计数据集的记录数 返回 List<Object[]>，其中 [0]=datasetId (Long), [1]=totalRecords (Long)
    */
-  @Query("SELECT dd.datasetId, COALESCE(SUM(dd.recordCount), 0) FROM DatasetData dd " +
+  @Query("SELECT dd.datasetId, COALESCE(SUM(dd.dataCount), 0) FROM DatasetData dd " +
       "WHERE dd.datasetId IN :datasetIds GROUP BY dd.datasetId")
   List<Object[]> sumRecordsByDatasetIds(@Param("datasetIds") List<Long> datasetIds);
 

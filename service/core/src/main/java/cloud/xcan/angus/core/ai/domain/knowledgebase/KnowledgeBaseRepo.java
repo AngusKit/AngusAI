@@ -14,12 +14,6 @@ public interface KnowledgeBaseRepo extends BaseRepository<KnowledgeBase, Long> {
   KnowledgeBase findByName(String name);
 
   /**
-   * 统计知识库数量
-   */
-  @Query("SELECT COUNT(kb) FROM KnowledgeBase kb WHERE kb.enabled = :enabled")
-  Long countByEnabled(@Param("enabled") Boolean enabled);
-
-  /**
    * 统计总知识库数
    */
   @Query("SELECT COUNT(kb) FROM KnowledgeBase kb")
