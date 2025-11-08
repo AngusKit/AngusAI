@@ -20,6 +20,7 @@ import type { KnowledgeBaseListVo, KnowledgeBaseStatisticsVo } from '@/services/
 import { GetKnowledgeBaseListOrderByEnum } from '@/services/KnowledgeBasesTypes';
 import type { KnowledgeBaseDocListVo } from '@/services/DocumentsTypes';
 import { getTagColor, formatDateOnly, formatFileSize } from '@/utils';
+import { useDebounce } from '@/hooks/useDebounce';
 
 interface KnowledgeBaseItem {
   id: string;
@@ -55,8 +56,7 @@ interface UploadFile {
 export function KnowledgeBase() {
   const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
-  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
-  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
   const [selectedKnowledgeBase, setSelectedKnowledgeBase] = useState<string | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
@@ -89,26 +89,10 @@ export function KnowledgeBase() {
     };
   }, []);
 
-  // 搜索防抖处理
+  // 搜索时重置到第一页
   useEffect(() => {
-    // 清除之前的定时器
-    if (searchTimeoutRef.current) {
-      clearTimeout(searchTimeoutRef.current);
-    }
-
-    // 设置新的定时器
-    searchTimeoutRef.current = setTimeout(() => {
-      setDebouncedSearchQuery(searchQuery);
-      setCurrentPage(1); // 搜索时重置到第一页
-    }, 300); // 300ms 防抖延迟
-
-    // 清理函数
-    return () => {
-      if (searchTimeoutRef.current) {
-        clearTimeout(searchTimeoutRef.current);
-      }
-    };
-  }, [searchQuery]);
+    setCurrentPage(1);
+  }, [debouncedSearchQuery]);
 
   /**
    * 文档状态映射
@@ -866,12 +850,7 @@ export function KnowledgeBase() {
             {searchQuery && (
               <button
                 onClick={() => {
-                  // 清除防抖定时器
-                  if (searchTimeoutRef.current) {
-                    clearTimeout(searchTimeoutRef.current);
-                  }
                   setSearchQuery('');
-                  setDebouncedSearchQuery('');
                   setCurrentPage(1);
                 }}
                 className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors'
