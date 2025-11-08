@@ -42,14 +42,12 @@ public class KnowledgeBaseDocFacadeImpl implements KnowledgeBaseDocFacade {
     return KnowledgeBaseDocAssembler.toDocumentListVo(doc);
   }
 
-  @NameJoin
   @Override
   public KnowledgeBaseDocStatusVo reprocessDocument(Long knowledgeBaseId, Long documentId) {
     KnowledgeBaseDoc document = documentCmd.reprocessDocument(knowledgeBaseId, documentId);
     return KnowledgeBaseDocAssembler.toDocumentStatusVo(document);
   }
 
-  @NameJoin
   @Override
   public KnowledgeBaseDocStatusVo toggleDocument(Long knowledgeBaseId, Long documentId,
       KnowledgeBaseDocToggleDto dto) {
