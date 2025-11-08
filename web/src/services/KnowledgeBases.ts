@@ -20,7 +20,7 @@ export class KnowledgeBases<SecurityDataType = unknown> {
    * @secure
    */
   modifyKnowledgeBaseVisibility = (
-    id: number,
+    id: string,
     query: {
       /** 可见性 */
       visibility: VisibilityEnum;
@@ -43,7 +43,7 @@ export class KnowledgeBases<SecurityDataType = unknown> {
    * @request PUT:/api/v1/knowledge-bases/{id}/toggle
    * @secure
    */
-  toggleKnowledgeStatus = (id: number, data: KnowledgeBaseToggleDto, params: RequestParams = {}) =>
+  toggleKnowledgeStatus = (id: string, data: KnowledgeBaseToggleDto, params: RequestParams = {}) =>
     this.http.request<KnowledgeBaseDetailResult, ApiLocaleResult>({
       path: `${AI}/knowledge-bases/${id}/toggle`,
       method: 'PUT',
@@ -131,7 +131,7 @@ export class KnowledgeBases<SecurityDataType = unknown> {
    * @request GET:/api/v1/knowledge-bases/{id}
    * @secure
    */
-  getKnowledgeBaseDetail = (id: number, params: RequestParams = {}) =>
+  getKnowledgeBaseDetail = (id: string, params: RequestParams = {}) =>
     this.http.request<KnowledgeBaseDetailResult, ApiLocaleResult>({
       path: `${AI}/knowledge-bases/${id}`,
       method: 'GET',
@@ -147,7 +147,7 @@ export class KnowledgeBases<SecurityDataType = unknown> {
    * @request DELETE:/api/v1/knowledge-bases/{id}
    * @secure
    */
-  deleteKnowledgeBase = (id: number, params: RequestParams = {}) =>
+  deleteKnowledgeBase = (id: string, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `${AI}/knowledge-bases/${id}`,
       method: 'DELETE',
@@ -163,7 +163,7 @@ export class KnowledgeBases<SecurityDataType = unknown> {
    * @request PATCH:/api/v1/knowledge-bases/{id}
    * @secure
    */
-  toggleKnowledge = (id: number, data: KnowledgeBaseUpdateDto, params: RequestParams = {}) =>
+  toggleKnowledge = (id: string, data: KnowledgeBaseUpdateDto, params: RequestParams = {}) =>
     this.http.request<KnowledgeBaseDetailResult, ApiLocaleResult>({
       path: `${AI}/knowledge-bases/${id}`,
       method: 'PATCH',

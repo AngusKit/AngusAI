@@ -22,7 +22,7 @@ import type { KnowledgeBaseDocListVo } from '@/services/DocumentsTypes';
 import { getTagColor, formatDateOnly, formatFileSize } from '@/utils';
 
 interface KnowledgeBaseItem {
-  id: number;
+  id: string;
   name: string;
   description: string;
   icon: string;
@@ -58,20 +58,20 @@ export function KnowledgeBase() {
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
-  const [selectedKnowledgeBase, setSelectedKnowledgeBase] = useState<number | null>(null);
+  const [selectedKnowledgeBase, setSelectedKnowledgeBase] = useState<string | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [viewingKB, setViewingKB] = useState<KnowledgeBaseItem | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [editingKB, setEditingKB] = useState<KnowledgeBaseItem | null>(null);
+  const [editingKnowledgeBase, setEditingKnowledgeBase] = useState<KnowledgeBaseItem | null>(null);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [documentPage, setDocumentPage] = useState(1);
   const documentsPerPage = 6;
-  const [loading, setLoading] = useState(false);
-  const [documentsLoading, setDocumentsLoading] = useState(false);
+  const [isLoadingKnowledgeBases, setIsLoadingKnowledgeBases] = useState(false);
+  const [isLoadingDocuments, setIsLoadingDocuments] = useState(false);
   const [statistics, setStatistics] = useState<KnowledgeBaseStatisticsVo | null>(null);
-  const [statisticsLoading, setStatisticsLoading] = useState(false);
+  const [isLoadingStatistics, setIsLoadingStatistics] = useState(false);
   const [sortBy, setSortBy] = useState<'createdDate' | 'documentsCount' | 'totalSize' | 'name'>('createdDate');
 
   // 文件上传相关状态
@@ -174,7 +174,7 @@ export function KnowledgeBase() {
 
   // 加载统计数据
   const loadStatistics = async () => {
-    setStatisticsLoading(true);
+    setIsLoadingStatistics(true);
     try {
       const response = await KnowledgeBases.getKnowledgeBaseStatistics();
       // 处理响应结构
@@ -191,7 +191,7 @@ export function KnowledgeBase() {
       console.error('加载统计数据失败:', error);
       // 不显示错误提示，避免影响用户体验
     } finally {
-      setStatisticsLoading(false);
+      setIsLoadingStatistics(false);
     }
   };
 
@@ -297,7 +297,7 @@ export function KnowledgeBase() {
 
   // 加载知识库列表
   const loadKnowledgeBases = async () => {
-    setLoading(true);
+    setIsLoadingKnowledgeBases(true);
     try {
       // 构建查询参数
       const queryParams: any = {
@@ -320,7 +320,7 @@ export function KnowledgeBase() {
 
       if (Array.isArray(listData)) {
         const mappedList: KnowledgeBaseItem[] = listData.map((kb: KnowledgeBaseListVo) => ({
-          id: kb.id || 0,
+          id: kb.id ? String(kb.id) : '',
           name: kb.name || '',
           description: kb.description || '',
           icon: kb.icon || '📚',
@@ -355,7 +355,7 @@ export function KnowledgeBase() {
       toast.error(error?.data?.message || error?.message || '加载知识库列表失败');
       setKnowledgeBases([]);
     } finally {
-      setLoading(false);
+      setIsLoadingKnowledgeBases(false);
     }
   };
 
@@ -365,25 +365,25 @@ export function KnowledgeBase() {
 
   // 旧的模拟数据已移除，现在使用API加载
 
-  const handleToggleKB = async (id: number) => {
-    const kb = knowledgeBases.find(k => k.id === id);
-    if (!kb) return;
+  const handleToggleKnowledgeBaseStatus = async (id: string) => {
+    const knowledgeBase = knowledgeBases.find(kb => kb.id === id);
+    if (!knowledgeBase) return;
 
-    const newEnabled = !kb.enabled;
+    const newEnabled = !knowledgeBase.enabled;
     try {
       await KnowledgeBases.toggleKnowledgeStatus(id, { enabled: newEnabled });
 
       setKnowledgeBases(prev =>
-        prev.map(k => {
-          if (k.id === id) {
+        prev.map(kb => {
+          if (kb.id === id) {
             return {
-              ...k,
+              ...kb,
               enabled: newEnabled,
               status: newEnabled ? '已启用' : '禁用',
               statusColor: newEnabled ? KNOWLEDGE_BASE_STATUS_COLORS.enabled : KNOWLEDGE_BASE_STATUS_COLORS.disabled,
             };
           }
-          return k;
+          return kb;
         })
       );
       toast.success(newEnabled ? '知识库已启用' : '知识库已禁用');
@@ -397,10 +397,10 @@ export function KnowledgeBase() {
   const [totalDocuments, setTotalDocuments] = useState<number>(0);
 
   // 加载文档列表
-  const loadDocuments = async (knowledgeBaseId: number) => {
+  const loadDocuments = async (knowledgeBaseId: string) => {
     if (!knowledgeBaseId) return;
 
-    setDocumentsLoading(true);
+    setIsLoadingDocuments(true);
     try {
       const response = await Documents.getDocumentList(knowledgeBaseId, {
         pageNo: documentPage,
@@ -424,7 +424,7 @@ export function KnowledgeBase() {
           const typeInfo = DOCUMENT_TYPE_MAP[type] || DOCUMENT_TYPE_MAP[KnowledgeBaseDocTypeEnum.TXT]!;
 
           return {
-            id: typeof doc.id === 'string' ? Number(doc.id) : doc.id || 0,
+            id: doc.id ? String(doc.id) : '',
             name: doc.name || '',
             type: typeInfo.text,
             typeColor: typeInfo.color,
@@ -452,7 +452,7 @@ export function KnowledgeBase() {
       setDocuments([]);
       setTotalDocuments(0);
     } finally {
-      setDocumentsLoading(false);
+      setIsLoadingDocuments(false);
     }
   };
 
@@ -478,7 +478,7 @@ export function KnowledgeBase() {
   // 旧的模拟数据已移除，现在使用API加载
 
   // 文档启用/禁用处理
-  const handleToggleDocument = async (id: number) => {
+  const handleToggleDocument = async (id: string) => {
     if (!selectedKnowledgeBase) return;
 
     const doc = documents.find(d => d.id === id);
@@ -569,51 +569,51 @@ export function KnowledgeBase() {
     }
   };
 
-  const handleView = async (kb: KnowledgeBaseItem) => {
+  const handleViewKnowledgeBase = async (knowledgeBase: KnowledgeBaseItem) => {
     try {
-      const response = await KnowledgeBases.getKnowledgeBaseDetail(kb.id);
+      const response = await KnowledgeBases.getKnowledgeBaseDetail(knowledgeBase.id);
       const responseData = (response as any).data;
       const detail = responseData?.data;
 
       if (detail) {
-        const mappedKB: KnowledgeBaseItem = {
-          ...kb,
-          description: detail.description || kb.description,
+        const mappedKnowledgeBase: KnowledgeBaseItem = {
+          ...knowledgeBase,
+          description: detail.description || knowledgeBase.description,
           documentCount: String(detail.documentsCount || 0),
-          size: detail.totalSize || kb.size,
+          size: detail.totalSize || knowledgeBase.size,
           tags: detail.tags,
           visibility: detail.visibility,
           chunkSize: detail.config?.chunkSize,
           chunkOverlap: detail.config?.chunkOverlap,
           embeddingModelId: detail.config?.embeddingModelId,
         };
-        setViewingKB(mappedKB);
+        setViewingKB(mappedKnowledgeBase);
         setViewDialogOpen(true);
       } else {
-        setViewingKB(kb);
+        setViewingKB(knowledgeBase);
         setViewDialogOpen(true);
       }
     } catch (error: any) {
       toast.error(error?.data?.message || '获取知识库详情失败');
       // 失败时仍显示基本信息
-      setViewingKB(kb);
+      setViewingKB(knowledgeBase);
       setViewDialogOpen(true);
     }
   };
 
-  const handleEdit = (kb: KnowledgeBaseItem) => {
-    setEditingKB(kb);
+  const handleEditKnowledgeBase = (knowledgeBase: KnowledgeBaseItem) => {
+    setEditingKnowledgeBase(knowledgeBase);
     setEditDialogOpen(true);
   };
 
-  const handleDeleteKB = async (kb: KnowledgeBaseItem) => {
-    if (!confirm(`确定要删除知识库 "${kb.name}" 吗？此操作不可恢复。`)) return;
+  const handleDeleteKnowledgeBase = async (knowledgeBase: KnowledgeBaseItem) => {
+    if (!confirm(`确定要删除知识库 "${knowledgeBase.name}" 吗？此操作不可恢复。`)) return;
 
     try {
-      await KnowledgeBases.deleteKnowledgeBase(kb.id);
-      toast.success(`已删除知识库: ${kb.name}`);
+      await KnowledgeBases.deleteKnowledgeBase(knowledgeBase.id);
+      toast.success(`已删除知识库: ${knowledgeBase.name}`);
       loadKnowledgeBases(); // 重新加载列表
-      if (selectedKnowledgeBase === kb.id) {
+      if (selectedKnowledgeBase === knowledgeBase.id) {
         setSelectedKnowledgeBase(null);
       }
     } catch (error: any) {
@@ -1002,8 +1002,8 @@ export function KnowledgeBase() {
                         <h3 className='dark:text-white'>{kb.name}</h3>
                         <Switch
                           checked={kb.enabled}
-                          onCheckedChange={checked => {
-                            handleToggleKB(kb.id);
+                          onCheckedChange={() => {
+                            handleToggleKnowledgeBaseStatus(kb.id);
                           }}
                           onClick={e => e.stopPropagation()}
                           className='data-[state=checked]:bg-blue-500'
@@ -1026,15 +1026,15 @@ export function KnowledgeBase() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align='end' className='dark:bg-gray-800 dark:border-gray-700'>
-                      <DropdownMenuItem onClick={() => handleView(kb)} className='dark:text-gray-300'>
+                      <DropdownMenuItem onClick={() => handleViewKnowledgeBase(kb)} className='dark:text-gray-300'>
                         <Eye className='w-4 h-4 mr-2' />
                         查看
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleEdit(kb)} className='dark:text-gray-300'>
+                      <DropdownMenuItem onClick={() => handleEditKnowledgeBase(kb)} className='dark:text-gray-300'>
                         <Edit className='w-4 h-4 mr-2' />
                         编辑
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleDeleteKB(kb)} className='text-red-600 dark:text-red-400'>
+                      <DropdownMenuItem onClick={() => handleDeleteKnowledgeBase(kb)} className='text-red-600 dark:text-red-400'>
                         <Trash2 className='w-4 h-4 mr-2' />
                         删除
                       </DropdownMenuItem>
@@ -1147,7 +1147,7 @@ export function KnowledgeBase() {
                           </Badge>
                           <Switch
                             checked={kb.enabled}
-                            onCheckedChange={() => handleToggleKB(kb.id)}
+                            onCheckedChange={() => handleToggleKnowledgeBaseStatus(kb.id)}
                             className='data-[state=checked]:bg-blue-500'
                           />
                         </div>
@@ -1168,16 +1168,16 @@ export function KnowledgeBase() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align='end' className='dark:bg-gray-800 dark:border-gray-700'>
-                            <DropdownMenuItem onClick={() => handleView(kb)} className='dark:text-gray-300'>
+                            <DropdownMenuItem onClick={() => handleViewKnowledgeBase(kb)} className='dark:text-gray-300'>
                               <Eye className='w-4 h-4 mr-2' />
                               查看
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleEdit(kb)} className='dark:text-gray-300'>
+                            <DropdownMenuItem onClick={() => handleEditKnowledgeBase(kb)} className='dark:text-gray-300'>
                               <Edit className='w-4 h-4 mr-2' />
                               编辑
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              onClick={() => handleDeleteKB(kb)}
+                              onClick={() => handleDeleteKnowledgeBase(kb)}
                               className='text-red-600 dark:text-red-400'
                             >
                               <Trash2 className='w-4 h-4 mr-2' />
@@ -1629,14 +1629,14 @@ export function KnowledgeBase() {
       <EditKnowledgeBaseDialog
         open={editDialogOpen}
         onOpenChange={setEditDialogOpen}
-        knowledgeBase={editingKB}
+        knowledgeBase={editingKnowledgeBase}
         onSuccess={() => {
           loadKnowledgeBases();
-          if (editingKB) {
+          if (editingKnowledgeBase) {
             // 更新当前选中的知识库信息
-            const updatedKB = knowledgeBases.find(kb => kb.id === editingKB.id);
-            if (updatedKB && selectedKnowledgeBase === editingKB.id) {
-              loadDocuments(editingKB.id);
+            const updatedKnowledgeBase = knowledgeBases.find(kb => kb.id === editingKnowledgeBase.id);
+            if (updatedKnowledgeBase && selectedKnowledgeBase === editingKnowledgeBase.id) {
+              loadDocuments(editingKnowledgeBase.id);
             }
           }
         }}

@@ -20,8 +20,8 @@ export class Documents<SecurityDataType = unknown> {
    * @secure
    */
   toggleDocument = (
-    documentId: number,
-    knowledgeBaseId: number,
+    documentId: string,
+    knowledgeBaseId: string,
     data: KnowledgeBaseDocToggleDto,
     params: RequestParams = {}
   ) =>
@@ -42,7 +42,7 @@ export class Documents<SecurityDataType = unknown> {
    * @request POST:/api/v1/knowledge-bases/{knowledgeBaseId}/documents/{documentId}/reprocess
    * @secure
    */
-  reprocessDocument = (documentId: number, knowledgeBaseId: number, params: RequestParams = {}) =>
+  reprocessDocument = (documentId: string, knowledgeBaseId: string, params: RequestParams = {}) =>
     this.http.request<KnowledgeBaseDocStatusResult, ApiLocaleResult>({
       path: `${AI}/knowledge-bases/${knowledgeBaseId}/documents/${documentId}/reprocess`,
       method: 'POST',
@@ -59,7 +59,7 @@ export class Documents<SecurityDataType = unknown> {
    * @secure
    */
   getDocumentList = (
-    knowledgeBaseId: number,
+    knowledgeBaseId: string,
     query?: PageQuery & {
       /** 文档类型筛选 */
       type?: KnowledgeBaseDocTypeEnum;
@@ -89,7 +89,7 @@ export class Documents<SecurityDataType = unknown> {
    * @secure
    */
   uploadDocument = (
-    knowledgeBaseId: number,
+    knowledgeBaseId: string,
     query: {
       /** 文件列表 */
       file: File;
@@ -112,7 +112,7 @@ export class Documents<SecurityDataType = unknown> {
    * @request POST:/api/v1/knowledge-bases/{knowledgeBaseId}/documents/search
    * @secure
    */
-  searchDocuments = (knowledgeBaseId: number, data: KnowledgeBaseDocSearchDto, params: RequestParams = {}) =>
+  searchDocuments = (knowledgeBaseId: string, data: KnowledgeBaseDocSearchDto, params: RequestParams = {}) =>
     this.http.request<ListKnowledgeBaseDocSearchResult, ApiLocaleResult>({
       path: `${AI}/knowledge-bases/${knowledgeBaseId}/documents/search`,
       method: 'POST',
@@ -130,7 +130,7 @@ export class Documents<SecurityDataType = unknown> {
    * @request POST:/api/v1/knowledge-bases/{knowledgeBaseId}/documents/batch-delete
    * @secure
    */
-  batchDeleteDocuments = (knowledgeBaseId: number, data: KnowledgeBaseDocBatchDeleteDto, params: RequestParams = {}) =>
+  batchDeleteDocuments = (knowledgeBaseId: string, data: KnowledgeBaseDocBatchDeleteDto, params: RequestParams = {}) =>
     this.http.request<void, ApiLocaleResult>({
       path: `${AI}/knowledge-bases/${knowledgeBaseId}/documents/batch-delete`,
       method: 'POST',
@@ -148,7 +148,7 @@ export class Documents<SecurityDataType = unknown> {
    * @request DELETE:/api/v1/knowledge-bases/{knowledgeBaseId}/documents/{documentId}
    * @secure
    */
-  deleteDocument = (documentId: number, knowledgeBaseId: number, params: RequestParams = {}) =>
+  deleteDocument = (documentId: string, knowledgeBaseId: string, params: RequestParams = {}) =>
     this.http.request<ApiLocaleResult, ApiLocaleResult>({
       path: `${AI}/knowledge-bases/${knowledgeBaseId}/documents/${documentId}`,
       method: 'DELETE',

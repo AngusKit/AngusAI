@@ -34,9 +34,9 @@ export interface KnowledgeBaseDetailVo extends TenantAuditingVo {
   /**
    * 知识库ID
    * @format int64
-   * @example 1
+   * @example "1"
    */
-  id?: number;
+  id?: string;
   /**
    * 知识库名称
    * @example "产品文档库"
@@ -201,9 +201,9 @@ export interface KnowledgeBaseListVo extends TenantAuditingVo {
   /**
    * 知识库ID
    * @format int64
-   * @example 1
+   * @example "1"
    */
-  id?: number;
+  id?: string;
   /**
    * 知识库名称
    * @example "产品文档库"
@@ -342,7 +342,7 @@ export interface KnowledgeBaseTopKnowledgeBase {
    * 知识库ID
    * @format int64
    */
-  id?: number;
+  id?: string;
   /**
    * 知识库名称
    */

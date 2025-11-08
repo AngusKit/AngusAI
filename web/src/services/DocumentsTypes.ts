@@ -15,9 +15,9 @@ export interface KnowledgeBaseDocListVo extends TenantAuditingVo {
   /**
    * 文档ID
    * @format int64
-   * @example 1
+   * @example "1"
    */
-  id?: number;
+  id?: string;
   /**
    * 文档名称
    * @example "产品手册.pdf"
@@ -80,9 +80,9 @@ export interface KnowledgeBaseDocStatusVo {
   /**
    * 文档ID
    * @format int64
-   * @example 1
+   * @example "1"
    */
-  id?: number;
+  id?: string;
   /**
    * 处理状态
    * @example "PROCESSING"
@@ -138,9 +138,9 @@ export interface KnowledgeBaseDocSearchResultVo {
   /**
    * 文档ID
    * @format int64
-   * @example 1
+   * @example "1"
    */
-  documentId?: number;
+  documentId?: string;
   /**
    * 文档名称
    * @example "产品手册.pdf"
@@ -179,9 +179,9 @@ export type ListKnowledgeBaseDocSearchResult = ApiLocaleResult & {
 export interface KnowledgeBaseDocBatchDeleteDto {
   /**
    * 文档ID列表
-   * @example [1,2,3]
+   * @example ["1","2","3"]
    */
-  documentIds: number[];
+  documentIds: string[];
 }
 
 export interface PageKnowledgeBaseDocListVo {
