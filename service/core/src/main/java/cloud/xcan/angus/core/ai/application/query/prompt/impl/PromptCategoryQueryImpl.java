@@ -238,12 +238,22 @@ public class PromptCategoryQueryImpl implements PromptCategoryQuery {
       }
     }
 
-    // Apply aggregated counts to requested categories
-    for (PromptCategory root : categories) {
-      if (root == null || root.getId() == null) {
+    // Apply aggregated counts to all accessible categories (including children)
+    // This ensures all categories, including subcategories, have their promptCount set
+    for (PromptCategory c : accessible) {
+      if (c == null || c.getId() == null) {
         continue;
       }
-      root.setPromptCount(aggregated.getOrDefault(root.getId(), 0L));
+      c.setPromptCount(aggregated.getOrDefault(c.getId(), 0L));
+    }
+    
+    // Also set counts for categories in the input list
+    // This ensures the returned categories have promptCount set even if they are different instances
+    for (PromptCategory c : categories) {
+      if (c == null || c.getId() == null) {
+        continue;
+      }
+      c.setPromptCount(aggregated.getOrDefault(c.getId(), 0L));
     }
   }
 }
