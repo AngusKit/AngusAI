@@ -22,6 +22,136 @@ import { ICON_MAP, SYSTEM_CATEGORY_IDS, LIMITS } from './constants';
 import { getTagColorByIndex, buildCategoryTree, getCategoryPath, getTopLevelCategories, getChildCategories, getCategoryDisplayName, getDefaultCategoryId, } from './utils';
 import { useDebounce } from './hooks/useDebounce';
 
+// 递归渲染分类树组件（支持多级分组）
+interface CategoryItemProps {
+  category: Category;
+  selectedCategoryId: string;
+  categories: Category[];
+  level: number;
+  getCategoryCount: (categoryId: string) => number | undefined;
+  getCategoryDisplayName: (cat: Category, language: string) => string;
+  language: string;
+  onSelect: (categoryId: string) => void;
+  onEdit: (category: Category) => void;
+  onDelete: (category: Category) => void;
+}
+
+function CategoryItem({
+  category,
+  selectedCategoryId,
+  categories,
+  level,
+  getCategoryCount,
+  getCategoryDisplayName,
+  language,
+  onSelect,
+  onEdit,
+  onDelete,
+}: CategoryItemProps) {
+  const Icon = category.icon || BookOpen;
+  const count = getCategoryCount(category.id);
+  const childCategories = getChildCategories(categories, category.id);
+  const isSelected = selectedCategoryId === category.id;
+
+  // 根据层级设置缩进：level 0 无缩进，level 1 缩进 16px，level 2+ 缩进 32px
+  const indentClass = level === 0 ? '' : level === 1 ? 'ml-4' : 'ml-8';
+  const paddingClass = level === 0 ? 'py-2' : 'py-1.5';
+
+  return (
+    <div>
+      {/* 当前分类 */}
+      <div
+        className={cn(
+          'group w-full flex items-center gap-2 px-3 rounded-lg transition-colors',
+          paddingClass,
+          indentClass,
+          isSelected
+            ? 'bg-blue-50 dark:bg-blue-900/20'
+            : 'hover:bg-gray-100 dark:hover:bg-gray-750'
+        )}
+      >
+        <button
+          onClick={() => onSelect(category.id)}
+          className='flex items-center gap-2 text-left min-w-0'
+        >
+          <Icon
+            className={cn(
+              'w-4 h-4 shrink-0',
+              category.color,
+              isSelected && 'text-blue-600 dark:text-blue-400'
+            )}
+          />
+          <span
+            className={cn(
+              'text-sm truncate max-w-[100px] block',
+              isSelected
+                ? 'text-blue-600 dark:text-blue-400'
+                : level === 0
+                  ? 'text-gray-700 dark:text-gray-300'
+                  : 'text-gray-600 dark:text-gray-400'
+            )}
+            title={getCategoryDisplayName(category, language)}
+          >
+            {getCategoryDisplayName(category, language)}
+          </span>
+        </button>
+        <div className='flex items-center gap-1 shrink-0 ml-auto'>
+          {!category.isSystem && (
+            <>
+              <Button
+                variant='ghost'
+                size='icon'
+                className='h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity'
+                onClick={e => {
+                  e.stopPropagation();
+                  onEdit(category);
+                }}
+              >
+                <Edit className='w-3 h-3 text-blue-600' />
+              </Button>
+              <Button
+                variant='ghost'
+                size='icon'
+                className='h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity'
+                onClick={e => {
+                  e.stopPropagation();
+                  onDelete(category);
+                }}
+              >
+                <Trash2 className='w-3 h-3 text-red-600' />
+              </Button>
+            </>
+          )}
+          <Badge variant='secondary' className='text-xs'>
+            {category.promptCount || count}
+          </Badge>
+        </div>
+      </div>
+
+      {/* 递归渲染子分类 */}
+      {childCategories.length > 0 && (
+        <div className='mt-1 space-y-1'>
+          {childCategories.map(childCategory => (
+            <CategoryItem
+              key={childCategory.id}
+              category={childCategory}
+              selectedCategoryId={selectedCategoryId}
+              categories={categories}
+              level={level + 1}
+              getCategoryCount={getCategoryCount}
+              getCategoryDisplayName={getCategoryDisplayName}
+              language={language}
+              onSelect={onSelect}
+              onEdit={onEdit}
+              onDelete={onDelete}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function PromptLibraryPage() {
   const { t, language } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
@@ -338,6 +468,21 @@ export function PromptLibraryPage() {
     }
   };
 
+  // 递归收集所有子分类ID（包括多级子分类）
+  const collectAllChildCategoryIds = useCallback((parentId: string, allCategories: Category[]): string[] => {
+    const childIds: string[] = [];
+    const children = allCategories.filter(c => c.parentId === parentId);
+    
+    for (const child of children) {
+      childIds.push(child.id);
+      // 递归获取子分类的子分类
+      const grandChildren = collectAllChildCategoryIds(child.id, allCategories);
+      childIds.push(...grandChildren);
+    }
+    
+    return childIds;
+  }, []);
+
   const handleDeleteCategory = async () => {
     if (!deletingCategory) return;
 
@@ -350,15 +495,15 @@ export function PromptLibraryPage() {
     }
 
     try {
-      // 获取所有子分类
-      const childCategories = categories.filter(c => c.parentId === deletingCategory.id);
-      const allCategoryIds = [deletingCategory.id, ...childCategories.map(c => c.id)];
+      // 递归获取所有子分类ID（包括三级分组）
+      const allChildIds = collectAllChildCategoryIds(deletingCategory.id, categories);
+      const allCategoryIds = [deletingCategory.id, ...allChildIds];
 
       // 批量删除分类及其所有子分类
       await PromptCategories.batchDeletePromptCategories({ ids: allCategoryIds });
 
-      // 如果当前选中的是被删除的分类，切换到"全部"
-      if (selectedCategoryId === deletingCategory.id) {
+      // 如果当前选中的是被删除的分类或其子分类，切换到"全部"
+      if (allCategoryIds.includes(selectedCategoryId)) {
         setSelectedCategoryId(SYSTEM_CATEGORY_IDS.ALL);
       }
 
@@ -400,165 +545,30 @@ export function PromptLibraryPage() {
               </div>
             ) : (
               <div className='space-y-1'>
-                {getTopLevelCategories(categories).map(category => {
-                  const Icon = category.icon;
-                  const count = getCategoryCount(category.id);
-                  const childCategories = getChildCategories(categories, category.id);
-
-                  return (
-                    <div key={category.id}>
-                      {/* 父分类 */}
-                      <div
-                        className={cn(
-                          'group w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors',
-                          selectedCategoryId === category.id
-                            ? 'bg-blue-50 dark:bg-blue-900/20'
-                            : 'hover:bg-gray-100 dark:hover:bg-gray-750'
-                        )}
-                      >
-                        <button
-                          onClick={() => {
-                            setSelectedCategoryId(category.id);
-                            setPageParam(pre => ({ ...pre, pageNo: 1 }));
-                          }}
-                          className='flex-1 flex items-center gap-2'
-                        >
-                          <Icon
-                            className={cn(
-                              'w-4 h-4',
-                              category.color,
-                              selectedCategoryId === category.id && 'text-blue-600 dark:text-blue-400'
-                            )}
-                          />
-                          <span
-                            className={cn(
-                              'text-sm',
-                              selectedCategoryId === category.id
-                                ? 'text-blue-600 dark:text-blue-400'
-                                : 'text-gray-700 dark:text-gray-300'
-                            )}
-                          >
-                            {getCategoryDisplayName(category, language)}
-                          </span>
-                        </button>
-                        <div className='flex items-center gap-1'>
-                          {!category.isSystem && (
-                            <>
-                              <Button
-                                variant='ghost'
-                                size='icon'
-                                className='h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity'
-                                onClick={e => {
-                                  e.stopPropagation();
-                                  setEditingCategory(category);
-                                  setShowCategoryDialog(true);
-                                }}
-                              >
-                                <Edit className='w-3 h-3 text-blue-600' />
-                              </Button>
-                              <Button
-                                variant='ghost'
-                                size='icon'
-                                className='h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity'
-                                onClick={e => {
-                                  e.stopPropagation();
-                                  setDeletingCategory(category);
-                                  setShowDeleteCategoryDialog(true);
-                                }}
-                              >
-                                <Trash2 className='w-3 h-3 text-red-600' />
-                              </Button>
-                            </>
-                          )}
-                          <Badge variant='secondary' className='text-xs'>
-                            {category.promptCount || count}
-                          </Badge>
-                        </div>
-                      </div>
-
-                      {/* 子分类 */}
-                      {childCategories.length > 0 && (
-                        <div className='ml-4 mt-1 space-y-1'>
-                          {childCategories.map(childCategory => {
-                            const childCount = getCategoryCount(childCategory.id);
-                            const ChildIcon = childCategory.icon || BookOpen;
-
-                            return (
-                              <div
-                                key={childCategory.id}
-                                className={cn(
-                                  'group w-full flex items-center justify-between px-3 py-1.5 rounded-lg transition-colors',
-                                  selectedCategoryId === childCategory.id
-                                    ? 'bg-blue-50 dark:bg-blue-900/20'
-                                    : 'hover:bg-gray-100 dark:hover:bg-gray-750'
-                                )}
-                              >
-                                <button
-                                  onClick={() => {
-                                    setSelectedCategoryId(childCategory.id);
-                                    setPageParam(pre => ({ ...pre, pageNo: 1 }));
-                                  }}
-                                  className='flex-1 flex items-center gap-2'
-                                >
-                                  <ChildIcon
-                                    className={cn(
-                                      'w-4 h-4',
-                                      childCategory.color,
-                                      selectedCategoryId === childCategory.id && 'text-blue-600 dark:text-blue-400'
-                                    )}
-                                  />
-                                  <span
-                                    className={cn(
-                                      'text-sm',
-                                      selectedCategoryId === childCategory.id
-                                        ? 'text-blue-600 dark:text-blue-400'
-                                        : 'text-gray-600 dark:text-gray-400'
-                                    )}
-                                  >
-                                    {getCategoryDisplayName(childCategory, language)}
-                                  </span>
-                                </button>
-                                <div className='flex items-center gap-1'>
-                                  {!childCategory.isSystem && (
-                                    <>
-                                      <Button
-                                        variant='ghost'
-                                        size='icon'
-                                        className='h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity'
-                                        onClick={e => {
-                                          e.stopPropagation();
-                                          setEditingCategory(childCategory);
-                                          setShowCategoryDialog(true);
-                                        }}
-                                      >
-                                        <Edit className='w-3 h-3 text-blue-600' />
-                                      </Button>
-                                      <Button
-                                        variant='ghost'
-                                        size='icon'
-                                        className='h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity'
-                                        onClick={e => {
-                                          e.stopPropagation();
-                                          setDeletingCategory(childCategory);
-                                          setShowDeleteCategoryDialog(true);
-                                        }}
-                                      >
-                                        <Trash2 className='w-3 h-3 text-red-600' />
-                                      </Button>
-                                    </>
-                                  )}
-                                  <Badge variant='secondary' className='text-xs'>
-                                    {childCategory.promptCount || childCount}
-                                  </Badge>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+                {getTopLevelCategories(categories).map(category => (
+                  <CategoryItem
+                    key={category.id}
+                    category={category}
+                    selectedCategoryId={selectedCategoryId}
+                    categories={categories}
+                    level={0}
+                    getCategoryCount={getCategoryCount}
+                    getCategoryDisplayName={getCategoryDisplayName}
+                    language={language}
+                    onSelect={(categoryId) => {
+                      setSelectedCategoryId(categoryId);
+                      setPageParam(pre => ({ ...pre, pageNo: 1 }));
+                    }}
+                    onEdit={(category) => {
+                      setEditingCategory(category);
+                      setShowCategoryDialog(true);
+                    }}
+                    onDelete={(category) => {
+                      setDeletingCategory(category);
+                      setShowDeleteCategoryDialog(true);
+                    }}
+                  />
+                ))}
               </div>
             )}
           </div>
