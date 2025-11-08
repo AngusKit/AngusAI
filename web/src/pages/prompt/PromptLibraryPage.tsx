@@ -20,7 +20,7 @@ import { DeleteCategoryDialog } from './DeleteCategoryDialog';
 import { Prompt, Category } from './types';
 import { ICON_MAP, SYSTEM_CATEGORY_IDS, LIMITS } from './constants';
 import { getTagColorByIndex, buildCategoryTree, getCategoryPath, getTopLevelCategories, getChildCategories, getCategoryDisplayName, getDefaultCategoryId, } from './utils';
-import { useDebounce } from './hooks/useDebounce';
+import { useDebounce } from '@/hooks/useDebounce';
 
 // 递归渲染分类树组件（支持多级分组）
 interface CategoryItemProps {
