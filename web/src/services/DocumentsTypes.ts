@@ -50,6 +50,16 @@ export interface KnowledgeBaseDocListVo extends TenantAuditingVo {
    */
   chunks?: number;
   /**
+   * 文件存储URL路径
+   * @example "https://example.com/file.pdf"
+   */
+  filePath?: string;
+  /**
+   * 文件内容哈希编码
+   * @example "3c9b5de3b42eeba213989e92713baa1653dc675cd38c89a2eaa2c64cb8e27f7a"
+   */
+  contentHash?: string;
+  /**
    * 处理进度
    * @format int32
    * @example 100

@@ -33,10 +33,10 @@ public class KnowledgeBaseDocVo extends TenantAuditingVo {
   @Schema(description = "分段数量", example = "8")
   private Integer chunks;
 
-  @Schema(description = "文件存储URL路径")
+  @Schema(description = "文件存储URL路径", example = "https://example.com/file.pdf")
   private String filePath;
 
-  @Schema(description = "文件内容哈希编码")
+  @Schema(description = "文件内容哈希编码", example = "3c9b5de3b42eeba213989e92713baa1653dc675cd38c89a2eaa2c64cb8e27f7a")
   private String contentHash;
 
   @Schema(description = "处理进度", example = "100")
