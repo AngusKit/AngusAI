@@ -5,6 +5,7 @@ export * from '../services/ApiCollectionsTypes.ts';
 export * from '../services/ApplicationsTypes.ts';
 export * from '../services/ChatTypes.ts';
 export * from '../services/DatasetsTypes.ts';
+export * from '../services/DatasetsDataTypes.ts';
 export * from '../services/DocumentsTypes.ts';
 export * from '../services/KnowledgeBasesTypes.ts';
 export * from '../services/ModelsTypes.ts';
