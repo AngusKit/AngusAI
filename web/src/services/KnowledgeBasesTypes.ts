@@ -275,6 +275,7 @@ export enum GetKnowledgeBaseListOrderByEnum {
   ModifiedDate = 'modifiedDate',
   Name = 'name',
   DocumentsCount = 'documentsCount',
+  TotalSize = 'totalSize',
 }
 
 /** 知识库统计概览 */

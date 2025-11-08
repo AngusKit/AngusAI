@@ -17,6 +17,7 @@ import KnowledgeBases from '@/services/KnowledgeBases';
 import Documents from '@/services/Documents';
 import { KnowledgeBaseDocStatusEnum, KnowledgeBaseDocTypeEnum } from '@/enums/enums';
 import type { KnowledgeBaseListVo, KnowledgeBaseStatisticsVo } from '@/services/KnowledgeBasesTypes';
+import { GetKnowledgeBaseListOrderByEnum } from '@/services/KnowledgeBasesTypes';
 import type { KnowledgeBaseDocListVo } from '@/services/DocumentsTypes';
 import { getTagColor, formatDateOnly, formatFileSize } from '@/utils';
 
@@ -71,6 +72,7 @@ export function KnowledgeBase() {
   const [documentsLoading, setDocumentsLoading] = useState(false);
   const [statistics, setStatistics] = useState<KnowledgeBaseStatisticsVo | null>(null);
   const [statisticsLoading, setStatisticsLoading] = useState(false);
+  const [sortBy, setSortBy] = useState<'createdDate' | 'documentsCount' | 'totalSize' | 'name'>('createdDate');
 
   // 文件上传相关状态
   const [uploadFiles, setUploadFiles] = useState<UploadFile[]>([]);
@@ -297,11 +299,17 @@ export function KnowledgeBase() {
   const loadKnowledgeBases = async () => {
     setLoading(true);
     try {
-      const response = await KnowledgeBases.getKnowledgeBaseList({
+      // 构建查询参数
+      const queryParams: any = {
         keyword: debouncedSearchQuery.trim() || undefined,
         pageNo: currentPage,
         pageSize: itemsPerPage,
-      });
+      };
+
+      // 根据排序方式设置 orderBy
+      queryParams.orderBy = sortBy as GetKnowledgeBaseListOrderByEnum;
+
+      const response = await KnowledgeBases.getKnowledgeBaseList(queryParams);
 
       // 处理响应结构
       const responseData = (response as any).data;
@@ -327,6 +335,17 @@ export function KnowledgeBase() {
           updateTime: kb.modifiedDate,
           tags: kb.tags,
         }));
+
+        // 注意：createdDate 需要降序排序（最近创建在前），但 API 可能默认是升序
+        // 如果后端不支持排序方向，这里需要客户端处理 createdDate 的降序
+        if (sortBy === 'createdDate') {
+          mappedList.sort((a, b) => {
+            const dateA = a.createdTime ? new Date(a.createdTime).getTime() : 0;
+            const dateB = b.createdTime ? new Date(b.createdTime).getTime() : 0;
+            return dateB - dateA; // 降序：最近创建在前
+          });
+        }
+
         setKnowledgeBases(mappedList);
       } else {
         setKnowledgeBases([]);
@@ -342,7 +361,7 @@ export function KnowledgeBase() {
 
   useEffect(() => {
     loadKnowledgeBases();
-  }, [currentPage, debouncedSearchQuery]);
+  }, [currentPage, debouncedSearchQuery, sortBy]);
 
   // 旧的模拟数据已移除，现在使用API加载
 
@@ -879,10 +898,42 @@ export function KnowledgeBase() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align='end' className='dark:bg-gray-800 dark:border-gray-700'>
-                <DropdownMenuItem className='dark:text-gray-300'>最近创建</DropdownMenuItem>
-                <DropdownMenuItem className='dark:text-gray-300'>文档数量</DropdownMenuItem>
-                <DropdownMenuItem className='dark:text-gray-300'>存储大小</DropdownMenuItem>
-                <DropdownMenuItem className='dark:text-gray-300'>按名称排序</DropdownMenuItem>
+                <DropdownMenuItem
+                  className={`dark:text-gray-300 ${sortBy === 'createdDate' ? 'bg-blue-50 dark:bg-blue-900/30' : ''}`}
+                  onClick={() => {
+                    setSortBy('createdDate');
+                    setCurrentPage(1); // 重置到第一页
+                  }}
+                >
+                  最近创建
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className={`dark:text-gray-300 ${sortBy === 'documentsCount' ? 'bg-blue-50 dark:bg-blue-900/30' : ''}`}
+                  onClick={() => {
+                    setSortBy('documentsCount');
+                    setCurrentPage(1);
+                  }}
+                >
+                  文档数量
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className={`dark:text-gray-300 ${sortBy === 'totalSize' ? 'bg-blue-50 dark:bg-blue-900/30' : ''}`}
+                  onClick={() => {
+                    setSortBy('totalSize');
+                    setCurrentPage(1);
+                  }}
+                >
+                  存储大小
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className={`dark:text-gray-300 ${sortBy === 'name' ? 'bg-blue-50 dark:bg-blue-900/30' : ''}`}
+                  onClick={() => {
+                    setSortBy('name');
+                    setCurrentPage(1);
+                  }}
+                >
+                  按名称排序
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
@@ -982,10 +1033,6 @@ export function KnowledgeBase() {
                       <DropdownMenuItem onClick={() => handleEdit(kb)} className='dark:text-gray-300'>
                         <Edit className='w-4 h-4 mr-2' />
                         编辑
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleAction('下载', kb.name)} className='dark:text-gray-300'>
-                        <Download className='w-4 h-4 mr-2' />
-                        导出
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleDeleteKB(kb)} className='text-red-600 dark:text-red-400'>
                         <Trash2 className='w-4 h-4 mr-2' />
@@ -1130,14 +1177,7 @@ export function KnowledgeBase() {
                               编辑
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              onClick={() => handleAction('下载', kb.name)}
-                              className='dark:text-gray-300'
-                            >
-                              <Download className='w-4 h-4 mr-2' />
-                              导出
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => handleAction('删除', kb.name)}
+                              onClick={() => handleDeleteKB(kb)}
                               className='text-red-600 dark:text-red-400'
                             >
                               <Trash2 className='w-4 h-4 mr-2' />

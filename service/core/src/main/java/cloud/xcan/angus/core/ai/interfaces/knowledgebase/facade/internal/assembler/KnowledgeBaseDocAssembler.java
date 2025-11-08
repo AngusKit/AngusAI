@@ -24,6 +24,8 @@ public class KnowledgeBaseDocAssembler {
     vo.setStatus(document.getStatus());
     vo.setEnabled(document.getEnabled());
     vo.setChunks(document.getChunks());
+    vo.setFilePath(document.getFilePath());
+    vo.setContentHash(document.getContentHash());
     vo.setProcessingProgress(document.getProcessingProgress());
     vo.setErrorMessage(document.getErrorMessage());
 

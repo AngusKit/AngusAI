@@ -49,17 +49,17 @@ public class KnowledgeBaseDoc extends TenantAuditingEntity<KnowledgeBaseDoc, Lon
   @Column(name = "chunks")
   private Integer chunks = 0;
 
-  @Column(name = "processing_progress")
-  private Double processingProgress = 0D;
-
-  @Column(name = "error_message", length = Constants.DOCUMENT_ERROR_MESSAGE_MAX_LENGTH)
-  private String errorMessage;
-
   @Column(name = "file_path", length = Constants.DOCUMENT_FILE_PATH_MAX_LENGTH)
   private String filePath;
 
   @Column(name = "content_hash", length = Constants.DOCUMENT_CONTENT_HASH_MAX_LENGTH)
   private String contentHash;
+
+  @Column(name = "processing_progress")
+  private Double processingProgress = 0D;
+
+  @Column(name = "error_message", length = Constants.DOCUMENT_ERROR_MESSAGE_MAX_LENGTH)
+  private String errorMessage;
 
   @Transient
   private String sizeFormatted;
