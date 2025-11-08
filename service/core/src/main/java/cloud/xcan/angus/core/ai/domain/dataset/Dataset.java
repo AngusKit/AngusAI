@@ -43,9 +43,8 @@ public class Dataset extends TenantAuditingEntity<Dataset, Long> {
   @Column(name = "type", nullable = false)
   private DatasetType type;
 
-  @Enumerated(EnumType.STRING)
-  @Column(name = "status", nullable = false)
-  private DatasetStatus status;
+  @Column(name = "enabled", nullable = false)
+  private Boolean enabled;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "visibility", nullable = false)

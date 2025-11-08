@@ -8,7 +8,6 @@ import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasourceTableData
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.SyncDataVo;
 import cloud.xcan.angus.remote.PageResult;
 import java.util.List;
-import org.springframework.web.multipart.MultipartFile;
 
 public interface DatasetDataFacade {
 

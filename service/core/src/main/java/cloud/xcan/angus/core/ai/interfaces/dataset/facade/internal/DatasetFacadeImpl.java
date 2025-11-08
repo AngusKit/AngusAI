@@ -18,6 +18,7 @@ import cloud.xcan.angus.core.ai.interfaces.dataset.facade.DatasetFacade;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DataSourceUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetFindDto;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetToggleDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasourceConnectionTestDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.internal.assembler.DatasetAssembler;
@@ -74,6 +75,13 @@ public class DatasetFacadeImpl implements DatasetFacade {
   public DatasetDetailVo update(Long id, DatasetUpdateDto dto) {
     Dataset dataset = DatasetAssembler.toUpdateDomain(id, dto);
     Dataset saved = datasetCmd.update(dataset);
+    return DatasetAssembler.toDetailVo(saved);
+  }
+
+  @NameJoin
+  @Override
+  public DatasetDetailVo toggle(Long id, DatasetToggleDto dto) {
+    Dataset saved = datasetCmd.toggle(id, dto.getEnabled());
     return DatasetAssembler.toDetailVo(saved);
   }
 

@@ -5,6 +5,7 @@ import cloud.xcan.angus.core.ai.interfaces.dataset.facade.DatasetFacade;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DataSourceUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetFindDto;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetToggleDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasourceConnectionTestDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetDetailVo;
@@ -68,6 +69,18 @@ public class DatasetRest {
       @Parameter(description = "数据集ID") @PathVariable Long id,
       @Valid @RequestBody DatasetUpdateDto dto) {
     return ApiLocaleResult.success(datasetFacade.update(id, dto));
+  }
+
+  @Operation(operationId = "toggleDatasetStatus", summary = "切换数据集状态", description = "切换数据集的启用状态")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "状态修改成功")
+  })
+  @ResponseStatus(HttpStatus.OK)
+  @PutMapping("/{id}/toggle")
+  public ApiLocaleResult<DatasetDetailVo> toggle(
+      @Parameter(description = "数据集ID") @PathVariable Long id,
+      @Valid @RequestBody DatasetToggleDto dto) {
+    return ApiLocaleResult.success(datasetFacade.toggle(id, dto));
   }
 
   @Operation(operationId = "modifyDatasetVisibility", summary = "修改数据集可见性", description = "修改数据集可见性")

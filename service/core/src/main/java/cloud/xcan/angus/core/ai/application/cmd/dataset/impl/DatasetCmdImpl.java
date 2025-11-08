@@ -82,6 +82,26 @@ public class DatasetCmdImpl extends CommCmd<Dataset, Long> implements DatasetCmd
 
   @Override
   @Transactional
+  public Dataset toggle(Long id, Boolean enabled) {
+    return new BizTemplate<Dataset>() {
+      Dataset datasetDb;
+
+      @Override
+      protected void checkParams() {
+        // 获取数据集并验证是否存在
+        datasetDb = datasetQuery.findAndCheck(id);
+      }
+
+      @Override
+      protected Dataset process() {
+        datasetDb.setEnabled(enabled);
+        return datasetRepo.save(datasetDb);
+      }
+    }.execute();
+  }
+
+  @Override
+  @Transactional
   public Dataset modifyVisibility(Long id, Visibility visibility) {
     return new BizTemplate<Dataset>() {
       Dataset datasetDb;

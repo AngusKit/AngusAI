@@ -19,6 +19,15 @@ export interface DatasetDataStatisticsVo {
   usedStoreSize?: string;
 }
 
+/** 数据集启用状态切换请求参数 */
+export interface DatasetToggleDto {
+  /**
+   * 启用状态
+   * @example true
+   */
+  enabled: boolean;
+}
+
 /** 数据集详情响应 */
 export interface DatasetDetailVo extends TenantAuditingVo {
   /**

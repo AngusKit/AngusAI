@@ -4,7 +4,6 @@ import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatFileSize;
 import static cloud.xcan.angus.spec.utils.ObjectUtils.isNull;
 
 import cloud.xcan.angus.core.ai.domain.dataset.Dataset;
-import cloud.xcan.angus.core.ai.domain.dataset.DatasetStatus;
 import cloud.xcan.angus.core.ai.domain.dataset.DatasourceConfig;
 import cloud.xcan.angus.core.ai.infra.util.DatasourceUtils.ConnectionTestResult;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DataSourceUpdateDto;
@@ -37,7 +36,7 @@ public class DatasetAssembler {
     dataset.setIconBg(dto.getIconBg());
 
     // 设置默认状态
-    dataset.setStatus(DatasetStatus.PREPARING);
+    dataset.setEnabled(true);
     return dataset;
   }
 
@@ -109,7 +108,7 @@ public class DatasetAssembler {
     vo.setName(dataset.getName());
     vo.setDescription(dataset.getDescription());
     vo.setType(dataset.getType());
-    vo.setStatus(dataset.getStatus());
+    vo.setEnabled(dataset.getEnabled());
     vo.setVisibility(dataset.getVisibility());
     vo.setIcon(dataset.getIcon());
     vo.setIconBg(dataset.getIconBg());
@@ -136,7 +135,7 @@ public class DatasetAssembler {
     vo.setName(dataset.getName());
     vo.setDescription(dataset.getDescription());
     vo.setType(dataset.getType());
-    vo.setStatus(dataset.getStatus());
+    vo.setEnabled(dataset.getEnabled());
     vo.setVisibility(dataset.getVisibility());
     vo.setIcon(dataset.getIcon());
     vo.setIconBg(dataset.getIconBg());

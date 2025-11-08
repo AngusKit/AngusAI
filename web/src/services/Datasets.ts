@@ -1,7 +1,20 @@
 import { ApiLocaleResult, PageQuery, AI } from '@xcan-angus/infra';
-import { DatasetCreateDto, DatasetDetailResult, DatasetStatisticsResult, DatasetUpdateDto, DatasourceConnectionTestDto, DatasourceConnectionTestResult, DatasourceTableDataPreviewResult, DataSourceUpdateDto, GetDatasetListOrderByEnum, PageDatasetListResult, } from './DatasetsTypes.ts';
+import {
+  DatasetCreateDto,
+  DatasetDetailResult,
+  DatasetStatisticsResult,
+  DatasetToggleDto,
+  DatasetUpdateDto,
+  DatasourceConnectionTestDto,
+  DatasourceConnectionTestResult,
+  DatasourceTableDataPreviewResult,
+  DataSourceUpdateDto,
+  GetDatasetListOrderByEnum,
+  PageDatasetListResult,
+} from './DatasetsTypes.ts';
 import http, { ContentType, HttpClient, RequestParams } from './HttpClient.ts';
 import { DatasetTypeEnum, VisibilityEnum } from '@/enums/enums.ts';
+import {KnowledgeBaseDetailResult} from "@/services/KnowledgeBasesTypes.ts";
 
 export class Datasets<SecurityDataType = unknown> {
   http: HttpClient<SecurityDataType>;
@@ -32,6 +45,24 @@ export class Datasets<SecurityDataType = unknown> {
       method: 'PUT',
       query: query,
       secure: true,
+      ...params,
+    });
+  /**
+   * @description 切换数据集的启用状态
+   *
+   * @tags KnowledgeBase
+   * @name toggleDatasetStatus
+   * @summary 切换数据集状态
+   * @request PUT:/api/v1/datasets/{id}/toggle
+   * @secure
+   */
+  toggleDatasetStatus = (id: string, data: DatasetToggleDto, params: RequestParams = {}) =>
+    this.http.request<KnowledgeBaseDetailResult, ApiLocaleResult>({
+      path: `${AI}/datasets/${id}/toggle`,
+      method: 'PUT',
+      body: data,
+      secure: true,
+      type: ContentType.Json,
       ...params,
     });
   /**

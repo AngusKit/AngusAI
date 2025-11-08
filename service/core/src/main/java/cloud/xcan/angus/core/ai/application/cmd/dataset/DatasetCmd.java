@@ -18,6 +18,11 @@ public interface DatasetCmd {
   Dataset update(Dataset dataset);
 
   /**
+   * 启用/禁用数据集
+   */
+  Dataset toggle(Long id, Boolean enabled);
+
+  /**
    * 修改数据集可见性
    */
   Dataset modifyVisibility(Long id, Visibility visibility);

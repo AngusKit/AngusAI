@@ -4,6 +4,7 @@ import cloud.xcan.angus.core.ai.domain.Visibility;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DataSourceUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetFindDto;
+import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetToggleDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasourceConnectionTestDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetDetailVo;
@@ -25,6 +26,11 @@ public interface DatasetFacade {
    * 更新数据集基本信息
    */
   DatasetDetailVo update(Long id, DatasetUpdateDto dto);
+
+  /**
+   * 启用/禁用数据集
+   */
+  DatasetDetailVo toggle(Long id, DatasetToggleDto dto);
 
   /**
    * 修改数据集可见性
