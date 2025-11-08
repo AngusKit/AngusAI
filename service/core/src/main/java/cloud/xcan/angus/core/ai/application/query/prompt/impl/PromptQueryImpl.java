@@ -56,6 +56,9 @@ public class PromptQueryImpl implements PromptQuery {
 
         // 设置收藏数量
         setFavoritesCount(List.of(prompt));
+
+        // 设置当前用户是否收藏
+        setIsFavoriteFlag(List.of(prompt));
         return prompt;
       }
     }.execute();
@@ -81,6 +84,9 @@ public class PromptQueryImpl implements PromptQuery {
 
         // 设置收藏数量
         setFavoritesCount(page.getContent());
+
+        // 设置当前用户是否收藏
+        setIsFavoriteFlag(page.getContent());
         return page;
       }
 
@@ -168,6 +174,27 @@ public class PromptQueryImpl implements PromptQuery {
       if (prompt != null && prompt.getId() != null) {
         Long count = favoritesCountMap.getOrDefault(prompt.getId(), 0L);
         prompt.setFavorites(count);
+      }
+    }
+  }
+
+  @Override
+  public void setIsFavoriteFlag(List<Prompt> prompts) {
+    if (prompts == null || prompts.isEmpty()) {
+      return;
+    }
+
+    // 获取当前用户收藏的所有提示词ID集合
+    Set<Long> favoritePromptIds = promptFavoritesRepo.findAllIdByCreatedBy(getUserId());
+
+    // 设置每个提示词的收藏标志
+    for (Prompt prompt : prompts) {
+      if (prompt != null && prompt.getId() != null) {
+        boolean isFavorite = favoritePromptIds.contains(prompt.getId());
+        prompt.setIsFavorite(isFavorite);
+      } else if (prompt != null) {
+        // 如果提示词ID为空，设置为false
+        prompt.setIsFavorite(false);
       }
     }
   }

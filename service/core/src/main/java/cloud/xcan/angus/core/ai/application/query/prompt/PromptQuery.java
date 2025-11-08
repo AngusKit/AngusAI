@@ -36,4 +36,9 @@ public interface PromptQuery {
    */
   void setFavoritesCount(List<Prompt> prompts);
 
+  /**
+   * 设置当前用户是否收藏标志
+   */
+  void setIsFavoriteFlag(List<Prompt> prompts);
+
 }
