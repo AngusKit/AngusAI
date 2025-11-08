@@ -125,17 +125,27 @@ export function PromptDialog({
           tags: [...editingPrompt.tags],
         });
       } else {
+        // 获取可用的分组列表（过滤掉系统分组、all 和 favorites）
+        const availableCategories = categories.filter(
+          cat => cat.id !== 'all' && cat.id !== 'favorites' && !cat.isSystem
+        );
+        // 验证 defaultCategoryId 是否在可用分组列表中
+        const isValidDefaultCategory = defaultCategoryId && availableCategories.some(cat => cat.id === defaultCategoryId);
+        // 如果有有效的 defaultCategoryId 则使用它，否则使用第一个可用分组
+        const firstAvailableCategory = availableCategories.length > 0 ? availableCategories[0] : null;
+        const initialCategoryId = isValidDefaultCategory ? defaultCategoryId : (firstAvailableCategory?.id || '');
+        
         setPromptForm({
           title: '',
           content: '',
-          category: defaultCategoryId || '',
+          category: initialCategoryId,
           tags: [],
         });
       }
       setNewTagLabel('');
       setNewTagColor(TAG_COLORS[0]?.value || 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400');
     }
-  }, [open, editingPrompt, defaultCategoryId]);
+  }, [open, editingPrompt, defaultCategoryId, categories]);
 
   const getTagColorName = (color: (typeof TAG_COLORS)[0]) => (language === 'zh-CN' ? color.name : color.nameEn);
 

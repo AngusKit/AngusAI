@@ -819,7 +819,7 @@ export function PromptLibraryPage() {
                 <FolderPlus className='w-4 h-4' />
                 {t('prompts.newCategory')}
               </Button>
-              <Button onClick={openCreateDialog} className='gap-2'>
+              <Button onClick={openCreateDialog} className='bg-blue-500 hover:bg-blue-600 gap-2'>
                 <Plus className='w-4 h-4' />
                 {t('prompts.newPrompt')}
               </Button>
@@ -936,9 +936,19 @@ export function PromptLibraryPage() {
         editingPrompt={editingPrompt}
         categories={categories}
         defaultCategoryId={
-          selectedCategory === 'all' || selectedCategory === 'favorites'
-            ? categories.find(c => c.id !== 'all' && c.id !== 'favorites')?.id
-            : selectedCategory
+          (() => {
+            // 如果选中的是 'all' 或 'favorites'，查找第一个可用分组
+            if (selectedCategory === 'all' || selectedCategory === 'favorites') {
+              return categories.find(c => c.id !== 'all' && c.id !== 'favorites' && !c.isSystem)?.id;
+            }
+            // 如果选中的是系统分组，也查找第一个可用分组
+            const selectedCat = categories.find(c => c.id === selectedCategory);
+            if (selectedCat?.isSystem) {
+              return categories.find(c => c.id !== 'all' && c.id !== 'favorites' && !c.isSystem)?.id;
+            }
+            // 否则使用选中的分类
+            return selectedCategory;
+          })()
         }
         onSuccess={loadPrompts}
         getCategoryName={getCategoryName}
