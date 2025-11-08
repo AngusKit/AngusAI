@@ -16,7 +16,6 @@ import cloud.xcan.angus.core.ai.interfaces.apis.facade.ApiCollectionFacade;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionFindDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionImportDto;
-import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionStatisticsDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.internal.assembler.ApiCollectionAssembler;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionDetailVo;
@@ -26,6 +25,7 @@ import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionStatistic
 import cloud.xcan.angus.core.biz.NameJoin;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.PageResult;
+import cloud.xcan.angus.remote.dto.SimpleStatisticsDto;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import java.time.LocalDate;
@@ -133,7 +133,7 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
    * @return 统计信息VO
    */
   @Override
-  public ApiCollectionStatisticsVo getStatistics(ApiCollectionStatisticsDto dto) {
+  public ApiCollectionStatisticsVo getStatistics(SimpleStatisticsDto dto) {
     LocalDateTime now = LocalDateTime.now();
     LocalDate today = now.toLocalDate();
     LocalDateTime todayStart = today.atStartOfDay();

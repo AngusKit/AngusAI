@@ -4,7 +4,6 @@ import cloud.xcan.angus.core.ai.interfaces.apis.facade.ApiCollectionFacade;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionFindDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionImportDto;
-import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionStatisticsDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionImportVo;
@@ -12,6 +11,7 @@ import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionListVo;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionStatisticsVo;
 import cloud.xcan.angus.remote.ApiLocaleResult;
 import cloud.xcan.angus.remote.PageResult;
+import cloud.xcan.angus.remote.dto.SimpleStatisticsDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -105,7 +105,7 @@ public class ApiCollectionRest {
   @Operation(operationId = "getApiCollectionStatistics", summary = "获取统计信息", description = "获取接口集的统计数据，包括总体统计、使用率排行、性能趋势等")
   @GetMapping("/statistics")
   public ApiLocaleResult<ApiCollectionStatisticsVo> getStatistics(
-      @ParameterObject ApiCollectionStatisticsDto dto) {
+      @ParameterObject SimpleStatisticsDto dto) {
     return ApiLocaleResult.success(apiCollectionFacade.getStatistics(dto));
   }
 

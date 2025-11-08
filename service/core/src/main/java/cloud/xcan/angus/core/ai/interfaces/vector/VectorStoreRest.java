@@ -1,6 +1,5 @@
 package cloud.xcan.angus.core.ai.interfaces.vector;
 
-import cloud.xcan.angus.core.ai.interfaces.team.facade.dto.ActivityStatisticsDto;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.VectorStoreFacade;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.ConnectionTestDto;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.VectorStoreCreateDto;
@@ -11,6 +10,7 @@ import cloud.xcan.angus.core.ai.interfaces.vector.facade.vo.VectorStoreStatistic
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.vo.VectorStoreVo;
 import cloud.xcan.angus.remote.ApiLocaleResult;
 import cloud.xcan.angus.remote.PageResult;
+import cloud.xcan.angus.remote.dto.SimpleStatisticsDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -122,7 +122,7 @@ public class VectorStoreRest {
   @Operation(operationId = "getVectorStoreStatistics", summary = "获取统计信息", description = "获取向量存储源的统计数据，包括总体统计、类型分布、使用率排行、性能趋势等")
   @GetMapping("/statistics")
   public ApiLocaleResult<VectorStoreStatisticsVo> getStatistics(
-      @ParameterObject ActivityStatisticsDto dto) {
+      @ParameterObject SimpleStatisticsDto dto) {
     return ApiLocaleResult.success(vectorStoreFacade.getStatistics(dto));
   }
 

@@ -12,7 +12,6 @@ import cloud.xcan.angus.core.ai.application.query.vector.impl.VectorStoreQueryIm
 import cloud.xcan.angus.core.ai.domain.vector.VectorStore;
 import cloud.xcan.angus.core.ai.domain.vector.VectorStoreRepo;
 import cloud.xcan.angus.core.ai.infra.ai.vector.VectorStoreType;
-import cloud.xcan.angus.core.ai.interfaces.team.facade.dto.ActivityStatisticsDto;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.VectorStoreFacade;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.ConnectionTestDto;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.VectorStoreCreateDto;
@@ -25,6 +24,7 @@ import cloud.xcan.angus.core.ai.interfaces.vector.facade.vo.VectorStoreVo;
 import cloud.xcan.angus.core.biz.NameJoin;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.PageResult;
+import cloud.xcan.angus.remote.dto.SimpleStatisticsDto;
 import jakarta.annotation.Resource;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -116,7 +116,7 @@ public class VectorStoreFacadeImpl implements VectorStoreFacade {
    * @return 统计信息VO
    */
   @Override
-  public VectorStoreStatisticsVo getStatistics(ActivityStatisticsDto dto) {
+  public VectorStoreStatisticsVo getStatistics(SimpleStatisticsDto dto) {
     LocalDateTime now = LocalDateTime.now();
     LocalDate today = now.toLocalDate();
     LocalDateTime todayStart = today.atStartOfDay();

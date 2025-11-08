@@ -18,6 +18,7 @@ import cloud.xcan.angus.core.ai.interfaces.team.facade.internal.assembler.Activi
 import cloud.xcan.angus.core.ai.interfaces.team.facade.vo.ActivityDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.team.facade.vo.ActivityStatisticsVo;
 import cloud.xcan.angus.remote.PageResult;
+import cloud.xcan.angus.remote.dto.SimpleStatisticsDto;
 import jakarta.annotation.Resource;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -57,15 +58,13 @@ public class ActivityFacadeImpl implements ActivityFacade {
    * total count, success rate, distribution by action type, resource type, status, and trends over
    * time.</p>
    *
-   * @param startDate the start date of the range (inclusive)
-   * @param endDate   the end date of the range (exclusive)
    * @return an ActivityStatisticsVo object containing the statistics
    */
   @Override
-  public ActivityStatisticsVo getStatistics(String startDate, String endDate) {
+  public ActivityStatisticsVo getStatistics(SimpleStatisticsDto dto) {
     // parse and normalize date range
-    LocalDateTime start = parseStartDate(startDate);
-    LocalDateTime end = parseEndDate(endDate);
+    LocalDateTime start = parseStartDate(dto.getStartDate());
+    LocalDateTime end = parseEndDate(dto.getEndDate());
 
     ActivityStatisticsVo vo = new ActivityStatisticsVo();
 

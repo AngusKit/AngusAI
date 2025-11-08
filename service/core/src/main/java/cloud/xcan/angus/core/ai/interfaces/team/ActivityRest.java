@@ -3,11 +3,11 @@ package cloud.xcan.angus.core.ai.interfaces.team;
 
 import cloud.xcan.angus.core.ai.interfaces.team.facade.ActivityFacade;
 import cloud.xcan.angus.core.ai.interfaces.team.facade.dto.ActivityFindDto;
-import cloud.xcan.angus.core.ai.interfaces.team.facade.dto.ActivityStatisticsDto;
 import cloud.xcan.angus.core.ai.interfaces.team.facade.vo.ActivityDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.team.facade.vo.ActivityStatisticsVo;
 import cloud.xcan.angus.remote.ApiLocaleResult;
 import cloud.xcan.angus.remote.PageResult;
+import cloud.xcan.angus.remote.dto.SimpleStatisticsDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -43,9 +43,8 @@ public class ActivityRest {
   @Operation(operationId = "getActivityStatistics", summary = "获取活动统计", description = "获取活动模块统计数据")
   @GetMapping("/statistics")
   public ApiLocaleResult<ActivityStatisticsVo> getStatistics(
-      @ParameterObject ActivityStatisticsDto dto) {
-    return ApiLocaleResult.success(
-        activityFacade.getStatistics(dto.getStartDate(), dto.getEndDate()));
+      @ParameterObject SimpleStatisticsDto dto) {
+    return ApiLocaleResult.success(activityFacade.getStatistics(dto));
   }
 
 }
