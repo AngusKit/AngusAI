@@ -70,7 +70,8 @@ public class PromptCategoryAssembler {
 
     // 定义排序规则：先按 isSystem 排序（true 靠前），再按 orderNum 排序（越小越靠前）
     Comparator<PromptCategoryVo> comparator = Comparator
-        .comparing((PromptCategoryVo vo) -> Boolean.TRUE.equals(vo.getIsSystem()), Comparator.reverseOrder())
+        .comparing((PromptCategoryVo vo) -> Boolean.TRUE.equals(vo.getIsSystem()),
+            Comparator.reverseOrder())
         .thenComparing(vo -> vo.getOrderNum() != null ? vo.getOrderNum() : Integer.MAX_VALUE);
 
     // 对每个分组内的节点进行排序

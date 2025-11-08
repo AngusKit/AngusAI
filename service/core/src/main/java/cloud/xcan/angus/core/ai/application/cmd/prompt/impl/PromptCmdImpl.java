@@ -16,7 +16,6 @@ import cloud.xcan.angus.core.biz.cmd.CommCmd;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
 import cloud.xcan.angus.remote.message.ProtocolException;
 import cloud.xcan.angus.remote.message.http.ResourceExisted;
-import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import cloud.xcan.angus.spec.annotations.DoInFuture;
 import cloud.xcan.angus.spec.utils.ObjectUtils;
 import jakarta.annotation.Resource;
@@ -52,7 +51,7 @@ public class PromptCmdImpl extends CommCmd<Prompt, Long> implements PromptCmd {
 
         // 检查分类是否存在，且不是系统分组
         PromptCategory category = promptCategoryQuery.findAndCheck(prompt.getCategoryId());
-        if (category.getIsSystem()){
+        if (category.getIsSystem()) {
           throw ProtocolException.of("不允许添加提示词到系统分组", new Object[]{});
         }
 
@@ -81,7 +80,7 @@ public class PromptCmdImpl extends CommCmd<Prompt, Long> implements PromptCmd {
         // 如果更新了分类，检查新分类是否存在
         if (prompt.getCategoryId() != null) {
           PromptCategory category = promptCategoryQuery.findAndCheck(prompt.getCategoryId());
-          if (category.getIsSystem()){
+          if (category.getIsSystem()) {
             throw ProtocolException.of("不允许添加提示词到系统分组", new Object[]{});
           }
         }
@@ -142,7 +141,7 @@ public class PromptCmdImpl extends CommCmd<Prompt, Long> implements PromptCmd {
 
         // 检查分类是否存在，且不是系统分组
         PromptCategory category = promptCategoryQuery.findAndCheck(sourcePrompt.getCategoryId());
-        if (category.getIsSystem()){
+        if (category.getIsSystem()) {
           throw ProtocolException.of("不允许复制系统分组", new Object[]{});
         }
       }
@@ -190,7 +189,7 @@ public class PromptCmdImpl extends CommCmd<Prompt, Long> implements PromptCmd {
         // 检查是否为系统模板
         // 检查分类是否存在，且不是系统分组
         PromptCategory category = promptCategoryQuery.findAndCheck(promptDb.getCategoryId());
-        if (category.getIsSystem()){
+        if (category.getIsSystem()) {
           throw ProtocolException.of("不允许系统分组", new Object[]{});
         }
       }

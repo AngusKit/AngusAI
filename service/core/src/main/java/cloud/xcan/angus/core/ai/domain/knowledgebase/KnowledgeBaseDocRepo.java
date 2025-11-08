@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 @NoRepositoryBean
 public interface KnowledgeBaseDocRepo extends BaseRepository<KnowledgeBaseDoc, Long> {
+
   /**
    * 统计总文件数
    */

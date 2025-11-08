@@ -146,6 +146,7 @@ public class CommonUtils {
 
   /**
    * 根据文件名计算文件类型
+   *
    * @param filename 文件名
    * @return 文件类型，如果无法识别则返回 TXT
    */
@@ -174,6 +175,7 @@ public class CommonUtils {
 
   /**
    * 计算文件内容的哈希值（使用 SHA-256）
+   *
    * @param file 文件
    * @return 文件内容的 SHA-256 哈希值（十六进制字符串），如果计算失败返回 null
    */

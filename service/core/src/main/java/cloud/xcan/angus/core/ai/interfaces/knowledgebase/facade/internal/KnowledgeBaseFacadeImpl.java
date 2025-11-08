@@ -1,9 +1,9 @@
 package cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.internal;
 
+import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatFileSize;
 import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.DATE_FMT;
 import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.parseEndDate;
 import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.parseStartDate;
-import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatFileSize;
 import static cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder.getMatchSearchFields;
 import static cloud.xcan.angus.core.utils.CoreUtils.buildVoPageResult;
 
@@ -13,8 +13,6 @@ import cloud.xcan.angus.core.ai.application.query.knowledgebase.KnowledgeBaseDoc
 import cloud.xcan.angus.core.ai.application.query.knowledgebase.KnowledgeBaseQuery;
 import cloud.xcan.angus.core.ai.domain.Visibility;
 import cloud.xcan.angus.core.ai.domain.knowledgebase.KnowledgeBase;
-import cloud.xcan.angus.core.ai.domain.knowledgebase.KnowledgeBaseDocChunkRepo;
-import cloud.xcan.angus.core.ai.domain.knowledgebase.KnowledgeBaseDocRepo;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.KnowledgeBaseFacade;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBaseCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto.KnowledgeBaseFindDto;

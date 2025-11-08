@@ -30,7 +30,7 @@ public class DatasetUsageLogQueryImpl implements DatasetUsageLogQuery {
   @Override
   public List<Object[]> getTopDatasetsByQueryCount(LocalDateTime start, LocalDateTime end,
       Integer limit) {
-        return datasetUsageLogRepo.getTopDatasetsByQueryCount(start, end, limit);
+    return datasetUsageLogRepo.getTopDatasetsByQueryCount(start, end, limit);
   }
 
   @Override

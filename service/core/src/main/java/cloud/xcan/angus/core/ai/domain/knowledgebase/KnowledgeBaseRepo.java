@@ -3,7 +3,6 @@ package cloud.xcan.angus.core.ai.domain.knowledgebase;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.NoRepositoryBean;
-import org.springframework.data.repository.query.Param;
 
 @NoRepositoryBean
 public interface KnowledgeBaseRepo extends BaseRepository<KnowledgeBase, Long> {

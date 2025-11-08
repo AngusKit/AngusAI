@@ -3,7 +3,6 @@ package cloud.xcan.angus.core.ai.domain.dataset;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.NoRepositoryBean;
-import org.springframework.data.repository.query.Param;
 
 @NoRepositoryBean
 public interface DatasetRepo extends BaseRepository<Dataset, Long> {

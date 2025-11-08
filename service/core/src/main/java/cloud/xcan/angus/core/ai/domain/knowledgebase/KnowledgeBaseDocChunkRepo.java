@@ -1,10 +1,8 @@
 package cloud.xcan.angus.core.ai.domain.knowledgebase;
 
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
-import java.util.List;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.NoRepositoryBean;
-import org.springframework.data.repository.query.Param;
 
 @NoRepositoryBean
 public interface KnowledgeBaseDocChunkRepo extends BaseRepository<KnowledgeBaseDocChunk, Long> {

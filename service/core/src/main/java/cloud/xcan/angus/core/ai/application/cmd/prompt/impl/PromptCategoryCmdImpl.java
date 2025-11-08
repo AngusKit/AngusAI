@@ -126,7 +126,7 @@ public class PromptCategoryCmdImpl extends CommCmd<PromptCategory, Long>
 
   @Override
   public PromptCategory updateOrder(Long id, Integer newPosition) {
-   return new BizTemplate<PromptCategory>() {
+    return new BizTemplate<PromptCategory>() {
       PromptCategory categoryDb;
 
       @Override

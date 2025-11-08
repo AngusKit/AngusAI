@@ -32,8 +32,8 @@ public interface DatasetUsageLogRepo extends BaseRepository<DatasetUsageLog, Lon
       @Param("end") LocalDateTime end, @Param("limit") Integer limit);
 
   /**
-   * 按日期分组统计查询趋势 返回 List<Object[]>，其中 [0]=date (String), [1]=totalQueries (Long), [2]=avgResponseTime
-   * (Double), [3]=errorCount (Long)
+   * 按日期分组统计查询趋势 返回 List<Object[]>，其中 [0]=date (String), [1]=totalQueries (Long),
+   * [2]=avgResponseTime (Double), [3]=errorCount (Long)
    */
   @Query(value = "SELECT DATE(query_date) d, COUNT(1) cnt, AVG(response_time_ms) avg_time, " +
       "SUM(CASE WHEN status='FAILED' THEN 1 ELSE 0 END) error_cnt " +

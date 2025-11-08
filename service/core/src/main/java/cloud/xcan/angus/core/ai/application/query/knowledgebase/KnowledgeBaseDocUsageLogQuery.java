@@ -27,8 +27,8 @@ public interface KnowledgeBaseDocUsageLogQuery {
       Integer limit);
 
   /**
-   * 按日期分组统计查询趋势 返回 List<Object[]>，其中 [0]=date (String), [1]=totalQueries (Long), [2]=avgResponseTime
-   * (Double), [3]=errorCount (Long)
+   * 按日期分组统计查询趋势 返回 List<Object[]>，其中 [0]=date (String), [1]=totalQueries (Long),
+   * [2]=avgResponseTime (Double), [3]=errorCount (Long)
    */
   List<Object[]> getQueryTrendByDay(LocalDateTime start, LocalDateTime end);
 }

@@ -1,6 +1,6 @@
 package cloud.xcan.angus.core.ai.domain.knowledgebase;
 
-public enum DocumentType  {
+public enum DocumentType {
   TXT, // 文本文件
   PDF, // PDF文件
   DOCX, // Word文档
