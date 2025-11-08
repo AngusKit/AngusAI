@@ -101,7 +101,7 @@ public class VectorStoreRest {
     vectorStoreFacade.delete(id, force);
   }
 
-  @Operation(operationId = "vectorStoreGetDetail", summary = "获取存储源详情", description = "根据ID获取向量存储源的详细信息")
+  @Operation(operationId = "getVectorStoreDetail", summary = "获取存储源详情", description = "根据ID获取向量存储源的详细信息")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "查询成功"),
       @ApiResponse(responseCode = "404", description = "存储源不存在")
@@ -112,14 +112,14 @@ public class VectorStoreRest {
     return ApiLocaleResult.success(vectorStoreFacade.getDetail(id));
   }
 
-  @Operation(operationId = "vectorStoreList", summary = "获取存储源列表", description = "分页查询向量存储源列表，支持关键词搜索、类型筛选、状态筛选等")
+  @Operation(operationId = "getVectorStoreList", summary = "获取存储源列表", description = "分页查询向量存储源列表，支持关键词搜索、类型筛选、状态筛选等")
   @GetMapping
   public ApiLocaleResult<PageResult<VectorStoreVo>> list(
       @Valid @ParameterObject VectorStoreFindDto dto) {
     return ApiLocaleResult.success(vectorStoreFacade.list(dto));
   }
 
-  @Operation(operationId = "vectorStoreGetStatistics", summary = "获取统计信息", description = "获取向量存储源的统计数据，包括总体统计、类型分布、使用率排行、性能趋势等")
+  @Operation(operationId = "getVectorStoreStatistics", summary = "获取统计信息", description = "获取向量存储源的统计数据，包括总体统计、类型分布、使用率排行、性能趋势等")
   @GetMapping("/statistics")
   public ApiLocaleResult<VectorStoreStatisticsVo> getStatistics(
       @ParameterObject ActivityStatisticsDto dto) {

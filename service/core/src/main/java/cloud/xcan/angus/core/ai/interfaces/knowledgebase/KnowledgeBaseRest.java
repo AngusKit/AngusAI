@@ -125,7 +125,7 @@ public class KnowledgeBaseRest {
     return ApiLocaleResult.success(knowledgeBaseFacade.list(dto));
   }
 
-  @Operation(operationId = "knowledgeBaseGetStatistics", summary = "获取统计信息", description = "获取接口集的统计数据，包括总体统计、使用率排行、性能趋势等")
+  @Operation(operationId = "GetKnowledgeBaseStatistics", summary = "获取统计信息", description = "获取接口集的统计数据，包括总体统计、使用率排行、性能趋势等")
   @GetMapping("/statistics")
   public ApiLocaleResult<KnowledgeBaseStatisticsVo> getStatistics(
       @ParameterObject SimpleStatisticsDto dto) {

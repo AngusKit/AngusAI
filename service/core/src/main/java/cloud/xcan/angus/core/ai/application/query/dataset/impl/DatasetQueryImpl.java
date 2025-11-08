@@ -9,9 +9,12 @@ import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import jakarta.annotation.Resource;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -55,6 +58,26 @@ public class DatasetQueryImpl implements DatasetQuery {
   @Override
   public boolean existsByNameAndIdNot(String name, Long id) {
     return datasetRepo.existsByNameAndIdNot(name, id);
+  }
+
+  @Override
+  public Long countTotalDatasets() {
+    return datasetRepo.countTotalDatasets();
+  }
+
+  @Override
+  public Long countActiveDatasets() {
+    return datasetRepo.countActiveDatasets();
+  }
+
+  @Override
+  public Map<Long, Dataset> findByIds(List<Long> datasetIds) {
+    if (datasetIds == null || datasetIds.isEmpty()) {
+      return new HashMap<>();
+    }
+    List<Dataset> datasets = datasetRepo.findAllById(datasetIds);
+    return datasets.stream()
+        .collect(Collectors.toMap(Dataset::getId, ds -> ds));
   }
 
 }

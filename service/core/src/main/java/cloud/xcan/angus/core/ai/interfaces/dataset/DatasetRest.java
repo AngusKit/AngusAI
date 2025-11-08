@@ -12,8 +12,10 @@ import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetListVo;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetStatisticsVo;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasourceConfigVo;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasourceConnectionTestVo;
+import cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.vo.KnowledgeBaseStatisticsVo;
 import cloud.xcan.angus.remote.ApiLocaleResult;
 import cloud.xcan.angus.remote.PageResult;
+import cloud.xcan.angus.remote.dto.SimpleStatisticsDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -154,8 +156,8 @@ public class DatasetRest {
   })
   @GetMapping("/statistics")
   public ApiLocaleResult<DatasetStatisticsVo> getStatistics(
-      @Parameter(description = "数据集ID") @RequestParam(required = false) Long id) {
-    return ApiLocaleResult.success(datasetFacade.getStatistics(id));
+      @ParameterObject SimpleStatisticsDto dto) {
+    return ApiLocaleResult.success(datasetFacade.getStatistics(dto));
   }
 
 }

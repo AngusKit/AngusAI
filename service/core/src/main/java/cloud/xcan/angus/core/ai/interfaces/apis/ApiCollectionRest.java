@@ -84,7 +84,7 @@ public class ApiCollectionRest {
     apiCollectionFacade.delete(id, force);
   }
 
-  @Operation(operationId = "apiCollectionGetDetail", summary = "获取接口集详情", description = "根据ID获取接口集的详细信息")
+  @Operation(operationId = "getApiCollectionDetail", summary = "获取接口集详情", description = "根据ID获取接口集的详细信息")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "查询成功"),
       @ApiResponse(responseCode = "404", description = "接口集不存在")
@@ -95,14 +95,14 @@ public class ApiCollectionRest {
     return ApiLocaleResult.success(apiCollectionFacade.getDetail(id));
   }
 
-  @Operation(operationId = "apiCollectionList", summary = "获取接口集列表", description = "分页查询接口集列表，支持关键词搜索、来源筛选、可见性筛选等")
+  @Operation(operationId = "getApiCollectionList", summary = "获取接口集列表", description = "分页查询接口集列表，支持关键词搜索、来源筛选、可见性筛选等")
   @GetMapping
   public ApiLocaleResult<PageResult<ApiCollectionListVo>> list(
       @Valid @ParameterObject ApiCollectionFindDto dto) {
     return ApiLocaleResult.success(apiCollectionFacade.list(dto));
   }
 
-  @Operation(operationId = "apiCollectionGetStatistics", summary = "获取统计信息", description = "获取接口集的统计数据，包括总体统计、使用率排行、性能趋势等")
+  @Operation(operationId = "getApiCollectionStatistics", summary = "获取统计信息", description = "获取接口集的统计数据，包括总体统计、使用率排行、性能趋势等")
   @GetMapping("/statistics")
   public ApiLocaleResult<ApiCollectionStatisticsVo> getStatistics(
       @ParameterObject ApiCollectionStatisticsDto dto) {

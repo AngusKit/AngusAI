@@ -12,6 +12,7 @@ import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetStatisticsVo
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasourceConfigVo;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasourceConnectionTestVo;
 import cloud.xcan.angus.remote.PageResult;
+import cloud.xcan.angus.remote.dto.SimpleStatisticsDto;
 
 public interface DatasetFacade {
 
@@ -63,6 +64,6 @@ public interface DatasetFacade {
   /**
    * 获取数据集统计
    */
-  DatasetStatisticsVo getStatistics(Long id);
+  DatasetStatisticsVo getStatistics(SimpleStatisticsDto dto);
 
 }
