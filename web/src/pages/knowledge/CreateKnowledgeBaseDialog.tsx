@@ -75,12 +75,15 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange, onSuccess }: Cre
         tags: formData.tags.length > 0 ? formData.tags : undefined,
       };
 
-      // 如果配置了向量化模型，添加config
-      if (formData.embeddingModelId && formData.chunkSize[0] && formData.chunkOverlap[0] !== undefined) {
+      // 如果有chunkSize和chunkOverlap，添加config
+      if (formData.chunkSize[0] && formData.chunkOverlap[0] !== undefined) {
         createData.config = {
           chunkSize: formData.chunkSize[0],
           chunkOverlap: formData.chunkOverlap[0],
-          embeddingModelId: formData.embeddingModelId,
+          embeddingModelId: formData.embeddingModelId ?? 0,
+          removeDuplicates: formData.removeDuplicates,
+          cleanHTML: formData.cleanHTML,
+          optimizeTextFormat: formData.optimizeTextFormat,
         };
       }
 
@@ -109,13 +112,6 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange, onSuccess }: Cre
 
   // 处理取消/关闭
   const handleCancel = () => {
-    onOpenChange(false);
-    setCurrentStep(1);
-  };
-
-  // 处理保存草稿
-  const handleSaveDraft = () => {
-    toast.success('已保存为草稿');
     onOpenChange(false);
     setCurrentStep(1);
   };
@@ -198,18 +194,7 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange, onSuccess }: Cre
         </div>
 
         {/* Footer */}
-        <div className='px-8 py-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between flex-shrink-0'>
-          <div>
-            {currentStep === 2 && (
-              <Button
-                variant='outline'
-                onClick={handleSaveDraft}
-                className='dark:bg-gray-800 dark:border-gray-700 dark:text-white'
-              >
-                保存为草稿
-              </Button>
-            )}
-          </div>
+        <div className='px-8 py-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-end flex-shrink-0'>
           <div className='flex items-center gap-3'>
             {currentStep > 1 ? (
               <Button

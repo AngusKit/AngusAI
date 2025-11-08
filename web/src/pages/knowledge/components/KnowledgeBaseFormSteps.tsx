@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
+import { Checkbox } from '@/components/ui/checkbox';
 import { ICON_OPTIONS, VECTOR_STORES, CONFIG_CONSTANTS } from '../constants';
 import { getTagColor } from '@/utils';
 import type { KnowledgeBaseFormData } from '../hooks/useKnowledgeBaseForm';
@@ -271,6 +272,45 @@ export function ConfigurationStep({ formData, onFieldChange }: ConfigurationStep
           <p className='text-xs text-gray-500 dark:text-gray-400 mt-2'>
             选择用于文本向量化的模型，不指定时使用默认模型
           </p>
+        </div>
+
+        {/* 预处理选项 */}
+        <div>
+          <Label className='text-sm mb-3 block dark:text-gray-300'>预处理选项</Label>
+          <div className='space-y-2.5'>
+            <div className='flex items-center gap-2'>
+              <Checkbox
+                id='remove-duplicates'
+                checked={formData.removeDuplicates}
+                onCheckedChange={checked => onFieldChange('removeDuplicates', checked as boolean)}
+              />
+              <label htmlFor='remove-duplicates' className='text-sm dark:text-gray-300 cursor-pointer'>
+                去除重复数据
+              </label>
+            </div>
+
+            <div className='flex items-center gap-2'>
+              <Checkbox
+                id='clean-html'
+                checked={formData.cleanHTML}
+                onCheckedChange={checked => onFieldChange('cleanHTML', checked as boolean)}
+              />
+              <label htmlFor='clean-html' className='text-sm dark:text-gray-300 cursor-pointer'>
+                清理HTML标签
+              </label>
+            </div>
+
+            <div className='flex items-center gap-2'>
+              <Checkbox
+                id='optimize-text-format'
+                checked={formData.optimizeTextFormat}
+                onCheckedChange={checked => onFieldChange('optimizeTextFormat', checked as boolean)}
+              />
+              <label htmlFor='optimize-text-format' className='text-sm dark:text-gray-300 cursor-pointer'>
+                二次优化文本格式
+              </label>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -81,6 +81,11 @@ export function EditKnowledgeBaseDialog({
           updateField('chunkOverlap', [chunkOverlap]);
           updateField('embeddingModelId', detail.config?.embeddingModelId);
 
+          // 预处理选项
+          updateField('removeDuplicates', detail.config?.removeDuplicates ?? true);
+          updateField('cleanHTML', detail.config?.cleanHTML ?? true);
+          updateField('optimizeTextFormat', detail.config?.optimizeTextFormat ?? true);
+
           // 根据icon找到对应的索引
           if (detail.icon) {
             setSelectedIconByEmoji(detail.icon);
@@ -101,6 +106,10 @@ export function EditKnowledgeBaseDialog({
           updateField('chunkSize', [knowledgeBase.chunkSize || CONFIG_CONSTANTS.CHUNK_SIZE.DEFAULT]);
           updateField('chunkOverlap', [knowledgeBase.chunkOverlap || CONFIG_CONSTANTS.CHUNK_OVERLAP.DEFAULT]);
           updateField('embeddingModelId', knowledgeBase.embeddingModelId);
+          // 预处理选项使用默认值
+          updateField('removeDuplicates', true);
+          updateField('cleanHTML', true);
+          updateField('optimizeTextFormat', true);
           if (knowledgeBase.icon) {
             setSelectedIconByEmoji(knowledgeBase.icon);
           }
@@ -172,6 +181,9 @@ export function EditKnowledgeBaseDialog({
           chunkOverlap: currentChunkOverlap,
           // 如果embeddingModelId存在则添加，否则使用0作为默认值（后端会使用默认模型）
           embeddingModelId: formData.embeddingModelId ?? 0,
+          removeDuplicates: formData.removeDuplicates,
+          cleanHTML: formData.cleanHTML,
+          optimizeTextFormat: formData.optimizeTextFormat,
         };
       }
 

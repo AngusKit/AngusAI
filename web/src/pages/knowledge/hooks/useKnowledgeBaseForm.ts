@@ -17,6 +17,9 @@ export interface KnowledgeBaseFormData {
   chunkOverlap: number[];
   embeddingModelId: number | undefined;
   vectorStoreId: string;
+  removeDuplicates: boolean;
+  cleanHTML: boolean;
+  optimizeTextFormat: boolean;
 }
 
 const DEFAULT_FORM_DATA: KnowledgeBaseFormData = {
@@ -29,6 +32,9 @@ const DEFAULT_FORM_DATA: KnowledgeBaseFormData = {
   chunkOverlap: [CONFIG_CONSTANTS.CHUNK_OVERLAP.DEFAULT],
   embeddingModelId: undefined,
   vectorStoreId: '1',
+  removeDuplicates: true,
+  cleanHTML: true,
+  optimizeTextFormat: true,
 };
 
 /**

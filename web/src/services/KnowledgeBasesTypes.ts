@@ -158,6 +158,18 @@ export interface KnowledgeBaseConfig {
    * 向量化模型ID，不指定时使用默认模型
    */
   embeddingModelId: number;
+  /**
+   * 去除重复数据
+   */
+  removeDuplicates?: boolean;
+  /**
+   * 清理HTML标签
+   */
+  cleanHTML?: boolean;
+  /**
+   * 二次优化文本格式
+   */
+  optimizeTextFormat?: boolean;
 }
 
 /** 更新知识库请求参数 */

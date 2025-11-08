@@ -26,4 +26,13 @@ public class KnowledgeBaseConfig {
   @Schema(description = "向量化模型ID，不指定时使用默认模型")
   private Long embeddingModelId;
 
+  @Schema(description = "去除重复数据", example = "true")
+  private Boolean removeDuplicates;
+
+  @Schema(description = "清理HTML标签", example = "true")
+  private Boolean cleanHTML;
+
+  @Schema(description = "二次优化文本格式", example = "true")
+  private Boolean optimizeTextFormat;
+
 }
