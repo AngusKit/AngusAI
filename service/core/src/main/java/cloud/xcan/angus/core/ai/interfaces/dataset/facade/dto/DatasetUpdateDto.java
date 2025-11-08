@@ -14,7 +14,7 @@ public class DatasetUpdateDto {
   @Schema(description = "数据集名称", example = "用户行为数据")
   private String name;
 
-  @Length(max = 400)
+  @Length(max = 500)
   @Schema(description = "数据集描述", example = "用户行为分析数据集")
   private String description;
 

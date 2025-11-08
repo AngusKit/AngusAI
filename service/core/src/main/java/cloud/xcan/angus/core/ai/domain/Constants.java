@@ -13,7 +13,7 @@ public interface Constants {
   /**
    * 应用描述最大长度
    */
-  int APPLICATION_DESCRIPTION_MAX_LENGTH = 400;
+  int APPLICATION_DESCRIPTION_MAX_LENGTH = 500;
 
   /**
    * 应用语言最大长度

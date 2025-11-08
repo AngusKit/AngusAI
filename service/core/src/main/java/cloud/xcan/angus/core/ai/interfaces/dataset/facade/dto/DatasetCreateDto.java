@@ -21,7 +21,7 @@ public class DatasetCreateDto {
   private String name;
 
   @NotBlank
-  @Length(max = 400)
+  @Length(max = 500)
   @Schema(description = "数据集描述", example = "用户行为分析数据集", requiredMode = RequiredMode.REQUIRED)
   private String description;
 

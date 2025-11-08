@@ -90,15 +90,19 @@ public class Dataset extends TenantAuditingEntity<Dataset, Long> {
 
   // 统计数据
   @Schema(description = "总文件或表数")
+  @Column(name = "total_files_or_tables")
   private long totalFilesOrTables;
 
   @Schema(description = "总记录数")
+  @Column(name = "total_records")
   private long totalRecords;
 
   @Schema(description = "记录总大小")
+  @Column(name = "total_records_size")
   private long totalRecordsSize;
 
   @Schema(description = "已使用存储空间大小")
+  @Column(name = "used_store_size")
   private long usedStoreSize;
 
   @Transient
