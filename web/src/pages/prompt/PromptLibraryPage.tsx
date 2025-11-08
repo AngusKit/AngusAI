@@ -1,9 +1,10 @@
-import { Search, Star, Copy, Plus, Trash2, Edit, Sparkles, BookOpen, Shield, FolderPlus } from 'lucide-react';
+import { Search, Star, Copy, Plus, Trash2, Edit, Sparkles, BookOpen, Shield, FolderPlus, Eye } from 'lucide-react';
 import { XcanPagination } from '@/components/ui/pagination';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
 import { cn } from '@/components/ui/utils';
@@ -61,10 +62,12 @@ export function PromptLibraryPage() {
   const [showCategoryDialog, setShowCategoryDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showDeleteCategoryDialog, setShowDeleteCategoryDialog] = useState(false);
+  const [showViewDialog, setShowViewDialog] = useState(false);
   const [editingPrompt, setEditingPrompt] = useState<Prompt | null>(null);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [deletingPrompt, setDeletingPrompt] = useState<Prompt | null>(null);
   const [deletingCategory, setDeletingCategory] = useState<Category | null>(null);
+  const [viewingPrompt, setViewingPrompt] = useState<Prompt | null>(null);
 
   // 将API返回的分类转换为页面使用的格式
   const convertCategoryVoToCategory = useCallback((vo: PromptCategoryVo): Category => {
@@ -247,11 +250,21 @@ export function PromptLibraryPage() {
   };
 
   const copyPrompt = async (content: string) => {
-    const success = await copyToClipboard(content);
-    if (success) {
-      toast.success(language === 'zh-CN' ? '已复制到剪贴板' : 'Copied to clipboard');
-    } else {
-      toast.error(language === 'zh-CN' ? '复制失败' : 'Copy failed');
+    if (!content || content.trim() === '') {
+      toast.error(language === 'zh-CN' ? '内容为空，无法复制' : 'Content is empty, cannot copy');
+      return;
+    }
+    
+    try {
+      const success = await copyToClipboard(content);
+      if (success) {
+        toast.success(language === 'zh-CN' ? '已复制到剪贴板' : 'Copied to clipboard');
+      } else {
+        toast.error(language === 'zh-CN' ? '复制失败，请手动复制' : 'Copy failed, please copy manually');
+      }
+    } catch (error) {
+      console.error('复制错误:', error);
+      toast.error(language === 'zh-CN' ? '复制失败，请手动复制' : 'Copy failed, please copy manually');
     }
   };
 
@@ -651,6 +664,18 @@ export function PromptLibraryPage() {
                           {language === 'zh-CN' ? '副本' : 'Duplicate'}
                         </Button>
                       )}
+                      {/* 查看按钮 - 所有提示词都可以查看 */}
+                      <Button
+                        variant='ghost'
+                        size='icon'
+                        className='h-8 w-8'
+                        onClick={() => {
+                          setViewingPrompt(prompt);
+                          setShowViewDialog(true);
+                        }}
+                      >
+                        <Eye className='w-4 h-4' />
+                      </Button>
                       {/* 只显示非系统模板的编辑和删除按钮 */}
                       {!prompt.isSystem && (
                         <>
@@ -722,6 +747,101 @@ export function PromptLibraryPage() {
         deletingCategory={deletingCategory}
         onConfirm={handleDeleteCategory}
       />
+
+      {/* 查看提示词对话框 */}
+      <Dialog open={showViewDialog} onOpenChange={setShowViewDialog}>
+        <DialogContent className='max-w-[792px] dark:bg-gray-800 dark:border-gray-700'>
+          <DialogHeader>
+            <DialogTitle className='dark:text-white'>提示词详情</DialogTitle>
+            <DialogDescription className='dark:text-gray-400'>查看提示词的详细信息</DialogDescription>
+          </DialogHeader>
+          {viewingPrompt && (
+            <div className='space-y-4'>
+              <div className='flex items-center gap-3 pb-4 border-b border-gray-200 dark:border-gray-700'>
+                <div className='w-16 h-16 rounded-lg flex items-center justify-center bg-blue-100 dark:bg-blue-900/30'>
+                  <Sparkles className='w-8 h-8 text-blue-600 dark:text-blue-400' />
+                </div>
+                <div className='flex-1'>
+                  <div className='flex items-center gap-2'>
+                    <h3 className='text-xl dark:text-white'>{viewingPrompt.title}</h3>
+                    {viewingPrompt.isSystem && (
+                      <Badge variant='secondary' className='text-xs gap-1'>
+                        <Shield className='w-3 h-3' />
+                        {language === 'zh-CN' ? '系统' : 'System'}
+                      </Badge>
+                    )}
+                    <Badge
+                      variant='secondary'
+                      className={
+                        viewingPrompt.isFavorite
+                          ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+                          : ''
+                      }
+                    >
+                      <Star className={cn('w-3 h-3', viewingPrompt.isFavorite && 'fill-yellow-400')} />
+                    </Badge>
+                  </div>
+                  <div className='flex items-center gap-2 mt-1'>
+                    <Badge variant='outline' className='text-xs'>
+                      {language === 'zh-CN' ? '使用' : ''} {viewingPrompt.usageCount}{' '}
+                      {language === 'zh-CN' ? '次' : 'uses'}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+
+              <div className='space-y-3'>
+                <div>
+                  <label className='text-sm text-gray-600 dark:text-gray-400'>分类</label>
+                  <p className='text-sm dark:text-white mt-1'>
+                    {(() => {
+                      const category = categories.find(c => c.id === viewingPrompt.category);
+                      return category ? getCategoryDisplayName(category, language) : '-';
+                    })()}
+                  </p>
+                </div>
+
+                {viewingPrompt.tags && viewingPrompt.tags.length > 0 && (
+                  <div>
+                    <label className='text-sm text-gray-600 dark:text-gray-400'>标签</label>
+                    <div className='flex flex-wrap gap-2 mt-2'>
+                      {viewingPrompt.tags.map((tag, index) => (
+                        <Badge key={index} variant='secondary' className={cn('text-xs', tag.color)}>
+                          {tag.label}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div>
+                  <div className='flex items-center justify-between mb-2'>
+                    <label className='text-sm text-gray-600 dark:text-gray-400'>内容</label>
+                    <Button
+                      variant='outline'
+                      size='sm'
+                      onClick={() => {
+                        if (viewingPrompt?.content) {
+                          copyPrompt(viewingPrompt.content);
+                        }
+                      }}
+                      className='gap-2'
+                    >
+                      <Copy className='w-3 h-3' />
+                      {t('common.copy')}
+                    </Button>
+                  </div>
+                  <div className='mt-2 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600'>
+                    <p className='text-sm dark:text-gray-300 whitespace-pre-wrap break-words'>
+                      {viewingPrompt.content}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
