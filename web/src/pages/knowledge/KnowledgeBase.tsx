@@ -175,10 +175,15 @@ export function KnowledgeBase() {
     setStatisticsLoading(true);
     try {
       const response = await KnowledgeBases.getKnowledgeBaseStatistics();
+      // 处理响应结构
       const responseData = (response as any).data;
-      const statsData = responseData?.data;
-      if (statsData) {
+      let statsData = responseData;
+
+      // 如果 statsData 有 overview 字段，说明是正确的统计数据
+      if (statsData && typeof statsData === 'object' && 'overview' in statsData) {
         setStatistics(statsData);
+      } else {
+        console.warn('统计数据格式不正确:', statsData);
       }
     } catch (error: any) {
       console.error('加载统计数据失败:', error);
@@ -229,7 +234,7 @@ export function KnowledgeBase() {
             : `${statistics.overview?.usedStoreSize || '0 MB'} / --`,
           subtext: statistics.overview?.totalStoreSize
             ? `已使用 ${statistics.overview.usedStoreRate || '0%'}`
-            : '未授权存储空间',
+            : '存储空间未限制',
           icon: Database,
           iconBg: 'bg-purple-500',
           progress: statistics.overview?.usedStoreRate
