@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -100,7 +100,9 @@ export function CategoryDialog({
 
         <div className='space-y-4'>
           <div>
-            <Label htmlFor='categoryName' className='mb-1'>{t('prompts.categoryName')}</Label>
+            <Label htmlFor='categoryName' className='mb-1'>
+              {t('prompts.categoryName')}
+            </Label>
             <Input
               id='categoryName'
               value={formData.name}
@@ -116,7 +118,12 @@ export function CategoryDialog({
             </Label>
             <Select
               value={formData.parentId || DEFAULT_VALUES.PARENT_CATEGORY_NONE}
-              onValueChange={value => updateFormField('parentId', value === DEFAULT_VALUES.PARENT_CATEGORY_NONE ? DEFAULT_VALUES.PARENT_CATEGORY_NONE : value)}
+              onValueChange={value =>
+                updateFormField(
+                  'parentId',
+                  value === DEFAULT_VALUES.PARENT_CATEGORY_NONE ? DEFAULT_VALUES.PARENT_CATEGORY_NONE : value
+                )
+              }
             >
               <SelectTrigger className='dark:bg-gray-900 dark:border-gray-700'>
                 <SelectValue />
@@ -149,7 +156,9 @@ export function CategoryDialog({
 
           <div className='grid grid-cols-2 gap-4'>
             <div>
-              <Label htmlFor='categoryIcon' className='mb-1'>{language === 'zh-CN' ? '图标' : 'Icon'}</Label>
+              <Label htmlFor='categoryIcon' className='mb-1'>
+                {language === 'zh-CN' ? '图标' : 'Icon'}
+              </Label>
               <Select
                 value={AVAILABLE_ICONS.find(icon => icon.component === formData.icon)?.name || 'BookOpen'}
                 onValueChange={value => {
@@ -183,11 +192,10 @@ export function CategoryDialog({
             </div>
 
             <div>
-              <Label htmlFor='categoryColor' className='mb-1'>{language === 'zh-CN' ? '颜色' : 'Color'}</Label>
-              <Select
-                value={formData.color}
-                onValueChange={value => updateFormField('color', value)}
-              >
+              <Label htmlFor='categoryColor' className='mb-1'>
+                {language === 'zh-CN' ? '颜色' : 'Color'}
+              </Label>
+              <Select value={formData.color} onValueChange={value => updateFormField('color', value)}>
                 <SelectTrigger className='dark:bg-gray-900 dark:border-gray-700'>
                   <SelectValue />
                 </SelectTrigger>
@@ -216,4 +224,3 @@ export function CategoryDialog({
     </Dialog>
   );
 }
-

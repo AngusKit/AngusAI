@@ -39,15 +39,8 @@ export function EditKnowledgeBaseDialog({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
 
-  const {
-    formData,
-    tagInput,
-    setTagInput,
-    updateField,
-    removeTag,
-    handleTagInputKeyDown,
-    setSelectedIconByEmoji,
-  } = useKnowledgeBaseForm();
+  const { formData, tagInput, setTagInput, updateField, removeTag, handleTagInputKeyDown, setSelectedIconByEmoji } =
+    useKnowledgeBaseForm();
 
   // 加载知识库详情
   useEffect(() => {
@@ -63,7 +56,7 @@ export function EditKnowledgeBaseDialog({
 
       setIsLoadingDetail(true);
       setCurrentStep(1); // 重置到第一步
-      
+
       try {
         const response = await KnowledgeBases.getKnowledgeBaseDetail(knowledgeBase.id);
         const detail = (response as KnowledgeBaseDetailResult)?.data;
@@ -72,13 +65,13 @@ export function EditKnowledgeBaseDialog({
           // 更新表单数据
           updateField('name', detail.name || '');
           updateField('description', detail.description || '');
-          
+
           // 将 VisibilityEnum 转换为小写字符串（PRIVATE -> private）
           const visibilityValue = detail.visibility
-            ? detail.visibility.toLowerCase() as 'private' | 'team' | 'public'
+            ? (detail.visibility.toLowerCase() as 'private' | 'team' | 'public')
             : 'private';
           updateField('visibility', visibilityValue);
-          
+
           updateField('tags', detail.tags || []);
 
           // 配置处理参数
@@ -101,7 +94,7 @@ export function EditKnowledgeBaseDialog({
           updateField('name', knowledgeBase.name);
           updateField('description', knowledgeBase.description);
           const visibilityValue = knowledgeBase.visibility
-            ? knowledgeBase.visibility.toLowerCase() as 'private' | 'team' | 'public'
+            ? (knowledgeBase.visibility.toLowerCase() as 'private' | 'team' | 'public')
             : 'private';
           updateField('visibility', visibilityValue);
           updateField('tags', knowledgeBase.tags || []);
@@ -171,7 +164,7 @@ export function EditKnowledgeBaseDialog({
       // 添加config配置（与创建逻辑保持一致：只要有chunkSize和chunkOverlap就添加config）
       const currentChunkSize = formData.chunkSize[0] ?? CONFIG_CONSTANTS.CHUNK_SIZE.DEFAULT;
       const currentChunkOverlap = formData.chunkOverlap[0] ?? CONFIG_CONSTANTS.CHUNK_OVERLAP.DEFAULT;
-      
+
       // 只要有chunkSize和chunkOverlap就添加config，embeddingModelId可选
       if (currentChunkSize && currentChunkOverlap !== undefined) {
         updateData.config = {
@@ -287,12 +280,7 @@ export function EditKnowledgeBaseDialog({
                     onRemoveTag={removeTag}
                   />
                 )}
-                {currentStep === 2 && (
-                  <ConfigurationStep
-                    formData={formData}
-                    onFieldChange={updateField}
-                  />
-                )}
+                {currentStep === 2 && <ConfigurationStep formData={formData} onFieldChange={updateField} />}
               </>
             )}
           </div>

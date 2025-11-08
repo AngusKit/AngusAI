@@ -1,4 +1,4 @@
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, } from '@/components/ui/alert-dialog';
 import { useLanguage } from '@/components/ui/LanguageProvider';
 
 interface Category {
@@ -31,9 +31,7 @@ export function DeleteCategoryDialog({ open, onOpenChange, deletingCategory, onC
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={() => onOpenChange(false)}>
-            {t('common.cancel')}
-          </AlertDialogCancel>
+          <AlertDialogCancel onClick={() => onOpenChange(false)}>{t('common.cancel')}</AlertDialogCancel>
           <AlertDialogAction onClick={onConfirm} className='bg-red-600 hover:bg-red-700'>
             {t('common.delete')}
           </AlertDialogAction>
@@ -42,4 +40,3 @@ export function DeleteCategoryDialog({ open, onOpenChange, deletingCategory, onC
     </AlertDialog>
   );
 }
-

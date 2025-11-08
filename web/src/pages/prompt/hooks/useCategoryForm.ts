@@ -38,10 +38,7 @@ export const useCategoryForm = ({ editingCategory, isDialogOpen }: UseCategoryFo
     }
   }, [isDialogOpen, editingCategory]);
 
-  const updateFormField = <K extends keyof CategoryFormData>(
-    field: K,
-    value: CategoryFormData[K]
-  ) => {
+  const updateFormField = <K extends keyof CategoryFormData>(field: K, value: CategoryFormData[K]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -55,4 +52,3 @@ export const useCategoryForm = ({ editingCategory, isDialogOpen }: UseCategoryFo
     resetForm,
   };
 };
-

@@ -50,4 +50,3 @@ export interface PromptFormData {
   category: string;
   tags: PromptTag[];
 }
-

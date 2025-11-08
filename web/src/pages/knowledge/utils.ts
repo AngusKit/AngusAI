@@ -63,10 +63,7 @@ export const validateChunkOverlap = (chunkOverlap: number): ValidationResult => 
 /**
  * 验证标签
  */
-export const validateTag = (
-  tag: string,
-  existingTags: string[]
-): ValidationResult => {
+export const validateTag = (tag: string, existingTags: string[]): ValidationResult => {
   const trimmedTag = tag.trim();
   if (!trimmedTag) {
     return { isValid: false };
@@ -93,10 +90,7 @@ export const validateTag = (
 /**
  * 验证第一步表单（基本信息）
  */
-export const validateBasicInfoStep = (
-  name: string,
-  description: string
-): ValidationResult => {
+export const validateBasicInfoStep = (name: string, description: string): ValidationResult => {
   const nameValidation = validateKnowledgeBaseName(name);
   if (!nameValidation.isValid) {
     toast.error(nameValidation.error);
@@ -115,10 +109,7 @@ export const validateBasicInfoStep = (
 /**
  * 验证第二步表单（配置处理）
  */
-export const validateConfigurationStep = (
-  chunkSize: number,
-  chunkOverlap: number
-): ValidationResult => {
+export const validateConfigurationStep = (chunkSize: number, chunkOverlap: number): ValidationResult => {
   const chunkSizeValidation = validateChunkSize(chunkSize);
   if (!chunkSizeValidation.isValid) {
     toast.error(chunkSizeValidation.error);
@@ -133,4 +124,3 @@ export const validateConfigurationStep = (
 
   return { isValid: true };
 };
-

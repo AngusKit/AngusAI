@@ -1,15 +1,4 @@
-import {
-  Search,
-  Star,
-  Copy,
-  Plus,
-  Trash2,
-  Edit,
-  Sparkles,
-  BookOpen,
-  Shield,
-  FolderPlus,
-} from 'lucide-react';
+import { Search, Star, Copy, Plus, Trash2, Edit, Sparkles, BookOpen, Shield, FolderPlus } from 'lucide-react';
 import { XcanPagination } from '@/components/ui/pagination';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,7 +18,7 @@ import { DeletePromptDialog } from './DeletePromptDialog';
 import { DeleteCategoryDialog } from './DeleteCategoryDialog';
 import { Prompt, Category } from './types';
 import { ICON_MAP, SYSTEM_CATEGORY_IDS, LIMITS } from './constants';
-import { getTagColorByIndex, buildCategoryTree, getCategoryPath, getTopLevelCategories, getChildCategories, getCategoryDisplayName, getDefaultCategoryId } from './utils';
+import { getTagColorByIndex, buildCategoryTree, getCategoryPath, getTopLevelCategories, getChildCategories, getCategoryDisplayName, getDefaultCategoryId, } from './utils';
 import { useDebounce } from './hooks/useDebounce';
 
 export function PromptLibraryPage() {
@@ -193,12 +182,18 @@ export function PromptLibraryPage() {
     } finally {
       setIsLoadingPrompts(false);
     }
-  }, [selectedCategoryId, debouncedSearchQuery, convertPromptVoToPrompt, language, pageParam.pageNo, pageParam.pageSize]);
+  }, [
+    selectedCategoryId,
+    debouncedSearchQuery,
+    convertPromptVoToPrompt,
+    language,
+    pageParam.pageNo,
+    pageParam.pageSize,
+  ]);
 
   const handlePageChange = (page: { pageSize: number; pageNo: number }) => {
     setPageParam(pre => ({ ...pre, ...page }));
   };
-
 
   // 初始化加载数据
   useEffect(() => {
@@ -208,7 +203,6 @@ export function PromptLibraryPage() {
   useEffect(() => {
     loadPrompts();
   }, [loadPrompts]);
-
 
   const getCategoryCount = (categoryId: string) => {
     if (categoryId === SYSTEM_CATEGORY_IDS.ALL) {
@@ -330,7 +324,6 @@ export function PromptLibraryPage() {
       toast.error(error?.message || (language === 'zh-CN' ? '删除提示词失败' : 'Failed to delete prompt'));
     }
   };
-
 
   const handleDeleteCategory = async () => {
     if (!deletingCategory) return;
@@ -572,10 +565,14 @@ export function PromptLibraryPage() {
               />
             </div>
             <div className='flex gap-3 shrink-0'>
-              <Button onClick={() => {
-                setEditingCategory(null);
-                setShowCategoryDialog(true);
-              }} variant='outline' className='gap-2'>
+              <Button
+                onClick={() => {
+                  setEditingCategory(null);
+                  setShowCategoryDialog(true);
+                }}
+                variant='outline'
+                className='gap-2'
+              >
                 <FolderPlus className='w-4 h-4' />
                 {t('prompts.newCategory')}
               </Button>

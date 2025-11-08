@@ -1,4 +1,4 @@
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, } from '@/components/ui/alert-dialog';
 import { useLanguage } from '@/components/ui/LanguageProvider';
 
 interface Prompt {
@@ -34,4 +34,3 @@ export function DeletePromptDialog({ open, onOpenChange, deletingPrompt, onConfi
     </AlertDialog>
   );
 }
-

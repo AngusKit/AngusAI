@@ -2,7 +2,7 @@ import { Plus, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
@@ -50,7 +50,8 @@ export function PromptDialog({
     isDialogOpen: open,
   });
 
-  const getTagColorDisplayName = (color: (typeof TAG_COLORS)[number]) => (language === 'zh-CN' ? color.name : color.nameEn);
+  const getTagColorDisplayName = (color: (typeof TAG_COLORS)[number]) =>
+    language === 'zh-CN' ? color.name : color.nameEn;
 
   const handleAddTag = () => {
     const validation = validateTag(newTagLabel, formData.tags, language);
@@ -114,7 +115,9 @@ export function PromptDialog({
 
         <div className='space-y-4'>
           <div>
-            <Label htmlFor='title' className='mb-1'>{t('prompts.promptTitle')}</Label>
+            <Label htmlFor='title' className='mb-1'>
+              {t('prompts.promptTitle')}
+            </Label>
             <Input
               id='title'
               value={formData.title}
@@ -125,7 +128,9 @@ export function PromptDialog({
           </div>
 
           <div>
-            <Label htmlFor='content' className='mb-1'>{t('prompts.promptContent')}</Label>
+            <Label htmlFor='content' className='mb-1'>
+              {t('prompts.promptContent')}
+            </Label>
             <Textarea
               id='content'
               value={formData.content}
@@ -136,11 +141,10 @@ export function PromptDialog({
           </div>
 
           <div>
-            <Label htmlFor='category' className='mb-1'>{t('prompts.category')}</Label>
-            <Select
-              value={formData.category}
-              onValueChange={value => updateFormField('category', value)}
-            >
+            <Label htmlFor='category' className='mb-1'>
+              {t('prompts.category')}
+            </Label>
+            <Select value={formData.category} onValueChange={value => updateFormField('category', value)}>
               <SelectTrigger className='dark:bg-gray-900 dark:border-gray-700'>
                 <SelectValue />
               </SelectTrigger>
@@ -220,4 +224,3 @@ export function PromptDialog({
     </Dialog>
   );
 }
-

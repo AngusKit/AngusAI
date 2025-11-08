@@ -19,16 +19,9 @@ interface CreateKnowledgeBaseDialogProps {
 export function CreateKnowledgeBaseDialog({ open, onOpenChange, onSuccess }: CreateKnowledgeBaseDialogProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const {
-    formData,
-    tagInput,
-    setTagInput,
-    updateField,
-    removeTag,
-    handleTagInputKeyDown,
-    resetForm,
-  } = useKnowledgeBaseForm();
+
+  const { formData, tagInput, setTagInput, updateField, removeTag, handleTagInputKeyDown, resetForm } =
+    useKnowledgeBaseForm();
 
   // 可见性映射
   const visibilityMap: Record<string, VisibilityEnum> = {
@@ -197,12 +190,7 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange, onSuccess }: Cre
                 onRemoveTag={removeTag}
               />
             )}
-            {currentStep === 2 && (
-              <ConfigurationStep
-                formData={formData}
-                onFieldChange={updateField}
-              />
-            )}
+            {currentStep === 2 && <ConfigurationStep formData={formData} onFieldChange={updateField} />}
             {currentStep !== 1 && currentStep !== 2 && (
               <div className='py-6 text-center text-gray-500 dark:text-gray-400'>未知步骤: {currentStep}</div>
             )}

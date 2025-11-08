@@ -15,10 +15,7 @@ import type { KnowledgeBaseFormData } from '../hooks/useKnowledgeBaseForm';
 interface BasicInfoStepProps {
   formData: KnowledgeBaseFormData;
   tagInput: string;
-  onFieldChange: <K extends keyof KnowledgeBaseFormData>(
-    field: K,
-    value: KnowledgeBaseFormData[K]
-  ) => void;
+  onFieldChange: <K extends keyof KnowledgeBaseFormData>(field: K, value: KnowledgeBaseFormData[K]) => void;
   onTagInputChange: (value: string) => void;
   onTagInputKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   onRemoveTag: (tag: string) => void;
@@ -85,7 +82,10 @@ export function BasicInfoStep({
       {/* 标签 */}
       <div className='mt-5'>
         <Label className='text-sm mb-2 block dark:text-gray-300'>
-          标签 <span className='text-gray-400'>({formData.tags.length}/{CONFIG_CONSTANTS.TAG.MAX_COUNT})</span>
+          标签{' '}
+          <span className='text-gray-400'>
+            ({formData.tags.length}/{CONFIG_CONSTANTS.TAG.MAX_COUNT})
+          </span>
         </Label>
         <Input
           value={tagInput}
@@ -101,10 +101,7 @@ export function BasicInfoStep({
             {formData.tags.map(tag => (
               <Badge key={tag} className={`border-0 ${getTagColor(tag)}`}>
                 {tag}
-                <button
-                  onClick={() => onRemoveTag(tag)}
-                  className='ml-1 hover:opacity-70 transition-opacity'
-                >
+                <button onClick={() => onRemoveTag(tag)} className='ml-1 hover:opacity-70 transition-opacity'>
                   ×
                 </button>
               </Badge>
@@ -141,10 +138,7 @@ export function BasicInfoStep({
 
 interface ConfigurationStepProps {
   formData: KnowledgeBaseFormData;
-  onFieldChange: <K extends keyof KnowledgeBaseFormData>(
-    field: K,
-    value: KnowledgeBaseFormData[K]
-  ) => void;
+  onFieldChange: <K extends keyof KnowledgeBaseFormData>(field: K, value: KnowledgeBaseFormData[K]) => void;
 }
 
 /**
@@ -152,12 +146,14 @@ interface ConfigurationStepProps {
  */
 export function ConfigurationStep({ formData, onFieldChange }: ConfigurationStepProps) {
   // 确保 chunkSize 和 chunkOverlap 始终是有效的数组
-  const safeChunkSize = Array.isArray(formData.chunkSize) && formData.chunkSize.length > 0
-    ? formData.chunkSize
-    : [CONFIG_CONSTANTS.CHUNK_SIZE.DEFAULT];
-  const safeChunkOverlap = Array.isArray(formData.chunkOverlap) && formData.chunkOverlap.length > 0
-    ? formData.chunkOverlap
-    : [CONFIG_CONSTANTS.CHUNK_OVERLAP.DEFAULT];
+  const safeChunkSize =
+    Array.isArray(formData.chunkSize) && formData.chunkSize.length > 0
+      ? formData.chunkSize
+      : [CONFIG_CONSTANTS.CHUNK_SIZE.DEFAULT];
+  const safeChunkOverlap =
+    Array.isArray(formData.chunkOverlap) && formData.chunkOverlap.length > 0
+      ? formData.chunkOverlap
+      : [CONFIG_CONSTANTS.CHUNK_OVERLAP.DEFAULT];
   const currentChunkSize = safeChunkSize[0];
   const currentChunkOverlap = safeChunkOverlap[0];
 
@@ -235,7 +231,8 @@ export function ConfigurationStep({ formData, onFieldChange }: ConfigurationStep
             className='w-full'
           />
           <p className='text-xs text-gray-500 dark:text-gray-400 mt-2'>
-            控制相邻文本块的重叠字符数，范围：{CONFIG_CONSTANTS.CHUNK_OVERLAP.MIN}-{CONFIG_CONSTANTS.CHUNK_OVERLAP.MAX} 字符
+            控制相邻文本块的重叠字符数，范围：{CONFIG_CONSTANTS.CHUNK_OVERLAP.MIN}-{CONFIG_CONSTANTS.CHUNK_OVERLAP.MAX}{' '}
+            字符
           </p>
         </div>
 
@@ -279,4 +276,3 @@ export function ConfigurationStep({ formData, onFieldChange }: ConfigurationStep
     </div>
   );
 }
-

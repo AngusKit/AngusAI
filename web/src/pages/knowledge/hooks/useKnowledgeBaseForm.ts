@@ -52,24 +52,27 @@ export const useKnowledgeBaseForm = (initialData?: Partial<KnowledgeBaseFormData
   }, [initialData]);
 
   // 更新表单字段
-  const updateField = useCallback(<K extends keyof KnowledgeBaseFormData>(
-    field: K,
-    value: KnowledgeBaseFormData[K]
-  ) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  }, []);
+  const updateField = useCallback(
+    <K extends keyof KnowledgeBaseFormData>(field: K, value: KnowledgeBaseFormData[K]) => {
+      setFormData(prev => ({ ...prev, [field]: value }));
+    },
+    []
+  );
 
   // 添加标签
-  const addTag = useCallback((tag: string) => {
-    const validation = validateTag(tag, formData.tags);
-    if (validation.isValid) {
-      setFormData(prev => ({
-        ...prev,
-        tags: [...prev.tags, tag.trim()],
-      }));
-      setTagInput('');
-    }
-  }, [formData.tags]);
+  const addTag = useCallback(
+    (tag: string) => {
+      const validation = validateTag(tag, formData.tags);
+      if (validation.isValid) {
+        setFormData(prev => ({
+          ...prev,
+          tags: [...prev.tags, tag.trim()],
+        }));
+        setTagInput('');
+      }
+    },
+    [formData.tags]
+  );
 
   // 移除标签
   const removeTag = useCallback((tagToRemove: string) => {
@@ -80,14 +83,17 @@ export const useKnowledgeBaseForm = (initialData?: Partial<KnowledgeBaseFormData
   }, []);
 
   // 处理标签输入
-  const handleTagInputKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' || e.key === ',') {
-      e.preventDefault();
-      if (tagInput.trim()) {
-        addTag(tagInput);
+  const handleTagInputKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter' || e.key === ',') {
+        e.preventDefault();
+        if (tagInput.trim()) {
+          addTag(tagInput);
+        }
       }
-    }
-  }, [tagInput, addTag]);
+    },
+    [tagInput, addTag]
+  );
 
   // 重置表单
   const resetForm = useCallback(() => {
@@ -96,12 +102,15 @@ export const useKnowledgeBaseForm = (initialData?: Partial<KnowledgeBaseFormData
   }, []);
 
   // 根据图标emoji查找索引
-  const setSelectedIconByEmoji = useCallback((emoji: string) => {
-    const iconIndex = ICON_OPTIONS.findIndex(opt => opt.emoji === emoji);
-    if (iconIndex !== -1) {
-      updateField('selectedIconIndex', iconIndex);
-    }
-  }, [updateField]);
+  const setSelectedIconByEmoji = useCallback(
+    (emoji: string) => {
+      const iconIndex = ICON_OPTIONS.findIndex(opt => opt.emoji === emoji);
+      if (iconIndex !== -1) {
+        updateField('selectedIconIndex', iconIndex);
+      }
+    },
+    [updateField]
+  );
 
   return {
     formData,
@@ -115,4 +124,3 @@ export const useKnowledgeBaseForm = (initialData?: Partial<KnowledgeBaseFormData
     setSelectedIconByEmoji,
   };
 };
-

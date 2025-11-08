@@ -171,7 +171,6 @@ export function KnowledgeBase() {
     disabled: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
   } as const;
 
-
   // 加载统计数据
   const loadStatistics = async () => {
     setIsLoadingStatistics(true);
@@ -496,7 +495,9 @@ export function KnowledgeBase() {
               ...d,
               enabled: newEnabled,
               status: newEnabled ? '已完成' : '禁用',
-              statusColor: newEnabled ? (completedStatus?.color || KNOWLEDGE_BASE_STATUS_COLORS.enabled) : KNOWLEDGE_BASE_STATUS_COLORS.disabled,
+              statusColor: newEnabled
+                ? completedStatus?.color || KNOWLEDGE_BASE_STATUS_COLORS.enabled
+                : KNOWLEDGE_BASE_STATUS_COLORS.disabled,
             };
           }
           return d;
@@ -525,7 +526,8 @@ export function KnowledgeBase() {
           prev.map(d => {
             if (d.id === doc.id) {
               const status = statusData.status || KnowledgeBaseDocStatusEnum.PROCESSING;
-              const statusInfo = DOCUMENT_STATUS_MAP[status] || DOCUMENT_STATUS_MAP[KnowledgeBaseDocStatusEnum.PROCESSING]!;
+              const statusInfo =
+                DOCUMENT_STATUS_MAP[status] || DOCUMENT_STATUS_MAP[KnowledgeBaseDocStatusEnum.PROCESSING]!;
 
               return {
                 ...d,
@@ -621,7 +623,6 @@ export function KnowledgeBase() {
     }
   };
 
-
   const handleFiles = (files: FileList | File[]) => {
     const fileArray = Array.from(files);
     const maxSize = 50 * 1024 * 1024; // 50MB
@@ -674,9 +675,9 @@ export function KnowledgeBase() {
       prev.map(f =>
         f.id === fileId
           ? {
-            ...f,
-            status: 'uploading' as const,
-          }
+              ...f,
+              status: 'uploading' as const,
+            }
           : f
       )
     );
@@ -688,15 +689,11 @@ export function KnowledgeBase() {
 
       // 调用上传API - 注意：根据API定义，file在query中，但实际文件上传应该使用FormData
       // 这里需要根据实际API实现调整
-      await Documents.uploadDocument(
-        selectedKnowledgeBase,
-        { file },
-        {
-          body: formData,
-          // 移除ContentType，让浏览器自动设置multipart/form-data
-          type: undefined as any,
-        } as any
-      );
+      await Documents.uploadDocument(selectedKnowledgeBase, { file }, {
+        body: formData,
+        // 移除ContentType，让浏览器自动设置multipart/form-data
+        type: undefined as any,
+      } as any);
 
       // 上传成功
       const currentInterval = uploadIntervalsRef.current.get(fileId);
@@ -726,10 +723,10 @@ export function KnowledgeBase() {
         prev.map(f =>
           f.id === fileId
             ? {
-              ...f,
-              status: 'error' as const,
-              error: error?.data?.message || '上传失败',
-            }
+                ...f,
+                status: 'error' as const,
+                error: error?.data?.message || '上传失败',
+              }
             : f
         )
       );
@@ -940,19 +937,21 @@ export function KnowledgeBase() {
             <div className='flex items-center gap-1 border border-gray-200 dark:border-gray-700 rounded-lg p-1'>
               <button
                 onClick={() => setViewMode('grid')}
-                className={`p-1.5 rounded ${viewMode === 'grid'
+                className={`p-1.5 rounded ${
+                  viewMode === 'grid'
                     ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
                     : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-                  }`}
+                }`}
               >
                 <Grid3x3 className='w-4 h-4' />
               </button>
               <button
                 onClick={() => setViewMode('table')}
-                className={`p-1.5 rounded ${viewMode === 'table'
+                className={`p-1.5 rounded ${
+                  viewMode === 'table'
                     ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
                     : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-                  }`}
+                }`}
               >
                 <List className='w-4 h-4' />
               </button>
@@ -986,10 +985,11 @@ export function KnowledgeBase() {
             {currentKnowledgeBases.map(kb => (
               <Card
                 key={kb.id}
-                className={`p-5 hover:shadow-md transition-all cursor-pointer ${selectedKnowledgeBase === kb.id
+                className={`p-5 hover:shadow-md transition-all cursor-pointer ${
+                  selectedKnowledgeBase === kb.id
                     ? 'ring-2 ring-blue-500 dark:ring-blue-400 shadow-lg bg-blue-50/50 dark:bg-blue-900/10'
                     : 'dark:bg-gray-800'
-                  } dark:border-gray-700`}
+                } dark:border-gray-700`}
                 onClick={() => setSelectedKnowledgeBase(selectedKnowledgeBase === kb.id ? null : kb.id)}
               >
                 <div className='flex items-start justify-between mb-4'>
@@ -1034,7 +1034,10 @@ export function KnowledgeBase() {
                         <Edit className='w-4 h-4 mr-2' />
                         编辑
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleDeleteKnowledgeBase(kb)} className='text-red-600 dark:text-red-400'>
+                      <DropdownMenuItem
+                        onClick={() => handleDeleteKnowledgeBase(kb)}
+                        className='text-red-600 dark:text-red-400'
+                      >
                         <Trash2 className='w-4 h-4 mr-2' />
                         删除
                       </DropdownMenuItem>
@@ -1104,10 +1107,11 @@ export function KnowledgeBase() {
                   {currentKnowledgeBases.map(kb => (
                     <tr
                       key={kb.id}
-                      className={`cursor-pointer transition-colors ${selectedKnowledgeBase === kb.id
+                      className={`cursor-pointer transition-colors ${
+                        selectedKnowledgeBase === kb.id
                           ? 'bg-blue-50 dark:bg-blue-900/10 hover:bg-blue-100 dark:hover:bg-blue-900/20'
                           : 'hover:bg-gray-50 dark:hover:bg-gray-700/50'
-                        }`}
+                      }`}
                       onClick={() => setSelectedKnowledgeBase(selectedKnowledgeBase === kb.id ? null : kb.id)}
                     >
                       <td className='px-5 py-4'>
@@ -1168,11 +1172,17 @@ export function KnowledgeBase() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align='end' className='dark:bg-gray-800 dark:border-gray-700'>
-                            <DropdownMenuItem onClick={() => handleViewKnowledgeBase(kb)} className='dark:text-gray-300'>
+                            <DropdownMenuItem
+                              onClick={() => handleViewKnowledgeBase(kb)}
+                              className='dark:text-gray-300'
+                            >
                               <Eye className='w-4 h-4 mr-2' />
                               查看
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleEditKnowledgeBase(kb)} className='dark:text-gray-300'>
+                            <DropdownMenuItem
+                              onClick={() => handleEditKnowledgeBase(kb)}
+                              className='dark:text-gray-300'
+                            >
                               <Edit className='w-4 h-4 mr-2' />
                               编辑
                             </DropdownMenuItem>
@@ -1268,17 +1278,19 @@ export function KnowledgeBase() {
               </h3>
               <Card className='p-6 dark:bg-gray-800 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm'>
                 <div
-                  className={`border-2 border-dashed rounded-lg p-8 text-center transition-all ${isDragging
+                  className={`border-2 border-dashed rounded-lg p-8 text-center transition-all ${
+                    isDragging
                       ? 'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-900/20'
                       : 'border-gray-300 dark:border-gray-600 hover:border-blue-400 dark:hover:border-blue-500'
-                    }`}
+                  }`}
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
                 >
                   <Upload
-                    className={`w-12 h-12 mx-auto mb-4 ${isDragging ? 'text-blue-500 dark:text-blue-400' : 'text-gray-400 dark:text-gray-500'
-                      }`}
+                    className={`w-12 h-12 mx-auto mb-4 ${
+                      isDragging ? 'text-blue-500 dark:text-blue-400' : 'text-gray-400 dark:text-gray-500'
+                    }`}
                   />
 
                   <div className='flex items-center justify-center gap-3 mb-4'>

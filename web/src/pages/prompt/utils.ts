@@ -159,20 +159,13 @@ export const isSystemCategory = (categoryId: string): boolean => {
  * 检查是否为可用分类（非系统分类）
  */
 export const isAvailableCategory = (category: Category): boolean => {
-  return (
-    category.id !== SYSTEM_CATEGORY_IDS.ALL &&
-    category.id !== SYSTEM_CATEGORY_IDS.FAVORITES &&
-    !category.isSystem
-  );
+  return category.id !== SYSTEM_CATEGORY_IDS.ALL && category.id !== SYSTEM_CATEGORY_IDS.FAVORITES && !category.isSystem;
 };
 
 /**
  * 获取默认分类ID（用于新建提示词时）
  */
-export const getDefaultCategoryId = (
-  categories: Category[],
-  selectedCategoryId: string
-): string | undefined => {
+export const getDefaultCategoryId = (categories: Category[], selectedCategoryId: string): string | undefined => {
   // 如果选中的是 'all' 或 'favorites'，查找第一个可用分组
   if (selectedCategoryId === SYSTEM_CATEGORY_IDS.ALL || selectedCategoryId === SYSTEM_CATEGORY_IDS.FAVORITES) {
     return categories.find(c => isAvailableCategory(c))?.id;
@@ -185,4 +178,3 @@ export const getDefaultCategoryId = (
   // 否则使用选中的分类
   return selectedCategoryId;
 };
-

@@ -21,12 +21,7 @@ interface UsePromptFormProps {
   isDialogOpen: boolean;
 }
 
-export const usePromptForm = ({
-  editingPrompt,
-  categories,
-  defaultCategoryId,
-  isDialogOpen,
-}: UsePromptFormProps) => {
+export const usePromptForm = ({ editingPrompt, categories, defaultCategoryId, isDialogOpen }: UsePromptFormProps) => {
   const [formData, setFormData] = useState<PromptFormData>(INITIAL_FORM_DATA);
   const [newTagLabel, setNewTagLabel] = useState('');
   const [newTagColor, setNewTagColor] = useState<string>(DEFAULT_VALUES.TAG_COLOR);
@@ -49,9 +44,7 @@ export const usePromptForm = ({
           defaultCategoryId && availableCategories.some(cat => cat.id === defaultCategoryId);
         // 如果有有效的 defaultCategoryId 则使用它，否则使用第一个可用分组
         const firstAvailableCategory = availableCategories.length > 0 ? availableCategories[0] : null;
-        const initialCategoryId = isValidDefaultCategory
-          ? defaultCategoryId
-          : firstAvailableCategory?.id || '';
+        const initialCategoryId = isValidDefaultCategory ? defaultCategoryId : firstAvailableCategory?.id || '';
 
         setFormData({
           title: '',
@@ -103,4 +96,3 @@ export const usePromptForm = ({
     resetForm,
   };
 };
-
