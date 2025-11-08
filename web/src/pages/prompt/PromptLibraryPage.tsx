@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, } from '@/components/ui/alert-dialog';
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { toast } from 'sonner';
 import { cn } from '@/components/ui/utils';
 import { useLanguage } from '@/components/ui/LanguageProvider';
@@ -267,6 +267,7 @@ export function PromptLibraryPage() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showDeleteCategoryDialog, setShowDeleteCategoryDialog] = useState(false);
   const [editingPrompt, setEditingPrompt] = useState<Prompt | null>(null);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [deletingPrompt, setDeletingPrompt] = useState<Prompt | null>(null);
   const [deletingCategory, setDeletingCategory] = useState<Category | null>(null);
 
@@ -289,7 +290,7 @@ export function PromptLibraryPage() {
   // 将API返回的提示词转换为页面使用的格式
   const convertPromptVoToPrompt = useCallback((vo: PromptListVo): Prompt => {
     return {
-      id: vo.id,
+      id: vo.id || '',
       title: vo.title || '',
       content: vo.content || '',
       category: vo.categoryId ? String(vo.categoryId) : '',
@@ -671,6 +672,7 @@ export function PromptLibraryPage() {
       await loadCategories(); // 重新加载分类树
       toast.success(language === 'zh-CN' ? '分类已创建' : 'Category created');
       setShowCategoryDialog(false);
+      setEditingCategory(null);
       setCategoryForm({
         name: '',
         icon: BookOpen,
@@ -678,6 +680,39 @@ export function PromptLibraryPage() {
         parentId: 'none',
       });
     } catch {}
+  };
+
+  const handleUpdateCategory = async () => {
+    if (!editingCategory || !categoryForm.name.trim()) {
+      toast.error(language === 'zh-CN' ? '请输入分类名称' : 'Please enter category name');
+      return;
+    }
+
+    try {
+      // 找到图标名称
+      const iconName = AVAILABLE_ICONS.find(icon => icon.component === categoryForm.icon)?.name || 'BookOpen';
+
+      await PromptCategories.updatePromptCategory(editingCategory.id, {
+        name: categoryForm.name,
+        icon: iconName,
+        color: categoryForm.color,
+        parentId: categoryForm.parentId === 'none' ? undefined : categoryForm.parentId,
+      });
+
+      await loadCategories(); // 重新加载分类树
+      toast.success(language === 'zh-CN' ? '分类已更新' : 'Category updated');
+      setShowCategoryDialog(false);
+      setEditingCategory(null);
+      setCategoryForm({
+        name: '',
+        icon: BookOpen,
+        color: 'text-blue-600 dark:text-blue-400',
+        parentId: 'none',
+      });
+    } catch (error: any) {
+      console.error('更新分类失败:', error);
+      toast.error(error?.message || (language === 'zh-CN' ? '更新分类失败' : 'Failed to update category'));
+    }
   };
 
   // 获取分类的层级路径（用于显示）
@@ -748,7 +783,7 @@ export function PromptLibraryPage() {
 
       <div className='flex gap-6 flex-1 min-h-[200px]'>
         {/* Categories Sidebar */}
-        <div className='w-64 shrink-0 h-full'>
+        <div className='w-[296px] shrink-0 h-full'>
           <div className='bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 overflow-y-auto h-full pb-4'>
             {categoriesLoading ? (
               <div className='text-center py-8'>
@@ -799,24 +834,46 @@ export function PromptLibraryPage() {
                               {getCategoryName(category)}
                             </span>
                           </div>
-                          <Badge variant='secondary' className='text-xs'>
-                            {category.promptCount || count}
-                          </Badge>
+                          <div className='flex items-center gap-1'>
+                            {!category.isSystem && (
+                              <>
+                                <Button
+                                  variant='ghost'
+                                  size='icon'
+                                  className='h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity'
+                                  onClick={e => {
+                                    e.stopPropagation();
+                                    setEditingCategory(category);
+                                    setCategoryForm({
+                                      name: category.name,
+                                      icon: category.icon,
+                                      color: category.color,
+                                      parentId: category.parentId || 'none',
+                                    });
+                                    setShowCategoryDialog(true);
+                                  }}
+                                >
+                                  <Edit className='w-3 h-3 text-blue-600' />
+                                </Button>
+                                <Button
+                                  variant='ghost'
+                                  size='icon'
+                                  className='h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity'
+                                  onClick={e => {
+                                    e.stopPropagation();
+                                    setDeletingCategory(category);
+                                    setShowDeleteCategoryDialog(true);
+                                  }}
+                                >
+                                  <Trash2 className='w-3 h-3 text-red-600' />
+                                </Button>
+                              </>
+                            )}
+                            <Badge variant='secondary' className='text-xs'>
+                              {category.promptCount || count}
+                            </Badge>
+                          </div>
                         </button>
-                        {!category.isSystem && (
-                          <Button
-                            variant='ghost'
-                            size='icon'
-                            className='h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity ml-1'
-                            onClick={e => {
-                              e.stopPropagation();
-                              setDeletingCategory(category);
-                              setShowDeleteCategoryDialog(true);
-                            }}
-                          >
-                            <Trash2 className='w-3 h-3 text-red-600' />
-                          </Button>
-                        )}
                       </div>
 
                       {/* 子分类 */}
@@ -854,24 +911,46 @@ export function PromptLibraryPage() {
                                       {getCategoryName(childCategory)}
                                     </span>
                                   </div>
-                                  <Badge variant='secondary' className='text-xs'>
-                                    {childCount}
-                                  </Badge>
+                                  <div className='flex items-center gap-1'>
+                                    {!childCategory.isSystem && (
+                                      <>
+                                        <Button
+                                          variant='ghost'
+                                          size='icon'
+                                          className='h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity'
+                                          onClick={e => {
+                                            e.stopPropagation();
+                                            setEditingCategory(childCategory);
+                                            setCategoryForm({
+                                              name: childCategory.name,
+                                              icon: childCategory.icon,
+                                              color: childCategory.color,
+                                              parentId: childCategory.parentId || 'none',
+                                            });
+                                            setShowCategoryDialog(true);
+                                          }}
+                                        >
+                                          <Edit className='w-3 h-3 text-blue-600' />
+                                        </Button>
+                                        <Button
+                                          variant='ghost'
+                                          size='icon'
+                                          className='h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity'
+                                          onClick={e => {
+                                            e.stopPropagation();
+                                            setDeletingCategory(childCategory);
+                                            setShowDeleteCategoryDialog(true);
+                                          }}
+                                        >
+                                          <Trash2 className='w-3 h-3 text-red-600' />
+                                        </Button>
+                                      </>
+                                    )}
+                                    <Badge variant='secondary' className='text-xs'>
+                                      {childCategory.promptCount || childCount}
+                                    </Badge>
+                                  </div>
                                 </button>
-                                {!childCategory.isSystem && (
-                                  <Button
-                                    variant='ghost'
-                                    size='icon'
-                                    className='h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity ml-1'
-                                    onClick={e => {
-                                      e.stopPropagation();
-                                      setDeletingCategory(childCategory);
-                                      setShowDeleteCategoryDialog(true);
-                                    }}
-                                  >
-                                    <Trash2 className='w-3 h-3 text-red-600' />
-                                  </Button>
-                                )}
                               </div>
                             );
                           })}
@@ -899,7 +978,16 @@ export function PromptLibraryPage() {
               />
             </div>
             <div className='flex gap-3 shrink-0'>
-              <Button onClick={() => setShowCategoryDialog(true)} variant='outline' className='gap-2'>
+              <Button onClick={() => {
+                setEditingCategory(null);
+                setCategoryForm({
+                  name: '',
+                  icon: BookOpen,
+                  color: 'text-blue-600 dark:text-blue-400',
+                  parentId: 'none',
+                });
+                setShowCategoryDialog(true);
+              }} variant='outline' className='gap-2'>
                 <FolderPlus className='w-4 h-4' />
                 {t('prompts.newCategory')}
               </Button>
@@ -972,10 +1060,12 @@ export function PromptLibraryPage() {
                         <Copy className='w-3 h-3' />
                         {t('common.copy')}
                       </Button>
-                      <Button variant='outline' size='sm' onClick={() => duplicatePrompt(prompt)} className='gap-2'>
-                        <Copy className='w-3 h-3' />
-                        {language === 'zh-CN' ? '副本' : 'Duplicate'}
-                      </Button>
+                      {!prompt.isSystem && (
+                        <Button variant='outline' size='sm' onClick={() => duplicatePrompt(prompt)} className='gap-2'>
+                          <Copy className='w-3 h-3' />
+                          {language === 'zh-CN' ? '副本' : 'Duplicate'}
+                        </Button>
+                      )}
                       {/* 只显示非系统模板的编辑和删除按钮 */}
                       {!prompt.isSystem && (
                         <>
@@ -1140,13 +1230,21 @@ export function PromptLibraryPage() {
         </DialogContent>
       </Dialog>
 
-      {/* 新建分组对话框 */}
+      {/* 新建/编辑分组对话框 */}
       <Dialog open={showCategoryDialog} onOpenChange={setShowCategoryDialog}>
         <DialogContent className='dark:bg-gray-800'>
           <DialogHeader>
-            <DialogTitle className='dark:text-white'>{t('prompts.newCategory')}</DialogTitle>
+            <DialogTitle className='dark:text-white'>
+              {editingCategory ? (language === 'zh-CN' ? '编辑分组' : 'Edit Category') : t('prompts.newCategory')}
+            </DialogTitle>
             <DialogDescription>
-              {language === 'zh-CN' ? '创建一个新的提示词分组' : 'Create a new prompt category'}
+              {editingCategory
+                ? language === 'zh-CN'
+                  ? '修改提示词分组信息'
+                  : 'Edit prompt category information'
+                : language === 'zh-CN'
+                  ? '创建一个新的提示词分组'
+                  : 'Create a new prompt category'}
             </DialogDescription>
           </DialogHeader>
 
@@ -1182,7 +1280,7 @@ export function PromptLibraryPage() {
                   <SelectItem value='none'>
                     {language === 'zh-CN' ? '无（作为顶层分组）' : 'None (Top-level category)'}
                   </SelectItem>
-                  {buildCategoryTree(undefined).map(cat => {
+                  {buildCategoryTree(undefined, 0, editingCategory?.id).map(cat => {
                     const path = getCategoryPath(cat.id);
                     const level = path.length - 1;
                     return (
@@ -1292,10 +1390,21 @@ export function PromptLibraryPage() {
           </div>
 
           <DialogFooter>
-            <Button variant='outline' onClick={() => setShowCategoryDialog(false)}>
+            <Button variant='outline' onClick={() => {
+              setShowCategoryDialog(false);
+              setEditingCategory(null);
+              setCategoryForm({
+                name: '',
+                icon: BookOpen,
+                color: 'text-blue-600 dark:text-blue-400',
+                parentId: 'none',
+              });
+            }}>
               {t('common.cancel')}
             </Button>
-            <Button onClick={handleCreateCategory}>{t('common.create')}</Button>
+            <Button onClick={editingCategory ? handleUpdateCategory : handleCreateCategory}>
+              {editingCategory ? t('common.save') : t('common.create')}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
