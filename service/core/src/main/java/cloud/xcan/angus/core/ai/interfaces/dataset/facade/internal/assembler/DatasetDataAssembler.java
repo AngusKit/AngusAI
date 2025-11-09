@@ -35,6 +35,10 @@ public class DatasetDataAssembler {
     vo.setDataCount(data.getDataCount());
     vo.setDataSize(formatFileSize(data.getDataSize()));
 
+    // 设置文件信息
+    vo.setFilePath(data.getFilePath());
+    vo.setContentHash(data.getContentHash());
+
     // 设置审计信息
     vo.setTenantId(data.getTenantId());
     vo.setCreatedBy(data.getCreatedBy());

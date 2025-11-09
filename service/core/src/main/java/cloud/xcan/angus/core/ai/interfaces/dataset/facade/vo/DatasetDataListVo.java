@@ -30,4 +30,10 @@ public class DatasetDataListVo extends TenantAuditingVo {
   @Schema(description = "数据大小")
   private String dataSize;
 
+  @Schema(description = "文件存储URL路径", example = "https://example.com/file.pdf")
+  private String filePath;
+
+  @Schema(description = "文件内容哈希编码", example = "3c9b5de3b42eeba213989e92713baa1653dc675cd38c89a2eaa2c64cb8e27f7a")
+  private String contentHash;
+
 }

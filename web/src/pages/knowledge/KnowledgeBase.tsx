@@ -1297,33 +1297,29 @@ export function KnowledgeBase() {
                               disabled={doc.statusEnum === KnowledgeBaseDocStatusEnum.PROCESSING}
                               className='data-[state=checked]:bg-blue-500'
                             />
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant='ghost' size='sm' className='dark:text-gray-400'>
-                                  <MoreHorizontal className='w-4 h-4' />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align='end' className='dark:bg-gray-800 dark:border-gray-700'>
-                                <DropdownMenuItem onClick={() => handleReparse(doc)} className='dark:text-gray-300'>
-                                  <RefreshCw className='w-4 h-4 mr-2' />
-                                  重新解析
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() => handleAction('下载', doc.name)}
-                                  className='dark:text-gray-300'
-                                >
-                                  <Download className='w-4 h-4 mr-2' />
-                                  下载
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() => handleDeleteDocument(doc)}
-                                  className='text-red-600 dark:text-red-400'
-                                >
-                                  <Trash2 className='w-4 h-4 mr-2' />
-                                  删除
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
+                            <div className='flex items-center gap-2'>
+                              <button
+                                onClick={() => handleReparse(doc)}
+                                className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
+                                title='重新解析'
+                              >
+                                <RefreshCw className='w-4 h-4 text-green-500' />
+                              </button>
+                              <button
+                                onClick={() => handleAction('下载', doc.name)}
+                                className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
+                                title='下载文件'
+                              >
+                                <Download className='w-4 h-4 text-blue-500' />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteDocument(doc)}
+                                className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
+                                title='删除文件'
+                              >
+                                <Trash2 className='w-4 h-4 text-red-500' />
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>
