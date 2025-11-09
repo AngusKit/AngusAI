@@ -16,6 +16,7 @@ import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
 import cloud.xcan.angus.remote.message.ProtocolException;
+import cloud.xcan.angus.remote.message.http.ResourceExisted;
 import jakarta.annotation.Resource;
 import java.util.List;
 import org.springframework.boot.autoconfigure.web.servlet.MultipartProperties;
@@ -52,15 +53,21 @@ public class KnowledgeBaseDocCmdImpl extends CommCmd<KnowledgeBaseDoc, Long> imp
         knowledgeBaseQuery.findAndCheck(knowledgeBaseId);
 
         // 检查文件格式
-        if (calculateDocumentType(file.getOriginalFilename(), null) == null){
-          throw ProtocolException.of(String.format("不支持的文件格式：%s",file.getOriginalFilename()));
+        String fileName = file.getOriginalFilename();
+        if (calculateDocumentType(fileName, null) == null){
+          throw ProtocolException.of(String.format("不支持的文件格式：%s",fileName));
         }
 
         // 检查文件大小限制
         long maxFileSize = multipartProperties.getMaxFileSize().toBytes();
         if (file.getSize() > maxFileSize) {
           throw ProtocolException.of(String.format("文件[%s]超过大小限制，最大允许上传%s",
-              file.getOriginalFilename(), multipartProperties.getMaxFileSize().toString()));
+              fileName, multipartProperties.getMaxFileSize().toString()));
+        }
+
+        // 检查名称是否已存在
+        if (knowledgeBaseDocQuery.existsByKnowledgeBaseIdAndName(knowledgeBaseId, fileName)) {
+          throw ResourceExisted.of("文件名称「{0}」已存在", new Object[]{fileName});
         }
       }
 

@@ -2,6 +2,7 @@ package cloud.xcan.angus.core.ai.domain.dataset;
 
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
 import java.util.List;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.query.Param;
@@ -13,6 +14,9 @@ public interface DatasetDataRepo extends BaseRepository<DatasetData, Long> {
 
   List<DatasetData> findByDatasetIdAndNameIn(Long datasetId, List<String> names);
 
+  boolean existsByDatasetIdAndName(Long datasetId, String fileName);
+
+  @Modifying
   void deleteByIdAndNameIn(Long id, List<String> names);
 
   /**

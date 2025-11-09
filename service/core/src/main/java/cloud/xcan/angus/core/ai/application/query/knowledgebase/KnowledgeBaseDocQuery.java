@@ -27,6 +27,11 @@ public interface KnowledgeBaseDocQuery {
       Integer limit, Double threshold);
 
   /**
+   * 检查知识库下是否存在同名文件
+   */
+  boolean existsByKnowledgeBaseIdAndName(Long knowledgeBaseId, String fileName);
+
+  /**
    * 批量根据知识库ID统计文档数 返回 List<Object[]> [knowledgeBaseId, docCount]
    */
   List<Object[]> countByKnowledgeBaseIds(List<Long> knowledgeBaseIds);
@@ -55,4 +60,5 @@ public interface KnowledgeBaseDocQuery {
    * 统计总文件数
    */
   Long countTotalFiles();
+
 }

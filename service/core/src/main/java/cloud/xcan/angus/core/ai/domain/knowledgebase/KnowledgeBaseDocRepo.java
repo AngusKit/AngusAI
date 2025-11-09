@@ -11,6 +11,11 @@ import org.springframework.data.repository.query.Param;
 public interface KnowledgeBaseDocRepo extends BaseRepository<KnowledgeBaseDoc, Long> {
 
   /**
+   * 检查知识库下是否存在同名文件
+   */
+  boolean existsByKnowledgeBaseIdAndName(Long knowledgeBaseId, String fileName);
+
+  /**
    * 统计总文件数
    */
   @Query("SELECT COUNT(d) FROM KnowledgeBaseDoc d")

@@ -67,6 +67,11 @@ public class KnowledgeBaseDocQueryImpl implements KnowledgeBaseDocQuery {
   }
 
   @Override
+  public boolean existsByKnowledgeBaseIdAndName(Long knowledgeBaseId, String fileName) {
+    return knowledgeBaseDocRepo.existsByKnowledgeBaseIdAndName(knowledgeBaseId, fileName);
+  }
+
+  @Override
   public List<Object[]> countByKnowledgeBaseIds(List<Long> knowledgeBaseIds) {
     return List.of();
   }
