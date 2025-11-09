@@ -34,9 +34,10 @@ interface KnowledgeBaseItem {
   statusColor: string;
   enabled: boolean;
   visibility?: string;
-  createdTime?: string;
+  createdDate?: string;
   creator?: string;
-  updateTime?: string;
+  modifiedDate?: string;
+  modifier?: string;
   tags?: string[];
   chunkSize?: number;
   chunkOverlap?: number;
@@ -314,8 +315,10 @@ export function KnowledgeBase() {
           statusColor: kb.enabled ? KNOWLEDGE_BASE_STATUS_COLORS.enabled : KNOWLEDGE_BASE_STATUS_COLORS.disabled,
           enabled: kb.enabled || false,
           visibility: kb.visibility,
-          createdTime: kb.createdDate,
-          updateTime: kb.modifiedDate,
+          createdDate: kb.createdDate,
+          creator: kb.creator,
+          modifiedDate: kb.modifiedDate,
+          modifier: kb.modifier,
           tags: kb.tags,
         }));
 
@@ -323,8 +326,8 @@ export function KnowledgeBase() {
         // 如果后端不支持排序方向，这里需要客户端处理 createdDate 的降序
         if (sortBy === 'createdDate') {
           mappedList.sort((a, b) => {
-            const dateA = a.createdTime ? new Date(a.createdTime).getTime() : 0;
-            const dateB = b.createdTime ? new Date(b.createdTime).getTime() : 0;
+            const dateA = a.createdDate ? new Date(a.createdDate).getTime() : 0;
+            const dateB = b.createdDate ? new Date(b.createdDate).getTime() : 0;
             return dateB - dateA; // 降序：最近创建在前
           });
         }
@@ -1028,7 +1031,7 @@ export function KnowledgeBase() {
 
                 {/* 标签 */}
                 {kb.tags && kb.tags.length > 0 && (
-                  <div className='flex flex-wrap gap-2 mb-0.5'>
+                  <div className='flex flex-wrap gap-1'>
                     {kb.tags.map((tag, index) => (
                       <Badge key={index} variant='secondary' className={`${getTagColor(tag)} text-xs`}>
                         {tag}
@@ -1055,7 +1058,7 @@ export function KnowledgeBase() {
                       <span>
                         可见性: {kb.visibility === 'team' ? '团队' : kb.visibility === 'private' ? '私有' : '公开'}
                       </span>
-                      <span>{formatDateOnly(kb.updateTime)}</span>
+                      <span>{formatDateOnly(kb.modifiedDate)}</span>
                     </div>
                     {kb.creator && <div className='mt-1'>创建者: {kb.creator}</div>}
                   </div>
@@ -1141,7 +1144,7 @@ export function KnowledgeBase() {
                         </div>
                       </td>
                       <td className='px-5 py-4'>
-                        <div className='text-sm text-gray-600 dark:text-gray-400'>{formatDateOnly(kb.updateTime)}</div>
+                        <div className='text-sm text-gray-600 dark:text-gray-400'>{formatDateOnly(kb.modifiedDate)}</div>
                       </td>
                       <td className='px-5 py-4 text-right' onClick={e => e.stopPropagation()}>
                         <DropdownMenu>
@@ -1590,11 +1593,11 @@ export function KnowledgeBase() {
                 <div className='grid grid-cols-2 gap-4'>
                   <div>
                     <label className='text-sm text-gray-600 dark:text-gray-400'>创建时间</label>
-                    <p className='text-sm dark:text-white mt-1'>{viewingKB.createdTime}</p>
+                    <p className='text-sm dark:text-white mt-1'>{viewingKB.createdDate}</p>
                   </div>
                   <div>
                     <label className='text-sm text-gray-600 dark:text-gray-400'>更新时间</label>
-                    <p className='text-sm dark:text-white mt-1'>{formatDateOnly(viewingKB.updateTime)}</p>
+                    <p className='text-sm dark:text-white mt-1'>{viewingKB.modifiedDate}</p>
                   </div>
                 </div>
 

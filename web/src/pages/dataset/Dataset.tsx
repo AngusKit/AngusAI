@@ -1,4 +1,4 @@
-import { Database, Plus, MoreHorizontal, Eye, Trash2, Edit, FileText, Copy, Search, X, Filter, Grid3x3, List, Upload, Download, RefreshCw, } from 'lucide-react';
+import { Database, Plus, MoreHorizontal, Eye, Trash2, Edit, FileText, Search, X, Filter, Grid3x3, List, Upload, Download, RefreshCw, } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -12,7 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
-import { getTagColor } from '@/utils';
+import { formatDateOnly, getTagColor } from '@/utils';
 import { CreateDatasetDialog } from './CreateDatasetDialog';
 import { EditDatasetDialog } from './EditDatasetDialog';
 import { AddDataSourceDialog } from './AddDataSourceDialog';
@@ -37,8 +37,8 @@ interface DatasetItem {
   statusColor: string;
   enabled: boolean;
   visibility?: string;
-  updateTime: string;
-  createdTime: string;
+  modifiedDate: string;
+  createdDate: string;
   creator: string;
   tags?: string[];
 }
@@ -91,7 +91,7 @@ export function Dataset() {
     size: string;
     status: '已处理' | '处理中' | '待处理';
     statusColor: string;
-    uploadTime: string;
+    modifiedDate: string;
     recordCount: string;
   }
 
@@ -153,7 +153,7 @@ export function Dataset() {
         : status === '处理中'
         ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
         : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
-      uploadTime: vo.createdDate || '',
+      modifiedDate: vo.createdDate || '',
       recordCount: vo.dataCount ? vo.dataCount.toLocaleString() : '0',
     };
   }, []);
@@ -167,7 +167,7 @@ export function Dataset() {
     tableName: string;
     rowCount: string;
     size: string;
-    lastUpdated: string;
+    modifiedDate: string;
     description?: string;
   }
 
@@ -182,7 +182,7 @@ export function Dataset() {
       tableName: vo.name || '',
       rowCount: vo.dataCount ? vo.dataCount.toLocaleString() : '0',
       size: vo.dataSize || '0 MB',
-      lastUpdated: vo.modifiedDate || '',
+      modifiedDate: vo.modifiedDate || '',
       description: vo.name || '',
     };
   }, []);
@@ -252,12 +252,12 @@ export function Dataset() {
       ? String(vo.dataStatistics.totalFilesOrTables) 
       : '0';
     const size = vo.dataStatistics?.totalRecordsSize || '0 条';
-    const createdTime = vo.createdDate || '';
-    const updateTime = vo.modifiedDate || '';
-    const creator = vo.createdBy ? String(vo.createdBy) : '';
+    const createdDate = vo.createdDate || '';
+    const modifiedDate = vo.modifiedDate || '';
+    const creator = vo.creator ? vo.creator : '';
 
     return {
-      id: vo.id ? String(vo.id) : '',
+      id: vo.id ? vo.id : '',
       name: vo.name || '',
       description: vo.description || '',
       icon: vo.icon || '📊',
@@ -269,8 +269,8 @@ export function Dataset() {
       statusColor: vo.enabled ? DATASET_STATUS_COLORS.enabled : DATASET_STATUS_COLORS.disabled,
       enabled: vo.enabled || false,
       visibility: vo.visibility ? visibilityMap[vo.visibility] : 'private',
-      updateTime,
-      createdTime,
+      modifiedDate,
+      createdDate,
       creator,
       tags: vo.tags || [],
     };
@@ -846,7 +846,7 @@ export function Dataset() {
                           />
                         </div>
                       </td>
-                      <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{dataset.updateTime}</td>
+                      <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{formatDateOnly(dataset.modifiedDate)}</td>
                       <td className='px-6 py-4'>
                         <div className='flex items-center gap-2' onClick={e => e.stopPropagation()}>
                           <button
@@ -921,42 +921,45 @@ export function Dataset() {
               {currentDatasets.map(dataset => (
                 <Card
                   key={dataset.id}
-                  className={`p-4 dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow cursor-pointer ${
-                    selectedDataset === dataset.id ? 'ring-2 ring-blue-500 dark:ring-blue-400' : ''
-                  }`}
+                  className={`p-5 hover:shadow-md transition-all cursor-pointer ${
+                    selectedDataset === dataset.id
+                      ? 'ring-2 ring-blue-500 dark:ring-blue-400 shadow-lg bg-blue-50/50 dark:bg-blue-900/10'
+                      : 'dark:bg-gray-800'
+                  } dark:border-gray-700`}
                   onClick={() => setSelectedDataset(dataset.id)}
                 >
-                  <div className='flex items-start justify-between gap-3 mb-3'>
-                    <div className='flex items-center gap-2 flex-1 min-w-0'>
-                      <div
-                        className={`${dataset.iconBg} w-10 h-10 rounded-lg flex items-center justify-center text-xl shrink-0`}
-                      >
+                  <div className='flex items-start justify-between mb-4'>
+                    <div className='flex items-center gap-3'>
+                      <div className={`${dataset.iconBg} w-12 h-12 rounded-lg flex items-center justify-center text-2xl`}>
                         {dataset.icon}
                       </div>
-                      <div className='flex items-center gap-2 flex-1 min-w-0'>
-                        <h3 className='dark:text-white truncate'>{dataset.name}</h3>
-                        <Badge variant='outline' className='text-xs shrink-0 dark:border-gray-600'>
-                          {dataset.visibility === 'private'
-                            ? '🔒 私有'
-                            : dataset.visibility === 'team'
-                              ? '👥 团队'
-                              : '🌐 公开'}
+                      <div>
+                        <div className='flex items-center gap-2'>
+                          <h3 className='dark:text-white'>{dataset.name}</h3>
+                          <Switch
+                            checked={dataset.enabled}
+                            onCheckedChange={() => {
+                              handleToggleDatasetStatus(dataset.id);
+                            }}
+                            onClick={e => e.stopPropagation()}
+                            className='data-[state=checked]:bg-blue-500'
+                          />
+                        </div>
+                        <Badge variant='secondary' className={`${dataset.statusColor} text-xs mt-1`}>
+                          {dataset.status}
                         </Badge>
-                        <Switch
-                          checked={dataset.enabled}
-                          onCheckedChange={() => {
-                            handleToggleDatasetStatus(dataset.id);
-                          }}
-                          onClick={e => e.stopPropagation()}
-                          className='data-[state=checked]:bg-blue-500'
-                        />
                       </div>
                     </div>
                     <DropdownMenu>
-                      <DropdownMenuTrigger asChild onClick={e => e.stopPropagation()}>
-                        <button className='p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors shrink-0'>
-                          <MoreHorizontal className='w-4 h-4 text-gray-600 dark:text-gray-400' />
-                        </button>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant='ghost'
+                          size='sm'
+                          className='dark:text-gray-400'
+                          onClick={e => e.stopPropagation()}
+                        >
+                          <MoreHorizontal className='w-4 h-4' />
+                        </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align='end' className='dark:bg-gray-800 dark:border-gray-700'>
                         <DropdownMenuItem onClick={() => handleView(dataset)} className='dark:text-gray-300'>
@@ -966,13 +969,6 @@ export function Dataset() {
                         <DropdownMenuItem onClick={() => handleEdit(dataset)} className='dark:text-gray-300'>
                           <Edit className='w-4 h-4 mr-2' />
                           编辑
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => handleAction('复制', dataset.name)}
-                          className='dark:text-gray-300'
-                        >
-                          <Copy className='w-4 h-4 mr-2' />
-                          复制
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => handleDelete(dataset)}
@@ -985,34 +981,43 @@ export function Dataset() {
                     </DropdownMenu>
                   </div>
 
-                  <p className='text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2'>{dataset.description}</p>
+                  <p className='text-sm text-gray-600 dark:text-gray-400 mb-1 line-clamp-2'>{dataset.description}</p>
 
+                  {/* 标签 */}
                   {dataset.tags && dataset.tags.length > 0 && (
-                    <div className='flex flex-wrap gap-1 mb-3'>
-                      {dataset.tags.slice(0, 3).map((tag, index) => (
-                        <Badge key={index} className={`text-xs px-1.5 py-0 border-0 ${getTagColor(tag)}`}>
+                    <div className='flex flex-wrap gap-1 mb-0.5'>
+                      {dataset.tags.map((tag, index) => (
+                        <Badge key={index} variant='secondary' className={`${getTagColor(tag)} text-xs`}>
                           {tag}
                         </Badge>
                       ))}
-                      {dataset.tags.length > 3 && (
-                        <Badge
-                          variant='secondary'
-                          className='text-xs px-1.5 py-0 bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 border-0'
-                        >
-                          +{dataset.tags.length - 3}
-                        </Badge>
-                      )}
                     </div>
                   )}
 
-                  <div className='flex items-center justify-between text-xs text-gray-500 dark:text-gray-400'>
-                    <div className='flex items-center gap-2'>
-                      <span>{dataset.dataCount} 文档</span>
-                      <span>·</span>
-                      <span>{dataset.size}</span>
+                  <div className='grid grid-cols-2 gap-4 pt-2 border-t border-gray-100 dark:border-gray-700'>
+                    <div>
+                      <div className='text-xs text-gray-500 dark:text-gray-400 mb-1'>
+                        {dataset.type === '数据源' ? '表数量' : '文件数'}
+                      </div>
+                      <div className='dark:text-white'>{dataset.dataCount}</div>
                     </div>
-                    <Badge className={`text-xs ${dataset.statusColor} border-0`}>{dataset.status}</Badge>
+                    <div>
+                      <div className='text-xs text-gray-500 dark:text-gray-400 mb-1'>大小</div>
+                      <div className='dark:text-white'>{dataset.size}</div>
+                    </div>
                   </div>
+
+                  {/* 附加信息 */}
+                  {dataset.visibility && (
+                    <div className='mt-0.5 pt-3 border-t border-gray-100 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400'>
+                      <div className='flex items-center justify-between'>
+                        <span>
+                          可见性: {dataset.visibility === 'team' ? '团队' : dataset.visibility === 'private' ? '私有' : '公开'}
+                        </span>
+                        <span>{formatDateOnly(dataset.modifiedDate)}</span>
+                      </div>
+                    </div>
+                  )}
                 </Card>
               ))}
             </div>
@@ -1168,7 +1173,7 @@ export function Dataset() {
                       <td className='px-6 py-4'>
                         <Badge className={`text-xs ${file.statusColor} border-0`}>{file.status}</Badge>
                       </td>
-                      <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{file.uploadTime}</td>
+                      <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{file.modifiedDate}</td>
                       <td className='px-6 py-4'>
                         <div className='flex items-center gap-2'>
                           <button
@@ -1508,8 +1513,8 @@ export function Dataset() {
                   <p className='text-sm dark:text-white mt-1'>{viewingDataset.type}</p>
                 </div>
                 <div>
-                  <Label className='text-sm text-gray-600 dark:text-gray-400'>文档数量</Label>
-                  <p className='text-sm dark:text-white mt-1'>{viewingDataset.dataCount} 个文档</p>
+                  <Label className='text-sm text-gray-600 dark:text-gray-400'>{viewingDataset.type === '数据源' ? '表数量' : '文件数量'}</Label>
+                  <p className='text-sm dark:text-white mt-1'>{viewingDataset.dataCount} </p>
                 </div>
                 <div>
                   <Label className='text-sm text-gray-600 dark:text-gray-400'>数据量</Label>
@@ -1521,11 +1526,11 @@ export function Dataset() {
                 </div>
                 <div>
                   <Label className='text-sm text-gray-600 dark:text-gray-400'>创建时间</Label>
-                  <p className='text-sm dark:text-white mt-1'>{viewingDataset.createdTime}</p>
+                  <p className='text-sm dark:text-white mt-1'>{viewingDataset.createdDate}</p>
                 </div>
                 <div>
                   <Label className='text-sm text-gray-600 dark:text-gray-400'>最后更新</Label>
-                  <p className='text-sm dark:text-white mt-1'>{viewingDataset.updateTime}</p>
+                  <p className='text-sm dark:text-white mt-1'>{viewingDataset.modifiedDate}</p>
                 </div>
               </div>
 
@@ -1543,25 +1548,6 @@ export function Dataset() {
               )}
             </div>
           )}
-
-          <div className='flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700'>
-            <Button
-              variant='outline'
-              onClick={() => setViewDialogOpen(false)}
-              className='dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300'
-            >
-              关闭
-            </Button>
-            <Button
-              className='bg-blue-500 hover:bg-blue-600 text-white'
-              onClick={() => {
-                setViewDialogOpen(false);
-                viewingDataset && handleAction('编辑', viewingDataset.name);
-              }}
-            >
-              编辑数据集
-            </Button>
-          </div>
         </DialogContent>
       </Dialog>
 
