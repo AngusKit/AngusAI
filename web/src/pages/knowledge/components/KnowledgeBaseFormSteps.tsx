@@ -1,7 +1,3 @@
-/**
- * 知识库表单步骤组件
- */
-
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
