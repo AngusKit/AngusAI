@@ -1304,13 +1304,6 @@ export function KnowledgeBase() {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align='end' className='dark:bg-gray-800 dark:border-gray-700'>
-                                <DropdownMenuItem
-                                  onClick={() => handleAction('查看', doc.name)}
-                                  className='dark:text-gray-300'
-                                >
-                                  <Eye className='w-4 h-4 mr-2' />
-                                  查看
-                                </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => handleReparse(doc)} className='dark:text-gray-300'>
                                   <RefreshCw className='w-4 h-4 mr-2' />
                                   重新解析

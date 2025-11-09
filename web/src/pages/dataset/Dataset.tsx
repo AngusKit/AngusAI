@@ -728,6 +728,26 @@ export function Dataset() {
     toast.info('已清空文件列表');
   };
 
+  // 同步单个文件
+  const handleSyncFile = async (fileName: string) => {
+    if (!selectedDS) {
+      toast.error('请先选择数据集');
+      return;
+    }
+
+    try {
+      await DatasetsData.syncDatasetData(selectedDS.id, { names: [fileName] });
+      toast.success(`文件 "${fileName}" 同步已启动`);
+      // 重新加载文件列表
+      setTimeout(() => {
+        loadDatasetDataList(selectedDS.id);
+      }, 1000);
+    } catch (error: any) {
+      console.error('同步文件失败:', error);
+      toast.error(error?.data?.message || error?.message || '同步文件失败');
+    }
+  };
+
   return (
     <div className='space-y-6'>
       {/* Header */}
@@ -1413,18 +1433,18 @@ export function Dataset() {
                             <td className='px-6 py-4'>
                               <div className='flex items-center gap-2'>
                                 <button
+                                  onClick={() => handleSyncFile(file.name)}
+                                  className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
+                                  title='同步数据到数据库'
+                                >
+                                  <RefreshCw className='w-4 h-4 text-green-500' />
+                                </button>
+                                <button
                                   onClick={() => handleAction('下载', file.name)}
                                   className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
                                   title='下载文件'
                                 >
                                   <Download className='w-4 h-4 text-blue-500' />
-                                </button>
-                                <button
-                                  onClick={() => handleAction('查看', file.name)}
-                                  className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
-                                  title='预览'
-                                >
-                                  <Eye className='w-4 h-4 text-gray-600 dark:text-gray-400' />
                                 </button>
                                 <button
                                   onClick={() => handleAction('删除', file.name)}
