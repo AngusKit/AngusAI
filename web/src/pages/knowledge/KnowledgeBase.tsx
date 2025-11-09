@@ -1023,7 +1023,7 @@ export function KnowledgeBase() {
                     <th className='px-5 py-3 text-left text-xs text-gray-500 dark:text-gray-400'>状态</th>
                     <th className='px-5 py-3 text-left text-xs text-gray-500 dark:text-gray-400'>可见性</th>
                     <th className='px-5 py-3 text-left text-xs text-gray-500 dark:text-gray-400'>更新时间</th>
-                    <th className='px-5 py-3 text-right text-xs text-gray-500 dark:text-gray-400'>操作</th>
+                    <th className='px-5 py-3 text-left text-xs text-gray-500 dark:text-gray-400'>操作</th>
                   </tr>
                 </thead>
                 <tbody className='divide-y divide-gray-100 dark:divide-gray-700'>
@@ -1087,37 +1087,27 @@ export function KnowledgeBase() {
                       <td className='px-5 py-4'>
                         <div className='text-sm text-gray-600 dark:text-gray-400'>{formatDateOnly(kb.modifiedDate)}</div>
                       </td>
-                      <td className='px-5 py-4 text-right' onClick={e => e.stopPropagation()}>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant='ghost' size='sm' className='dark:text-gray-400'>
-                              <MoreHorizontal className='w-4 h-4' />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align='end' className='dark:bg-gray-800 dark:border-gray-700'>
-                            <DropdownMenuItem
-                              onClick={() => handleViewKnowledgeBase(kb)}
-                              className='dark:text-gray-300'
-                            >
-                              <Eye className='w-4 h-4 mr-2' />
-                              查看
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => handleEditKnowledgeBase(kb)}
-                              className='dark:text-gray-300'
-                            >
-                              <Edit className='w-4 h-4 mr-2' />
-                              编辑
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => handleDeleteKnowledgeBase(kb)}
-                              className='text-red-600 dark:text-red-400'
-                            >
-                              <Trash2 className='w-4 h-4 mr-2' />
-                              删除
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                      <td className='px-5 py-4'>
+                        <div className='flex items-center gap-2' onClick={e => e.stopPropagation()}>
+                          <button
+                            onClick={() => handleViewKnowledgeBase(kb)}
+                            className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
+                          >
+                            <Eye className='w-4 h-4 text-blue-500' />
+                          </button>
+                          <button
+                            onClick={() => handleEditKnowledgeBase(kb)}
+                            className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
+                          >
+                            <Edit className='w-4 h-4 text-gray-600 dark:text-gray-400' />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteKnowledgeBase(kb)}
+                            className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
+                          >
+                            <Trash2 className='w-4 h-4 text-red-500' />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}

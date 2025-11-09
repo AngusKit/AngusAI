@@ -1,7 +1,7 @@
 package cloud.xcan.angus.core.ai.application.cmd.dataset.impl;
 
 import static cloud.xcan.angus.core.ai.application.converter.DatasetDataConverter.toDatasetData;
-import static cloud.xcan.angus.core.ai.domain.Constants.KNOWLEDGE_DOC_UPLOAD_BIZ_KEY;
+import static cloud.xcan.angus.core.ai.domain.Constants.DATASET_UPLOAD_BIZ_KEY;
 import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.calculateDatasetType;
 
 import cloud.xcan.angus.api.storage.file.FileRemote;
@@ -73,7 +73,7 @@ public class DatasetDataCmdImpl extends CommCmd<DatasetData, Long> implements Da
 
         // 上传文件到文件存储服务
         List<FileUploadVo> uploadResult = fileRemote.upload(
-            new MultipartFile[]{file}, null, KNOWLEDGE_DOC_UPLOAD_BIZ_KEY,
+            new MultipartFile[]{file}, null, DATASET_UPLOAD_BIZ_KEY,
             null).orElseContentThrow();
 
         DatasetData data = toDatasetData(datasetId, file, uploadResult.get(0));

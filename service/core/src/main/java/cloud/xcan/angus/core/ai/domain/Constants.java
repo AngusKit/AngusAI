@@ -25,6 +25,11 @@ public interface Constants {
    */
   int APPLICATION_DESCRIPTION_DB_LENGTH = 500;
 
+
+  // ==================== 聊天相关字段长度常量 ====================
+
+  String CHAT_ATTACHMENTS_UPLOAD_BIZ_KEY = "angusAIChatAttachments";
+
   // ==================== 知识库相关字段长度常量 ====================
 
   String KNOWLEDGE_DOC_UPLOAD_BIZ_KEY = "angusAIKnowledgeBaseDocs";
@@ -114,6 +119,8 @@ public interface Constants {
   double SIMILARITY_THRESHOLD_MAX_VALUE = 1.0;
 
   // ==================== 数据集相关字段长度常量 ====================
+
+  String DATASET_UPLOAD_BIZ_KEY = "angusAIDatasetFiles";
 
   /**
    * 数据集名称最大长度
