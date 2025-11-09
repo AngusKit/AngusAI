@@ -1,6 +1,5 @@
 package cloud.xcan.angus.core.ai.interfaces.dataset.facade;
 
-import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetDataBatchDeleteDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetDataFindDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetFileUploadDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetDataListVo;
@@ -19,12 +18,12 @@ public interface DatasetDataFacade {
   /**
    * 同步文件数据到关系数据库或同步表信息
    */
-  List<SyncDataVo> syncDatasetData(Long id, List<String> names);
+  List<SyncDataVo> syncDatasetData(Long id, List<Long> dataIds);
 
   /**
    * 批量删除文件或表
    */
-  void batchDeleteData(Long id, DatasetDataBatchDeleteDto dto);
+  void batchDeleteData(Long id, List<Long> dataIds);
 
   /**
    * 获取数据集数据列表

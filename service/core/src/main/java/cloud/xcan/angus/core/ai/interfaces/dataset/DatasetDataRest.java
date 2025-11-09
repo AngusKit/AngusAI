@@ -1,7 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.dataset;
 
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.DatasetDataFacade;
-import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetDataBatchDeleteDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetDataFindDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetFileUploadDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.vo.DatasetDataListVo;
@@ -62,19 +61,20 @@ public class DatasetDataRest {
   @PostMapping("/{datasetId}/data/sync")
   public ApiLocaleResult<List<SyncDataVo>> syncDatasetData(
       @Parameter(description = "数据集ID") @PathVariable Long datasetId,
-      @Parameter(description = "同步文件或表名") @RequestParam(required = false) List<String> names) {
-    return ApiLocaleResult.success(datasetDataFacade.syncDatasetData(datasetId, names));
+      @Parameter(description = "文件或表IDs") @RequestParam(required = false) List<Long> dataIds) {
+    return ApiLocaleResult.success(datasetDataFacade.syncDatasetData(datasetId, dataIds));
   }
 
   @Operation(operationId = "batchDeleteData", summary = "批量删除数据", description = "批量删除文件或表")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "批量删除成功")
+      @ApiResponse(responseCode = "204", description = "批量删除成功")
   })
+  @ResponseStatus(HttpStatus.NO_CONTENT)
   @DeleteMapping("/{datasetId}/data/batch-delete")
   public void batchDeleteData(
       @Parameter(description = "数据集ID") @PathVariable Long datasetId,
-      @Valid @RequestBody DatasetDataBatchDeleteDto dto) {
-    datasetDataFacade.batchDeleteData(datasetId, dto);
+      @Parameter(description = "文件或表IDs") @RequestParam(required = false) List<Long> dataIds) {
+    datasetDataFacade.batchDeleteData(datasetId, dataIds);
   }
 
   @Operation(operationId = "getDatasetDataList", summary = "获取数据集数据列表", description = "获取数据集数据列表")

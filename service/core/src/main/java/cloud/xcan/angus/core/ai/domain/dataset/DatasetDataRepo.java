@@ -12,12 +12,12 @@ public interface DatasetDataRepo extends BaseRepository<DatasetData, Long> {
 
   List<DatasetData> findByDatasetId(Long datasetId);
 
-  List<DatasetData> findByDatasetIdAndNameIn(Long datasetId, List<String> names);
+  List<DatasetData> findByDatasetIdAndIdIn(Long datasetId, List<Long> dataIds);
 
   boolean existsByDatasetIdAndName(Long datasetId, String fileName);
 
   @Modifying
-  void deleteByIdAndNameIn(Long id, List<String> names);
+  void deleteByDatasetIdAndIdIn(Long datasetId, List<Long> dataIds);
 
   /**
    * 统计总文件或表数

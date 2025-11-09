@@ -92,7 +92,7 @@ public class DatasetDataCmdImpl extends CommCmd<DatasetData, Long> implements Da
 
   @Override
   @Transactional
-  public List<SyncDataResult> syncDatasetData(Long datasetId, List<String> names) {
+  public List<SyncDataResult> syncDatasetData(Long datasetId, List<Long> dataIds) {
     return new BizTemplate<List<SyncDataResult>>() {
       Dataset datasetDb;
 
@@ -107,9 +107,9 @@ public class DatasetDataCmdImpl extends CommCmd<DatasetData, Long> implements Da
         if (datasetDb.getType().isDatasource()) {
           // TODO 同步表和统计信息
         } else {
-          List<DatasetData> data = ObjectUtils.isEmpty(names)
+          List<DatasetData> data = ObjectUtils.isEmpty(dataIds)
               ? datasetDataRepo.findByDatasetId(datasetId)
-              : datasetDataRepo.findByDatasetIdAndNameIn(datasetId, names);
+              : datasetDataRepo.findByDatasetIdAndIdIn(datasetId, dataIds);
           if (data.isEmpty()) {
             throw BizException.of("没有可同步的文件数据，请上传后再试");
           }
@@ -123,14 +123,14 @@ public class DatasetDataCmdImpl extends CommCmd<DatasetData, Long> implements Da
 
   @Override
   @Transactional
-  public void batchDeleteData(Long id, @Nullable List<String> names) {
+  public void batchDeleteData(Long id, @Nullable List<Long> dataIds) {
     new BizTemplate<Void>() {
       @Override
       protected Void process() {
-        if (ObjectUtils.isEmpty(names)) {
+        if (ObjectUtils.isEmpty(dataIds)) {
           datasetDataRepo.deleteById(id);
         } else {
-          datasetDataRepo.deleteByIdAndNameIn(id, names);
+          datasetDataRepo.deleteByDatasetIdAndIdIn(id, dataIds);
         }
         return null;
       }

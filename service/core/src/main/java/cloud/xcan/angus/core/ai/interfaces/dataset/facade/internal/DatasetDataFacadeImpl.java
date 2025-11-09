@@ -9,7 +9,6 @@ import cloud.xcan.angus.core.ai.domain.dataset.DatasetData;
 import cloud.xcan.angus.core.ai.domain.dataset.SyncDataResult;
 import cloud.xcan.angus.core.ai.infra.util.DatasourceUtils.TableDataResult;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.DatasetDataFacade;
-import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetDataBatchDeleteDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetDataFindDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto.DatasetFileUploadDto;
 import cloud.xcan.angus.core.ai.interfaces.dataset.facade.internal.assembler.DatasetDataAssembler;
@@ -41,15 +40,15 @@ public class DatasetDataFacadeImpl implements DatasetDataFacade {
   }
 
   @Override
-  public List<SyncDataVo> syncDatasetData(Long datasetId, List<String> names) {
-    List<SyncDataResult> results = datasetDataCmd.syncDatasetData(datasetId, names);
+  public List<SyncDataVo> syncDatasetData(Long datasetId, List<Long> dataIds) {
+    List<SyncDataResult> results = datasetDataCmd.syncDatasetData(datasetId, dataIds);
     return results.stream().map(DatasetDataAssembler::toSyncDataVo)
         .collect(Collectors.toList());
   }
 
   @Override
-  public void batchDeleteData(Long datasetId, DatasetDataBatchDeleteDto dto) {
-    datasetDataCmd.batchDeleteData(datasetId, dto.getNames());
+  public void batchDeleteData(Long datasetId, List<Long> dataIds) {
+    datasetDataCmd.batchDeleteData(datasetId, dataIds);
   }
 
   @Override
