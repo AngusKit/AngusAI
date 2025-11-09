@@ -196,6 +196,8 @@ public class CommonUtils {
       return DatasetDataType.CSV;
     } else if (lowerFilename.endsWith(".json")) {
       return DatasetDataType.JSON;
+    } else if (lowerFilename.endsWith(".xml")) {
+      return DatasetDataType.XML;
     }
     // 默认返回
     return defaultType;

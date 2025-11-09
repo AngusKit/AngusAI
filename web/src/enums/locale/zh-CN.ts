@@ -173,6 +173,8 @@ export const enumTranslations = {
   DatasetDataTypeEnum: {
     EXCEL: 'Excel',
     CSV: 'CSV',
+    JSON: 'JSON',
+    XML: 'XML',
     TABLE: '表',
   },
   DatasetDataStatusEnum: {

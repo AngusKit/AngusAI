@@ -8,6 +8,7 @@ public enum DatasetDataType implements EnumMessage<String> {
   EXCEL,   // Excel文件
   CSV,  // CSV文件
   JSON, // JSON文件
+  XML, // XML
   TABLE;   // 数据表
 
   public String getValue() {

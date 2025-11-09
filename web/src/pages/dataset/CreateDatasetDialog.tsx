@@ -11,6 +11,9 @@ import { Slider } from '@/components/ui/slider';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
+import Datasets from '@/services/Datasets';
+import { DatasetCreateDto } from '@/services/DatasetsTypes';
+import { DatasetTypeEnum, VisibilityEnum } from '@/enums/enums';
 
 // 扩展的图标选项 - 32个图标
 const iconOptions = [
@@ -51,9 +54,10 @@ const iconOptions = [
 interface CreateDatasetDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
 }
 
-export function CreateDatasetDialog({ open, onOpenChange }: CreateDatasetDialogProps) {
+export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDatasetDialogProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [datasetName, setDatasetName] = useState('');
   const [description, setDescription] = useState('');
@@ -130,7 +134,7 @@ export function CreateDatasetDialog({ open, onOpenChange }: CreateDatasetDialogP
     setTags(tags.filter(tag => tag !== tagToRemove));
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentStep === 1) {
       if (!datasetName.trim()) {
         toast.error('请输入数据集名称');
@@ -146,16 +150,53 @@ export function CreateDatasetDialog({ open, onOpenChange }: CreateDatasetDialogP
       setCurrentStep(currentStep + 1);
     } else {
       // 创建数据集
-      toast.success('数据集创建成功！');
-      onOpenChange(false);
-      // 重置表单
-      setCurrentStep(1);
-      setDatasetName('');
-      setDescription('');
-      setVisibility('private');
-      setSelectedIcon(0);
-      setTags([]);
-      setTagInput('');
+      try {
+        // 映射数据类型：页面上的'text'和'table'都对应FILE类型，'datasource'对应DATASOURCE类型
+        const datasetType = dataType === 'datasource' ? DatasetTypeEnum.DATASOURCE : DatasetTypeEnum.FILE;
+        
+        // 映射可见性
+        const visibilityMap: Record<string, VisibilityEnum> = {
+          private: VisibilityEnum.PRIVATE,
+          team: VisibilityEnum.TEAM,
+          public: VisibilityEnum.PUBLIC,
+        };
+
+        const createDto: DatasetCreateDto = {
+          name: datasetName.trim(),
+          description: description.trim(),
+          type: datasetType,
+          visibility: visibilityMap[visibility] || VisibilityEnum.PRIVATE,
+          icon: iconOptions[selectedIcon]?.emoji,
+          iconBg: iconOptions[selectedIcon]?.bg,
+          tags: tags.length > 0 ? tags : undefined,
+        };
+
+        await Datasets.createDataset(createDto);
+        toast.success('数据集创建成功！');
+        onOpenChange(false);
+        onSuccess?.();
+        
+        // 重置表单
+        setCurrentStep(1);
+        setDatasetName('');
+        setDescription('');
+        setVisibility('private');
+        setSelectedIcon(0);
+        setTags([]);
+        setTagInput('');
+        setDataType('table');
+        setRemoveDuplicates(true);
+        setCleanHTML(true);
+        setAutoSegment(false);
+        setNormalizeFormat(true);
+        setTrainingSplit([80]);
+        setValidationSplit([10]);
+        setTestSplit([10]);
+        setPriority('standard');
+      } catch (error: any) {
+        console.error('创建数据集失败:', error);
+        toast.error(error?.message || '创建数据集失败');
+      }
     }
   };
 

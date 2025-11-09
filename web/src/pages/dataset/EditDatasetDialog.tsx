@@ -11,12 +11,15 @@ import { Slider } from '@/components/ui/slider';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
+import Datasets from '@/services/Datasets';
+import { DatasetUpdateDto } from '@/services/DatasetsTypes';
+import { VisibilityEnum } from '@/enums/enums';
 
 interface EditDatasetDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   dataset: {
-    id: number;
+    id: string;
     name: string;
     description: string;
     icon?: string;
@@ -24,6 +27,7 @@ interface EditDatasetDialogProps {
     visibility?: string;
     tags?: string[];
   } | null;
+  onSuccess?: () => void;
 }
 
 // 扩展的图标选项 - 32个图标
@@ -62,7 +66,7 @@ const iconOptions = [
   { emoji: '🔥', bg: 'bg-orange-100 dark:bg-orange-900/30', label: '热门' },
 ];
 
-export function EditDatasetDialog({ open, onOpenChange, dataset }: EditDatasetDialogProps) {
+export function EditDatasetDialog({ open, onOpenChange, dataset, onSuccess }: EditDatasetDialogProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [datasetName, setDatasetName] = useState('');
   const [description, setDescription] = useState('');
@@ -157,7 +161,7 @@ export function EditDatasetDialog({ open, onOpenChange, dataset }: EditDatasetDi
     setTags(tags.filter(tag => tag !== tagToRemove));
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentStep === 1) {
       if (!datasetName.trim()) {
         toast.error('请输入数据集名称');
@@ -173,10 +177,39 @@ export function EditDatasetDialog({ open, onOpenChange, dataset }: EditDatasetDi
       setCurrentStep(currentStep + 1);
     } else {
       // 更新数据集
-      toast.success('数据集更新成功！');
-      onOpenChange(false);
-      // 重置表单
-      setCurrentStep(1);
+      if (!dataset) {
+        toast.error('数据集信息不存在');
+        return;
+      }
+
+      try {
+        // 映射可见性
+        const visibilityMap: Record<string, VisibilityEnum> = {
+          private: VisibilityEnum.PRIVATE,
+          team: VisibilityEnum.TEAM,
+          public: VisibilityEnum.PUBLIC,
+        };
+
+        const updateDto: DatasetUpdateDto = {
+          name: datasetName.trim(),
+          description: description.trim(),
+          icon: iconOptions[selectedIcon]?.emoji,
+          iconBg: iconOptions[selectedIcon]?.bg,
+          visibility: visibilityMap[visibility] || VisibilityEnum.PRIVATE,
+          tags: tags.length > 0 ? tags : undefined,
+        };
+
+        await Datasets.updateDataset(dataset.id, updateDto);
+        toast.success('数据集更新成功！');
+        onOpenChange(false);
+        onSuccess?.();
+        
+        // 重置表单
+        setCurrentStep(1);
+      } catch (error: any) {
+        console.error('更新数据集失败:', error);
+        toast.error(error?.message || '更新数据集失败');
+      }
     }
   };
 

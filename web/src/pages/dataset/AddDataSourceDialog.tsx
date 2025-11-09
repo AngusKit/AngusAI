@@ -6,16 +6,29 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import Datasets from '@/services/Datasets';
+import { DatasourceConnectionTestDto, DataSourceUpdateDto } from '@/services/DatasetsTypes';
+import { DatasourceTypeEnum } from '@/enums/enums';
 
 interface AddDataSourceDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   datasetName?: string;
+  datasetId?: string;
+  onSuccess?: () => void;
 }
 
 type DatabaseType = 'mysql' | 'postgresql' | 'sqlserver' | 'oracle';
 
-export function AddDataSourceDialog({ open, onOpenChange, datasetName }: AddDataSourceDialogProps) {
+// 数据库类型映射
+const databaseTypeMap: Record<DatabaseType, DatasourceTypeEnum> = {
+  mysql: DatasourceTypeEnum.MySQL,
+  postgresql: DatasourceTypeEnum.PostgreSQL,
+  sqlserver: DatasourceTypeEnum.SQLServer,
+  oracle: DatasourceTypeEnum.Oracle,
+};
+
+export function AddDataSourceDialog({ open, onOpenChange, datasetName, datasetId, onSuccess }: AddDataSourceDialogProps) {
   const [isTestingConnection, setIsTestingConnection] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [showPassword, setShowPassword] = useState(false);
@@ -87,30 +100,82 @@ export function AddDataSourceDialog({ open, onOpenChange, datasetName }: AddData
 
   // 测试连接
   const handleTestConnection = async () => {
+    if (!canSubmit()) {
+      toast.error('请填写完整的连接信息');
+      return;
+    }
+
     setIsTestingConnection(true);
     setConnectionStatus('idle');
 
-    // 模拟测试连接
-    setTimeout(() => {
-      const success = Math.random() > 0.3; // 70%成功率
-      setConnectionStatus(success ? 'success' : 'error');
-      setIsTestingConnection(false);
+    try {
+      const finalJdbcUrl = useCustomUrl ? jdbcUrl : generateJdbcUrl();
+      
+      const testDto: DatasourceConnectionTestDto = {
+        datasetId: datasetId || undefined,
+        databaseType: databaseTypeMap[dbType],
+        database: dbName || undefined,
+        jdbcUrl: finalJdbcUrl || undefined,
+        host: dbHost || undefined,
+        port: dbPort ? Number(dbPort) : undefined,
+        username: dbUser || undefined,
+        password: dbPassword || undefined,
+      };
 
-      if (success) {
-        toast.success('连接测试成功');
+      const response = await Datasets.testDataSourceConnection(testDto);
+      const responseData = (response as any).data;
+      
+      if (responseData?.success) {
+        setConnectionStatus('success');
+        toast.success(responseData?.message || '连接测试成功');
       } else {
-        toast.error('连接测试失败，请检查配置参数');
+        setConnectionStatus('error');
+        toast.error(responseData?.message || '连接测试失败，请检查配置参数');
       }
-    }, 2000);
+    } catch (error: any) {
+      console.error('测试连接失败:', error);
+      setConnectionStatus('error');
+      toast.error(error?.message || '连接测试失败，请检查配置参数');
+    } finally {
+      setIsTestingConnection(false);
+    }
   };
 
-  const handleSubmit = () => {
-    const finalJdbcUrl = useCustomUrl ? jdbcUrl : generateJdbcUrl();
-    const sourceName = connectionName || `${databaseConfigs[dbType].name} - ${dbName}`;
+  const handleSubmit = async () => {
+    if (!canSubmit() || connectionStatus !== 'success') {
+      toast.error('请先测试连接，确保连接成功后再添加');
+      return;
+    }
 
-    toast.success(`数据源 "${sourceName}" 添加成功`);
-    onOpenChange(false);
-    resetForm();
+    if (!datasetId) {
+      toast.error('数据集ID不存在');
+      return;
+    }
+
+    try {
+      const finalJdbcUrl = useCustomUrl ? jdbcUrl : generateJdbcUrl();
+      const sourceName = connectionName || `${databaseConfigs[dbType].name} - ${dbName}`;
+
+      const updateDto: DataSourceUpdateDto = {
+        name: sourceName,
+        databaseType: databaseTypeMap[dbType],
+        database: dbName || undefined,
+        jdbcUrl: finalJdbcUrl || undefined,
+        host: dbHost || undefined,
+        port: dbPort ? Number(dbPort) : undefined,
+        username: dbUser || undefined,
+        password: dbPassword || undefined,
+      };
+
+      await Datasets.modifyDataSource(datasetId, updateDto);
+      toast.success(`数据源 "${sourceName}" 添加成功`);
+      onOpenChange(false);
+      onSuccess?.();
+      resetForm();
+    } catch (error: any) {
+      console.error('添加数据源失败:', error);
+      toast.error(error?.message || '添加数据源失败');
+    }
   };
 
   const resetForm = () => {
