@@ -3,6 +3,7 @@ package cloud.xcan.angus.core.ai.application.cmd.dataset.impl;
 import static cloud.xcan.angus.core.ai.application.converter.DatasetDataConverter.toDatasetData;
 import static cloud.xcan.angus.core.ai.domain.Constants.DATASET_UPLOAD_BIZ_KEY;
 import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.calculateDatasetType;
+import static cloud.xcan.angus.spec.utils.FileNameSecurityUtil.sanitizeFileName;
 
 import cloud.xcan.angus.api.storage.file.FileRemote;
 import cloud.xcan.angus.api.storage.file.vo.FileUploadVo;
@@ -69,7 +70,8 @@ public class DatasetDataCmdImpl extends CommCmd<DatasetData, Long> implements Da
         }
 
         // 检查名称是否已存在
-        if (datasetDataRepo.existsByDatasetIdAndName(datasetId, fileName)) {
+        String safeFileName = sanitizeFileName(fileName);
+        if (datasetDataRepo.existsByDatasetIdAndName(datasetId, safeFileName)) {
           throw ResourceExisted.of("文件名称「{0}」已存在", new Object[]{fileName});
         }
       }

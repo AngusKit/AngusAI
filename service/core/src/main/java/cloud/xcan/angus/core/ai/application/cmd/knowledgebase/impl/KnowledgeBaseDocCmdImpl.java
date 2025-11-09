@@ -3,6 +3,7 @@ package cloud.xcan.angus.core.ai.application.cmd.knowledgebase.impl;
 import static cloud.xcan.angus.core.ai.application.converter.KnowledgeBaseConverter.toUploadDomain;
 import static cloud.xcan.angus.core.ai.domain.Constants.KNOWLEDGE_DOC_UPLOAD_BIZ_KEY;
 import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.calculateDocumentType;
+import static cloud.xcan.angus.spec.utils.FileNameSecurityUtil.sanitizeFileName;
 
 import cloud.xcan.angus.api.storage.file.FileRemote;
 import cloud.xcan.angus.api.storage.file.vo.FileUploadVo;
@@ -66,7 +67,8 @@ public class KnowledgeBaseDocCmdImpl extends CommCmd<KnowledgeBaseDoc, Long> imp
         }
 
         // 检查名称是否已存在
-        if (knowledgeBaseDocQuery.existsByKnowledgeBaseIdAndName(knowledgeBaseId, fileName)) {
+        String safeFileName = sanitizeFileName(fileName);
+        if (knowledgeBaseDocQuery.existsByKnowledgeBaseIdAndName(knowledgeBaseId, safeFileName)) {
           throw ResourceExisted.of("文件名称「{0}」已存在", new Object[]{fileName});
         }
       }

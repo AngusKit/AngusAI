@@ -96,20 +96,47 @@ export function validateFile(
 }
 
 /**
+ * 处理文件选择的结果
+ */
+export interface ProcessFilesResult {
+  /** 有效的文件列表 */
+  validFiles: UploadFile[];
+  /** 被过滤的文件数量 */
+  filteredCount: number;
+  /** 被过滤的文件名称列表（用于提示） */
+  filteredFiles: string[];
+}
+
+/**
  * 处理文件选择，验证并转换为UploadFile数组
+ * @param files 文件列表
+ * @param config 验证配置
+ * @param customErrorMessages 自定义错误消息
+ * @param silent 是否静默处理（不显示每个文件的错误提示，适用于文件夹上传）
+ * @returns 处理结果
  */
 export function processFiles(
   files: FileList | File[],
   config: FileValidationConfig,
-  customErrorMessages?: { sizeExceeded?: string; formatNotSupported?: string }
-): UploadFile[] {
+  customErrorMessages?: { sizeExceeded?: string; formatNotSupported?: string },
+  silent: boolean = false
+): ProcessFilesResult {
   const fileArray = Array.from(files);
+  const filteredFiles: string[] = [];
+  let filteredCount = 0;
 
-  const newFiles: UploadFile[] = fileArray
+  const validFiles: UploadFile[] = fileArray
     .filter(file => {
       const validation = validateFile(file, config, customErrorMessages);
-      if (!validation.valid && validation.error) {
-        toast.error(validation.error);
+      if (!validation.valid) {
+        filteredCount++;
+        if (validation.error) {
+          filteredFiles.push(file.name);
+          // 只有在非静默模式下才显示每个文件的错误
+          if (!silent) {
+            toast.error(validation.error);
+          }
+        }
         return false;
       }
       return true;
@@ -123,7 +150,11 @@ export function processFiles(
       status: 'pending' as const,
     }));
 
-  return newFiles;
+  return {
+    validFiles,
+    filteredCount,
+    filteredFiles,
+  };
 }
 
 /**

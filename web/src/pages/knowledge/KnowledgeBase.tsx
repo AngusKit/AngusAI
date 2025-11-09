@@ -587,26 +587,59 @@ export function KnowledgeBase() {
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
       'text/plain',
     ],
+    allowedExtensions: ['.pdf', '.doc', '.docx', '.txt'],
     errorMessages: {
       sizeExceeded: `${t('knowledgeUpload.fileSizeExceeded')} (50MB)`,
       formatNotSupported: t('knowledgeUpload.fileFormatNotSupported'),
     },
   };
 
-  const handleFiles = (files: FileList | File[]) => {
-    const newFiles = processFiles(files, fileValidationConfig, {
-      sizeExceeded: `${t('knowledgeUpload.fileAdded')} {fileName} ${t('knowledgeUpload.fileSizeExceeded')} (50MB)`,
-      formatNotSupported: `${t('knowledgeUpload.fileAdded')} {fileName} ${t('knowledgeUpload.fileFormatNotSupported')}`,
-    });
+  const handleFiles = (files: FileList | File[], isFolderUpload: boolean = false) => {
+    // 文件夹上传时使用静默模式，避免显示大量错误提示
+    const result = processFiles(
+      files,
+      fileValidationConfig,
+      {
+        sizeExceeded: `${t('knowledgeUpload.fileAdded')} {fileName} ${t('knowledgeUpload.fileSizeExceeded')} (50MB)`,
+        formatNotSupported: `${t('knowledgeUpload.fileAdded')} {fileName} ${t('knowledgeUpload.fileFormatNotSupported')}`,
+      },
+      isFolderUpload // 文件夹上传时静默处理
+    );
 
-    if (newFiles.length > 0) {
-      setUploadFiles(prev => [...prev, ...newFiles]);
-      toast.success(`${t('knowledgeUpload.fileAdded')} ${newFiles.length} ${t('knowledgeUpload.filesCount')}`);
+    if (result.validFiles.length > 0) {
+      setUploadFiles(prev => [...prev, ...result.validFiles]);
+      
+      // 显示成功消息
+      if (isFolderUpload) {
+        // 文件夹上传：显示有效文件数和被过滤的文件数
+        if (result.filteredCount > 0) {
+          toast.success(
+            `已添加 ${result.validFiles.length} 个有效文件，已过滤 ${result.filteredCount} 个不支持的文件`,
+            {
+              description: result.filteredFiles.slice(0, 3).join('、') + 
+                (result.filteredFiles.length > 3 ? ` 等 ${result.filteredFiles.length} 个文件` : ''),
+            }
+          );
+        } else {
+          toast.success(`已添加 ${result.validFiles.length} 个文件`);
+        }
+      } else {
+        // 单个文件上传：显示成功消息
+        toast.success(`${t('knowledgeUpload.fileAdded')} ${result.validFiles.length} ${t('knowledgeUpload.filesCount')}`);
+      }
 
       // 自动开始上传
-      newFiles.forEach(uploadFile => {
+      result.validFiles.forEach(uploadFile => {
         handleUpload(uploadFile);
       });
+    } else if (isFolderUpload && result.filteredCount > 0) {
+      // 文件夹中没有有效文件
+      toast.warning(
+        `文件夹中没有支持的文件格式`,
+        {
+          description: `已过滤 ${result.filteredCount} 个文件。支持 PDF、Word、TXT 格式`,
+        }
+      );
     }
   };
 
@@ -642,8 +675,12 @@ export function KnowledgeBase() {
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      handleFiles(e.target.files);
+      // 检查是否是文件夹上传（通过检查 input 是否有 webkitdirectory 属性）
+      const isFolderUpload = e.target.hasAttribute('webkitdirectory') || e.target.hasAttribute('directory');
+      handleFiles(e.target.files, isFolderUpload);
     }
+    // 重置 input，允许重复选择同一文件
+    e.target.value = '';
   };
 
   const handleSelectFiles = () => {
@@ -1198,6 +1235,7 @@ export function KnowledgeBase() {
                     webkitdirectory=''
                     directory=''
                     multiple
+                    accept='.pdf,.doc,.docx,.txt'
                     onChange={handleFileInputChange}
                     className='hidden'
                   />
