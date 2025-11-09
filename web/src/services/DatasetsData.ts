@@ -1,10 +1,5 @@
 import { ApiLocaleResult, PageQuery } from '@xcan-angus/infra';
-import {
-  DatasetDataBatchDeleteDto,
-  ListSyncDataResult,
-  PageDatasetDataListResult,
-  GetDatasetDataListOrderByEnum,
-} from './DatasetsDataTypes.ts';
+import { DatasetDataBatchDeleteDto, ListSyncDataResult, PageDatasetDataListResult, GetDatasetDataListOrderByEnum, } from './DatasetsDataTypes.ts';
 import http, { ContentType, HttpClient, RequestParams } from './HttpClient.ts';
 import { DatasetDataStatusEnum, DatasetDataTypeEnum } from '@/enums/enums.ts';
 import { AI } from '@xcan-angus/infra';
@@ -126,4 +121,3 @@ export class DatasetsData<SecurityDataType = unknown> {
 }
 
 export default new DatasetsData(http);
-

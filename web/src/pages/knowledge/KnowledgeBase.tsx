@@ -11,8 +11,6 @@ import { Switch } from '@/components/ui/switch';
 import { useEffect, useRef, useState } from 'react';
 import { useLanguage } from '@/components/ui/LanguageProvider';
 import { toast } from 'sonner';
-import { EditKnowledgeBaseDialog } from './EditKnowledgeBaseDialog';
-import { CreateKnowledgeBaseDialog } from './CreateKnowledgeBaseDialog';
 import KnowledgeBases from '@/services/KnowledgeBases';
 import Documents from '@/services/Documents';
 import { KnowledgeBaseDocStatusEnum, KnowledgeBaseDocTypeEnum } from '@/enums/enums';
@@ -22,6 +20,10 @@ import type { KnowledgeBaseDocListVo } from '@/services/DocumentsTypes';
 import { getTagColor, formatDateOnly, formatFileSize, ENABLED_STATUS_COLOR } from '@/utils';
 import { useDebounce } from '@/hooks/useDebounce';
 import { DOCUMENT_STATUS_MAP, DOCUMENT_TYPE_MAP } from './constants';
+import { UploadFile, processFiles, uploadFileWithProgress, createDragHandlers, clearAllUploadIntervals, clearUploadInterval, type FileValidationConfig, type UploadConfig, } from '@/utils/UploadUtils';
+
+import { EditKnowledgeBaseDialog } from './EditKnowledgeBaseDialog';
+import { CreateKnowledgeBaseDialog } from './CreateKnowledgeBaseDialog';
 
 interface KnowledgeBaseItem {
   id: string;
@@ -43,16 +45,6 @@ interface KnowledgeBaseItem {
   chunkSize?: number;
   chunkOverlap?: number;
   embeddingModelId?: number;
-}
-
-interface UploadFile {
-  id: string;
-  file: File;
-  name: string;
-  size: number;
-  progress: number;
-  status: 'pending' | 'uploading' | 'success' | 'error';
-  error?: string;
 }
 
 export function KnowledgeBase() {
@@ -86,8 +78,7 @@ export function KnowledgeBase() {
   // 清理所有上传任务的定时器
   useEffect(() => {
     return () => {
-      uploadIntervalsRef.current.forEach(interval => clearInterval(interval));
-      uploadIntervalsRef.current.clear();
+      clearAllUploadIntervals(uploadIntervalsRef);
     };
   }, []);
 
@@ -95,7 +86,6 @@ export function KnowledgeBase() {
   useEffect(() => {
     setCurrentPage(1);
   }, [debouncedSearchQuery]);
-
 
   // 加载统计数据
   const loadStatistics = async () => {
@@ -551,137 +541,67 @@ export function KnowledgeBase() {
     }
   };
 
-  const handleFiles = (files: FileList | File[]) => {
-    const fileArray = Array.from(files);
-    const maxSize = 50 * 1024 * 1024; // 50MB
-    const allowedTypes = [
+  // 文件验证配置
+  const fileValidationConfig: FileValidationConfig = {
+    maxSize: 50 * 1024 * 1024, // 50MB
+    allowedTypes: [
       'application/pdf',
       'application/msword',
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
       'text/plain',
-    ];
+    ],
+    errorMessages: {
+      sizeExceeded: `${t('knowledgeUpload.fileSizeExceeded')} (50MB)`,
+      formatNotSupported: t('knowledgeUpload.fileFormatNotSupported'),
+    },
+  };
 
-    const newFiles: UploadFile[] = fileArray
-      .filter(file => {
-        if (file.size > maxSize) {
-          toast.error(`${t('knowledgeUpload.fileAdded')} ${file.name} ${t('knowledgeUpload.fileSizeExceeded')} (50MB)`);
-          return false;
-        }
-        if (!allowedTypes.includes(file.type)) {
-          toast.error(`${t('knowledgeUpload.fileAdded')} ${file.name} ${t('knowledgeUpload.fileFormatNotSupported')}`);
-          return false;
-        }
-        return true;
-      })
-      .map(file => ({
-        id: Math.random().toString(36).substr(2, 9),
-        file,
-        name: file.name,
-        size: file.size,
-        progress: 0,
-        status: 'pending' as const,
-      }));
+  const handleFiles = (files: FileList | File[]) => {
+    const newFiles = processFiles(files, fileValidationConfig, {
+      sizeExceeded: `${t('knowledgeUpload.fileAdded')} {fileName} ${t('knowledgeUpload.fileSizeExceeded')} (50MB)`,
+      formatNotSupported: `${t('knowledgeUpload.fileAdded')} {fileName} ${t('knowledgeUpload.fileFormatNotSupported')}`,
+    });
 
     if (newFiles.length > 0) {
       setUploadFiles(prev => [...prev, ...newFiles]);
       toast.success(`${t('knowledgeUpload.fileAdded')} ${newFiles.length} ${t('knowledgeUpload.filesCount')}`);
 
-      // 自动开始上传 - 传递文件名和文件对象用于成功提示
+      // 自动开始上传
       newFiles.forEach(uploadFile => {
-        simulateUpload(uploadFile.id, uploadFile.name, uploadFile.file);
+        handleUpload(uploadFile);
       });
     }
   };
 
-  const simulateUpload = async (fileId: string, fileName: string, file: File) => {
-    if (!selectedKnowledgeBase) {
-      toast.error('请先选择知识库');
-      return;
-    }
-
-    setUploadFiles(prev =>
-      prev.map(f =>
-        f.id === fileId
-          ? {
-              ...f,
-              status: 'uploading' as const,
-            }
-          : f
-      )
-    );
-
-    try {
-      // 创建FormData
-      const formData = new FormData();
-      formData.append('file', file);
-
-      // 调用上传API - 注意：根据API定义，file在query中，但实际文件上传应该使用FormData
-      // 这里需要根据实际API实现调整
-      await Documents.uploadDocument(selectedKnowledgeBase, { file }, {
-        body: formData,
-        // 移除ContentType，让浏览器自动设置multipart/form-data
-        type: undefined as any,
-      } as any);
-
-      // 上传成功
-      const currentInterval = uploadIntervalsRef.current.get(fileId);
-      if (currentInterval) {
-        clearInterval(currentInterval);
-        uploadIntervalsRef.current.delete(fileId);
-      }
-
-      setUploadFiles(prev =>
-        prev.map(f => (f.id === fileId ? { ...f, progress: 100, status: 'success' as const } : f))
-      );
-
-      toast.success(`${fileName} ${t('knowledgeUpload.uploadSuccess')}`);
-
-      // 重新加载文档列表
-      setTimeout(() => {
-        loadDocuments(selectedKnowledgeBase);
-      }, 1000);
-    } catch (error: any) {
-      const currentInterval = uploadIntervalsRef.current.get(fileId);
-      if (currentInterval) {
-        clearInterval(currentInterval);
-        uploadIntervalsRef.current.delete(fileId);
-      }
-
-      setUploadFiles(prev =>
-        prev.map(f =>
-          f.id === fileId
-            ? {
-                ...f,
-                status: 'error' as const,
-                error: error?.data?.message || '上传失败',
-              }
-            : f
-        )
-      );
-
-      toast.error(`${fileName} 上传失败: ${error?.data?.message || '未知错误'}`);
-    }
+  // 更新文件状态的辅助函数
+  const updateFile = (fileId: string, updates: Partial<UploadFile>) => {
+    setUploadFiles(prev => prev.map(f => (f.id === fileId ? { ...f, ...updates } : f)));
   };
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
+  // 上传文件
+  const handleUpload = async (uploadFile: UploadFile) => {
+    const uploadConfig: UploadConfig = {
+      uploadApi: async (id: string, file: File, params?: any) => {
+        return Documents.uploadDocument(id, { file }, params);
+      },
+      resourceId: selectedKnowledgeBase,
+      resourceName: '知识库',
+      onSuccess: () => {
+        // 重新加载文档列表
+        setTimeout(() => {
+          if (selectedKnowledgeBase) {
+            loadDocuments(selectedKnowledgeBase);
+          }
+        }, 1000);
+      },
+    };
+
+    await uploadFileWithProgress(uploadFile, uploadConfig, updateFile, uploadIntervalsRef);
   };
 
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-
-    const files = e.dataTransfer.files;
-    if (files.length > 0) {
-      handleFiles(files);
-    }
-  };
+  // 拖拽处理
+  const dragHandlers = createDragHandlers(setIsDragging, handleFiles);
+  const { handleDragOver, handleDragLeave, handleDrop } = dragHandlers;
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -699,11 +619,7 @@ export function KnowledgeBase() {
 
   const removeFile = (fileId: string) => {
     // 清理该文件的上传定时器
-    const interval = uploadIntervalsRef.current.get(fileId);
-    if (interval) {
-      clearInterval(interval);
-      uploadIntervalsRef.current.delete(fileId);
-    }
+    clearUploadInterval(fileId, uploadIntervalsRef);
 
     setUploadFiles(prev => prev.filter(f => f.id !== fileId));
     toast.info(t('knowledgeUpload.fileRemoved'));
@@ -711,8 +627,7 @@ export function KnowledgeBase() {
 
   const clearAllFiles = () => {
     // 清理所有上传定时器
-    uploadIntervalsRef.current.forEach(interval => clearInterval(interval));
-    uploadIntervalsRef.current.clear();
+    clearAllUploadIntervals(uploadIntervalsRef);
 
     setUploadFiles([]);
     toast.info(t('knowledgeUpload.listCleared'));
@@ -1085,7 +1000,9 @@ export function KnowledgeBase() {
                         </div>
                       </td>
                       <td className='px-5 py-4'>
-                        <div className='text-sm text-gray-600 dark:text-gray-400'>{formatDateOnly(kb.modifiedDate)}</div>
+                        <div className='text-sm text-gray-600 dark:text-gray-400'>
+                          {formatDateOnly(kb.modifiedDate)}
+                        </div>
                       </td>
                       <td className='px-5 py-4'>
                         <div className='flex items-center gap-2' onClick={e => e.stopPropagation()}>

@@ -1,10 +1,6 @@
 package cloud.xcan.angus.core.ai.domain.dataset;
 
-import cloud.xcan.angus.spec.experimental.EndpointRegister;
-import cloud.xcan.angus.spec.locale.EnumMessage;
-
-@EndpointRegister
-public enum DatasetDataType implements EnumMessage<String> {
+public enum DatasetDataType {
   EXCEL,   // Excel文件
   CSV,  // CSV文件
   JSON, // JSON文件

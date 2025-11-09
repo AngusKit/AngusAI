@@ -1,4 +1,4 @@
-import { Database, Plus, MoreHorizontal, Eye, Trash2, Edit, FileText, Search, X, Filter, Grid3x3, List, Upload, Download, RefreshCw, } from 'lucide-react';
+import { Database, Plus, MoreHorizontal, Eye, Trash2, Edit, FileText, Search, X, Filter, Grid3x3, List, Upload, Download, RefreshCw, Files, FolderOpen, Check, } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -10,16 +10,17 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, } from '@/components/ui/alert-dialog';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { toast } from 'sonner';
-import { formatDateOnly, getTagColor } from '@/utils';
+import { formatDateOnly, getTagColor, formatFileSize } from '@/utils';
+import { UploadFile, processFiles, uploadFileWithProgress, createDragHandlers, clearAllUploadIntervals, clearUploadInterval, type FileValidationConfig, type UploadConfig, } from '@/utils/UploadUtils';
 import { CreateDatasetDialog } from './CreateDatasetDialog';
 import { EditDatasetDialog } from './EditDatasetDialog';
 import { AddDataSourceDialog } from './AddDataSourceDialog';
 import { useDebounce } from '@/hooks/useDebounce';
 import Datasets from '@/services/Datasets';
 import DatasetsData from '@/services/DatasetsData';
-import { DatasetListVo, DatasetStatisticsVo, DatasetDetailVo, DatasourceTableDataPreviewVo } from '@/services/DatasetsTypes';
+import { DatasetListVo, DatasetStatisticsVo, DatasetDetailVo, DatasourceTableDataPreviewVo, } from '@/services/DatasetsTypes';
 import { DatasetDataListVo } from '@/services/DatasetsDataTypes';
 import { DatasetTypeEnum, VisibilityEnum, DatasetDataTypeEnum } from '@/enums/enums';
 import { GetDatasetListOrderByEnum } from '@/services/DatasetsTypes';
@@ -68,6 +69,20 @@ export function Dataset() {
   const [dataFiles, setDataFiles] = useState<DatasetDataListVo[]>([]);
   const [databaseTables, setDatabaseTables] = useState<DatasetDataListVo[]>([]);
   const [tablePreviewData, setTablePreviewData] = useState<DatasourceTableDataPreviewVo | null>(null);
+
+  // 文件上传相关状态
+  const [uploadFiles, setUploadFiles] = useState<UploadFile[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const folderInputRef = useRef<HTMLInputElement>(null);
+  const uploadIntervalsRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
+
+  // 清理所有上传任务的定时器
+  useEffect(() => {
+    return () => {
+      clearAllUploadIntervals(uploadIntervalsRef);
+    };
+  }, []);
 
   /**
    * 数据集状态颜色
@@ -138,21 +153,23 @@ export function Dataset() {
       name: vo.name || '',
       type: typeEnum,
       typeDisplay,
-      typeColor: typeEnum === DatasetDataTypeEnum.CSV
-        ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-        : typeEnum === DatasetDataTypeEnum.JSON
-        ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
-        : typeEnum === DatasetDataTypeEnum.EXCEL
-        ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
-        : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300',
+      typeColor:
+        typeEnum === DatasetDataTypeEnum.CSV
+          ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+          : typeEnum === DatasetDataTypeEnum.JSON
+            ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+            : typeEnum === DatasetDataTypeEnum.EXCEL
+              ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+              : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300',
       typeIcon: typeIconMap[typeEnum] || '📄',
       size: vo.dataSize || '0 MB',
       status,
-      statusColor: status === '已处理'
-        ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-        : status === '处理中'
-        ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
-        : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
+      statusColor:
+        status === '已处理'
+          ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+          : status === '处理中'
+            ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+            : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
       modifiedDate: vo.createdDate || '',
       recordCount: vo.dataCount ? vo.dataCount.toLocaleString() : '0',
     };
@@ -248,9 +265,7 @@ export function Dataset() {
       [VisibilityEnum.PUBLIC]: 'public',
     };
 
-    const dataCount = vo.dataStatistics?.totalFilesOrTables 
-      ? String(vo.dataStatistics.totalFilesOrTables) 
-      : '0';
+    const dataCount = vo.dataStatistics?.totalFilesOrTables ? String(vo.dataStatistics.totalFilesOrTables) : '0';
     const size = vo.dataStatistics?.totalRecordsSize || '0 条';
     const createdDate = vo.createdDate || '';
     const modifiedDate = vo.modifiedDate || '';
@@ -326,7 +341,7 @@ export function Dataset() {
         const totalRecords = statsData.totalRecords || 0;
         const usedStoreSize = statsData.usedStoreSize || '0GB';
         const authorizedStoreSize = statsData.authorizedStoreSize || '0GB';
-        
+
         // 计算存储空间使用率
         const usedSizeNum = parseFloat(usedStoreSize.replace(/[^0-9.]/g, '')) || 0;
         const totalSizeNum = parseFloat(authorizedStoreSize.replace(/[^0-9.]/g, '')) || 0;
@@ -400,19 +415,19 @@ export function Dataset() {
   const handleView = async (dataset: DatasetItem) => {
     setViewingDataset(dataset);
     setViewDialogOpen(true);
-    
+
     try {
       const response = await Datasets.getDatasetDetail(dataset.id);
       const responseData = (response as any).data;
       const detail: DatasetDetailVo | undefined = responseData;
-      
+
       if (detail) {
         setDatasetDetail(detail);
         // 更新viewingDataset的详细信息
         setViewingDataset({
           ...dataset,
-          dataCount: detail.dataStatistics?.totalFilesOrTables 
-            ? String(detail.dataStatistics.totalFilesOrTables) 
+          dataCount: detail.dataStatistics?.totalFilesOrTables
+            ? String(detail.dataStatistics.totalFilesOrTables)
             : dataset.dataCount,
           size: detail.dataStatistics?.totalRecordsSize || dataset.size,
         });
@@ -440,7 +455,7 @@ export function Dataset() {
     const newEnabled = !dataset.enabled;
     try {
       await Datasets.toggleDatasetStatus(id, { enabled: newEnabled });
-      
+
       // 更新本地状态
       setDatasets(prev =>
         prev.map(ds => {
@@ -544,31 +559,34 @@ export function Dataset() {
   }, []);
 
   // 预览数据源表数据
-  const loadTablePreview = useCallback(async (datasetId: string, tableName: string) => {
-    setIsLoadingTablePreview(true);
-    try {
-      const response = await Datasets.previewDatasourceData(datasetId, {
-        tableName,
-        pageNo: tableCurrentPage,
-        pageSize: tablePageSize,
-      });
+  const loadTablePreview = useCallback(
+    async (datasetId: string, tableName: string) => {
+      setIsLoadingTablePreview(true);
+      try {
+        const response = await Datasets.previewDatasourceData(datasetId, {
+          tableName,
+          pageNo: tableCurrentPage,
+          pageSize: tablePageSize,
+        });
 
-      const responseData = (response as any).data;
-      const previewData: DatasourceTableDataPreviewVo | undefined = responseData;
+        const responseData = (response as any).data;
+        const previewData: DatasourceTableDataPreviewVo | undefined = responseData;
 
-      if (previewData) {
-        setTablePreviewData(previewData);
-      } else {
+        if (previewData) {
+          setTablePreviewData(previewData);
+        } else {
+          setTablePreviewData(null);
+        }
+      } catch (error: any) {
+        console.error('加载表预览数据失败:', error);
+        toast.error(error?.message || '加载表预览数据失败');
         setTablePreviewData(null);
+      } finally {
+        setIsLoadingTablePreview(false);
       }
-    } catch (error: any) {
-      console.error('加载表预览数据失败:', error);
-      toast.error(error?.message || '加载表预览数据失败');
-      setTablePreviewData(null);
-    } finally {
-      setIsLoadingTablePreview(false);
-    }
-  }, [tableCurrentPage, tablePageSize]);
+    },
+    [tableCurrentPage, tablePageSize]
+  );
 
   // 当选中数据集变化时，加载对应的数据和详情
   useEffect(() => {
@@ -606,12 +624,118 @@ export function Dataset() {
     }
   }, [selectedDS, selectedTable, loadTablePreview]);
 
+  // 当切换数据集时，清空上传文件列表
+  useEffect(() => {
+    if (!selectedDS || (selectedDS.type !== '文本' && selectedDS.type !== '表格')) {
+      // 清理所有上传定时器
+      clearAllUploadIntervals(uploadIntervalsRef);
+      setUploadFiles([]);
+    }
+  }, [selectedDS]);
+
+  // 文件验证配置
+  const fileValidationConfig: FileValidationConfig = {
+    maxSize: 50 * 1024 * 1024, // 50MB
+    allowedTypes: [
+      'text/csv',
+      'application/json',
+      'application/xml',
+      'text/xml',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-excel',
+    ],
+    allowedExtensions: ['.csv', '.json', '.xml', '.xlsx', '.xls'],
+    errorMessages: {
+      sizeExceeded: '超过大小限制 (50MB)',
+      formatNotSupported: '格式不支持，支持 CSV, JSON, XML, Excel 格式',
+    },
+  };
+
+  // 处理文件选择
+  const handleFiles = (files: FileList | File[]) => {
+    const newFiles = processFiles(files, fileValidationConfig);
+
+    if (newFiles.length > 0) {
+      setUploadFiles(prev => [...prev, ...newFiles]);
+      toast.success(`已添加 ${newFiles.length} 个文件`);
+
+      // 自动开始上传
+      newFiles.forEach(uploadFile => {
+        handleUpload(uploadFile);
+      });
+    }
+  };
+
+  // 更新文件状态的辅助函数
+  const updateFile = (fileId: string, updates: Partial<UploadFile>) => {
+    setUploadFiles(prev => prev.map(f => (f.id === fileId ? { ...f, ...updates } : f)));
+  };
+
+  // 上传文件
+  const handleUpload = async (uploadFile: UploadFile) => {
+    const uploadConfig: UploadConfig = {
+      uploadApi: async (id: string, file: File, params?: any) => {
+        return DatasetsData.uploadDatasetFile(id, { file }, params);
+      },
+      resourceId: selectedDS?.id || null,
+      resourceName: '数据集',
+      onSuccess: () => {
+        // 重新加载文件列表
+        setTimeout(() => {
+          if (selectedDS) {
+            loadDatasetDataList(selectedDS.id);
+          }
+        }, 1000);
+      },
+    };
+
+    await uploadFileWithProgress(uploadFile, uploadConfig, updateFile, uploadIntervalsRef);
+  };
+
+  // 拖拽处理
+  const dragHandlers = createDragHandlers(setIsDragging, handleFiles);
+  const { handleDragOver, handleDragLeave, handleDrop } = dragHandlers;
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      handleFiles(e.target.files);
+    }
+    // 重置input，允许重复选择同一文件
+    e.target.value = '';
+  };
+
+  const handleSelectFiles = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleSelectFolder = () => {
+    folderInputRef.current?.click();
+  };
+
+  const removeFile = (fileId: string) => {
+    // 清理该文件的上传定时器
+    clearUploadInterval(fileId, uploadIntervalsRef);
+
+    setUploadFiles(prev => prev.filter(f => f.id !== fileId));
+    toast.info('已移除文件');
+  };
+
+  const clearAllFiles = () => {
+    // 清理所有上传定时器
+    clearAllUploadIntervals(uploadIntervalsRef);
+
+    setUploadFiles([]);
+    toast.info('已清空文件列表');
+  };
+
   return (
     <div className='space-y-6'>
       {/* Header */}
       <div>
         <h1 className='text-2xl mb-1 dark:text-white'>数据集</h1>
-        <p className='text-sm text-gray-600 dark:text-gray-400'>数据集是关系型数据组织与管理工具，用于AI模型应用知识补充和数据分析</p>
+        <p className='text-sm text-gray-600 dark:text-gray-400'>
+          数据集是关系型数据组织与管理工具，用于AI模型应用知识补充和数据分析
+        </p>
       </div>
 
       {/* Stats Cards */}
@@ -691,25 +815,25 @@ export function Dataset() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align='end' className='dark:bg-gray-800 dark:border-gray-700'>
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   className='dark:text-gray-300'
                   onClick={() => setSort(GetDatasetListOrderByEnum.ModifiedDate)}
                 >
                   按时间排序
                 </DropdownMenuItem>
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   className='dark:text-gray-300'
                   onClick={() => setSort(GetDatasetListOrderByEnum.Name)}
                 >
                   按名称排序
                 </DropdownMenuItem>
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   className='dark:text-gray-300'
                   onClick={() => setSort(GetDatasetListOrderByEnum.Type)}
                 >
                   按类型排序
                 </DropdownMenuItem>
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   className='dark:text-gray-300'
                   onClick={() => setSort(GetDatasetListOrderByEnum.CreatedDate)}
                 >
@@ -846,7 +970,9 @@ export function Dataset() {
                           />
                         </div>
                       </td>
-                      <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{formatDateOnly(dataset.modifiedDate)}</td>
+                      <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>
+                        {formatDateOnly(dataset.modifiedDate)}
+                      </td>
                       <td className='px-6 py-4'>
                         <div className='flex items-center gap-2' onClick={e => e.stopPropagation()}>
                           <button
@@ -930,7 +1056,9 @@ export function Dataset() {
                 >
                   <div className='flex items-start justify-between mb-4'>
                     <div className='flex items-center gap-3'>
-                      <div className={`${dataset.iconBg} w-12 h-12 rounded-lg flex items-center justify-center text-2xl`}>
+                      <div
+                        className={`${dataset.iconBg} w-12 h-12 rounded-lg flex items-center justify-center text-2xl`}
+                      >
                         {dataset.icon}
                       </div>
                       <div>
@@ -1012,7 +1140,8 @@ export function Dataset() {
                     <div className='mt-0.5 pt-3 border-t border-gray-100 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400'>
                       <div className='flex items-center justify-between'>
                         <span>
-                          可见性: {dataset.visibility === 'team' ? '团队' : dataset.visibility === 'private' ? '私有' : '公开'}
+                          可见性:{' '}
+                          {dataset.visibility === 'team' ? '团队' : dataset.visibility === 'private' ? '私有' : '公开'}
                         </span>
                         <span>{formatDateOnly(dataset.modifiedDate)}</span>
                       </div>
@@ -1064,148 +1193,257 @@ export function Dataset() {
 
       {/* 文件/表格类型 - 文件上传区域 */}
       {selectedDS && (selectedDS.type === '文本' || selectedDS.type === '表格') && (
-        <div className='border-t-2 border-gray-200 dark:border-gray-700 pt-6'>
-          <div className='mb-4'>
-            <h2 className='text-xl dark:text-white mb-1'>文件管理</h2>
-            <p className='text-sm text-gray-600 dark:text-gray-400'>
-              {selectedDS.name} - 上传和管理{selectedDS.type}文件
-            </p>
+        <div className='border-t-4 border-blue-500 dark:border-blue-400 bg-gradient-to-b from-blue-50/50 to-transparent dark:from-blue-900/10 dark:to-transparent -mx-6 px-6 pt-6 pb-6 mt-6'>
+          {/* Header with Dataset info */}
+          <div className='flex items-center justify-between mb-6'>
+            <div className='flex items-center gap-3'>
+              <div className={`${selectedDS.iconBg} w-12 h-12 rounded-lg flex items-center justify-center text-2xl`}>
+                {selectedDS.icon}
+              </div>
+              <div>
+                <div className='flex items-center gap-3'>
+                  <h2 className='text-xl dark:text-white'>{selectedDS.name}</h2>
+                  <Badge variant='secondary' className={`${selectedDS.statusColor}`}>
+                    {selectedDS.status}
+                  </Badge>
+                </div>
+                <p className='text-sm text-gray-600 dark:text-gray-400 mt-1'>
+                  {selectedDS.description} · {selectedDS.dataCount} 个文件 · {selectedDS.size}
+                </p>
+              </div>
+            </div>
+            <Button
+              variant='ghost'
+              size='sm'
+              onClick={() => setSelectedDataset(null)}
+              className='dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+            >
+              <X className='w-4 h-4' />
+            </Button>
           </div>
 
-          {/* Upload Area */}
-          <Card className='p-6 mb-4 dark:bg-gray-800 dark:border-gray-700'>
-            <div className='border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center hover:border-blue-500 dark:hover:border-blue-400 transition-colors cursor-pointer'>
-              <input
-                type='file'
-                id='file-upload'
-                multiple
-                accept='.csv,.json,.xml,.xlsx,.xls'
-                className='hidden'
-                onChange={async (e) => {
-                  const files = e.target.files;
-                  if (!files || files.length === 0) return;
-                  if (!selectedDS) {
-                    toast.error('请先选择数据集');
-                    return;
-                  }
+          <div className='space-y-6'>
+            {/* Upload Section */}
+            <div>
+              <h3 className='text-lg dark:text-white mb-3 flex items-center gap-2'>
+                <Upload className='w-5 h-5 text-blue-500 dark:text-blue-400' />
+                上传文件
+              </h3>
+              <Card className='p-6 dark:bg-gray-800 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm'>
+                <div
+                  className={`border-2 border-dashed rounded-lg p-8 text-center transition-all ${
+                    isDragging
+                      ? 'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-900/20'
+                      : 'border-gray-300 dark:border-gray-600 hover:border-blue-400 dark:hover:border-blue-500'
+                  }`}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                >
+                  <Upload
+                    className={`w-12 h-12 mx-auto mb-4 ${
+                      isDragging ? 'text-blue-500 dark:text-blue-400' : 'text-gray-400 dark:text-gray-500'
+                    }`}
+                  />
 
-                  for (const file of Array.from(files)) {
-                    try {
-                      await DatasetsData.uploadDatasetFile(selectedDS.id, { file });
-                      toast.success(`文件 "${file.name}" 上传成功`);
-                      // 重新加载文件列表
-                      loadDatasetDataList(selectedDS.id);
-                    } catch (error: any) {
-                      console.error('上传文件失败:', error);
-                      toast.error(`文件 "${file.name}" 上传失败: ${error?.message || '未知错误'}`);
-                    }
-                  }
-                  // 重置input
-                  e.target.value = '';
-                }}
-              />
-              <Upload className='w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-4' />
-              <Button
-                className='bg-blue-500 hover:bg-blue-600 text-white mb-4'
-                onClick={() => {
-                  const input = document.getElementById('file-upload');
-                  if (input) {
-                    input.click();
-                  }
-                }}
-              >
-                <Upload className='w-4 h-4 mr-2' />
-                选择文件
-              </Button>
-              <p className='text-sm text-gray-600 dark:text-gray-400'>
-                拖拽文件到此处或点击选择文件 · 支持 CSV, JSON, XML, Excel 格式，最大 50MB
-              </p>
+                  <div className='flex items-center justify-center gap-3 mb-4'>
+                    <Button className='bg-blue-500 hover:bg-blue-600 text-white' onClick={handleSelectFiles}>
+                      <Files className='w-4 h-4 mr-2' />
+                      选择文件
+                    </Button>
+                    <Button
+                      variant='outline'
+                      className='dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600'
+                      onClick={handleSelectFolder}
+                    >
+                      <FolderOpen className='w-4 h-4 mr-2' />
+                      选择文件夹
+                    </Button>
+                  </div>
+
+                  <p className='text-sm text-gray-600 dark:text-gray-400'>
+                    {isDragging ? '松开鼠标以上传文件' : '拖拽文件到此处或点击选择文件'}
+                  </p>
+                  <p className='text-xs text-gray-500 dark:text-gray-500 mt-2'>
+                    支持 CSV、JSON、XML、Excel 格式 · 单文件限制 50MB
+                  </p>
+
+                  {/* 隐藏的文件输入 */}
+                  <input
+                    ref={fileInputRef}
+                    type='file'
+                    multiple
+                    accept='.csv,.json,.xml,.xlsx,.xls'
+                    onChange={handleFileInputChange}
+                    className='hidden'
+                  />
+                  <input
+                    ref={folderInputRef}
+                    type='file'
+                    // @ts-ignore - webkitdirectory is not in TypeScript types
+                    webkitdirectory=''
+                    directory=''
+                    multiple
+                    onChange={handleFileInputChange}
+                    className='hidden'
+                  />
+                </div>
+
+                {/* 上传文件列表 */}
+                {uploadFiles.length > 0 && (
+                  <div className='mt-6'>
+                    <div className='flex items-center justify-between mb-3'>
+                      <h4 className='text-sm dark:text-white'>上传队列 ({uploadFiles.length} 个文件)</h4>
+                      <Button
+                        variant='ghost'
+                        size='sm'
+                        onClick={clearAllFiles}
+                        className='text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400'
+                      >
+                        <X className='w-4 h-4 mr-1' />
+                        清空列表
+                      </Button>
+                    </div>
+
+                    <div className='space-y-2 max-h-60 overflow-y-auto'>
+                      {uploadFiles.map(uploadFile => (
+                        <div
+                          key={uploadFile.id}
+                          className='flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg'
+                        >
+                          <div className='flex-1 min-w-0'>
+                            <div className='flex items-center justify-between mb-1'>
+                              <span className='text-sm dark:text-white truncate'>{uploadFile.name}</span>
+                              <span className='text-xs text-gray-500 dark:text-gray-400 ml-2'>
+                                {formatFileSize(uploadFile.size)}
+                              </span>
+                            </div>
+
+                            {uploadFile.status === 'uploading' && (
+                              <div className='flex items-center gap-2'>
+                                <Progress value={uploadFile.progress} className='h-1.5 flex-1' />
+                                <span className='text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap'>
+                                  {Math.round(uploadFile.progress)}%
+                                </span>
+                              </div>
+                            )}
+
+                            {uploadFile.status === 'success' && (
+                              <div className='flex items-center gap-1 text-green-600 dark:text-green-400'>
+                                <Check className='w-3 h-3' />
+                                <span className='text-xs'>上传成功</span>
+                              </div>
+                            )}
+
+                            {uploadFile.status === 'error' && (
+                              <span className='text-xs text-red-600 dark:text-red-400'>
+                                {uploadFile.error || '上传失败'}
+                              </span>
+                            )}
+                          </div>
+
+                          <Button
+                            variant='ghost'
+                            size='sm'
+                            onClick={() => removeFile(uploadFile.id)}
+                            className='text-gray-400 hover:text-red-600 dark:hover:text-red-400 flex-shrink-0'
+                          >
+                            <X className='w-4 h-4' />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </Card>
             </div>
-          </Card>
 
-          {/* Uploaded Files List */}
-          <div className='mb-4'>
-            <h3 className='text-lg dark:text-white mb-3'>已上传文件</h3>
+            {/* Document List Section */}
+            <div>
+              <h3 className='text-lg dark:text-white mb-3 flex items-center gap-2'>
+                <FileText className='w-5 h-5 text-green-500 dark:text-green-400' />
+                文件列表
+              </h3>
+              <Card className='dark:bg-gray-800 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm'>
+                <div className='overflow-x-auto'>
+                  <table className='w-full'>
+                    <thead className='bg-gray-50 dark:bg-gray-900'>
+                      <tr>
+                        <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>文件名称</th>
+                        <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>类型</th>
+                        <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>大小</th>
+                        <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>记录数</th>
+                        <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>状态</th>
+                        <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>上传时间</th>
+                        <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>操作</th>
+                      </tr>
+                    </thead>
+                    <tbody className='divide-y divide-gray-200 dark:divide-gray-700'>
+                      {isLoadingDataList ? (
+                        <tr>
+                          <td colSpan={7} className='px-6 py-8 text-center'>
+                            <div className='w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-2' />
+                            <p className='text-sm text-gray-600 dark:text-gray-400'>加载中...</p>
+                          </td>
+                        </tr>
+                      ) : convertedDataFiles.length === 0 ? (
+                        <tr>
+                          <td colSpan={7} className='px-6 py-8 text-center text-gray-500 dark:text-gray-400'>
+                            暂无文件
+                          </td>
+                        </tr>
+                      ) : (
+                        convertedDataFiles.map(file => (
+                          <tr key={file.id} className='hover:bg-gray-50 dark:hover:bg-gray-900'>
+                            <td className='px-6 py-4'>
+                              <div className='flex items-center gap-3'>
+                                <span className='text-xl'>{file.typeIcon}</span>
+                                <span className='text-sm dark:text-white'>{file.name}</span>
+                              </div>
+                            </td>
+                            <td className='px-6 py-4'>
+                              <Badge className={`text-xs ${file.typeColor} border-0`}>{file.typeDisplay}</Badge>
+                            </td>
+                            <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{file.size}</td>
+                            <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{file.recordCount}</td>
+                            <td className='px-6 py-4'>
+                              <Badge className={`text-xs ${file.statusColor} border-0`}>{file.status}</Badge>
+                            </td>
+                            <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{file.modifiedDate}</td>
+                            <td className='px-6 py-4'>
+                              <div className='flex items-center gap-2'>
+                                <button
+                                  onClick={() => handleAction('下载', file.name)}
+                                  className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
+                                  title='下载文件'
+                                >
+                                  <Download className='w-4 h-4 text-blue-500' />
+                                </button>
+                                <button
+                                  onClick={() => handleAction('查看', file.name)}
+                                  className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
+                                  title='预览'
+                                >
+                                  <Eye className='w-4 h-4 text-gray-600 dark:text-gray-400' />
+                                </button>
+                                <button
+                                  onClick={() => handleAction('删除', file.name)}
+                                  className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
+                                  title='删除文件'
+                                >
+                                  <Trash2 className='w-4 h-4 text-red-500' />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </Card>
+            </div>
           </div>
-
-          <Card className='dark:bg-gray-800 dark:border-gray-700'>
-            <div className='overflow-x-auto'>
-              <table className='w-full'>
-                <thead className='bg-gray-50 dark:bg-gray-900'>
-                  <tr>
-                    <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>文件名称</th>
-                    <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>类型</th>
-                    <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>大小</th>
-                    <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>记录数</th>
-                    <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>状态</th>
-                    <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>上传时间</th>
-                    <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>操作</th>
-                  </tr>
-                </thead>
-                <tbody className='divide-y divide-gray-200 dark:divide-gray-700'>
-                  {isLoadingDataList ? (
-                    <tr>
-                      <td colSpan={7} className='px-6 py-8 text-center'>
-                        <div className='w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-2' />
-                        <p className='text-sm text-gray-600 dark:text-gray-400'>加载中...</p>
-                      </td>
-                    </tr>
-                  ) : convertedDataFiles.length === 0 ? (
-                    <tr>
-                      <td colSpan={7} className='px-6 py-8 text-center text-gray-500 dark:text-gray-400'>
-                        暂无文件
-                      </td>
-                    </tr>
-                  ) : (
-                    convertedDataFiles.map(file => (
-                      <tr key={file.id} className='hover:bg-gray-50 dark:hover:bg-gray-900'>
-                      <td className='px-6 py-4'>
-                        <div className='flex items-center gap-3'>
-                          <span className='text-xl'>{file.typeIcon}</span>
-                          <span className='text-sm dark:text-white'>{file.name}</span>
-                        </div>
-                      </td>
-                      <td className='px-6 py-4'>
-                        <Badge className={`text-xs ${file.typeColor} border-0`}>{file.typeDisplay}</Badge>
-                      </td>
-                      <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{file.size}</td>
-                      <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{file.recordCount}</td>
-                      <td className='px-6 py-4'>
-                        <Badge className={`text-xs ${file.statusColor} border-0`}>{file.status}</Badge>
-                      </td>
-                      <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{file.modifiedDate}</td>
-                      <td className='px-6 py-4'>
-                        <div className='flex items-center gap-2'>
-                          <button
-                            onClick={() => handleAction('下载', file.name)}
-                            className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
-                            title='下载文件'
-                          >
-                            <Download className='w-4 h-4 text-blue-500' />
-                          </button>
-                          <button
-                            onClick={() => handleAction('查看', file.name)}
-                            className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
-                            title='预览'
-                          >
-                            <Eye className='w-4 h-4 text-gray-600 dark:text-gray-400' />
-                          </button>
-                          <button
-                            onClick={() => handleAction('删除', file.name)}
-                            className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
-                            title='删除文件'
-                          >
-                            <Trash2 className='w-4 h-4 text-red-500' />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </Card>
         </div>
       )}
 
@@ -1217,10 +1455,15 @@ export function Dataset() {
             <div className='flex items-start justify-between mb-4'>
               <div className='flex items-center gap-4'>
                 <div className='bg-blue-500 w-14 h-14 rounded-xl flex items-center justify-center text-3xl'>
-                  {datasetDetail.datasourceConfig?.databaseType === 'MySQL' ? '🐬' :
-                   datasetDetail.datasourceConfig?.databaseType === 'PostgreSQL' ? '🐘' :
-                   datasetDetail.datasourceConfig?.databaseType === 'SQLServer' ? '🔷' :
-                   datasetDetail.datasourceConfig?.databaseType === 'Oracle' ? '🔴' : '🔌'}
+                  {datasetDetail.datasourceConfig?.databaseType === 'MySQL'
+                    ? '🐬'
+                    : datasetDetail.datasourceConfig?.databaseType === 'PostgreSQL'
+                      ? '🐘'
+                      : datasetDetail.datasourceConfig?.databaseType === 'SQLServer'
+                        ? '🔷'
+                        : datasetDetail.datasourceConfig?.databaseType === 'Oracle'
+                          ? '🔴'
+                          : '🔌'}
                 </div>
                 <div>
                   <h2 className='text-xl dark:text-white mb-1'>{datasetDetail.datasourceConfig?.name || '数据源'}</h2>
@@ -1283,12 +1526,12 @@ export function Dataset() {
               <Card className='p-4 dark:bg-gray-800 dark:border-gray-700'>
                 <div className='text-sm text-gray-600 dark:text-gray-400 mb-1'>总记录数</div>
                 <div className='text-2xl dark:text-white'>
-                  {datasetDetail.dataStatistics?.totalRecords 
-                    ? datasetDetail.dataStatistics.totalRecords >= 1000000 
+                  {datasetDetail.dataStatistics?.totalRecords
+                    ? datasetDetail.dataStatistics.totalRecords >= 1000000
                       ? `${(datasetDetail.dataStatistics.totalRecords / 1000000).toFixed(1)}M`
                       : datasetDetail.dataStatistics.totalRecords >= 1000
-                      ? `${(datasetDetail.dataStatistics.totalRecords / 1000).toFixed(1)}K`
-                      : String(datasetDetail.dataStatistics.totalRecords)
+                        ? `${(datasetDetail.dataStatistics.totalRecords / 1000).toFixed(1)}K`
+                        : String(datasetDetail.dataStatistics.totalRecords)
                     : '0'}
                 </div>
               </Card>
@@ -1315,9 +1558,7 @@ export function Dataset() {
                     <p className='text-sm text-gray-600 dark:text-gray-400'>加载中...</p>
                   </div>
                 ) : databaseTables.length === 0 ? (
-                  <div className='p-8 text-center text-gray-500 dark:text-gray-400'>
-                    暂无数据表
-                  </div>
+                  <div className='p-8 text-center text-gray-500 dark:text-gray-400'>暂无数据表</div>
                 ) : (
                   <div className='divide-y divide-gray-200 dark:divide-gray-700'>
                     {databaseTables.map(vo => {
@@ -1396,9 +1637,7 @@ export function Dataset() {
                         )}
                       </div>
                     ) : tableColumns.length === 0 ? (
-                      <div className='p-8 text-center text-gray-500 dark:text-gray-400'>
-                        暂无数据
-                      </div>
+                      <div className='p-8 text-center text-gray-500 dark:text-gray-400'>暂无数据</div>
                     ) : (
                       <div className='overflow-x-auto'>
                         <table className='w-full text-sm'>
@@ -1513,7 +1752,9 @@ export function Dataset() {
                   <p className='text-sm dark:text-white mt-1'>{viewingDataset.type}</p>
                 </div>
                 <div>
-                  <Label className='text-sm text-gray-600 dark:text-gray-400'>{viewingDataset.type === '数据源' ? '表数量' : '文件数量'}</Label>
+                  <Label className='text-sm text-gray-600 dark:text-gray-400'>
+                    {viewingDataset.type === '数据源' ? '表数量' : '文件数量'}
+                  </Label>
                   <p className='text-sm dark:text-white mt-1'>{viewingDataset.dataCount} </p>
                 </div>
                 <div>
@@ -1552,8 +1793,8 @@ export function Dataset() {
       </Dialog>
 
       {/* Create Dataset Dialog */}
-      <CreateDatasetDialog 
-        open={createDialogOpen} 
+      <CreateDatasetDialog
+        open={createDialogOpen}
         onOpenChange={setCreateDialogOpen}
         onSuccess={() => {
           loadDatasets();
@@ -1562,9 +1803,9 @@ export function Dataset() {
       />
 
       {/* Edit Dataset Dialog */}
-      <EditDatasetDialog 
-        open={editDialogOpen} 
-        onOpenChange={setEditDialogOpen} 
+      <EditDatasetDialog
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
         dataset={editingDataset}
         onSuccess={() => {
           loadDatasets();

@@ -65,22 +65,11 @@ function CategoryItem({
           'group w-full flex items-center gap-2 px-3 rounded-lg transition-colors',
           paddingClass,
           indentClass,
-          isSelected
-            ? 'bg-blue-50 dark:bg-blue-900/20'
-            : 'hover:bg-gray-100 dark:hover:bg-gray-750'
+          isSelected ? 'bg-blue-50 dark:bg-blue-900/20' : 'hover:bg-gray-100 dark:hover:bg-gray-750'
         )}
       >
-        <button
-          onClick={() => onSelect(category.id)}
-          className='flex items-center gap-2 text-left min-w-0'
-        >
-          <Icon
-            className={cn(
-              'w-4 h-4 shrink-0',
-              category.color,
-              isSelected && 'text-blue-600 dark:text-blue-400'
-            )}
-          />
+        <button onClick={() => onSelect(category.id)} className='flex items-center gap-2 text-left min-w-0'>
+          <Icon className={cn('w-4 h-4 shrink-0', category.color, isSelected && 'text-blue-600 dark:text-blue-400')} />
           <span
             className={cn(
               'text-sm truncate max-w-[100px] block',
@@ -384,7 +373,7 @@ export function PromptLibraryPage() {
       toast.error(language === 'zh-CN' ? '内容为空，无法复制' : 'Content is empty, cannot copy');
       return;
     }
-    
+
     try {
       const success = await copyToClipboard(content);
       if (success) {
@@ -472,14 +461,14 @@ export function PromptLibraryPage() {
   const collectAllChildCategoryIds = useCallback((parentId: string, allCategories: Category[]): string[] => {
     const childIds: string[] = [];
     const children = allCategories.filter(c => c.parentId === parentId);
-    
+
     for (const child of children) {
       childIds.push(child.id);
       // 递归获取子分类的子分类
       const grandChildren = collectAllChildCategoryIds(child.id, allCategories);
       childIds.push(...grandChildren);
     }
-    
+
     return childIds;
   }, []);
 
@@ -555,15 +544,15 @@ export function PromptLibraryPage() {
                     getCategoryCount={getCategoryCount}
                     getCategoryDisplayName={getCategoryDisplayName}
                     language={language}
-                    onSelect={(categoryId) => {
+                    onSelect={categoryId => {
                       setSelectedCategoryId(categoryId);
                       setPageParam(pre => ({ ...pre, pageNo: 1 }));
                     }}
-                    onEdit={(category) => {
+                    onEdit={category => {
                       setEditingCategory(category);
                       setShowCategoryDialog(true);
                     }}
-                    onDelete={(category) => {
+                    onDelete={category => {
                       setDeletingCategory(category);
                       setShowDeleteCategoryDialog(true);
                     }}

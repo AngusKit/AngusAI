@@ -133,7 +133,6 @@ export function EditDatasetDialog({ open, onOpenChange, dataset, onSuccess }: Ed
     }
   };
 
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='w-[760px] !max-w-[90vw] max-h-[85vh] overflow-hidden p-0 dark:bg-gray-900 dark:border-gray-700 flex flex-col'>
@@ -303,11 +302,7 @@ export function EditDatasetDialog({ open, onOpenChange, dataset, onSuccess }: Ed
             >
               取消
             </Button>
-            <Button
-              onClick={handleSubmit}
-              disabled={isSubmitting}
-              className='bg-blue-500 hover:bg-blue-600 text-white'
-            >
+            <Button onClick={handleSubmit} disabled={isSubmitting} className='bg-blue-500 hover:bg-blue-600 text-white'>
               {isSubmitting ? '保存中...' : '保存'}
             </Button>
           </div>

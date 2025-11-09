@@ -175,7 +175,6 @@ export interface DatasetUpdateDto {
   tags?: string[];
 }
 
-
 /** 测试数据源连接请求参数 */
 export interface DatasourceConnectionTestDto {
   /**
@@ -217,7 +216,6 @@ export type DatasourceConnectionTestResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: DatasourceConnectionTestVo;
 };
-
 
 /** 数据集列表项响应 */
 export interface DatasetListVo extends TenantAuditingVo {
@@ -292,7 +290,6 @@ export type DatasourceTableDataPreviewResult = ApiLocaleResult & {
   data?: DatasourceTableDataPreviewVo;
 };
 
-
 /** 数据集统计响应 */
 export interface DatasetStatisticsVo {
   /**
@@ -339,4 +336,3 @@ export enum GetDatasetListOrderByEnum {
   CreatedDate = 'createdDate',
   ModifiedDate = 'modifiedDate',
 }
-

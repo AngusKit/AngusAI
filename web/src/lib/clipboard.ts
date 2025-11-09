@@ -30,9 +30,9 @@ export async function copyToClipboard(text: string): Promise<boolean> {
   textArea.style.pointerEvents = 'none';
   textArea.setAttribute('readonly', '');
   textArea.setAttribute('aria-hidden', 'true');
-  
+
   document.body.appendChild(textArea);
-  
+
   // Select the text
   let selectionSuccess = false;
   if (navigator.userAgent.match(/ipad|iphone/i)) {
@@ -59,12 +59,12 @@ export async function copyToClipboard(text: string): Promise<boolean> {
     if (selectionSuccess) {
       successful = document.execCommand('copy');
     }
-    
+
     // Clean up
     if (document.body.contains(textArea)) {
       document.body.removeChild(textArea);
     }
-    
+
     return successful;
   } catch (err) {
     console.error('复制失败:', err);

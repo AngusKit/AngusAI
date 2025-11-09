@@ -28,7 +28,13 @@ const databaseTypeMap: Record<DatabaseType, DatasourceTypeEnum> = {
   oracle: DatasourceTypeEnum.Oracle,
 };
 
-export function AddDataSourceDialog({ open, onOpenChange, datasetName, datasetId, onSuccess }: AddDataSourceDialogProps) {
+export function AddDataSourceDialog({
+  open,
+  onOpenChange,
+  datasetName,
+  datasetId,
+  onSuccess,
+}: AddDataSourceDialogProps) {
   const [isTestingConnection, setIsTestingConnection] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [showPassword, setShowPassword] = useState(false);
@@ -110,7 +116,7 @@ export function AddDataSourceDialog({ open, onOpenChange, datasetName, datasetId
 
     try {
       const finalJdbcUrl = useCustomUrl ? jdbcUrl : generateJdbcUrl();
-      
+
       const testDto: DatasourceConnectionTestDto = {
         datasetId: datasetId || undefined,
         databaseType: databaseTypeMap[dbType],
@@ -124,7 +130,7 @@ export function AddDataSourceDialog({ open, onOpenChange, datasetName, datasetId
 
       const response = await Datasets.testDataSourceConnection(testDto);
       const responseData = (response as any).data;
-      
+
       if (responseData?.success) {
         setConnectionStatus('success');
         toast.success(responseData?.message || '连接测试成功');

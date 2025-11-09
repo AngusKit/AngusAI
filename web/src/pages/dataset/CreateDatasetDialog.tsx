@@ -75,7 +75,7 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
     try {
       // 映射数据类型：页面上的'text'和'table'都对应FILE类型，'datasource'对应DATASOURCE类型
       const datasetType = dataType === 'datasource' ? DatasetTypeEnum.DATASOURCE : DatasetTypeEnum.FILE;
-      
+
       // 映射可见性
       const visibilityMap: Record<string, VisibilityEnum> = {
         private: VisibilityEnum.PRIVATE,
@@ -97,7 +97,7 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
       toast.success('数据集创建成功！');
       onOpenChange(false);
       onSuccess?.();
-      
+
       // 重置表单
       setDatasetName('');
       setDescription('');
@@ -113,7 +113,6 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
       setIsSubmitting(false);
     }
   };
-
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -293,11 +292,7 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
             >
               取消
             </Button>
-            <Button
-              onClick={handleSubmit}
-              disabled={isSubmitting}
-              className='bg-blue-500 hover:bg-blue-600 text-white'
-            >
+            <Button onClick={handleSubmit} disabled={isSubmitting} className='bg-blue-500 hover:bg-blue-600 text-white'>
               {isSubmitting ? '创建中...' : '创建'}
             </Button>
           </div>

@@ -1,20 +1,8 @@
 import { ApiLocaleResult, PageQuery, AI } from '@xcan-angus/infra';
-import {
-  DatasetCreateDto,
-  DatasetDetailResult,
-  DatasetStatisticsResult,
-  DatasetToggleDto,
-  DatasetUpdateDto,
-  DatasourceConnectionTestDto,
-  DatasourceConnectionTestResult,
-  DatasourceTableDataPreviewResult,
-  DataSourceUpdateDto,
-  GetDatasetListOrderByEnum,
-  PageDatasetListResult,
-} from './DatasetsTypes.ts';
+import { DatasetCreateDto, DatasetDetailResult, DatasetStatisticsResult, DatasetToggleDto, DatasetUpdateDto, DatasourceConnectionTestDto, DatasourceConnectionTestResult, DatasourceTableDataPreviewResult, DataSourceUpdateDto, GetDatasetListOrderByEnum, PageDatasetListResult, } from './DatasetsTypes.ts';
 import http, { ContentType, HttpClient, RequestParams } from './HttpClient.ts';
 import { DatasetTypeEnum, VisibilityEnum } from '@/enums/enums.ts';
-import {KnowledgeBaseDetailResult} from "@/services/KnowledgeBasesTypes.ts";
+import { KnowledgeBaseDetailResult } from '@/services/KnowledgeBasesTypes.ts';
 
 export class Datasets<SecurityDataType = unknown> {
   http: HttpClient<SecurityDataType>;
