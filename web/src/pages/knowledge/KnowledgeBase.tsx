@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, } from '@/components/ui/pagination';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, } from '@/components/ui/alert-dialog';
 import { Switch } from '@/components/ui/switch';
 import { useEffect, useRef, useState } from 'react';
 import { useLanguage } from '@/components/ui/LanguageProvider';
@@ -18,6 +19,7 @@ import type { KnowledgeBaseListVo, KnowledgeBaseStatisticsVo } from '@/services/
 import { GetKnowledgeBaseListOrderByEnum } from '@/services/KnowledgeBasesTypes';
 import type { KnowledgeBaseDocListVo } from '@/services/DocumentsTypes';
 import { getTagColor, formatDateOnly, formatFileSize, ENABLED_STATUS_COLOR } from '@/utils';
+import { downloadFile } from '@/utils/DownloadUtils';
 import { useDebounce } from '@/hooks/useDebounce';
 import { DOCUMENT_STATUS_MAP, DOCUMENT_TYPE_MAP } from './constants';
 import { UploadFile, processFiles, uploadFileWithProgress, createDragHandlers, clearAllUploadIntervals, clearUploadInterval, type FileValidationConfig, type UploadConfig, } from '@/utils/UploadUtils';
@@ -60,6 +62,10 @@ export function KnowledgeBase() {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingKnowledgeBase, setEditingKnowledgeBase] = useState<KnowledgeBaseItem | null>(null);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deletingKnowledgeBase, setDeletingKnowledgeBase] = useState<KnowledgeBaseItem | null>(null);
+  const [deleteDocumentDialogOpen, setDeleteDocumentDialogOpen] = useState(false);
+  const [deletingDocument, setDeletingDocument] = useState<any | null>(null);
   const [documentPage, setDocumentPage] = useState(1);
   const documentsPerPage = 6;
   const [isLoadingKnowledgeBases, setIsLoadingKnowledgeBases] = useState(false);
@@ -203,9 +209,6 @@ export function KnowledgeBase() {
         },
       ];
 
-  const handleAction = (action: string, name: string) => {
-    toast.success(`${action}: ${name}`);
-  };
 
   // 知识库列表
   const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeBaseItem[]>([]);
@@ -355,6 +358,7 @@ export function KnowledgeBase() {
             chunks: doc.chunks,
             errorMessage: doc.errorMessage,
             statusEnum: status,
+            filePath: doc.filePath,
           };
         });
         setDocuments(mappedDocs);
@@ -474,18 +478,43 @@ export function KnowledgeBase() {
   };
 
   // 删除文档
-  const handleDeleteDocument = async (doc: any) => {
+  const handleDeleteDocument = (doc: any) => {
     if (!selectedKnowledgeBase) return;
 
-    if (!confirm(`确定要删除文档 "${doc.name}" 吗？`)) return;
+    setDeletingDocument(doc);
+    setDeleteDocumentDialogOpen(true);
+  };
+
+  // 确认删除文档
+  const confirmDeleteDocument = async () => {
+    if (deletingDocument && selectedKnowledgeBase) {
+      try {
+        await Documents.deleteDocument(deletingDocument.id, selectedKnowledgeBase);
+        toast.success(`已删除文档: ${deletingDocument.name}`);
+        setDeleteDocumentDialogOpen(false);
+        setDeletingDocument(null);
+        loadDocuments(selectedKnowledgeBase); // 重新加载列表
+      } catch (error: any) {
+        toast.error(error?.data?.message || '删除文档失败');
+      }
+    }
+  };
+
+  // 下载文档
+  const handleDownloadDocument = async (doc: any) => {
+    if (!doc.filePath) {
+      toast.error('文件路径不存在，无法下载');
+      return;
+    }
 
     try {
-      await Documents.deleteDocument(doc.id, selectedKnowledgeBase);
-      setDocuments(prev => prev.filter(d => d.id !== doc.id));
-      toast.success(`已删除文档: ${doc.name}`);
-      loadDocuments(selectedKnowledgeBase); // 重新加载列表
+      await downloadFile(doc.filePath, {
+        filename: doc.name,
+        showToast: true,
+      });
     } catch (error: any) {
-      toast.error(error?.data?.message || '删除文档失败');
+      // 错误已在 downloadFile 中处理
+      console.error('下载文档失败:', error);
     }
   };
 
@@ -526,18 +555,26 @@ export function KnowledgeBase() {
     setEditDialogOpen(true);
   };
 
-  const handleDeleteKnowledgeBase = async (knowledgeBase: KnowledgeBaseItem) => {
-    if (!confirm(`确定要删除知识库 "${knowledgeBase.name}" 吗？此操作不可恢复。`)) return;
+  const handleDeleteKnowledgeBase = (knowledgeBase: KnowledgeBaseItem) => {
+    setDeletingKnowledgeBase(knowledgeBase);
+    setDeleteDialogOpen(true);
+  };
 
-    try {
-      await KnowledgeBases.deleteKnowledgeBase(knowledgeBase.id);
-      toast.success(`已删除知识库: ${knowledgeBase.name}`);
-      loadKnowledgeBases(); // 重新加载列表
-      if (selectedKnowledgeBase === knowledgeBase.id) {
-        setSelectedKnowledgeBase(null);
+  // 确认删除知识库
+  const confirmDeleteKnowledgeBase = async () => {
+    if (deletingKnowledgeBase) {
+      try {
+        await KnowledgeBases.deleteKnowledgeBase(deletingKnowledgeBase.id);
+        toast.success(`已删除知识库: ${deletingKnowledgeBase.name}`);
+        setDeleteDialogOpen(false);
+        setDeletingKnowledgeBase(null);
+        loadKnowledgeBases(); // 重新加载列表
+        if (selectedKnowledgeBase === deletingKnowledgeBase.id) {
+          setSelectedKnowledgeBase(null);
+        }
+      } catch (error: any) {
+        toast.error(error?.data?.message || '删除知识库失败');
       }
-    } catch (error: any) {
-      toast.error(error?.data?.message || '删除知识库失败');
     }
   };
 
@@ -1306,7 +1343,7 @@ export function KnowledgeBase() {
                                 <RefreshCw className='w-4 h-4 text-green-500' />
                               </button>
                               <button
-                                onClick={() => handleAction('下载', doc.name)}
+                                onClick={() => handleDownloadDocument(doc)}
                                 className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
                                 title='下载文件'
                               >
@@ -1481,6 +1518,46 @@ export function KnowledgeBase() {
           loadKnowledgeBases();
         }}
       />
+
+      {/* Delete Knowledge Base Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent className='dark:bg-gray-900 dark:border-gray-700'>
+          <AlertDialogHeader>
+            <AlertDialogTitle className='dark:text-white'>确认删除</AlertDialogTitle>
+            <AlertDialogDescription className='dark:text-gray-400'>
+              确定要删除知识库 "{deletingKnowledgeBase?.name}" 吗？此操作无法撤销。
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className='dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300'>
+              取消
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteKnowledgeBase} className='bg-red-600 hover:bg-red-700 text-white'>
+              删除
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Document Confirmation Dialog */}
+      <AlertDialog open={deleteDocumentDialogOpen} onOpenChange={setDeleteDocumentDialogOpen}>
+        <AlertDialogContent className='dark:bg-gray-900 dark:border-gray-700'>
+          <AlertDialogHeader>
+            <AlertDialogTitle className='dark:text-white'>确认删除</AlertDialogTitle>
+            <AlertDialogDescription className='dark:text-gray-400'>
+              确定要删除文档 "{deletingDocument?.name}" 吗？此操作无法撤销。
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className='dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300'>
+              取消
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteDocument} className='bg-red-600 hover:bg-red-700 text-white'>
+              删除
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

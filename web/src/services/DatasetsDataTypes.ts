@@ -21,6 +21,10 @@ export interface DatasetDataListVo extends TenantAuditingVo {
   dataCount?: number;
   /** 数据大小 */
   dataSize?: string;
+  /** 文件存储URL路径 */
+  filePath?: string;
+  /** 文件内容哈希编码 */
+  contentHash?: string;
 }
 
 /** 同步结果响应 */

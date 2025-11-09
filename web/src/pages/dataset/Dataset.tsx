@@ -13,6 +13,7 @@ import { Switch } from '@/components/ui/switch';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { toast } from 'sonner';
 import { formatDateOnly, getTagColor, formatFileSize } from '@/utils';
+import { downloadFile } from '@/utils/DownloadUtils';
 import { UploadFile, processFiles, uploadFileWithProgress, createDragHandlers, clearAllUploadIntervals, clearUploadInterval, type FileValidationConfig, type UploadConfig, } from '@/utils/UploadUtils';
 import { CreateDatasetDialog } from './CreateDatasetDialog';
 import { EditDatasetDialog } from './EditDatasetDialog';
@@ -110,6 +111,7 @@ export function Dataset() {
     statusColor: string;
     modifiedDate: string;
     recordCount: string;
+    filePath?: string; // 文件存储URL路径
   }
 
   // 将DatasetDataListVo转换为DataFileItem（先定义转换函数）
@@ -174,6 +176,7 @@ export function Dataset() {
             : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
       modifiedDate: vo.createdDate || '',
       recordCount: vo.dataCount ? vo.dataCount.toLocaleString() : '0',
+      filePath: vo.filePath,
     };
   }, []);
 
@@ -410,9 +413,6 @@ export function Dataset() {
     setCurrentPage(1);
   }, [debouncedSearchQuery]);
 
-  const handleAction = (action: string, name: string) => {
-    toast.success(`${action}: ${name}`);
-  };
 
   const handleView = async (dataset: DatasetItem) => {
     setViewingDataset(dataset);
@@ -770,6 +770,24 @@ export function Dataset() {
         console.error('删除文件失败:', error);
         toast.error(error?.data?.message || error?.message || '删除文件失败');
       }
+    }
+  };
+
+  // 下载文件
+  const handleDownloadFile = async (file: DataFileItem) => {
+    if (!file.filePath) {
+      toast.error('文件路径不存在，无法下载');
+      return;
+    }
+
+    try {
+      await downloadFile(file.filePath, {
+        filename: file.name,
+        showToast: true,
+      });
+    } catch (error: any) {
+      // 错误已在 downloadFile 中处理
+      console.error('下载文件失败:', error);
     }
   };
 
@@ -1465,7 +1483,7 @@ export function Dataset() {
                                   <RefreshCw className='w-4 h-4 text-green-500' />
                                 </button>
                                 <button
-                                  onClick={() => handleAction('下载', file.name)}
+                                  onClick={() => handleDownloadFile(file)}
                                   className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
                                   title='下载文件'
                                 >
