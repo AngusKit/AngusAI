@@ -19,7 +19,6 @@ import cloud.xcan.angus.remote.message.http.ResourceExisted;
 import cloud.xcan.angus.spec.annotations.DoInFuture;
 import cloud.xcan.angus.spec.utils.ObjectUtils;
 import jakarta.annotation.Resource;
-import java.util.Optional;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -133,7 +132,7 @@ public class DatasetCmdImpl extends CommCmd<Dataset, Long> implements DatasetCmd
         datasetDb = datasetQuery.findAndCheck(id);
 
         // 检查是否数据源类型
-        if(!datasetDb.getType().isDatasource()){
+        if (!datasetDb.getType().isDatasource()) {
           throw ProtocolException.of("不是数据源类型数据集");
         }
 
@@ -171,7 +170,6 @@ public class DatasetCmdImpl extends CommCmd<Dataset, Long> implements DatasetCmd
         if (isNull(checkConfig) || !checkConfig.isValid()) {
           throw ProtocolException.of("数据集的数据源未配置");
         }
-
         return DatasourceUtils.testConnection(checkConfig);
       }
     }.execute();

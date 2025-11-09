@@ -241,8 +241,8 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
                     {dataType === 'table' && <div className='w-2.5 h-2.5 rounded-full bg-blue-500' />}
                   </div>
                   <div>
-                    <div className='dark:text-white mb-0.5'>表格数据</div>
-                    <div className='text-sm text-gray-500 dark:text-gray-400'>CSV、Excel等</div>
+                    <div className='dark:text-white mb-0.5'>文件表格数据</div>
+                    <div className='text-sm text-gray-500 dark:text-gray-400'>CSV、JSON、XML、Excel 格式</div>
                   </div>
                 </div>
               </button>
@@ -265,7 +265,7 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
                   </div>
                   <div>
                     <div className='dark:text-white mb-0.5'>数据源</div>
-                    <div className='text-sm text-gray-500 dark:text-gray-400'>API、数据库等</div>
+                    <div className='text-sm text-gray-500 dark:text-gray-400'>MySQL、Postgres数据库等</div>
                   </div>
                 </div>
               </button>

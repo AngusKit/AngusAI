@@ -290,8 +290,8 @@ export type DatasourceTableDataPreviewResult = ApiLocaleResult & {
   data?: DatasourceTableDataPreviewVo;
 };
 
-/** 数据集统计响应 */
-export interface DatasetStatisticsVo {
+/** 数据集统计总体统计 */
+export interface DatasetStatisticsOverview {
   /**
    * 总数据集数
    * @format int64
@@ -308,19 +308,109 @@ export interface DatasetStatisticsVo {
    */
   totalFilesOrTables?: number;
   /**
+   * 活跃（被引用）文件或表数
+   * @format int64
+   */
+  activeFilesOrTables?: number;
+  /**
    * 总记录数
    * @format int64
    */
   totalRecords?: number;
   /**
-   * 记录总大小
+   * 总查询次数
    * @format int64
    */
-  totalRecordsSize?: number;
-  /** 已使用存储空间大小 */
+  totalQueryCount?: number;
+  /**
+   * 今日查询次数
+   * @format int64
+   */
+  todayQueryCount?: number;
+  /**
+   * 已使用存储空间大小
+   */
   usedStoreSize?: string;
-  /** 授权的存储空间大小，自定义数据源返回空 */
-  authorizedStoreSize?: string;
+  /**
+   * 授权的存储空间大小，自定义数据源返回空
+   */
+  totalStoreSize?: string;
+  /**
+   * 已使用存储空间占比，自定义数据源返回空
+   */
+  usedStoreRate?: string;
+}
+
+/** 使用率排行 */
+export interface DatasetTopDataset {
+  /**
+   * 数据集ID
+   * @format int64
+   */
+  id?: string;
+  /**
+   * 数据集名称
+   */
+  name?: string;
+  /**
+   * 查询次数
+   * @format int64
+   */
+  queryCount?: number;
+  /**
+   * 文件或表数
+   * @format int64
+   */
+  fileOrTableCount?: number;
+  /**
+   * 记录数
+   * @format int64
+   */
+  recordCount?: number;
+}
+
+/** 查询趋势 */
+export interface DatasetQueryTrend {
+  /**
+   * 时间戳
+   * @format int64
+   */
+  timestamp?: number;
+  /**
+   * 日期
+   */
+  date?: string;
+  /**
+   * 总查询次数
+   * @format int64
+   */
+  totalQueries?: number;
+  /**
+   * 平均响应时间（毫秒）
+   * @format int64
+   */
+  avgResponseTime?: number;
+  /**
+   * 错误数
+   * @format int64
+   */
+  errors?: number;
+  /**
+   * 错误率（百分比）
+   */
+  errorRate?: number;
+}
+
+/** 数据集统计响应 */
+export interface DatasetStatisticsVo {
+  /** 总体统计 */
+  overview?: DatasetStatisticsOverview;
+  /** 近一月趋势 */
+  lastMonthGrowthTrend?: DatasetStatisticsOverview;
+  /** 使用率排行 */
+  topDatasets?: DatasetTopDataset[];
+  /** 查询趋势 */
+  queryTrend?: DatasetQueryTrend[];
 }
 
 /** The API response result of supporting international message. */

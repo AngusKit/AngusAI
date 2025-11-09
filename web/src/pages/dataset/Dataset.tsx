@@ -17,7 +17,7 @@ import { downloadFile } from '@/utils/DownloadUtils';
 import { UploadFile, processFiles, uploadFileWithProgress, createDragHandlers, clearAllUploadIntervals, clearUploadInterval, type FileValidationConfig, type UploadConfig, } from '@/utils/UploadUtils';
 import { CreateDatasetDialog } from './CreateDatasetDialog';
 import { EditDatasetDialog } from './EditDatasetDialog';
-import { AddDataSourceDialog } from './AddDataSourceDialog';
+import { EditDataSourceDialog } from './EditDataSourceDialog';
 import { useDebounce } from '@/hooks/useDebounce';
 import Datasets from '@/services/Datasets';
 import DatasetsData from '@/services/DatasetsData';
@@ -32,7 +32,7 @@ interface DatasetItem {
   description: string;
   icon: string;
   iconBg: string;
-  type: '文本' | '表格' | '数据源';
+  type: '文件' | '数据源';
   dataCount: string;
   size: string;
   status: '已启用' | '禁用';
@@ -98,7 +98,7 @@ export function Dataset() {
   // 数据集列表
   const [datasets, setDatasets] = useState<DatasetItem[]>([]);
 
-  // 文件上传列表 - 用于文本和表格类型的数据集
+  // 文件上传列表 - 用于文件类型的数据集
   interface DataFileItem {
     id: string;
     name: string;
@@ -219,48 +219,48 @@ export function Dataset() {
   const [stats, setStats] = useState([
     {
       label: '数据集数量',
-      value: '0',
-      subtext: '活跃数据集 0个',
+      value: '--',
+      subtext: '活跃数据集 -- 个',
       icon: Database,
       iconBg: 'bg-blue-500',
-      trend: '+0%',
-      trendUp: true,
+      trend: undefined,
+      trendUp: undefined,
     },
     {
       label: '数据总量',
-      value: '0',
-      subtext: '0 条记录',
+      value: '--',
+      subtext: '文件/表数 -- 个 · 活跃 -- 个 · 总大小：--',
       icon: FileText,
       iconBg: 'bg-green-500',
-      trend: '+0%',
-      trendUp: true,
+      trend: undefined,
+      trendUp: undefined,
     },
     {
       label: '今日查询',
-      value: '0',
-      subtext: '累计查询数 0 次',
+      value: '--',
+      subtext: '累计查询数 -- 次',
       icon: Eye,
       iconBg: 'bg-orange-500',
-      trend: '+0%',
-      trendUp: true,
+      trend: undefined,
+      trendUp: undefined,
     },
     {
       label: '存储空间',
-      value: '0GB / 0GB',
-      subtext: '已使用 0%',
+      value: '-- / --',
+      subtext: '存储空间未限制',
       icon: Database,
       iconBg: 'bg-purple-500',
       progress: 0,
-      showProgress: true,
-      trend: '+0MB',
-      trendUp: true,
+      showProgress: false,
+      trend: undefined,
+      trendUp: undefined,
     },
   ]);
 
   // 将DatasetListVo转换为DatasetItem
   const convertDatasetVoToItem = useCallback((vo: DatasetListVo): DatasetItem => {
-    const typeMap: Record<DatasetTypeEnum, '文本' | '表格' | '数据源'> = {
-      [DatasetTypeEnum.FILE]: '文本', // FILE类型对应文本/表格，这里统一为文本
+    const typeMap: Record<DatasetTypeEnum, '文件' | '数据源'> = {
+      [DatasetTypeEnum.FILE]: '文件',
       [DatasetTypeEnum.DATASOURCE]: '数据源',
     };
 
@@ -282,7 +282,7 @@ export function Dataset() {
       description: vo.description || '',
       icon: vo.icon || '📊',
       iconBg: vo.iconBg || 'bg-blue-50 dark:bg-blue-900/20',
-      type: typeMap[vo.type || DatasetTypeEnum.FILE] || '文本',
+      type: typeMap[vo.type || DatasetTypeEnum.FILE] || '文件',
       dataCount,
       size,
       status: vo.enabled ? '已启用' : '禁用',
@@ -340,56 +340,67 @@ export function Dataset() {
       const responseData = (response as any).data;
       const statsData: DatasetStatisticsVo | undefined = responseData;
 
-      if (statsData) {
-        const totalDatasets = statsData.totalDatasets || 0;
-        const activeDatasets = statsData.activeDatasets || 0;
-        const totalRecords = statsData.totalRecords || 0;
-        const usedStoreSize = statsData.usedStoreSize || '0GB';
-        const authorizedStoreSize = statsData.authorizedStoreSize || '0GB';
-
-        // 计算存储空间使用率
-        const usedSizeNum = parseFloat(usedStoreSize.replace(/[^0-9.]/g, '')) || 0;
-        const totalSizeNum = parseFloat(authorizedStoreSize.replace(/[^0-9.]/g, '')) || 0;
-        const progress = totalSizeNum > 0 ? Math.round((usedSizeNum / totalSizeNum) * 100) : 0;
+      if (statsData?.overview) {
+        const overview = statsData.overview;
+        const totalDatasets = overview.totalDatasets || 0;
+        const activeDatasets = overview.activeDatasets || 0;
+        const totalFilesOrTables = overview.totalFilesOrTables || 0;
+        const activeFilesOrTables = overview.activeFilesOrTables || 0;
+        const totalRecords = overview.totalRecords || 0;
+        const totalQueryCount = overview.totalQueryCount || 0;
+        const todayQueryCount = overview.todayQueryCount || 0;
+        const usedStoreSize = overview.usedStoreSize || '0 MB';
+        const totalStoreSize = overview.totalStoreSize;
+        const usedStoreRate = overview.usedStoreRate;
 
         setStats([
           {
             label: '数据集数量',
             value: String(totalDatasets),
-            subtext: `活跃数据集 ${activeDatasets}个`,
+            subtext: `活跃数据集 ${activeDatasets} 个`,
             icon: Database,
             iconBg: 'bg-blue-500',
-            trend: '+0%',
-            trendUp: true,
+            trend: undefined,
+            trendUp: undefined,
           },
           {
             label: '数据总量',
-            value: totalRecords >= 1000 ? `${(totalRecords / 1000).toFixed(1)}K` : String(totalRecords),
-            subtext: `${totalRecords.toLocaleString()} 条记录`,
+            value: totalRecords >= 1000 
+              ? totalRecords >= 1000000
+                ? `${(totalRecords / 1000000).toFixed(1)}M`
+                : `${(totalRecords / 1000).toFixed(1)}K`
+              : String(totalRecords),
+            subtext: `文件/表数 ${totalFilesOrTables} 个 · 活跃 ${activeFilesOrTables} 个 · 总大小：${usedStoreSize}`,
             icon: FileText,
             iconBg: 'bg-green-500',
-            trend: '+0%',
-            trendUp: true,
+            trend: undefined,
+            trendUp: undefined,
           },
           {
             label: '今日查询',
-            value: '0',
-            subtext: '累计查询数 0 次',
+            value: String(todayQueryCount),
+            subtext: `累计查询数 ${totalQueryCount} 次`,
             icon: Eye,
             iconBg: 'bg-orange-500',
-            trend: '+0%',
-            trendUp: true,
+            trend: undefined,
+            trendUp: undefined,
           },
           {
             label: '存储空间',
-            value: `${usedStoreSize} / ${authorizedStoreSize}`,
-            subtext: `已使用 ${progress}%`,
+            value: totalStoreSize
+              ? `${usedStoreSize} / ${totalStoreSize}`
+              : `${usedStoreSize} / --`,
+            subtext: totalStoreSize
+              ? `已使用 ${usedStoreRate || '0%'}`
+              : '存储空间未限制',
             icon: Database,
             iconBg: 'bg-purple-500',
-            progress,
-            showProgress: true,
-            trend: '+0MB',
-            trendUp: true,
+            progress: usedStoreRate
+              ? parseFloat(usedStoreRate.replace('%', '')) || 0
+              : 0,
+            showProgress: !!totalStoreSize,
+            trend: undefined,
+            trendUp: undefined,
           },
         ]);
       }
@@ -502,7 +513,7 @@ export function Dataset() {
   // 获取选中的数据集
   const selectedDS = datasets.find(ds => ds.id === selectedDataset);
 
-  // 加载数据集数据列表（文件/表格类型）
+  // 加载数据集数据列表（文件类型）
   const loadDatasetDataList = useCallback(async (datasetId: string) => {
     setIsLoadingDataList(true);
     try {
@@ -605,7 +616,7 @@ export function Dataset() {
           console.error('加载数据集详情失败:', error);
         });
 
-      if (selectedDS.type === '文本' || selectedDS.type === '表格') {
+      if (selectedDS.type === '文件') {
         loadDatasetDataList(selectedDS.id);
       } else if (selectedDS.type === '数据源') {
         loadDataSourceTables(selectedDS.id);
@@ -628,7 +639,7 @@ export function Dataset() {
 
   // 当切换数据集时，清空上传文件列表
   useEffect(() => {
-    if (!selectedDS || (selectedDS.type !== '文本' && selectedDS.type !== '表格')) {
+    if (!selectedDS || selectedDS.type !== '文件') {
       // 清理所有上传定时器
       clearAllUploadIntervals(uploadIntervalsRef);
       setUploadFiles([]);
@@ -1283,8 +1294,8 @@ export function Dataset() {
         )}
       </div>
 
-      {/* 文件/表格类型 - 文件上传区域 */}
-      {selectedDS && (selectedDS.type === '文本' || selectedDS.type === '表格') && (
+      {/* 文件类型 - 文件上传区域 */}
+      {selectedDS && selectedDS.type === '文件' && (
         <div className='border-t-4 border-blue-500 dark:border-blue-400 bg-gradient-to-b from-blue-50/50 to-transparent dark:from-blue-900/10 dark:to-transparent -mx-6 px-6 pt-6 pb-6 mt-6'>
           {/* Header with Dataset info */}
           <div className='flex items-center justify-between mb-6'>
@@ -1651,7 +1662,7 @@ export function Dataset() {
                     <p className='text-sm text-gray-600 dark:text-gray-400'>加载中...</p>
                   </div>
                 ) : databaseTables.length === 0 ? (
-                  <div className='p-8 text-center text-gray-500 dark:text-gray-400'>暂无数据表</div>
+                  <div className='p-8 text-center text-gray-500 dark:text-gray-400 flex items-center justify-center' style={{ height: '350px' }}>无数据表信息</div>
                 ) : (
                   <div className='divide-y divide-gray-200 dark:divide-gray-700'>
                     {databaseTables.map(vo => {
@@ -1899,14 +1910,21 @@ export function Dataset() {
       <EditDatasetDialog
         open={editDialogOpen}
         onOpenChange={setEditDialogOpen}
-        dataset={editingDataset}
+        dataset={
+          editingDataset
+            ? {
+                ...editingDataset,
+                type: editingDataset.type,
+              }
+            : null
+        }
         onSuccess={() => {
           loadDatasets();
         }}
       />
 
       {/* Add Data Source Dialog */}
-      <AddDataSourceDialog
+      <EditDataSourceDialog
         open={addDataSourceOpen}
         onOpenChange={setAddDataSourceOpen}
         datasetName={selectedDS?.name}
@@ -1914,6 +1932,17 @@ export function Dataset() {
         onSuccess={() => {
           if (selectedDS?.id) {
             loadDatasets();
+            // 重新加载数据集详情
+            Datasets.getDatasetDetail(selectedDS.id)
+              .then((response: any) => {
+                const detail: DatasetDetailVo | undefined = response.data;
+                if (detail) {
+                  setDatasetDetail(detail);
+                }
+              })
+              .catch((error: any) => {
+                console.error('加载数据集详情失败:', error);
+              });
           }
         }}
       />

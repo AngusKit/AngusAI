@@ -1,6 +1,6 @@
 package cloud.xcan.angus.core.ai.domain.dataset;
 
-public enum DatasetDataStatus  {
+public enum DatasetDataStatus {
   PENDING, // 待处理
   PROCESSING, // 处理中
   COMPLETED, // 已完成

@@ -55,8 +55,8 @@ public class KnowledgeBaseDocCmdImpl extends CommCmd<KnowledgeBaseDoc, Long> imp
 
         // 检查文件格式
         String fileName = file.getOriginalFilename();
-        if (calculateDocumentType(fileName, null) == null){
-          throw ProtocolException.of(String.format("不支持的文件格式：%s",fileName));
+        if (calculateDocumentType(fileName, null) == null) {
+          throw ProtocolException.of(String.format("不支持的文件格式：%s", fileName));
         }
 
         // 检查文件大小限制

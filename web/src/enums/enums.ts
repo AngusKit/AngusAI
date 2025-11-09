@@ -192,6 +192,7 @@ export enum DatasourceTypeEnum {
   DB2 = 'DB2',
   PostgreSQL = 'PostgreSQL',
   Oracle = 'Oracle',
+  DM = 'DM',
 }
 
 /** 应用分类 */
@@ -226,6 +227,8 @@ export enum ApiKeyStatusEnum {
 export enum DatasetDataTypeEnum {
   EXCEL = 'EXCEL',
   CSV = 'CSV',
+  JSON = 'JSON',
+  XML = 'XML',
   TABLE = 'TABLE',
 }
 

@@ -1,11 +1,11 @@
-import { zhCN } from '../locales/zh-CN';
-import { enUS } from '../locales/en-US';
+import {zhCN} from '../locales/zh-CN';
+import {enUS} from '../locales/en-US';
 
 export type Language = 'zh-CN' | 'en-US';
 
 export const languages = {
-  'zh-CN': { name: '中文', translations: zhCN },
-  'en-US': { name: 'English', translations: enUS },
+  'zh-CN': {name: '中文', translations: zhCN},
+  'en-US': {name: 'English', translations: enUS},
 };
 
 export const defaultLanguage: Language = 'zh-CN';

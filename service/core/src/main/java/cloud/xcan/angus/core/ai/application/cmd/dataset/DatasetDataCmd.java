@@ -20,6 +20,6 @@ public interface DatasetDataCmd {
   /**
    * 批量删除文件或表
    */
-  void batchDeleteData(Long id,List<Long> dataIds);
+  void batchDeleteData(Long id, List<Long> dataIds);
 
 }

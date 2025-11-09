@@ -23,6 +23,7 @@ interface EditDatasetDialogProps {
     iconBg?: string;
     visibility?: string;
     tags?: string[];
+    type?: '文件' | '数据源'; // 数据集类型
   } | null;
   onSuccess?: () => void;
 }
@@ -44,6 +45,14 @@ export function EditDatasetDialog({ open, onOpenChange, dataset, onSuccess }: Ed
       setDescription(dataset.description);
       setVisibility(dataset.visibility || 'private');
       setTags(dataset.tags || []);
+
+      // 根据数据集类型设置数据类型（编辑时不允许修改）
+      if (dataset.type === '数据源') {
+        setDataType('datasource');
+      } else {
+        // '文件' 都对应 table 类型
+        setDataType('table');
+      }
 
       // 根据icon找到对应的索引
       if (dataset.icon) {
@@ -241,50 +250,97 @@ export function EditDatasetDialog({ open, onOpenChange, dataset, onSuccess }: Ed
           </div>
 
           <div className='mt-5'>
-            <Label className='text-sm mb-3 block dark:text-gray-300'>数据类型</Label>
+            <Label className='text-sm mb-3 block dark:text-gray-300'>
+              数据类型
+              <span className='text-xs text-gray-400 dark:text-gray-500 ml-2 font-normal'>(编辑时不可修改)</span>
+            </Label>
             <div className='grid grid-cols-2 gap-3'>
               <button
-                onClick={() => setDataType('table')}
-                className={`p-3 border-2 rounded-lg text-left transition-all ${
-                  dataType === 'table'
-                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  // 编辑时禁用切换
+                  if (dataset) return;
+                  setDataType('table');
+                }}
+                disabled={!!dataset}
+                className={`p-3 border-2 rounded-lg text-left transition-all relative ${
+                  dataset
+                    ? 'opacity-50 cursor-not-allowed bg-gray-50 dark:bg-gray-800/50 border-gray-300 dark:border-gray-600'
+                    : dataType === 'table'
+                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 cursor-pointer'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 cursor-pointer'
                 }`}
+                title={dataset ? '编辑时不允许修改数据类型' : ''}
               >
-                <div className='flex items-start gap-3'>
+                {dataset && (
+                  <div className='absolute inset-0 bg-gray-100/50 dark:bg-gray-900/30 rounded-lg pointer-events-none' />
+                )}
+                <div className='flex items-start gap-3 relative'>
                   <div
-                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${
-                      dataType === 'table' ? 'border-blue-500' : 'border-gray-300 dark:border-gray-600'
+                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-all ${
+                      dataset
+                        ? 'border-gray-400 dark:border-gray-500'
+                        : dataType === 'table'
+                          ? 'border-blue-500'
+                          : 'border-gray-300 dark:border-gray-600'
                     }`}
                   >
-                    {dataType === 'table' && <div className='w-2.5 h-2.5 rounded-full bg-blue-500' />}
+                    {dataType === 'table' && !dataset && <div className='w-2.5 h-2.5 rounded-full bg-blue-500' />}
+                    {dataType === 'table' && dataset && (
+                      <div className='w-2.5 h-2.5 rounded-full bg-gray-400 dark:bg-gray-500' />
+                    )}
                   </div>
-                  <div>
-                    <div className='dark:text-white mb-0.5'>表格数据</div>
-                    <div className='text-sm text-gray-500 dark:text-gray-400'>CSV、Excel等</div>
+                  <div className='flex-1'>
+                    <div className={`mb-0.5 ${dataset ? 'text-gray-500 dark:text-gray-400' : 'dark:text-white'}`}>
+                      文件表格数据
+                    </div>
+                    <div className='text-sm text-gray-400 dark:text-gray-500'>CSV、JSON、XML、Excel 格式</div>
                   </div>
                 </div>
               </button>
 
               <button
-                onClick={() => setDataType('datasource')}
-                className={`p-3 border-2 rounded-lg text-left transition-all ${
-                  dataType === 'datasource'
-                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  // 编辑时禁用切换
+                  if (dataset) return;
+                  setDataType('datasource');
+                }}
+                disabled={!!dataset}
+                className={`p-3 border-2 rounded-lg text-left transition-all relative ${
+                  dataset
+                    ? 'opacity-50 cursor-not-allowed bg-gray-50 dark:bg-gray-800/50 border-gray-300 dark:border-gray-600'
+                    : dataType === 'datasource'
+                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 cursor-pointer'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 cursor-pointer'
                 }`}
+                title={dataset ? '编辑时不允许修改数据类型' : ''}
               >
-                <div className='flex items-start gap-3'>
+                {dataset && (
+                  <div className='absolute inset-0 bg-gray-100/50 dark:bg-gray-900/30 rounded-lg pointer-events-none' />
+                )}
+                <div className='flex items-start gap-3 relative'>
                   <div
-                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${
-                      dataType === 'datasource' ? 'border-blue-500' : 'border-gray-300 dark:border-gray-600'
+                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-all ${
+                      dataset
+                        ? 'border-gray-400 dark:border-gray-500'
+                        : dataType === 'datasource'
+                          ? 'border-blue-500'
+                          : 'border-gray-300 dark:border-gray-600'
                     }`}
                   >
-                    {dataType === 'datasource' && <div className='w-2.5 h-2.5 rounded-full bg-blue-500' />}
+                    {dataType === 'datasource' && !dataset && <div className='w-2.5 h-2.5 rounded-full bg-blue-500' />}
+                    {dataType === 'datasource' && dataset && (
+                      <div className='w-2.5 h-2.5 rounded-full bg-gray-400 dark:bg-gray-500' />
+                    )}
                   </div>
-                  <div>
-                    <div className='dark:text-white mb-0.5'>数据源</div>
-                    <div className='text-sm text-gray-500 dark:text-gray-400'>API、数据库等</div>
+                  <div className='flex-1'>
+                    <div className={`mb-0.5 ${dataset ? 'text-gray-500 dark:text-gray-400' : 'dark:text-white'}`}>
+                      数据源
+                    </div>
+                    <div className='text-sm text-gray-400 dark:text-gray-500'>MySQL、Postgres数据库等</div>
                   </div>
                 </div>
               </button>

@@ -25,7 +25,6 @@ public interface Constants {
    */
   int APPLICATION_DESCRIPTION_DB_LENGTH = 500;
 
-
   // ==================== 聊天相关字段长度常量 ====================
 
   String CHAT_ATTACHMENTS_UPLOAD_BIZ_KEY = "angusAIChatAttachments";

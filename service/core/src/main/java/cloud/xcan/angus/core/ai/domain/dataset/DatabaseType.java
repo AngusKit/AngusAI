@@ -5,7 +5,8 @@ public enum DatabaseType {
   SQLServer,
   DB2,
   PostgreSQL,
-  Oracle;
+  Oracle,
+  DM;
 
   public String getValue() {
     return this.name();

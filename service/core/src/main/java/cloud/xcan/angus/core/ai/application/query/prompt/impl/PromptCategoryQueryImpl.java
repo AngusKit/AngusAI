@@ -246,7 +246,7 @@ public class PromptCategoryQueryImpl implements PromptCategoryQuery {
       }
       c.setPromptCount(aggregated.getOrDefault(c.getId(), 0L));
     }
-    
+
     // Also set counts for categories in the input list
     // This ensures the returned categories have promptCount set even if they are different instances
     for (PromptCategory c : categories) {

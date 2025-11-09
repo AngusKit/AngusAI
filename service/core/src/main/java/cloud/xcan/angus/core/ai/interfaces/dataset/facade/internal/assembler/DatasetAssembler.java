@@ -56,6 +56,7 @@ public class DatasetAssembler {
 
   public static DatasourceConfig toDatasourceConfig(DataSourceUpdateDto vo) {
     DatasourceConfig config = new DatasourceConfig();
+    config.setName(vo.getName());
     config.setDatabaseType(vo.getDatabaseType());
     config.setDatabase(vo.getDatabase());
     config.setJdbcUrl(vo.getJdbcUrl());
@@ -68,7 +69,7 @@ public class DatasetAssembler {
 
   public static DatasourceConfigVo toDatasourceConfigVo(DatasourceConfig config) {
     DatasourceConfigVo vo = new DatasourceConfigVo();
-    if (isNull(config)){
+    if (isNull(config)) {
       return vo;
     }
     vo.setName(config.getName());

@@ -42,6 +42,7 @@ public class DatasourceUtils {
     DRIVER_CLASS_MAP.put(DatabaseType.SQLServer, "com.microsoft.sqlserver.jdbc.SQLServerDriver");
     DRIVER_CLASS_MAP.put(DatabaseType.Oracle, "oracle.jdbc.OracleDriver");
     DRIVER_CLASS_MAP.put(DatabaseType.DB2, "com.ibm.db2.jcc.DB2Driver");
+    DRIVER_CLASS_MAP.put(DatabaseType.DM, "dm.jdbc.driver.DmDriver");
   }
 
   /**
@@ -81,7 +82,7 @@ public class DatasourceUtils {
     if (driverClass == null) {
       result.setSuccess(false);
       result.setMessage("不支持的数据库类型: " + config.getDatabaseType());
-      result.setDetails("支持的数据库类型: MySQL, PostgreSQL, SQL Server, Oracle, DB2");
+      result.setDetails("支持的数据库类型: MySQL, PostgreSQL, SQL Server, Oracle, DB2, DM");
       return result;
     }
 
@@ -158,7 +159,8 @@ public class DatasourceUtils {
     }
 
     // 根据主机、端口等信息构建 JDBC URL
-    if (isNull(config.getHost()) || isNull(config.getPort()) || isNotEmpty(config.getDatabase())) {
+    if (isNull(config.getHost()) || isNull(config.getPort()) || isNull(config.getDatabase())
+        || config.getDatabase().isEmpty()) {
       return null;
     }
 
@@ -172,6 +174,8 @@ public class DatasourceUtils {
       case Oracle -> String.format("jdbc:oracle:thin:@%s:%d:%s", config.getHost(),
           config.getPort(), config.getDatabase());
       case DB2 -> String.format("jdbc:db2://%s:%d/%s", config.getHost(), config.getPort(),
+          config.getDatabase());
+      case DM -> String.format("jdbc:dm://%s:%d/%s", config.getHost(), config.getPort(),
           config.getDatabase());
     };
   }
@@ -452,6 +456,8 @@ public class DatasourceUtils {
           qualifiedTableName, offset + pageSize, offset);
       case DB2 -> String.format("SELECT * FROM %s FETCH FIRST %d ROWS ONLY OFFSET %d ROWS",
           qualifiedTableName, pageSize, offset);
+      case DM -> String.format("SELECT * FROM %s LIMIT %d OFFSET %d", qualifiedTableName,
+          pageSize, offset);
     };
   }
 
@@ -469,6 +475,7 @@ public class DatasourceUtils {
       case SQLServer -> "SELECT COUNT_BIG(*) FROM " + tableName;
       case Oracle -> "SELECT COUNT(*) FROM " + tableName;
       case DB2 -> "SELECT COUNT(*) FROM " + tableName;
+      case DM -> "SELECT COUNT(*) FROM " + tableName;
     };
   }
 
@@ -500,6 +507,9 @@ public class DatasourceUtils {
       case DB2 -> String.format(
           "SELECT data_object_pages * 4096 FROM syscat.tables WHERE tabschema = UPPER('%s') AND tabname = UPPER('%s')",
           dbName, tableName);
+      case DM -> String.format(
+          "SELECT bytes FROM user_segments WHERE segment_name = UPPER('%s') AND segment_type = 'TABLE'",
+          tableName);
     };
   }
 
