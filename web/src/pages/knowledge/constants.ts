@@ -2,49 +2,7 @@
  * 知识库相关常量
  */
 
-// 图标选项配置 - 优化为更贴近知识库场景的图标
-export const ICON_OPTIONS = [
-  // 文档和书籍类
-  { emoji: '📘', bg: 'bg-blue-100 dark:bg-blue-900/30', label: '书籍' },
-  { emoji: '📚', bg: 'bg-indigo-100 dark:bg-indigo-900/30', label: '图书馆' },
-  { emoji: '📖', bg: 'bg-purple-100 dark:bg-purple-900/30', label: '打开的书' },
-  { emoji: '📝', bg: 'bg-yellow-100 dark:bg-yellow-900/30', label: '笔记' },
-  { emoji: '📄', bg: 'bg-gray-100 dark:bg-gray-700/30', label: '文档' },
-  { emoji: '📋', bg: 'bg-yellow-100 dark:bg-yellow-900/30', label: '列表' },
-  { emoji: '📑', bg: 'bg-pink-100 dark:bg-pink-900/30', label: '书签' },
-  { emoji: '📁', bg: 'bg-purple-100 dark:bg-purple-900/30', label: '文件夹' },
-  { emoji: '🗂️', bg: 'bg-blue-100 dark:bg-blue-900/30', label: '文件分类' },
-  { emoji: '📰', bg: 'bg-orange-100 dark:bg-orange-900/30', label: '新闻' },
-
-  // 学习和教育类
-  { emoji: '🎓', bg: 'bg-green-100 dark:bg-green-900/30', label: '学术' },
-  { emoji: '🧠', bg: 'bg-purple-100 dark:bg-purple-900/30', label: '大脑' },
-  { emoji: '💡', bg: 'bg-yellow-100 dark:bg-yellow-900/30', label: '想法' },
-  { emoji: '🔍', bg: 'bg-slate-100 dark:bg-slate-700/30', label: '搜索' },
-  { emoji: '🔬', bg: 'bg-cyan-100 dark:bg-cyan-900/30', label: '科研' },
-  { emoji: '⚗️', bg: 'bg-cyan-100 dark:bg-cyan-900/30', label: '化学' },
-  { emoji: '📐', bg: 'bg-blue-100 dark:bg-blue-900/30', label: '测量' },
-  { emoji: '🧪', bg: 'bg-green-100 dark:bg-green-900/30', label: '实验' },
-
-  // 工作和专业类
-  { emoji: '💼', bg: 'bg-gray-100 dark:bg-gray-700/30', label: '公文包' },
-  { emoji: '🏢', bg: 'bg-blue-100 dark:bg-blue-900/30', label: '办公室' },
-  { emoji: '📊', bg: 'bg-orange-100 dark:bg-orange-900/30', label: '数据' },
-  { emoji: '📈', bg: 'bg-green-100 dark:bg-green-900/30', label: '图表' },
-  { emoji: '💻', bg: 'bg-slate-100 dark:bg-slate-700/30', label: '电脑' },
-  { emoji: '💾', bg: 'bg-blue-100 dark:bg-blue-900/30', label: '存储' },
-
-  // 安全和权限类
-  { emoji: '🔒', bg: 'bg-red-100 dark:bg-red-900/30', label: '安全' },
-  { emoji: '🔑', bg: 'bg-yellow-100 dark:bg-yellow-900/30', label: '钥匙' },
-  { emoji: '🛡️', bg: 'bg-blue-100 dark:bg-blue-900/30', label: '盾牌' },
-
-  // 其他知识相关
-  { emoji: '🌐', bg: 'bg-cyan-100 dark:bg-cyan-900/30', label: '网络' },
-  { emoji: '📌', bg: 'bg-red-100 dark:bg-red-900/30', label: '图钉' },
-  { emoji: '✨', bg: 'bg-pink-100 dark:bg-pink-900/30', label: '灵感' },
-  { emoji: '🎯', bg: 'bg-red-100 dark:bg-red-900/30', label: '目标' },
-] as const;
+import { KnowledgeBaseDocStatusEnum, KnowledgeBaseDocTypeEnum } from '@/enums/enums';
 
 // 向量存储源配置
 export const VECTOR_STORES = [
@@ -108,3 +66,56 @@ export const FORM_STEPS = [
   { number: 1, title: '基本信息' },
   { number: 2, title: '配置处理' },
 ] as const;
+
+/**
+ * 文档状态映射
+ */
+export const DOCUMENT_STATUS_MAP: Record<string, { text: string; color: string }> = {
+  [KnowledgeBaseDocStatusEnum.PENDING]: {
+    text: '待处理',
+    color: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
+  },
+  [KnowledgeBaseDocStatusEnum.PROCESSING]: {
+    text: '处理中',
+    color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
+  },
+  [KnowledgeBaseDocStatusEnum.COMPLETED]: {
+    text: '已完成',
+    color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+  },
+  [KnowledgeBaseDocStatusEnum.FAILED]: {
+    text: '失败',
+    color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+  },
+};
+
+/**
+ * 文档类型映射
+ */
+export const DOCUMENT_TYPE_MAP: Record<string, { text: string; icon: string; color: string }> = {
+  [KnowledgeBaseDocTypeEnum.PDF]: {
+    text: 'PDF',
+    icon: '📄',
+    color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+  },
+  [KnowledgeBaseDocTypeEnum.DOCX]: {
+    text: 'Word',
+    icon: '📘',
+    color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+  },
+  [KnowledgeBaseDocTypeEnum.TXT]: {
+    text: 'Text',
+    icon: '📝',
+    color: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
+  },
+  [KnowledgeBaseDocTypeEnum.MD]: {
+    text: 'Markdown',
+    icon: '📝',
+    color: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
+  },
+  [KnowledgeBaseDocTypeEnum.HTML]: {
+    text: 'HTML',
+    icon: '🌐',
+    color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+  },
+};

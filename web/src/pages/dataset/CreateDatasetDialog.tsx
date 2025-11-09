@@ -14,42 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import Datasets from '@/services/Datasets';
 import { DatasetCreateDto } from '@/services/DatasetsTypes';
 import { DatasetTypeEnum, VisibilityEnum } from '@/enums/enums';
-
-// 扩展的图标选项 - 32个图标
-const iconOptions = [
-  { emoji: '📊', bg: 'bg-blue-100 dark:bg-blue-900/30', label: '图表' },
-  { emoji: '📈', bg: 'bg-green-100 dark:bg-green-900/30', label: '趋势' },
-  { emoji: '📋', bg: 'bg-yellow-100 dark:bg-yellow-900/30', label: '列表' },
-  { emoji: '📁', bg: 'bg-purple-100 dark:bg-purple-900/30', label: '文件夹' },
-  { emoji: '💾', bg: 'bg-indigo-100 dark:bg-indigo-900/30', label: '存储' },
-  { emoji: '🗂️', bg: 'bg-gray-100 dark:bg-gray-700/30', label: '归档' },
-  { emoji: '📉', bg: 'bg-red-100 dark:bg-red-900/30', label: '分析' },
-  { emoji: '🎯', bg: 'bg-orange-100 dark:bg-orange-900/30', label: '目标' },
-  { emoji: '🔢', bg: 'bg-cyan-100 dark:bg-cyan-900/30', label: '数字' },
-  { emoji: '📑', bg: 'bg-teal-100 dark:bg-teal-900/30', label: '统计' },
-  { emoji: '💼', bg: 'bg-slate-100 dark:bg-slate-700/30', label: '商业' },
-  { emoji: '🎲', bg: 'bg-pink-100 dark:bg-pink-900/30', label: '数据' },
-  { emoji: '⚡', bg: 'bg-yellow-100 dark:bg-yellow-900/30', label: '快速' },
-  { emoji: '🌟', bg: 'bg-amber-100 dark:bg-amber-900/30', label: '重要' },
-  { emoji: '🔍', bg: 'bg-blue-100 dark:bg-blue-900/30', label: '搜索' },
-  { emoji: '📝', bg: 'bg-green-100 dark:bg-green-900/30', label: '笔记' },
-  { emoji: '🗃️', bg: 'bg-indigo-100 dark:bg-indigo-900/30', label: '存档' },
-  { emoji: '📌', bg: 'bg-red-100 dark:bg-red-900/30', label: '置顶' },
-  { emoji: '🔖', bg: 'bg-purple-100 dark:bg-purple-900/30', label: '书签' },
-  { emoji: '📎', bg: 'bg-gray-100 dark:bg-gray-700/30', label: '附件' },
-  { emoji: '🔐', bg: 'bg-orange-100 dark:bg-orange-900/30', label: '安全' },
-  { emoji: '💡', bg: 'bg-yellow-100 dark:bg-yellow-900/30', label: '想法' },
-  { emoji: '🚀', bg: 'bg-blue-100 dark:bg-blue-900/30', label: '火箭' },
-  { emoji: '🎨', bg: 'bg-pink-100 dark:bg-pink-900/30', label: '创意' },
-  { emoji: '🏆', bg: 'bg-amber-100 dark:bg-amber-900/30', label: '成就' },
-  { emoji: '⚙️', bg: 'bg-slate-100 dark:bg-slate-700/30', label: '配置' },
-  { emoji: '🔔', bg: 'bg-yellow-100 dark:bg-yellow-900/30', label: '通知' },
-  { emoji: '📮', bg: 'bg-red-100 dark:bg-red-900/30', label: '邮箱' },
-  { emoji: '🎪', bg: 'bg-pink-100 dark:bg-pink-900/30', label: '活动' },
-  { emoji: '🌐', bg: 'bg-cyan-100 dark:bg-cyan-900/30', label: '全球' },
-  { emoji: '💎', bg: 'bg-indigo-100 dark:bg-indigo-900/30', label: '宝石' },
-  { emoji: '🔥', bg: 'bg-orange-100 dark:bg-orange-900/30', label: '热门' },
-];
+import { getTagColor, ICON_OPTIONS } from '@/utils';
 
 interface CreateDatasetDialogProps {
   open: boolean;
@@ -61,7 +26,7 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
   const [currentStep, setCurrentStep] = useState(1);
   const [datasetName, setDatasetName] = useState('');
   const [description, setDescription] = useState('');
-  const [dataType, setDataType] = useState<'text' | 'table' | 'datasource'>('table');
+  const [dataType, setDataType] = useState<'table' | 'datasource'>('table');
   const [visibility, setVisibility] = useState('private');
   const [selectedIcon, setSelectedIcon] = useState(0);
   const [tags, setTags] = useState<string[]>([]);
@@ -85,23 +50,6 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
     { number: 1, title: '基本信息' },
     { number: 2, title: '配置处理' },
   ];
-
-  // 标签颜色映射
-  const getTagColor = (tag: string): string => {
-    const colors = [
-      'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-      'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-      'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
-      'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
-      'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400',
-      'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
-      'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400',
-      'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
-    ];
-
-    const index = tag.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
-    return colors[index];
-  };
 
   const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' || e.key === ',') {
@@ -166,8 +114,8 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
           description: description.trim(),
           type: datasetType,
           visibility: visibilityMap[visibility] || VisibilityEnum.PRIVATE,
-          icon: iconOptions[selectedIcon]?.emoji,
-          iconBg: iconOptions[selectedIcon]?.bg,
+          icon: ICON_OPTIONS[selectedIcon]?.emoji,
+          iconBg: ICON_OPTIONS[selectedIcon]?.bg,
           tags: tags.length > 0 ? tags : undefined,
         };
 
@@ -284,7 +232,7 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
         <Label className='text-sm mb-2 block dark:text-gray-300'>图标</Label>
         <div className='max-h-[140px] overflow-y-auto pr-2 border border-gray-200 dark:border-gray-700 rounded-lg p-2'>
           <div className='grid grid-cols-8 gap-2'>
-            {iconOptions.map((option, index) => (
+            {ICON_OPTIONS.map((option, index) => (
               <button
                 key={index}
                 onClick={() => setSelectedIcon(index)}
@@ -304,30 +252,7 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
 
       <div className='mt-5'>
         <Label className='text-sm mb-3 block dark:text-gray-300'>数据类型</Label>
-        <div className='grid grid-cols-3 gap-3'>
-          <button
-            onClick={() => setDataType('text')}
-            className={`p-3 border-2 rounded-lg text-left transition-all ${
-              dataType === 'text'
-                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-            }`}
-          >
-            <div className='flex items-start gap-3'>
-              <div
-                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${
-                  dataType === 'text' ? 'border-blue-500' : 'border-gray-300 dark:border-gray-600'
-                }`}
-              >
-                {dataType === 'text' && <div className='w-2.5 h-2.5 rounded-full bg-blue-500' />}
-              </div>
-              <div>
-                <div className='dark:text-white mb-0.5'>文本数据</div>
-                <div className='text-sm text-gray-500 dark:text-gray-400'>文档、文章等</div>
-              </div>
-            </div>
-          </button>
-
+        <div className='grid grid-cols-2 gap-3'>
           <button
             onClick={() => setDataType('table')}
             className={`p-3 border-2 rounded-lg text-left transition-all ${

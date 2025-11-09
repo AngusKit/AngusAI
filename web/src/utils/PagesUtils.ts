@@ -54,3 +54,55 @@ export const formatFileSize = (bytes: number): string => {
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
 };
+
+/**
+ * 启用/禁用状态颜色映射
+ */
+export const ENABLED_STATUS_COLOR = {
+  enabled: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+  disabled: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
+} as const;
+
+// 图标选项配置 - 优化为更贴近知识库场景的图标
+export const ICON_OPTIONS = [
+  // 文档和书籍类
+  { emoji: '📘', bg: 'bg-blue-100 dark:bg-blue-900/30', label: '书籍' },
+  { emoji: '📚', bg: 'bg-indigo-100 dark:bg-indigo-900/30', label: '图书馆' },
+  { emoji: '📖', bg: 'bg-purple-100 dark:bg-purple-900/30', label: '打开的书' },
+  { emoji: '📝', bg: 'bg-yellow-100 dark:bg-yellow-900/30', label: '笔记' },
+  { emoji: '📄', bg: 'bg-gray-100 dark:bg-gray-700/30', label: '文档' },
+  { emoji: '📋', bg: 'bg-yellow-100 dark:bg-yellow-900/30', label: '列表' },
+  { emoji: '📑', bg: 'bg-pink-100 dark:bg-pink-900/30', label: '书签' },
+  { emoji: '📁', bg: 'bg-purple-100 dark:bg-purple-900/30', label: '文件夹' },
+  { emoji: '🗂️', bg: 'bg-blue-100 dark:bg-blue-900/30', label: '文件分类' },
+  { emoji: '📰', bg: 'bg-orange-100 dark:bg-orange-900/30', label: '新闻' },
+
+  // 学习和教育类
+  { emoji: '🎓', bg: 'bg-green-100 dark:bg-green-900/30', label: '学术' },
+  { emoji: '🧠', bg: 'bg-purple-100 dark:bg-purple-900/30', label: '大脑' },
+  { emoji: '💡', bg: 'bg-yellow-100 dark:bg-yellow-900/30', label: '想法' },
+  { emoji: '🔍', bg: 'bg-slate-100 dark:bg-slate-700/30', label: '搜索' },
+  { emoji: '🔬', bg: 'bg-cyan-100 dark:bg-cyan-900/30', label: '科研' },
+  { emoji: '⚗️', bg: 'bg-cyan-100 dark:bg-cyan-900/30', label: '化学' },
+  { emoji: '📐', bg: 'bg-blue-100 dark:bg-blue-900/30', label: '测量' },
+  { emoji: '🧪', bg: 'bg-green-100 dark:bg-green-900/30', label: '实验' },
+
+  // 工作和专业类
+  { emoji: '💼', bg: 'bg-gray-100 dark:bg-gray-700/30', label: '公文包' },
+  { emoji: '🏢', bg: 'bg-blue-100 dark:bg-blue-900/30', label: '办公室' },
+  { emoji: '📊', bg: 'bg-orange-100 dark:bg-orange-900/30', label: '数据' },
+  { emoji: '📈', bg: 'bg-green-100 dark:bg-green-900/30', label: '图表' },
+  { emoji: '💻', bg: 'bg-slate-100 dark:bg-slate-700/30', label: '电脑' },
+  { emoji: '💾', bg: 'bg-blue-100 dark:bg-blue-900/30', label: '存储' },
+
+  // 安全和权限类
+  { emoji: '🔒', bg: 'bg-red-100 dark:bg-red-900/30', label: '安全' },
+  { emoji: '🔑', bg: 'bg-yellow-100 dark:bg-yellow-900/30', label: '钥匙' },
+  { emoji: '🛡️', bg: 'bg-blue-100 dark:bg-blue-900/30', label: '盾牌' },
+
+  // 其他知识相关
+  { emoji: '🌐', bg: 'bg-cyan-100 dark:bg-cyan-900/30', label: '网络' },
+  { emoji: '📌', bg: 'bg-red-100 dark:bg-red-900/30', label: '图钉' },
+  { emoji: '✨', bg: 'bg-pink-100 dark:bg-pink-900/30', label: '灵感' },
+  { emoji: '🎯', bg: 'bg-red-100 dark:bg-red-900/30', label: '目标' },
+] as const;

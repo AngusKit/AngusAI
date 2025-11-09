@@ -9,8 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ICON_OPTIONS, VECTOR_STORES, CONFIG_CONSTANTS } from '../constants';
-import { getTagColor } from '@/utils';
+import { VECTOR_STORES, CONFIG_CONSTANTS } from '../constants';
+import { getTagColor, ICON_OPTIONS } from '@/utils';
 import type { KnowledgeBaseFormData } from '../hooks/useKnowledgeBaseForm';
 
 interface BasicInfoStepProps {

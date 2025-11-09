@@ -19,8 +19,9 @@ import { KnowledgeBaseDocStatusEnum, KnowledgeBaseDocTypeEnum } from '@/enums/en
 import type { KnowledgeBaseListVo, KnowledgeBaseStatisticsVo } from '@/services/KnowledgeBasesTypes';
 import { GetKnowledgeBaseListOrderByEnum } from '@/services/KnowledgeBasesTypes';
 import type { KnowledgeBaseDocListVo } from '@/services/DocumentsTypes';
-import { getTagColor, formatDateOnly, formatFileSize } from '@/utils';
+import { getTagColor, formatDateOnly, formatFileSize, ENABLED_STATUS_COLOR } from '@/utils';
 import { useDebounce } from '@/hooks/useDebounce';
+import { DOCUMENT_STATUS_MAP, DOCUMENT_TYPE_MAP } from './constants';
 
 interface KnowledgeBaseItem {
   id: string;
@@ -95,66 +96,6 @@ export function KnowledgeBase() {
     setCurrentPage(1);
   }, [debouncedSearchQuery]);
 
-  /**
-   * 文档状态映射
-   */
-  const DOCUMENT_STATUS_MAP: Record<string, { text: string; color: string }> = {
-    [KnowledgeBaseDocStatusEnum.PENDING]: {
-      text: '待处理',
-      color: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
-    },
-    [KnowledgeBaseDocStatusEnum.PROCESSING]: {
-      text: '处理中',
-      color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
-    },
-    [KnowledgeBaseDocStatusEnum.COMPLETED]: {
-      text: '已完成',
-      color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-    },
-    [KnowledgeBaseDocStatusEnum.FAILED]: {
-      text: '失败',
-      color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-    },
-  };
-
-  /**
-   * 文档类型映射
-   */
-  const DOCUMENT_TYPE_MAP: Record<string, { text: string; icon: string; color: string }> = {
-    [KnowledgeBaseDocTypeEnum.PDF]: {
-      text: 'PDF',
-      icon: '📄',
-      color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-    },
-    [KnowledgeBaseDocTypeEnum.DOCX]: {
-      text: 'Word',
-      icon: '📘',
-      color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-    },
-    [KnowledgeBaseDocTypeEnum.TXT]: {
-      text: 'Text',
-      icon: '📝',
-      color: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
-    },
-    [KnowledgeBaseDocTypeEnum.MD]: {
-      text: 'Markdown',
-      icon: '📝',
-      color: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
-    },
-    [KnowledgeBaseDocTypeEnum.HTML]: {
-      text: 'HTML',
-      icon: '🌐',
-      color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
-    },
-  };
-
-  /**
-   * 知识库状态颜色
-   */
-  const KNOWLEDGE_BASE_STATUS_COLORS = {
-    enabled: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-    disabled: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
-  } as const;
 
   // 加载统计数据
   const loadStatistics = async () => {
@@ -312,7 +253,7 @@ export function KnowledgeBase() {
           documentCount: String(kb.documentsCount || 0),
           size: kb.totalSize || '0 MB',
           status: (kb.enabled ? '已启用' : '禁用') as '已启用' | '禁用',
-          statusColor: kb.enabled ? KNOWLEDGE_BASE_STATUS_COLORS.enabled : KNOWLEDGE_BASE_STATUS_COLORS.disabled,
+          statusColor: kb.enabled ? ENABLED_STATUS_COLOR.enabled : ENABLED_STATUS_COLOR.disabled,
           enabled: kb.enabled || false,
           visibility: kb.visibility,
           createdDate: kb.createdDate,
@@ -366,7 +307,7 @@ export function KnowledgeBase() {
               ...kb,
               enabled: newEnabled,
               status: newEnabled ? '已启用' : '禁用',
-              statusColor: newEnabled ? KNOWLEDGE_BASE_STATUS_COLORS.enabled : KNOWLEDGE_BASE_STATUS_COLORS.disabled,
+              statusColor: newEnabled ? ENABLED_STATUS_COLOR.enabled : ENABLED_STATUS_COLOR.disabled,
             };
           }
           return kb;
@@ -483,8 +424,8 @@ export function KnowledgeBase() {
               enabled: newEnabled,
               status: newEnabled ? '已完成' : '禁用',
               statusColor: newEnabled
-                ? completedStatus?.color || KNOWLEDGE_BASE_STATUS_COLORS.enabled
-                : KNOWLEDGE_BASE_STATUS_COLORS.disabled,
+                ? completedStatus?.color || ENABLED_STATUS_COLOR.enabled
+                : ENABLED_STATUS_COLOR.disabled,
             };
           }
           return d;

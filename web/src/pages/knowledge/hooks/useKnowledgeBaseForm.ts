@@ -3,9 +3,9 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { CONFIG_CONSTANTS, ICON_OPTIONS } from '../constants';
+import { CONFIG_CONSTANTS } from '../constants';
+import { ICON_OPTIONS } from '@/utils';
 import { validateTag } from '../utils';
-import { toast } from 'sonner';
 
 export interface KnowledgeBaseFormData {
   name: string;
