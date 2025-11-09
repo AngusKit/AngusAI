@@ -49,7 +49,7 @@ export class DatasetsData<SecurityDataType = unknown> {
     id: string,
     query?: {
       /** 同步文件或表名 */
-      names?: string[];
+      dataIds?: string[];
     },
     params: RequestParams = {}
   ) =>
@@ -109,11 +109,17 @@ export class DatasetsData<SecurityDataType = unknown> {
    * @request DELETE:/api/v1/datasets/{id}/data/batch-delete
    * @secure
    */
-  batchDeleteData = (id: string, data: DatasetDataBatchDeleteDto, params: RequestParams = {}) =>
+  batchDeleteData = (
+    id: string, 
+    query?: {
+      /** 同步文件或表名 */
+      dataIds?: string[];
+    },
+    params: RequestParams = {}) =>
     this.http.request<void, ApiLocaleResult>({
       path: `${AI}/datasets/${id}/data/batch-delete`,
       method: 'DELETE',
-      body: data,
+      query: query,
       secure: true,
       type: ContentType.Json,
       ...params,

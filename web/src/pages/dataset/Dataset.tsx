@@ -59,6 +59,8 @@ export function Dataset() {
   const [editingDataset, setEditingDataset] = useState<DatasetItem | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deletingDataset, setDeletingDataset] = useState<DatasetItem | null>(null);
+  const [deleteFileDialogOpen, setDeleteFileDialogOpen] = useState(false);
+  const [deletingFile, setDeletingFile] = useState<DataFileItem | null>(null);
   const [addDataSourceOpen, setAddDataSourceOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [totalPages, setTotalPages] = useState(1);
@@ -729,15 +731,15 @@ export function Dataset() {
   };
 
   // 同步单个文件
-  const handleSyncFile = async (fileName: string) => {
+  const handleSyncFile = async (file: DataFileItem) => {
     if (!selectedDS) {
       toast.error('请先选择数据集');
       return;
     }
 
     try {
-      await DatasetsData.syncDatasetData(selectedDS.id, { names: [fileName] });
-      toast.success(`文件 "${fileName}" 同步已启动`);
+      await DatasetsData.syncDatasetData(selectedDS.id, { dataIds: [file.id] });
+      toast.success(`文件 "${file.name}" 同步已启动`);
       // 重新加载文件列表
       setTimeout(() => {
         loadDatasetDataList(selectedDS.id);
@@ -745,6 +747,29 @@ export function Dataset() {
     } catch (error: any) {
       console.error('同步文件失败:', error);
       toast.error(error?.data?.message || error?.message || '同步文件失败');
+    }
+  };
+
+  // 处理删除文件
+  const handleDeleteFile = (file: DataFileItem) => {
+    setDeletingFile(file);
+    setDeleteFileDialogOpen(true);
+  };
+
+  // 确认删除文件
+  const confirmDeleteFile = async () => {
+    if (deletingFile && selectedDS) {
+      try {
+        await DatasetsData.batchDeleteData(selectedDS.id, { dataIds: [deletingFile.id] });
+        toast.success(`文件 "${deletingFile.name}" 已删除`);
+        setDeleteFileDialogOpen(false);
+        setDeletingFile(null);
+        // 重新加载文件列表
+        loadDatasetDataList(selectedDS.id);
+      } catch (error: any) {
+        console.error('删除文件失败:', error);
+        toast.error(error?.data?.message || error?.message || '删除文件失败');
+      }
     }
   };
 
@@ -1433,7 +1458,7 @@ export function Dataset() {
                             <td className='px-6 py-4'>
                               <div className='flex items-center gap-2'>
                                 <button
-                                  onClick={() => handleSyncFile(file.name)}
+                                  onClick={() => handleSyncFile(file)}
                                   className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
                                   title='同步数据到数据库'
                                 >
@@ -1447,7 +1472,7 @@ export function Dataset() {
                                   <Download className='w-4 h-4 text-blue-500' />
                                 </button>
                                 <button
-                                  onClick={() => handleAction('删除', file.name)}
+                                  onClick={() => handleDeleteFile(file)}
                                   className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
                                   title='删除文件'
                                 >
@@ -1845,7 +1870,7 @@ export function Dataset() {
         }}
       />
 
-      {/* Delete Confirmation Dialog */}
+      {/* Delete Dataset Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent className='dark:bg-gray-900 dark:border-gray-700'>
           <AlertDialogHeader>
@@ -1859,6 +1884,26 @@ export function Dataset() {
               取消
             </AlertDialogCancel>
             <AlertDialogAction onClick={confirmDelete} className='bg-red-600 hover:bg-red-700 text-white'>
+              删除
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete File Confirmation Dialog */}
+      <AlertDialog open={deleteFileDialogOpen} onOpenChange={setDeleteFileDialogOpen}>
+        <AlertDialogContent className='dark:bg-gray-900 dark:border-gray-700'>
+          <AlertDialogHeader>
+            <AlertDialogTitle className='dark:text-white'>确认删除</AlertDialogTitle>
+            <AlertDialogDescription className='dark:text-gray-400'>
+              确定要删除文件 "{deletingFile?.name}" 吗？此操作无法撤销。
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className='dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300'>
+              取消
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteFile} className='bg-red-600 hover:bg-red-700 text-white'>
               删除
             </AlertDialogAction>
           </AlertDialogFooter>
