@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, } from '@/components/ui/alert-dialog';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { toast } from 'sonner';
 import { formatDateOnly, getTagColor, formatFileSize } from '@/utils';
 import { downloadFile } from '@/utils/DownloadUtils';
@@ -25,6 +25,7 @@ import { DatasetListVo, DatasetStatisticsVo, DatasetDetailVo, DatasourceTableDat
 import { DatasetDataListVo } from '@/services/DatasetsDataTypes';
 import { DatasetTypeEnum, VisibilityEnum, DatasetDataTypeEnum } from '@/enums/enums';
 import { GetDatasetListOrderByEnum } from '@/services/DatasetsTypes';
+import { useLanguage } from '@/components/ui/LanguageProvider';
 
 interface DatasetItem {
   id: string;
@@ -32,10 +33,11 @@ interface DatasetItem {
   description: string;
   icon: string;
   iconBg: string;
-  type: '文件' | '数据源';
+  type: DatasetTypeEnum;
+  typeLabelKey: string;
   dataCount: string;
   size: string;
-  status: '已启用' | '禁用';
+  statusKey: string;
   statusColor: string;
   enabled: boolean;
   visibility?: string;
@@ -45,7 +47,20 @@ interface DatasetItem {
   tags?: string[];
 }
 
+interface StatCard {
+  label: string;
+  value: string;
+  subtext: string;
+  icon: typeof Database;
+  iconBg: string;
+  trend?: string;
+  trendUp?: boolean;
+  progress?: number;
+  showProgress?: boolean;
+}
+
 export function Dataset() {
+  const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('table');
@@ -72,6 +87,14 @@ export function Dataset() {
   const [dataFiles, setDataFiles] = useState<DatasetDataListVo[]>([]);
   const [databaseTables, setDatabaseTables] = useState<DatasetDataListVo[]>([]);
   const [tablePreviewData, setTablePreviewData] = useState<DatasourceTableDataPreviewVo | null>(null);
+  const visibilityBadgeMap = useMemo(
+    () => ({
+      private: { icon: '🔒', label: t('dataset.visibility.private') },
+      team: { icon: '👥', label: t('dataset.visibility.team') },
+      public: { icon: '🌐', label: t('dataset.visibility.public') },
+    }),
+    [t]
+  );
 
   // 文件上传相关状态
   const [uploadFiles, setUploadFiles] = useState<UploadFile[]>([]);
@@ -103,11 +126,11 @@ export function Dataset() {
     id: string;
     name: string;
     type: DatasetDataTypeEnum;
-    typeDisplay: string; // 用于UI显示的类型名称
+    typeLabelKey: string;
     typeColor: string;
     typeIcon: string;
     size: string;
-    status: '已处理' | '处理中' | '待处理';
+    statusKey: string;
     statusColor: string;
     modifiedDate: string;
     recordCount: string;
@@ -116,16 +139,14 @@ export function Dataset() {
 
   // 将DatasetDataListVo转换为DataFileItem（先定义转换函数）
   const convertDataListVoToFile = useCallback((vo: DatasetDataListVo): DataFileItem => {
-    // 枚举值到显示字符串的映射
-    const typeDisplayMap: Record<DatasetDataTypeEnum, string> = {
-      [DatasetDataTypeEnum.CSV]: 'CSV',
-      [DatasetDataTypeEnum.JSON]: 'JSON',
-      [DatasetDataTypeEnum.EXCEL]: 'Excel',
-      [DatasetDataTypeEnum.XML]: 'XML',
-      [DatasetDataTypeEnum.TABLE]: 'Table',
+    const typeLabelKeyMap: Record<DatasetDataTypeEnum, string> = {
+      [DatasetDataTypeEnum.CSV]: 'dataset.dataTypes.csv',
+      [DatasetDataTypeEnum.JSON]: 'dataset.dataTypes.json',
+      [DatasetDataTypeEnum.EXCEL]: 'dataset.dataTypes.excel',
+      [DatasetDataTypeEnum.XML]: 'dataset.dataTypes.xml',
+      [DatasetDataTypeEnum.TABLE]: 'dataset.dataTypes.table',
     };
 
-    // API返回的字符串到枚举值的映射
     const stringToEnumMap: Record<string, DatasetDataTypeEnum> = {
       CSV: DatasetDataTypeEnum.CSV,
       JSON: DatasetDataTypeEnum.JSON,
@@ -134,11 +155,11 @@ export function Dataset() {
       TABLE: DatasetDataTypeEnum.TABLE,
     };
 
-    const statusMap: Record<string, '已处理' | '处理中' | '待处理'> = {
-      COMPLETED: '已处理',
-      PROCESSING: '处理中',
-      PENDING: '待处理',
-    } as any;
+    const statusKeyMap: Record<string, string> = {
+      COMPLETED: 'dataset.fileStatus.completed',
+      PROCESSING: 'dataset.fileStatus.processing',
+      PENDING: 'dataset.fileStatus.pending',
+    };
 
     const typeIconMap: Record<DatasetDataTypeEnum, string> = {
       [DatasetDataTypeEnum.CSV]: '📊',
@@ -149,14 +170,14 @@ export function Dataset() {
     };
 
     const typeEnum = stringToEnumMap[vo.type || 'CSV'] || DatasetDataTypeEnum.CSV;
-    const typeDisplay = typeDisplayMap[typeEnum];
-    const status = statusMap[vo.status || 'PENDING'] || '待处理';
+    const statusRaw = (vo.status || 'PENDING').toUpperCase();
+    const statusKey = statusKeyMap[statusRaw] || 'dataset.fileStatus.pending';
 
     return {
       id: vo.id ? String(vo.id) : '',
       name: vo.name || '',
       type: typeEnum,
-      typeDisplay,
+      typeLabelKey: typeLabelKeyMap[typeEnum],
       typeColor:
         typeEnum === DatasetDataTypeEnum.CSV
           ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
@@ -167,11 +188,11 @@ export function Dataset() {
               : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300',
       typeIcon: typeIconMap[typeEnum] || '📄',
       size: vo.dataSize || '0 MB',
-      status,
+      statusKey,
       statusColor:
-        status === '已处理'
+        statusRaw === 'COMPLETED'
           ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-          : status === '处理中'
+          : statusRaw === 'PROCESSING'
             ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
             : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
       modifiedDate: vo.createdDate || '',
@@ -216,59 +237,50 @@ export function Dataset() {
   const paginatedTableRecords = tablePreviewData?.data || [];
 
   // 统计数据
-  const [stats, setStats] = useState([
+  const [stats, setStats] = useState<StatCard[]>(() => [
     {
-      label: '数据集数量',
+      label: t('dataset.page.stats.totalDatasets.label'),
       value: '--',
-      subtext: '活跃数据集 -- 个',
+      subtext: t('dataset.page.stats.totalDatasets.placeholder'),
       icon: Database,
       iconBg: 'bg-blue-500',
-      trend: undefined,
-      trendUp: undefined,
     },
     {
-      label: '数据总量',
+      label: t('dataset.page.stats.totalData.label'),
       value: '--',
-      subtext: '文件/表数 -- 个 · 活跃 -- 个 · 总大小：--',
+      subtext: t('dataset.page.stats.totalData.placeholder'),
       icon: FileText,
       iconBg: 'bg-green-500',
-      trend: undefined,
-      trendUp: undefined,
     },
     {
-      label: '今日查询',
+      label: t('dataset.page.stats.todayQueries.label'),
       value: '--',
-      subtext: '累计查询数 -- 次',
+      subtext: t('dataset.page.stats.todayQueries.placeholder'),
       icon: Eye,
       iconBg: 'bg-orange-500',
-      trend: undefined,
-      trendUp: undefined,
     },
     {
-      label: '存储空间',
+      label: t('dataset.page.stats.storage.label'),
       value: '-- / --',
-      subtext: '存储空间未限制',
+      subtext: t('dataset.page.stats.storage.placeholder'),
       icon: Database,
       iconBg: 'bg-purple-500',
       progress: 0,
       showProgress: false,
-      trend: undefined,
-      trendUp: undefined,
     },
   ]);
 
   // 将DatasetListVo转换为DatasetItem
   const convertDatasetVoToItem = useCallback((vo: DatasetListVo): DatasetItem => {
-    const typeMap: Record<DatasetTypeEnum, '文件' | '数据源'> = {
-      [DatasetTypeEnum.FILE]: '文件',
-      [DatasetTypeEnum.DATASOURCE]: '数据源',
-    };
-
     const visibilityMap: Record<VisibilityEnum, string> = {
       [VisibilityEnum.PRIVATE]: 'private',
       [VisibilityEnum.TEAM]: 'team',
       [VisibilityEnum.PUBLIC]: 'public',
     };
+
+    const type = vo.type || DatasetTypeEnum.FILE;
+    const typeLabelKey =
+      type === DatasetTypeEnum.FILE ? 'dataset.types.file' : 'dataset.types.datasource';
 
     const dataCount = vo.dataStatistics?.totalFilesOrTables ? String(vo.dataStatistics.totalFilesOrTables) : '0';
     const size = vo.dataStatistics?.totalRecordsSize || '0 条';
@@ -282,10 +294,11 @@ export function Dataset() {
       description: vo.description || '',
       icon: vo.icon || '📊',
       iconBg: vo.iconBg || 'bg-blue-50 dark:bg-blue-900/20',
-      type: typeMap[vo.type || DatasetTypeEnum.FILE] || '文件',
+      type,
+      typeLabelKey,
       dataCount,
       size,
-      status: vo.enabled ? '已启用' : '禁用',
+      statusKey: vo.enabled ? 'common.status.enabled' : 'common.status.disabled',
       statusColor: vo.enabled ? DATASET_STATUS_COLORS.enabled : DATASET_STATUS_COLORS.disabled,
       enabled: vo.enabled || false,
       visibility: vo.visibility ? visibilityMap[vo.visibility] : 'private',
@@ -325,8 +338,8 @@ export function Dataset() {
         setTotalPages(1);
       }
     } catch (error: any) {
-      console.error('加载数据集列表失败:', error);
-      toast.error(error?.message || '加载数据集列表失败');
+      console.error('Failed to load dataset list:', error);
+      toast.error(error?.message || t('dataset.toasts.loadListFailed'));
       setDatasets([]);
     } finally {
       setIsLoading(false);
@@ -355,44 +368,48 @@ export function Dataset() {
 
         setStats([
           {
-            label: '数据集数量',
+            label: t('dataset.page.stats.totalDatasets.label'),
             value: String(totalDatasets),
-            subtext: `活跃数据集 ${activeDatasets} 个`,
+            subtext: t('dataset.page.stats.totalDatasets.subtext', { count: activeDatasets }),
             icon: Database,
             iconBg: 'bg-blue-500',
             trend: undefined,
             trendUp: undefined,
           },
           {
-            label: '数据总量',
+            label: t('dataset.page.stats.totalData.label'),
             value: totalRecords >= 1000 
               ? totalRecords >= 1000000
                 ? `${(totalRecords / 1000000).toFixed(1)}M`
                 : `${(totalRecords / 1000).toFixed(1)}K`
               : String(totalRecords),
-            subtext: `文件/表数 ${totalFilesOrTables} 个 · 活跃 ${activeFilesOrTables} 个 · 总大小：${usedStoreSize}`,
+            subtext: t('dataset.page.stats.totalData.subtext', {
+              total: totalFilesOrTables,
+              active: activeFilesOrTables,
+              size: usedStoreSize,
+            }),
             icon: FileText,
             iconBg: 'bg-green-500',
             trend: undefined,
             trendUp: undefined,
           },
           {
-            label: '今日查询',
+            label: t('dataset.page.stats.todayQueries.label'),
             value: String(todayQueryCount),
-            subtext: `累计查询数 ${totalQueryCount} 次`,
+            subtext: t('dataset.page.stats.todayQueries.subtext', { total: totalQueryCount }),
             icon: Eye,
             iconBg: 'bg-orange-500',
             trend: undefined,
             trendUp: undefined,
           },
           {
-            label: '存储空间',
+            label: t('dataset.page.stats.storage.label'),
             value: totalStoreSize
               ? `${usedStoreSize} / ${totalStoreSize}`
               : `${usedStoreSize} / --`,
             subtext: totalStoreSize
-              ? `已使用 ${usedStoreRate || '0%'}`
-              : '存储空间未限制',
+              ? t('dataset.page.stats.storage.subtext', { rate: usedStoreRate || '0%' })
+              : t('dataset.page.stats.storage.unlimited'),
             icon: Database,
             iconBg: 'bg-purple-500',
             progress: usedStoreRate
@@ -405,7 +422,7 @@ export function Dataset() {
         ]);
       }
     } catch (error: any) {
-      console.error('加载统计数据失败:', error);
+      console.error('Failed to load dataset statistics:', error);
       // 不显示错误提示，使用默认值
     }
   }, []);
@@ -446,8 +463,8 @@ export function Dataset() {
         });
       }
     } catch (error: any) {
-      console.error('加载数据集详情失败:', error);
-      toast.error(error?.message || '加载数据集详情失败');
+      console.error('Failed to load dataset detail:', error);
+      toast.error(error?.message || t('dataset.toasts.loadDetailFailed'));
     }
   };
 
@@ -476,17 +493,19 @@ export function Dataset() {
             return {
               ...ds,
               enabled: newEnabled,
-              status: newEnabled ? '已启用' : '禁用',
+              statusKey: newEnabled ? 'common.status.enabled' : 'common.status.disabled',
               statusColor: newEnabled ? DATASET_STATUS_COLORS.enabled : DATASET_STATUS_COLORS.disabled,
             };
           }
           return ds;
         })
       );
-      toast.success(newEnabled ? '数据集已启用' : '数据集已禁用');
+      toast.success(
+        newEnabled ? t('dataset.toasts.enableSuccess') : t('dataset.toasts.disableSuccess')
+      );
     } catch (error: any) {
-      console.error('切换数据集状态失败:', error);
-      toast.error(error?.message || '切换数据集状态失败');
+      console.error('Failed to toggle dataset status:', error);
+      toast.error(error?.message || t('dataset.toasts.toggleFailed'));
     }
   };
 
@@ -494,14 +513,14 @@ export function Dataset() {
     if (deletingDataset) {
       try {
         await Datasets.deleteDataset(deletingDataset.id);
-        toast.success(`数据集 "${deletingDataset.name}" 已删除`);
+        toast.success(t('dataset.toasts.deleteSuccess', { name: deletingDataset.name }));
         setDeleteDialogOpen(false);
         setDeletingDataset(null);
         // 重新加载列表
         loadDatasets();
       } catch (error: any) {
-        console.error('删除数据集失败:', error);
-        toast.error(error?.message || '删除数据集失败');
+        console.error('Failed to delete dataset:', error);
+        toast.error(error?.message || t('dataset.toasts.deleteFailed'));
       }
     }
   };
@@ -534,8 +553,8 @@ export function Dataset() {
         setDataFiles([]);
       }
     } catch (error: any) {
-      console.error('加载数据集数据列表失败:', error);
-      toast.error(error?.message || '加载数据集数据列表失败');
+      console.error('Failed to load dataset data list:', error);
+      toast.error(error?.message || t('dataset.toasts.loadDataListFailed'));
       setDataFiles([]);
     } finally {
       setIsLoadingDataList(false);
@@ -563,8 +582,8 @@ export function Dataset() {
         setDatabaseTables([]);
       }
     } catch (error: any) {
-      console.error('加载数据源表列表失败:', error);
-      toast.error(error?.message || '加载数据源表列表失败');
+      console.error('Failed to load datasource tables:', error);
+      toast.error(error?.message || t('dataset.toasts.loadDatasourceTablesFailed'));
       setDatabaseTables([]);
     } finally {
       setIsLoadingDataList(false);
@@ -591,8 +610,8 @@ export function Dataset() {
           setTablePreviewData(null);
         }
       } catch (error: any) {
-        console.error('加载表预览数据失败:', error);
-        toast.error(error?.message || '加载表预览数据失败');
+        console.error('Failed to load table preview:', error);
+        toast.error(error?.message || t('dataset.toasts.loadTablePreviewFailed'));
         setTablePreviewData(null);
       } finally {
         setIsLoadingTablePreview(false);
@@ -613,12 +632,12 @@ export function Dataset() {
           }
         })
         .catch((error: any) => {
-          console.error('加载数据集详情失败:', error);
+          console.error('Failed to load dataset detail:', error);
         });
 
-      if (selectedDS.type === '文件') {
+      if (selectedDS.type === DatasetTypeEnum.FILE) {
         loadDatasetDataList(selectedDS.id);
-      } else if (selectedDS.type === '数据源') {
+      } else if (selectedDS.type === DatasetTypeEnum.DATASOURCE) {
         loadDataSourceTables(selectedDS.id);
       }
     } else {
@@ -632,14 +651,14 @@ export function Dataset() {
 
   // 当选中表变化时，加载预览数据
   useEffect(() => {
-    if (selectedDS && selectedDS.type === '数据源' && selectedTable) {
+    if (selectedDS && selectedDS.type === DatasetTypeEnum.DATASOURCE && selectedTable) {
       loadTablePreview(selectedDS.id, selectedTable.tableName);
     }
   }, [selectedDS, selectedTable, loadTablePreview]);
 
   // 当切换数据集时，清空上传文件列表
   useEffect(() => {
-    if (!selectedDS || selectedDS.type !== '文件') {
+    if (!selectedDS || selectedDS.type !== DatasetTypeEnum.FILE) {
       // 清理所有上传定时器
       clearAllUploadIntervals(uploadIntervalsRef);
       setUploadFiles([]);
@@ -647,8 +666,11 @@ export function Dataset() {
   }, [selectedDS]);
 
   // 文件验证配置
+  const MAX_FILE_SIZE_MB = 50;
+  const SUPPORTED_FORMATS_LABEL = 'CSV, JSON, XML, Excel';
+
   const fileValidationConfig: FileValidationConfig = {
-    maxSize: 50 * 1024 * 1024, // 50MB
+    maxSize: MAX_FILE_SIZE_MB * 1024 * 1024, // 50MB
     allowedTypes: [
       'text/csv',
       'application/json',
@@ -659,8 +681,10 @@ export function Dataset() {
     ],
     allowedExtensions: ['.csv', '.json', '.xml', '.xlsx', '.xls'],
     errorMessages: {
-      sizeExceeded: '超过大小限制 (50MB)',
-      formatNotSupported: '格式不支持，支持 CSV, JSON, XML, Excel 格式',
+      sizeExceeded: t('dataset.upload.errors.sizeExceeded', { maxSize: `${MAX_FILE_SIZE_MB}MB` }),
+      formatNotSupported: t('dataset.upload.errors.formatNotSupported', {
+        formats: SUPPORTED_FORMATS_LABEL,
+      }),
     },
   };
 
@@ -671,36 +695,44 @@ export function Dataset() {
 
     if (result.validFiles.length > 0) {
       setUploadFiles(prev => [...prev, ...result.validFiles]);
-      
-      // 显示成功消息
+
+      const filteredPreview = result.filteredFiles.slice(0, 3).join(', ');
+      const filteredDescription =
+        result.filteredCount > 0
+          ? t('dataset.upload.folderFilteredDescription', {
+              preview: filteredPreview,
+              total: result.filteredFiles.length,
+            })
+          : undefined;
+
       if (isFolderUpload) {
-        // 文件夹上传：显示有效文件数和被过滤的文件数
         if (result.filteredCount > 0) {
           toast.success(
-            `已添加 ${result.validFiles.length} 个有效文件，已过滤 ${result.filteredCount} 个不支持的文件`,
-            {
-              description: result.filteredFiles.slice(0, 3).join('、') + 
-                (result.filteredFiles.length > 3 ? ` 等 ${result.filteredFiles.length} 个文件` : ''),
-            }
+            t('dataset.upload.folderSuccessDetailed', {
+              added: result.validFiles.length,
+              filtered: result.filteredCount,
+            }),
+            filteredDescription ? { description: filteredDescription } : undefined
           );
         } else {
-          toast.success(`已添加 ${result.validFiles.length} 个文件`);
+          toast.success(
+            t('dataset.upload.folderSuccess', { added: result.validFiles.length })
+          );
         }
       } else {
-        // 单个文件上传：显示成功消息
-        toast.success(`已添加 ${result.validFiles.length} 个文件`);
+        toast.success(t('dataset.upload.fileSuccess', { count: result.validFiles.length }));
       }
 
-      // 自动开始上传
       result.validFiles.forEach(uploadFile => {
         handleUpload(uploadFile);
       });
     } else if (isFolderUpload && result.filteredCount > 0) {
-      // 文件夹中没有有效文件
       toast.warning(
-        `文件夹中没有支持的文件格式`,
+        t('dataset.upload.noSupportedFiles'),
         {
-          description: `已过滤 ${result.filteredCount} 个文件。支持 CSV、JSON、XML、Excel 格式`,
+          description: t('dataset.upload.noSupportedFilesDescription', {
+            count: result.filteredCount,
+          }),
         }
       );
     }
@@ -718,7 +750,7 @@ export function Dataset() {
         return DatasetsData.uploadDatasetFile(id, { file }, params);
       },
       resourceId: selectedDS?.id || null,
-      resourceName: '数据集',
+      resourceName: t('dataset.upload.resourceName'),
       onSuccess: () => {
         // 重新加载文件列表
         setTimeout(() => {
@@ -759,7 +791,7 @@ export function Dataset() {
     clearUploadInterval(fileId, uploadIntervalsRef);
 
     setUploadFiles(prev => prev.filter(f => f.id !== fileId));
-    toast.info('已移除文件');
+    toast.info(t('dataset.upload.fileRemoved'));
   };
 
   const clearAllFiles = () => {
@@ -767,26 +799,26 @@ export function Dataset() {
     clearAllUploadIntervals(uploadIntervalsRef);
 
     setUploadFiles([]);
-    toast.info('已清空文件列表');
+    toast.info(t('dataset.upload.filesCleared'));
   };
 
   // 同步单个文件
   const handleSyncFile = async (file: DataFileItem) => {
     if (!selectedDS) {
-      toast.error('请先选择数据集');
+      toast.error(t('dataset.toasts.selectDatasetFirst'));
       return;
     }
 
     try {
       await DatasetsData.syncDatasetData(selectedDS.id, { dataIds: [file.id] });
-      toast.success(`文件 "${file.name}" 同步已启动`);
+      toast.success(t('dataset.toasts.syncFileStarted', { name: file.name }));
       // 重新加载文件列表
       setTimeout(() => {
         loadDatasetDataList(selectedDS.id);
       }, 1000);
     } catch (error: any) {
-      console.error('同步文件失败:', error);
-      toast.error(error?.data?.message || error?.message || '同步文件失败');
+      console.error('Failed to sync file:', error);
+      toast.error(error?.data?.message || error?.message || t('dataset.toasts.syncFileFailed'));
     }
   };
 
@@ -801,14 +833,14 @@ export function Dataset() {
     if (deletingFile && selectedDS) {
       try {
         await DatasetsData.batchDeleteData(selectedDS.id, { dataIds: [deletingFile.id] });
-        toast.success(`文件 "${deletingFile.name}" 已删除`);
+        toast.success(t('dataset.toasts.deleteFileSuccess', { name: deletingFile.name }));
         setDeleteFileDialogOpen(false);
         setDeletingFile(null);
         // 重新加载文件列表
         loadDatasetDataList(selectedDS.id);
       } catch (error: any) {
-        console.error('删除文件失败:', error);
-        toast.error(error?.data?.message || error?.message || '删除文件失败');
+        console.error('Failed to delete file:', error);
+        toast.error(error?.data?.message || error?.message || t('dataset.toasts.deleteFileFailed'));
       }
     }
   };
@@ -816,7 +848,7 @@ export function Dataset() {
   // 下载文件
   const handleDownloadFile = async (file: DataFileItem) => {
     if (!file.filePath) {
-      toast.error('文件路径不存在，无法下载');
+      toast.error(t('dataset.toasts.filePathMissing'));
       return;
     }
 
@@ -827,7 +859,7 @@ export function Dataset() {
       });
     } catch (error: any) {
       // 错误已在 downloadFile 中处理
-      console.error('下载文件失败:', error);
+      console.error('Failed to download file:', error);
     }
   };
 
@@ -835,10 +867,8 @@ export function Dataset() {
     <div className='space-y-6'>
       {/* Header */}
       <div>
-        <h1 className='text-2xl mb-1 dark:text-white'>数据集</h1>
-        <p className='text-sm text-gray-600 dark:text-gray-400'>
-          数据集是关系型数据组织与管理工具，用于AI模型应用知识补充和数据分析
-        </p>
+        <h1 className='text-2xl mb-1 dark:text-white'>{t('dataset.page.title')}</h1>
+        <p className='text-sm text-gray-600 dark:text-gray-400'>{t('dataset.page.description')}</p>
       </div>
 
       {/* Stats Cards */}
@@ -883,7 +913,7 @@ export function Dataset() {
             <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500' />
             <Input
               type='text'
-              placeholder='搜索数据集名称、描述'
+              placeholder={t('dataset.page.searchInputPlaceholder')}
               value={searchQuery}
               onChange={e => {
                 setSearchQuery(e.target.value);
@@ -914,7 +944,7 @@ export function Dataset() {
                   className='dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300'
                 >
                   <Filter className='w-4 h-4 mr-2' />
-                  筛选
+                  {t('common.actions.filter')}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align='end' className='dark:bg-gray-800 dark:border-gray-700'>
@@ -922,25 +952,25 @@ export function Dataset() {
                   className='dark:text-gray-300'
                   onClick={() => setSort(GetDatasetListOrderByEnum.ModifiedDate)}
                 >
-                  按时间排序
+                  {t('dataset.page.sort.modifiedDate')}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className='dark:text-gray-300'
                   onClick={() => setSort(GetDatasetListOrderByEnum.Name)}
                 >
-                  按名称排序
+                  {t('dataset.page.sort.name')}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className='dark:text-gray-300'
                   onClick={() => setSort(GetDatasetListOrderByEnum.Type)}
                 >
-                  按类型排序
+                  {t('dataset.page.sort.type')}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className='dark:text-gray-300'
                   onClick={() => setSort(GetDatasetListOrderByEnum.CreatedDate)}
                 >
-                  按创建时间排序
+                  {t('dataset.page.sort.createdDate')}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -974,7 +1004,7 @@ export function Dataset() {
               onClick={() => setCreateDialogOpen(true)}
             >
               <Plus className='w-4 h-4 mr-2' />
-              创建数据集
+              {t('dataset.createNew')}
             </Button>
           </div>
         </div>
@@ -983,7 +1013,7 @@ export function Dataset() {
         {isLoading && (
           <div className='text-center py-12'>
             <div className='w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-3' />
-            <p className='text-gray-600 dark:text-gray-400'>加载中...</p>
+            <p className='text-gray-600 dark:text-gray-400'>{t('common.messages.loading')}</p>
           </div>
         )}
 
@@ -991,9 +1021,9 @@ export function Dataset() {
         {!isLoading && datasets.length === 0 && (
           <div className='text-center py-12'>
             <Database className='w-12 h-12 text-gray-400 dark:text-gray-600 mx-auto mb-3' />
-            <p className='text-gray-600 dark:text-gray-400'>未找到匹配的数据集</p>
+            <p className='text-gray-600 dark:text-gray-400'>{t('dataset.page.empty.title')}</p>
             <p className='text-sm text-gray-500 dark:text-gray-500 mt-1'>
-              {searchQuery ? '尝试使用其他搜索词' : '暂无数据集'}
+              {searchQuery ? t('dataset.page.empty.noResultsSuggestion') : t('dataset.page.empty.noData')}
             </p>
           </div>
         )}
@@ -1005,101 +1035,114 @@ export function Dataset() {
               <table className='w-full'>
                 <thead className='bg-gray-50 dark:bg-gray-900'>
                   <tr>
-                    <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>数据集名称</th>
-                    <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>类型</th>
-                    <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>文档数</th>
-                    <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>状态</th>
-                    <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>更新时间</th>
-                    <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>操作</th>
+                    <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>
+                      {t('dataset.table.columns.name')}
+                    </th>
+                    <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>
+                      {t('dataset.table.columns.type')}
+                    </th>
+                    <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>
+                      {t('dataset.table.columns.items')}
+                    </th>
+                    <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>
+                      {t('dataset.table.columns.status')}
+                    </th>
+                    <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>
+                      {t('dataset.table.columns.updatedAt')}
+                    </th>
+                    <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>
+                      {t('dataset.table.columns.actions')}
+                    </th>
                   </tr>
                 </thead>
                 <tbody className='divide-y divide-gray-200 dark:divide-gray-700'>
-                  {currentDatasets.map(dataset => (
-                    <tr
-                      key={dataset.id}
-                      className={`hover:bg-gray-50 dark:hover:bg-gray-900 cursor-pointer ${
-                        selectedDataset === dataset.id ? 'bg-blue-50 dark:bg-blue-900/20' : ''
-                      }`}
-                      onClick={() => setSelectedDataset(dataset.id)}
-                    >
-                      <td className='px-6 py-4'>
-                        <div className='flex items-center gap-3'>
-                          <div
-                            className={`${dataset.iconBg} w-10 h-10 rounded-lg flex items-center justify-center text-xl`}
-                          >
-                            {dataset.icon}
-                          </div>
-                          <div className='flex-1'>
-                            <div className='flex items-center gap-2 mb-1'>
-                              <span className='text-sm dark:text-white'>{dataset.name}</span>
-                              <Badge variant='outline' className='text-xs dark:border-gray-600'>
-                                {dataset.visibility === 'private'
-                                  ? '🔒 私有'
-                                  : dataset.visibility === 'team'
-                                    ? '👥 团队'
-                                    : '🌐 公开'}
-                              </Badge>
-                              {dataset.tags && dataset.tags.length > 0 && (
-                                <div className='flex gap-1'>
-                                  {dataset.tags.slice(0, 2).map((tag, index) => (
-                                    <Badge key={index} className={`text-xs px-1.5 py-0 border-0 ${getTagColor(tag)}`}>
-                                      {tag}
-                                    </Badge>
-                                  ))}
-                                  {dataset.tags.length > 2 && (
-                                    <Badge
-                                      variant='secondary'
-                                      className='text-xs px-1.5 py-0 bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 border-0'
-                                    >
-                                      +{dataset.tags.length - 2}
-                                    </Badge>
-                                  )}
-                                </div>
-                              )}
+                  {currentDatasets.map(dataset => {
+                    const visibilityKey = (dataset.visibility || 'private') as keyof typeof visibilityBadgeMap;
+                    const visibilityInfo = visibilityBadgeMap[visibilityKey];
+
+                    return (
+                      <tr
+                        key={dataset.id}
+                        className={`hover:bg-gray-50 dark:hover:bg-gray-900 cursor-pointer ${
+                          selectedDataset === dataset.id ? 'bg-blue-50 dark:bg-blue-900/20' : ''
+                        }`}
+                        onClick={() => setSelectedDataset(dataset.id)}
+                      >
+                        <td className='px-6 py-4'>
+                          <div className='flex items-center gap-3'>
+                            <div
+                              className={`${dataset.iconBg} w-10 h-10 rounded-lg flex items-center justify-center text-xl`}
+                            >
+                              {dataset.icon}
                             </div>
-                            <div className='text-xs text-gray-500 dark:text-gray-400'>{dataset.description}</div>
+                            <div className='flex-1'>
+                              <div className='flex items-center gap-2 mb-1'>
+                                <span className='text-sm dark:text-white'>{dataset.name}</span>
+                                <Badge variant='outline' className='text-xs dark:border-gray-600'>
+                                  {`${visibilityInfo.icon} ${visibilityInfo.label}`}
+                                </Badge>
+                                {dataset.tags && dataset.tags.length > 0 && (
+                                  <div className='flex gap-1'>
+                                    {dataset.tags.slice(0, 2).map((tag, index) => (
+                                      <Badge key={index} className={`text-xs px-1.5 py-0 border-0 ${getTagColor(tag)}`}>
+                                        {tag}
+                                      </Badge>
+                                    ))}
+                                    {dataset.tags.length > 2 && (
+                                      <Badge
+                                        variant='secondary'
+                                        className='text-xs px-1.5 py-0 bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 border-0'
+                                      >
+                                        +{dataset.tags.length - 2}
+                                      </Badge>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                              <div className='text-xs text-gray-500 dark:text-gray-400'>{dataset.description}</div>
+                            </div>
                           </div>
-                        </div>
-                      </td>
-                      <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{dataset.type}</td>
-                      <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{dataset.dataCount}</td>
-                      <td className='px-6 py-4'>
-                        <div className='flex items-center gap-2' onClick={e => e.stopPropagation()}>
-                          <Badge className={`text-xs ${dataset.statusColor} border-0`}>{dataset.status}</Badge>
-                          <Switch
-                            checked={dataset.enabled}
-                            onCheckedChange={() => handleToggleDatasetStatus(dataset.id)}
-                            className='data-[state=checked]:bg-blue-500'
-                          />
-                        </div>
-                      </td>
-                      <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>
-                        {formatDateOnly(dataset.modifiedDate)}
-                      </td>
-                      <td className='px-6 py-4'>
-                        <div className='flex items-center gap-2' onClick={e => e.stopPropagation()}>
-                          <button
-                            onClick={() => handleView(dataset)}
-                            className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
-                          >
-                            <Eye className='w-4 h-4 text-blue-500' />
-                          </button>
-                          <button
-                            onClick={() => handleEdit(dataset)}
-                            className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
-                          >
-                            <Edit className='w-4 h-4 text-gray-600 dark:text-gray-400' />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(dataset)}
-                            className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
-                          >
-                            <Trash2 className='w-4 h-4 text-red-500' />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                        </td>
+                        <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{t(dataset.typeLabelKey)}</td>
+                        <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{dataset.dataCount}</td>
+                        <td className='px-6 py-4'>
+                          <div className='flex items-center gap-2' onClick={e => e.stopPropagation()}>
+                            <Badge className={`text-xs ${dataset.statusColor} border-0`}>{t(dataset.statusKey)}</Badge>
+                            <Switch
+                              checked={dataset.enabled}
+                              onCheckedChange={() => handleToggleDatasetStatus(dataset.id)}
+                              className='data-[state=checked]:bg-blue-500'
+                            />
+                          </div>
+                        </td>
+                        <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>
+                          {formatDateOnly(dataset.modifiedDate)}
+                        </td>
+                        <td className='px-6 py-4'>
+                          <div className='flex items-center gap-2' onClick={e => e.stopPropagation()}>
+                            <button
+                              onClick={() => handleView(dataset)}
+                              className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
+                            >
+                              <Eye className='w-4 h-4 text-blue-500' />
+                            </button>
+                            <button
+                              onClick={() => handleEdit(dataset)}
+                              className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
+                            >
+                              <Edit className='w-4 h-4 text-gray-600 dark:text-gray-400' />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(dataset)}
+                              className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
+                            >
+                              <Trash2 className='w-4 h-4 text-red-500' />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -1114,7 +1157,7 @@ export function Dataset() {
                         onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                         className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
                       >
-                        上一页
+                        {t('common.pagination.previous')}
                       </PaginationPrevious>
                     </PaginationItem>
                     {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
@@ -1133,7 +1176,7 @@ export function Dataset() {
                         onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                         className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
                       >
-                        下一页
+                        {t('common.pagination.next')}
                       </PaginationNext>
                     </PaginationItem>
                   </PaginationContent>
@@ -1176,9 +1219,9 @@ export function Dataset() {
                             className='data-[state=checked]:bg-blue-500'
                           />
                         </div>
-                        <Badge variant='secondary' className={`${dataset.statusColor} text-xs mt-1`}>
-                          {dataset.status}
-                        </Badge>
+                    <Badge variant='secondary' className={`${dataset.statusColor} text-xs mt-1`}>
+                      {t(dataset.statusKey)}
+                    </Badge>
                       </div>
                     </div>
                     <DropdownMenu>
@@ -1195,18 +1238,18 @@ export function Dataset() {
                       <DropdownMenuContent align='end' className='dark:bg-gray-800 dark:border-gray-700'>
                         <DropdownMenuItem onClick={() => handleView(dataset)} className='dark:text-gray-300'>
                           <Eye className='w-4 h-4 mr-2' />
-                          查看
+                          {t('common.actions.view')}
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => handleEdit(dataset)} className='dark:text-gray-300'>
                           <Edit className='w-4 h-4 mr-2' />
-                          编辑
+                          {t('common.actions.edit')}
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => handleDelete(dataset)}
                           className='text-red-600 dark:text-red-400'
                         >
                           <Trash2 className='w-4 h-4 mr-2' />
-                          删除
+                          {t('common.actions.delete')}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -1228,28 +1271,33 @@ export function Dataset() {
                   <div className='grid grid-cols-2 gap-4 pt-2 border-t border-gray-100 dark:border-gray-700'>
                     <div>
                       <div className='text-xs text-gray-500 dark:text-gray-400 mb-1'>
-                        {dataset.type === '数据源' ? '表数量' : '文件数'}
+                        {t(
+                          dataset.type === DatasetTypeEnum.DATASOURCE
+                            ? 'dataset.card.metrics.tables'
+                            : 'dataset.card.metrics.files'
+                        )}
                       </div>
                       <div className='dark:text-white'>{dataset.dataCount}</div>
                     </div>
                     <div>
-                      <div className='text-xs text-gray-500 dark:text-gray-400 mb-1'>大小</div>
+                      <div className='text-xs text-gray-500 dark:text-gray-400 mb-1'>
+                        {t('dataset.card.metrics.size')}
+                      </div>
                       <div className='dark:text-white'>{dataset.size}</div>
                     </div>
                   </div>
 
                   {/* 附加信息 */}
-                  {dataset.visibility && (
-                    <div className='mt-0.5 pt-3 border-t border-gray-100 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400'>
-                      <div className='flex items-center justify-between'>
-                        <span>
-                          可见性:{' '}
-                          {dataset.visibility === 'team' ? '团队' : dataset.visibility === 'private' ? '私有' : '公开'}
-                        </span>
-                        <span>{formatDateOnly(dataset.modifiedDate)}</span>
-                      </div>
+                  <div className='mt-0.5 pt-3 border-t border-gray-100 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400'>
+                    <div className='flex items-center justify-between'>
+                      <span>
+                        {t('dataset.card.visibility', {
+                          visibility: t(`dataset.visibility.${dataset.visibility || 'private'}`),
+                        })}
+                      </span>
+                      <span>{formatDateOnly(dataset.modifiedDate)}</span>
                     </div>
-                  )}
+                  </div>
                 </Card>
               ))}
             </div>
@@ -1264,7 +1312,7 @@ export function Dataset() {
                         onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                         className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
                       >
-                        上一页
+                        {t('common.pagination.previous')}
                       </PaginationPrevious>
                     </PaginationItem>
                     {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
@@ -1283,7 +1331,7 @@ export function Dataset() {
                         onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                         className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
                       >
-                        下一页
+                        {t('common.pagination.next')}
                       </PaginationNext>
                     </PaginationItem>
                   </PaginationContent>
@@ -1295,7 +1343,7 @@ export function Dataset() {
       </div>
 
       {/* 文件类型 - 文件上传区域 */}
-      {selectedDS && selectedDS.type === '文件' && (
+      {selectedDS && selectedDS.type === DatasetTypeEnum.FILE && (
         <div className='border-t-4 border-blue-500 dark:border-blue-400 bg-gradient-to-b from-blue-50/50 to-transparent dark:from-blue-900/10 dark:to-transparent -mx-6 px-6 pt-6 pb-6 mt-6'>
           {/* Header with Dataset info */}
           <div className='flex items-center justify-between mb-6'>
@@ -1307,12 +1355,16 @@ export function Dataset() {
                 <div className='flex items-center gap-3'>
                   <h2 className='text-xl dark:text-white'>{selectedDS.name}</h2>
                   <Badge variant='secondary' className={`${selectedDS.statusColor}`}>
-                    {selectedDS.status}
+                    {t(selectedDS.statusKey)}
                   </Badge>
                 </div>
-                <p className='text-sm text-gray-600 dark:text-gray-400 mt-1'>
-                  {selectedDS.description} · {selectedDS.dataCount} 个文件 · {selectedDS.size}
-                </p>
+                  <p className='text-sm text-gray-600 dark:text-gray-400 mt-1'>
+                    {t('dataset.page.selected.summary', {
+                      description: selectedDS.description,
+                      count: selectedDS.dataCount,
+                      size: selectedDS.size,
+                    })}
+                  </p>
               </div>
             </div>
             <Button
@@ -1330,7 +1382,7 @@ export function Dataset() {
             <div>
               <h3 className='text-lg dark:text-white mb-3 flex items-center gap-2'>
                 <Upload className='w-5 h-5 text-blue-500 dark:text-blue-400' />
-                上传文件
+                {t('dataset.upload.sectionTitle')}
               </h3>
               <Card className='p-6 dark:bg-gray-800 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm'>
                 <div
@@ -1352,7 +1404,7 @@ export function Dataset() {
                   <div className='flex items-center justify-center gap-3 mb-4'>
                     <Button className='bg-blue-500 hover:bg-blue-600 text-white' onClick={handleSelectFiles}>
                       <Files className='w-4 h-4 mr-2' />
-                      选择文件
+                      {t('dataset.upload.buttons.selectFiles')}
                     </Button>
                     <Button
                       variant='outline'
@@ -1360,15 +1412,20 @@ export function Dataset() {
                       onClick={handleSelectFolder}
                     >
                       <FolderOpen className='w-4 h-4 mr-2' />
-                      选择文件夹
+                      {t('dataset.upload.buttons.selectFolder')}
                     </Button>
                   </div>
 
                   <p className='text-sm text-gray-600 dark:text-gray-400'>
-                    {isDragging ? '松开鼠标以上传文件' : '拖拽文件到此处或点击选择文件'}
+                    {isDragging
+                      ? t('dataset.upload.dropHintActive')
+                      : t('dataset.upload.dropHint')}
                   </p>
                   <p className='text-xs text-gray-500 dark:text-gray-500 mt-2'>
-                    支持 CSV、JSON、XML、Excel 格式 · 单文件限制 50MB
+                    {t('dataset.upload.supportedFormatsDetail', {
+                      formats: SUPPORTED_FORMATS_LABEL,
+                      maxSize: `${MAX_FILE_SIZE_MB}MB`,
+                    })}
                   </p>
 
                   {/* 隐藏的文件输入 */}
@@ -1397,7 +1454,9 @@ export function Dataset() {
                 {uploadFiles.length > 0 && (
                   <div className='mt-6'>
                     <div className='flex items-center justify-between mb-3'>
-                      <h4 className='text-sm dark:text-white'>上传队列 ({uploadFiles.length} 个文件)</h4>
+                      <h4 className='text-sm dark:text-white'>
+                        {t('dataset.upload.queueTitle', { count: uploadFiles.length })}
+                      </h4>
                       <Button
                         variant='ghost'
                         size='sm'
@@ -1405,7 +1464,7 @@ export function Dataset() {
                         className='text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400'
                       >
                         <X className='w-4 h-4 mr-1' />
-                        清空列表
+                        {t('dataset.upload.clearList')}
                       </Button>
                     </div>
 
@@ -1435,13 +1494,13 @@ export function Dataset() {
                             {uploadFile.status === 'success' && (
                               <div className='flex items-center gap-1 text-green-600 dark:text-green-400'>
                                 <Check className='w-3 h-3' />
-                                <span className='text-xs'>上传成功</span>
+                                <span className='text-xs'>{t('dataset.upload.status.success')}</span>
                               </div>
                             )}
 
                             {uploadFile.status === 'error' && (
                               <span className='text-xs text-red-600 dark:text-red-400'>
-                                {uploadFile.error || '上传失败'}
+                                {uploadFile.error || t('dataset.upload.status.error')}
                               </span>
                             )}
                           </div>
@@ -1466,20 +1525,34 @@ export function Dataset() {
             <div>
               <h3 className='text-lg dark:text-white mb-3 flex items-center gap-2'>
                 <FileText className='w-5 h-5 text-green-500 dark:text-green-400' />
-                文件列表
+                {t('dataset.files.sectionTitle')}
               </h3>
               <Card className='dark:bg-gray-800 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm'>
                 <div className='overflow-x-auto'>
                   <table className='w-full'>
                     <thead className='bg-gray-50 dark:bg-gray-900'>
                       <tr>
-                        <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>文件名称</th>
-                        <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>类型</th>
-                        <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>大小</th>
-                        <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>记录数</th>
-                        <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>状态</th>
-                        <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>上传时间</th>
-                        <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>操作</th>
+                        <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>
+                          {t('dataset.files.columns.name')}
+                        </th>
+                        <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>
+                          {t('dataset.files.columns.type')}
+                        </th>
+                        <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>
+                          {t('dataset.files.columns.size')}
+                        </th>
+                        <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>
+                          {t('dataset.files.columns.records')}
+                        </th>
+                        <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>
+                          {t('dataset.files.columns.status')}
+                        </th>
+                        <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>
+                          {t('dataset.files.columns.uploadedAt')}
+                        </th>
+                        <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>
+                          {t('dataset.files.columns.actions')}
+                        </th>
                       </tr>
                     </thead>
                     <tbody className='divide-y divide-gray-200 dark:divide-gray-700'>
@@ -1487,13 +1560,13 @@ export function Dataset() {
                         <tr>
                           <td colSpan={7} className='px-6 py-8 text-center'>
                             <div className='w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-2' />
-                            <p className='text-sm text-gray-600 dark:text-gray-400'>加载中...</p>
+                            <p className='text-sm text-gray-600 dark:text-gray-400'>{t('common.messages.loading')}</p>
                           </td>
                         </tr>
                       ) : convertedDataFiles.length === 0 ? (
                         <tr>
                           <td colSpan={7} className='px-6 py-8 text-center text-gray-500 dark:text-gray-400'>
-                            暂无文件
+                            {t('dataset.files.empty')}
                           </td>
                         </tr>
                       ) : (
@@ -1506,12 +1579,12 @@ export function Dataset() {
                               </div>
                             </td>
                             <td className='px-6 py-4'>
-                              <Badge className={`text-xs ${file.typeColor} border-0`}>{file.typeDisplay}</Badge>
+                              <Badge className={`text-xs ${file.typeColor} border-0`}>{t(file.typeLabelKey)}</Badge>
                             </td>
                             <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{file.size}</td>
                             <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{file.recordCount}</td>
                             <td className='px-6 py-4'>
-                              <Badge className={`text-xs ${file.statusColor} border-0`}>{file.status}</Badge>
+                              <Badge className={`text-xs ${file.statusColor} border-0`}>{t(file.statusKey)}</Badge>
                             </td>
                             <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{file.modifiedDate}</td>
                             <td className='px-6 py-4'>
@@ -1519,21 +1592,21 @@ export function Dataset() {
                                 <button
                                   onClick={() => handleSyncFile(file)}
                                   className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
-                                  title='同步数据到数据库'
+                                  title={t('dataset.files.actions.syncTooltip')}
                                 >
                                   <RefreshCw className='w-4 h-4 text-green-500' />
                                 </button>
                                 <button
                                   onClick={() => handleDownloadFile(file)}
                                   className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
-                                  title='下载文件'
+                                  title={t('dataset.files.actions.downloadTooltip')}
                                 >
                                   <Download className='w-4 h-4 text-blue-500' />
                                 </button>
                                 <button
                                   onClick={() => handleDeleteFile(file)}
                                   className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
-                                  title='删除文件'
+                                  title={t('dataset.files.actions.deleteTooltip')}
                                 >
                                   <Trash2 className='w-4 h-4 text-red-500' />
                                 </button>
@@ -1552,7 +1625,7 @@ export function Dataset() {
       )}
 
       {/* 数据源类型 - 数据库表管理区域 */}
-      {selectedDS && selectedDS.type === '数据源' && datasetDetail && (
+      {selectedDS && selectedDS.type === DatasetTypeEnum.DATASOURCE && datasetDetail && (
         <div className='border-t-2 border-gray-200 dark:border-gray-700 pt-6'>
           {/* 数据库信息头部 */}
           <div className='mb-6'>
@@ -1570,16 +1643,20 @@ export function Dataset() {
                           : '🔌'}
                 </div>
                 <div>
-                  <h2 className='text-xl dark:text-white mb-1'>{datasetDetail.datasourceConfig?.name || '数据源'}</h2>
+                  <h2 className='text-xl dark:text-white mb-1'>
+                    {datasetDetail.datasourceConfig?.name || t('dataset.datasource.header.defaultName')}
+                  </h2>
                   <p className='text-sm text-gray-600 dark:text-gray-400'>
-                    {datasetDetail.datasourceConfig?.jdbcUrl || '未配置JDBC URL'}
+                    {datasetDetail.datasourceConfig?.jdbcUrl || t('dataset.datasource.header.noJdbcUrl')}
                   </p>
                   <div className='flex items-center gap-3 mt-2'>
                     <Badge className='text-xs bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-0'>
-                      已连接
+                      {t('dataset.datasource.status.connected')}
                     </Badge>
                     <span className='text-xs text-gray-500 dark:text-gray-400'>
-                      最后同步: {datasetDetail.modifiedDate || '未知'}
+                      {t('dataset.datasource.status.lastSynced', {
+                        time: datasetDetail.modifiedDate || t('dataset.datasource.status.unknown'),
+                      })}
                     </span>
                   </div>
                 </div>
@@ -1593,17 +1670,17 @@ export function Dataset() {
                     if (!selectedDS) return;
                     try {
                       await DatasetsData.syncDatasetData(selectedDS.id);
-                      toast.success('同步已启动');
+                    toast.success(t('dataset.toasts.datasourceSyncStarted'));
                       // 重新加载表列表
                       loadDataSourceTables(selectedDS.id);
                     } catch (error: any) {
-                      console.error('同步数据库失败:', error);
-                      toast.error(error?.message || '同步数据库失败');
+                    console.error('Failed to sync datasource:', error);
+                    toast.error(error?.message || t('dataset.toasts.syncDatasourceFailed'));
                     }
                   }}
                 >
                   <RefreshCw className='w-4 h-4 mr-2' />
-                  同步
+                  {t('dataset.datasource.actions.sync')}
                 </Button>
                 <Button
                   variant='outline'
@@ -1612,7 +1689,7 @@ export function Dataset() {
                   onClick={() => setAddDataSourceOpen(true)}
                 >
                   <Edit className='w-4 h-4 mr-2' />
-                  编辑连接
+                  {t('dataset.datasource.actions.editConnection')}
                 </Button>
               </div>
             </div>
@@ -1620,15 +1697,23 @@ export function Dataset() {
             {/* 数据库统计 */}
             <div className='grid grid-cols-4 gap-4'>
               <Card className='p-4 dark:bg-gray-800 dark:border-gray-700'>
-                <div className='text-sm text-gray-600 dark:text-gray-400 mb-1'>数据库大小</div>
+                <div className='text-sm text-gray-600 dark:text-gray-400 mb-1'>
+                  {t('dataset.datasource.stats.databaseSize')}
+                </div>
                 <div className='text-2xl dark:text-white'>{datasetDetail.dataStatistics?.usedStoreSize || '0 MB'}</div>
               </Card>
               <Card className='p-4 dark:bg-gray-800 dark:border-gray-700'>
-                <div className='text-sm text-gray-600 dark:text-gray-400 mb-1'>表数量</div>
-                <div className='text-2xl dark:text-white'>{databaseTables.length} 张</div>
+                <div className='text-sm text-gray-600 dark:text-gray-400 mb-1'>
+                  {t('dataset.datasource.stats.tableCount')}
+                </div>
+                <div className='text-2xl dark:text-white'>
+                  {t('dataset.datasource.stats.tableCountValue', { count: databaseTables.length })}
+                </div>
               </Card>
               <Card className='p-4 dark:bg-gray-800 dark:border-gray-700'>
-                <div className='text-sm text-gray-600 dark:text-gray-400 mb-1'>总记录数</div>
+                <div className='text-sm text-gray-600 dark:text-gray-400 mb-1'>
+                  {t('dataset.datasource.stats.totalRecords')}
+                </div>
                 <div className='text-2xl dark:text-white'>
                   {datasetDetail.dataStatistics?.totalRecords
                     ? datasetDetail.dataStatistics.totalRecords >= 1000000
@@ -1640,8 +1725,12 @@ export function Dataset() {
                 </div>
               </Card>
               <Card className='p-4 dark:bg-gray-800 dark:border-gray-700'>
-                <div className='text-sm text-gray-600 dark:text-gray-400 mb-1'>连接状态</div>
-                <div className='text-2xl text-green-600 dark:text-green-400'>正常</div>
+                <div className='text-sm text-gray-600 dark:text-gray-400 mb-1'>
+                  {t('dataset.datasource.stats.connectionStatus')}
+                </div>
+                <div className='text-2xl text-green-600 dark:text-green-400'>
+                  {t('dataset.datasource.stats.connectionStatusValue')}
+                </div>
               </Card>
             </div>
           </div>
@@ -1651,18 +1740,25 @@ export function Dataset() {
             {/* 左侧：表列表 */}
             <div className='col-span-2'>
               <div className='mb-4'>
-                <h3 className='text-lg dark:text-white mb-1'>数据表</h3>
-                <p className='text-sm text-gray-600 dark:text-gray-400'>点击表名查看数据记录</p>
+                <h3 className='text-lg dark:text-white mb-1'>{t('dataset.datasource.tables.title')}</h3>
+                <p className='text-sm text-gray-600 dark:text-gray-400'>
+                  {t('dataset.datasource.tables.subtitle')}
+                </p>
               </div>
 
               <Card className='dark:bg-gray-800 dark:border-gray-700'>
                 {isLoadingDataList ? (
                   <div className='p-8 text-center'>
                     <div className='w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-2' />
-                    <p className='text-sm text-gray-600 dark:text-gray-400'>加载中...</p>
+                    <p className='text-sm text-gray-600 dark:text-gray-400'>{t('common.messages.loading')}</p>
                   </div>
                 ) : databaseTables.length === 0 ? (
-                  <div className='p-8 text-center text-gray-500 dark:text-gray-400 flex items-center justify-center' style={{ height: '350px' }}>无数据表信息</div>
+                  <div
+                    className='p-8 text-center text-gray-500 dark:text-gray-400 flex items-center justify-center'
+                    style={{ height: '350px' }}
+                  >
+                    {t('dataset.datasource.tables.empty')}
+                  </div>
                 ) : (
                   <div className='divide-y divide-gray-200 dark:divide-gray-700 max-h-[660px] overflow-y-auto'>
                     {databaseTables.map(vo => {
@@ -1691,7 +1787,7 @@ export function Dataset() {
                             </span>
                           </div>
                           <div className='flex items-center gap-4 text-xs text-gray-600 dark:text-gray-400 ml-8'>
-                            <span>{table.rowCount} 行</span>
+                            <span>{t('dataset.datasource.tables.rowCount', { count: table.rowCount })}</span>
                             <span>{table.size}</span>
                             <span>{table.description}</span>
                           </div>
@@ -1710,11 +1806,15 @@ export function Dataset() {
                   <div className='mb-4 flex items-center justify-between'>
                     <div>
                       <h3 className='text-lg dark:text-white mb-1'>
-                        数据记录预览 -{' '}
-                        <span className='font-mono text-blue-600 dark:text-blue-400'>{selectedTable.tableName}</span>
+                        {t('dataset.datasource.preview.title', {
+                          table: selectedTable.tableName,
+                        })}
                       </h3>
                       <p className='text-sm text-gray-600 dark:text-gray-400'>
-                        共 {totalTableRecords.toLocaleString()} 行记录，当前第 {tableCurrentPage} 页
+                        {t('dataset.datasource.preview.summary', {
+                          total: totalTableRecords.toLocaleString(),
+                          page: tableCurrentPage,
+                        })}
                       </p>
                     </div>
                     <Button
@@ -1723,7 +1823,7 @@ export function Dataset() {
                       className='dark:bg-gray-800 dark:border-gray-700'
                       onClick={() => setSelectedTable(null)}
                     >
-                      关闭预览
+                      {t('dataset.datasource.preview.close')}
                     </Button>
                   </div>
 
@@ -1731,17 +1831,23 @@ export function Dataset() {
                     {isLoadingTablePreview ? (
                       <div className='p-8 text-center'>
                         <div className='w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-2' />
-                        <p className='text-sm text-gray-600 dark:text-gray-400'>加载预览数据中...</p>
+                        <p className='text-sm text-gray-600 dark:text-gray-400'>
+                          {t('dataset.datasource.preview.loading')}
+                        </p>
                       </div>
                     ) : tablePreviewData && tablePreviewData.success === false ? (
                       <div className='p-8 text-center text-red-500 dark:text-red-400'>
-                        <p className='text-sm'>{tablePreviewData.message || '加载预览数据失败'}</p>
+                        <p className='text-sm'>
+                          {tablePreviewData.message || t('dataset.datasource.preview.failed')}
+                        </p>
                         {tablePreviewData.details && (
                           <p className='text-xs mt-2 text-gray-500 dark:text-gray-400'>{tablePreviewData.details}</p>
                         )}
                       </div>
                     ) : tableColumns.length === 0 ? (
-                      <div className='p-8 text-center text-gray-500 dark:text-gray-400'>暂无数据</div>
+                      <div className='p-8 text-center text-gray-500 dark:text-gray-400'>
+                        {t('dataset.datasource.preview.noData')}
+                      </div>
                     ) : (
                       <div className='overflow-x-auto'>
                         <table className='w-full text-sm'>
@@ -1782,7 +1888,7 @@ export function Dataset() {
                                 onClick={() => setTableCurrentPage(prev => Math.max(1, prev - 1))}
                                 className={tableCurrentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
                               >
-                                上一页
+                                {t('common.pagination.previous')}
                               </PaginationPrevious>
                             </PaginationItem>
                             {Array.from({ length: totalTablePages }, (_, i) => i + 1).map(page => (
@@ -1805,7 +1911,7 @@ export function Dataset() {
                                     : 'cursor-pointer'
                                 }
                               >
-                                下一页
+                                {t('common.pagination.next')}
                               </PaginationNext>
                             </PaginationItem>
                           </PaginationContent>
@@ -1817,7 +1923,9 @@ export function Dataset() {
               ) : (
                 <div className='flex flex-col items-center justify-center h-96 text-center'>
                   <Database className='w-16 h-16 text-gray-300 dark:text-gray-600 mb-4' />
-                  <p className='text-gray-500 dark:text-gray-400 text-sm'>选择左侧的数据表以查看记录预览</p>
+                  <p className='text-gray-500 dark:text-gray-400 text-sm'>
+                    {t('dataset.datasource.preview.placeholder')}
+                  </p>
                 </div>
               )}
             </div>
@@ -1829,9 +1937,9 @@ export function Dataset() {
       <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
         <DialogContent className='max-w-2xl dark:bg-gray-900 dark:border-gray-700'>
           <DialogHeader>
-            <DialogTitle className='text-xl dark:text-white'>数据集详情</DialogTitle>
+            <DialogTitle className='text-xl dark:text-white'>{t('dataset.dialogs.view.title')}</DialogTitle>
             <DialogDescription className='text-sm text-gray-500 dark:text-gray-400'>
-              查看数据集的详细信息
+              {t('dataset.dialogs.view.description')}
             </DialogDescription>
           </DialogHeader>
 
@@ -1847,41 +1955,64 @@ export function Dataset() {
                   <h3 className='text-lg dark:text-white mb-1'>{viewingDataset.name}</h3>
                   <p className='text-sm text-gray-600 dark:text-gray-400'>{viewingDataset.description}</p>
                 </div>
-                <Badge className={`text-xs ${viewingDataset.statusColor} border-0`}>{viewingDataset.status}</Badge>
+                <Badge className={`text-xs ${viewingDataset.statusColor} border-0`}>
+                  {t(
+                    viewingDataset.statusKey ||
+                      (viewingDataset.enabled ? 'common.status.enabled' : 'common.status.disabled')
+                  )}
+                </Badge>
               </div>
 
               <div className='grid grid-cols-2 gap-4'>
                 <div>
-                  <Label className='text-sm text-gray-600 dark:text-gray-400'>数据类型</Label>
-                  <p className='text-sm dark:text-white mt-1'>{viewingDataset.type}</p>
+                  <Label className='text-sm text-gray-600 dark:text-gray-400'>
+                    {t('dataset.dialogs.view.typeLabel')}
+                  </Label>
+                  <p className='text-sm dark:text-white mt-1'>
+                    {t(viewingDataset.typeLabelKey || 'dataset.types.file')}
+                  </p>
                 </div>
                 <div>
                   <Label className='text-sm text-gray-600 dark:text-gray-400'>
-                    {viewingDataset.type === '数据源' ? '表数量' : '文件数量'}
+                    {t(
+                      viewingDataset.type === DatasetTypeEnum.DATASOURCE
+                        ? 'dataset.dialogs.view.itemsLabel.tables'
+                        : 'dataset.dialogs.view.itemsLabel.files'
+                    )}
                   </Label>
-                  <p className='text-sm dark:text-white mt-1'>{viewingDataset.dataCount} </p>
+                  <p className='text-sm dark:text-white mt-1'>{viewingDataset.dataCount}</p>
                 </div>
                 <div>
-                  <Label className='text-sm text-gray-600 dark:text-gray-400'>数据量</Label>
+                  <Label className='text-sm text-gray-600 dark:text-gray-400'>
+                    {t('dataset.dialogs.view.dataVolumeLabel')}
+                  </Label>
                   <p className='text-sm dark:text-white mt-1'>{viewingDataset.size}</p>
                 </div>
                 <div>
-                  <Label className='text-sm text-gray-600 dark:text-gray-400'>创建者</Label>
+                  <Label className='text-sm text-gray-600 dark:text-gray-400'>
+                    {t('dataset.dialogs.view.creatorLabel')}
+                  </Label>
                   <p className='text-sm dark:text-white mt-1'>{viewingDataset.creator}</p>
                 </div>
                 <div>
-                  <Label className='text-sm text-gray-600 dark:text-gray-400'>创建时间</Label>
+                  <Label className='text-sm text-gray-600 dark:text-gray-400'>
+                    {t('dataset.dialogs.view.createdAt')}
+                  </Label>
                   <p className='text-sm dark:text-white mt-1'>{viewingDataset.createdDate}</p>
                 </div>
                 <div>
-                  <Label className='text-sm text-gray-600 dark:text-gray-400'>最后更新</Label>
+                  <Label className='text-sm text-gray-600 dark:text-gray-400'>
+                    {t('dataset.dialogs.view.updatedAt')}
+                  </Label>
                   <p className='text-sm dark:text-white mt-1'>{viewingDataset.modifiedDate}</p>
                 </div>
               </div>
 
               {viewingDataset.tags && viewingDataset.tags.length > 0 && (
                 <div>
-                  <Label className='text-sm text-gray-600 dark:text-gray-400 mb-2 block'>标签</Label>
+                  <Label className='text-sm text-gray-600 dark:text-gray-400 mb-2 block'>
+                    {t('common.labels.tags')}
+                  </Label>
                   <div className='flex flex-wrap gap-2'>
                     {viewingDataset.tags.map((tag, index) => (
                       <Badge key={index} className={`text-xs px-2 py-1 border-0 ${getTagColor(tag)}`}>
@@ -1913,8 +2044,14 @@ export function Dataset() {
         dataset={
           editingDataset
             ? {
-                ...editingDataset,
-                type: editingDataset.type,
+                id: editingDataset.id,
+                name: editingDataset.name,
+                description: editingDataset.description,
+                icon: editingDataset.icon,
+                iconBg: editingDataset.iconBg,
+                visibility: editingDataset.visibility,
+                tags: editingDataset.tags,
+                type: editingDataset.type === DatasetTypeEnum.DATASOURCE ? '数据源' : '文件',
               }
             : null
         }
@@ -1941,7 +2078,7 @@ export function Dataset() {
                 }
               })
               .catch((error: any) => {
-                console.error('加载数据集详情失败:', error);
+                console.error('Failed to load dataset detail:', error);
               });
           }
         }}
@@ -1951,17 +2088,21 @@ export function Dataset() {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent className='dark:bg-gray-900 dark:border-gray-700'>
           <AlertDialogHeader>
-            <AlertDialogTitle className='dark:text-white'>确认删除</AlertDialogTitle>
+            <AlertDialogTitle className='dark:text-white'>
+              {t('dataset.dialogs.deleteDataset.title')}
+            </AlertDialogTitle>
             <AlertDialogDescription className='dark:text-gray-400'>
-              确定要删除数据集 "{deletingDataset?.name}" 吗？此操作无法撤销。
+              {t('dataset.dialogs.deleteDataset.description', {
+                name: deletingDataset?.name ?? '',
+              })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel className='dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300'>
-              取消
+              {t('common.actions.cancel')}
             </AlertDialogCancel>
             <AlertDialogAction onClick={confirmDelete} className='bg-red-600 hover:bg-red-700 text-white'>
-              删除
+              {t('common.actions.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -1971,17 +2112,21 @@ export function Dataset() {
       <AlertDialog open={deleteFileDialogOpen} onOpenChange={setDeleteFileDialogOpen}>
         <AlertDialogContent className='dark:bg-gray-900 dark:border-gray-700'>
           <AlertDialogHeader>
-            <AlertDialogTitle className='dark:text-white'>确认删除</AlertDialogTitle>
+            <AlertDialogTitle className='dark:text-white'>
+              {t('dataset.dialogs.deleteFile.title')}
+            </AlertDialogTitle>
             <AlertDialogDescription className='dark:text-gray-400'>
-              确定要删除文件 "{deletingFile?.name}" 吗？此操作无法撤销。
+              {t('dataset.dialogs.deleteFile.description', {
+                name: deletingFile?.name ?? '',
+              })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel className='dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300'>
-              取消
+              {t('common.actions.cancel')}
             </AlertDialogCancel>
             <AlertDialogAction onClick={confirmDeleteFile} className='bg-red-600 hover:bg-red-700 text-white'>
-              删除
+              {t('common.actions.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

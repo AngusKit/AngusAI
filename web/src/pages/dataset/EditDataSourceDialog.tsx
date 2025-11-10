@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import Datasets from '@/services/Datasets';
 import { useDataSourceForm } from './hooks/useDataSourceForm';
 import { DataSourceFormContent } from './components/DataSourceFormContent';
+import { useLanguage } from '@/components/ui/LanguageProvider';
 
 interface EditDataSourceDialogProps {
   open: boolean;
@@ -22,6 +23,7 @@ export function EditDataSourceDialog({
   datasetId,
   onSuccess,
 }: EditDataSourceDialogProps) {
+  const { t } = useLanguage();
   const {
     formState,
     connectionStatus,
@@ -62,8 +64,8 @@ export function EditDataSourceDialog({
         resetForm();
       }
     } catch (error: any) {
-      console.error('加载数据源配置失败:', error);
-      toast.error(error?.message || '加载数据源配置失败');
+      console.error('Failed to load data source config:', error);
+      toast.error(error?.message || t('dataset.editDialog.loadFailed'));
       resetForm();
     } finally {
       setIsLoading(false);
@@ -76,24 +78,28 @@ export function EditDataSourceDialog({
 
   const handleSubmit = async () => {
     if (!validateForm() || connectionStatus !== 'success') {
-      toast.error('请先测试连接，确保连接成功后再保存');
+      toast.error(t('dataset.editDialog.testConnectionRequired'));
       return;
     }
 
     if (!datasetId) {
-      toast.error('数据集ID不存在');
+      toast.error(t('dataset.editDialog.datasetIdMissing'));
       return;
     }
 
     try {
       const updateDto = getSubmitData();
       await Datasets.modifyDataSource(datasetId, updateDto);
-      toast.success(`数据源 "${updateDto.name}" 更新成功`);
+      toast.success(
+        t('dataset.editDialog.updateSuccess', {
+          name: updateDto.name,
+        })
+      );
       onOpenChange(false);
       onSuccess?.();
     } catch (error: any) {
-      console.error('更新数据源失败:', error);
-      toast.error(error?.message || '更新数据源失败');
+      console.error('Failed to update data source:', error);
+      toast.error(error?.message || t('dataset.editDialog.updateFailed'));
     }
   };
 
@@ -113,10 +119,12 @@ export function EditDataSourceDialog({
         <DialogHeader className='px-6 py-4 border-b border-gray-200 dark:border-gray-700'>
           <DialogTitle className='flex items-center gap-3 text-xl dark:text-white'>
             <Database className='w-6 h-6 text-blue-500' />
-            编辑数据源
+            {t('dataset.editDialog.title')}
           </DialogTitle>
           <DialogDescription className='text-sm text-gray-500 dark:text-gray-400 mt-1'>
-            {datasetName ? `编辑数据集 "${datasetName}" 的数据库连接配置` : '编辑关系型数据库连接参数 (JDBC)'}
+            {datasetName
+              ? t('dataset.editDialog.descriptionWithName', { name: datasetName })
+              : t('dataset.editDialog.descriptionGeneric')}
           </DialogDescription>
         </DialogHeader>
 
@@ -124,7 +132,9 @@ export function EditDataSourceDialog({
           {isLoading ? (
             <div className='flex items-center justify-center py-12'>
               <div className='w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin' />
-              <span className='ml-3 text-sm text-gray-600 dark:text-gray-400'>加载数据源配置中...</span>
+              <span className='ml-3 text-sm text-gray-600 dark:text-gray-400'>
+                {t('dataset.editDialog.loadingConfig')}
+              </span>
             </div>
           ) : (
             <DataSourceFormContent
@@ -151,7 +161,7 @@ export function EditDataSourceDialog({
             }}
             className='dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300'
           >
-            取消
+            {t('common.actions.cancel')}
           </Button>
           <Button
             onClick={handleSubmit}
@@ -159,7 +169,7 @@ export function EditDataSourceDialog({
             className='bg-blue-500 hover:bg-blue-600 text-white'
           >
             <Database className='w-4 h-4 mr-2' />
-            保存配置
+            {t('dataset.editDialog.saveButton')}
           </Button>
         </div>
       </DialogContent>
