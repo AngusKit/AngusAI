@@ -35,6 +35,9 @@ export const zhCN = {
       copyEmptyError: '内容为空，无法复制',
       copySuccess: '已复制到剪贴板',
       copyFailed: '复制失败，请手动复制',
+      saving: '保存中...',
+      loading: '加载中...',
+      creating: '创建中...',
     },
     status: {
       enabled: '已启用',
@@ -43,6 +46,19 @@ export const zhCN = {
       processing: '处理中',
       completed: '已完成',
       failed: '失败',
+      connected: '已连接',
+      disconnected: '未连接',
+    },
+    pagination: {
+      previous: '上一页',
+      next: '下一页',
+      total: '共 {total} 条',
+    },
+    labels: {
+      name: '名称',
+      description: '描述',
+      tags: '标签',
+      icon: '图标',
     }
   },
 
@@ -163,7 +179,6 @@ export const zhCN = {
     categorySaveFailed: '保存分类失败',
     parentCategoryLabel: '父分组（可选）',
     parentCategoryNone: '无（作为顶层分组）',
-    iconLabel: '图标',
     iconPlaceholder: '选择图标',
     colorLabel: '颜色',
     loadCategoriesFailed: '加载分类失败',
@@ -195,6 +210,46 @@ export const zhCN = {
     searchPlaceholder: '搜索知识库名称、描述...',
     actions: {
       create: '创建知识库',
+    },
+    formSteps: {
+      basicInfo: '基本信息',
+      configuration: '配置处理',
+    },
+    form: {
+      basic: {
+        nameLabel: '知识库名称',
+        namePlaceholder: '请输入知识库名称',
+        visibilityLabel: '可见性',
+        visibilityPlaceholder: '选择可见性',
+        visibilityOptions: {
+          private: '私有',
+          team: '团队可见',
+          public: '公开',
+        },
+        descriptionPlaceholder: '请输入知识库描述',
+        tagsCount: '({current}/{max})',
+        tagInputPlaceholder: '输入标签后按回车，最多 {maxCount} 个，每个不超过 {maxLength} 字符',
+
+      },
+      configuration: {
+        vectorStoreLabel: '向量存储源',
+        vectorStorePlaceholder: '选择向量存储源',
+        vectorStoreHelp: '选择用于存储向量数据的存储源',
+        chunkSizeLabel: '分段大小',
+        chunkSizeHelp: '控制文本分块的大小，范围：{min}-{max} 字符',
+        chunkOverlapLabel: '分段重叠',
+        chunkOverlapHelp: '控制相邻文本块的重叠字符数，范围：{min}-{max} 字符',
+        embeddingModelLabel: '向量化模型（可选）',
+        embeddingModelPlaceholder: '不指定时使用默认模型',
+        embeddingModelDefault: '使用默认模型',
+        embeddingModelHelp: '选择用于文本向量化的模型，不指定时使用默认模型',
+      },
+      preprocessing: {
+        title: '预处理选项',
+        removeDuplicates: '去除重复数据',
+        cleanHTML: '清理HTML标签',
+        optimizeTextFormat: '二次优化文本格式',
+      },
     },
     sort: {
       recentCreated: '最近创建',
@@ -230,6 +285,31 @@ export const zhCN = {
     },
     selected: {
       summary: '{description} · {count} 个文档 · {size}',
+    },
+    validation: {
+      nameRequired: '请输入知识库名称',
+      descriptionRequired: '请输入知识库描述',
+      chunkSizeRange: '分段大小必须在 {min}-{max} 之间',
+      chunkOverlapRange: '分段重叠必须在 {min}-{max} 之间',
+    },
+    editDialog: {
+      title: '编辑知识库',
+      description: '修改知识库的基本信息和配置参数',
+      loadFailed: '加载知识库详情失败，请重试',
+      updateSuccess: '知识库更新成功！',
+      updateFailed: '更新知识库失败，请重试',
+      loadingDetail: '加载知识库详情中...',
+      saveButton: '保存更新',
+      nextButton: '下一步',
+    },
+    createDialog: {
+      title: '创建知识库',
+      description: '按照步骤创建和配置您的知识库',
+      selectIconRequired: '请选择图标',
+      createSuccess: '知识库创建成功！',
+      createFailed: '创建知识库失败，请重试',
+      confirmButton: '确认并创建',
+      unknownStep: '未知步骤: {step}',
     },
     upload: {
       sectionTitle: '上传文档',

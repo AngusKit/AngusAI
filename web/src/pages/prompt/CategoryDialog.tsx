@@ -151,7 +151,7 @@ export function CategoryDialog({
           <div className='grid grid-cols-2 gap-4'>
             <div>
               <Label htmlFor='categoryIcon' className='mb-1'>
-                {t('prompts.iconLabel')}
+                {t('common.labels.icon')}
               </Label>
               <Select
                 value={AVAILABLE_ICONS.find(icon => icon.component === formData.icon)?.name || 'BookOpen'}

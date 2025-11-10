@@ -8,6 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { VECTOR_STORES, CONFIG_CONSTANTS } from '../constants';
 import { getTagColor, ICON_OPTIONS } from '@/utils';
 import type { KnowledgeBaseFormData } from '../hooks/useKnowledgeBaseForm';
+import { useLanguage } from '@/components/ui/LanguageProvider';
 
 interface BasicInfoStepProps {
   formData: KnowledgeBaseFormData;
@@ -29,35 +30,41 @@ export function BasicInfoStep({
   onTagInputKeyDown,
   onRemoveTag,
 }: BasicInfoStepProps) {
+  const { t } = useLanguage();
+  const tagCountText = t('knowledge.form.basic.tagsCount', {
+    current: formData.tags.length,
+    max: CONFIG_CONSTANTS.TAG.MAX_COUNT,
+  });
+
   return (
     <div className='py-6'>
       {/* 名称和可见性在同一行 */}
       <div className='grid grid-cols-2 gap-6'>
         <div>
-          <Label className='text-sm mb-2 block dark:text-gray-300'>知识库名称</Label>
+          <Label className='text-sm mb-2 block dark:text-gray-300'>{t('knowledge.form.basic.nameLabel')}</Label>
           <Input
             value={formData.name}
             onChange={e => onFieldChange('name', e.target.value)}
-            placeholder='请输入知识库名称'
+            placeholder={t('knowledge.form.basic.namePlaceholder')}
             className='dark:bg-gray-900 dark:border-gray-700 dark:text-white'
           />
         </div>
 
         <div>
-          <Label className='text-sm mb-2 block dark:text-gray-300'>可见性</Label>
+          <Label className='text-sm mb-2 block dark:text-gray-300'>{t('knowledge.form.basic.visibilityLabel')}</Label>
           <Select value={formData.visibility} onValueChange={value => onFieldChange('visibility', value as any)}>
             <SelectTrigger className='dark:bg-gray-900 dark:border-gray-700 dark:text-white'>
-              <SelectValue />
+              <SelectValue placeholder={t('knowledge.form.basic.visibilityPlaceholder')} />
             </SelectTrigger>
             <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
               <SelectItem value='private' className='dark:text-white'>
-                私有
+                {t('knowledge.form.basic.visibilityOptions.private')}
               </SelectItem>
               <SelectItem value='team' className='dark:text-white'>
-                团队可见
+                {t('knowledge.form.basic.visibilityOptions.team')}
               </SelectItem>
               <SelectItem value='public' className='dark:text-white'>
-                公开
+                {t('knowledge.form.basic.visibilityOptions.public')}
               </SelectItem>
             </SelectContent>
           </Select>
@@ -66,11 +73,11 @@ export function BasicInfoStep({
 
       {/* 描述 */}
       <div className='mt-5'>
-        <Label className='text-sm mb-2 block dark:text-gray-300'>描述</Label>
+        <Label className='text-sm mb-2 block dark:text-gray-300'>{t('common.labels.description')}</Label>
         <Textarea
           value={formData.description}
           onChange={e => onFieldChange('description', e.target.value)}
-          placeholder='请输入知识库描述'
+          placeholder={t('knowledge.form.basic.descriptionPlaceholder')}
           rows={3}
           className='dark:bg-gray-900 dark:border-gray-700 dark:text-white resize-none'
         />
@@ -79,16 +86,17 @@ export function BasicInfoStep({
       {/* 标签 */}
       <div className='mt-5'>
         <Label className='text-sm mb-2 block dark:text-gray-300'>
-          标签{' '}
-          <span className='text-gray-400'>
-            ({formData.tags.length}/{CONFIG_CONSTANTS.TAG.MAX_COUNT})
-          </span>
+          {t('common.labels.tags')}{' '}
+          <span className='text-gray-400'>{tagCountText}</span>
         </Label>
         <Input
           value={tagInput}
           onChange={e => onTagInputChange(e.target.value)}
           onKeyDown={onTagInputKeyDown}
-          placeholder='输入标签后按回车，最多5个，每个不超过10字符'
+          placeholder={t('knowledge.form.basic.tagInputPlaceholder', {
+            maxCount: CONFIG_CONSTANTS.TAG.MAX_COUNT,
+            maxLength: CONFIG_CONSTANTS.TAG.MAX_LENGTH,
+          })}
           className='dark:bg-gray-900 dark:border-gray-700 dark:text-white'
           disabled={formData.tags.length >= CONFIG_CONSTANTS.TAG.MAX_COUNT}
           maxLength={CONFIG_CONSTANTS.TAG.MAX_LENGTH}
@@ -109,7 +117,7 @@ export function BasicInfoStep({
 
       {/* 图标 - 超过两排时可滚动 */}
       <div className='mt-5'>
-        <Label className='text-sm mb-2 block dark:text-gray-300'>图标</Label>
+        <Label className='text-sm mb-2 block dark:text-gray-300'>{t('common.labels.icon')}</Label>
         <div className='max-h-[140px] overflow-y-auto pr-2 border border-gray-200 dark:border-gray-700 rounded-lg p-2'>
           <div className='grid grid-cols-8 gap-2'>
             {ICON_OPTIONS.map((option, index) => (
@@ -142,6 +150,7 @@ interface ConfigurationStepProps {
  * 配置处理步骤组件
  */
 export function ConfigurationStep({ formData, onFieldChange }: ConfigurationStepProps) {
+  const { t } = useLanguage();
   // 确保 chunkSize 和 chunkOverlap 始终是有效的数组
   const safeChunkSize =
     Array.isArray(formData.chunkSize) && formData.chunkSize.length > 0
@@ -159,10 +168,12 @@ export function ConfigurationStep({ formData, onFieldChange }: ConfigurationStep
       <div className='space-y-6'>
         {/* 向量存储源 */}
         <div>
-          <Label className='text-sm mb-3 block dark:text-gray-300'>向量存储源</Label>
+          <Label className='text-sm mb-3 block dark:text-gray-300'>
+            {t('knowledge.form.configuration.vectorStoreLabel')}
+          </Label>
           <Select value={formData.vectorStoreId} onValueChange={value => onFieldChange('vectorStoreId', value)}>
             <SelectTrigger className='dark:bg-gray-900 dark:border-gray-700 dark:text-white'>
-              <SelectValue />
+              <SelectValue placeholder={t('knowledge.form.configuration.vectorStorePlaceholder')} />
             </SelectTrigger>
             <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
               {VECTOR_STORES.map(store => (
@@ -176,14 +187,14 @@ export function ConfigurationStep({ formData, onFieldChange }: ConfigurationStep
                         variant='outline'
                         className='text-xs border-green-500 text-green-600 dark:text-green-400 ml-2'
                       >
-                        已连接
+                        {t('common.status.connected')}
                       </Badge>
                     ) : (
                       <Badge
                         variant='outline'
                         className='text-xs border-gray-400 text-gray-500 dark:text-gray-400 ml-2'
                       >
-                        未连接
+                        {t('common.status.disconnected')}
                       </Badge>
                     )}
                   </div>
@@ -191,13 +202,15 @@ export function ConfigurationStep({ formData, onFieldChange }: ConfigurationStep
               ))}
             </SelectContent>
           </Select>
-          <p className='text-xs text-gray-500 dark:text-gray-400 mt-2'>选择用于存储向量数据的存储源</p>
+          <p className='text-xs text-gray-500 dark:text-gray-400 mt-2'>
+            {t('knowledge.form.configuration.vectorStoreHelp')}
+          </p>
         </div>
 
         {/* 分段大小 */}
         <div>
           <div className='flex items-center justify-between mb-3'>
-            <Label className='text-sm dark:text-gray-300'>分段大小</Label>
+            <Label className='text-sm dark:text-gray-300'>{t('knowledge.form.configuration.chunkSizeLabel')}</Label>
             <span className='text-sm dark:text-white'>{currentChunkSize}</span>
           </div>
           <Slider
@@ -209,14 +222,17 @@ export function ConfigurationStep({ formData, onFieldChange }: ConfigurationStep
             className='w-full'
           />
           <p className='text-xs text-gray-500 dark:text-gray-400 mt-2'>
-            控制文本分块的大小，范围：{CONFIG_CONSTANTS.CHUNK_SIZE.MIN}-{CONFIG_CONSTANTS.CHUNK_SIZE.MAX} 字符
+            {t('knowledge.form.configuration.chunkSizeHelp', {
+              min: CONFIG_CONSTANTS.CHUNK_SIZE.MIN,
+              max: CONFIG_CONSTANTS.CHUNK_SIZE.MAX,
+            })}
           </p>
         </div>
 
         {/* 分段重叠 */}
         <div>
           <div className='flex items-center justify-between mb-3'>
-            <Label className='text-sm dark:text-gray-300'>分段重叠</Label>
+            <Label className='text-sm dark:text-gray-300'>{t('knowledge.form.configuration.chunkOverlapLabel')}</Label>
             <span className='text-sm dark:text-white'>{currentChunkOverlap}</span>
           </div>
           <Slider
@@ -228,24 +244,28 @@ export function ConfigurationStep({ formData, onFieldChange }: ConfigurationStep
             className='w-full'
           />
           <p className='text-xs text-gray-500 dark:text-gray-400 mt-2'>
-            控制相邻文本块的重叠字符数，范围：{CONFIG_CONSTANTS.CHUNK_OVERLAP.MIN}-{CONFIG_CONSTANTS.CHUNK_OVERLAP.MAX}{' '}
-            字符
+            {t('knowledge.form.configuration.chunkOverlapHelp', {
+              min: CONFIG_CONSTANTS.CHUNK_OVERLAP.MIN,
+              max: CONFIG_CONSTANTS.CHUNK_OVERLAP.MAX,
+            })}
           </p>
         </div>
 
         {/* 向量化模型 */}
         <div>
-          <Label className='text-sm mb-3 block dark:text-gray-300'>向量化模型（可选）</Label>
+          <Label className='text-sm mb-3 block dark:text-gray-300'>
+            {t('knowledge.form.configuration.embeddingModelLabel')}
+          </Label>
           <Select
             value={formData.embeddingModelId?.toString() || 'default'}
             onValueChange={value => onFieldChange('embeddingModelId', value === 'default' ? undefined : Number(value))}
           >
             <SelectTrigger className='dark:bg-gray-900 dark:border-gray-700 dark:text-white'>
-              <SelectValue placeholder='不指定时使用默认模型' />
+              <SelectValue placeholder={t('knowledge.form.configuration.embeddingModelPlaceholder')} />
             </SelectTrigger>
             <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
               <SelectItem value='default' className='dark:text-white'>
-                使用默认模型
+                {t('knowledge.form.configuration.embeddingModelDefault')}
               </SelectItem>
               {/* 注意：这里需要根据实际的模型ID列表来填充，目前使用示例ID */}
               <SelectItem value='1' className='dark:text-white'>
@@ -266,13 +286,13 @@ export function ConfigurationStep({ formData, onFieldChange }: ConfigurationStep
             </SelectContent>
           </Select>
           <p className='text-xs text-gray-500 dark:text-gray-400 mt-2'>
-            选择用于文本向量化的模型，不指定时使用默认模型
+            {t('knowledge.form.configuration.embeddingModelHelp')}
           </p>
         </div>
 
         {/* 预处理选项 */}
         <div>
-          <Label className='text-sm mb-3 block dark:text-gray-300'>预处理选项</Label>
+          <Label className='text-sm mb-3 block dark:text-gray-300'>{t('knowledge.form.preprocessing.title')}</Label>
           <div className='space-y-2.5'>
             <div className='flex items-center gap-2'>
               <Checkbox
@@ -281,7 +301,7 @@ export function ConfigurationStep({ formData, onFieldChange }: ConfigurationStep
                 onCheckedChange={checked => onFieldChange('removeDuplicates', checked as boolean)}
               />
               <label htmlFor='remove-duplicates' className='text-sm dark:text-gray-300 cursor-pointer'>
-                去除重复数据
+                {t('knowledge.form.preprocessing.removeDuplicates')}
               </label>
             </div>
 
@@ -292,7 +312,7 @@ export function ConfigurationStep({ formData, onFieldChange }: ConfigurationStep
                 onCheckedChange={checked => onFieldChange('cleanHTML', checked as boolean)}
               />
               <label htmlFor='clean-html' className='text-sm dark:text-gray-300 cursor-pointer'>
-                清理HTML标签
+                {t('knowledge.form.preprocessing.cleanHTML')}
               </label>
             </div>
 
@@ -303,7 +323,7 @@ export function ConfigurationStep({ formData, onFieldChange }: ConfigurationStep
                 onCheckedChange={checked => onFieldChange('optimizeTextFormat', checked as boolean)}
               />
               <label htmlFor='optimize-text-format' className='text-sm dark:text-gray-300 cursor-pointer'>
-                二次优化文本格式
+                {t('knowledge.form.preprocessing.optimizeTextFormat')}
               </label>
             </div>
           </div>

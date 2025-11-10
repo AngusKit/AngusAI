@@ -36,6 +36,8 @@ export const enUS = {
       copyEmptyError: 'Content is empty, cannot copy',
       copySuccess: 'Copied to clipboard',
       copyFailed: 'Copy failed, please copy manually',
+      saving: 'Saving...',
+      loading: 'Loading...',
     },
     status: {
       enabled: 'Enabled',
@@ -44,6 +46,19 @@ export const enUS = {
       processing: 'Processing',
       completed: 'Completed',
       failed: 'Failed',
+      connected: 'Connected',
+      disconnected: 'Disconnected',
+    },
+    pagination: {
+      previous: 'Previous',
+      next: 'Next',
+      total: 'Total {total} items',
+    },
+    labels: {
+      name: 'Name',
+      description: 'Description',
+      tags: 'Tags',
+      icon: 'Icon',
     }
   },
 
@@ -500,7 +515,6 @@ export const enUS = {
     categorySaveFailed: 'Failed to save category',
     parentCategoryLabel: 'Parent Category (Optional)',
     parentCategoryNone: 'None (Top-level category)',
-    iconLabel: 'Icon',
     iconPlaceholder: 'Select icon',
     colorLabel: 'Color',
     deleteCategoryFailed: 'Failed to delete category',
@@ -530,6 +544,45 @@ export const enUS = {
     searchPlaceholder: 'Search knowledge base name or description...',
     actions: {
       create: 'Create Knowledge Base',
+    },
+    formSteps: {
+      basicInfo: 'Basic Information',
+      configuration: 'Processing Configuration',
+    },
+    form: {
+      basic: {
+        nameLabel: 'Knowledge base name',
+        namePlaceholder: 'Enter knowledge base name',
+        visibilityLabel: 'Visibility',
+        visibilityPlaceholder: 'Select visibility',
+        visibilityOptions: {
+          private: 'Private',
+          team: 'Team visible',
+          public: 'Public',
+        },
+        descriptionPlaceholder: 'Enter knowledge base description',
+        tagsCount: '({current}/{max})',
+        tagInputPlaceholder: 'Type a tag and press Enter. Up to {maxCount} tags, {maxLength} characters each',
+      },
+      configuration: {
+        vectorStoreLabel: 'Vector store source',
+        vectorStorePlaceholder: 'Select a vector store',
+        vectorStoreHelp: 'Choose where vector embeddings will be stored',
+        chunkSizeLabel: 'Chunk size',
+        chunkSizeHelp: 'Control the text chunk size ({min}-{max} characters)',
+        chunkOverlapLabel: 'Chunk overlap',
+        chunkOverlapHelp: 'Control overlapping characters between chunks ({min}-{max})',
+        embeddingModelLabel: 'Embedding model (optional)',
+        embeddingModelPlaceholder: 'Use default model when not specified',
+        embeddingModelDefault: 'Use default model',
+        embeddingModelHelp: 'Select the embedding model. The default model is used when none is selected.',
+      },
+      preprocessing: {
+        title: 'Preprocessing options',
+        removeDuplicates: 'Remove duplicate data',
+        cleanHTML: 'Clean HTML tags',
+        optimizeTextFormat: 'Optimize text formatting',
+      },
     },
     sort: {
       recentCreated: 'Recently Created',
@@ -565,6 +618,31 @@ export const enUS = {
     },
     selected: {
       summary: '{description} · {count} documents · {size}',
+    },
+    validation: {
+      nameRequired: 'Please enter the knowledge base name',
+      descriptionRequired: 'Please enter the knowledge base description',
+      chunkSizeRange: 'Chunk size must be between {min} and {max}',
+      chunkOverlapRange: 'Chunk overlap must be between {min} and {max}',
+    },
+    editDialog: {
+      title: 'Edit Knowledge Base',
+      description: 'Update the basic information and configuration parameters',
+      loadFailed: 'Failed to load knowledge base details. Please try again.',
+      updateSuccess: 'Knowledge base updated successfully!',
+      updateFailed: 'Failed to update knowledge base. Please try again.',
+      loadingDetail: 'Loading knowledge base details...',
+      saveButton: 'Save Changes',
+      nextButton: 'Next',
+    },
+    createDialog: {
+      title: 'Create Knowledge Base',
+      description: 'Follow the steps to create and configure your knowledge base',
+      selectIconRequired: 'Please select an icon',
+      createSuccess: 'Knowledge base created successfully!',
+      createFailed: 'Failed to create knowledge base. Please try again.',
+      confirmButton: 'Confirm and Create',
+      unknownStep: 'Unknown step: {step}',
     },
     upload: {
       sectionTitle: 'Upload Documents',

@@ -5,12 +5,12 @@ import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import KnowledgeBases from '@/services/KnowledgeBases';
 import { VisibilityEnum } from '@/enums/enums';
-import { FORM_STEPS, CONFIG_CONSTANTS } from './constants';
+import { CONFIG_CONSTANTS } from './constants';
 import { ICON_OPTIONS } from '@/utils';
-import { validateBasicInfoStep, validateConfigurationStep } from './utils';
 import { useKnowledgeBaseForm } from './hooks/useKnowledgeBaseForm';
 import { BasicInfoStep, ConfigurationStep } from './components/KnowledgeBaseFormSteps';
 import { KnowledgeBaseDetailResult } from '@/types/api-types';
+import { useLanguage } from '@/components/ui/LanguageProvider';
 
 interface EditKnowledgeBaseDialogProps {
   open: boolean;
@@ -36,12 +36,58 @@ export function EditKnowledgeBaseDialog({
   knowledgeBase,
   onSuccess,
 }: EditKnowledgeBaseDialogProps) {
+  const { t } = useLanguage();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
 
   const { formData, tagInput, setTagInput, updateField, removeTag, handleTagInputKeyDown, setSelectedIconByEmoji } =
     useKnowledgeBaseForm();
+
+  const steps = [
+    { number: 1, title: t('knowledge.formSteps.basicInfo') },
+    { number: 2, title: t('knowledge.formSteps.configuration') },
+  ];
+
+  const validateBasicInfo = () => {
+    if (!formData.name.trim()) {
+      toast.error(t('knowledge.validation.nameRequired'));
+      return false;
+    }
+    if (!formData.description.trim()) {
+      toast.error(t('knowledge.validation.descriptionRequired'));
+      return false;
+    }
+    return true;
+  };
+
+  const validateConfiguration = () => {
+    const chunkSize = formData.chunkSize[0] ?? CONFIG_CONSTANTS.CHUNK_SIZE.DEFAULT;
+    const chunkOverlap = formData.chunkOverlap[0] ?? CONFIG_CONSTANTS.CHUNK_OVERLAP.DEFAULT;
+    const { MIN: chunkSizeMin, MAX: chunkSizeMax } = CONFIG_CONSTANTS.CHUNK_SIZE;
+    if (!chunkSize || chunkSize < chunkSizeMin || chunkSize > chunkSizeMax) {
+      toast.error(
+        t('knowledge.validation.chunkSizeRange', {
+          min: chunkSizeMin,
+          max: chunkSizeMax,
+        })
+      );
+      return false;
+    }
+
+    const { MIN: overlapMin, MAX: overlapMax } = CONFIG_CONSTANTS.CHUNK_OVERLAP;
+    if (chunkOverlap === undefined || chunkOverlap < overlapMin || chunkOverlap > overlapMax) {
+      toast.error(
+        t('knowledge.validation.chunkOverlapRange', {
+          min: overlapMin,
+          max: overlapMax,
+        })
+      );
+      return false;
+    }
+
+    return true;
+  };
 
   // 加载知识库详情
   useEffect(() => {
@@ -93,8 +139,8 @@ export function EditKnowledgeBaseDialog({
           }
         }
       } catch (error: any) {
-        console.error('加载知识库详情失败:', error);
-        toast.error(error?.data?.message || '加载知识库详情失败，请重试');
+        console.error('Failed to load knowledge base detail:', error);
+        toast.error(error?.data?.message || t('knowledge.editDialog.loadFailed'));
         // 如果加载失败，使用传入的基础数据
         if (knowledgeBase) {
           updateField('name', knowledgeBase.name);
@@ -134,21 +180,14 @@ export function EditKnowledgeBaseDialog({
   // 处理下一步/提交
   const handleNextStep = () => {
     if (currentStep === 1) {
-      const validation = validateBasicInfoStep(formData.name, formData.description);
-      if (!validation.isValid) {
+      if (!validateBasicInfo()) {
         return;
       }
       setCurrentStep(2);
     } else {
-      // 验证配置处理参数
-      const currentChunkSize = formData.chunkSize[0] ?? CONFIG_CONSTANTS.CHUNK_SIZE.DEFAULT;
-      const currentChunkOverlap = formData.chunkOverlap[0] ?? CONFIG_CONSTANTS.CHUNK_OVERLAP.DEFAULT;
-
-      const validation = validateConfigurationStep(currentChunkSize, currentChunkOverlap);
-      if (!validation.isValid) {
+      if (!validateConfiguration()) {
         return;
       }
-
       // 更新知识库
       handleSubmit();
     }
@@ -190,12 +229,12 @@ export function EditKnowledgeBaseDialog({
 
       await KnowledgeBases.toggleKnowledge(knowledgeBase.id, updateData);
 
-      toast.success('知识库更新成功！');
+      toast.success(t('knowledge.editDialog.updateSuccess'));
       onOpenChange(false);
       onSuccess?.();
       setCurrentStep(1);
     } catch (error: any) {
-      toast.error(error?.data?.message || '更新知识库失败，请重试');
+      toast.error(error?.data?.message || t('knowledge.editDialog.updateFailed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -219,9 +258,9 @@ export function EditKnowledgeBaseDialog({
       <DialogContent className='w-[760px] !max-w-[90vw] max-h-[85vh] overflow-hidden p-0 dark:bg-gray-900 dark:border-gray-700 flex flex-col'>
         {/* Header */}
         <DialogHeader className='px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0'>
-          <DialogTitle className='text-xl dark:text-white'>编辑知识库</DialogTitle>
+          <DialogTitle className='text-xl dark:text-white'>{t('knowledge.editDialog.title')}</DialogTitle>
           <DialogDescription className='text-sm text-gray-500 dark:text-gray-400 mt-1'>
-            修改知识库的基本信息和配置参数
+            {t('knowledge.editDialog.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -230,7 +269,7 @@ export function EditKnowledgeBaseDialog({
           {/* Left Sidebar - Step Indicator */}
           <div className='w-56 border-r border-gray-200 dark:border-gray-700 p-6 flex-shrink-0'>
             <div className='space-y-4'>
-              {FORM_STEPS.map((step, index) => (
+              {steps.map((step, index) => (
                 <div key={step.number}>
                   <div className='flex items-start gap-3'>
                     <div className='flex flex-col items-center'>
@@ -245,7 +284,7 @@ export function EditKnowledgeBaseDialog({
                       >
                         {step.number < currentStep ? <Check className='w-5 h-5' /> : <span>{step.number}</span>}
                       </div>
-                      {index < FORM_STEPS.length - 1 && (
+                      {index < steps.length - 1 && (
                         <div
                           className={`w-0.5 h-12 mt-2 transition-all ${
                             step.number < currentStep ? 'bg-green-500' : 'bg-gray-200 dark:bg-gray-700'
@@ -278,7 +317,9 @@ export function EditKnowledgeBaseDialog({
               <div className='flex items-center justify-center py-12'>
                 <div className='flex flex-col items-center gap-3'>
                   <Loader2 className='w-8 h-8 animate-spin text-blue-500' />
-                  <p className='text-sm text-gray-500 dark:text-gray-400'>加载知识库详情中...</p>
+                  <p className='text-sm text-gray-500 dark:text-gray-400'>
+                    {t('knowledge.editDialog.loadingDetail')}
+                  </p>
                 </div>
               </div>
             ) : (
@@ -309,7 +350,7 @@ export function EditKnowledgeBaseDialog({
                 onClick={handleBackStep}
                 className='dark:bg-gray-800 dark:border-gray-700 dark:text-white'
               >
-                上一步
+                {t('common.actions.previous')}
               </Button>
             ) : (
               <Button
@@ -317,7 +358,7 @@ export function EditKnowledgeBaseDialog({
                 onClick={handleCancel}
                 className='dark:bg-gray-800 dark:border-gray-700 dark:text-white'
               >
-                取消
+                {t('common.actions.cancel')}
               </Button>
             )}
             <Button
@@ -329,7 +370,13 @@ export function EditKnowledgeBaseDialog({
                   : 'bg-blue-500 hover:bg-blue-600 text-white'
               }
             >
-              {isSubmitting ? '保存中...' : isLoadingDetail ? '加载中...' : currentStep === 2 ? '保存更新' : '下一步'}
+              {isSubmitting
+                ? t('common.messages.saving')
+                : isLoadingDetail
+                  ? t('common.messages.loading')
+                  : currentStep === 2
+                    ? t('knowledge.editDialog.saveButton')
+                    : t('common.actions.next')}
             </Button>
           </div>
         </div>

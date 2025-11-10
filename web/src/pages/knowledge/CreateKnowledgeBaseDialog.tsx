@@ -5,11 +5,11 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import KnowledgeBases from '@/services/KnowledgeBases';
 import { VisibilityEnum } from '@/enums/enums';
-import { FORM_STEPS, CONFIG_CONSTANTS } from './constants';
+import { CONFIG_CONSTANTS } from './constants';
 import { ICON_OPTIONS } from '@/utils';
-import { validateBasicInfoStep, validateConfigurationStep } from './utils';
 import { useKnowledgeBaseForm } from './hooks/useKnowledgeBaseForm';
 import { BasicInfoStep, ConfigurationStep } from './components/KnowledgeBaseFormSteps';
+import { useLanguage } from '@/components/ui/LanguageProvider';
 
 interface CreateKnowledgeBaseDialogProps {
   open: boolean;
@@ -18,11 +18,57 @@ interface CreateKnowledgeBaseDialogProps {
 }
 
 export function CreateKnowledgeBaseDialog({ open, onOpenChange, onSuccess }: CreateKnowledgeBaseDialogProps) {
+  const { t } = useLanguage();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { formData, tagInput, setTagInput, updateField, removeTag, handleTagInputKeyDown, resetForm } =
     useKnowledgeBaseForm();
+
+  const steps = [
+    { number: 1, title: t('knowledge.formSteps.basicInfo') },
+    { number: 2, title: t('knowledge.formSteps.configuration') },
+  ];
+
+  const validateBasicInfo = () => {
+    if (!formData.name.trim()) {
+      toast.error(t('knowledge.validation.nameRequired'));
+      return false;
+    }
+    if (!formData.description.trim()) {
+      toast.error(t('knowledge.validation.descriptionRequired'));
+      return false;
+    }
+    return true;
+  };
+
+  const validateConfiguration = () => {
+    const chunkSize = formData.chunkSize[0] ?? CONFIG_CONSTANTS.CHUNK_SIZE.DEFAULT;
+    const chunkOverlap = formData.chunkOverlap[0] ?? CONFIG_CONSTANTS.CHUNK_OVERLAP.DEFAULT;
+    const { MIN: chunkSizeMin, MAX: chunkSizeMax } = CONFIG_CONSTANTS.CHUNK_SIZE;
+    if (!chunkSize || chunkSize < chunkSizeMin || chunkSize > chunkSizeMax) {
+      toast.error(
+        t('knowledge.validation.chunkSizeRange', {
+          min: chunkSizeMin,
+          max: chunkSizeMax,
+        })
+      );
+      return false;
+    }
+
+    const { MIN: overlapMin, MAX: overlapMax } = CONFIG_CONSTANTS.CHUNK_OVERLAP;
+    if (chunkOverlap === undefined || chunkOverlap < overlapMin || chunkOverlap > overlapMax) {
+      toast.error(
+        t('knowledge.validation.chunkOverlapRange', {
+          min: overlapMin,
+          max: overlapMax,
+        })
+      );
+      return false;
+    }
+
+    return true;
+  };
 
   // 可见性映射
   const visibilityMap: Record<string, VisibilityEnum> = {
@@ -34,18 +80,12 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange, onSuccess }: Cre
   // 处理下一步/提交
   const handleNextStep = () => {
     if (currentStep === 1) {
-      const validation = validateBasicInfoStep(formData.name, formData.description);
-      if (!validation.isValid) {
+      if (!validateBasicInfo()) {
         return;
       }
       setCurrentStep(2);
     } else {
-      // 验证配置处理参数
-      const currentChunkSize = formData.chunkSize[0] ?? CONFIG_CONSTANTS.CHUNK_SIZE.DEFAULT;
-      const currentChunkOverlap = formData.chunkOverlap[0] ?? CONFIG_CONSTANTS.CHUNK_OVERLAP.DEFAULT;
-
-      const validation = validateConfigurationStep(currentChunkSize, currentChunkOverlap);
-      if (!validation.isValid) {
+      if (!validateConfiguration()) {
         return;
       }
 
@@ -58,14 +98,14 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange, onSuccess }: Cre
   const handleSubmit = async () => {
     if (isSubmitting) return;
 
+    const selectedIconOption = ICON_OPTIONS[formData.selectedIconIndex];
+    if (!selectedIconOption) {
+      toast.error(t('knowledge.createDialog.selectIconRequired'));
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      const selectedIconOption = ICON_OPTIONS[formData.selectedIconIndex];
-      if (!selectedIconOption) {
-        toast.error('请选择图标');
-        setIsSubmitting(false);
-        return;
-      }
 
       const createData: any = {
         name: formData.name.trim(),
@@ -90,7 +130,7 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange, onSuccess }: Cre
 
       await KnowledgeBases.createKnowledgeBase(createData);
 
-      toast.success('知识库创建成功！');
+      toast.success(t('knowledge.createDialog.createSuccess'));
       onOpenChange(false);
       onSuccess?.();
 
@@ -98,7 +138,7 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange, onSuccess }: Cre
       setCurrentStep(1);
       resetForm();
     } catch (error: any) {
-      toast.error(error?.data?.message || '创建知识库失败，请重试');
+      toast.error(error?.data?.message || t('knowledge.createDialog.createFailed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -122,9 +162,9 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange, onSuccess }: Cre
       <DialogContent className='w-[760px] !max-w-[90vw] max-h-[85vh] overflow-hidden p-0 dark:bg-gray-900 dark:border-gray-700 flex flex-col'>
         {/* Header */}
         <DialogHeader className='px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0'>
-          <DialogTitle className='text-xl dark:text-white'>创建知识库</DialogTitle>
+          <DialogTitle className='text-xl dark:text-white'>{t('knowledge.createDialog.title')}</DialogTitle>
           <DialogDescription className='text-sm text-gray-500 dark:text-gray-400 mt-1'>
-            按照步骤创建和配置您的知识库
+            {t('knowledge.createDialog.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -133,7 +173,7 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange, onSuccess }: Cre
           {/* Left Sidebar - Step Indicator */}
           <div className='w-56 border-r border-gray-200 dark:border-gray-700 p-6 flex-shrink-0'>
             <div className='space-y-4'>
-              {FORM_STEPS.map((step, index) => (
+              {steps.map((step, index) => (
                 <div key={step.number}>
                   <div className='flex items-start gap-3'>
                     <div className='flex flex-col items-center'>
@@ -148,7 +188,7 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange, onSuccess }: Cre
                       >
                         {step.number < currentStep ? <Check className='w-5 h-5' /> : <span>{step.number}</span>}
                       </div>
-                      {index < FORM_STEPS.length - 1 && (
+                      {index < steps.length - 1 && (
                         <div
                           className={`w-0.5 h-12 mt-2 transition-all ${
                             step.number < currentStep ? 'bg-green-500' : 'bg-gray-200 dark:bg-gray-700'
@@ -189,7 +229,9 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange, onSuccess }: Cre
             )}
             {currentStep === 2 && <ConfigurationStep formData={formData} onFieldChange={updateField} />}
             {currentStep !== 1 && currentStep !== 2 && (
-              <div className='py-6 text-center text-gray-500 dark:text-gray-400'>未知步骤: {currentStep}</div>
+              <div className='py-6 text-center text-gray-500 dark:text-gray-400'>
+                {t('knowledge.createDialog.unknownStep', { step: currentStep })}
+              </div>
             )}
           </div>
         </div>
@@ -203,7 +245,7 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange, onSuccess }: Cre
                 onClick={handleBackStep}
                 className='dark:bg-gray-800 dark:border-gray-700 dark:text-white'
               >
-                上一步
+                {t('common.actions.previous')}
               </Button>
             ) : (
               <Button
@@ -211,7 +253,7 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange, onSuccess }: Cre
                 onClick={handleCancel}
                 className='dark:bg-gray-800 dark:border-gray-700 dark:text-white'
               >
-                取消
+                {t('common.actions.cancel')}
               </Button>
             )}
             <Button
@@ -223,7 +265,11 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange, onSuccess }: Cre
                   : 'bg-blue-500 hover:bg-blue-600 text-white'
               }
             >
-              {isSubmitting ? '创建中...' : currentStep === 2 ? '确认并创建' : '下一步'}
+              {isSubmitting
+                ? t('common.messages.saving')
+                : currentStep === 2
+                  ? t('knowledge.createDialog.confirmButton')
+                  : t('common.actions.next')}
             </Button>
           </div>
         </div>
