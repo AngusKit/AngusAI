@@ -4,7 +4,7 @@ import { Language, languages, defaultLanguage, getNestedTranslation } from '../.
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: string) => string;
+  t: (key: string, params?: Record<string, string | number>) => string;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -24,9 +24,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const t = useCallback(
-    (key: string): string => {
+    (key: string, params?: Record<string, string | number>): string => {
       const translations = languages[language].translations;
-      return getNestedTranslation(translations, key);
+      return getNestedTranslation(translations, key, params);
     },
     [language]
   );

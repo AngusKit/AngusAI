@@ -77,7 +77,7 @@ export function PromptDialog({
           categoryId: formData.category,
           tags: formData.tags.map(t => t.label),
         });
-        toast.success(language === 'zh-CN' ? '提示词已更新' : 'Prompt updated');
+        toast.success(t('prompts.updateSuccess'));
       } else {
         await Prompts.createPrompt({
           title: formData.title,
@@ -85,13 +85,13 @@ export function PromptDialog({
           categoryId: formData.category,
           tags: formData.tags.map(t => t.label),
         });
-        toast.success(language === 'zh-CN' ? '提示词已创建' : 'Prompt created');
+        toast.success(t('prompts.createSuccess'));
       }
       onSuccess();
       onOpenChange(false);
     } catch (error: any) {
-      console.error('保存提示词失败:', error);
-      toast.error(error?.message || (language === 'zh-CN' ? '保存提示词失败' : 'Failed to save prompt'));
+      console.error('Failed to save prompt:', error);
+      toast.error(error?.message || t('prompts.saveFailed'));
     }
   };
 
@@ -103,13 +103,7 @@ export function PromptDialog({
             {editingPrompt ? t('prompts.editPrompt') : t('prompts.newPrompt')}
           </DialogTitle>
           <DialogDescription>
-            {editingPrompt
-              ? language === 'zh-CN'
-                ? '修改提示词信息'
-                : 'Edit prompt information'
-              : language === 'zh-CN'
-                ? '创建一个新的提示词模板'
-                : 'Create a new prompt template'}
+            {editingPrompt ? t('prompts.editDescription') : t('prompts.createDescription')}
           </DialogDescription>
         </DialogHeader>
 
@@ -122,7 +116,7 @@ export function PromptDialog({
               id='title'
               value={formData.title}
               onChange={e => updateFormField('title', e.target.value)}
-              placeholder={language === 'zh-CN' ? '输入提示词标题...' : 'Enter prompt title...'}
+              placeholder={t('prompts.titlePlaceholder')}
               className='dark:bg-gray-900 dark:border-gray-700'
             />
           </div>
@@ -135,7 +129,7 @@ export function PromptDialog({
               id='content'
               value={formData.content}
               onChange={e => updateFormField('content', e.target.value)}
-              placeholder={language === 'zh-CN' ? '输入提示词内容...' : 'Enter prompt content...'}
+              placeholder={t('prompts.contentPlaceholder')}
               className='min-h-[200px] dark:bg-gray-900 dark:border-gray-700'
             />
           </div>
@@ -155,8 +149,8 @@ export function PromptDialog({
                   </SelectItem>
                 ))}
                 {categories.filter(isAvailableCategory).length === 0 && (
-                  <SelectItem value={undefined} disabled>
-                    {language === 'zh-CN' ? '暂无分类' : 'No categories'}
+                  <SelectItem value="__none__" disabled>
+                    {t('prompts.noCategories')}
                   </SelectItem>
                 )}
               </SelectContent>
