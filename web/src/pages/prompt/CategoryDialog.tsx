@@ -37,9 +37,9 @@ export function CategoryDialog({
   });
 
   const handleSave = async () => {
-    const validation = validateCategoryName(formData.name);
+    const validation = validateCategoryName(formData.name, t);
     if (!validation.isValid) {
-      toast.error(language === 'zh-CN' ? validation.error : 'Please enter category name');
+      toast.error(validation.error || t('prompts.categoryNameRequired'));
       return;
     }
 
@@ -55,7 +55,7 @@ export function CategoryDialog({
           color: formData.color,
           parentId,
         });
-        toast.success(language === 'zh-CN' ? '分类已更新' : 'Category updated');
+        toast.success(t('prompts.categoryUpdateSuccess'));
       } else {
         await PromptCategories.createPromptCategory({
           name: formData.name,
@@ -63,15 +63,15 @@ export function CategoryDialog({
           color: formData.color,
           parentId,
         });
-        toast.success(language === 'zh-CN' ? '分类已创建' : 'Category created');
+        toast.success(t('prompts.categoryCreateSuccess'));
       }
 
       onSuccess();
       onOpenChange(false);
       resetForm();
     } catch (error: any) {
-      console.error('保存分类失败:', error);
-      toast.error(error?.message || (language === 'zh-CN' ? '保存分类失败' : 'Failed to save category'));
+      console.error('Failed to save category:', error);
+      toast.error(error?.message || t('prompts.categorySaveFailed'));
     }
   };
 
@@ -85,16 +85,10 @@ export function CategoryDialog({
       <DialogContent className='dark:bg-gray-800'>
         <DialogHeader>
           <DialogTitle className='dark:text-white'>
-            {editingCategory ? (language === 'zh-CN' ? '编辑分组' : 'Edit Category') : t('prompts.newCategory')}
+            {editingCategory ? t('prompts.editCategory') : t('prompts.newCategory')}
           </DialogTitle>
           <DialogDescription>
-            {editingCategory
-              ? language === 'zh-CN'
-                ? '修改提示词分组信息'
-                : 'Edit prompt category information'
-              : language === 'zh-CN'
-                ? '创建一个新的提示词分组'
-                : 'Create a new prompt category'}
+            {editingCategory ? t('prompts.editCategoryDescription') : t('prompts.createCategoryDescription')}
           </DialogDescription>
         </DialogHeader>
 
@@ -107,14 +101,14 @@ export function CategoryDialog({
               id='categoryName'
               value={formData.name}
               onChange={e => updateFormField('name', e.target.value)}
-              placeholder={language === 'zh-CN' ? '输入分组名称...' : 'Enter category name...'}
+              placeholder={t('prompts.categoryNamePlaceholder')}
               className='dark:bg-gray-900 dark:border-gray-700'
             />
           </div>
 
           <div>
             <Label htmlFor='parentCategory' className='mb-1'>
-              {language === 'zh-CN' ? '父分组（可选）' : 'Parent Category (Optional)'}
+              {t('prompts.parentCategoryLabel')}
             </Label>
             <Select
               value={formData.parentId || DEFAULT_VALUES.PARENT_CATEGORY_NONE}
@@ -130,7 +124,7 @@ export function CategoryDialog({
               </SelectTrigger>
               <SelectContent className='dark:bg-gray-800 dark:border-gray-700 max-h-[300px]'>
                 <SelectItem value={DEFAULT_VALUES.PARENT_CATEGORY_NONE}>
-                  {language === 'zh-CN' ? '无（作为顶层分组）' : 'None (Top-level category)'}
+                  {t('prompts.parentCategoryNone')}
                 </SelectItem>
                 {buildCategoryTree(undefined, 0, editingCategory?.id).map(cat => {
                   const path = getCategoryPath(cat.id);
@@ -157,7 +151,7 @@ export function CategoryDialog({
           <div className='grid grid-cols-2 gap-4'>
             <div>
               <Label htmlFor='categoryIcon' className='mb-1'>
-                {language === 'zh-CN' ? '图标' : 'Icon'}
+                {t('prompts.iconLabel')}
               </Label>
               <Select
                 value={AVAILABLE_ICONS.find(icon => icon.component === formData.icon)?.name || 'BookOpen'}
@@ -169,7 +163,7 @@ export function CategoryDialog({
                 }}
               >
                 <SelectTrigger className='dark:bg-gray-900 dark:border-gray-700'>
-                  <SelectValue placeholder={language === 'zh-CN' ? '选择图标' : 'Select icon'} />
+                  <SelectValue placeholder={t('prompts.iconPlaceholder')} />
                 </SelectTrigger>
                 <SelectContent className='dark:bg-gray-800 dark:border-gray-700 max-h-[300px]'>
                   <ScrollArea className='h-[250px]'>
@@ -193,7 +187,7 @@ export function CategoryDialog({
 
             <div>
               <Label htmlFor='categoryColor' className='mb-1'>
-                {language === 'zh-CN' ? '颜色' : 'Color'}
+                {t('prompts.colorLabel')}
               </Label>
               <Select value={formData.color} onValueChange={value => updateFormField('color', value)}>
                 <SelectTrigger className='dark:bg-gray-900 dark:border-gray-700'>

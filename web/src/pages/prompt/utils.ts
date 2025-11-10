@@ -9,11 +9,8 @@ import { TAG_COLORS, SYSTEM_CATEGORY_IDS } from './constants';
  * 根据索引获取标签颜色（循环分配）
  */
 export const getTagColorByIndex = (index: number): string => {
-  if (TAG_COLORS.length === 0) {
-    return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400';
-  }
-  const color = TAG_COLORS[index % TAG_COLORS.length];
-  return color?.value || TAG_COLORS[0]?.value || 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400';
+  const color = TAG_COLORS[index % TAG_COLORS.length] ?? TAG_COLORS[0];
+  return color?.value ?? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400';
 };
 
 /**
@@ -92,9 +89,12 @@ export const getCategoryDisplayName = (category: Category, language: string): st
 /**
  * 验证分类名称
  */
-export const validateCategoryName = (name: string): { isValid: boolean; error?: string } => {
+export const validateCategoryName = (
+  name: string,
+  t: (key: string, params?: Record<string, string | number>) => string,
+): { isValid: boolean; error?: string } => {
   if (!name.trim()) {
-    return { isValid: false, error: '请输入分类名称' };
+    return { isValid: false, error: t('prompts.categoryNameRequired') };
   }
   return { isValid: true };
 };
