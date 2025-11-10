@@ -328,6 +328,13 @@ export const zhCN = {
       paginationInfo: ' (第 {page} 页，每页 {perPage} 个)',
       empty: '暂无文档',
       emptyDescription: '还没有上传任何文档，点击上方上传区域开始添加文档',
+      types: {
+        pdf: 'PDF',
+        docx: 'Word',
+        txt: '文本',
+        md: 'Markdown',
+        html: 'HTML',
+      },
       actions: {
         reparse: '重新解析',
         download: '下载文件',

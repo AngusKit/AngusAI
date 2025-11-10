@@ -661,6 +661,13 @@ export const enUS = {
       paginationInfo: ' (Page {page}, {perPage} per page)',
       empty: 'No documents yet',
       emptyDescription: 'No documents uploaded yet. Use the upload area above to add documents.',
+      types: {
+        pdf: 'PDF',
+        docx: 'Word',
+        txt: 'Text',
+        md: 'Markdown',
+        html: 'HTML',
+      },
       actions: {
         reparse: 'Reprocess',
         download: 'Download file',

@@ -380,15 +380,15 @@ export function KnowledgeBase() {
 
       if (Array.isArray(listData)) {
         const mappedDocs = listData.map((doc: KnowledgeBaseDocListVo) => {
-          const status = doc.status || KnowledgeBaseDocStatusEnum.PENDING;
-          const type = doc.type || KnowledgeBaseDocTypeEnum.TXT;
+          const status = (doc.status ?? KnowledgeBaseDocStatusEnum.PENDING) as KnowledgeBaseDocStatusEnum;
+          const type = (doc.type ?? KnowledgeBaseDocTypeEnum.TXT) as KnowledgeBaseDocTypeEnum;
           const statusInfo = DOCUMENT_STATUS_MAP[status] || DOCUMENT_STATUS_MAP[KnowledgeBaseDocStatusEnum.PENDING]!;
           const typeInfo = DOCUMENT_TYPE_MAP[type] || DOCUMENT_TYPE_MAP[KnowledgeBaseDocTypeEnum.TXT]!;
 
           return {
             id: doc.id ? String(doc.id) : '',
             name: doc.name || '',
-            type: typeInfo.text,
+            type: t(typeInfo.labelKey),
             typeColor: typeInfo.color,
             typeIcon: typeInfo.icon,
             size: doc.size || '0 MB',
@@ -493,13 +493,13 @@ export function KnowledgeBase() {
         setDocuments(prev =>
           prev.map(d => {
             if (d.id === doc.id) {
-              const status = statusData.status || KnowledgeBaseDocStatusEnum.PROCESSING;
+              const status = (statusData.status ?? KnowledgeBaseDocStatusEnum.PROCESSING) as KnowledgeBaseDocStatusEnum;
               const statusInfo =
                 DOCUMENT_STATUS_MAP[status] || DOCUMENT_STATUS_MAP[KnowledgeBaseDocStatusEnum.PROCESSING]!;
 
               return {
                 ...d,
-                status: statusInfo.text,
+                status: t(statusInfo.textKey),
                 statusColor: statusInfo.color,
                 enabled: statusData.enabled || false,
                 processingProgress: statusData.processingProgress,
@@ -1050,7 +1050,7 @@ export function KnowledgeBase() {
                   </DropdownMenu>
                 </div>
 
-                <p className='text-sm text-gray-600 dark:text-gray-400 mb-1 line-clamp-2'>{kb.description}</p>
+                <p className='text-sm text-gray-600 dark:text-gray-400 mb-1 line-clamp-2 flex-1'>{kb.description}</p>
 
                 {/* 标签 */}
                 {kb.tags && kb.tags.length > 0 && (

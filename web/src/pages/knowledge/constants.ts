@@ -63,28 +63,31 @@ export const CONFIG_CONSTANTS = {
 
 // 步骤配置
 export const FORM_STEPS = [
-  { number: 1, title: '基本信息' },
-  { number: 2, title: '配置处理' },
+  { number: 1, titleKey: 'knowledge.formSteps.basicInfo' },
+  { number: 2, titleKey: 'knowledge.formSteps.configuration' },
 ] as const;
 
 /**
  * 文档状态映射
  */
-export const DOCUMENT_STATUS_MAP: Record<string, { text: string; color: string }> = {
+export const DOCUMENT_STATUS_MAP: Record<
+  KnowledgeBaseDocStatusEnum,
+  { textKey: string; color: string }
+> = {
   [KnowledgeBaseDocStatusEnum.PENDING]: {
-    text: '待处理',
+    textKey: 'common.status.pending',
     color: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
   },
   [KnowledgeBaseDocStatusEnum.PROCESSING]: {
-    text: '处理中',
+    textKey: 'common.status.processing',
     color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
   },
   [KnowledgeBaseDocStatusEnum.COMPLETED]: {
-    text: '已完成',
+    textKey: 'common.status.completed',
     color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
   },
   [KnowledgeBaseDocStatusEnum.FAILED]: {
-    text: '失败',
+    textKey: 'common.status.failed',
     color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
   },
 };
@@ -92,29 +95,32 @@ export const DOCUMENT_STATUS_MAP: Record<string, { text: string; color: string }
 /**
  * 文档类型映射
  */
-export const DOCUMENT_TYPE_MAP: Record<string, { text: string; icon: string; color: string }> = {
+export const DOCUMENT_TYPE_MAP: Record<
+  KnowledgeBaseDocTypeEnum,
+  { labelKey: string; icon: string; color: string }
+> = {
   [KnowledgeBaseDocTypeEnum.PDF]: {
-    text: 'PDF',
+    labelKey: 'knowledge.documents.types.pdf',
     icon: '📄',
     color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
   },
   [KnowledgeBaseDocTypeEnum.DOCX]: {
-    text: 'Word',
+    labelKey: 'knowledge.documents.types.docx',
     icon: '📘',
     color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
   },
   [KnowledgeBaseDocTypeEnum.TXT]: {
-    text: 'Text',
+    labelKey: 'knowledge.documents.types.txt',
     icon: '📝',
     color: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
   },
   [KnowledgeBaseDocTypeEnum.MD]: {
-    text: 'Markdown',
+    labelKey: 'knowledge.documents.types.md',
     icon: '📝',
     color: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
   },
   [KnowledgeBaseDocTypeEnum.HTML]: {
-    text: 'HTML',
+    labelKey: 'knowledge.documents.types.html',
     icon: '🌐',
     color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
   },
