@@ -1150,7 +1150,7 @@ export function Dataset() {
               {currentDatasets.map(dataset => (
                 <Card
                   key={dataset.id}
-                  className={`p-5 hover:shadow-md transition-all cursor-pointer ${
+                  className={`p-5 hover:shadow-md transition-all cursor-pointer gap-2 ${
                     selectedDataset === dataset.id
                       ? 'ring-2 ring-blue-500 dark:ring-blue-400 shadow-lg bg-blue-50/50 dark:bg-blue-900/10'
                       : 'dark:bg-gray-800'
@@ -1664,7 +1664,7 @@ export function Dataset() {
                 ) : databaseTables.length === 0 ? (
                   <div className='p-8 text-center text-gray-500 dark:text-gray-400 flex items-center justify-center' style={{ height: '350px' }}>无数据表信息</div>
                 ) : (
-                  <div className='divide-y divide-gray-200 dark:divide-gray-700'>
+                  <div className='divide-y divide-gray-200 dark:divide-gray-700 max-h-[660px] overflow-y-auto'>
                     {databaseTables.map(vo => {
                       const table = convertDataListVoToTable(vo);
                       return (

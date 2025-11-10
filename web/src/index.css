@@ -1213,6 +1213,10 @@
     max-height: 500px;
   }
 
+  .max-h-\[660px\] {
+    max-height: 660px;
+  }
+
   .max-h-\[calc\(90vh-180px\)\] {
     max-height: calc(90vh - 180px);
   }
@@ -2814,6 +2818,10 @@
 
   .pl-2 {
     padding-left: calc(var(--spacing) * 2);
+  }
+
+  .pl-4 {
+    padding-left: calc(var(--spacing) * 4);
   }
 
   .pl-6 {

@@ -155,7 +155,7 @@ export function PromptDialog({
                   </SelectItem>
                 ))}
                 {categories.filter(isAvailableCategory).length === 0 && (
-                  <SelectItem value='' disabled>
+                  <SelectItem value={undefined} disabled>
                     {language === 'zh-CN' ? '暂无分类' : 'No categories'}
                   </SelectItem>
                 )}

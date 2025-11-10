@@ -628,10 +628,8 @@ export function KnowledgeBase() {
         toast.success(`${t('knowledgeUpload.fileAdded')} ${result.validFiles.length} ${t('knowledgeUpload.filesCount')}`);
       }
 
-      // 自动开始上传
-      result.validFiles.forEach(uploadFile => {
-        handleUpload(uploadFile);
-      });
+      // 自动开始上传 分组上传(5个一组 执行)
+      uploadFilesInBatches(result.validFiles);
     } else if (isFolderUpload && result.filteredCount > 0) {
       // 文件夹中没有有效文件
       toast.warning(
@@ -646,6 +644,43 @@ export function KnowledgeBase() {
   // 更新文件状态的辅助函数
   const updateFile = (fileId: string, updates: Partial<UploadFile>) => {
     setUploadFiles(prev => prev.map(f => (f.id === fileId ? { ...f, ...updates } : f)));
+  };
+
+  // 分组上传文件（每5个一组）
+  const uploadFilesInBatches = async (files: UploadFile[]) => {
+    const BATCH_SIZE = 5;
+    
+    // 如果文件数量小于等于5，直接并行上传
+    if (files.length <= BATCH_SIZE) {
+      await Promise.all(files.map(file => handleUpload(file)));
+      return;
+    }
+
+    // 将文件按5个一组分组
+    const batches: UploadFile[][] = [];
+    for (let i = 0; i < files.length; i += BATCH_SIZE) {
+      batches.push(files.slice(i, i + BATCH_SIZE));
+    }
+
+    // 按组顺序上传，每组内并行上传
+    for (let i = 0; i < batches.length; i++) {
+      const batch = batches[i];
+      if (!batch || batch.length === 0) {
+        continue;
+      }
+      
+      console.log(`开始上传第 ${i + 1}/${batches.length} 组，共 ${batch.length} 个文件`);
+      
+      // 等待当前组的所有文件上传完成
+      await Promise.all(batch.map(file => handleUpload(file)));
+      
+      // 每组之间可以添加短暂延迟，避免服务器压力过大
+      if (i < batches.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+    }
+    
+    console.log(`所有文件上传完成，共 ${files.length} 个文件`);
   };
 
   // 上传文件
@@ -897,7 +932,7 @@ export function KnowledgeBase() {
             {currentKnowledgeBases.map(kb => (
               <Card
                 key={kb.id}
-                className={`p-5 hover:shadow-md transition-all cursor-pointer ${
+                className={`p-5 hover:shadow-md transition-all cursor-pointer gap-2 ${
                   selectedKnowledgeBase === kb.id
                     ? 'ring-2 ring-blue-500 dark:ring-blue-400 shadow-lg bg-blue-50/50 dark:bg-blue-900/10'
                     : 'dark:bg-gray-800'
@@ -990,7 +1025,6 @@ export function KnowledgeBase() {
                       </span>
                       <span>{formatDateOnly(kb.modifiedDate)}</span>
                     </div>
-                    {kb.creator && <div className='mt-1'>创建者: {kb.creator}</div>}
                   </div>
                 )}
               </Card>
@@ -1318,7 +1352,7 @@ export function KnowledgeBase() {
                 <FileText className='w-5 h-5 text-green-500 dark:text-green-400' />
                 文档列表
               </h3>
-              <Card className='dark:bg-gray-800 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm'>
+              <Card className='dark:bg-gray-800 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm gap-0'>
                 <div className='p-5 border-b border-gray-200 dark:border-gray-700'>
                   <div className='flex items-center justify-between'>
                     <h4 className='dark:text-white'>已上传文档</h4>

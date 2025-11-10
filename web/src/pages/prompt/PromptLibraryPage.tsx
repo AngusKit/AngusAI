@@ -54,7 +54,7 @@ function CategoryItem({
   const isSelected = selectedCategoryId === category.id;
 
   // 根据层级设置缩进：level 0 无缩进，level 1 缩进 16px，level 2+ 缩进 32px
-  const indentClass = level === 0 ? '' : level === 1 ? 'ml-4' : 'ml-8';
+  const indentClass = level === 0 ? '' : level === 1 ? 'pl-8' : 'pl-10';
   const paddingClass = level === 0 ? 'py-2' : 'py-1.5';
 
   return (
@@ -362,6 +362,7 @@ export function PromptLibraryPage() {
       await Prompts.toggleFavoritePrompt(id, { isFavorite: newFavoriteStatus });
       setPrompts(prev => prev.map(p => (p.id === id ? { ...p, isFavorite: newFavoriteStatus } : p)));
       toast.success(language === 'zh-CN' ? '已更新收藏状态' : 'Favorite status updated');
+      loadCategories()
     } catch (error: any) {
       // console.error('更新收藏状态失败:', error);
       // toast.error(error?.message || (language === 'zh-CN' ? '更新收藏状态失败' : 'Failed to update favorite status'));
@@ -524,7 +525,7 @@ export function PromptLibraryPage() {
 
       <div className='flex gap-6 flex-1 min-h-[200px]'>
         {/* Categories Sidebar */}
-        <div className='w-[296px] shrink-0 h-full'>
+        <div className='w-[300px] shrink-0 h-full'>
           <div className='bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 overflow-y-auto h-full pb-4 scrollbar-hide'>
             {isLoadingCategories ? (
               <div className='text-center py-8'>
@@ -748,8 +749,8 @@ export function PromptLibraryPage() {
       />
 
       {/* 查看提示词对话框 */}
-      <Dialog open={showViewDialog} onOpenChange={setShowViewDialog}>
-        <DialogContent className='max-w-[792px] dark:bg-gray-800 dark:border-gray-700'>
+      <Dialog open={showViewDialog} onOpenChange={setShowViewDialog} modal={false}>
+        <DialogContent className='max-w-[792px] dark:bg-gray-800 dark:border-gray-700' >
           <DialogHeader>
             <DialogTitle className='dark:text-white'>提示词详情</DialogTitle>
             <DialogDescription className='dark:text-gray-400'>查看提示词的详细信息</DialogDescription>
