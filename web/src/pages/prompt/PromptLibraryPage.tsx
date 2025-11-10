@@ -188,6 +188,16 @@ export function PromptLibraryPage() {
   const [deletingCategory, setDeletingCategory] = useState<Category | null>(null);
   const [viewingPrompt, setViewingPrompt] = useState<Prompt | null>(null);
 
+  const formatUsageCount = useCallback(
+    (count: number) => {
+      const parts = [t('prompts.usagePrefix'), String(count), t('prompts.usageSuffix')].filter(
+        part => part && part.trim().length > 0
+      );
+      return parts.join(' ');
+    },
+    [t]
+  );
+
   // 将API返回的分类转换为页面使用的格式
   const convertCategoryVoToCategory = useCallback((vo: PromptCategoryVo): Category => {
     const iconName = vo.icon || 'BookOpen';
@@ -252,8 +262,8 @@ export function PromptLibraryPage() {
         });
       }
     } catch (error: any) {
-      console.error('加载分类失败:', error);
-      toast.error(error?.message || (language === 'zh-CN' ? '加载分类失败' : 'Failed to load categories'));
+      console.error('Failed to load categories:', error);
+      toast.error(error?.message || t('prompts.loadCategoriesFailed'));
     } finally {
       setIsLoadingCategories(false);
     }
@@ -281,8 +291,8 @@ export function PromptLibraryPage() {
       }
 
       const response = await Prompts.getPromptList(query);
-      console.log('API响应数据:', response); // 调试日志
-
+      console.log('API response:', response); // 调试日志
+      
       const { data } = response || {};
       const list = data?.list || [];
       const total = Number(data?.total) || 0;
@@ -291,7 +301,7 @@ export function PromptLibraryPage() {
         ...pre,
         total,
       }));
-
+      
       if (list && Array.isArray(list)) {
         const convertedPrompts = list.map(convertPromptVoToPrompt);
         setPrompts(convertedPrompts);
@@ -299,8 +309,8 @@ export function PromptLibraryPage() {
         setPrompts([]);
       }
     } catch (error: any) {
-      console.error('加载提示词失败:', error);
-      toast.error(error?.message || (language === 'zh-CN' ? '加载提示词失败' : 'Failed to load prompts'));
+      console.error('Failed to load prompts:', error);
+      toast.error(error?.message || t('prompts.loadPromptsFailed'));
     } finally {
       setIsLoadingPrompts(false);
     }
@@ -361,30 +371,29 @@ export function PromptLibraryPage() {
     try {
       await Prompts.toggleFavoritePrompt(id, { isFavorite: newFavoriteStatus });
       setPrompts(prev => prev.map(p => (p.id === id ? { ...p, isFavorite: newFavoriteStatus } : p)));
-      toast.success(language === 'zh-CN' ? '已更新收藏状态' : 'Favorite status updated');
-      loadCategories()
+      toast.success(t('prompts.favoriteUpdated'));
+      await loadCategories();
     } catch (error: any) {
-      // console.error('更新收藏状态失败:', error);
-      // toast.error(error?.message || (language === 'zh-CN' ? '更新收藏状态失败' : 'Failed to update favorite status'));
+      console.error('Failed to update favorite status:', error);
     }
   };
 
   const copyPrompt = async (content: string) => {
     if (!content || content.trim() === '') {
-      toast.error(language === 'zh-CN' ? '内容为空，无法复制' : 'Content is empty, cannot copy');
+      toast.error(t('common.messages.copyEmptyError'));
       return;
     }
 
     try {
       const success = await copyToClipboard(content);
       if (success) {
-        toast.success(language === 'zh-CN' ? '已复制到剪贴板' : 'Copied to clipboard');
+        toast.success(t('common.messages.copySuccess'));
       } else {
-        toast.error(language === 'zh-CN' ? '复制失败，请手动复制' : 'Copy failed, please copy manually');
+        toast.error(t('common.messages.copyFailed'));
       }
     } catch (error) {
-      console.error('复制错误:', error);
-      toast.error(language === 'zh-CN' ? '复制失败，请手动复制' : 'Copy failed, please copy manually');
+      console.error('Copy error:', error);
+      toast.error(t('common.messages.copyFailed'));
     }
   };
 
@@ -394,25 +403,28 @@ export function PromptLibraryPage() {
       // 重新加载提示词以获取最新的使用次数
       await loadPrompts();
       copyPrompt(prompt.content);
-      toast.success(language === 'zh-CN' ? '提示词已复制' : 'Prompt copied');
+      toast.success(t('prompts.promptCopied'));
     } catch (error: any) {
-      console.error('使用提示词失败:', error);
+      console.error('Failed to use prompt:', error);
       // 即使API调用失败，也复制内容
       copyPrompt(prompt.content);
-      toast.error(error?.message || (language === 'zh-CN' ? '使用提示词失败' : 'Failed to use prompt'));
+      toast.error(error?.message || t('prompts.usePromptFailed'));
     }
   };
 
   const duplicatePrompt = async (prompt: Prompt) => {
+    const copySuffix = t('prompts.copySuffix');
+    const duplicateTitle = [prompt.title, copySuffix].filter(Boolean).join(' ').trim();
+
     try {
       await Prompts.duplicatePrompt(prompt.id, {
-        title: `${prompt.title} ${language === 'zh-CN' ? '(副本)' : '(Copy)'}`,
+        title: duplicateTitle,
       });
       await loadPrompts(); // 重新加载列表
-      toast.success(language === 'zh-CN' ? '已复制提示词' : 'Prompt duplicated');
+      toast.success(t('prompts.duplicateSuccess'));
     } catch (error: any) {
-      console.error('复制提示词失败:', error);
-      toast.error(error?.message || (language === 'zh-CN' ? '复制提示词失败' : 'Failed to duplicate prompt'));
+      console.error('Failed to duplicate prompt:', error);
+      toast.error(error?.message || t('prompts.duplicateFailed'));
     }
   };
 
@@ -424,11 +436,7 @@ export function PromptLibraryPage() {
   const openEditDialog = (prompt: Prompt) => {
     // 检查是否为系统模板
     if (prompt.isSystem) {
-      toast.error(
-        language === 'zh-CN'
-          ? '系统模板不可编辑，可以复制后修改'
-          : 'System templates cannot be edited, please duplicate and modify'
-      );
+      toast.error(t('prompts.cannotEditSystem'));
       return;
     }
     setEditingPrompt(prompt);
@@ -440,7 +448,7 @@ export function PromptLibraryPage() {
 
     // 检查是否为系统模板
     if (deletingPrompt.isSystem) {
-      toast.error(language === 'zh-CN' ? '系统模板不可删除' : 'System templates cannot be deleted');
+      toast.error(t('prompts.cannotDeleteSystem'));
       setShowDeleteDialog(false);
       setDeletingPrompt(null);
       return;
@@ -449,12 +457,12 @@ export function PromptLibraryPage() {
     try {
       await Prompts.deletePrompt(deletingPrompt.id);
       await loadPrompts(); // 重新加载列表
-      toast.success(language === 'zh-CN' ? '提示词已删除' : 'Prompt deleted');
+      toast.success(t('prompts.promptDeleteSuccess'));
       setShowDeleteDialog(false);
       setDeletingPrompt(null);
     } catch (error: any) {
-      console.error('删除提示词失败:', error);
-      toast.error(error?.message || (language === 'zh-CN' ? '删除提示词失败' : 'Failed to delete prompt'));
+      console.error('Failed to delete prompt:', error);
+      toast.error(error?.message || t('prompts.promptDeleteFailed'));
     }
   };
 
@@ -478,7 +486,7 @@ export function PromptLibraryPage() {
 
     // 检查是否为系统分类
     if (deletingCategory.isSystem) {
-      toast.error(language === 'zh-CN' ? '系统分类不可删除' : 'System categories cannot be deleted');
+      toast.error(t('prompts.cannotDeleteSystemCategory'));
       setShowDeleteCategoryDialog(false);
       setDeletingCategory(null);
       return;
@@ -499,12 +507,12 @@ export function PromptLibraryPage() {
 
       await loadCategories(); // 重新加载分类树
       await loadPrompts(); // 重新加载提示词列表
-      toast.success(language === 'zh-CN' ? '分类已删除' : 'Category deleted');
+      toast.success(t('prompts.categoryDeleted'));
       setShowDeleteCategoryDialog(false);
       setDeletingCategory(null);
     } catch (error: any) {
-      console.error('删除分类失败:', error);
-      toast.error(error?.message || (language === 'zh-CN' ? '删除分类失败' : 'Failed to delete category'));
+      console.error('Failed to delete category:', error);
+      toast.error(error?.message || t('prompts.deleteCategoryFailed'));
     }
   };
 
@@ -518,9 +526,7 @@ export function PromptLibraryPage() {
       {/* Header */}
       <div>
         <h1 className='text-2xl mb-1 dark:text-white'>{t('prompts.title')}</h1>
-        <p className='text-sm text-gray-600 dark:text-gray-400'>
-          {language === 'zh-CN' ? '管理和使用您的提示词模板' : 'Manage and use your prompt templates'}
-        </p>
+        <p className='text-sm text-gray-600 dark:text-gray-400'>{t('prompts.subtitle')}</p>
       </div>
 
       <div className='flex gap-6 flex-1 min-h-[200px]'>
@@ -529,9 +535,7 @@ export function PromptLibraryPage() {
           <div className='bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 overflow-y-auto h-full pb-4 scrollbar-hide'>
             {isLoadingCategories ? (
               <div className='text-center py-8'>
-                <p className='text-sm text-gray-500 dark:text-gray-400'>
-                  {language === 'zh-CN' ? '加载中...' : 'Loading...'}
-                </p>
+                <p className='text-sm text-gray-500 dark:text-gray-400'>{t('prompts.loading')}</p>
               </div>
             ) : (
               <div className='space-y-1'>
@@ -554,12 +558,12 @@ export function PromptLibraryPage() {
                       setShowCategoryDialog(true);
                     }}
                     onDelete={category => {
-                      setDeletingCategory(category);
-                      setShowDeleteCategoryDialog(true);
-                    }}
+                            setDeletingCategory(category);
+                            setShowDeleteCategoryDialog(true);
+                          }}
                   />
                 ))}
-              </div>
+                    </div>
             )}
           </div>
         </div>
@@ -601,9 +605,7 @@ export function PromptLibraryPage() {
               {isLoadingPrompts ? (
                 <div className='text-center py-20 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg'>
                   <Sparkles className='w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600 animate-pulse' />
-                  <p className='text-gray-500 dark:text-gray-400'>
-                    {language === 'zh-CN' ? '加载中...' : 'Loading...'}
-                  </p>
+                  <p className='text-gray-500 dark:text-gray-400'>{t('prompts.loading')}</p>
                 </div>
               ) : prompts.length === 0 ? (
                 <div className='text-center py-20 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg'>
@@ -625,13 +627,10 @@ export function PromptLibraryPage() {
                           {prompt.isSystem && (
                             <Badge variant='secondary' className='text-xs gap-1'>
                               <Shield className='w-3 h-3' />
-                              {language === 'zh-CN' ? '系统' : 'System'}
+                              {t('prompts.systemLabel')}
                             </Badge>
                           )}
-                          <Badge variant='outline' className='text-xs'>
-                            {language === 'zh-CN' ? '使用' : ''} {prompt.usageCount}{' '}
-                            {language === 'zh-CN' ? '次' : 'uses'}
-                          </Badge>
+                          <Badge variant='outline' className='text-xs'>{formatUsageCount(prompt.usageCount)}</Badge>
                         </div>
                         <div className='flex flex-wrap gap-1.5'>
                           {prompt.tags.map((tag, index) => (
@@ -656,12 +655,12 @@ export function PromptLibraryPage() {
                       </Button>
                       <Button variant='outline' size='sm' onClick={() => copyPrompt(prompt.content)} className='gap-2'>
                         <Copy className='w-3 h-3' />
-                        {t('common.copy')}
+                        {t('common.actions.copy')}
                       </Button>
                       {!prompt.isSystem && (
-                        <Button variant='outline' size='sm' onClick={() => duplicatePrompt(prompt)} className='gap-2'>
-                          <Copy className='w-3 h-3' />
-                          {language === 'zh-CN' ? '副本' : 'Duplicate'}
+                      <Button variant='outline' size='sm' onClick={() => duplicatePrompt(prompt)} className='gap-2'>
+                        <Copy className='w-3 h-3' />
+                          {t('prompts.duplicateAction')}
                         </Button>
                       )}
                       {/* 查看按钮 - 所有提示词都可以查看 */}
@@ -709,7 +708,7 @@ export function PromptLibraryPage() {
 
           {pageParam.total > pageParam.pageSize && <XcanPagination {...pageParam} onChange={handlePageChange} />}
         </div>
-      </div>
+        </div>
 
       {/* 新建/编辑提示词对话框 */}
       <PromptDialog
@@ -752,22 +751,24 @@ export function PromptLibraryPage() {
       <Dialog open={showViewDialog} onOpenChange={setShowViewDialog} modal={false}>
         <DialogContent className='max-w-[792px] dark:bg-gray-800 dark:border-gray-700' >
           <DialogHeader>
-            <DialogTitle className='dark:text-white'>提示词详情</DialogTitle>
-            <DialogDescription className='dark:text-gray-400'>查看提示词的详细信息</DialogDescription>
+            <DialogTitle className='dark:text-white'>{t('prompts.viewPromptTitle')}</DialogTitle>
+            <DialogDescription className='dark:text-gray-400'>
+              {t('prompts.viewPromptDescription')}
+            </DialogDescription>
           </DialogHeader>
           {viewingPrompt && (
-            <div className='space-y-4'>
+          <div className='space-y-4'>
               <div className='flex items-center gap-3 pb-4 border-b border-gray-200 dark:border-gray-700'>
                 <div className='w-16 h-16 rounded-lg flex items-center justify-center bg-blue-100 dark:bg-blue-900/30'>
                   <Sparkles className='w-8 h-8 text-blue-600 dark:text-blue-400' />
-                </div>
+            </div>
                 <div className='flex-1'>
-                  <div className='flex items-center gap-2'>
+                        <div className='flex items-center gap-2'>
                     <h3 className='text-xl dark:text-white'>{viewingPrompt.title}</h3>
                     {viewingPrompt.isSystem && (
                       <Badge variant='secondary' className='text-xs gap-1'>
                         <Shield className='w-3 h-3' />
-                        {language === 'zh-CN' ? '系统' : 'System'}
+                    {t('prompts.systemLabel')}
                       </Badge>
                     )}
                     <Badge
@@ -780,43 +781,42 @@ export function PromptLibraryPage() {
                     >
                       <Star className={cn('w-3 h-3', viewingPrompt.isFavorite && 'fill-yellow-400')} />
                     </Badge>
-                  </div>
+              </div>
                   <div className='flex items-center gap-2 mt-1'>
                     <Badge variant='outline' className='text-xs'>
-                      {language === 'zh-CN' ? '使用' : ''} {viewingPrompt.usageCount}{' '}
-                      {language === 'zh-CN' ? '次' : 'uses'}
+                      {formatUsageCount(viewingPrompt.usageCount)}
                     </Badge>
-                  </div>
-                </div>
               </div>
+            </div>
+          </div>
 
               <div className='space-y-3'>
-                <div>
-                  <label className='text-sm text-gray-600 dark:text-gray-400'>分类</label>
+            <div>
+                  <label className='text-sm text-gray-600 dark:text-gray-400'>{t('prompts.category')}</label>
                   <p className='text-sm dark:text-white mt-1'>
                     {(() => {
                       const category = categories.find(c => c.id === viewingPrompt.category);
                       return category ? getCategoryDisplayName(category, language) : '-';
                     })()}
                   </p>
-                </div>
+            </div>
 
                 {viewingPrompt.tags && viewingPrompt.tags.length > 0 && (
-                  <div>
-                    <label className='text-sm text-gray-600 dark:text-gray-400'>标签</label>
+            <div>
+                    <label className='text-sm text-gray-600 dark:text-gray-400'>{t('prompts.tags')}</label>
                     <div className='flex flex-wrap gap-2 mt-2'>
                       {viewingPrompt.tags.map((tag, index) => (
                         <Badge key={index} variant='secondary' className={cn('text-xs', tag.color)}>
                           {tag.label}
                         </Badge>
-                      ))}
-                    </div>
-                  </div>
+                              ))}
+                            </div>
+                        </div>
                 )}
 
-                <div>
+              <div>
                   <div className='flex items-center justify-between mb-2'>
-                    <label className='text-sm text-gray-600 dark:text-gray-400'>内容</label>
+                    <label className='text-sm text-gray-600 dark:text-gray-400'>{t('prompts.promptContent')}</label>
                     <Button
                       variant='outline'
                       size='sm'
@@ -828,17 +828,17 @@ export function PromptLibraryPage() {
                       className='gap-2'
                     >
                       <Copy className='w-3 h-3' />
-                      {t('common.copy')}
+                      {t('common.actions.copy')}
                     </Button>
-                  </div>
+                              </div>
                   <div className='mt-2 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600'>
                     <p className='text-sm dark:text-gray-300 whitespace-pre-wrap break-words'>
                       {viewingPrompt.content}
                     </p>
-                  </div>
-                </div>
+                      </div>
               </div>
-            </div>
+                      </div>
+                      </div>
           )}
         </DialogContent>
       </Dialog>

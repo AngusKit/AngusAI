@@ -1,35 +1,42 @@
 import { TranslationKeys } from './zh-CN';
 import { enumTranslations } from '../enums/locale/en-US';
 
-export const enUS: TranslationKeys = {
+export const enUS = {
   // Common
   common: {
-    search: 'Search',
-    filter: 'Filter',
-    save: 'Save',
-    cancel: 'Cancel',
-    delete: 'Delete',
-    edit: 'Edit',
-    view: 'View',
-    create: 'Create',
-    export: 'Export',
-    import: 'Import',
-    download: 'Download',
-    upload: 'Upload',
-    share: 'Share',
-    copy: 'Copy',
-    more: 'More',
-    all: 'All',
-    active: 'Active',
-    inactive: 'Inactive',
-    status: 'Status',
-    actions: 'Actions',
-    confirm: 'Confirm',
-    back: 'Back',
-    next: 'Next',
-    previous: 'Previous',
-    finish: 'Finish',
-    settings: 'Settings',
+    actions: {
+      search: 'Search',
+      filter: 'Filter',
+      save: 'Save',
+      cancel: 'Cancel',
+      delete: 'Delete',
+      edit: 'Edit',
+      view: 'View',
+      create: 'Create',
+      export: 'Export',
+      import: 'Import',
+      download: 'Download',
+      upload: 'Upload',
+      share: 'Share',
+      copy: 'Copy',
+      more: 'More',
+      all: 'All',
+      active: 'Active',
+      inactive: 'Inactive',
+      status: 'Status',
+      actions: 'Actions',
+      confirm: 'Confirm',
+      back: 'Back',
+      next: 'Next',
+      previous: 'Previous',
+      finish: 'Finish',
+      settings: 'Settings',
+    },
+    messages: {
+      copyEmptyError: 'Content is empty, cannot copy',
+      copySuccess: 'Copied to clipboard',
+      copyFailed: 'Copy failed, please copy manually',
+    }
   },
 
   // Navigation
@@ -449,10 +456,13 @@ export const enUS: TranslationKeys = {
   prompts: {
     title: 'Prompt Library',
     search: 'Search prompts...',
+    subtitle: 'Manage and use your prompt templates',
+    loading: 'Loading...',
     newPrompt: 'New Prompt',
     editPrompt: 'Edit Prompt',
     deletePrompt: 'Delete Prompt',
     duplicatePrompt: 'Duplicate Prompt',
+    duplicateAction: 'Duplicate',
     category: 'Category',
     newCategory: 'New Group',
     categoryName: 'Group Name',
@@ -464,6 +474,8 @@ export const enUS: TranslationKeys = {
     productivity: 'Productivity',
     use: 'Use This Prompt',
     usageCount: 'uses',
+    usagePrefix: '',
+    usageSuffix: 'uses',
     noPrompts: 'No prompts yet',
     noResults: 'No prompts found',
     promptTitle: 'Title',
@@ -481,6 +493,20 @@ export const enUS: TranslationKeys = {
       'Are you sure you want to delete this category? Prompts in this category will be moved to "Coding" category. This action cannot be undone.',
     cannotDeleteSystemCategory: 'System categories cannot be deleted',
     categoryDeleted: 'Category deleted',
+    deleteCategoryFailed: 'Failed to delete category',
+    loadCategoriesFailed: 'Failed to load categories',
+    loadPromptsFailed: 'Failed to load prompts',
+    favoriteUpdated: 'Favorite status updated',
+    promptCopied: 'Prompt copied',
+    usePromptFailed: 'Failed to use prompt',
+    copySuffix: '(Copy)',
+    duplicateSuccess: 'Prompt duplicated',
+    duplicateFailed: 'Failed to duplicate prompt',
+    promptDeleteSuccess: 'Prompt deleted',
+    promptDeleteFailed: 'Failed to delete prompt',
+    systemLabel: 'System',
+    viewPromptTitle: 'Prompt Details',
+    viewPromptDescription: 'View detailed information about the prompt',
   },
 
   // Usage Analytics
@@ -496,4 +522,4 @@ export const enUS: TranslationKeys = {
 
   // Enum translations
   enum: enumTranslations,
-};
+} as unknown as TranslationKeys;

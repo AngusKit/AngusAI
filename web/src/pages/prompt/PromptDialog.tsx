@@ -216,9 +216,9 @@ export function PromptDialog({
 
         <DialogFooter>
           <Button variant='outline' onClick={() => onOpenChange(false)}>
-            {t('common.cancel')}
+            {t('common.actions.cancel')}
           </Button>
-          <Button onClick={handleSave}>{editingPrompt ? t('common.save') : t('common.create')}</Button>
+          <Button onClick={handleSave}>{editingPrompt ? t('common.actions.save') : t('common.actions.create')}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -25,9 +25,9 @@ export function DeletePromptDialog({ open, onOpenChange, deletingPrompt, onConfi
           <AlertDialogDescription>{t('prompts.confirmDelete')}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={() => onOpenChange(false)}>{t('common.cancel')}</AlertDialogCancel>
+          <AlertDialogCancel onClick={() => onOpenChange(false)}>{t('common.actions.cancel')}</AlertDialogCancel>
           <AlertDialogAction onClick={onConfirm} className='bg-red-600 hover:bg-red-700'>
-            {t('common.delete')}
+            {t('common.actions.delete')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

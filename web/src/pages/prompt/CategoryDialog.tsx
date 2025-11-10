@@ -216,9 +216,9 @@ export function CategoryDialog({
 
         <DialogFooter>
           <Button variant='outline' onClick={handleCancel}>
-            {t('common.cancel')}
+            {t('common.actions.cancel')}
           </Button>
-          <Button onClick={handleSave}>{editingCategory ? t('common.save') : t('common.create')}</Button>
+          <Button onClick={handleSave}>{editingCategory ? t('common.actions.save') : t('common.actions.create')}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

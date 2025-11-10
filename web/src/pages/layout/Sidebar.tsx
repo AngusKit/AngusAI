@@ -168,7 +168,7 @@ export function Sidebar({ activePage, onPageChange }: SidebarProps) {
         {/* Settings Section */}
         <div className='mt-6 border-t border-gray-200 dark:border-gray-700 pt-4'>
           <div className='px-4 mb-2'>
-            <span className='text-xs text-gray-500 dark:text-gray-400'>{t('common.settings')}</span>
+            <span className='text-xs text-gray-500 dark:text-gray-400'>{t('common.actions.settings')}</span>
           </div>
           <div className='px-2 space-y-1'>
             {settingsMenuItems.map(item => (
