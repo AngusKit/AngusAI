@@ -35,7 +35,7 @@ interface KnowledgeBaseItem {
   iconBg: string;
   documentCount: string;
   size: string;
-  status: '已启用' | '禁用';
+  status: string;
   statusColor: string;
   enabled: boolean;
   visibility?: string;
@@ -68,10 +68,10 @@ export function KnowledgeBase() {
   const [deletingDocument, setDeletingDocument] = useState<any | null>(null);
   const [documentPage, setDocumentPage] = useState(1);
   const documentsPerPage = 6;
-  const [isLoadingKnowledgeBases, setIsLoadingKnowledgeBases] = useState(false);
-  const [isLoadingDocuments, setIsLoadingDocuments] = useState(false);
+  const [_isLoadingKnowledgeBases, setIsLoadingKnowledgeBases] = useState(false);
+  const [_isLoadingDocuments, setIsLoadingDocuments] = useState(false);
   const [statistics, setStatistics] = useState<KnowledgeBaseStatisticsVo | null>(null);
-  const [isLoadingStatistics, setIsLoadingStatistics] = useState(false);
+  const [_isLoadingStatistics, setIsLoadingStatistics] = useState(false);
   const [sortBy, setSortBy] = useState<'createdDate' | 'documentsCount' | 'totalSize' | 'name'>('createdDate');
 
   // 文件上传相关状态
@@ -80,6 +80,35 @@ export function KnowledgeBase() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const folderInputRef = useRef<HTMLInputElement>(null);
   const uploadIntervalsRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
+
+  const getVisibilityLabel = (visibility?: string) => {
+    switch (visibility) {
+      case 'team':
+        return t('knowledge.visibility.team');
+      case 'private':
+        return t('knowledge.visibility.private');
+      default:
+        return t('knowledge.visibility.public');
+    }
+  };
+
+  const getKnowledgeStatusLabel = (enabled: boolean) =>
+    t(enabled ? 'common.status.enabled' : 'common.status.disabled');
+
+  const getDocumentStatusText = (status: KnowledgeBaseDocStatusEnum) => {
+    switch (status) {
+      case KnowledgeBaseDocStatusEnum.PENDING:
+        return t('common.status.pending');
+      case KnowledgeBaseDocStatusEnum.PROCESSING:
+        return t('common.status.processing');
+      case KnowledgeBaseDocStatusEnum.COMPLETED:
+        return t('common.status.completed');
+      case KnowledgeBaseDocStatusEnum.FAILED:
+        return t('common.status.failed');
+      default:
+        return t('common.status.pending');
+    }
+  };
 
   // 清理所有上传任务的定时器
   useEffect(() => {
@@ -106,10 +135,10 @@ export function KnowledgeBase() {
       if (statsData && typeof statsData === 'object' && 'overview' in statsData) {
         setStatistics(statsData);
       } else {
-        console.warn('统计数据格式不正确:', statsData);
+        console.warn('Unexpected statistics data format:', statsData);
       }
     } catch (error: any) {
-      console.error('加载统计数据失败:', error);
+      console.error('Failed to load statistics:', error);
       // 不显示错误提示，避免影响用户体验
     } finally {
       setIsLoadingStatistics(false);
@@ -124,40 +153,49 @@ export function KnowledgeBase() {
   const stats = statistics
     ? [
         {
-          label: '知识库数量',
+          label: t('knowledge.stats.totalKnowledgeBasesLabel'),
           value: String(statistics.overview?.totalKnowledgeBases || 0),
-          subtext: `活跃知识库 ${statistics.overview?.activeKnowledgeBases || 0} 个`,
+          subtext: t('knowledge.stats.totalKnowledgeBasesSubtext', {
+            count: statistics.overview?.activeKnowledgeBases || 0,
+          }),
           icon: Database,
           iconBg: 'bg-blue-500',
           trend: undefined,
           trendUp: undefined,
         },
         {
-          label: '文档总量',
+          label: t('knowledge.stats.totalDocumentsLabel'),
           value: String(statistics.overview?.totalFiles || 0),
-          subtext: `活跃文件 ${statistics.overview?.activeFiles || 0} 个 · 总大小：${statistics.overview?.usedStoreSize || '0 MB'}`,
+          subtext: t('knowledge.stats.totalDocumentsSubtext', {
+            count: statistics.overview?.activeFiles || 0,
+            size: statistics.overview?.usedStoreSize || '0 MB',
+          }),
           icon: FileText,
           iconBg: 'bg-green-500',
           trend: undefined,
           trendUp: undefined,
         },
         {
-          label: '今日查询',
+          label: t('knowledge.stats.todayQueriesLabel'),
           value: String(statistics.overview?.todayQueryCount || 0),
-          subtext: `累计查询数 ${statistics.overview?.totalQueryCount || 0} 次`,
+          subtext: t('knowledge.stats.todayQueriesSubtext', {
+            count: statistics.overview?.totalQueryCount || 0,
+          }),
           icon: Eye,
           iconBg: 'bg-orange-500',
           trend: undefined,
           trendUp: undefined,
         },
         {
-          label: '存储空间',
+          label: t('knowledge.stats.storageLabel'),
           value: statistics.overview?.totalStoreSize
             ? `${statistics.overview?.usedStoreSize || '0 MB'} / ${statistics.overview.totalStoreSize}`
             : `${statistics.overview?.usedStoreSize || '0 MB'} / --`,
           subtext: statistics.overview?.totalStoreSize
-            ? `已使用 ${statistics.overview.usedStoreRate || '0%'}`
-            : '存储空间未限制',
+            ? t('knowledge.stats.storageSubtext', {
+                rate: statistics.overview.usedStoreRate || '0%',
+              })
+            : t('knowledge.stats.storageUnlimited'),
           icon: Database,
           iconBg: 'bg-purple-500',
           progress: statistics.overview?.usedStoreRate
@@ -170,36 +208,36 @@ export function KnowledgeBase() {
       ]
     : [
         {
-          label: '知识库数量',
+          label: t('knowledge.stats.totalKnowledgeBasesLabel'),
           value: '--',
-          subtext: '加载中...',
+          subtext: t('knowledge.loading'),
           icon: Database,
           iconBg: 'bg-blue-500',
           trend: undefined,
           trendUp: undefined,
         },
         {
-          label: '文档总量',
+          label: t('knowledge.stats.totalDocumentsLabel'),
           value: '--',
-          subtext: '加载中...',
+          subtext: t('knowledge.loading'),
           icon: FileText,
           iconBg: 'bg-green-500',
           trend: undefined,
           trendUp: undefined,
         },
         {
-          label: '今日查询',
+          label: t('knowledge.stats.todayQueriesLabel'),
           value: '--',
-          subtext: '加载中...',
+          subtext: t('knowledge.loading'),
           icon: Eye,
           iconBg: 'bg-orange-500',
           trend: undefined,
           trendUp: undefined,
         },
         {
-          label: '存储空间',
+          label: t('knowledge.stats.storageLabel'),
           value: '--',
-          subtext: '加载中...',
+          subtext: t('knowledge.loading'),
           icon: Database,
           iconBg: 'bg-purple-500',
           progress: 0,
@@ -245,7 +283,7 @@ export function KnowledgeBase() {
           iconBg: kb.iconBg || 'bg-blue-50 dark:bg-blue-900/20',
           documentCount: String(kb.documentsCount || 0),
           size: kb.totalSize || '0 MB',
-          status: (kb.enabled ? '已启用' : '禁用') as '已启用' | '禁用',
+          status: getKnowledgeStatusLabel(!!kb.enabled),
           statusColor: kb.enabled ? ENABLED_STATUS_COLOR.enabled : ENABLED_STATUS_COLOR.disabled,
           enabled: kb.enabled || false,
           visibility: kb.visibility,
@@ -271,8 +309,8 @@ export function KnowledgeBase() {
         setKnowledgeBases([]);
       }
     } catch (error: any) {
-      console.error('加载知识库列表失败:', error);
-      toast.error(error?.data?.message || error?.message || '加载知识库列表失败');
+      console.error('Failed to load knowledge base list:', error);
+      toast.error(error?.data?.message || error?.message || t('knowledge.toasts.loadKnowledgeBasesFailed'));
       setKnowledgeBases([]);
     } finally {
       setIsLoadingKnowledgeBases(false);
@@ -299,16 +337,20 @@ export function KnowledgeBase() {
             return {
               ...kb,
               enabled: newEnabled,
-              status: newEnabled ? '已启用' : '禁用',
+              status: getKnowledgeStatusLabel(newEnabled),
               statusColor: newEnabled ? ENABLED_STATUS_COLOR.enabled : ENABLED_STATUS_COLOR.disabled,
             };
           }
           return kb;
         })
       );
-      toast.success(newEnabled ? '知识库已启用' : '知识库已禁用');
+      toast.success(
+        newEnabled
+          ? t('knowledge.toasts.enableKnowledgeBaseSuccess')
+          : t('knowledge.toasts.disableKnowledgeBaseSuccess')
+      );
     } catch (error: any) {
-      toast.error(error?.data?.message || '切换知识库状态失败');
+      toast.error(error?.data?.message || t('knowledge.toasts.toggleKnowledgeBaseFailed'));
     }
   };
 
@@ -350,7 +392,7 @@ export function KnowledgeBase() {
             typeColor: typeInfo.color,
             typeIcon: typeInfo.icon,
             size: doc.size || '0 MB',
-            status: statusInfo.text,
+            status: getDocumentStatusText(status),
             statusColor: statusInfo.color,
             enabled: doc.enabled || false,
             uploadTime: doc.createdDate || '',
@@ -368,8 +410,8 @@ export function KnowledgeBase() {
         setTotalDocuments(0);
       }
     } catch (error: any) {
-      console.error('加载文档列表失败:', error);
-      toast.error(error?.data?.message || error?.message || '加载文档列表失败');
+      console.error('Failed to load document list:', error);
+      toast.error(error?.data?.message || error?.message || t('knowledge.toasts.loadDocumentsFailed'));
       setDocuments([]);
       setTotalDocuments(0);
     } finally {
@@ -416,7 +458,9 @@ export function KnowledgeBase() {
             return {
               ...d,
               enabled: newEnabled,
-              status: newEnabled ? '已完成' : '禁用',
+              status: newEnabled
+                ? getDocumentStatusText(KnowledgeBaseDocStatusEnum.COMPLETED)
+                : t('common.status.disabled'),
               statusColor: newEnabled
                 ? completedStatus?.color || ENABLED_STATUS_COLOR.enabled
                 : ENABLED_STATUS_COLOR.disabled,
@@ -425,9 +469,11 @@ export function KnowledgeBase() {
           return d;
         })
       );
-      toast.success(newEnabled ? '文档已启用' : '文档已禁用');
+      toast.success(
+        newEnabled ? t('knowledge.toasts.enableDocumentSuccess') : t('knowledge.toasts.disableDocumentSuccess')
+      );
     } catch (error: any) {
-      toast.error(error?.data?.message || '切换文档状态失败');
+      toast.error(error?.data?.message || t('knowledge.toasts.toggleDocumentFailed'));
     }
   };
 
@@ -436,7 +482,7 @@ export function KnowledgeBase() {
     if (!selectedKnowledgeBase) return;
 
     try {
-      toast.info(`正在重新处理文档: ${doc.name}`);
+      toast.info(t('knowledge.toasts.reparseDocumentStart', { name: doc.name }));
 
       const response = await Documents.reprocessDocument(doc.id, selectedKnowledgeBase);
 
@@ -467,13 +513,13 @@ export function KnowledgeBase() {
         );
 
         if (statusData.status === KnowledgeBaseDocStatusEnum.COMPLETED) {
-          toast.success(`文档 ${doc.name} 处理完成`);
+          toast.success(t('knowledge.toasts.reparseDocumentCompleted', { name: doc.name }));
         } else if (statusData.status === KnowledgeBaseDocStatusEnum.PROCESSING) {
-          toast.info(`文档 ${doc.name} 正在处理中...`);
+          toast.info(t('knowledge.toasts.reparseDocumentProcessing', { name: doc.name }));
         }
       }
     } catch (error: any) {
-      toast.error(error?.data?.message || '重新处理文档失败');
+      toast.error(error?.data?.message || t('knowledge.toasts.reparseDocumentFailed'));
     }
   };
 
@@ -490,12 +536,12 @@ export function KnowledgeBase() {
     if (deletingDocument && selectedKnowledgeBase) {
       try {
         await Documents.deleteDocument(deletingDocument.id, selectedKnowledgeBase);
-        toast.success(`已删除文档: ${deletingDocument.name}`);
+        toast.success(t('knowledge.toasts.deleteDocumentSuccess', { name: deletingDocument.name }));
         setDeleteDocumentDialogOpen(false);
         setDeletingDocument(null);
         loadDocuments(selectedKnowledgeBase); // 重新加载列表
       } catch (error: any) {
-        toast.error(error?.data?.message || '删除文档失败');
+        toast.error(error?.data?.message || t('knowledge.toasts.deleteDocumentFailed'));
       }
     }
   };
@@ -503,7 +549,7 @@ export function KnowledgeBase() {
   // 下载文档
   const handleDownloadDocument = async (doc: any) => {
     if (!doc.filePath) {
-      toast.error('文件路径不存在，无法下载');
+      toast.error(t('knowledge.toasts.missingFilePath'));
       return;
     }
 
@@ -514,7 +560,7 @@ export function KnowledgeBase() {
       });
     } catch (error: any) {
       // 错误已在 downloadFile 中处理
-      console.error('下载文档失败:', error);
+      console.error('Failed to download document:', error);
     }
   };
 
@@ -543,7 +589,7 @@ export function KnowledgeBase() {
         setViewDialogOpen(true);
       }
     } catch (error: any) {
-      toast.error(error?.data?.message || '获取知识库详情失败');
+      toast.error(error?.data?.message || t('knowledge.toasts.loadKnowledgeBaseDetailFailed'));
       // 失败时仍显示基本信息
       setViewingKB(knowledgeBase);
       setViewDialogOpen(true);
@@ -565,7 +611,7 @@ export function KnowledgeBase() {
     if (deletingKnowledgeBase) {
       try {
         await KnowledgeBases.deleteKnowledgeBase(deletingKnowledgeBase.id);
-        toast.success(`已删除知识库: ${deletingKnowledgeBase.name}`);
+        toast.success(t('knowledge.toasts.deleteKnowledgeBaseSuccess', { name: deletingKnowledgeBase.name }));
         setDeleteDialogOpen(false);
         setDeletingKnowledgeBase(null);
         loadKnowledgeBases(); // 重新加载列表
@@ -573,7 +619,7 @@ export function KnowledgeBase() {
           setSelectedKnowledgeBase(null);
         }
       } catch (error: any) {
-        toast.error(error?.data?.message || '删除知识库失败');
+        toast.error(error?.data?.message || t('knowledge.toasts.deleteKnowledgeBaseFailed'));
       }
     }
   };
@@ -613,19 +659,29 @@ export function KnowledgeBase() {
       if (isFolderUpload) {
         // 文件夹上传：显示有效文件数和被过滤的文件数
         if (result.filteredCount > 0) {
+          const previewFiles = result.filteredFiles.slice(0, 3).join('、');
+          const description =
+            previewFiles.length > 0
+              ? t('knowledge.upload.filteredDescription', {
+                  preview: previewFiles,
+                  total: result.filteredFiles.length,
+                })
+              : undefined;
           toast.success(
-            `已添加 ${result.validFiles.length} 个有效文件，已过滤 ${result.filteredCount} 个不支持的文件`,
+            t('knowledge.upload.folderSummary', {
+              added: result.validFiles.length,
+              filtered: result.filteredCount,
+            }),
             {
-              description: result.filteredFiles.slice(0, 3).join('、') + 
-                (result.filteredFiles.length > 3 ? ` 等 ${result.filteredFiles.length} 个文件` : ''),
+              description,
             }
           );
         } else {
-          toast.success(`已添加 ${result.validFiles.length} 个文件`);
+          toast.success(t('knowledge.upload.folderAdded', { count: result.validFiles.length }));
         }
       } else {
         // 单个文件上传：显示成功消息
-        toast.success(`${t('knowledgeUpload.fileAdded')} ${result.validFiles.length} ${t('knowledgeUpload.filesCount')}`);
+        toast.success(t('knowledge.upload.filesAdded', { count: result.validFiles.length }));
       }
 
       // 自动开始上传 分组上传(5个一组 执行)
@@ -633,9 +689,11 @@ export function KnowledgeBase() {
     } else if (isFolderUpload && result.filteredCount > 0) {
       // 文件夹中没有有效文件
       toast.warning(
-        `文件夹中没有支持的文件格式`,
+        t('knowledge.upload.noSupportedFiles'),
         {
-          description: `已过滤 ${result.filteredCount} 个文件。支持 PDF、Word、TXT 格式`,
+          description: t('knowledge.upload.noSupportedFilesDescription', {
+            count: result.filteredCount,
+          }),
         }
       );
     }
@@ -669,7 +727,7 @@ export function KnowledgeBase() {
         continue;
       }
       
-      console.log(`开始上传第 ${i + 1}/${batches.length} 组，共 ${batch.length} 个文件`);
+      console.log(`Uploading batch ${i + 1}/${batches.length}, files: ${batch.length}`);
       
       // 等待当前组的所有文件上传完成
       await Promise.all(batch.map(file => handleUpload(file)));
@@ -680,7 +738,7 @@ export function KnowledgeBase() {
       }
     }
     
-    console.log(`所有文件上传完成，共 ${files.length} 个文件`);
+    console.log(`Finished uploading files. Total: ${files.length}`);
   };
 
   // 上传文件
@@ -690,7 +748,7 @@ export function KnowledgeBase() {
         return Documents.uploadDocument(id, { file }, params);
       },
       resourceId: selectedKnowledgeBase,
-      resourceName: '知识库',
+      resourceName: t('knowledge.resourceName'),
       onSuccess: () => {
         // 重新加载文档列表
         setTimeout(() => {
@@ -762,8 +820,8 @@ export function KnowledgeBase() {
     <div className='space-y-6'>
       {/* Header */}
       <div>
-        <h1 className='text-2xl mb-1 dark:text-white'>知识库</h1>
-        <p className='text-sm text-gray-600 dark:text-gray-400'>智能化知识库管理，用于AI助手知识增强</p>
+        <h1 className='text-2xl mb-1 dark:text-white'>{t('knowledge.title')}</h1>
+        <p className='text-sm text-gray-600 dark:text-gray-400'>{t('knowledge.subtitle')}</p>
       </div>
 
       {/* Stats Cards */}
@@ -808,7 +866,7 @@ export function KnowledgeBase() {
             <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500' />
             <Input
               type='text'
-              placeholder='搜索知识库名称、描述...'
+              placeholder={t('knowledge.searchPlaceholder')}
               value={searchQuery}
               onChange={e => {
                 setSearchQuery(e.target.value);
@@ -838,7 +896,7 @@ export function KnowledgeBase() {
                   className='dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300'
                 >
                   <Filter className='w-4 h-4 mr-2' />
-                  筛选
+                  {t('common.actions.filter')}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align='end' className='dark:bg-gray-800 dark:border-gray-700'>
@@ -849,7 +907,7 @@ export function KnowledgeBase() {
                     setCurrentPage(1); // 重置到第一页
                   }}
                 >
-                  最近创建
+                  {t('knowledge.sort.recentCreated')}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className={`dark:text-gray-300 ${sortBy === 'documentsCount' ? 'bg-blue-50 dark:bg-blue-900/30' : ''}`}
@@ -858,7 +916,7 @@ export function KnowledgeBase() {
                     setCurrentPage(1);
                   }}
                 >
-                  文档数量
+                  {t('knowledge.sort.documentsCount')}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className={`dark:text-gray-300 ${sortBy === 'totalSize' ? 'bg-blue-50 dark:bg-blue-900/30' : ''}`}
@@ -867,7 +925,7 @@ export function KnowledgeBase() {
                     setCurrentPage(1);
                   }}
                 >
-                  存储大小
+                  {t('knowledge.sort.totalSize')}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className={`dark:text-gray-300 ${sortBy === 'name' ? 'bg-blue-50 dark:bg-blue-900/30' : ''}`}
@@ -876,7 +934,7 @@ export function KnowledgeBase() {
                     setCurrentPage(1);
                   }}
                 >
-                  按名称排序
+                  {t('knowledge.sort.name')}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -910,7 +968,7 @@ export function KnowledgeBase() {
               onClick={() => setCreateDialogOpen(true)}
             >
               <Plus className='w-4 h-4 mr-2' />
-              创建知识库
+              {t('knowledge.actions.create')}
             </Button>
           </div>
         </div>
@@ -919,9 +977,9 @@ export function KnowledgeBase() {
         {filteredKnowledgeBases.length === 0 && (
           <div className='text-center py-12'>
             <Database className='w-12 h-12 text-gray-400 dark:text-gray-600 mx-auto mb-3' />
-            <p className='text-gray-600 dark:text-gray-400'>未找到匹配的知识库</p>
+            <p className='text-gray-600 dark:text-gray-400'>{t('knowledge.empty.noMatch')}</p>
             <p className='text-sm text-gray-500 dark:text-gray-500 mt-1'>
-              {searchQuery ? '尝试使用其他搜索词' : '暂无知识库'}
+              {searchQuery ? t('knowledge.empty.tryAnotherSearch') : t('knowledge.empty.noData')}
             </p>
           </div>
         )}
@@ -975,18 +1033,18 @@ export function KnowledgeBase() {
                     <DropdownMenuContent align='end' className='dark:bg-gray-800 dark:border-gray-700'>
                       <DropdownMenuItem onClick={() => handleViewKnowledgeBase(kb)} className='dark:text-gray-300'>
                         <Eye className='w-4 h-4 mr-2' />
-                        查看
+                        {t('common.actions.view')}
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleEditKnowledgeBase(kb)} className='dark:text-gray-300'>
                         <Edit className='w-4 h-4 mr-2' />
-                        编辑
+                        {t('common.actions.edit')}
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => handleDeleteKnowledgeBase(kb)}
                         className='text-red-600 dark:text-red-400'
                       >
                         <Trash2 className='w-4 h-4 mr-2' />
-                        删除
+                        {t('common.actions.delete')}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -1007,11 +1065,15 @@ export function KnowledgeBase() {
 
                 <div className='grid grid-cols-2 gap-4 pt-2 border-t border-gray-100 dark:border-gray-700'>
                   <div>
-                    <div className='text-xs text-gray-500 dark:text-gray-400 mb-1'>文档数</div>
+                    <div className='text-xs text-gray-500 dark:text-gray-400 mb-1'>
+                      {t('knowledge.card.documentsLabel')}
+                    </div>
                     <div className='dark:text-white'>{kb.documentCount}</div>
                   </div>
                   <div>
-                    <div className='text-xs text-gray-500 dark:text-gray-400 mb-1'>大小</div>
+                    <div className='text-xs text-gray-500 dark:text-gray-400 mb-1'>
+                      {t('knowledge.card.sizeLabel')}
+                    </div>
                     <div className='dark:text-white'>{kb.size}</div>
                   </div>
                 </div>
@@ -1021,7 +1083,9 @@ export function KnowledgeBase() {
                   <div className='mt-0.5 pt-3 border-t border-gray-100 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400'>
                     <div className='flex items-center justify-between'>
                       <span>
-                        可见性: {kb.visibility === 'team' ? '团队' : kb.visibility === 'private' ? '私有' : '公开'}
+                        {t('knowledge.card.visibilityPrefix', {
+                          visibility: getVisibilityLabel(kb.visibility),
+                        })}
                       </span>
                       <span>{formatDateOnly(kb.modifiedDate)}</span>
                     </div>
@@ -1039,14 +1103,30 @@ export function KnowledgeBase() {
               <table className='w-full'>
                 <thead className='border-b border-gray-200 dark:border-gray-700'>
                   <tr>
-                    <th className='px-5 py-3 text-left text-xs text-gray-500 dark:text-gray-400'>知识库</th>
-                    <th className='px-5 py-3 text-left text-xs text-gray-500 dark:text-gray-400'>描述</th>
-                    <th className='px-5 py-3 text-left text-xs text-gray-500 dark:text-gray-400'>文档数</th>
-                    <th className='px-5 py-3 text-left text-xs text-gray-500 dark:text-gray-400'>大小</th>
-                    <th className='px-5 py-3 text-left text-xs text-gray-500 dark:text-gray-400'>状态</th>
-                    <th className='px-5 py-3 text-left text-xs text-gray-500 dark:text-gray-400'>可见性</th>
-                    <th className='px-5 py-3 text-left text-xs text-gray-500 dark:text-gray-400'>更新时间</th>
-                    <th className='px-5 py-3 text-left text-xs text-gray-500 dark:text-gray-400'>操作</th>
+                    <th className='px-5 py-3 text-left text-xs text-gray-500 dark:text-gray-400'>
+                      {t('knowledge.table.columns.name')}
+                    </th>
+                    <th className='px-5 py-3 text-left text-xs text-gray-500 dark:text-gray-400'>
+                      {t('knowledge.table.columns.description')}
+                    </th>
+                    <th className='px-5 py-3 text-left text-xs text-gray-500 dark:text-gray-400'>
+                      {t('knowledge.table.columns.documents')}
+                    </th>
+                    <th className='px-5 py-3 text-left text-xs text-gray-500 dark:text-gray-400'>
+                      {t('knowledge.table.columns.size')}
+                    </th>
+                    <th className='px-5 py-3 text-left text-xs text-gray-500 dark:text-gray-400'>
+                      {t('knowledge.table.columns.status')}
+                    </th>
+                    <th className='px-5 py-3 text-left text-xs text-gray-500 dark:text-gray-400'>
+                      {t('knowledge.table.columns.visibility')}
+                    </th>
+                    <th className='px-5 py-3 text-left text-xs text-gray-500 dark:text-gray-400'>
+                      {t('knowledge.table.columns.updatedAt')}
+                    </th>
+                    <th className='px-5 py-3 text-left text-xs text-gray-500 dark:text-gray-400'>
+                      {t('knowledge.table.columns.actions')}
+                    </th>
                   </tr>
                 </thead>
                 <tbody className='divide-y divide-gray-100 dark:divide-gray-700'>
@@ -1103,9 +1183,7 @@ export function KnowledgeBase() {
                         </div>
                       </td>
                       <td className='px-5 py-4'>
-                        <div className='text-sm dark:text-white'>
-                          {kb.visibility === 'team' ? '团队' : kb.visibility === 'private' ? '私有' : '公开'}
-                        </div>
+                        <div className='text-sm dark:text-white'>{getVisibilityLabel(kb.visibility)}</div>
                       </td>
                       <td className='px-5 py-4'>
                         <div className='text-sm text-gray-600 dark:text-gray-400'>
@@ -1193,7 +1271,11 @@ export function KnowledgeBase() {
                   </Badge>
                 </div>
                 <p className='text-sm text-gray-600 dark:text-gray-400 mt-1'>
-                  {selectedKB.description} · {selectedKB.documentCount} 个文档 · {selectedKB.size}
+                  {t('knowledge.selected.summary', {
+                    description: selectedKB.description || '',
+                    count: selectedKB.documentCount,
+                    size: selectedKB.size,
+                  })}
                 </p>
               </div>
             </div>
@@ -1212,7 +1294,7 @@ export function KnowledgeBase() {
             <div>
               <h3 className='text-lg dark:text-white mb-3 flex items-center gap-2'>
                 <Upload className='w-5 h-5 text-blue-500 dark:text-blue-400' />
-                上传文档
+                {t('knowledge.upload.sectionTitle')}
               </h3>
               <Card className='p-6 dark:bg-gray-800 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm'>
                 <div
@@ -1250,7 +1332,7 @@ export function KnowledgeBase() {
                     {isDragging ? t('knowledgeUpload.dragDropActive') : t('knowledgeUpload.dragDropHint')}
                   </p>
                   <p className='text-xs text-gray-500 dark:text-gray-500 mt-2'>
-                    支持 PDF、Word、TXT、Markdown、HTML 格式 · 单文件限制 50MB
+                    {t('knowledge.upload.supportedFormats')}
                   </p>
 
                   {/* 隐藏的文件输入 */}
@@ -1350,15 +1432,23 @@ export function KnowledgeBase() {
             <div>
               <h3 className='text-lg dark:text-white mb-3 flex items-center gap-2'>
                 <FileText className='w-5 h-5 text-green-500 dark:text-green-400' />
-                文档列表
+                {t('knowledge.documents.sectionTitle')}
               </h3>
               <Card className='dark:bg-gray-800 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm gap-0'>
                 <div className='p-5 border-b border-gray-200 dark:border-gray-700'>
                   <div className='flex items-center justify-between'>
-                    <h4 className='dark:text-white'>已上传文档</h4>
+                    <h4 className='dark:text-white'>{t('knowledge.documents.uploadedTitle')}</h4>
                     <span className='text-sm text-gray-500 dark:text-gray-400'>
-                      {totalDocuments > 0 ? `共 ${totalDocuments} 个文档` : '暂无文档'}
-                      {totalDocuments > 0 && ` (第 ${documentPage} 页，每页 ${documentsPerPage} 个)`}
+                      {totalDocuments > 0
+                        ? t('knowledge.documents.totalSummary', {
+                            total: totalDocuments,
+                          })
+                        : t('knowledge.documents.empty')}
+                      {totalDocuments > 0 &&
+                        t('knowledge.documents.paginationInfo', {
+                          page: documentPage,
+                          perPage: documentsPerPage,
+                        })}
                     </span>
                   </div>
                 </div>
@@ -1370,9 +1460,11 @@ export function KnowledgeBase() {
                         <FileX className='w-10 h-10 text-gray-400 dark:text-gray-500' />
                       </div>
                     </div>
-                    <h4 className='text-lg font-medium text-gray-900 dark:text-white mb-2'>暂无文档</h4>
+                    <h4 className='text-lg font-medium text-gray-900 dark:text-white mb-2'>
+                      {t('knowledge.documents.empty')}
+                    </h4>
                     <p className='text-sm text-gray-500 dark:text-gray-400 text-center max-w-sm mb-4'>
-                      还没有上传任何文档，点击上方上传区域开始添加文档
+                      {t('knowledge.documents.emptyDescription')}
                     </p>
                   </div>
                 ) : (
@@ -1410,21 +1502,21 @@ export function KnowledgeBase() {
                               <button
                                 onClick={() => handleReparse(doc)}
                                 className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
-                                title='重新解析'
+                                title={t('knowledge.documents.actions.reparse')}
                               >
                                 <RefreshCw className='w-4 h-4 text-green-500' />
                               </button>
                               <button
                                 onClick={() => handleDownloadDocument(doc)}
                                 className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
-                                title='下载文件'
+                                title={t('knowledge.documents.actions.download')}
                               >
                                 <Download className='w-4 h-4 text-blue-500' />
                               </button>
                               <button
                                 onClick={() => handleDeleteDocument(doc)}
                                 className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
-                                title='删除文件'
+                                title={t('knowledge.documents.actions.delete')}
                               >
                                 <Trash2 className='w-4 h-4 text-red-500' />
                               </button>
@@ -1489,8 +1581,8 @@ export function KnowledgeBase() {
       <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
         <DialogContent className='max-w-2xl dark:bg-gray-800 dark:border-gray-700'>
           <DialogHeader>
-            <DialogTitle className='dark:text-white'>知识库详情</DialogTitle>
-            <DialogDescription className='dark:text-gray-400'>查看知识库的详细信息</DialogDescription>
+            <DialogTitle className='dark:text-white'>{t('knowledge.viewDialog.title')}</DialogTitle>
+            <DialogDescription className='dark:text-gray-400'>{t('knowledge.viewDialog.description')}</DialogDescription>
           </DialogHeader>
           {viewingKB && (
             <div className='space-y-4'>
@@ -1508,48 +1600,62 @@ export function KnowledgeBase() {
 
               <div className='space-y-3'>
                 <div>
-                  <label className='text-sm text-gray-600 dark:text-gray-400'>描述</label>
+                  <label className='text-sm text-gray-600 dark:text-gray-400'>{t('knowledge.viewDialog.descriptionLabel')}</label>
                   <p className='text-sm dark:text-white mt-1'>{viewingKB.description}</p>
                 </div>
 
                 <div className='grid grid-cols-2 gap-4'>
                   <div>
-                    <label className='text-sm text-gray-600 dark:text-gray-400'>文档数量</label>
-                    <p className='text-sm dark:text-white mt-1'>{viewingKB.documentCount} 个</p>
+                    <label className='text-sm text-gray-600 dark:text-gray-400'>
+                      {t('knowledge.viewDialog.documentsLabel')}
+                    </label>
+                    <p className='text-sm dark:text-white mt-1'>
+                      {t('knowledge.viewDialog.documentsValue', { count: viewingKB.documentCount })}
+                    </p>
                   </div>
                   <div>
-                    <label className='text-sm text-gray-600 dark:text-gray-400'>存储大小</label>
+                    <label className='text-sm text-gray-600 dark:text-gray-400'>
+                      {t('knowledge.viewDialog.sizeLabel')}
+                    </label>
                     <p className='text-sm dark:text-white mt-1'>{viewingKB.size}</p>
                   </div>
                 </div>
 
                 <div className='grid grid-cols-2 gap-4'>
                   <div>
-                    <label className='text-sm text-gray-600 dark:text-gray-400'>可见性</label>
-                    <p className='text-sm dark:text-white mt-1'>
-                      {viewingKB.visibility === 'team' ? '团队' : viewingKB.visibility === 'private' ? '私有' : '公开'}
-                    </p>
+                    <label className='text-sm text-gray-600 dark:text-gray-400'>
+                      {t('knowledge.viewDialog.visibilityLabel')}
+                    </label>
+                    <p className='text-sm dark:text-white mt-1'>{getVisibilityLabel(viewingKB.visibility)}</p>
                   </div>
                   <div>
-                    <label className='text-sm text-gray-600 dark:text-gray-400'>创建者</label>
+                    <label className='text-sm text-gray-600 dark:text-gray-400'>
+                      {t('knowledge.viewDialog.creatorLabel')}
+                    </label>
                     <p className='text-sm dark:text-white mt-1'>{viewingKB.creator}</p>
                   </div>
                 </div>
 
                 <div className='grid grid-cols-2 gap-4'>
                   <div>
-                    <label className='text-sm text-gray-600 dark:text-gray-400'>创建时间</label>
+                    <label className='text-sm text-gray-600 dark:text-gray-400'>
+                      {t('knowledge.viewDialog.createdLabel')}
+                    </label>
                     <p className='text-sm dark:text-white mt-1'>{viewingKB.createdDate}</p>
                   </div>
                   <div>
-                    <label className='text-sm text-gray-600 dark:text-gray-400'>更新时间</label>
+                    <label className='text-sm text-gray-600 dark:text-gray-400'>
+                      {t('knowledge.viewDialog.updatedLabel')}
+                    </label>
                     <p className='text-sm dark:text-white mt-1'>{viewingKB.modifiedDate}</p>
                   </div>
                 </div>
 
                 {viewingKB.tags && viewingKB.tags.length > 0 && (
                   <div>
-                    <label className='text-sm text-gray-600 dark:text-gray-400'>标签</label>
+                    <label className='text-sm text-gray-600 dark:text-gray-400'>
+                      {t('knowledge.viewDialog.tagsLabel')}
+                    </label>
                     <div className='flex flex-wrap gap-2 mt-2'>
                       {viewingKB.tags.map((tag, index) => (
                         <Badge key={index} variant='secondary' className={`${getTagColor(tag)} text-xs`}>
@@ -1595,17 +1701,17 @@ export function KnowledgeBase() {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent className='dark:bg-gray-900 dark:border-gray-700'>
           <AlertDialogHeader>
-            <AlertDialogTitle className='dark:text-white'>确认删除</AlertDialogTitle>
+            <AlertDialogTitle className='dark:text-white'>{t('knowledge.deleteKnowledgeBase.title')}</AlertDialogTitle>
             <AlertDialogDescription className='dark:text-gray-400'>
-              确定要删除知识库 "{deletingKnowledgeBase?.name}" 吗？此操作无法撤销。
+              {t('knowledge.deleteKnowledgeBase.description', { name: deletingKnowledgeBase?.name || '' })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel className='dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300'>
-              取消
+              {t('common.actions.cancel')}
             </AlertDialogCancel>
             <AlertDialogAction onClick={confirmDeleteKnowledgeBase} className='bg-red-600 hover:bg-red-700 text-white'>
-              删除
+              {t('common.actions.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -1615,17 +1721,17 @@ export function KnowledgeBase() {
       <AlertDialog open={deleteDocumentDialogOpen} onOpenChange={setDeleteDocumentDialogOpen}>
         <AlertDialogContent className='dark:bg-gray-900 dark:border-gray-700'>
           <AlertDialogHeader>
-            <AlertDialogTitle className='dark:text-white'>确认删除</AlertDialogTitle>
+            <AlertDialogTitle className='dark:text-white'>{t('knowledge.deleteDocument.title')}</AlertDialogTitle>
             <AlertDialogDescription className='dark:text-gray-400'>
-              确定要删除文档 "{deletingDocument?.name}" 吗？此操作无法撤销。
+              {t('knowledge.deleteDocument.description', { name: deletingDocument?.name || '' })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel className='dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300'>
-              取消
+              {t('common.actions.cancel')}
             </AlertDialogCancel>
             <AlertDialogAction onClick={confirmDeleteDocument} className='bg-red-600 hover:bg-red-700 text-white'>
-              删除
+              {t('common.actions.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
