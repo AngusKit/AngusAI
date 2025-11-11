@@ -1,11 +1,10 @@
-import { Home, FileText, Workflow, BookOpen, Package, Database, Settings, Users, Share2, BarChart3, Key, CreditCard, ChevronDown, Check, MessageSquare, Sparkles, Code2, Server, Activity, } from 'lucide-react';
+import { Home, FileText, Workflow, BookOpen, Package, Database, Settings, Users, Share2, BarChart3, Key, CreditCard, ChevronDown, Check, MessageSquare, Sparkles, Code2, Server, Activity, SlidersVertical} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AngusAILogo } from './AngusAILogo';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from '@/components/ui/dropdown-menu';
-import { useState } from 'react';
 import { useLanguage } from '@/components/ui/LanguageProvider';
-import { toast } from 'sonner';
+import { appContext, WebTagValue, AppInfo } from '@xcan-angus/infra';
 
 interface SidebarProps {
   activePage: string;
@@ -13,30 +12,45 @@ interface SidebarProps {
 }
 
 export function Sidebar({ activePage, onPageChange }: SidebarProps) {
-  const [selectedApp, setSelectedApp] = useState('AngusAI');
   const { t } = useLanguage();
+  const appContextInfo = appContext.getContext();
+  const accessApps = appContextInfo?.authApps || [];
+  const currentEditionType = appContextInfo.accessApp?.editionType?.value;
 
-  const applications = [
-    { id: 'angusai', name: 'AngusAI', icon: '🤖', description: 'AI 工作平台' },
-    {
-      id: 'chatbot',
-      name: '智能客服',
-      icon: '💬',
-      description: '客服对话系统',
-    },
-    {
-      id: 'content',
-      name: '内容创作',
-      icon: '✨',
-      description: '内容生成工具',
-    },
-    {
-      id: 'analytics',
-      name: '数据分析',
-      icon: '📊',
-      description: '数据可视化',
-    },
-  ];
+  const applications: AppInfo[] = accessApps.filter(app => {
+    return app.editionType?.value === currentEditionType &&
+    (app.tags || [])?.some(tag => tag.name === WebTagValue.DISPLAY_ON_NAVIGATOR)
+  });
+
+  const currentApplication = appContextInfo?.accessApp;
+
+  const handleSelectApplication = (url?: string) => {
+    if (url) {
+      window.open(url, '_blank');
+    }
+  };
+
+  // const applications = [
+  //   { id: 'angusai', name: 'AngusAI', icon: '🤖', description: 'AI 工作平台' },
+  //   {
+  //     id: 'chatbot',
+  //     name: '智能客服',
+  //     icon: '💬',
+  //     description: '客服对话系统',
+  //   },
+  //   {
+  //     id: 'content',
+  //     name: '内容创作',
+  //     icon: '✨',
+  //     description: '内容生成工具',
+  //   },
+  //   {
+  //     id: 'analytics',
+  //     name: '数据分析',
+  //     icon: '📊',
+  //     description: '数据可视化',
+  //   },
+  // ];
 
   const mainMenuItems = [
     { id: 'home', icon: Home, label: t('nav.dashboard') },
@@ -75,8 +89,8 @@ export function Sidebar({ activePage, onPageChange }: SidebarProps) {
             <DropdownMenuTrigger asChild>
               <button className='flex items-center gap-2 flex-1 min-w-0 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg px-2 py-1.5 transition-colors'>
                 <div className='flex-1 min-w-0 text-left'>
-                  <div className='font-semibold dark:text-white truncate'>{selectedApp}</div>
-                  <div className='text-xs text-gray-500 dark:text-gray-400 truncate'>工作平台</div>
+                  <div className='font-semibold dark:text-white truncate'>{currentApplication?.showName}</div>
+                  <div className='text-xs text-gray-500 dark:text-gray-400 truncate'>{currentApplication?.description}</div>
                 </div>
                 <ChevronDown className='w-4 h-4 text-gray-400 flex-shrink-0' />
               </button>
@@ -86,20 +100,16 @@ export function Sidebar({ activePage, onPageChange }: SidebarProps) {
                 <div className='text-xs text-gray-500 dark:text-gray-400 px-2 py-1.5 mb-1'>切换应用</div>
                 {applications.map(app => (
                   <DropdownMenuItem
-                    key={app.id}
-                    onClick={() => {
-                      setSelectedApp(app.name);
-                      toast.success(`已切换到 ${app.name}`);
-                    }}
+                    key={app.code}
+                    onClick={() =>handleSelectApplication(app.url)}
                     className={`flex items-center gap-3 px-2 py-2.5 cursor-pointer ${
-                      selectedApp === app.name ? 'bg-blue-50 dark:bg-blue-900/30' : ''
-                    }`}
-                  >
-                    <span className='text-2xl'>{app.icon}</span>
+                      currentApplication.code === app.code ? 'bg-blue-50 dark:bg-blue-900/30' : ''
+                    }`}>
+                    <span className='text-2xl'><SlidersVertical /></span>
                     <div className='flex-1 min-w-0'>
                       <div className='flex items-center gap-2'>
                         <span className='text-sm dark:text-white'>{app.name}</span>
-                        {selectedApp === app.name && <Check className='w-4 h-4 text-blue-500' />}
+                        {currentApplication.code === app.code && <Check className='w-4 h-4 text-blue-500' />}
                       </div>
                       <div className='text-xs text-gray-500 dark:text-gray-400'>{app.description}</div>
                     </div>
