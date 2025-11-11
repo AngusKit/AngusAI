@@ -1,6 +1,6 @@
 import { ApiLocaleResult, PageQuery, AI } from '@xcan-angus/infra';
 import { ConnectionTestDto, ConnectionTestResult, PageResultVectorStoreResult, VectorStoreCreateDto, VectorStoreListParamsOrderByEnum, VectorStoreResult, VectorStoreStatisticsResult, VectorStoreUpdateDto, } from './VectorStoresTypes.ts';
-import { ContentType, HttpClient, RequestParams } from './HttpClient.ts';
+import http, { ContentType, HttpClient, RequestParams } from './HttpClient.ts';
 import { ConnectionStatusEnum, VectorStoreTypeEnum } from '@/enums/enums.ts';
 
 export class VectorStores<SecurityDataType = unknown> {
@@ -200,3 +200,5 @@ export class VectorStores<SecurityDataType = unknown> {
       ...params,
     });
 }
+
+export default new VectorStores(http);
