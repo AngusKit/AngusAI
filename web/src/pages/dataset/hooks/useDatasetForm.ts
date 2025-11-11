@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 import { VisibilityEnum } from '@/enums/enums';
 import { VISIBILITY_OPTIONS_MAP, FORM_VALIDATION } from '../constants';
 import { ICON_OPTIONS } from '@/utils';
+import { useLanguage } from '@/components/ui/LanguageProvider';
 
 /** 数据集表单数据类型 */
 export type DatasetFormDataType = 'table' | 'datasource';
@@ -38,6 +39,7 @@ export function useDatasetForm(initialState?: Partial<DatasetFormState>) {
     ...initialState,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { t } = useLanguage();
 
   /** 更新表单字段 */
   const updateField = useCallback(<K extends keyof DatasetFormState>(field: K, value: DatasetFormState[K]) => {
@@ -56,17 +58,17 @@ export function useDatasetForm(initialState?: Partial<DatasetFormState>) {
     if (!newTag) return false;
 
     if (newTag.length > FORM_VALIDATION.TAG_MAX_LENGTH) {
-      toast.error('标签长度不能超过10个字符');
+      toast.error(t('dataset.form.tags.lengthExceeded', { maxLength: FORM_VALIDATION.TAG_MAX_LENGTH }));
       return false;
     }
 
     if (formState.tags.length >= FORM_VALIDATION.TAG_MAX_COUNT) {
-      toast.error('最多只能添加5个标签');
+      toast.error(t('dataset.form.tags.countExceeded', { maxCount: FORM_VALIDATION.TAG_MAX_COUNT }));
       return false;
     }
 
     if (formState.tags.includes(newTag)) {
-      toast.error('标签已存在');
+      toast.error(t('dataset.form.tags.duplicate'));
       return false;
     }
 
@@ -97,11 +99,11 @@ export function useDatasetForm(initialState?: Partial<DatasetFormState>) {
   /** 验证表单 */
   const validateForm = useCallback((): boolean => {
     if (!formState.datasetName.trim()) {
-      toast.error('请输入数据集名称');
+      toast.error(t('dataset.editDatasetDialog.nameRequired'));
       return false;
     }
     if (!formState.description.trim()) {
-      toast.error('请输入描述');
+      toast.error(t('dataset.editDatasetDialog.descriptionRequired'));
       return false;
     }
     return true;

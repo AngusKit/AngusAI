@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react';
 import { toast } from 'sonner';
 import { DatasourceConnectionTestDto, DataSourceUpdateDto, DatasourceConfigVo } from '@/services/DatasetsTypes';
-import { DatasourceTypeEnum } from '@/enums/enums';
 import Datasets from '@/services/Datasets';
 import {
   DatabaseType,
@@ -10,6 +9,7 @@ import {
   ENUM_TO_DATABASE_TYPE_MAP,
 } from '../constants';
 import { generateJdbcUrl } from '../utils';
+import { useLanguage } from '@/components/ui/LanguageProvider';
 
 /** 连接状态 */
 export type ConnectionStatus = 'idle' | 'success' | 'error';
@@ -52,6 +52,7 @@ export function useDataSourceForm() {
   const [isTestingConnection, setIsTestingConnection] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('idle');
   const [isLoading, setIsLoading] = useState(false);
+  const { t } = useLanguage();
 
   /** 更新表单字段 */
   const updateField = useCallback(<K extends keyof DataSourceFormState>(field: K, value: DataSourceFormState[K]) => {
@@ -85,10 +86,9 @@ export function useDataSourceForm() {
 
   /** 从配置加载表单数据 */
   const loadFromConfig = useCallback((config: DatasourceConfigVo) => {
-    if (config.name) {
-      setFormState(prev => ({ ...prev, connectionName: config.name }));
+    if (config.name !== undefined) {
+      setFormState(prev => ({ ...prev, connectionName: config.name ?? '' }));
     }
-
     if (config.databaseType && ENUM_TO_DATABASE_TYPE_MAP[config.databaseType]) {
       const dbType = ENUM_TO_DATABASE_TYPE_MAP[config.databaseType];
       setFormState(prev => ({
@@ -126,12 +126,12 @@ export function useDataSourceForm() {
   const validateForm = useCallback((): boolean => {
     if (formState.useCustomUrl) {
       if (!formState.jdbcUrl || !formState.dbUser) {
-        toast.error('请填写完整的连接信息');
+        toast.error(t('dataset.datasource.form.validationIncomplete'));
         return false;
       }
     } else {
       if (!formState.dbHost || !formState.dbPort || !formState.dbName || !formState.dbUser) {
-        toast.error('请填写完整的连接信息');
+        toast.error(t('dataset.datasource.form.validationIncomplete'));
         return false;
       }
     }
@@ -175,17 +175,17 @@ export function useDataSourceForm() {
 
       if (responseData?.success) {
         setConnectionStatus('success');
-        toast.success(responseData?.message || '连接测试成功');
+        toast.success(responseData?.message || t('dataset.toasts.datasourceTestSuccess'));
         return true;
       } else {
         setConnectionStatus('error');
-        toast.error(responseData?.message || '连接测试失败，请检查配置参数');
+        toast.error(responseData?.message || t('dataset.toasts.datasourceTestFailed'));
         return false;
       }
     } catch (error: any) {
-      console.error('测试连接失败:', error);
+      console.error('Failed to test datasource connection:', error);
       setConnectionStatus('error');
-      toast.error(error?.message || '连接测试失败，请检查配置参数');
+      toast.error(error?.message || t('dataset.toasts.datasourceTestFailed'));
       return false;
     } finally {
       setIsTestingConnection(false);
@@ -196,7 +196,8 @@ export function useDataSourceForm() {
   const getSubmitData = useCallback((): DataSourceUpdateDto => {
     const finalJdbcUrl = getJdbcUrl();
     const config = DATABASE_CONFIGS[formState.dbType];
-    const sourceName = formState.connectionName || `${config.name} - ${formState.dbName}`;
+    const sourceName =
+      formState.connectionName || `${t(config.nameKey)} - ${formState.dbName || t('dataset.datasource.form.unnamed')}`;
 
     return {
       name: sourceName,

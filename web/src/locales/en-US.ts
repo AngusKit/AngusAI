@@ -59,6 +59,12 @@ export const enUS = {
       description: 'Description',
       tags: 'Tags',
       icon: 'Icon',
+      optional: 'Optional',
+    },
+    placeholders: {
+      description: 'Enter description',
+      tags: 'Enter tags',
+      icon: 'Select icon',
     }
   },
 
@@ -257,6 +263,10 @@ export const enUS = {
     size: 'Size',
     quality: 'Quality',
     uploadTime: 'Upload Time',
+    types: {
+      file: 'File',
+      datasource: 'Datasource',
+    },
     visibility: {
       private: 'Private',
       team: 'Team Visible',
@@ -304,6 +314,24 @@ export const enUS = {
       updateSuccess: 'Data source "{name}" updated successfully',
       updateFailed: 'Failed to update data source',
       saveButton: 'Save Configuration',
+    },
+    addDialog: {
+      title: 'Add Relational Database Datasource',
+      descriptionWithName: 'Configure database connection for dataset "{name}"',
+      descriptionGeneric: 'Configure relational database connection parameters (JDBC)',
+      testConnectionRequired: 'Please test the connection and ensure it succeeds before adding',
+      datasetIdMissing: 'Dataset ID does not exist',
+      addSuccess: 'Datasource "{name}" added successfully',
+      addFailed: 'Failed to add datasource',
+      addButton: 'Add Datasource',
+    },
+    createDialog: {
+      title: 'Create Dataset',
+      description: 'Create and configure a new dataset',
+      nameRequired: 'Please enter the dataset name',
+      descriptionRequired: 'Please enter the description',
+      createSuccess: 'Dataset created successfully!',
+      createFailed: 'Failed to create dataset',
     },
     page: {
       title: 'Dataset Management',
@@ -419,11 +447,6 @@ export const enUS = {
       xml: 'XML',
       table: 'Table',
     },
-    fileStatus: {
-      completed: 'Completed',
-      processing: 'Processing',
-      pending: 'Pending',
-    },
     datasource: {
       header: {
         defaultName: 'Datasource',
@@ -461,6 +484,70 @@ export const enUS = {
         noData: 'No data available',
         placeholder: 'Select a table on the left to preview records',
       },
+      databases: {
+        mysql: {
+          name: 'MySQL',
+          description: 'MySQL 5.7+ / MariaDB',
+        },
+        postgresql: {
+          name: 'PostgreSQL',
+          description: 'PostgreSQL 9.6+',
+        },
+        sqlserver: {
+          name: 'SQL Server',
+          description: 'Microsoft SQL Server 2012+',
+        },
+        oracle: {
+          name: 'Oracle',
+          description: 'Oracle Database 11g+',
+        },
+        db2: {
+          name: 'DB2',
+          description: 'IBM DB2 10.5+',
+        },
+        dm: {
+          name: 'DM',
+          description: 'DM Database 8.0+',
+        },
+      },
+      form: {
+        connectionNameLabel: 'Connection Name',
+        connectionNamePlaceholder: 'e.g. Production MySQL',
+        dbTypeLabel: 'Database Type',
+        useCustomUrl: 'Use custom JDBC URL',
+        hostLabel: 'Host',
+        hostPlaceholder: 'localhost or 192.168.1.100',
+        portLabel: 'Port',
+        databaseLabel: 'Database Name',
+        databasePlaceholder: 'database_name',
+        databasePlaceholderOracle: 'SID or Service Name',
+        schemaLabel: 'Schema',
+        schemaPlaceholderPostgres: 'public',
+        schemaPlaceholderDefault: 'dbo',
+        generatedJdbcLabel: 'Generated JDBC URL',
+        customJdbcLabel: 'JDBC URL',
+        authSectionTitle: 'Authentication',
+        usernameLabel: 'Username',
+        usernamePlaceholder: 'username',
+        passwordLabel: 'Password',
+        passwordPlaceholder: 'password',
+        testConnection: {
+          testing: 'Testing connection...',
+          success: 'Connection successful',
+          failed: 'Connection failed',
+          default: 'Test Connection',
+        },
+        connectionSuccess: 'Database connection successful! You can now add the datasource.',
+        connectionFailed: {
+          title: 'Connection failed, please check:',
+          hostPort: 'Database host and port are correct',
+          credentials: 'Username and password are correct',
+          database: 'Database name exists',
+          network: 'Network connectivity is normal',
+        },
+        validationIncomplete: 'Please complete all required connection information',
+        unnamed: 'Unnamed Datasource',
+      },
     },
     toasts: {
       loadListFailed: 'Failed to load dataset list',
@@ -481,6 +568,8 @@ export const enUS = {
       filePathMissing: 'File path not found. Cannot download.',
       datasourceSyncStarted: 'Sync started',
       syncDatasourceFailed: 'Failed to sync datasource',
+      datasourceTestSuccess: 'Connection test succeeded',
+      datasourceTestFailed: 'Connection test failed. Please verify the configuration.',
     },
     dialogs: {
       view: {

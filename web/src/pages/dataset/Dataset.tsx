@@ -140,11 +140,11 @@ export function Dataset() {
   // 将DatasetDataListVo转换为DataFileItem（先定义转换函数）
   const convertDataListVoToFile = useCallback((vo: DatasetDataListVo): DataFileItem => {
     const typeLabelKeyMap: Record<DatasetDataTypeEnum, string> = {
-      [DatasetDataTypeEnum.CSV]: 'dataset.dataTypes.csv',
-      [DatasetDataTypeEnum.JSON]: 'dataset.dataTypes.json',
-      [DatasetDataTypeEnum.EXCEL]: 'dataset.dataTypes.excel',
-      [DatasetDataTypeEnum.XML]: 'dataset.dataTypes.xml',
-      [DatasetDataTypeEnum.TABLE]: 'dataset.dataTypes.table',
+      [DatasetDataTypeEnum.CSV]: t('dataset.dataTypes.csv'),
+      [DatasetDataTypeEnum.JSON]: t('dataset.dataTypes.json'),
+      [DatasetDataTypeEnum.EXCEL]: t('dataset.dataTypes.excel'),
+      [DatasetDataTypeEnum.XML]: t('dataset.dataTypes.xml'),
+      [DatasetDataTypeEnum.TABLE]: t('dataset.dataTypes.table'),
     };
 
     const stringToEnumMap: Record<string, DatasetDataTypeEnum> = {
@@ -156,9 +156,9 @@ export function Dataset() {
     };
 
     const statusKeyMap: Record<string, string> = {
-      COMPLETED: 'dataset.fileStatus.completed',
-      PROCESSING: 'dataset.fileStatus.processing',
-      PENDING: 'dataset.fileStatus.pending',
+      COMPLETED: t('common.status.completed'),
+      PROCESSING: t('common.status.processing'),
+      PENDING: t('common.status.pending'),
     };
 
     const typeIconMap: Record<DatasetDataTypeEnum, string> = {
@@ -171,7 +171,7 @@ export function Dataset() {
 
     const typeEnum = stringToEnumMap[vo.type || 'CSV'] || DatasetDataTypeEnum.CSV;
     const statusRaw = (vo.status || 'PENDING').toUpperCase();
-    const statusKey = statusKeyMap[statusRaw] || 'dataset.fileStatus.pending';
+    const statusKey = statusKeyMap[statusRaw] || 'common.status.pending';
 
     return {
       id: vo.id ? String(vo.id) : '',
@@ -280,7 +280,7 @@ export function Dataset() {
 
     const type = vo.type || DatasetTypeEnum.FILE;
     const typeLabelKey =
-      type === DatasetTypeEnum.FILE ? 'dataset.types.file' : 'dataset.types.datasource';
+      type === DatasetTypeEnum.FILE ? t('dataset.types.file') : t('dataset.types.datasource');
 
     const dataCount = vo.dataStatistics?.totalFilesOrTables ? String(vo.dataStatistics.totalFilesOrTables) : '0';
     const size = vo.dataStatistics?.totalRecordsSize || '0 条';
@@ -1103,7 +1103,7 @@ export function Dataset() {
                             </div>
                           </div>
                         </td>
-                        <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{t(dataset.typeLabelKey)}</td>
+                        <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{dataset.typeLabelKey}</td>
                         <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{dataset.dataCount}</td>
                         <td className='px-6 py-4'>
                           <div className='flex items-center gap-2' onClick={e => e.stopPropagation()}>
@@ -1255,7 +1255,7 @@ export function Dataset() {
                     </DropdownMenu>
                   </div>
 
-                  <p className='text-sm text-gray-600 dark:text-gray-400 mb-1 line-clamp-2'>{dataset.description}</p>
+                  <p className='text-sm text-gray-600 dark:text-gray-400 mb-1 line-clamp-2 flex-1'>{dataset.description}</p>
 
                   {/* 标签 */}
                   {dataset.tags && dataset.tags.length > 0 && (
@@ -1579,7 +1579,7 @@ export function Dataset() {
                               </div>
                             </td>
                             <td className='px-6 py-4'>
-                              <Badge className={`text-xs ${file.typeColor} border-0`}>{t(file.typeLabelKey)}</Badge>
+                              <Badge className={`text-xs ${file.typeColor} border-0`}>{file.typeLabelKey}</Badge>
                             </td>
                             <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{file.size}</td>
                             <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{file.recordCount}</td>

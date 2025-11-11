@@ -59,6 +59,12 @@ export const zhCN = {
       description: '描述',
       tags: '标签',
       icon: '图标',
+      optional: '可选',
+    },
+    placeholders: {
+      description: '请输入描述',
+      tags: '请输入标签',
+      icon: '请选择图标',
     }
   },
 
@@ -554,6 +560,10 @@ dataset: {
   size: '大小',
   quality: '质量',
   uploadTime: '上传时间',
+  types: {
+    file: '文件',
+    datasource: '数据源',
+  },
   visibility: {
     private: '私有',
     team: '团队可见',
@@ -601,6 +611,24 @@ dataset: {
     updateSuccess: '数据源“{name}”更新成功',
     updateFailed: '更新数据源失败',
     saveButton: '保存配置',
+  },
+  addDialog: {
+    title: '添加关系型数据库数据源',
+    descriptionWithName: '为数据集“{name}”配置数据库连接',
+    descriptionGeneric: '配置关系型数据库连接参数 (JDBC)',
+    testConnectionRequired: '请先测试连接，确保连接成功后再添加',
+    datasetIdMissing: '数据集ID不存在',
+    addSuccess: '数据源“{name}”添加成功',
+    addFailed: '添加数据源失败',
+    addButton: '添加数据源',
+  },
+  createDialog: {
+    title: '创建数据集',
+    description: '创建并配置新的数据集',
+    nameRequired: '请输入数据集名称',
+    descriptionRequired: '请输入描述',
+    createSuccess: '数据集创建成功！',
+    createFailed: '创建数据集失败',
   },
   page: {
     title: '数据集管理',
@@ -716,11 +744,6 @@ dataset: {
     xml: 'XML',
     table: '数据表',
   },
-  fileStatus: {
-    completed: '已完成',
-    processing: '处理中',
-    pending: '待处理',
-  },
   datasource: {
     header: {
       defaultName: '数据源',
@@ -758,6 +781,70 @@ dataset: {
       noData: '暂无数据',
       placeholder: '选择左侧的数据表以查看记录预览',
     },
+    databases: {
+      mysql: {
+        name: 'MySQL',
+        description: 'MySQL 5.7+ / MariaDB',
+      },
+      postgresql: {
+        name: 'PostgreSQL',
+        description: 'PostgreSQL 9.6+',
+      },
+      sqlserver: {
+        name: 'SQL Server',
+        description: 'Microsoft SQL Server 2012+',
+      },
+      oracle: {
+        name: 'Oracle',
+        description: 'Oracle Database 11g+',
+      },
+      db2: {
+        name: 'DB2',
+        description: 'IBM DB2 10.5+',
+      },
+      dm: {
+        name: '达梦',
+        description: 'DM Database 8.0+',
+      },
+    },
+    form: {
+      connectionNameLabel: '连接名称',
+      connectionNamePlaceholder: '例如：生产环境 MySQL',
+      dbTypeLabel: '数据库类型',
+      useCustomUrl: '使用自定义 JDBC URL',
+      hostLabel: '主机地址',
+      hostPlaceholder: 'localhost 或 192.168.1.100',
+      portLabel: '端口',
+      databaseLabel: '数据库名',
+      databasePlaceholder: 'database_name',
+      databasePlaceholderOracle: 'SID 或 Service Name',
+      schemaLabel: 'Schema',
+      schemaPlaceholderPostgres: 'public',
+      schemaPlaceholderDefault: 'dbo',
+      generatedJdbcLabel: '生成的 JDBC URL',
+      customJdbcLabel: 'JDBC URL',
+      authSectionTitle: '认证信息',
+      usernameLabel: '用户名',
+      usernamePlaceholder: 'username',
+      passwordLabel: '密码',
+      passwordPlaceholder: 'password',
+      testConnection: {
+        testing: '测试连接中...',
+        success: '连接成功',
+        failed: '连接失败',
+        default: '测试连接',
+      },
+      connectionSuccess: '数据库连接成功！可以开始添加数据源。',
+      connectionFailed: {
+        title: '连接失败，请检查：',
+        hostPort: '数据库主机地址和端口是否正确',
+        credentials: '用户名和密码是否正确',
+        database: '数据库名称是否存在',
+        network: '网络连接是否正常',
+      },
+      validationIncomplete: '请填写完整的连接信息',
+      unnamed: '未命名数据源',
+    },
   },
   toasts: {
     loadListFailed: '加载数据集列表失败',
@@ -778,6 +865,8 @@ dataset: {
     filePathMissing: '文件路径不存在，无法下载',
     datasourceSyncStarted: '同步已启动',
     syncDatasourceFailed: '同步数据库失败',
+    datasourceTestSuccess: '连接测试成功',
+    datasourceTestFailed: '连接测试失败，请检查配置参数',
   },
   dialogs: {
     view: {

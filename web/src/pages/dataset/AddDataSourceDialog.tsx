@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import Datasets from '@/services/Datasets';
 import { useDataSourceForm } from './hooks/useDataSourceForm';
 import { DataSourceFormContent } from './components/DataSourceFormContent';
+import { useLanguage } from '@/components/ui/LanguageProvider';
 
 interface AddDataSourceDialogProps {
   open: boolean;
@@ -22,6 +23,7 @@ export function AddDataSourceDialog({
   datasetId,
   onSuccess,
 }: AddDataSourceDialogProps) {
+  const { t } = useLanguage();
   const {
     formState,
     connectionStatus,
@@ -49,25 +51,25 @@ export function AddDataSourceDialog({
 
   const handleSubmit = async () => {
     if (!validateForm() || connectionStatus !== 'success') {
-      toast.error('请先测试连接，确保连接成功后再添加');
+      toast.error(t('dataset.addDialog.testConnectionRequired'));
       return;
     }
 
     if (!datasetId) {
-      toast.error('数据集ID不存在');
+      toast.error(t('dataset.addDialog.datasetIdMissing'));
       return;
     }
 
     try {
       const updateDto = getSubmitData();
       await Datasets.modifyDataSource(datasetId, updateDto);
-      toast.success(`数据源 "${updateDto.name}" 添加成功`);
+      toast.success(t('dataset.addDialog.addSuccess', { name: updateDto.name }));
       onOpenChange(false);
       onSuccess?.();
       resetForm();
     } catch (error: any) {
-      console.error('添加数据源失败:', error);
-      toast.error(error?.message || '添加数据源失败');
+      console.error('Failed to add datasource:', error);
+      toast.error(error?.message || t('dataset.addDialog.addFailed'));
     }
   };
 
@@ -84,10 +86,12 @@ export function AddDataSourceDialog({
         <DialogHeader className='px-6 py-4 border-b border-gray-200 dark:border-gray-700'>
           <DialogTitle className='flex items-center gap-3 text-xl dark:text-white'>
             <Database className='w-6 h-6 text-blue-500' />
-            添加关系型数据库数据源
+            {t('dataset.addDialog.title')}
           </DialogTitle>
           <DialogDescription className='text-sm text-gray-500 dark:text-gray-400 mt-1'>
-            {datasetName ? `为数据集 "${datasetName}" 配置数据库连接` : '配置关系型数据库连接参数 (JDBC)'}
+            {datasetName
+              ? t('dataset.addDialog.descriptionWithName', { name: datasetName })
+              : t('dataset.addDialog.descriptionGeneric')}
           </DialogDescription>
         </DialogHeader>
 
@@ -115,7 +119,7 @@ export function AddDataSourceDialog({
             }}
             className='dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300'
           >
-            取消
+            {t('common.actions.cancel')}
           </Button>
           <Button
             onClick={handleSubmit}
@@ -123,7 +127,7 @@ export function AddDataSourceDialog({
             className='bg-blue-500 hover:bg-blue-600 text-white'
           >
             <Database className='w-4 h-4 mr-2' />
-            添加数据源
+            {t('dataset.addDialog.addButton')}
           </Button>
         </div>
       </DialogContent>

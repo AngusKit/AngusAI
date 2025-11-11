@@ -50,6 +50,8 @@ export interface DatabaseConfig {
   color: string;
   jdbcUrlTemplate: string;
   description: string;
+  nameKey: string;
+  descriptionKey: string;
 }
 
 /** 数据库配置映射 */
@@ -61,6 +63,8 @@ export const DATABASE_CONFIGS: Record<DatabaseType, DatabaseConfig> = {
     color: 'bg-blue-500',
     jdbcUrlTemplate: 'jdbc:mysql://{host}:{port}/{database}?useSSL=false&serverTimezone=UTC',
     description: 'MySQL 5.7+ / MariaDB',
+    nameKey: 'dataset.datasource.databases.mysql.name',
+    descriptionKey: 'dataset.datasource.databases.mysql.description',
   },
   postgresql: {
     name: 'PostgreSQL',
@@ -69,6 +73,8 @@ export const DATABASE_CONFIGS: Record<DatabaseType, DatabaseConfig> = {
     color: 'bg-indigo-500',
     jdbcUrlTemplate: 'jdbc:postgresql://{host}:{port}/{database}',
     description: 'PostgreSQL 9.6+',
+    nameKey: 'dataset.datasource.databases.postgresql.name',
+    descriptionKey: 'dataset.datasource.databases.postgresql.description',
   },
   sqlserver: {
     name: 'SQL Server',
@@ -77,6 +83,8 @@ export const DATABASE_CONFIGS: Record<DatabaseType, DatabaseConfig> = {
     color: 'bg-red-500',
     jdbcUrlTemplate: 'jdbc:sqlserver://{host}:{port};databaseName={database}',
     description: 'Microsoft SQL Server 2012+',
+    nameKey: 'dataset.datasource.databases.sqlserver.name',
+    descriptionKey: 'dataset.datasource.databases.sqlserver.description',
   },
   oracle: {
     name: 'Oracle',
@@ -85,6 +93,8 @@ export const DATABASE_CONFIGS: Record<DatabaseType, DatabaseConfig> = {
     color: 'bg-orange-500',
     jdbcUrlTemplate: 'jdbc:oracle:thin:@{host}:{port}:{database}',
     description: 'Oracle Database 11g+',
+    nameKey: 'dataset.datasource.databases.oracle.name',
+    descriptionKey: 'dataset.datasource.databases.oracle.description',
   },
   db2: {
     name: 'DB2',
@@ -93,6 +103,8 @@ export const DATABASE_CONFIGS: Record<DatabaseType, DatabaseConfig> = {
     color: 'bg-purple-500',
     jdbcUrlTemplate: 'jdbc:db2://{host}:{port}/{database}',
     description: 'IBM DB2 10.5+',
+    nameKey: 'dataset.datasource.databases.db2.name',
+    descriptionKey: 'dataset.datasource.databases.db2.description',
   },
   dm: {
     name: '达梦',
@@ -101,6 +113,8 @@ export const DATABASE_CONFIGS: Record<DatabaseType, DatabaseConfig> = {
     color: 'bg-cyan-500',
     jdbcUrlTemplate: 'jdbc:dm://{host}:{port}/{database}',
     description: 'DM Database 8.0+',
+    nameKey: 'dataset.datasource.databases.dm.name',
+    descriptionKey: 'dataset.datasource.databases.dm.description',
   },
 };
 

@@ -8,6 +8,7 @@ import { GetDatasetListOrderByEnum } from '@/services/DatasetsTypes';
 import { convertDatasetVoToItem, convertDataListVoToFile, convertDataListVoToTable } from '../utils';
 import { DatasetItem, DataFileItem, DatabaseTable } from '../utils';
 import { PAGINATION } from '../constants';
+import { useLanguage } from '@/components/ui/LanguageProvider';
 
 /**
  * 数据集列表管理 Hook
@@ -17,6 +18,7 @@ export function useDatasetList() {
   const [isLoading, setIsLoading] = useState(false);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+  const { t } = useLanguage();
 
   /** 加载数据集列表 */
   const loadDatasets = useCallback(
@@ -43,8 +45,8 @@ export function useDatasetList() {
           setTotalPages(1);
         }
       } catch (error: any) {
-        console.error('加载数据集列表失败:', error);
-        toast.error(error?.message || '加载数据集列表失败');
+        console.error('Failed to load dataset list:', error);
+        toast.error(error?.message || t('dataset.toasts.loadListFailed'));
         setDatasets([]);
       } finally {
         setIsLoading(false);
@@ -69,6 +71,7 @@ export function useDatasetList() {
 export function useDatasetDetail() {
   const [datasetDetail, setDatasetDetail] = useState<DatasetDetailVo | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const { t } = useLanguage();
 
   /** 加载数据集详情 */
   const loadDatasetDetail = useCallback(async (datasetId: string) => {
@@ -84,8 +87,8 @@ export function useDatasetDetail() {
       }
       return null;
     } catch (error: any) {
-      console.error('加载数据集详情失败:', error);
-      toast.error(error?.message || '加载数据集详情失败');
+      console.error('Failed to load dataset detail:', error);
+      toast.error(error?.message || t('dataset.toasts.loadDetailFailed'));
       return null;
     } finally {
       setIsLoading(false);
@@ -119,7 +122,7 @@ export function useDatasetStatistics() {
         setStatistics(statsData);
       }
     } catch (error: any) {
-      console.error('加载统计数据失败:', error);
+      console.error('Failed to load dataset statistics:', error);
       // 不显示错误提示，使用默认值
     } finally {
       setIsLoading(false);
@@ -139,6 +142,7 @@ export function useDatasetStatistics() {
 export function useDatasetFiles() {
   const [dataFiles, setDataFiles] = useState<DatasetDataListVo[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const { t } = useLanguage();
 
   /** 加载文件列表 */
   const loadFiles = useCallback(async (datasetId: string) => {
@@ -158,8 +162,8 @@ export function useDatasetFiles() {
         setDataFiles([]);
       }
     } catch (error: any) {
-      console.error('加载数据集数据列表失败:', error);
-      toast.error(error?.message || '加载数据集数据列表失败');
+      console.error('Failed to load dataset data list:', error);
+      toast.error(error?.message || t('dataset.toasts.loadDataListFailed'));
       setDataFiles([]);
     } finally {
       setIsLoading(false);
@@ -185,6 +189,7 @@ export function useDatasetFiles() {
 export function useDataSourceTables() {
   const [databaseTables, setDatabaseTables] = useState<DatasetDataListVo[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const { t } = useLanguage();
 
   /** 加载表列表 */
   const loadTables = useCallback(async (datasetId: string) => {
@@ -204,8 +209,8 @@ export function useDataSourceTables() {
         setDatabaseTables([]);
       }
     } catch (error: any) {
-      console.error('加载数据源表列表失败:', error);
-      toast.error(error?.message || '加载数据源表列表失败');
+      console.error('Failed to load datasource tables:', error);
+      toast.error(error?.message || t('dataset.toasts.loadDatasourceTablesFailed'));
       setDatabaseTables([]);
     } finally {
       setIsLoading(false);

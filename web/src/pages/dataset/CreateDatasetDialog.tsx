@@ -11,6 +11,7 @@ import Datasets from '@/services/Datasets';
 import { DatasetCreateDto } from '@/services/DatasetsTypes';
 import { DatasetTypeEnum, VisibilityEnum } from '@/enums/enums';
 import { getTagColor, ICON_OPTIONS } from '@/utils';
+import { useLanguage } from '@/components/ui/LanguageProvider';
 
 interface CreateDatasetDialogProps {
   open: boolean;
@@ -19,6 +20,7 @@ interface CreateDatasetDialogProps {
 }
 
 export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDatasetDialogProps) {
+  const { t } = useLanguage();
   const [datasetName, setDatasetName] = useState('');
   const [description, setDescription] = useState('');
   const [dataType, setDataType] = useState<'table' | 'datasource'>('table');
@@ -28,6 +30,13 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
   const [tagInput, setTagInput] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const MAX_TAGS = 5;
+  const MAX_TAG_LENGTH = 10;
+  const tagCountText = t('dataset.form.tags.count', {
+    current: tags.length,
+    max: MAX_TAGS,
+  });
+
   const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' || e.key === ',') {
       e.preventDefault();
@@ -35,18 +44,18 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
 
       if (!newTag) return;
 
-      if (newTag.length > 10) {
-        toast.error('标签长度不能超过10个字符');
+      if (newTag.length > MAX_TAG_LENGTH) {
+        toast.error(t('dataset.form.tags.lengthExceeded', { maxLength: MAX_TAG_LENGTH }));
         return;
       }
 
-      if (tags.length >= 5) {
-        toast.error('最多只能添加5个标签');
+      if (tags.length >= MAX_TAGS) {
+        toast.error(t('dataset.form.tags.countExceeded', { maxCount: MAX_TAGS }));
         return;
       }
 
       if (tags.includes(newTag)) {
-        toast.error('标签已存在');
+        toast.error(t('dataset.form.tags.duplicate'));
         return;
       }
 
@@ -63,11 +72,11 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
     if (isSubmitting) return;
 
     if (!datasetName.trim()) {
-      toast.error('请输入数据集名称');
+      toast.error(t('dataset.createDialog.nameRequired'));
       return;
     }
     if (!description.trim()) {
-      toast.error('请输入描述');
+      toast.error(t('common.placeholders.description'));
       return;
     }
 
@@ -94,7 +103,7 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
       };
 
       await Datasets.createDataset(createDto);
-      toast.success('数据集创建成功！');
+      toast.success(t('dataset.createDialog.createSuccess'));
       onOpenChange(false);
       onSuccess?.();
 
@@ -107,8 +116,8 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
       setTagInput('');
       setDataType('table');
     } catch (error: any) {
-      console.error('创建数据集失败:', error);
-      toast.error(error?.message || '创建数据集失败');
+      console.error('Failed to create dataset:', error);
+      toast.error(error?.message || t('dataset.createDialog.createFailed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -119,9 +128,9 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
       <DialogContent className='w-[760px] !max-w-[90vw] max-h-[85vh] overflow-hidden p-0 dark:bg-gray-900 dark:border-gray-700 flex flex-col'>
         {/* Header */}
         <DialogHeader className='px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0'>
-          <DialogTitle className='text-xl dark:text-white'>创建数据集</DialogTitle>
+          <DialogTitle className='text-xl dark:text-white'>{t('dataset.createDialog.title')}</DialogTitle>
           <DialogDescription className='text-sm text-gray-500 dark:text-gray-400 mt-1'>
-            创建和配置您的数据集
+            {t('dataset.createDialog.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -129,30 +138,30 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
         <div className='flex-1 overflow-y-auto px-8 py-6'>
           <div className='grid grid-cols-2 gap-6'>
             <div>
-              <Label className='text-sm mb-2 block dark:text-gray-300'>数据集名称</Label>
+              <Label className='text-sm mb-2 block dark:text-gray-300'>{t('common.labels.name')}</Label>
               <Input
                 value={datasetName}
                 onChange={e => setDatasetName(e.target.value)}
-                placeholder='请输入数据集名称'
+                placeholder={t('dataset.form.namePlaceholder')}
                 className='dark:bg-gray-800 dark:border-gray-700 dark:text-white'
               />
             </div>
 
             <div>
-              <Label className='text-sm mb-2 block dark:text-gray-300'>可见性</Label>
+              <Label className='text-sm mb-2 block dark:text-gray-300'>{t('dataset.form.visibilityLabel')}</Label>
               <Select value={visibility} onValueChange={setVisibility}>
                 <SelectTrigger className='dark:bg-gray-800 dark:border-gray-700 dark:text-white'>
-                  <SelectValue />
+                  <SelectValue placeholder={t('dataset.form.visibilityPlaceholder')} />
                 </SelectTrigger>
                 <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
                   <SelectItem value='private' className='dark:text-white'>
-                    私有
+                    {t('dataset.visibility.private')}
                   </SelectItem>
                   <SelectItem value='team' className='dark:text-white'>
-                    团队可见
+                    {t('dataset.visibility.team')}
                   </SelectItem>
                   <SelectItem value='public' className='dark:text-white'>
-                    公开
+                    {t('dataset.visibility.public')}
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -160,11 +169,11 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
           </div>
 
           <div className='mt-5'>
-            <Label className='text-sm mb-2 block dark:text-gray-300'>描述</Label>
+            <Label className='text-sm mb-2 block dark:text-gray-300'>{t('common.labels.description')}</Label>
             <Textarea
               value={description}
               onChange={e => setDescription(e.target.value)}
-              placeholder='请输入数据集描述'
+              placeholder={t('dataset.form.descriptionPlaceholder')}
               rows={3}
               className='dark:bg-gray-800 dark:border-gray-700 dark:text-white resize-none'
             />
@@ -173,16 +182,20 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
           {/* 标签 */}
           <div className='mt-5'>
             <Label className='text-sm mb-2 block dark:text-gray-300'>
-              标签 <span className='text-gray-400'>({tags.length}/5)</span>
+              {t('common.labels.tags')}{' '}
+              <span className='text-gray-400'>{tagCountText}</span>
             </Label>
             <Input
               value={tagInput}
               onChange={e => setTagInput(e.target.value)}
               onKeyDown={handleAddTag}
-              placeholder='输入标签后按回车，最多5个，每个不超过10字符'
+              placeholder={t('dataset.form.tags.placeholder', {
+                maxCount: MAX_TAGS,
+                maxLength: MAX_TAG_LENGTH,
+              })}
               className='dark:bg-gray-800 dark:border-gray-700 dark:text-white'
-              disabled={tags.length >= 5}
-              maxLength={10}
+              disabled={tags.length >= MAX_TAGS}
+              maxLength={MAX_TAG_LENGTH}
             />
             {tags.length > 0 && (
               <div className='flex flex-wrap gap-2 mt-2'>
@@ -200,7 +213,7 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
 
           {/* 图标 - 超过两排时可滚动 */}
           <div className='mt-5'>
-            <Label className='text-sm mb-2 block dark:text-gray-300'>图标</Label>
+            <Label className='text-sm mb-2 block dark:text-gray-300'>{t('common.labels.icon')}</Label>
             <div className='max-h-[140px] overflow-y-auto pr-2 border border-gray-200 dark:border-gray-700 rounded-lg p-2'>
               <div className='grid grid-cols-8 gap-2'>
                 {ICON_OPTIONS.map((option, index) => (
@@ -222,7 +235,9 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
           </div>
 
           <div className='mt-5'>
-            <Label className='text-sm mb-3 block dark:text-gray-300'>数据类型</Label>
+            <Label className='text-sm mb-3 block dark:text-gray-300'>
+              {t('dataset.editDatasetDialog.dataTypeLabel')}
+            </Label>
             <div className='grid grid-cols-2 gap-3'>
               <button
                 onClick={() => setDataType('table')}
@@ -241,8 +256,12 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
                     {dataType === 'table' && <div className='w-2.5 h-2.5 rounded-full bg-blue-500' />}
                   </div>
                   <div>
-                    <div className='dark:text-white mb-0.5'>文件表格数据</div>
-                    <div className='text-sm text-gray-500 dark:text-gray-400'>CSV、JSON、XML、Excel 格式</div>
+                    <div className='dark:text-white mb-0.5'>
+                      {t('dataset.editDatasetDialog.dataType.tableTitle')}
+                    </div>
+                    <div className='text-sm text-gray-500 dark:text-gray-400'>
+                      {t('dataset.editDatasetDialog.dataType.tableDescription')}
+                    </div>
                   </div>
                 </div>
               </button>
@@ -264,8 +283,12 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
                     {dataType === 'datasource' && <div className='w-2.5 h-2.5 rounded-full bg-blue-500' />}
                   </div>
                   <div>
-                    <div className='dark:text-white mb-0.5'>数据源</div>
-                    <div className='text-sm text-gray-500 dark:text-gray-400'>MySQL、Postgres数据库等</div>
+                    <div className='dark:text-white mb-0.5'>
+                      {t('dataset.editDatasetDialog.dataType.datasourceTitle')}
+                    </div>
+                    <div className='text-sm text-gray-500 dark:text-gray-400'>
+                      {t('dataset.editDatasetDialog.dataType.datasourceDescription')}
+                    </div>
                   </div>
                 </div>
               </button>
@@ -290,10 +313,10 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
               }}
               className='dark:bg-gray-800 dark:border-gray-700 dark:text-white'
             >
-              取消
+              {t('common.actions.cancel')}
             </Button>
             <Button onClick={handleSubmit} disabled={isSubmitting} className='bg-blue-500 hover:bg-blue-600 text-white'>
-              {isSubmitting ? '创建中...' : '创建'}
+              {isSubmitting ? t('common.messages.creating') : t('common.actions.create')}
             </Button>
           </div>
         </div>
