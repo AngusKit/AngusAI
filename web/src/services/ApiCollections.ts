@@ -1,6 +1,6 @@
 import { ApiLocaleResult, PageQuery, AI } from '@xcan-angus/infra';
 import { ApiCollectionCreateDto, ApiCollectionDetailResult, ApiCollectionImportDto, ApiCollectionListParamsOrderByEnum, ApiCollectionListResult, ApiCollectionStatisticsResult, ApiCollectionUpdateDto, ApiEndpointCreateDto, ApiEndpointDetailResult, ApiEndpointListParamsOrderByEnum, ApiEndpointResult, ApiEndpointTestDto, ApiEndpointTestResult, ApiEndpointUpdateDto, ResultApiEndpointVo, } from './ApiCollectionsTypes.ts';
-import { ContentType, HttpClient, RequestParams } from './HttpClient.ts';
+import http, { ContentType, HttpClient, RequestParams } from './HttpClient.ts';
 import { ApiCollectionSourceEnum, HttpMethodEnum, VisibilityEnum } from '@/enums/enums.ts';
 
 export class ApiCollections<SecurityDataType = unknown> {
@@ -357,3 +357,5 @@ export class ApiCollections<SecurityDataType = unknown> {
       ...params,
     });
 }
+
+export default new ApiCollections(http);

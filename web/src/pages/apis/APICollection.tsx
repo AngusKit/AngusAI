@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {ChangeEvent, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   Plus,
   Upload,
@@ -58,30 +58,34 @@ import {
 import {toast} from 'sonner';
 import {useLanguage} from '@/components/ui/LanguageProvider';
 import {cn} from '@/components/ui/utils';
+import {useDebounce} from '@/hooks/useDebounce';
+import ApiCollectionsService from '@/services/ApiCollections';
+import {
+  ApiCollectionDetailVo,
+  ApiCollectionListParamsOrderByEnum,
+  ApiCollectionListVo,
+  ApiCollectionStatisticsVo,
+  ApiEndpointListParamsOrderByEnum,
+  ApiEndpointVo,
+} from '@/services/ApiCollectionsTypes';
+import {
+  ApiCollectionImportTypeEnum,
+  ApiCollectionSourceEnum,
+  ConflictStrategyEnum,
+  HttpMethodEnum,
+  VisibilityEnum,
+} from '@/enums/enums';
+import {XcanPagination} from '@/components/ui/pagination';
 
-interface APIEndpoint {
+type CollectionListItem = ApiCollectionListVo & {
   id: string;
-  name: string;
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
-  path: string;
-  description: string;
-  category: string;
-  tags: string[];
-  enabled: boolean;
-  lastUsed?: Date;
-}
+  enabledEndpointsCount?: number;
+};
 
-interface APICollection {
+type EndpointItem = ApiEndpointVo & {
   id: string;
-  name: string;
-  description: string;
-  source: 'openapi' | 'swagger' | 'postman' | 'manual';
-  endpointsCount: number;
-  createdAt: Date;
-  updatedAt: Date;
-  enabled: number;
-  visibility: 'private' | 'team' | 'public';
-}
+  lastUsedDate?: Date;
+};
 
 interface CustomAuthParam {
   id: string;
@@ -94,93 +98,47 @@ export function APICollection() {
   const {language} = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [endpointSearchQuery, setEndpointSearchQuery] = useState('');
-  const [selectedCollection, setSelectedCollection] = useState<string | null>(null);
+  const debouncedSearchQuery = useDebounce(searchQuery, 500);
+  const debouncedEndpointSearchQuery = useDebounce(endpointSearchQuery, 500);
+  const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [showEndpointDialog, setShowEndpointDialog] = useState(false);
-  const [selectedEndpoint, setSelectedEndpoint] = useState<APIEndpoint | null>(null);
+  const [selectedEndpoint, setSelectedEndpoint] = useState<EndpointItem | null>(null);
   const [showOpenAPIPreview, setShowOpenAPIPreview] = useState(false);
   const [showImportSettingsDialog, setShowImportSettingsDialog] = useState(false);
   const [importConflictStrategy, setImportConflictStrategy] = useState<'overwrite' | 'ignore'>('ignore');
   const [sortBy, setSortBy] = useState<'name' | 'method' | 'lastUsed'>('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-
-  const [collections, setCollections] = useState<APICollection[]>([
-    {
-      id: '1',
-      name: 'OpenAI API',
-      description: 'OpenAI GPT-4 和相关模型的接口集合',
-      source: 'openapi',
-      endpointsCount: 15,
-      createdAt: new Date('2024-01-15'),
-      updatedAt: new Date('2024-10-20'),
-      enabled: 12,
-      visibility: 'private',
-    },
-    {
-      id: '2',
-      name: '支付服务 API',
-      description: '支付宝、微信支付等第三方支付接口',
-      source: 'swagger',
-      endpointsCount: 28,
-      createdAt: new Date('2024-02-10'),
-      updatedAt: new Date('2024-10-25'),
-      enabled: 8,
-      visibility: 'team',
-    },
-    {
-      id: '3',
-      name: '电商平台 API',
-      description: '商品管理、订单处理、库存系统接口',
-      source: 'postman',
-      endpointsCount: 45,
-      createdAt: new Date('2024-03-05'),
-      updatedAt: new Date('2024-10-28'),
-      enabled: 15,
-      visibility: 'public',
-    },
-  ]);
-
-  const [endpoints, setEndpoints] = useState<APIEndpoint[]>([
-    {
-      id: '1',
-      name: 'Create Chat Completion',
-      method: 'POST',
-      path: '/v1/chat/completions',
-      description: '创建聊天补全请求，支持流式和非流式输出',
-      category: 'chat',
-      tags: ['GPT-4', 'Streaming'],
-      enabled: true,
-      lastUsed: new Date('2024-10-30'),
-    },
-    {
-      id: '2',
-      name: 'List Models',
-      method: 'GET',
-      path: '/v1/models',
-      description: '获取可用模型列表',
-      category: 'models',
-      tags: ['Models'],
-      enabled: true,
-      lastUsed: new Date('2024-10-29'),
-    },
-    {
-      id: '3',
-      name: 'Create Embedding',
-      method: 'POST',
-      path: '/v1/embeddings',
-      description: '创建文本向量嵌入',
-      category: 'embeddings',
-      tags: ['Embedding', 'Vector'],
-      enabled: false,
-    },
-  ]);
+  const collectionsPageSize = 12;
+  const endpointsPageSize = 10;
+  const [collections, setCollections] = useState<CollectionListItem[]>([]);
+  const [collectionsLoading, setCollectionsLoading] = useState(false);
+  const [collectionsTotal, setCollectionsTotal] = useState(0);
+  const [collectionsPage, setCollectionsPage] = useState(1);
+  const [collectionDetail, setCollectionDetail] = useState<ApiCollectionDetailVo | null>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [statistics, setStatistics] = useState<ApiCollectionStatisticsVo | null>(null);
+  const [statisticsLoading, setStatisticsLoading] = useState(false);
+  const [endpoints, setEndpoints] = useState<EndpointItem[]>([]);
+  const [endpointTotal, setEndpointTotal] = useState(0);
+  const [endpointPage, setEndpointPage] = useState(1);
+  const [endpointsLoading, setEndpointsLoading] = useState(false);
+  const [isCreatingCollection, setIsCreatingCollection] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
+  const [selectedImportType, setSelectedImportType] = useState<ApiCollectionImportTypeEnum>(
+    ApiCollectionImportTypeEnum.OPENAPI
+  );
+  const [selectedImportFileName, setSelectedImportFileName] = useState('');
+  const [importMode, setImportMode] = useState<'quick' | 'settings'>('quick');
+  const [strategyFile, setStrategyFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    source: 'openapi' as const,
-    visibility: 'private' as const,
+    source: ApiCollectionSourceEnum.OPENAPI,
+    visibility: VisibilityEnum.PRIVATE,
   });
 
   // 服务器配置
@@ -241,7 +199,192 @@ export function APICollection() {
     } : param)));
   };
 
+  const mapCollections = useCallback((items?: ApiCollectionListVo[]): CollectionListItem[] => {
+    if (!Array.isArray(items)) {
+      return [];
+    }
+    return items
+      .map(item => {
+        const id = item.id !== undefined && item.id !== null ? String(item.id) : '';
+        if (!id) {
+          return null;
+        }
+        return {
+          ...item,
+          id,
+          enabledEndpointsCount: item.enabledEndpointsCount ?? 0,
+        };
+      })
+      .filter(Boolean) as CollectionListItem[];
+  }, []);
+
+  const mapEndpoints = useCallback((items?: ApiEndpointVo[]): EndpointItem[] => {
+    if (!Array.isArray(items)) {
+      return [];
+    }
+    return items
+      .map(item => {
+        const id = item.id !== undefined && item.id !== null ? String(item.id) : '';
+        if (!id) {
+          return null;
+        }
+        const modifiedDate = (item as any)?.modifiedDate;
+        return {
+          ...item,
+          id,
+          lastUsedDate: modifiedDate ? new Date(modifiedDate) : undefined,
+        };
+      })
+      .filter(Boolean) as EndpointItem[];
+  }, []);
+
+  const loadStatistics = useCallback(async () => {
+    setStatisticsLoading(true);
+    try {
+      const response = await ApiCollectionsService.apiCollectionGetStatistics();
+      const responseData = (response as any).data;
+      if (responseData) {
+        setStatistics(responseData);
+      }
+    } catch (error) {
+      console.error('Failed to load API collection statistics:', error);
+    } finally {
+      setStatisticsLoading(false);
+    }
+  }, []);
+
+  const loadCollections = useCallback(
+    async (pageNo: number, keywordValue: string) => {
+      setCollectionsLoading(true);
+      try {
+        const response = await ApiCollectionsService.apiCollectionList({
+          keyword: keywordValue.trim() || undefined,
+          pageNo,
+          pageSize: collectionsPageSize,
+        });
+
+        const responseData = (response as any).data;
+        const listData: ApiCollectionListVo[] | undefined = responseData?.list;
+        const mappedList = mapCollections(listData);
+        setCollections(mappedList);
+        setCollectionsTotal(responseData?.total ?? mappedList.length);
+
+        if (mappedList.length === 0) {
+          setSelectedCollectionId(null);
+          setCollectionDetail(null);
+          setEndpoints([]);
+          setEndpointTotal(0);
+        } else if (!selectedCollectionId || !mappedList.some(item => item.id === selectedCollectionId)) {
+          setSelectedCollectionId(mappedList[0].id);
+          setEndpointPage(1);
+        }
+      } catch (error: any) {
+        console.error('Failed to load API collections:', error);
+        toast.error(error?.message || (language === 'zh-CN' ? '加载接口集失败' : 'Failed to load API collections'));
+      } finally {
+        setCollectionsLoading(false);
+      }
+    },
+    [collectionsPageSize, language, mapCollections, selectedCollectionId]
+  );
+
+  const loadCollectionDetail = useCallback(
+    async (collectionId: string) => {
+      setDetailLoading(true);
+      try {
+        const response = await ApiCollectionsService.apiCollectionGetDetail(collectionId);
+        const responseData: ApiCollectionDetailVo | undefined = (response as any).data;
+        setCollectionDetail(responseData ?? null);
+      } catch (error: any) {
+        console.error('Failed to load API collection detail:', error);
+        toast.error(error?.message || (language === 'zh-CN' ? '加载接口集详情失败' : 'Failed to load collection detail'));
+      } finally {
+        setDetailLoading(false);
+      }
+    },
+    [language]
+  );
+
+  const getEndpointOrderBy = useCallback(() => {
+    switch (sortBy) {
+      case 'name':
+        return ApiEndpointListParamsOrderByEnum.Name;
+      case 'method':
+        return ApiEndpointListParamsOrderByEnum.Method;
+      case 'lastUsed':
+      default:
+        return ApiEndpointListParamsOrderByEnum.CreatedDate;
+    }
+  }, [sortBy]);
+
+  const loadEndpoints = useCallback(
+    async (collectionId: string, pageNo: number, keywordValue: string) => {
+      setEndpointsLoading(true);
+      try {
+        const response = await ApiCollectionsService.apiEndpointList(collectionId, {
+          pageNo,
+          pageSize: endpointsPageSize,
+          name: keywordValue.trim() || undefined,
+          orderBy: getEndpointOrderBy(),
+        });
+
+        const responseData = (response as any).data;
+        const listData: ApiEndpointVo[] | undefined = responseData?.list;
+        const mappedList = mapEndpoints(listData);
+        setEndpoints(mappedList);
+        setEndpointTotal(responseData?.total ?? mappedList.length);
+      } catch (error: any) {
+        console.error('Failed to load API endpoints:', error);
+        toast.error(error?.message || (language === 'zh-CN' ? '加载接口列表失败' : 'Failed to load endpoints'));
+      } finally {
+        setEndpointsLoading(false);
+      }
+    },
+    [endpointsPageSize, getEndpointOrderBy, language, mapEndpoints]
+  );
+
+  useEffect(() => {
+    loadStatistics();
+  }, [loadStatistics]);
+
+  useEffect(() => {
+    loadCollections(collectionsPage, debouncedSearchQuery);
+  }, [collectionsPage, debouncedSearchQuery, loadCollections]);
+
+  useEffect(() => {
+    if (!selectedCollectionId) {
+      return;
+    }
+    loadCollectionDetail(selectedCollectionId);
+  }, [selectedCollectionId, loadCollectionDetail]);
+
+  useEffect(() => {
+    if (!selectedCollectionId) {
+      return;
+    }
+    loadEndpoints(selectedCollectionId, endpointPage, debouncedEndpointSearchQuery);
+  }, [selectedCollectionId, endpointPage, debouncedEndpointSearchQuery, loadEndpoints]);
+
+  useEffect(() => {
+    setCollectionsPage(prev => (prev === 1 ? prev : 1));
+  }, [debouncedSearchQuery]);
+
+  useEffect(() => {
+    setEndpointPage(prev => (prev === 1 ? prev : 1));
+  }, [selectedCollectionId, debouncedEndpointSearchQuery]);
+
+  useEffect(() => {
+    if (!selectedEndpoint) {
+      return;
+    }
+    const updated = endpoints.find(endpoint => endpoint.id === selectedEndpoint.id);
+    if (updated) {
+      setSelectedEndpoint(updated);
+    }
+  }, [endpoints, selectedEndpoint]);
+
   const getMethodColor = (method: string) => {
+    const normalized = method?.toUpperCase() ?? '';
     const colors = {
       GET: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
       POST: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
@@ -249,42 +392,45 @@ export function APICollection() {
       DELETE: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
       PATCH: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
     };
-    return colors[method as keyof typeof colors] || 'bg-gray-100 text-gray-700';
+    return colors[normalized as keyof typeof colors] || 'bg-gray-100 text-gray-700';
   };
 
-  const getSourceIcon = (source: string) => {
-    switch (source) {
-      case 'openapi':
+  const getSourceIcon = (source?: ApiCollectionSourceEnum | string) => {
+    const normalized = (source || '').toString().toUpperCase();
+    switch (normalized) {
+      case ApiCollectionSourceEnum.OPENAPI:
         return <FileJson className='w-4 h-4'/>;
-      case 'swagger':
+      case ApiCollectionSourceEnum.SWAGGER:
         return <Code2 className='w-4 h-4'/>;
-      case 'postman':
+      case ApiCollectionSourceEnum.POSTMAN:
         return <Globe className='w-4 h-4'/>;
       default:
         return <Book className='w-4 h-4'/>;
     }
   };
 
-  const getVisibilityIcon = (visibility: string) => {
-    switch (visibility) {
-      case 'private':
+  const getVisibilityIcon = (visibility?: VisibilityEnum | string) => {
+    const normalized = (visibility || '').toString().toUpperCase();
+    switch (normalized) {
+      case VisibilityEnum.PRIVATE:
         return <Shield className='w-3 h-3'/>;
-      case 'team':
+      case VisibilityEnum.TEAM:
         return <Eye className='w-3 h-3'/>;
-      case 'public':
+      case VisibilityEnum.PUBLIC:
         return <Globe className='w-3 h-3'/>;
       default:
         return <Shield className='w-3 h-3'/>;
     }
   };
 
-  const getVisibilityLabel = (visibility: string) => {
+  const getVisibilityLabel = (visibility?: VisibilityEnum | string) => {
+    const normalized = (visibility || '').toString().toUpperCase();
     const labels = {
-      private: language === 'zh-CN' ? '私有' : 'Private',
-      team: language === 'zh-CN' ? '团队' : 'Team',
-      public: language === 'zh-CN' ? '公开' : 'Public',
+      [VisibilityEnum.PRIVATE]: language === 'zh-CN' ? '私有' : 'Private',
+      [VisibilityEnum.TEAM]: language === 'zh-CN' ? '团队' : 'Team',
+      [VisibilityEnum.PUBLIC]: language === 'zh-CN' ? '公开' : 'Public',
     };
-    return labels[visibility as keyof typeof labels] || visibility;
+    return labels[normalized as VisibilityEnum] || visibility || '-';
   };
 
   const getSortLabel = () => {
@@ -304,84 +450,317 @@ export function APICollection() {
     return `${labels[sortBy]} (${orderLabel})`;
   };
 
-  const handleCreateCollection = () => {
+  const selectedCollectionItem = useMemo(
+    () => (selectedCollectionId ? collections.find(item => item.id === selectedCollectionId) ?? null : null),
+    [collections, selectedCollectionId]
+  );
+
+  const stats = useMemo(() => {
+    const overview = statistics?.overview;
+    const previous = statistics?.lastMonthGrowthTrend;
+    const formatNumber = (value?: number) => (typeof value === 'number' ? value.toLocaleString() : '0');
+    const buildTrend = (current?: number, prev?: number) => {
+      if (typeof current !== 'number' || typeof prev !== 'number') {
+        return undefined;
+      }
+      const diff = current - prev;
+      if (diff === 0) {
+        return {text: '0', up: true};
+      }
+      return {text: `${diff > 0 ? '+' : ''}${diff.toLocaleString()}`, up: diff >= 0};
+    };
+
+    const statsConfig = [
+      {
+        key: 'collections',
+        labelZh: '接口集数量',
+        labelEn: 'Collections',
+        value: overview?.apiCollectionCount,
+        subtextZh: '全部接口集',
+        subtextEn: 'Total collections',
+        trend: buildTrend(overview?.apiCollectionCount, previous?.apiCollectionCount),
+        icon: Database,
+        iconBg: 'bg-blue-500',
+      },
+      {
+        key: 'totalApis',
+        labelZh: '接口总数',
+        labelEn: 'Total APIs',
+        value: overview?.apiTotalCount,
+        subtextZh: '跨所有接口集',
+        subtextEn: 'Across all collections',
+        trend: buildTrend(overview?.apiTotalCount, previous?.apiTotalCount),
+        icon: Code2,
+        iconBg: 'bg-green-500',
+      },
+      {
+        key: 'enabledApis',
+        labelZh: '已启用接口',
+        labelEn: 'Enabled APIs',
+        value: overview?.enabledApiCount,
+        subtextZh: '正在使用中',
+        subtextEn: 'Currently active',
+        trend: buildTrend(overview?.enabledApiCount, previous?.enabledApiCount),
+        icon: Zap,
+        iconBg: 'bg-orange-500',
+      },
+      {
+        key: 'todayCalls',
+        labelZh: '今日调用',
+        labelEn: 'Today Calls',
+        value: overview?.todayCallCount,
+        subtextZh: '相较昨日变化',
+        subtextEn: 'Change vs yesterday',
+        trend: buildTrend(overview?.todayCallCount, previous?.todayCallCount),
+        icon: Activity,
+        iconBg: 'bg-purple-500',
+      },
+    ];
+
+    return statsConfig.map(item => ({
+      label: language === 'zh-CN' ? item.labelZh : item.labelEn,
+      value: formatNumber(item.value),
+      subtext: language === 'zh-CN' ? item.subtextZh : item.subtextEn,
+      icon: item.icon,
+      iconBg: item.iconBg,
+      trend: item.trend?.text,
+      trendUp: item.trend?.up ?? true,
+    }));
+  }, [language, statistics]);
+
+  const buildServerObject = () => {
+    if (!serverConfig.url) {
+      return undefined;
+    }
+    return {
+      url: serverConfig.url,
+      description: serverConfig.description || undefined,
+    };
+  };
+
+  const buildSecurityScheme = () => {
+    switch (securityConfig.type) {
+      case 'apiKey':
+        if (!securityConfig.apiKeyName) {
+          return undefined;
+        }
+        return {
+          type: 'apiKey',
+          in: securityConfig.apiKeyIn,
+          name: securityConfig.apiKeyName,
+        } as any;
+      case 'httpBasic':
+        return {
+          type: 'http',
+          scheme: 'basic',
+        } as any;
+      case 'bearer':
+        return {
+          type: 'http',
+          scheme: 'bearer',
+        } as any;
+      case 'oauth2Password':
+        if (!securityConfig.oauth2TokenUrl) {
+          return undefined;
+        }
+        return {
+          type: 'oauth2',
+          flows: {
+            password: {
+              tokenUrl: securityConfig.oauth2TokenUrl,
+              scopes: securityConfig.oauth2Scope ? {[securityConfig.oauth2Scope]: securityConfig.oauth2Scope} : {},
+            },
+          },
+        } as any;
+      case 'oauth2Client':
+        if (!securityConfig.oauth2ClientTokenUrl) {
+          return undefined;
+        }
+        return {
+          type: 'oauth2',
+          flows: {
+            clientCredentials: {
+              tokenUrl: securityConfig.oauth2ClientTokenUrl,
+              scopes: securityConfig.oauth2ClientScope
+                ? {[securityConfig.oauth2ClientScope]: securityConfig.oauth2ClientScope}
+                : {},
+            },
+          },
+        } as any;
+      default:
+        return undefined;
+    }
+  };
+
+  const handleCreateCollection = async () => {
     if (!formData.name.trim()) {
       toast.error(language === 'zh-CN' ? '请输入接口集名称' : 'Please enter collection name');
       return;
     }
 
-    const newCollection: APICollection = {
-      id: Date.now().toString(),
-      name: formData.name,
-      description: formData.description,
-      source: formData.source,
-      endpointsCount: 0,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      enabled: 0,
+    setIsCreatingCollection(true);
+    try {
+      await ApiCollectionsService.apiCollectionCreate({
+        name: formData.name.trim(),
+        description: formData.description.trim() || undefined,
       visibility: formData.visibility,
-    };
+        server: buildServerObject(),
+        security: buildSecurityScheme(),
+      });
 
-    setCollections([newCollection, ...collections]);
-    toast.success(language === 'zh-CN' ? '接口集创建成功' : 'API Collection created successfully');
+      toast.success(language === 'zh-CN' ? '接口集创建成功' : 'API collection created successfully');
     setShowCreateDialog(false);
     setFormData({
       name: '',
       description: '',
-      source: 'openapi',
-      visibility: 'private',
-    });
+        source: ApiCollectionSourceEnum.OPENAPI,
+        visibility: VisibilityEnum.PRIVATE,
+      });
+      setServerConfig({
+        url: '',
+        description: '',
+      });
+      setStrategyFile(null);
+      await loadCollections(collectionsPage, debouncedSearchQuery);
+    } catch (error: any) {
+      console.error('Failed to create API collection:', error);
+      toast.error(error?.message || (language === 'zh-CN' ? '创建接口集失败' : 'Failed to create collection'));
+    } finally {
+      setIsCreatingCollection(false);
+    }
   };
 
-  const handleImport = (type: string) => {
-    toast.success(language === 'zh-CN' ? `正在导入 ${type} 文件...` : `Importing ${type} file...`);
+  const handleImport = (type: ApiCollectionImportTypeEnum) => {
+    setImportMode('quick');
+    setSelectedImportType(type);
+    setStrategyFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleSettingsImportClick = () => {
+    setImportMode('settings');
+    if (!selectedImportType) {
+      setSelectedImportType(ApiCollectionImportTypeEnum.OPENAPI);
+    }
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileInputChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      return;
+    }
+    setSelectedImportFileName(file.name);
+
+    if (importMode === 'quick') {
+      await handleImportWithStrategy(file);
+    } else {
+      setStrategyFile(file);
+      toast.success(language === 'zh-CN' ? '文件已选择，点击开始导入' : 'File selected, click Start Import');
+    }
+  };
+
+  const handleImportWithStrategy = async (file?: File) => {
+    if (!file) {
+      toast.error(language === 'zh-CN' ? '请选择要导入的文件' : 'Please choose a file to import');
+      return;
+    }
+    setIsImporting(true);
+    try {
+      await ApiCollectionsService.apiCollectionImport({
+        file,
+        type: selectedImportType,
+        name: file.name,
+        visibility: formData.visibility,
+        importStrategy: {
+          conflictStrategy:
+            importConflictStrategy === 'overwrite' ? ConflictStrategyEnum.OVERWRITE : ConflictStrategyEnum.IGNORE,
+          importSecurity: true,
+          importServers: true,
+          importTags: true,
+          enableByDefault: true,
+        },
+      });
+      toast.success(language === 'zh-CN' ? '接口集导入成功' : 'API collection imported successfully');
+      setShowImportSettingsDialog(false);
     setShowImportDialog(false);
+      setSelectedImportFileName('');
+      setStrategyFile(null);
+      loadCollections(collectionsPage, debouncedSearchQuery);
+    } catch (error: any) {
+      console.error('Failed to import API collection:', error);
+      toast.error(error?.message || (language === 'zh-CN' ? '导入接口集失败' : 'Failed to import collection'));
+    } finally {
+      setIsImporting(false);
+    }
   };
 
-  const handleImportWithStrategy = () => {
+  const toggleEndpointStatus = async (endpointId: string, currentlyEnabled?: boolean) => {
+    if (!selectedCollectionId) {
+      return;
+    }
+    try {
+      await ApiCollectionsService.apiEndpointToggle(selectedCollectionId, endpointId, {
+        enabled: !currentlyEnabled,
+      });
     toast.success(
       language === 'zh-CN'
-        ? `正在导入接口集（${importConflictStrategy === 'overwrite' ? '覆盖重复' : '忽略重复'}）...`
-        : `Importing collection (${importConflictStrategy === 'overwrite' ? 'overwrite duplicates' : 'ignore duplicates'})...`
-    );
-    setShowImportSettingsDialog(false);
+          ? `接口已${currentlyEnabled ? '禁用' : '启用'}`
+          : `Endpoint ${currentlyEnabled ? 'disabled' : 'enabled'}`
+      );
+      await loadEndpoints(selectedCollectionId, endpointPage, debouncedEndpointSearchQuery);
+    } catch (error: any) {
+      console.error('Failed to toggle endpoint status:', error);
+      toast.error(error?.message || (language === 'zh-CN' ? '更新接口状态失败' : 'Failed to update endpoint status'));
+    }
   };
 
-  const toggleEndpointStatus = (endpointId: string) => {
-    setEndpoints(prev => prev.map(ep => (ep.id === endpointId ? {
-      ...ep,
-      enabled: !ep.enabled
-    } : ep)));
-  };
+  const filteredCollections = useMemo(() => {
+    const keyword = debouncedSearchQuery.trim().toLowerCase();
+    if (!keyword) {
+      return collections;
+    }
+    return collections.filter(col => {
+      const name = col.name?.toLowerCase() ?? '';
+      const description = col.description?.toLowerCase() ?? '';
+      return name.includes(keyword) || description.includes(keyword);
+    });
+  }, [collections, debouncedSearchQuery]);
 
-  const filteredCollections = collections.filter(
-    col =>
-      col.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      col.description.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredAndSortedEndpoints = useMemo(() => {
+    const keyword = debouncedEndpointSearchQuery.trim().toLowerCase();
+    const filtered = keyword
+      ? endpoints.filter(endpoint => {
+        const name = endpoint.name?.toLowerCase() ?? '';
+        const path = endpoint.path?.toLowerCase() ?? '';
+        const description = endpoint.description?.toLowerCase() ?? '';
+        return name.includes(keyword) || path.includes(keyword) || description.includes(keyword);
+      })
+      : endpoints;
 
-  const filteredAndSortedEndpoints = endpoints
-    .filter(
-      endpoint =>
-        endpoint.name.toLowerCase().includes(endpointSearchQuery.toLowerCase()) ||
-        endpoint.path.toLowerCase().includes(endpointSearchQuery.toLowerCase()) ||
-        endpoint.description.toLowerCase().includes(endpointSearchQuery.toLowerCase())
-    )
-    .sort((a, b) => {
+    const sorted = [...filtered].sort((a, b) => {
       let comparison = 0;
 
       if (sortBy === 'name') {
-        comparison = a.name.localeCompare(b.name);
+        comparison = (a.name ?? '').localeCompare(b.name ?? '');
       } else if (sortBy === 'method') {
-        comparison = a.method.localeCompare(b.method);
+        comparison = (a.method ?? '').localeCompare(b.method ?? '');
       } else if (sortBy === 'lastUsed') {
-        const aTime = a.lastUsed?.getTime() || 0;
-        const bTime = b.lastUsed?.getTime() || 0;
+        const aTime = a.lastUsedDate?.getTime() ?? 0;
+        const bTime = b.lastUsedDate?.getTime() ?? 0;
         comparison = aTime - bTime;
       }
 
       return sortOrder === 'asc' ? comparison : -comparison;
     });
+    return sorted;
+  }, [debouncedEndpointSearchQuery, endpoints, sortBy, sortOrder]);
 
   const handleSort = (field: 'name' | 'method' | 'lastUsed') => {
     if (sortBy === field) {
@@ -390,95 +769,56 @@ export function APICollection() {
       setSortBy(field);
       setSortOrder('asc');
     }
+    setEndpointPage(1);
   };
 
   // OpenAPI 规范预览示例
   const generateOpenAPISpec = () => {
-    const selectedCol = collections.find(c => c.id === selectedCollection);
+    const selectedCol = (collectionDetail as any) ?? (selectedCollectionItem as any) ?? {};
 
     const securitySchemes: any = {};
     const security: any[] = [];
+    const configuredSecurity = collectionDetail?.security ?? buildSecurityScheme();
 
-    if (securityConfig.type === 'apiKey') {
-      securitySchemes.ApiKeyAuth = {
-        type: 'apiKey',
-        in: securityConfig.apiKeyIn,
-        name: securityConfig.apiKeyName || 'X-API-Key',
-      };
-      security.push({ApiKeyAuth: []});
-    } else if (securityConfig.type === 'httpBasic') {
-      securitySchemes.BasicAuth = {
-        type: 'http',
-        scheme: 'basic',
-      };
-      security.push({BasicAuth: []});
-    } else if (securityConfig.type === 'bearer') {
-      securitySchemes.BearerAuth = {
-        type: 'http',
-        scheme: 'bearer',
-      };
-      security.push({BearerAuth: []});
-    } else if (securityConfig.type === 'oauth2Password') {
-      securitySchemes.OAuth2Password = {
-        type: 'oauth2',
-        flows: {
-          password: {
-            tokenUrl: securityConfig.oauth2TokenUrl,
-            scopes: securityConfig.oauth2Scope ? {[securityConfig.oauth2Scope]: securityConfig.oauth2Scope} : {},
-          },
-        },
-      };
-      security.push({OAuth2Password: []});
-    } else if (securityConfig.type === 'oauth2Client') {
-      securitySchemes.OAuth2ClientCredentials = {
-        type: 'oauth2',
-        flows: {
-          clientCredentials: {
-            tokenUrl: securityConfig.oauth2ClientTokenUrl,
-            scopes: securityConfig.oauth2ClientScope
-              ? {
-                [securityConfig.oauth2ClientScope]: securityConfig.oauth2ClientScope,
-              }
-              : {},
-          },
-        },
-      };
-      security.push({OAuth2ClientCredentials: []});
+    if (configuredSecurity) {
+      securitySchemes.PrimaryAuth = configuredSecurity;
+      security.push({PrimaryAuth: []});
     } else if (securityConfig.type === 'custom') {
       customAuthParams.forEach((param, index) => {
         if (param.name) {
-          securitySchemes[`CustomAuth${index + 1}`] = {
+          const schemeKey = `CustomAuth${index + 1}`;
+          securitySchemes[schemeKey] = {
             type: 'apiKey',
             in: param.location,
             name: param.name,
           };
-          security.push({[`CustomAuth${index + 1}`]: []});
+          security.push({[schemeKey]: []});
         }
       });
     }
 
-    return {
-      openapi: '3.0.0',
-      info: {
-        title: selectedCol?.name || 'API Collection',
-        description: selectedCol?.description || '',
-        version: '1.0.0',
-      },
-      servers: [
-        {
-          url: serverConfig.url || 'https://api.example.com',
-          description: serverConfig.description || 'Production server',
-        },
-      ],
-      security,
-      components: {
-        securitySchemes,
-      },
-      paths: endpoints.reduce((acc, endpoint) => {
-        acc[endpoint.path] = {
-          [endpoint.method.toLowerCase()]: {
-            summary: endpoint.name,
-            description: endpoint.description,
+    const serverObject =
+      (collectionDetail?.server as any) ??
+      (selectedCol?.server as any) ??
+      buildServerObject() ??
+      (serverConfig.url
+        ? {
+          url: serverConfig.url,
+          description:
+            serverConfig.description || (language === 'zh-CN' ? '生产环境服务器' : 'Production server'),
+        }
+        : undefined);
+
+    const sourceEndpoints = filteredAndSortedEndpoints.length > 0 ? filteredAndSortedEndpoints : endpoints;
+
+    const paths = sourceEndpoints.reduce((acc, endpoint) => {
+      const pathKey = endpoint.path || '/';
+      const methodKey = (endpoint.method || HttpMethodEnum.GET).toLowerCase();
+      acc[pathKey] = {
+        ...(acc[pathKey] || {}),
+        [methodKey]: {
+          summary: endpoint.name || '',
+          description: endpoint.description || '',
             tags: endpoint.tags,
             responses: {
               '200': {
@@ -488,52 +828,71 @@ export function APICollection() {
           },
         };
         return acc;
-      }, {} as any),
+    }, {} as any);
+
+    return {
+      openapi: '3.0.0',
+      info: {
+        title: selectedCol?.name || 'API Collection',
+        description: selectedCol?.description || '',
+        version: '1.0.0',
+      },
+      servers: serverObject ? [serverObject] : [],
+      security,
+      components: Object.keys(securitySchemes).length > 0 ? {securitySchemes} : undefined,
+      paths,
     };
   };
 
   // 统计数据
-  const stats = [
-    {
-      label: language === 'zh-CN' ? '接口集数量' : 'Collections',
-      value: collections.length.toString(),
-      subtext: language === 'zh-CN' ? '全部接口集' : 'Total collections',
-      icon: Database,
-      iconBg: 'bg-blue-500',
-      trend: '+2',
-      trendUp: true,
-    },
-    {
-      label: language === 'zh-CN' ? '接口总数' : 'Total APIs',
-      value: collections.reduce((sum, col) => sum + col.endpointsCount, 0).toString(),
-      subtext: language === 'zh-CN' ? '跨所有接口集' : 'Across all collections',
-      icon: Code2,
-      iconBg: 'bg-green-500',
-      trend: '+15',
-      trendUp: true,
-    },
-    {
-      label: language === 'zh-CN' ? '已启用接口' : 'Enabled APIs',
-      value: collections.reduce((sum, col) => sum + col.enabled, 0).toString(),
-      subtext: language === 'zh-CN' ? '正在使用中' : 'Currently active',
-      icon: Zap,
-      iconBg: 'bg-orange-500',
-      trend: '+8',
-      trendUp: true,
-    },
-    {
-      label: language === 'zh-CN' ? '今日调用' : 'Today Calls',
-      value: '1,247',
-      subtext: language === 'zh-CN' ? '相较昨日增长 18%' : 'Up 18% from yesterday',
-      icon: Activity,
-      iconBg: 'bg-purple-500',
-      trend: '+18%',
-      trendUp: true,
-    },
-  ];
+  // const stats = [
+  //   {
+  //     label: language === 'zh-CN' ? '接口集数量' : 'Collections',
+  //     value: collections.length.toString(),
+  //     subtext: language === 'zh-CN' ? '全部接口集' : 'Total collections',
+  //     icon: Database,
+  //     iconBg: 'bg-blue-500',
+  //     trend: '+2',
+  //     trendUp: true,
+  //   },
+  //   {
+  //     label: language === 'zh-CN' ? '接口总数' : 'Total APIs',
+  //     value: collections.reduce((sum, col) => sum + col.endpointsCount, 0).toString(),
+  //     subtext: language === 'zh-CN' ? '跨所有接口集' : 'Across all collections',
+  //     icon: Code2,
+  //     iconBg: 'bg-green-500',
+  //     trend: '+15',
+  //     trendUp: true,
+  //   },
+  //   {
+  //     label: language === 'zh-CN' ? '已启用接口' : 'Enabled APIs',
+  //     value: collections.reduce((sum, col) => sum + col.enabled, 0).toString(),
+  //     subtext: language === 'zh-CN' ? '正在使用中' : 'Currently active',
+  //     icon: Zap,
+  //     iconBg: 'bg-orange-500',
+  //     trend: '+8',
+  //     trendUp: true,
+  //   },
+  //   {
+  //     label: language === 'zh-CN' ? '今日调用' : 'Today Calls',
+  //     value: '1,247',
+  //     subtext: language === 'zh-CN' ? '相较昨日增长 18%' : 'Up 18% from yesterday',
+  //     icon: Activity,
+  //     iconBg: 'bg-purple-500',
+  //     trend: '+18%',
+  //     trendUp: true,
+  //   },
+  // ];
 
   return (
     <div className='space-y-6'>
+      <input
+        ref={fileInputRef}
+        type='file'
+        accept='.json,.yaml,.yml'
+        className='hidden'
+        onChange={handleFileInputChange}
+      />
       {/* Header */}
       <div>
         <h1 className='text-2xl mb-1 dark:text-white'>
@@ -619,7 +978,7 @@ export function APICollection() {
               <h2
                 className='dark:text-white'>{language === 'zh-CN' ? '接口集列表' : 'Collections'}</h2>
               <p className='text-sm text-gray-500 dark:text-gray-400 mt-1'>
-                {filteredCollections.length} {language === 'zh-CN' ? '个接口集' : 'collections'}
+                {collectionsTotal.toLocaleString()} {language === 'zh-CN' ? '个接口集' : 'collections'}
               </p>
             </div>
             <ScrollArea className='h-[600px]'>
@@ -627,10 +986,10 @@ export function APICollection() {
                 {filteredCollections.map(collection => (
                   <button
                     key={collection.id}
-                    onClick={() => setSelectedCollection(collection.id)}
+                    onClick={() => setSelectedCollectionId(collection.id)}
                     className={cn(
                       'w-full p-4 rounded-lg border transition-all text-left',
-                      selectedCollection === collection.id
+                      selectedCollectionId === collection.id
                         ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'
                         : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                     )}
@@ -648,7 +1007,7 @@ export function APICollection() {
                         <ChevronRight
                           className={cn(
                             'w-4 h-4 transition-transform',
-                            selectedCollection === collection.id && 'text-blue-600 dark:text-blue-400'
+                            selectedCollectionId === collection.id && 'text-blue-600 dark:text-blue-400'
                           )}
                         />
                       </div>
@@ -661,7 +1020,8 @@ export function APICollection() {
                         {collection.endpointsCount} {language === 'zh-CN' ? '个接口' : 'APIs'}
                       </span>
                       <Badge variant='secondary' className='text-xs'>
-                        {collection.enabled}/{collection.endpointsCount} {language === 'zh-CN' ? '已启用' : 'enabled'}
+                        {(collection.enabledEndpointsCount ?? 0).toLocaleString()}/
+                        {collection.endpointsCount?.toLocaleString() ?? '0'} {language === 'zh-CN' ? '已启用' : 'enabled'}
                       </Badge>
                     </div>
                   </button>
@@ -673,7 +1033,7 @@ export function APICollection() {
 
         {/* API Endpoints Details */}
         <div className='lg:col-span-2'>
-          {selectedCollection ? (
+          {selectedCollectionItem ? (
             <div
               className='bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg'>
               <Tabs defaultValue='endpoints' className='w-full'>
@@ -1542,7 +1902,7 @@ export function APICollection() {
           <div className='space-y-4'>
             <div className='grid grid-cols-2 gap-3'>
               <button
-                onClick={() => handleImport('OpenAPI')}
+                onClick={() => handleImport(ApiCollectionImportTypeEnum.OPENAPI)}
                 className='p-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 transition-colors group'
               >
                 <FileJson className='w-8 h-8 mx-auto mb-2 text-gray-400 group-hover:text-blue-500'/>
@@ -1551,7 +1911,7 @@ export function APICollection() {
               </button>
 
               <button
-                onClick={() => handleImport('Swagger')}
+                onClick={() => handleImport(ApiCollectionImportTypeEnum.SWAGGER)}
                 className='p-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 transition-colors group'
               >
                 <Code2 className='w-8 h-8 mx-auto mb-2 text-gray-400 group-hover:text-blue-500'/>
@@ -1560,7 +1920,7 @@ export function APICollection() {
               </button>
 
               <button
-                onClick={() => handleImport('Postman')}
+                onClick={() => handleImport(ApiCollectionImportTypeEnum.POSTMAN)}
                 className='p-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 transition-colors group'
               >
                 <Globe className='w-8 h-8 mx-auto mb-2 text-gray-400 group-hover:text-blue-500'/>
