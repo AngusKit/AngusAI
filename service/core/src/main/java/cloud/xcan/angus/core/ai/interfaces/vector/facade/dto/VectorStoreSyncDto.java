@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Schema(description = "同步向量数据请求参数")
-public class SyncDto {
+public class VectorStoreSyncDto {
 
   @Schema(description = "是否全量同步", example = "false")
   private Boolean fullSync = false;

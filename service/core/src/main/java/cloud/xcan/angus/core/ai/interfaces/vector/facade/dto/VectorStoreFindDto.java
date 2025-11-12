@@ -21,8 +21,7 @@ public class VectorStoreFindDto extends PageQuery {
   @Schema(description = "启用状态筛选")
   private Boolean enabled;
 
-  @Schema(description = "排序字段", allowableValues = {"id", "name", "createdDate", "type",
-      "status"})
+  @Schema(description = "排序字段", allowableValues = {"id", "name", "createdDate", "type", "status"})
   private String orderBy = "createdDate";
 
   @Override

@@ -66,7 +66,7 @@ public class VectorStoreQueryImpl implements VectorStoreQuery {
    * 统计已连接的存储源数
    */
   public long countConnectedStores() {
-    return vectorStoreRepo.countByStatus(ConnectionStatus.CONNECTED.name());
+    return vectorStoreRepo.countByStatus(ConnectionStatus.CONNECTED);
   }
 
   /**

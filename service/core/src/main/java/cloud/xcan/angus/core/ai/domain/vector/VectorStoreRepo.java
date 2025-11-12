@@ -1,5 +1,6 @@
 package cloud.xcan.angus.core.ai.domain.vector;
 
+import cloud.xcan.angus.core.ai.domain.ConnectionStatus;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
 import java.util.List;
 import org.springframework.data.jpa.repository.Query;
@@ -14,7 +15,7 @@ public interface VectorStoreRepo extends BaseRepository<VectorStore, Long> {
   boolean existsByNameAndIdNot(String name, Long id);
 
   @Query("SELECT COUNT(v) FROM VectorStore v WHERE v.status = :status")
-  Long countByStatus(@Param("status") String status);
+  Long countByStatus(@Param("status") ConnectionStatus status);
 
   /**
    * 按类型分组统计存储源数量
