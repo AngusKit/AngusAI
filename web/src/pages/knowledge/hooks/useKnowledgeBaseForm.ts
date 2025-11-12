@@ -6,11 +6,12 @@ import { useState, useCallback, useEffect } from 'react';
 import { CONFIG_CONSTANTS } from '../constants';
 import { ICON_OPTIONS } from '@/utils';
 import { validateTag } from '../utils';
+import { VisibilityEnum } from '@/enums/enums';
 
 export interface KnowledgeBaseFormData {
   name: string;
   description: string;
-  visibility: 'private' | 'team' | 'public'; // TODO 用枚举替代
+  visibility: VisibilityEnum;
   selectedIconIndex: number;
   tags: string[];
   chunkSize: number[];
@@ -25,7 +26,7 @@ export interface KnowledgeBaseFormData {
 const DEFAULT_FORM_DATA: KnowledgeBaseFormData = {
   name: '',
   description: '',
-  visibility: 'private',
+  visibility: VisibilityEnum.PRIVATE,
   selectedIconIndex: 0,
   tags: [],
   chunkSize: [CONFIG_CONSTANTS.CHUNK_SIZE.DEFAULT],

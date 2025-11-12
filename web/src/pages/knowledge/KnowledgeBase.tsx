@@ -68,7 +68,8 @@ import type {KnowledgeBaseDocListVo} from '@/services/DocumentsTypes';
 import {ENABLED_STATUS_COLOR, formatDateOnly, formatFileSize, getTagColor} from '@/utils';
 import {downloadFile} from '@/utils/DownloadUtils';
 import {useDebounce} from '@/hooks/useDebounce';
-import {DOCUMENT_STATUS_MAP, DOCUMENT_TYPE_MAP} from './constants';
+import {DOCUMENT_STATUS_MAP, DOCUMENT_TYPE_MAP, FILE_MAX_SIZE_BYTES, FILE_MAX_SIZE_MB} from './constants';
+import { VisibilityEnum } from '@/enums/enums';
 import {
   clearAllUploadIntervals,
   clearUploadInterval,
@@ -140,9 +141,9 @@ export function KnowledgeBase() {
   // TODO 替换成枚举Message
   const getVisibilityLabel = (visibility?: string) => {
     switch (visibility) {
-      case 'team':
+      case VisibilityEnum.TEAM:
         return t('knowledge.visibility.team');
-      case 'private':
+      case VisibilityEnum.PRIVATE:
         return t('knowledge.visibility.private');
       default:
         return t('knowledge.visibility.public');
@@ -442,7 +443,7 @@ export function KnowledgeBase() {
           return {
             id: doc.id ? String(doc.id) : '',
             name: doc.name || '',
-            type: t(typeInfo.labelKey),
+            type: typeInfo.labelKey,
             typeColor: typeInfo.color,
             typeIcon: typeInfo.icon,
             size: doc.size || '0 MB',
@@ -553,7 +554,7 @@ export function KnowledgeBase() {
 
               return {
                 ...d,
-                status: t(statusInfo.textKey),
+                status: statusInfo.textKey,
                 statusColor: statusInfo.color,
                 enabled: statusData.enabled || false,
                 processingProgress: statusData.processingProgress,
@@ -680,7 +681,7 @@ export function KnowledgeBase() {
 
   // 文件验证配置
   const fileValidationConfig: FileValidationConfig = {
-    maxSize: 50 * 1024 * 1024, // 50MB TODO 提到常量文件constants.ts
+    maxSize: FILE_MAX_SIZE_BYTES,
     allowedTypes: [
       'application/pdf',
       'application/msword',
@@ -689,7 +690,7 @@ export function KnowledgeBase() {
     ],
     allowedExtensions: ['.pdf', '.doc', '.docx', '.txt'],
     errorMessages: {
-      sizeExceeded: `${t('knowledgeUpload.fileSizeExceeded')} (50MB)`, // TODO 50不写死根据常量拼接
+      sizeExceeded: `${t('knowledgeUpload.fileSizeExceeded')} (${FILE_MAX_SIZE_MB}MB)`,
       formatNotSupported: t('knowledgeUpload.fileFormatNotSupported'),
     },
   };
@@ -1155,10 +1156,10 @@ export function KnowledgeBase() {
                 <thead className='border-b border-gray-200 dark:border-gray-700'>
                   <tr>
                     <th className='px-5 py-3 text-left text-xs text-gray-500 dark:text-gray-400'>
-                      {t('knowledge.table.columns.name')}
+                      {t('common.labels.name')}
                     </th>
                     <th className='px-5 py-3 text-left text-xs text-gray-500 dark:text-gray-400'>
-                      {t('knowledge.table.columns.description')}
+                      {t('common.labels.description')}
                     </th>
                     <th className='px-5 py-3 text-left text-xs text-gray-500 dark:text-gray-400'>
                       {t('knowledge.table.columns.documents')}
@@ -1176,7 +1177,7 @@ export function KnowledgeBase() {
                       {t('knowledge.table.columns.updatedAt')}
                     </th>
                     <th className='px-5 py-3 text-left text-xs text-gray-500 dark:text-gray-400'>
-                      {t('knowledge.table.columns.actions')}
+                      {t('common.actions.actions')}
                     </th>
                   </tr>
                 </thead>

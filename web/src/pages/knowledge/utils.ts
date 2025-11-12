@@ -4,6 +4,8 @@
 
 import { CONFIG_CONSTANTS } from './constants';
 import { toast } from 'sonner';
+import { constantTranslation as t } from '@/lib/i18n';
+import type { KnowledgeBaseFormData } from './hooks/useKnowledgeBaseForm';
 
 export interface ValidationResult {
   isValid: boolean;
@@ -11,23 +13,23 @@ export interface ValidationResult {
 }
 
 /**
- * 验证知识库名称 TODO 国际化
+ * 验证知识库名称
  */
 export const validateKnowledgeBaseName = (name: string): ValidationResult => {
   const trimmedName = name.trim();
   if (!trimmedName) {
-    return { isValid: false, error: '请输入知识库名称' };
+    return { isValid: false, error: t('knowledge.validation.nameRequired') };
   }
   return { isValid: true };
 };
 
 /**
- * 验证知识库描述 TODO 国际化
+ * 验证知识库描述
  */
 export const validateDescription = (description: string): ValidationResult => {
   const trimmedDescription = description.trim();
   if (!trimmedDescription) {
-    return { isValid: false, error: '请输入知识库描述' };
+    return { isValid: false, error: t('knowledge.validation.descriptionRequired') };
   }
   return { isValid: true };
 };
@@ -40,7 +42,7 @@ export const validateChunkSize = (chunkSize: number): ValidationResult => {
   if (!chunkSize || chunkSize < MIN || chunkSize > MAX) {
     return {
       isValid: false,
-      error: `分段大小必须在${MIN}-${MAX}之间`,
+      error: t('knowledge.validation.chunkSizeRange', { min: MIN, max: MAX }),
     };
   }
   return { isValid: true };
@@ -54,7 +56,7 @@ export const validateChunkOverlap = (chunkOverlap: number): ValidationResult => 
   if (chunkOverlap === undefined || chunkOverlap < MIN || chunkOverlap > MAX) {
     return {
       isValid: false,
-      error: `分段重叠必须在${MIN}-${MAX}之间`,
+      error: t('knowledge.validation.chunkOverlapRange', { min: MIN, max: MAX }),
     };
   }
   return { isValid: true };
@@ -70,17 +72,17 @@ export const validateTag = (tag: string, existingTags: string[]): ValidationResu
   }
 
   if (trimmedTag.length > CONFIG_CONSTANTS.TAG.MAX_LENGTH) {
-    toast.error(`标签长度不能超过${CONFIG_CONSTANTS.TAG.MAX_LENGTH}个字符`);
+    toast.error(t('knowledge.validation.tagMaxLength', { maxLength: CONFIG_CONSTANTS.TAG.MAX_LENGTH }));
     return { isValid: false };
   }
 
   if (existingTags.length >= CONFIG_CONSTANTS.TAG.MAX_COUNT) {
-    toast.error(`最多只能添加${CONFIG_CONSTANTS.TAG.MAX_COUNT}个标签`);
+    toast.error(t('knowledge.validation.tagMaxCount', { maxCount: CONFIG_CONSTANTS.TAG.MAX_COUNT }));
     return { isValid: false };
   }
 
   if (existingTags.includes(trimmedTag)) {
-    toast.error('标签已存在');
+    toast.error(t('knowledge.validation.tagDuplicate'));
     return { isValid: false };
   }
 
@@ -88,7 +90,7 @@ export const validateTag = (tag: string, existingTags: string[]): ValidationResu
 };
 
 /**
- * 验证第一步表单（基本信息）TODO 需要替换
+ * 验证第一步表单（基本信息）
  */
 export const validateBasicInfoStep = (name: string, description: string): ValidationResult => {
   const nameValidation = validateKnowledgeBaseName(name);
@@ -107,7 +109,7 @@ export const validateBasicInfoStep = (name: string, description: string): Valida
 };
 
 /**
- * 验证第二步表单（配置处理） TODO
+ * 验证第二步表单（配置处理）
  */
 export const validateConfigurationStep = (chunkSize: number, chunkOverlap: number): ValidationResult => {
   const chunkSizeValidation = validateChunkSize(chunkSize);
@@ -123,4 +125,51 @@ export const validateConfigurationStep = (chunkSize: number, chunkOverlap: numbe
   }
 
   return { isValid: true };
+};
+
+ /**
+  * 验证（基本信息）
+  */
+ export const validateBasicInfo = (formData: KnowledgeBaseFormData) => {
+  if (!formData.name.trim()) {
+    toast.error(t('knowledge.validation.nameRequired'));
+    return false;
+  }
+  if (!formData.description.trim()) {
+    toast.error(t('knowledge.validation.descriptionRequired'));
+    return false;
+  }
+  return true;
+};
+
+
+ /**
+  * 验证（配置处理）
+  */
+ export const validateConfiguration = (formData: KnowledgeBaseFormData) => {
+  const chunkSize = formData.chunkSize[0] ?? CONFIG_CONSTANTS.CHUNK_SIZE.DEFAULT;
+  const chunkOverlap = formData.chunkOverlap[0] ?? CONFIG_CONSTANTS.CHUNK_OVERLAP.DEFAULT;
+  const { MIN: chunkSizeMin, MAX: chunkSizeMax } = CONFIG_CONSTANTS.CHUNK_SIZE;
+  if (!chunkSize || chunkSize < chunkSizeMin || chunkSize > chunkSizeMax) {
+    toast.error(
+      t('knowledge.validation.chunkSizeRange', {
+        min: chunkSizeMin,
+        max: chunkSizeMax,
+      })
+    );
+    return false;
+  }
+
+  const { MIN: overlapMin, MAX: overlapMax } = CONFIG_CONSTANTS.CHUNK_OVERLAP;
+  if (chunkOverlap === undefined || chunkOverlap < overlapMin || chunkOverlap > overlapMax) {
+    toast.error(
+      t('knowledge.validation.chunkOverlapRange', {
+        min: overlapMin,
+        max: overlapMax,
+      })
+    );
+    return false;
+  }
+
+  return true;
 };

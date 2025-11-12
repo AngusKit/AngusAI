@@ -5,11 +5,12 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import KnowledgeBases from '@/services/KnowledgeBases';
 import { VisibilityEnum } from '@/enums/enums';
-import { CONFIG_CONSTANTS } from './constants';
+import { steps } from './constants';
 import { ICON_OPTIONS } from '@/utils';
 import { useKnowledgeBaseForm } from './hooks/useKnowledgeBaseForm';
 import { BasicInfoStep, ConfigurationStep } from './components/KnowledgeBaseFormSteps';
 import { useLanguage } from '@/components/ui/LanguageProvider';
+import { validateBasicInfo, validateConfiguration } from './utils';
 
 interface CreateKnowledgeBaseDialogProps {
   open: boolean;
@@ -25,70 +26,15 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange, onSuccess }: Cre
   const { formData, tagInput, setTagInput, updateField, removeTag, handleTagInputKeyDown, resetForm } =
     useKnowledgeBaseForm();
 
-  // TODO 和公共重复
-  const steps = [
-    { number: 1, title: t('knowledge.formSteps.basicInfo') },
-    { number: 2, title: t('knowledge.formSteps.configuration') },
-  ];
-
-  // TODO 验证提到工具类
-  const validateBasicInfo = () => {
-    if (!formData.name.trim()) {
-      toast.error(t('knowledge.validation.nameRequired'));
-      return false;
-    }
-    if (!formData.description.trim()) {
-      toast.error(t('knowledge.validation.descriptionRequired'));
-      return false;
-    }
-    return true;
-  };
-
-  // TODO 验证提到工具类
-  const validateConfiguration = () => {
-    const chunkSize = formData.chunkSize[0] ?? CONFIG_CONSTANTS.CHUNK_SIZE.DEFAULT;
-    const chunkOverlap = formData.chunkOverlap[0] ?? CONFIG_CONSTANTS.CHUNK_OVERLAP.DEFAULT;
-    const { MIN: chunkSizeMin, MAX: chunkSizeMax } = CONFIG_CONSTANTS.CHUNK_SIZE;
-    if (!chunkSize || chunkSize < chunkSizeMin || chunkSize > chunkSizeMax) {
-      toast.error(
-        t('knowledge.validation.chunkSizeRange', {
-          min: chunkSizeMin,
-          max: chunkSizeMax,
-        })
-      );
-      return false;
-    }
-
-    const { MIN: overlapMin, MAX: overlapMax } = CONFIG_CONSTANTS.CHUNK_OVERLAP;
-    if (chunkOverlap === undefined || chunkOverlap < overlapMin || chunkOverlap > overlapMax) {
-      toast.error(
-        t('knowledge.validation.chunkOverlapRange', {
-          min: overlapMin,
-          max: overlapMax,
-        })
-      );
-      return false;
-    }
-
-    return true;
-  };
-
-  // 可见性映射 TODO 重复转换
-  const visibilityMap: Record<string, VisibilityEnum> = {
-    private: VisibilityEnum.PRIVATE,
-    team: VisibilityEnum.TEAM,
-    public: VisibilityEnum.PUBLIC,
-  };
-
   // 处理下一步/提交
   const handleNextStep = () => {
     if (currentStep === 1) {
-      if (!validateBasicInfo()) {
+      if (!validateBasicInfo(formData)) {
         return;
       }
       setCurrentStep(2);
     } else {
-      if (!validateConfiguration()) {
+      if (!validateConfiguration(formData)) {
         return;
       }
 
@@ -114,7 +60,7 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange, onSuccess }: Cre
         icon: selectedIconOption.emoji,
         iconBg: selectedIconOption.bg,
         description: formData.description.trim(),
-        visibility: visibilityMap[formData.visibility] || VisibilityEnum.PRIVATE,
+        visibility: formData.visibility || VisibilityEnum.PRIVATE,
         tags: formData.tags.length > 0 ? formData.tags : undefined,
       };
 

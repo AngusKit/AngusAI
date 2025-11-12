@@ -5,12 +5,13 @@ import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import KnowledgeBases from '@/services/KnowledgeBases';
 import { VisibilityEnum } from '@/enums/enums';
-import { CONFIG_CONSTANTS } from './constants';
+import { CONFIG_CONSTANTS, steps } from './constants';
 import { ICON_OPTIONS } from '@/utils';
 import { useKnowledgeBaseForm } from './hooks/useKnowledgeBaseForm';
 import { BasicInfoStep, ConfigurationStep } from './components/KnowledgeBaseFormSteps';
 import { KnowledgeBaseDetailResult } from '@/types/api-types';
 import { useLanguage } from '@/components/ui/LanguageProvider';
+import { validateBasicInfo, validateConfiguration } from './utils';
 
 interface EditKnowledgeBaseDialogProps {
   open: boolean;
@@ -43,54 +44,6 @@ export function EditKnowledgeBaseDialog({
 
   const { formData, tagInput, setTagInput, updateField, removeTag, handleTagInputKeyDown, setSelectedIconByEmoji } =
     useKnowledgeBaseForm();
-
-  // TODO 和公共重复
-  const steps = [
-    { number: 1, title: t('knowledge.formSteps.basicInfo') },
-    { number: 2, title: t('knowledge.formSteps.configuration') },
-  ];
-
-  // TODO 验证提到工具类
-  const validateBasicInfo = () => {
-    if (!formData.name.trim()) {
-      toast.error(t('knowledge.validation.nameRequired'));
-      return false;
-    }
-    if (!formData.description.trim()) {
-      toast.error(t('knowledge.validation.descriptionRequired'));
-      return false;
-    }
-    return true;
-  };
-
-  // TODO 验证提到工具类
-  const validateConfiguration = () => {
-    const chunkSize = formData.chunkSize[0] ?? CONFIG_CONSTANTS.CHUNK_SIZE.DEFAULT;
-    const chunkOverlap = formData.chunkOverlap[0] ?? CONFIG_CONSTANTS.CHUNK_OVERLAP.DEFAULT;
-    const { MIN: chunkSizeMin, MAX: chunkSizeMax } = CONFIG_CONSTANTS.CHUNK_SIZE;
-    if (!chunkSize || chunkSize < chunkSizeMin || chunkSize > chunkSizeMax) {
-      toast.error(
-        t('knowledge.validation.chunkSizeRange', {
-          min: chunkSizeMin,
-          max: chunkSizeMax,
-        })
-      );
-      return false;
-    }
-
-    const { MIN: overlapMin, MAX: overlapMax } = CONFIG_CONSTANTS.CHUNK_OVERLAP;
-    if (chunkOverlap === undefined || chunkOverlap < overlapMin || chunkOverlap > overlapMax) {
-      toast.error(
-        t('knowledge.validation.chunkOverlapRange', {
-          min: overlapMin,
-          max: overlapMax,
-        })
-      );
-      return false;
-    }
-
-    return true;
-  };
 
   // 加载知识库详情
   useEffect(() => {
@@ -148,10 +101,8 @@ export function EditKnowledgeBaseDialog({
         if (knowledgeBase) {
           updateField('name', knowledgeBase.name);
           updateField('description', knowledgeBase.description);
-          const visibilityValue = knowledgeBase.visibility
-            ? (knowledgeBase.visibility.toLowerCase() as 'private' | 'team' | 'public')
-            : 'private';
-          updateField('visibility', visibilityValue);
+          const visibilityValue = knowledgeBase.visibility || VisibilityEnum.PRIVATE;
+          updateField('visibility', visibilityValue as VisibilityEnum);
           updateField('tags', knowledgeBase.tags || []);
           updateField('chunkSize', [knowledgeBase.chunkSize || CONFIG_CONSTANTS.CHUNK_SIZE.DEFAULT]);
           updateField('chunkOverlap', [knowledgeBase.chunkOverlap || CONFIG_CONSTANTS.CHUNK_OVERLAP.DEFAULT]);
@@ -183,12 +134,12 @@ export function EditKnowledgeBaseDialog({
   // 处理下一步/提交
   const handleNextStep = () => {
     if (currentStep === 1) {
-      if (!validateBasicInfo()) {
+      if (!validateBasicInfo(formData)) {
         return;
       }
       setCurrentStep(2);
     } else {
-      if (!validateConfiguration()) {
+      if (!validateConfiguration(formData)) {
         return;
       }
       // 更新知识库

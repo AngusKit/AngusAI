@@ -1145,9 +1145,9 @@ export function ModelManagement() {
                       return (
                         <Card
                           key={model.id}
-                          className='p-5 dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow'
+                          className='p-5 dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow gap-0'
                         >
-                          <div className='flex items-start justify-between mb-4'>
+                          <div className='flex items-start justify-between mb-2'>
                             <button
                               onClick={() => handleToggleStatus(model)}
                               className='p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors'

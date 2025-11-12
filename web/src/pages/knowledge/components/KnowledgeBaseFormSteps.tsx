@@ -9,6 +9,7 @@ import { VECTOR_STORES, CONFIG_CONSTANTS } from '../constants';
 import { getTagColor, ICON_OPTIONS } from '@/utils';
 import type { KnowledgeBaseFormData } from '../hooks/useKnowledgeBaseForm';
 import { useLanguage } from '@/components/ui/LanguageProvider';
+import { VisibilityEnum } from '@/enums/enums';
 
 interface BasicInfoStepProps {
   formData: KnowledgeBaseFormData;
@@ -57,13 +58,13 @@ export function BasicInfoStep({
               <SelectValue placeholder={t('knowledge.form.basic.visibilityPlaceholder')} />
             </SelectTrigger>
             <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
-              <SelectItem value='private' className='dark:text-white'>
+              <SelectItem value={VisibilityEnum.PRIVATE} className='dark:text-white'>
                 {t('knowledge.form.basic.visibilityOptions.private')}
               </SelectItem>
-              <SelectItem value='team' className='dark:text-white'>
+              <SelectItem value={VisibilityEnum.TEAM} className='dark:text-white'>
                 {t('knowledge.form.basic.visibilityOptions.team')}
               </SelectItem>
-              <SelectItem value='public' className='dark:text-white'>
+              <SelectItem value={VisibilityEnum.PUBLIC} className='dark:text-white'>
                 {t('knowledge.form.basic.visibilityOptions.public')}
               </SelectItem>
             </SelectContent>

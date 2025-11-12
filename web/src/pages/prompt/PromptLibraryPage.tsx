@@ -19,7 +19,7 @@ import { DeletePromptDialog } from './DeletePromptDialog';
 import { DeleteCategoryDialog } from './DeleteCategoryDialog';
 import { Prompt, Category } from './types';
 import { ICON_MAP, SYSTEM_CATEGORY_IDS, LIMITS } from './constants';
-import { getTagColorByIndex, buildCategoryTree, getCategoryPath, getTopLevelCategories, getChildCategories, getCategoryDisplayName, getDefaultCategoryId, } from './utils';
+import { getTagColorByIndex, buildCategoryTree, getCategoryPath, getTopLevelCategories, getChildCategories, getDefaultCategoryId, } from './utils';
 import { useDebounce } from '@/hooks/useDebounce';
 
 // 递归渲染分类树组件（支持多级分组）
@@ -29,7 +29,6 @@ interface CategoryItemProps {
   categories: Category[];
   level: number;
   getCategoryCount: (categoryId: string) => number | undefined;
-  getCategoryDisplayName: (cat: Category, language: string) => string;
   language: string;
   onSelect: (categoryId: string) => void;
   onEdit: (category: Category) => void;
@@ -42,7 +41,6 @@ function CategoryItem({
   categories,
   level,
   getCategoryCount,
-  getCategoryDisplayName,
   language,
   onSelect,
   onEdit,
@@ -79,9 +77,9 @@ function CategoryItem({
                   ? 'text-gray-700 dark:text-gray-300'
                   : 'text-gray-600 dark:text-gray-400'
             )}
-            title={getCategoryDisplayName(category, language)}
+            title={category.name}
           >
-            {getCategoryDisplayName(category, language)}
+            {category.name}
           </span>
         </button>
         <div className='flex items-center gap-1 shrink-0 ml-auto'>
@@ -128,7 +126,6 @@ function CategoryItem({
               categories={categories}
               level={level + 1}
               getCategoryCount={getCategoryCount}
-              getCategoryDisplayName={getCategoryDisplayName}
               language={language}
               onSelect={onSelect}
               onEdit={onEdit}
@@ -149,16 +146,14 @@ export function PromptLibraryPage() {
   const [categories, setCategories] = useState<Category[]>([
     {
       id: 'all',
-      name: '全部', // TODO 国际化
-      nameEn: 'All',
+      name: t('common.all'),
       icon: Sparkles,
       color: 'text-gray-700 dark:text-gray-300',
       isSystem: true,
     },
     {
       id: 'favorites',
-      name: '收藏',
-      nameEn: 'Favorites',
+      name: t('common.favorites'),
       icon: Star,
       color: 'text-yellow-600 dark:text-yellow-500',
       isSystem: true,
@@ -205,7 +200,6 @@ export function PromptLibraryPage() {
     return {
       id: String(vo.id || ''),
       name: vo.name || '',
-      nameEn: vo.name || '', // API没有提供英文名称，使用中文名称
       icon: IconComponent,
       color: vo.color || 'text-blue-600 dark:text-blue-400',
       isSystem: vo.isSystem,
@@ -517,7 +511,7 @@ export function PromptLibraryPage() {
   };
 
   const getCategoryDisplayNameForDialog = useCallback(
-    (cat: Category) => getCategoryDisplayName(cat, language),
+    (cat: Category) => cat.name,
     [language]
   );
 
@@ -547,7 +541,6 @@ export function PromptLibraryPage() {
                     categories={categories}
                     level={0}
                     getCategoryCount={getCategoryCount}
-                    getCategoryDisplayName={getCategoryDisplayName}
                     language={language}
                     onSelect={categoryId => {
                       setSelectedCategoryId(categoryId);
@@ -796,7 +789,7 @@ export function PromptLibraryPage() {
                   <p className='text-sm dark:text-white mt-1'>
                     {(() => {
                       const category = categories.find(c => c.id === viewingPrompt.category);
-                      return category ? getCategoryDisplayName(category, language) : '-';
+                      return category ? category.name : '-';
                     })()}
                   </p>
                 </div>
