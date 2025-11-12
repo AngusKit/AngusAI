@@ -14,7 +14,7 @@ public interface VectorStoreRepo extends BaseRepository<VectorStore, Long> {
 
   boolean existsByNameAndIdNot(String name, Long id);
 
-  @Query(value = "SELECT COUNT(v) FROM vector_store v WHERE v.status = ?1", nativeQuery = true)
+  @Query(value = "SELECT COUNT(*) FROM vector_store WHERE status = ?1", nativeQuery = true)
   Long countByStatus(String status);
 
   /**
