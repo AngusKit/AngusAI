@@ -852,7 +852,7 @@ export function APICollection() {
         </h1>
         <p className='text-sm text-gray-600 dark:text-gray-400'>
           {language === 'zh-CN'
-            ? '用于大模型集成外部API接口，支持OpenAPI、Swagger、Postman等规范'
+            ? '用于大模型基于API接口集成外部系统，支持OpenAPI、Swagger、Postman等规范'
             : 'For LLM integration with external APIs, support OpenAPI, Swagger, Postman, etc.'}
         </p>
       </div>
