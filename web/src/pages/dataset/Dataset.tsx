@@ -1,31 +1,91 @@
-import { Database, Plus, MoreHorizontal, Eye, Trash2, Edit, FileText, Search, X, Filter, Grid3x3, List, Upload, Download, RefreshCw, Files, FolderOpen, Check, } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, } from '@/components/ui/pagination';
-import { Progress } from '@/components/ui/progress';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, } from '@/components/ui/alert-dialog';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { toast } from 'sonner';
-import { formatDateOnly, getTagColor, formatFileSize } from '@/utils';
-import { downloadFile } from '@/utils/DownloadUtils';
-import { UploadFile, processFiles, uploadFileWithProgress, createDragHandlers, clearAllUploadIntervals, clearUploadInterval, type FileValidationConfig, type UploadConfig, } from '@/utils/UploadUtils';
-import { CreateDatasetDialog } from './CreateDatasetDialog';
-import { EditDatasetDialog } from './EditDatasetDialog';
-import { EditDataSourceDialog } from './EditDataSourceDialog';
-import { useDebounce } from '@/hooks/useDebounce';
+import {
+  Check,
+  Database,
+  Download,
+  Edit,
+  Eye,
+  Files,
+  FileText,
+  Filter,
+  FolderOpen,
+  Grid3x3,
+  List,
+  MoreHorizontal,
+  Plus,
+  RefreshCw,
+  Search,
+  Trash2,
+  Upload,
+  X,
+} from 'lucide-react';
+import {Button} from '@/components/ui/button';
+import {Card} from '@/components/ui/card';
+import {Badge} from '@/components/ui/badge';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {Input} from '@/components/ui/input';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
+import {Progress} from '@/components/ui/progress';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle
+} from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {Label} from '@/components/ui/label';
+import {Switch} from '@/components/ui/switch';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {toast} from 'sonner';
+import {formatDateOnly, formatFileSize, getTagColor} from '@/utils';
+import {downloadFile} from '@/utils/DownloadUtils';
+import {
+  clearAllUploadIntervals,
+  clearUploadInterval,
+  createDragHandlers,
+  type FileValidationConfig,
+  processFiles,
+  type UploadConfig,
+  UploadFile,
+  uploadFileWithProgress,
+} from '@/utils/UploadUtils';
+import {CreateDatasetDialog} from './CreateDatasetDialog';
+import {EditDatasetDialog} from './EditDatasetDialog';
+import {EditDataSourceDialog} from './EditDataSourceDialog';
+import {useDebounce} from '@/hooks/useDebounce';
 import Datasets from '@/services/Datasets';
 import DatasetsData from '@/services/DatasetsData';
-import { DatasetListVo, DatasetStatisticsVo, DatasetDetailVo, DatasourceTableDataPreviewVo, } from '@/services/DatasetsTypes';
-import { DatasetDataListVo } from '@/services/DatasetsDataTypes';
-import { DatasetTypeEnum, VisibilityEnum, DatasetDataTypeEnum } from '@/enums/enums';
-import { GetDatasetListOrderByEnum } from '@/services/DatasetsTypes';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import {
+  DatasetDetailVo,
+  DatasetListVo,
+  DatasetStatisticsVo,
+  DatasourceTableDataPreviewVo,
+  GetDatasetListOrderByEnum,
+} from '@/services/DatasetsTypes';
+import {DatasetDataListVo} from '@/services/DatasetsDataTypes';
+import {DatasetDataTypeEnum, DatasetTypeEnum, VisibilityEnum} from '@/enums/enums';
+import {useLanguage} from '@/components/ui/LanguageProvider';
 
 interface DatasetItem {
   id: string;
@@ -378,7 +438,7 @@ export function Dataset() {
           },
           {
             label: t('dataset.page.stats.totalData.label'),
-            value: totalRecords >= 1000 
+            value: totalRecords >= 1000
               ? totalRecords >= 1000000
                 ? `${(totalRecords / 1000000).toFixed(1)}M`
                 : `${(totalRecords / 1000).toFixed(1)}K`
@@ -441,15 +501,13 @@ export function Dataset() {
     setCurrentPage(1);
   }, [debouncedSearchQuery]);
 
-
   const handleView = async (dataset: DatasetItem) => {
     setViewingDataset(dataset);
     setViewDialogOpen(true);
 
     try {
       const response = await Datasets.getDatasetDetail(dataset.id);
-      const responseData = (response as any).data;
-      const detail: DatasetDetailVo | undefined = responseData;
+      const detail: DatasetDetailVo | undefined = (response as any).data;
 
       if (detail) {
         setDatasetDetail(detail);
@@ -601,8 +659,7 @@ export function Dataset() {
           pageSize: tablePageSize,
         });
 
-        const responseData = (response as any).data;
-        const previewData: DatasourceTableDataPreviewVo | undefined = responseData;
+        const previewData: DatasourceTableDataPreviewVo | undefined = (response as any).data;
 
         if (previewData) {
           setTablePreviewData(previewData);

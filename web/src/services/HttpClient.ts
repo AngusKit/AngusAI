@@ -1,6 +1,29 @@
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, HeadersDefaults, ResponseType, AxiosError, InternalAxiosRequestConfig, } from 'axios';
 import axios from 'axios';
-import { routerUtils as RouterUtils, API_SERVER_ERROR_CODE, API_SUCCESS_CODE, ApiType, ApiLocaleResult, app, appContext, cookieUtils, DomainManager, eventQueue, httpUtils, LockUtils, REFRESH_TOKEN_AUTH_KEY, SYSTEM_ERROR_MESSAGE, typeUtils, IFRAME_ACCESS_TOKEN_NAME, IFRAME_EXPIRES_IN_NAME, IFRAME_REFRESH_TOKEN_NAME, IFRAME_REQUEST_AUTH_TIME_NAME, AppOrServiceRoute, DEFAULT_API_VERSION, } from '@xcan-angus/infra';
+import {
+  routerUtils as RouterUtils,
+  API_SERVER_ERROR_CODE,
+  API_SUCCESS_CODE,
+  ApiType,
+  ApiLocaleResult,
+  app,
+  appContext,
+  cookieUtils,
+  DomainManager,
+  eventQueue,
+  httpUtils,
+  LockUtils,
+  REFRESH_TOKEN_AUTH_KEY,
+  SYSTEM_ERROR_MESSAGE,
+  typeUtils,
+  IFRAME_ACCESS_TOKEN_NAME,
+  IFRAME_EXPIRES_IN_NAME,
+  IFRAME_REFRESH_TOKEN_NAME,
+  IFRAME_REQUEST_AUTH_TIME_NAME,
+  AppOrServiceRoute,
+  DEFAULT_API_VERSION,
+  TokenInfo,
+} from '@xcan-angus/infra';
 
 export type QueryParamsType = Record<string | number, any>;
 
@@ -87,7 +110,7 @@ export class HttpClient<SecurityDataType = unknown> {
       url: url,
       method: 'post',
       query: body,
-    });
+    } as any);
 
     if (!response.data) {
       app.toSignIn(true);
@@ -99,7 +122,7 @@ export class HttpClient<SecurityDataType = unknown> {
     let tokenInfo: TokenInfo = {
       request_auth_time: new Date().toISOString(),
       ..._resData,
-    };
+    } as any;
     cookieUtils.setTokenInfo(tokenInfo);
 
     if (httpUtils.isInIframe()) {
@@ -260,7 +283,7 @@ export class HttpClient<SecurityDataType = unknown> {
         ...(params1.headers || {}),
         ...((params2 && params2.headers) || {}),
       },
-    };
+    } as any;
   }
 
   protected stringifyFormItem(formItem: unknown) {
@@ -305,16 +328,16 @@ export class HttpClient<SecurityDataType = unknown> {
     const requestParams = this.mergeRequestParams(params, secureParams);
     const responseFormat = format || this.format || undefined;
 
-    if (type === ContentType.FormData && body && body !== null && typeof body === 'object') {
+    if (type === ContentType.FormData && body && typeof body === 'object') {
       body = this.createFormData(body as Record<string, unknown>);
     }
 
-    if (type === ContentType.Text && body && body !== null && typeof body !== 'string') {
+    if (type === ContentType.Text && body && typeof body !== 'string') {
       body = JSON.stringify(body);
     }
 
     try {
-      const response = await this.instance.request({
+      return await this.instance.request({
         ...requestParams,
         headers: {
           ...(requestParams.headers || {}),
@@ -324,8 +347,7 @@ export class HttpClient<SecurityDataType = unknown> {
         responseType: responseFormat,
         data: body,
         url: path,
-      });
-      return response;
+      } as any);
     } catch (err) {
       if (requestParams.method !== 'get') {
         eventQueue.commit('http_error', err?.message || SYSTEM_ERROR_MESSAGE);

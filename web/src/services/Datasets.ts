@@ -260,10 +260,15 @@ export class Datasets<SecurityDataType = unknown> {
   getDatasetStatistics = (
     query?: {
       /**
-       * 数据集ID
-       * @format int64
+       * 统计开始日期，可选，格式: yyyy-MM-dd 或 yyyy-MM-dd HH:mm:ss
+       * @example "2024-11-01"
        */
-      id?: string;
+      startDate?: string;
+      /**
+       * 统计结束日期，可选，格式: yyyy-MM-dd 或 yyyy-MM-dd HH:mm:ss
+       * @example "2024-11-30"
+       */
+      endDate?: string;
     },
     params: RequestParams = {}
   ) =>

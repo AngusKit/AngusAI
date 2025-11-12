@@ -1,7 +1,16 @@
-import { ApiLocaleResult, PageQuery, AI } from '@xcan-angus/infra';
-import { GetModelListParamsOrderByEnum, ModelConfig, ModelCreateDto, ModelDetailResult, ModelStatisticsResult, ModelTestDto, ModelUpdateDto, PageResultModelListResult, } from './ModelsTypes.ts';
-import http, { ContentType, HttpClient, RequestParams } from './HttpClient.ts';
-import { ModelProviderEnum, ModelStatusEnum, ModelTypeEnum, StatisticsPeriodEnum } from '@/enums/enums.ts';
+import {AI, ApiLocaleResult, PageQuery} from '@xcan-angus/infra';
+import {
+  GetModelListParamsOrderByEnum,
+  ModelConfig,
+  ModelCreateDto,
+  ModelDetailResult,
+  ModelStatisticsResult,
+  ModelTestDto,
+  ModelUpdateDto,
+  PageResultModelListResult,
+} from './ModelsTypes.ts';
+import http, {ContentType, HttpClient, RequestParams} from './HttpClient.ts';
+import {ModelProviderEnum, ModelStatusEnum, ModelTypeEnum} from '@/enums/enums.ts';
 
 export class Models<SecurityDataType = unknown> {
   http: HttpClient<SecurityDataType>;
@@ -223,8 +232,16 @@ export class Models<SecurityDataType = unknown> {
    */
   getModelStatistics = (
     query?: {
-      /** 统计周期 */
-      period?: StatisticsPeriodEnum;
+      /**
+       * 统计开始日期，可选，格式: yyyy-MM-dd 或 yyyy-MM-dd HH:mm:ss
+       * @example "2024-11-01"
+       */
+      startDate?: string;
+      /**
+       * 统计结束日期，可选，格式: yyyy-MM-dd 或 yyyy-MM-dd HH:mm:ss
+       * @example "2024-11-30"
+       */
+      endDate?: string;
     },
     params: RequestParams = {}
   ) =>
