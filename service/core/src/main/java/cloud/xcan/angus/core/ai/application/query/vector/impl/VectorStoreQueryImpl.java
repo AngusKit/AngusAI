@@ -105,17 +105,4 @@ public class VectorStoreQueryImpl implements VectorStoreQuery {
     return vectorStoreAccessLogRepo.performanceTrendByDay(start, end);
   }
 
-  /**
-   * 统计错误数
-   */
-  public long countFailedQueries(LocalDateTime start, LocalDateTime end) {
-    return vectorStoreAccessLogRepo.countFailedByQueryDateBetween(start, end);
-  }
-
-  /**
-   * 按存储源统计错误数
-   */
-  public List<Object[]> getErrorCountByStore(LocalDateTime start, LocalDateTime end) {
-    return vectorStoreAccessLogRepo.errorCountByStore(start, end);
-  }
 }

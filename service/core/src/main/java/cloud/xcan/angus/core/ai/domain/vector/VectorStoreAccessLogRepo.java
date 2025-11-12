@@ -10,21 +10,12 @@ import org.springframework.data.repository.query.Param;
 @NoRepositoryBean
 public interface VectorStoreAccessLogRepo extends BaseRepository<VectorStoreAccessLog, Long> {
 
-  // --- 统计相关查询 ---
-
   /**
    * 统计指定日期范围内的查询数
    */
   @Query(value = "SELECT COUNT(1) FROM vector_store_access_log WHERE query_date >= :start AND query_date <= :end", nativeQuery = true)
   long countByQueryDateBetween(@Param("start") LocalDateTime start,
       @Param("end") LocalDateTime end);
-
-  /**
-   * 统计指定存储源在指定日期范围内的查询数
-   */
-  @Query(value = "SELECT COUNT(1) FROM vector_store_access_log WHERE vector_store_id = :vectorStoreId AND query_date >= :start AND query_date <= :end", nativeQuery = true)
-  long countByVectorStoreIdAndQueryDateBetween(@Param("vectorStoreId") Long vectorStoreId,
-      @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
   /**
    * 按存储源分组统计查询次数（TOP N）
@@ -47,18 +38,5 @@ public interface VectorStoreAccessLogRepo extends BaseRepository<VectorStoreAcce
   List<Object[]> performanceTrendByDay(@Param("start") LocalDateTime start,
       @Param("end") LocalDateTime end);
 
-  /**
-   * 统计指定日期范围内的错误数
-   */
-  @Query(value = "SELECT COUNT(1) FROM vector_store_access_log WHERE status = 'FAILED' AND query_date >= :start AND query_date <= :end", nativeQuery = true)
-  long countFailedByQueryDateBetween(@Param("start") LocalDateTime start,
-      @Param("end") LocalDateTime end);
-
-  /**
-   * 按存储源统计错误数
-   */
-  @Query(value = "SELECT vector_store_id, COUNT(1) error_cnt FROM vector_store_access_log WHERE status = 'FAILED' AND query_date >= :start AND query_date <= :end GROUP BY vector_store_id", nativeQuery = true)
-  List<Object[]> errorCountByStore(@Param("start") LocalDateTime start,
-      @Param("end") LocalDateTime end);
 }
 
