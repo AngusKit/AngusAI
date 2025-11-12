@@ -15,7 +15,7 @@ public class ApiCollectionFindDto extends PageQuery {
   @Schema(description = "接口集ID")
   private Long id;
 
-  @Schema(description = "接口集名称，支持模糊查询")
+  @Schema(description = "接口集名称")
   private String name;
 
   @Schema(description = "来源筛选：OPENAPI-OpenAPI 3.0，SWAGGER-Swagger 2.0，POSTMAN-Postman Collection，MANUAL-手动创建")

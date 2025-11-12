@@ -51,12 +51,12 @@ public class ApiEndpoint extends TenantAuditingEntity<ApiEndpoint, Long> {
   @Column(name = "operation_id", length = 200)
   private String operationId;
 
+  @Column(name = "enabled", nullable = false)
+  private Boolean enabled = true;
+
   @Type(JsonType.class)
   @Column(columnDefinition = "json", name = "tags")
   private List<String> tags;
-
-  @Column(name = "enabled", nullable = false)
-  private Boolean enabled = true;
 
   @Type(JsonType.class)
   @Column(columnDefinition = "json", name = "parameters")
