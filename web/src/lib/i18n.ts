@@ -37,3 +37,12 @@ export function getNestedTranslation(obj: any, path: string, params?: Record<str
 
   return result;
 }
+
+export function constantTranslation(path: string, params?: Record<string, string | number>): string {
+  const language = localStorage.getItem('language');
+  const translations = languages[language as Language || defaultLanguage]?.translations;
+  if (!translations) {
+    return path;
+  }
+  return getNestedTranslation(translations, path, params);
+}

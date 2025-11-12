@@ -196,7 +196,7 @@ export function CategoryDialog({
                     <SelectItem key={color.value} value={color.value}>
                       <div className='flex items-center gap-2'>
                         <div className={cn('w-3 h-3 rounded', color.colorClass)} />
-                        {language === 'zh-CN' ? color.label : color.labelEn}
+                        {color.label}
                       </div>
                     </SelectItem>
                   ))}

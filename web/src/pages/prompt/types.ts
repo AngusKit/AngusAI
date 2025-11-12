@@ -27,7 +27,6 @@ export interface Prompt {
 export interface Category {
   id: string;
   name: string;
-  nameEn: string;
   icon: LucideIcon;
   color: string;
   isSystem?: boolean;

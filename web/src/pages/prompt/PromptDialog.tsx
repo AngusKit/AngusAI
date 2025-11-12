@@ -50,12 +50,8 @@ export function PromptDialog({
     isDialogOpen: open,
   });
 
-  // TODO 国际化
-  const getTagColorDisplayName = (color: (typeof TAG_COLORS)[number]) =>
-    language === 'zh-CN' ? color.name : color.nameEn;
-
   const handleAddTag = () => {
-    const validation = validateTag(newTagLabel, formData.tags, language);
+    const validation = validateTag(newTagLabel, formData.tags);
     if (!validation.isValid) {
       toast.error(validation.error);
       return;
@@ -64,7 +60,7 @@ export function PromptDialog({
   };
 
   const handleSave = async () => {
-    const validation = validatePromptForm(formData, language);
+    const validation = validatePromptForm(formData);
     if (!validation.isValid) {
       toast.error(validation.error);
       return;
@@ -196,7 +192,7 @@ export function PromptDialog({
                     <SelectItem key={color.value} value={color.value}>
                       <div className='flex items-center gap-2'>
                         <div className={cn('w-3 h-3 rounded', color.value)} />
-                        {getTagColorDisplayName(color)}
+                        {color.name}
                       </div>
                     </SelectItem>
                   ))}

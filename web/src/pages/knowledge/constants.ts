@@ -3,6 +3,10 @@
  */
 
 import { KnowledgeBaseDocStatusEnum, KnowledgeBaseDocTypeEnum } from '@/enums/enums';
+import { constantTranslation as t } from '@/lib/i18n';
+
+export const FILE_MAX_SIZE_BYTES  = 50 * 1024 * 1024; // 50MB
+export const FILE_MAX_SIZE_MB  = 50; // 50MB
 
 // 向量存储源配置
 export const VECTOR_STORES = [
@@ -61,62 +65,67 @@ export const CONFIG_CONSTANTS = {
   },
 } as const;
 
-// 步骤配置 TODO 国际化
-export const FORM_STEPS = [
-  { number: 1, titleKey: 'knowledge.formSteps.basicInfo' },
-  { number: 2, titleKey: 'knowledge.formSteps.configuration' },
-] as const;
 
 /**
- * 文档状态映射 TODO 国际化
+ * 文档状态映射 
  */
 export const DOCUMENT_STATUS_MAP: Record<KnowledgeBaseDocStatusEnum, { textKey: string; color: string }> = {
   [KnowledgeBaseDocStatusEnum.PENDING]: {
-    textKey: 'common.status.pending',
+    textKey: t('common.status.pending'),
     color: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
   },
   [KnowledgeBaseDocStatusEnum.PROCESSING]: {
-    textKey: 'common.status.processing',
+    textKey: t('common.status.processing'),
     color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
   },
   [KnowledgeBaseDocStatusEnum.COMPLETED]: {
-    textKey: 'common.status.completed',
+    textKey: t('common.status.completed'),
     color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
   },
   [KnowledgeBaseDocStatusEnum.FAILED]: {
-    textKey: 'common.status.failed',
+    textKey: t('common.status.failed'),
     color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
   },
 };
 
 /**
- * 文档类型映射 TODO 国际化
+ * 文档类型映射
  */
 export const DOCUMENT_TYPE_MAP: Record<KnowledgeBaseDocTypeEnum,
   { labelKey: string; icon: string; color: string }> = {
   [KnowledgeBaseDocTypeEnum.PDF]: {
-    labelKey: 'knowledge.documents.types.pdf',
+    labelKey: t('knowledge.documents.types.pdf'),
     icon: '📄',
     color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
   },
   [KnowledgeBaseDocTypeEnum.DOCX]: {
-    labelKey: 'knowledge.documents.types.docx',
+    labelKey: t('knowledge.documents.types.docx'),
     icon: '📘',
     color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
   },
   [KnowledgeBaseDocTypeEnum.TXT]: {
-    labelKey: 'knowledge.documents.types.txt',
+    labelKey: t('knowledge.documents.types.txt'),
     icon: '📝',
     color: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
   },
   [KnowledgeBaseDocTypeEnum.MD]: {
-    labelKey: 'knowledge.documents.types.md',
+    labelKey: t('knowledge.documents.types.md'),
     icon: '📝',
     color: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
   },
   [KnowledgeBaseDocTypeEnum.HTML]: {
-    labelKey: 'knowledge.documents.types.html',
+    labelKey: t('knowledge.documents.types.html'),
     icon: '🌐',
     color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
   },
 };
+
+/**
+ * 表单步骤配置
+ */
+export const steps = [
+  { number: 1, title: t('knowledge.formSteps.basicInfo') },
+  { number: 2, title: t('knowledge.formSteps.configuration') },
+];
+
+

@@ -4,6 +4,7 @@
 
 import { Category, PromptTag } from './types';
 import { TAG_COLORS, SYSTEM_CATEGORY_IDS } from './constants';
+import { constantTranslation as t } from '@/lib/i18n';
 
 /**
  * 根据索引获取标签颜色（循环分配）
@@ -80,13 +81,6 @@ export const getChildCategories = (categories: Category[], parentId: string): Ca
 };
 
 /**
- * 根据语言获取分类名称
- */
-export const getCategoryDisplayName = (category: Category, language: string): string => {
-  return language === 'zh-CN' ? category.name : category.nameEn;
-};
-
-/**
  * 验证分类名称
  */
 export const validateCategoryName = (
@@ -104,19 +98,18 @@ export const validateCategoryName = (
  */
 export const validatePromptForm = (
   formData: { title: string; content: string; category: string },
-  language: string
 ): { isValid: boolean; error?: string } => {
   if (!formData.title.trim() || !formData.content.trim()) {
     return {
-      isValid: false, // TODO 国际化
-      error: language === 'zh-CN' ? '请填写标题和内容' : 'Please fill in title and content',
+      isValid: false,
+      error: t('prompts.validateMessage.titleRequired'),
     };
   }
 
   if (!formData.category) {
     return {
       isValid: false,
-      error: language === 'zh-CN' ? '请选择分类' : 'Please select a category',
+      error: t('prompts.validateMessage.categoryRequired'),
     };
   }
 
@@ -129,19 +122,18 @@ export const validatePromptForm = (
 export const validateTag = (
   tagLabel: string,
   existingTags: PromptTag[],
-  language: string
 ): { isValid: boolean; error?: string } => {
   if (!tagLabel.trim()) {
     return {
-      isValid: false, // TODO 国际化
-      error: language === 'zh-CN' ? '请输入标签名称' : 'Please enter tag name',
+      isValid: false,
+      error: t('prompts.validateMessage.tagRequired'),
     };
   }
 
   if (existingTags.length >= 5) {
     return {
       isValid: false,
-      error: language === 'zh-CN' ? '最多添加5个标签' : 'Maximum 5 tags allowed',
+      error: t('prompts.validateMessage.tagMaxCount'),
     };
   }
 
