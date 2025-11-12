@@ -1,10 +1,6 @@
 package cloud.xcan.angus.core.ai.infra.ai.model;
 
-import cloud.xcan.angus.spec.experimental.EndpointRegister;
-import cloud.xcan.angus.spec.locale.EnumMessage;
-
-@EndpointRegister
-public enum ModelProvider implements EnumMessage<String> {
+public enum ModelProvider {
   // 主要提供商
   OPENAI,                    // OpenAI
   ANTHROPIC,                 // Anthropic Claude

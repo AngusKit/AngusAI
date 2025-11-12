@@ -1,8 +1,6 @@
 package cloud.xcan.angus.core.ai.application.query.model;
 
-import cloud.xcan.angus.core.ai.domain.StatisticsPeriod;
 import cloud.xcan.angus.core.ai.domain.model.Model;
-import cloud.xcan.angus.core.ai.domain.model.ModelStats;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,11 +17,6 @@ public interface ModelQuery {
    */
   Page<Model> find(GenericSpecification<Model> spec, PageRequest pageable,
       boolean fullTextSearch, String[] match);
-
-  /**
-   * 获取模型统计数据（period 可为 null，表示不按时间过滤）
-   */
-  ModelStats getStatistics(StatisticsPeriod period);
 
   /**
    * 检查模型名称是否存在

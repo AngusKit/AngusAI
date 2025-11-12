@@ -39,8 +39,8 @@ public class ModelUpdateDto {
 
   @Schema(description = "温度参数")
   @Range(min = 0, max = 2)
-  private Double temperature = 0.5;
+  private Double temperature;
 
-  @Schema(description = "最大token数")
+  @Schema(description = "最大token数", example = "128000")
   private Integer maxTokens;
 }

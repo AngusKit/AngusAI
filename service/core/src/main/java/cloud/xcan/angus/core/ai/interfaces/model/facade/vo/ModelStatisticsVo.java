@@ -45,5 +45,4 @@ public class ModelStatisticsVo {
   @Schema(description = "今天增长趋势")
   private TodayGrowthTrend todayGrowthTrend;
 
-
 }

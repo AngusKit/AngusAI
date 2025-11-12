@@ -566,7 +566,7 @@ export function ModelManagement() {
   useEffect(() => {
     loadModels();
   }, [loadModels]);
-  
+
   const shouldShowPagination = useMemo(() => {
     return modelsTotal > itemsPerPage;
   }, [modelsTotal, itemsPerPage]);
@@ -1495,7 +1495,7 @@ export function ModelManagement() {
                   <div className='dark:text-white'>{selectedModel.type}</div>
                 </div>
                 <div className='space-y-1'>
-                  <div className='text-xs text-gray-500 dark:text-gray-400'>部署时间</div>
+                  <div className='text-xs text-gray-500 dark:text-gray-400'>添加时间</div>
                   <div className='dark:text-white'>{selectedModel.deployed}</div>
                 </div>
               </div>

@@ -48,7 +48,7 @@ public class ModelCreateDto {
   @Range(min = 0, max = 2)
   private Double temperature = 0.5;
 
-  @Schema(description = "最大token数")
+  @Schema(description = "最大token数", example = "128000")
   private Integer maxTokens;
 
 }

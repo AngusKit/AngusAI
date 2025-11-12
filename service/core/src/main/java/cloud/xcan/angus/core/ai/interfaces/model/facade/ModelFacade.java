@@ -1,6 +1,5 @@
 package cloud.xcan.angus.core.ai.interfaces.model.facade;
 
-import cloud.xcan.angus.core.ai.domain.StatisticsPeriod;
 import cloud.xcan.angus.core.ai.infra.ai.model.ModelConfig;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelFindDto;
@@ -10,6 +9,7 @@ import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelListVo;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelStatisticsVo;
 import cloud.xcan.angus.remote.PageResult;
+import cloud.xcan.angus.remote.dto.SimpleStatisticsDto;
 
 public interface ModelFacade {
 
@@ -66,6 +66,6 @@ public interface ModelFacade {
   /**
    * 获取模型调用统计
    */
-  ModelStatisticsVo getStatistics(StatisticsPeriod period);
+  ModelStatisticsVo getStatistics(SimpleStatisticsDto dto);
 
 }

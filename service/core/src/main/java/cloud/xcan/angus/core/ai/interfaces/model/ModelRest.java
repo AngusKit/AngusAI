@@ -1,6 +1,5 @@
 package cloud.xcan.angus.core.ai.interfaces.model;
 
-import cloud.xcan.angus.core.ai.domain.StatisticsPeriod;
 import cloud.xcan.angus.core.ai.infra.ai.model.ModelConfig;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.ModelFacade;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelCreateDto;
@@ -12,6 +11,7 @@ import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelListVo;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelStatisticsVo;
 import cloud.xcan.angus.remote.ApiLocaleResult;
 import cloud.xcan.angus.remote.PageResult;
+import cloud.xcan.angus.remote.dto.SimpleStatisticsDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -102,7 +102,7 @@ public class ModelRest {
     return ApiLocaleResult.success(modelFacade.stop(id, graceful));
   }
 
-  @Operation(operationId = "restartModel", summary = "重启模型", description = "重启模型（先停止再启动）")
+  @Operation(operationId = "restartModel", summary = "重启模型", description = "重启模型")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "重启中")
   })
@@ -166,8 +166,8 @@ public class ModelRest {
   })
   @GetMapping("/statistics")
   public ApiLocaleResult<ModelStatisticsVo> getStatistics(
-      @Parameter(description = "统计周期") @RequestParam(required = false) StatisticsPeriod period) {
-    return ApiLocaleResult.success(modelFacade.getStatistics(period));
+      @ParameterObject SimpleStatisticsDto dto) {
+    return ApiLocaleResult.success(modelFacade.getStatistics(dto));
   }
 
 }
