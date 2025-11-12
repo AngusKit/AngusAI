@@ -55,6 +55,21 @@ export const formatFileSize = (bytes: number): string => {
   return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
 };
 
+
+/**
+ * 格式化记录数显示
+ */
+export function formatToHumanString(count: number): string {
+  if (count >= 1000000) {
+    return `${(count / 1000000).toFixed(1)}M`;
+  }
+  if (count >= 1000) {
+    return `${(count / 1000).toFixed(1)}K`;
+  }
+  return String(count);
+}
+
+
 /**
  * 启用/禁用状态颜色映射
  */

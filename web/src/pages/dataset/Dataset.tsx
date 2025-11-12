@@ -39,7 +39,7 @@ interface DatasetItem {
   statusKey: string;
   statusColor: string;
   enabled: boolean;
-  visibility?: string;
+  visibility?: string; // TODO 使用枚举代替
   modifiedDate: string;
   createdDate: string;
   creator: string;
@@ -86,7 +86,7 @@ export function Dataset() {
   const [dataFiles, setDataFiles] = useState<DatasetDataListVo[]>([]);
   const [databaseTables, setDatabaseTables] = useState<DatasetDataListVo[]>([]);
   const [tablePreviewData, setTablePreviewData] = useState<DatasourceTableDataPreviewVo | null>(null);
-  const visibilityBadgeMap = useMemo(
+  const visibilityBadgeMap = useMemo( // TODO 使用枚举代替
     () => ({
       private: { icon: '🔒', label: t('dataset.visibility.private') },
       team: { icon: '👥', label: t('dataset.visibility.team') },
@@ -110,7 +110,7 @@ export function Dataset() {
   }, []);
 
   /**
-   * 数据集状态颜色
+   * 数据集状态颜色 TODO 使用全局定义的
    */
   const DATASET_STATUS_COLORS = {
     enabled: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
@@ -138,7 +138,7 @@ export function Dataset() {
 
   // 将DatasetDataListVo转换为DataFileItem（先定义转换函数）
   const convertDataListVoToFile = useCallback((vo: DatasetDataListVo): DataFileItem => {
-    const typeLabelKeyMap: Record<DatasetDataTypeEnum, string> = {
+    const typeLabelKeyMap: Record<DatasetDataTypeEnum, string> = { // TODO 使用枚举代替
       [DatasetDataTypeEnum.CSV]: t('dataset.dataTypes.csv'),
       [DatasetDataTypeEnum.JSON]: t('dataset.dataTypes.json'),
       [DatasetDataTypeEnum.EXCEL]: t('dataset.dataTypes.excel'),
@@ -146,7 +146,7 @@ export function Dataset() {
       [DatasetDataTypeEnum.TABLE]: t('dataset.dataTypes.table'),
     };
 
-    const stringToEnumMap: Record<string, DatasetDataTypeEnum> = {
+    const stringToEnumMap: Record<string, DatasetDataTypeEnum> = { // TODO 使用枚举代替
       CSV: DatasetDataTypeEnum.CSV,
       JSON: DatasetDataTypeEnum.JSON,
       EXCEL: DatasetDataTypeEnum.EXCEL,
@@ -154,7 +154,7 @@ export function Dataset() {
       TABLE: DatasetDataTypeEnum.TABLE,
     };
 
-    const statusKeyMap: Record<string, string> = {
+    const statusKeyMap: Record<string, string> = { // TODO 使用枚举代替
       COMPLETED: t('common.status.completed'),
       PROCESSING: t('common.status.processing'),
       PENDING: t('common.status.pending'),
@@ -168,6 +168,7 @@ export function Dataset() {
       [DatasetDataTypeEnum.TABLE]: '📋',
     };
 
+    // TODO 统一用枚举常量
     const typeEnum = stringToEnumMap[vo.type || 'CSV'] || DatasetDataTypeEnum.CSV;
     const statusRaw = (vo.status || 'PENDING').toUpperCase();
     const statusKey = statusKeyMap[statusRaw] || 'common.status.pending';
@@ -188,7 +189,7 @@ export function Dataset() {
       typeIcon: typeIconMap[typeEnum] || '📄',
       size: vo.dataSize || '0 MB',
       statusKey,
-      statusColor:
+      statusColor: // TODO 使用枚举代替
         statusRaw === 'COMPLETED'
           ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
           : statusRaw === 'PROCESSING'
@@ -271,7 +272,7 @@ export function Dataset() {
 
   // 将DatasetListVo转换为DatasetItem
   const convertDatasetVoToItem = useCallback((vo: DatasetListVo): DatasetItem => {
-    const visibilityMap: Record<VisibilityEnum, string> = {
+    const visibilityMap: Record<VisibilityEnum, string> = { // TODO 使用枚举代替
       [VisibilityEnum.PRIVATE]: 'private',
       [VisibilityEnum.TEAM]: 'team',
       [VisibilityEnum.PUBLIC]: 'public',
@@ -281,7 +282,7 @@ export function Dataset() {
     const typeLabelKey = type === DatasetTypeEnum.FILE ? t('dataset.types.file') : t('dataset.types.datasource');
 
     const dataCount = vo.dataStatistics?.totalFilesOrTables ? String(vo.dataStatistics.totalFilesOrTables) : '0';
-    const size = vo.dataStatistics?.totalRecordsSize || '0 条';
+    const size = vo.dataStatistics?.totalRecordsSize || '0 条'; // TODO 国际互漏了
     const createdDate = vo.createdDate || '';
     const modifiedDate = vo.modifiedDate || '';
     const creator = vo.creator ? vo.creator : '';
@@ -348,8 +349,7 @@ export function Dataset() {
   const loadStatistics = useCallback(async () => {
     try {
       const response = await Datasets.getDatasetStatistics();
-      const responseData = (response as any).data;
-      const statsData: DatasetStatisticsVo | undefined = responseData;
+      const statsData: DatasetStatisticsVo | undefined = (response as any).data;
 
       if (statsData?.overview) {
         const overview = statsData.overview;
@@ -377,7 +377,7 @@ export function Dataset() {
           {
             label: t('dataset.page.stats.totalData.label'),
             value:
-              totalRecords >= 1000
+              totalRecords >= 1000 // TODO 提成公共方法，很多地方都用到 numberToHumanString
                 ? totalRecords >= 1000000
                   ? `${(totalRecords / 1000000).toFixed(1)}M`
                   : `${(totalRecords / 1000).toFixed(1)}K`
@@ -656,11 +656,11 @@ export function Dataset() {
   }, [selectedDS]);
 
   // 文件验证配置
-  const MAX_FILE_SIZE_MB = 50;
-  const SUPPORTED_FORMATS_LABEL = 'CSV, JSON, XML, Excel';
+  const MAX_FILE_SIZE_MB = 50; // TODO 提到常量文件
+  const SUPPORTED_FORMATS_LABEL = 'CSV, JSON, XML, Excel'; // TODO 提到常量文件
 
   const fileValidationConfig: FileValidationConfig = {
-    maxSize: MAX_FILE_SIZE_MB * 1024 * 1024, // 50MB
+    maxSize: MAX_FILE_SIZE_MB * 1024 * 1024, // 50MB TODO 提到常量文件
     allowedTypes: [
       'text/csv',
       'application/json',
@@ -669,7 +669,7 @@ export function Dataset() {
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       'application/vnd.ms-excel',
     ],
-    allowedExtensions: ['.csv', '.json', '.xml', '.xlsx', '.xls'],
+    allowedExtensions: ['.csv', '.json', '.xml', '.xlsx', '.xls'], // TODO 提到常量文件
     errorMessages: {
       sizeExceeded: t('dataset.upload.errors.sizeExceeded', { maxSize: `${MAX_FILE_SIZE_MB}MB` }),
       formatNotSupported: t('dataset.upload.errors.formatNotSupported', {
@@ -1429,7 +1429,7 @@ export function Dataset() {
                     webkitdirectory=''
                     directory=''
                     multiple
-                    accept='.csv,.json,.xml,.xlsx,.xls'
+                    accept='.csv,.json,.xml,.xlsx,.xls' // TODO 提到常量文件
                     onChange={handleFileInputChange}
                     className='hidden'
                   />
@@ -1617,7 +1617,7 @@ export function Dataset() {
             <div className='flex items-start justify-between mb-4'>
               <div className='flex items-center gap-4'>
                 <div className='bg-blue-500 w-14 h-14 rounded-xl flex items-center justify-center text-3xl'>
-                  {datasetDetail.datasourceConfig?.databaseType === 'MySQL'
+                  {datasetDetail.datasourceConfig?.databaseType === 'MySQL' // TODO 使用枚举常量
                     ? '🐬'
                     : datasetDetail.datasourceConfig?.databaseType === 'PostgreSQL'
                       ? '🐘'
@@ -1699,7 +1699,7 @@ export function Dataset() {
                 <div className='text-sm text-gray-600 dark:text-gray-400 mb-1'>
                   {t('dataset.datasource.stats.totalRecords')}
                 </div>
-                <div className='text-2xl dark:text-white'>
+                <div className='text-2xl dark:text-white'> // TODO 使用之前全局工具方法代替
                   {datasetDetail.dataStatistics?.totalRecords
                     ? datasetDetail.dataStatistics.totalRecords >= 1000000
                       ? `${(datasetDetail.dataStatistics.totalRecords / 1000000).toFixed(1)}M`
@@ -2031,7 +2031,7 @@ export function Dataset() {
                 icon: editingDataset.icon,
                 iconBg: editingDataset.iconBg,
                 visibility: editingDataset.visibility,
-                tags: editingDataset.tags,
+                tags: editingDataset.tags, // TODO 使用枚举Message
                 type: editingDataset.type === DatasetTypeEnum.DATASOURCE ? '数据源' : '文件',
               }
             : null

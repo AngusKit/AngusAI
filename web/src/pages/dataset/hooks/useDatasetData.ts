@@ -73,8 +73,7 @@ export function useDatasetDetail() {
     setIsLoading(true);
     try {
       const response = await Datasets.getDatasetDetail(datasetId);
-      const responseData = (response as any).data;
-      const detail: DatasetDetailVo | undefined = responseData;
+      const detail: DatasetDetailVo | undefined = (response as any).data;
 
       if (detail) {
         setDatasetDetail(detail);
@@ -110,8 +109,7 @@ export function useDatasetStatistics() {
     setIsLoading(true);
     try {
       const response = await Datasets.getDatasetStatistics();
-      const responseData = (response as any).data;
-      const statsData: DatasetStatisticsVo | undefined = responseData;
+      const statsData: DatasetStatisticsVo | undefined = (response as any).data;
 
       if (statsData) {
         setStatistics(statsData);

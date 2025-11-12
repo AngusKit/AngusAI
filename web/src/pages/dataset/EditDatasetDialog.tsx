@@ -22,9 +22,9 @@ interface EditDatasetDialogProps {
     description: string;
     icon?: string;
     iconBg?: string;
-    visibility?: string;
+    visibility?: string; // TODO 使用枚举代替
     tags?: string[];
-    type?: '文件' | '数据源'; // 数据集类型
+    type?: '文件' | '数据源'; // TODO 使用枚举代替
   } | null;
   onSuccess?: () => void;
 }
@@ -49,11 +49,11 @@ export function EditDatasetDialog({ open, onOpenChange, dataset, onSuccess }: Ed
       setTags(dataset.tags || []);
 
       // 根据数据集类型设置数据类型（编辑时不允许修改）
-      if (dataset.type === '数据源') {
+      if (dataset.type === '数据源') { // TODO 使用枚举值代替
         setDataType('datasource');
       } else {
         // '文件' 都对应 table 类型
-        setDataType('table');
+        setDataType('table'); // TODO 使用枚举值代替
       }
 
       // 根据icon找到对应的索引
@@ -77,6 +77,7 @@ export function EditDatasetDialog({ open, onOpenChange, dataset, onSuccess }: Ed
 
       if (!newTag) return;
 
+      // TODO 验证提到工具方法
       if (newTag.length > MAX_TAG_LENGTH) {
         toast.error(t('dataset.form.tags.lengthExceeded', { maxLength: MAX_TAG_LENGTH }));
         return;
@@ -120,7 +121,7 @@ export function EditDatasetDialog({ open, onOpenChange, dataset, onSuccess }: Ed
 
     setIsSubmitting(true);
     try {
-      // 映射可见性
+      // 映射可见性 // TODO 使用枚举值代替
       const visibilityMap: Record<string, VisibilityEnum> = {
         private: VisibilityEnum.PRIVATE,
         team: VisibilityEnum.TEAM,
@@ -177,7 +178,7 @@ export function EditDatasetDialog({ open, onOpenChange, dataset, onSuccess }: Ed
               <Select value={visibility} onValueChange={setVisibility}>
                 <SelectTrigger className='dark:bg-gray-800 dark:border-gray-700 dark:text-white'>
                   <SelectValue placeholder={t('dataset.form.visibilityPlaceholder')} />
-                </SelectTrigger>
+                </SelectTrigger> {/*// TODO 使用枚举message代替*/}
                 <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
                   <SelectItem value='private' className='dark:text-white'>
                     {t('dataset.visibility.private')}
@@ -292,7 +293,7 @@ export function EditDatasetDialog({ open, onOpenChange, dataset, onSuccess }: Ed
                     className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-all ${
                       dataset
                         ? 'border-gray-400 dark:border-gray-500'
-                        : dataType === 'table'
+                        : dataType === 'table' // TODO 使用枚举值代替
                           ? 'border-blue-500'
                           : 'border-gray-300 dark:border-gray-600'
                     }`}

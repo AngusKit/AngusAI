@@ -7,7 +7,7 @@ import { generateJdbcUrl } from '../utils';
 import { useLanguage } from '@/components/ui/LanguageProvider';
 
 /** 连接状态 */
-export type ConnectionStatus = 'idle' | 'success' | 'error';
+export type ConnectionStatus = 'idle' | 'success' | 'error';  // TODO 使用枚举代替
 
 /** 数据源表单状态 */
 export interface DataSourceFormState {
@@ -26,7 +26,7 @@ export interface DataSourceFormState {
 
 /** 初始表单状态 */
 const INITIAL_FORM_STATE: DataSourceFormState = {
-  dbType: 'mysql',
+  dbType: 'mysql', // TODO 使用枚举代替
   dbHost: '',
   dbPort: '3306',
   dbName: '',

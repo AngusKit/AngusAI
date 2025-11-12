@@ -44,11 +44,13 @@ export function EditKnowledgeBaseDialog({
   const { formData, tagInput, setTagInput, updateField, removeTag, handleTagInputKeyDown, setSelectedIconByEmoji } =
     useKnowledgeBaseForm();
 
+  // TODO 和公共重复
   const steps = [
     { number: 1, title: t('knowledge.formSteps.basicInfo') },
     { number: 2, title: t('knowledge.formSteps.configuration') },
   ];
 
+  // TODO 验证提到工具类
   const validateBasicInfo = () => {
     if (!formData.name.trim()) {
       toast.error(t('knowledge.validation.nameRequired'));
@@ -61,6 +63,7 @@ export function EditKnowledgeBaseDialog({
     return true;
   };
 
+  // TODO 验证提到工具类
   const validateConfiguration = () => {
     const chunkSize = formData.chunkSize[0] ?? CONFIG_CONSTANTS.CHUNK_SIZE.DEFAULT;
     const chunkOverlap = formData.chunkOverlap[0] ?? CONFIG_CONSTANTS.CHUNK_OVERLAP.DEFAULT;

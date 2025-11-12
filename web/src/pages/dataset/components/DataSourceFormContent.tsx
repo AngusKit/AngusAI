@@ -144,7 +144,7 @@ export function DataSourceFormContent({
                 value={dbName}
                 onChange={e => onFieldChange('dbName', e.target.value)}
                 placeholder={
-                  dbType === 'oracle'
+                  dbType === 'oracle' // TODO 使用枚举值代替
                     ? t('dataset.datasource.form.databasePlaceholderOracle')
                     : t('dataset.datasource.form.databasePlaceholder')
                 }
@@ -162,7 +162,7 @@ export function DataSourceFormContent({
                   value={dbSchema}
                   onChange={e => onFieldChange('dbSchema', e.target.value)}
                   placeholder={
-                    dbType === 'postgresql'
+                    dbType === 'postgresql' // TODO 使用枚举值代替
                       ? t('dataset.datasource.form.schemaPlaceholderPostgres')
                       : t('dataset.datasource.form.schemaPlaceholderDefault')
                   }
@@ -253,6 +253,7 @@ export function DataSourceFormContent({
           variant='outline'
           className='w-full dark:bg-gray-800 dark:border-gray-700'
         >
+          {/* TODO 使用枚举值代替 */}
           {isTestingConnection ? (
             <>
               <div className='w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mr-2' />

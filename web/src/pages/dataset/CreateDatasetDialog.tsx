@@ -30,7 +30,7 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
   const [tagInput, setTagInput] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const MAX_TAGS = 5;
+  const MAX_TAGS = 5; // TODO 提到常量文件
   const MAX_TAG_LENGTH = 10;
   const tagCountText = t('dataset.form.tags.count', {
     current: tags.length,
@@ -44,6 +44,7 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
 
       if (!newTag) return;
 
+      // TODO 提到工具方法
       if (newTag.length > MAX_TAG_LENGTH) {
         toast.error(t('dataset.form.tags.lengthExceeded', { maxLength: MAX_TAG_LENGTH }));
         return;
@@ -85,7 +86,7 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
       // 映射数据类型：页面上的'text'和'table'都对应FILE类型，'datasource'对应DATASOURCE类型
       const datasetType = dataType === 'datasource' ? DatasetTypeEnum.DATASOURCE : DatasetTypeEnum.FILE;
 
-      // 映射可见性
+      // 映射可见性 // TODO 使用枚举代替
       const visibilityMap: Record<string, VisibilityEnum> = {
         private: VisibilityEnum.PRIVATE,
         team: VisibilityEnum.TEAM,
@@ -155,6 +156,7 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
                 </SelectTrigger>
                 <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
                   <SelectItem value='private' className='dark:text-white'>
+                    {/*TODO 使用枚举Message代替*/}
                     {t('dataset.visibility.private')}
                   </SelectItem>
                   <SelectItem value='team' className='dark:text-white'>

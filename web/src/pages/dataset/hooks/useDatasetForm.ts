@@ -6,14 +6,14 @@ import { ICON_OPTIONS } from '@/utils';
 import { useLanguage } from '@/components/ui/LanguageProvider';
 
 /** 数据集表单数据类型 */
-export type DatasetFormDataType = 'table' | 'datasource';
+export type DatasetFormDataType = 'table' | 'datasource'; // TODO 使用枚举
 
 /** 数据集表单状态 */
 export interface DatasetFormState {
   datasetName: string;
   description: string;
-  dataType: DatasetFormDataType;
-  visibility: string;
+  dataType: DatasetFormDataType; // TODO 使用枚举
+  visibility: string; // TODO 使用枚举
   selectedIcon: number;
   tags: string[];
   tagInput: string;
@@ -23,8 +23,8 @@ export interface DatasetFormState {
 const INITIAL_FORM_STATE: DatasetFormState = {
   datasetName: '',
   description: '',
-  dataType: 'table',
-  visibility: 'private',
+  dataType: 'table', // TODO 使用枚举
+  visibility: 'private', // TODO 使用枚举
   selectedIcon: 0,
   tags: [],
   tagInput: '',
@@ -58,6 +58,7 @@ export function useDatasetForm(initialState?: Partial<DatasetFormState>) {
 
       if (!newTag) return false;
 
+      // TODO 提成工具方法
       if (newTag.length > FORM_VALIDATION.TAG_MAX_LENGTH) {
         toast.error(t('dataset.form.tags.lengthExceeded', { maxLength: FORM_VALIDATION.TAG_MAX_LENGTH }));
         return false;

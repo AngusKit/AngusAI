@@ -1,31 +1,87 @@
-import { Check, Database, Download, Edit, Eye, Files, FileText, FileX, Filter, FolderOpen, Grid3x3, List, MoreHorizontal, Plus, RefreshCw, Search, Trash2, Upload, X, } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
-import { Progress } from '@/components/ui/progress';
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, } from '@/components/ui/pagination';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, } from '@/components/ui/alert-dialog';
-import { Switch } from '@/components/ui/switch';
-import { useEffect, useRef, useState } from 'react';
-import { useLanguage } from '@/components/ui/LanguageProvider';
-import { toast } from 'sonner';
+import {
+  Check,
+  Database,
+  Download,
+  Edit,
+  Eye,
+  Files,
+  FileText,
+  FileX,
+  Filter,
+  FolderOpen,
+  Grid3x3,
+  List,
+  MoreHorizontal,
+  Plus,
+  RefreshCw,
+  Search,
+  Trash2,
+  Upload,
+  X,
+} from 'lucide-react';
+import {Button} from '@/components/ui/button';
+import {Card} from '@/components/ui/card';
+import {Badge} from '@/components/ui/badge';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {Input} from '@/components/ui/input';
+import {Progress} from '@/components/ui/progress';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle
+} from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {Switch} from '@/components/ui/switch';
+import {useEffect, useRef, useState} from 'react';
+import {useLanguage} from '@/components/ui/LanguageProvider';
+import {toast} from 'sonner';
 import KnowledgeBases from '@/services/KnowledgeBases';
 import Documents from '@/services/Documents';
-import { KnowledgeBaseDocStatusEnum, KnowledgeBaseDocTypeEnum } from '@/enums/enums';
-import type { KnowledgeBaseListVo, KnowledgeBaseStatisticsVo } from '@/services/KnowledgeBasesTypes';
-import { GetKnowledgeBaseListOrderByEnum } from '@/services/KnowledgeBasesTypes';
-import type { KnowledgeBaseDocListVo } from '@/services/DocumentsTypes';
-import { getTagColor, formatDateOnly, formatFileSize, ENABLED_STATUS_COLOR } from '@/utils';
-import { downloadFile } from '@/utils/DownloadUtils';
-import { useDebounce } from '@/hooks/useDebounce';
-import { DOCUMENT_STATUS_MAP, DOCUMENT_TYPE_MAP } from './constants';
-import { UploadFile, processFiles, uploadFileWithProgress, createDragHandlers, clearAllUploadIntervals, clearUploadInterval, type FileValidationConfig, type UploadConfig, } from '@/utils/UploadUtils';
+import {KnowledgeBaseDocStatusEnum, KnowledgeBaseDocTypeEnum} from '@/enums/enums';
+import type {KnowledgeBaseListVo, KnowledgeBaseStatisticsVo} from '@/services/KnowledgeBasesTypes';
+import {GetKnowledgeBaseListOrderByEnum} from '@/services/KnowledgeBasesTypes';
+import type {KnowledgeBaseDocListVo} from '@/services/DocumentsTypes';
+import {ENABLED_STATUS_COLOR, formatDateOnly, formatFileSize, getTagColor} from '@/utils';
+import {downloadFile} from '@/utils/DownloadUtils';
+import {useDebounce} from '@/hooks/useDebounce';
+import {DOCUMENT_STATUS_MAP, DOCUMENT_TYPE_MAP} from './constants';
+import {
+  clearAllUploadIntervals,
+  clearUploadInterval,
+  createDragHandlers,
+  type FileValidationConfig,
+  processFiles,
+  type UploadConfig,
+  UploadFile,
+  uploadFileWithProgress,
+} from '@/utils/UploadUtils';
 
-import { EditKnowledgeBaseDialog } from './EditKnowledgeBaseDialog';
-import { CreateKnowledgeBaseDialog } from './CreateKnowledgeBaseDialog';
+import {EditKnowledgeBaseDialog} from './EditKnowledgeBaseDialog';
+import {CreateKnowledgeBaseDialog} from './CreateKnowledgeBaseDialog';
 
 interface KnowledgeBaseItem {
   id: string;
@@ -81,6 +137,7 @@ export function KnowledgeBase() {
   const folderInputRef = useRef<HTMLInputElement>(null);
   const uploadIntervalsRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
 
+  // TODO 替换成枚举Message
   const getVisibilityLabel = (visibility?: string) => {
     switch (visibility) {
       case 'team':
@@ -127,8 +184,7 @@ export function KnowledgeBase() {
     try {
       const response = await KnowledgeBases.getKnowledgeBaseStatistics();
       // 处理响应结构
-      const responseData = (response as any).data;
-      let statsData = responseData;
+      let statsData = (response as any).data;
 
       // 如果 statsData 有 overview 字段，说明是正确的统计数据
       if (statsData && typeof statsData === 'object' && 'overview' in statsData) {
@@ -624,7 +680,7 @@ export function KnowledgeBase() {
 
   // 文件验证配置
   const fileValidationConfig: FileValidationConfig = {
-    maxSize: 50 * 1024 * 1024, // 50MB
+    maxSize: 50 * 1024 * 1024, // 50MB TODO 提到常量文件constants.ts
     allowedTypes: [
       'application/pdf',
       'application/msword',
@@ -633,7 +689,7 @@ export function KnowledgeBase() {
     ],
     allowedExtensions: ['.pdf', '.doc', '.docx', '.txt'],
     errorMessages: {
-      sizeExceeded: `${t('knowledgeUpload.fileSizeExceeded')} (50MB)`,
+      sizeExceeded: `${t('knowledgeUpload.fileSizeExceeded')} (50MB)`, // TODO 50不写死根据常量拼接
       formatNotSupported: t('knowledgeUpload.fileFormatNotSupported'),
     },
   };
@@ -764,7 +820,8 @@ export function KnowledgeBase() {
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       // 检查是否是文件夹上传（通过检查 input 是否有 webkitdirectory 属性）
-      const isFolderUpload = e.target.hasAttribute('webkitdirectory') || e.target.hasAttribute('directory');
+      const isFolderUpload = e.target.hasAttribute('webkitdirectory')
+        || e.target.hasAttribute('directory');
       handleFiles(e.target.files, isFolderUpload);
     }
     // 重置 input，允许重复选择同一文件
@@ -798,7 +855,8 @@ export function KnowledgeBase() {
   // 过滤知识库
   const filteredKnowledgeBases = knowledgeBases.filter(kb => {
     const searchLower = searchQuery.toLowerCase();
-    return kb.name.toLowerCase().includes(searchLower) || kb.description.toLowerCase().includes(searchLower);
+    return kb.name.toLowerCase().includes(searchLower)
+      || kb.description.toLowerCase().includes(searchLower);
   });
 
   // 分页逻辑

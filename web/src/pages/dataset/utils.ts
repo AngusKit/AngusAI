@@ -1,4 +1,5 @@
-import { DatasetListVo, DatasetDataListVo, DatasourceTableDataPreviewVo } from '@/services/DatasetsTypes';
+import { DatasetListVo, DatasourceTableDataPreviewVo } from '@/services/DatasetsTypes';
+import {DatasetDataListVo} from '@/services/DatasetsDataTypes.ts';
 import { DatasetTypeEnum, DatasetDataTypeEnum, DatasetDataStatusEnum, VisibilityEnum } from '@/enums/enums';
 import { DATASET_TYPE_DISPLAY_MAP, VISIBILITY_DISPLAY_MAP, DATA_TYPE_DISPLAY_MAP, DATA_TYPE_ICON_MAP, DATA_STATUS_DISPLAY_MAP, DATA_STATUS_COLOR_MAP, DATA_TYPE_COLOR_MAP, } from './constants';
 
@@ -9,10 +10,10 @@ export interface DatasetItem {
   description: string;
   icon: string;
   iconBg: string;
-  type: '文件' | '数据源';
+  type: '文件' | '数据源'; // TODO 使用枚举值代替
   dataCount: string;
   size: string;
-  status: '已启用' | '禁用';
+  status: '已启用' | '禁用'; // TODO 使用枚举值代替
   statusColor: string;
   enabled: boolean;
   visibility?: string;
@@ -31,7 +32,7 @@ export interface DataFileItem {
   typeColor: string;
   typeIcon: string;
   size: string;
-  status: '已处理' | '处理中' | '待处理';
+  status: '已处理' | '处理中' | '待处理'; // TODO 使用枚举值代替
   statusColor: string;
   modifiedDate: string;
   recordCount: string;
@@ -52,13 +53,13 @@ export interface DatabaseTable {
  * 将 DatasetListVo 转换为 DatasetItem
  */
 export function convertDatasetVoToItem(vo: DatasetListVo): DatasetItem {
-  const typeMap: Record<DatasetTypeEnum, '文件' | '数据源'> = {
+  const typeMap: Record<DatasetTypeEnum, '文件' | '数据源'> = { // TODO 使用枚举message代替
     [DatasetTypeEnum.FILE]: '文件',
     [DatasetTypeEnum.DATASOURCE]: '数据源',
   };
 
   const dataCount = vo.dataStatistics?.totalFilesOrTables ? String(vo.dataStatistics.totalFilesOrTables) : '0';
-  const size = vo.dataStatistics?.totalRecordsSize || '0 条';
+  const size = vo.dataStatistics?.totalRecordsSize || '0 条'; // TODO  国际化漏了
   const createdDate = vo.createdDate || '';
   const modifiedDate = vo.modifiedDate || '';
   const creator = vo.creator ? vo.creator : '';
@@ -69,11 +70,11 @@ export function convertDatasetVoToItem(vo: DatasetListVo): DatasetItem {
     description: vo.description || '',
     icon: vo.icon || '📊',
     iconBg: vo.iconBg || 'bg-blue-50 dark:bg-blue-900/20',
-    type: typeMap[vo.type || DatasetTypeEnum.FILE] || '文件',
+    type: typeMap[vo.type || DatasetTypeEnum.FILE] || '文件', // TODO 漏了
     dataCount,
     size,
-    status: vo.enabled ? '已启用' : '禁用',
-    statusColor: vo.enabled
+    status: vo.enabled ? '已启用' : '禁用', // TODO 漏了
+    statusColor: vo.enabled // TODO 使用全局定义的启用和禁用状态message
       ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
       : 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
     enabled: vo.enabled || false,
@@ -97,6 +98,7 @@ export function convertDataListVoToFile(vo: DatasetDataListVo): DataFileItem {
     TABLE: DatasetDataTypeEnum.TABLE,
   };
 
+  // TODO 使用枚举message代替
   const statusMap: Record<string, '已处理' | '处理中' | '待处理'> = {
     [DatasetDataStatusEnum.COMPLETED]: '已处理',
     [DatasetDataStatusEnum.PROCESSING]: '处理中',
@@ -104,9 +106,10 @@ export function convertDataListVoToFile(vo: DatasetDataListVo): DataFileItem {
     [DatasetDataStatusEnum.FAILED]: '待处理', // 失败状态也显示为待处理
   };
 
+  // TODO 使用枚举值代替
   const typeEnum = stringToEnumMap[vo.type || 'CSV'] || DatasetDataTypeEnum.CSV;
   const typeDisplay = DATA_TYPE_DISPLAY_MAP[typeEnum];
-  const status = statusMap[vo.status || DatasetDataStatusEnum.PENDING] || '待处理';
+  const status = statusMap[vo.status || DatasetDataStatusEnum.PENDING] || '待处理'; // TODO 使用枚举值代替
 
   return {
     id: vo.id ? String(vo.id) : '',
@@ -150,17 +153,4 @@ export function generateJdbcUrl(
 ): string {
   if (!host || !port || !database) return '';
   return jdbcUrlTemplate.replace('{host}', host).replace('{port}', port).replace('{database}', database);
-}
-
-/**
- * 格式化记录数显示
- */
-export function formatRecordCount(count: number): string {
-  if (count >= 1000000) {
-    return `${(count / 1000000).toFixed(1)}M`;
-  }
-  if (count >= 1000) {
-    return `${(count / 1000).toFixed(1)}K`;
-  }
-  return String(count);
 }

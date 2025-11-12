@@ -61,14 +61,14 @@ export const CONFIG_CONSTANTS = {
   },
 } as const;
 
-// 步骤配置
+// 步骤配置 TODO 国际化
 export const FORM_STEPS = [
   { number: 1, titleKey: 'knowledge.formSteps.basicInfo' },
   { number: 2, titleKey: 'knowledge.formSteps.configuration' },
 ] as const;
 
 /**
- * 文档状态映射
+ * 文档状态映射 TODO 国际化
  */
 export const DOCUMENT_STATUS_MAP: Record<KnowledgeBaseDocStatusEnum, { textKey: string; color: string }> = {
   [KnowledgeBaseDocStatusEnum.PENDING]: {
@@ -90,9 +90,10 @@ export const DOCUMENT_STATUS_MAP: Record<KnowledgeBaseDocStatusEnum, { textKey: 
 };
 
 /**
- * 文档类型映射
+ * 文档类型映射 TODO 国际化
  */
-export const DOCUMENT_TYPE_MAP: Record<KnowledgeBaseDocTypeEnum, { labelKey: string; icon: string; color: string }> = {
+export const DOCUMENT_TYPE_MAP: Record<KnowledgeBaseDocTypeEnum,
+  { labelKey: string; icon: string; color: string }> = {
   [KnowledgeBaseDocTypeEnum.PDF]: {
     labelKey: 'knowledge.documents.types.pdf',
     icon: '📄',

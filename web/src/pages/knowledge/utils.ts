@@ -11,7 +11,7 @@ export interface ValidationResult {
 }
 
 /**
- * 验证知识库名称
+ * 验证知识库名称 TODO 国际化
  */
 export const validateKnowledgeBaseName = (name: string): ValidationResult => {
   const trimmedName = name.trim();
@@ -22,7 +22,7 @@ export const validateKnowledgeBaseName = (name: string): ValidationResult => {
 };
 
 /**
- * 验证知识库描述
+ * 验证知识库描述 TODO 国际化
  */
 export const validateDescription = (description: string): ValidationResult => {
   const trimmedDescription = description.trim();
@@ -88,7 +88,7 @@ export const validateTag = (tag: string, existingTags: string[]): ValidationResu
 };
 
 /**
- * 验证第一步表单（基本信息）
+ * 验证第一步表单（基本信息）TODO 需要替换
  */
 export const validateBasicInfoStep = (name: string, description: string): ValidationResult => {
   const nameValidation = validateKnowledgeBaseName(name);
@@ -107,7 +107,7 @@ export const validateBasicInfoStep = (name: string, description: string): Valida
 };
 
 /**
- * 验证第二步表单（配置处理）
+ * 验证第二步表单（配置处理） TODO
  */
 export const validateConfigurationStep = (chunkSize: number, chunkOverlap: number): ValidationResult => {
   const chunkSizeValidation = validateChunkSize(chunkSize);

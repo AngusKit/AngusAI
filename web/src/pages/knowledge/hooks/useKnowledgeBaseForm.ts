@@ -10,7 +10,7 @@ import { validateTag } from '../utils';
 export interface KnowledgeBaseFormData {
   name: string;
   description: string;
-  visibility: 'private' | 'team' | 'public';
+  visibility: 'private' | 'team' | 'public'; // TODO 用枚举替代
   selectedIconIndex: number;
   tags: string[];
   chunkSize: number[];

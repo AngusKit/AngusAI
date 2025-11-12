@@ -3,3 +3,4 @@
  */
 export * from './PagesUtils';
 export * from './DownloadUtils';
+export * from './UploadUtils.ts';

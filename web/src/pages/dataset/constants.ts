@@ -1,28 +1,28 @@
 import { DatasourceTypeEnum, DatasetDataTypeEnum, DatasetDataStatusEnum, VisibilityEnum } from '@/enums/enums';
 
 /** 数据库类型 */
-export type DatabaseType = 'mysql' | 'postgresql' | 'sqlserver' | 'oracle' | 'db2' | 'dm';
+export type DatabaseType = 'mysql' | 'postgresql' | 'sqlserver' | 'oracle' | 'db2' | 'dm'; // TODO 使用枚举代替
 
 /** 数据集类型显示映射 */
 export const DATASET_TYPE_DISPLAY_MAP: Record<string, '文件' | '数据源'> = {
   FILE: '文件',
-  DATASOURCE: '数据源',
+  DATASOURCE: '数据源', // TODO 使用枚举代替
 };
 
-/** 可见性显示映射 */
+/** 可见性显示映射 */ // TODO 使用枚举代替
 export const VISIBILITY_DISPLAY_MAP: Record<VisibilityEnum, string> = {
   [VisibilityEnum.PRIVATE]: 'private',
   [VisibilityEnum.TEAM]: 'team',
   [VisibilityEnum.PUBLIC]: 'public',
 };
 
-/** 数据集状态颜色 */
+/** 数据集状态颜色 */ // TODO 启用禁用全局保持一份
 export const DATASET_STATUS_COLORS = {
   enabled: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
   disabled: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
 } as const;
 
-/** 数据库类型到枚举的映射 */
+/** 数据库类型到枚举的映射 */ // TODO 使用枚举代替
 export const DATABASE_TYPE_TO_ENUM_MAP: Record<DatabaseType, DatasourceTypeEnum> = {
   mysql: DatasourceTypeEnum.MySQL,
   postgresql: DatasourceTypeEnum.PostgreSQL,
@@ -32,7 +32,7 @@ export const DATABASE_TYPE_TO_ENUM_MAP: Record<DatabaseType, DatasourceTypeEnum>
   dm: DatasourceTypeEnum.DM,
 };
 
-/** 枚举到数据库类型的反向映射 */
+/** 枚举到数据库类型的反向映射 */  // TODO 使用枚举代替
 export const ENUM_TO_DATABASE_TYPE_MAP: Record<DatasourceTypeEnum, DatabaseType> = {
   [DatasourceTypeEnum.MySQL]: 'mysql',
   [DatasourceTypeEnum.PostgreSQL]: 'postgresql',
@@ -118,10 +118,10 @@ export const DATABASE_CONFIGS: Record<DatabaseType, DatabaseConfig> = {
   },
 };
 
-/** 需要Schema的数据库类型 */
+/** 需要Schema的数据库类型 */ // TODO 使用枚举代替
 export const DATABASES_REQUIRING_SCHEMA: DatabaseType[] = ['postgresql', 'sqlserver', 'oracle', 'db2', 'dm'];
 
-/** 数据类型显示映射 */
+/** 数据类型显示映射 */ // TODO 使用枚举代替
 export const DATA_TYPE_DISPLAY_MAP: Record<DatasetDataTypeEnum, string> = {
   [DatasetDataTypeEnum.CSV]: 'CSV',
   [DatasetDataTypeEnum.JSON]: 'JSON',
@@ -130,7 +130,7 @@ export const DATA_TYPE_DISPLAY_MAP: Record<DatasetDataTypeEnum, string> = {
   [DatasetDataTypeEnum.TABLE]: 'Table',
 };
 
-/** 数据类型图标映射 */
+/** 数据类型图标映射 */ // TODO 使用枚举代替
 export const DATA_TYPE_ICON_MAP: Record<DatasetDataTypeEnum, string> = {
   [DatasetDataTypeEnum.CSV]: '📊',
   [DatasetDataTypeEnum.JSON]: '📝',
@@ -139,7 +139,7 @@ export const DATA_TYPE_ICON_MAP: Record<DatasetDataTypeEnum, string> = {
   [DatasetDataTypeEnum.TABLE]: '📋',
 };
 
-/** 数据状态显示映射 */
+/** 数据状态显示映射 */ // TODO 使用枚举代替
 export const DATA_STATUS_DISPLAY_MAP: Record<DatasetDataStatusEnum, string> = {
   [DatasetDataStatusEnum.PENDING]: '待处理',
   [DatasetDataStatusEnum.PROCESSING]: '处理中',
@@ -147,7 +147,7 @@ export const DATA_STATUS_DISPLAY_MAP: Record<DatasetDataStatusEnum, string> = {
   [DatasetDataStatusEnum.FAILED]: '处理失败',
 };
 
-/** 数据状态颜色映射 */
+/** 数据状态颜色映射 */ // TODO 使用枚举代替
 export const DATA_STATUS_COLOR_MAP: Record<string, string> = {
   已处理: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
   处理中: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
@@ -164,7 +164,7 @@ export const DATA_TYPE_COLOR_MAP: Record<DatasetDataTypeEnum, string> = {
   [DatasetDataTypeEnum.TABLE]: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300',
 };
 
-/** 可见性选项映射 */
+/** 可见性选项映射 */ // TODO 使用枚举代替
 export const VISIBILITY_OPTIONS_MAP: Record<string, VisibilityEnum> = {
   private: VisibilityEnum.PRIVATE,
   team: VisibilityEnum.TEAM,
