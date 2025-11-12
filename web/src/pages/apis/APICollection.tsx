@@ -1621,7 +1621,7 @@ export function APICollection() {
                     <div>
                       <Label>{language === 'zh-CN' ? '接口集名称' : 'Collection Name'}</Label>
                       <Input
-                        defaultValue={collections.find(c => c.id === selectedCollection)?.name}
+                        defaultValue={selectedCollectionItem?.name}
                         className='mt-2 dark:bg-gray-750 dark:border-gray-600'
                       />
                     </div>
@@ -1629,14 +1629,14 @@ export function APICollection() {
                     <div>
                       <Label>{language === 'zh-CN' ? '描述' : 'Description'}</Label>
                       <Textarea
-                        defaultValue={collections.find(c => c.id === selectedCollection)?.description}
+                        defaultValue={selectedCollectionItem?.description}
                         className='mt-2 min-h-[100px] dark:bg-gray-750 dark:border-gray-600'
                       />
                     </div>
 
                     <div>
                       <Label>{language === 'zh-CN' ? '可见性' : 'Visibility'}</Label>
-                      <Select defaultValue={collections.find(c => c.id === selectedCollection)?.visibility}>
+                      <Select defaultValue={selectedCollectionItem?.visibility}>
                         <SelectTrigger className='dark:bg-gray-750 dark:border-gray-600 mt-2'>
                           <SelectValue />
                         </SelectTrigger>
