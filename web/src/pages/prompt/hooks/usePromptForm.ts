@@ -51,7 +51,7 @@ export const usePromptForm = ({ editingPrompt, categories, defaultCategoryId, is
           content: '',
           category: initialCategoryId,
           tags: [],
-        });
+        }); // TODO 类型不兼容
       }
       setNewTagLabel('');
       setNewTagColor(DEFAULT_VALUES.TAG_COLOR);

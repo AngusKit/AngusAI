@@ -66,7 +66,7 @@ export const ICON_MAP: Record<string, any> = {
   Compass,
 } as const;
 
-// 可用图标配置
+// 可用图标配置 TODO 国际化
 export const AVAILABLE_ICONS = [
   { name: 'Sparkles', component: Sparkles, label: '火花' },
   { name: 'Star', component: Star, label: '星星' },
@@ -128,7 +128,7 @@ export const AVAILABLE_ICONS = [
   { name: 'Compass', component: Compass, label: '指南针' },
 ] as const;
 
-// 标签颜色配置
+// 标签颜色配置 TODO 国际化
 export const TAG_COLORS = [
   {
     name: '蓝色',
@@ -192,7 +192,7 @@ export const CATEGORY_COLORS = [
   { value: 'text-pink-600 dark:text-pink-400', label: '粉色', labelEn: 'Pink', colorClass: 'bg-pink-500' },
 ] as const;
 
-// 默认值配置
+// 默认值配置 TODO 国际化
 export const DEFAULT_VALUES = {
   CATEGORY_ICON: BookOpen,
   CATEGORY_COLOR: 'text-blue-600 dark:text-blue-400',

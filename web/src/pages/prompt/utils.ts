@@ -108,7 +108,7 @@ export const validatePromptForm = (
 ): { isValid: boolean; error?: string } => {
   if (!formData.title.trim() || !formData.content.trim()) {
     return {
-      isValid: false,
+      isValid: false, // TODO 国际化
       error: language === 'zh-CN' ? '请填写标题和内容' : 'Please fill in title and content',
     };
   }
@@ -133,7 +133,7 @@ export const validateTag = (
 ): { isValid: boolean; error?: string } => {
   if (!tagLabel.trim()) {
     return {
-      isValid: false,
+      isValid: false, // TODO 国际化
       error: language === 'zh-CN' ? '请输入标签名称' : 'Please enter tag name',
     };
   }

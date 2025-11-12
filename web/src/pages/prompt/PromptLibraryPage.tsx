@@ -122,7 +122,7 @@ function CategoryItem({
         <div className='mt-1 space-y-1'>
           {childCategories.map(childCategory => (
             <CategoryItem
-              key={childCategory.id}
+              key={childCategory.id} // TODO 缺字段
               category={childCategory}
               selectedCategoryId={selectedCategoryId}
               categories={categories}
@@ -149,7 +149,7 @@ export function PromptLibraryPage() {
   const [categories, setCategories] = useState<Category[]>([
     {
       id: 'all',
-      name: '全部',
+      name: '全部', // TODO 国际化
       nameEn: 'All',
       icon: Sparkles,
       color: 'text-gray-700 dark:text-gray-300',
@@ -541,7 +541,7 @@ export function PromptLibraryPage() {
               <div className='space-y-1'>
                 {getTopLevelCategories(categories).map(category => (
                   <CategoryItem
-                    key={category.id}
+                    key={category.id} // TODO 缺字段
                     category={category}
                     selectedCategoryId={selectedCategoryId}
                     categories={categories}

@@ -50,6 +50,7 @@ export function PromptDialog({
     isDialogOpen: open,
   });
 
+  // TODO 国际化
   const getTagColorDisplayName = (color: (typeof TAG_COLORS)[number]) =>
     language === 'zh-CN' ? color.name : color.nameEn;
 
