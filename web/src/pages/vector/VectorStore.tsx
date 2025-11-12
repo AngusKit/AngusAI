@@ -21,6 +21,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
+  XcanPagination,
 } from '@/components/ui/pagination';
 import VectorStoresService from '@/services/VectorStores';
 import {
@@ -306,11 +307,6 @@ export function VectorStore() {
   useEffect(() => {
     setCurrentPage(prev => (prev === 1 ? prev : 1));
   }, [debouncedSearchQuery]);
-
-  const totalPages = useMemo(
-    () => Math.max(1, Math.ceil(vectorStoresTotal / itemsPerPage)),
-    [itemsPerPage, vectorStoresTotal]
-  );
 
   const shouldShowPagination = vectorStoresTotal > itemsPerPage;
 
@@ -883,37 +879,9 @@ export function VectorStore() {
 
           {shouldShowPagination && (
             <div className='flex items-center justify-center mt-6'>
-              <Pagination>
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious
-                      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                      className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                    >
-                      {language === 'zh-CN' ? '上一页' : 'Previous'}
-                    </PaginationPrevious>
-                  </PaginationItem>
-                  {Array.from({ length: totalPages }, (_, index) => index + 1).map(page => (
-                    <PaginationItem key={page}>
-                      <PaginationLink
-                        onClick={() => setCurrentPage(page)}
-                        isActive={currentPage === page}
-                        className='cursor-pointer'
-                      >
-                        {page}
-                      </PaginationLink>
-                    </PaginationItem>
-                  ))}
-                  <PaginationItem>
-                    <PaginationNext
-                      onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                      className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                    >
-                      {language === 'zh-CN' ? '下一页' : 'Next'}
-                    </PaginationNext>
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
+              <XcanPagination pageSize={itemsPerPage} pageNo={currentPage} total={vectorStoresTotal} onChange={({pageNo}) => {
+                setCurrentPage(pageNo);
+              }} />
             </div>
           )}
         </>

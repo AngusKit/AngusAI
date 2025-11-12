@@ -35,7 +35,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, } from '@/components/ui/pagination';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, XcanPagination} from '@/components/ui/pagination';
 import { toast } from 'sonner';
 import { useDebounce } from '@/hooks/useDebounce';
 import ModelsService from '@/services/Models';
@@ -566,13 +566,10 @@ export function ModelManagement() {
   useEffect(() => {
     loadModels();
   }, [loadModels]);
-
-  // 过滤和排序模型
-  const totalPages = useMemo(
-    () => Math.max(1, Math.ceil(modelsTotal / itemsPerPage)),
-    [itemsPerPage, modelsTotal]
-  );
-  const shouldShowPagination = modelsTotal > itemsPerPage;
+  
+  const shouldShowPagination = useMemo(() => {
+    return modelsTotal > itemsPerPage;
+  }, [modelsTotal, itemsPerPage]);
 
   const fetchModelDetail = useCallback(async (modelId: string) => {
     try {
@@ -1419,40 +1416,10 @@ export function ModelManagement() {
             </Card>
           )}
           {/* Table View Pagination */}
-          {shouldShowPagination && models.length > 0 && (
-            <div className='flex items-center justify-center px-6 py-4 border-t border-gray-200 dark:border-gray-700'>
-              <Pagination>
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious
-                      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                      className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                    >
-                      上一页
-                    </PaginationPrevious>
-                  </PaginationItem>
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                    <PaginationItem key={page}>
-                      <PaginationLink
-                        onClick={() => setCurrentPage(page)}
-                        isActive={currentPage === page}
-                        className='cursor-pointer'
-                      >
-                        {page}
-                      </PaginationLink>
-                    </PaginationItem>
-                  ))}
-                  <PaginationItem>
-                    <PaginationNext
-                      onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                      className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                    >
-                      下一页
-                    </PaginationNext>
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            </div>
+          {shouldShowPagination && (
+            <XcanPagination pageSize={itemsPerPage} pageNo={currentPage} total={modelsTotal} onChange={({pageNo}) => {
+              setCurrentPage(pageNo);
+            }} />
           )}
         </TabsContent>
 
