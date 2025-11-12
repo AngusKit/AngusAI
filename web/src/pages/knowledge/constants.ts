@@ -70,10 +70,7 @@ export const FORM_STEPS = [
 /**
  * 文档状态映射
  */
-export const DOCUMENT_STATUS_MAP: Record<
-  KnowledgeBaseDocStatusEnum,
-  { textKey: string; color: string }
-> = {
+export const DOCUMENT_STATUS_MAP: Record<KnowledgeBaseDocStatusEnum, { textKey: string; color: string }> = {
   [KnowledgeBaseDocStatusEnum.PENDING]: {
     textKey: 'common.status.pending',
     color: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
@@ -95,10 +92,7 @@ export const DOCUMENT_STATUS_MAP: Record<
 /**
  * 文档类型映射
  */
-export const DOCUMENT_TYPE_MAP: Record<
-  KnowledgeBaseDocTypeEnum,
-  { labelKey: string; icon: string; color: string }
-> = {
+export const DOCUMENT_TYPE_MAP: Record<KnowledgeBaseDocTypeEnum, { labelKey: string; icon: string; color: string }> = {
   [KnowledgeBaseDocTypeEnum.PDF]: {
     labelKey: 'knowledge.documents.types.pdf',
     icon: '📄',

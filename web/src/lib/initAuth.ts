@@ -1,23 +1,14 @@
 import httpClient from '../services/HttpClient';
 
-import {
-  app,
-  APP_CODE_MAP,
-  appContext,
-  AppOrServiceRoute,
-  CLIENT_ID_KEY,
-  cookieUtils,
-  PageQuery,
-  routerUtils,
-} from '@xcan-angus/infra';
+import { app, APP_CODE_MAP, appContext, AppOrServiceRoute, CLIENT_ID_KEY, cookieUtils, PageQuery, routerUtils, } from '@xcan-angus/infra';
 
 const initAfterAuthentication = async ({
-                                         code,
-                                       }: {
+  code,
+}: {
   code: keyof typeof AppOrServiceRoute;
 }): Promise<{ [key: string]: any }> => {
   //   Check for private parameters in URL and update authentication tokens
-  let {url, isPrivateParam} = app.updateAuthByPrivateParam();
+  let { url, isPrivateParam } = app.updateAuthByPrivateParam();
   if (isPrivateParam) {
     location.href = url.href;
     return {};
@@ -59,4 +50,4 @@ const initAfterAuthentication = async ({
   return userInfo;
 };
 
-export {initAfterAuthentication};
+export { initAfterAuthentication };

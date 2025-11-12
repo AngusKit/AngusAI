@@ -182,8 +182,7 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
           {/* 标签 */}
           <div className='mt-5'>
             <Label className='text-sm mb-2 block dark:text-gray-300'>
-              {t('common.labels.tags')}{' '}
-              <span className='text-gray-400'>{tagCountText}</span>
+              {t('common.labels.tags')} <span className='text-gray-400'>{tagCountText}</span>
             </Label>
             <Input
               value={tagInput}
@@ -256,9 +255,7 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
                     {dataType === 'table' && <div className='w-2.5 h-2.5 rounded-full bg-blue-500' />}
                   </div>
                   <div>
-                    <div className='dark:text-white mb-0.5'>
-                      {t('dataset.editDatasetDialog.dataType.tableTitle')}
-                    </div>
+                    <div className='dark:text-white mb-0.5'>{t('dataset.editDatasetDialog.dataType.tableTitle')}</div>
                     <div className='text-sm text-gray-500 dark:text-gray-400'>
                       {t('dataset.editDatasetDialog.dataType.tableDescription')}
                     </div>

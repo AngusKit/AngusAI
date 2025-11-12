@@ -1,91 +1,30 @@
-import {
-  Check,
-  Database,
-  Download,
-  Edit,
-  Eye,
-  Files,
-  FileText,
-  Filter,
-  FolderOpen,
-  Grid3x3,
-  List,
-  MoreHorizontal,
-  Plus,
-  RefreshCw,
-  Search,
-  Trash2,
-  Upload,
-  X,
-} from 'lucide-react';
-import {Button} from '@/components/ui/button';
-import {Card} from '@/components/ui/card';
-import {Badge} from '@/components/ui/badge';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {Input} from '@/components/ui/input';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@/components/ui/pagination';
-import {Progress} from '@/components/ui/progress';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle
-} from '@/components/ui/dialog';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import {Label} from '@/components/ui/label';
-import {Switch} from '@/components/ui/switch';
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {toast} from 'sonner';
-import {formatDateOnly, formatFileSize, getTagColor} from '@/utils';
-import {downloadFile} from '@/utils/DownloadUtils';
-import {
-  clearAllUploadIntervals,
-  clearUploadInterval,
-  createDragHandlers,
-  type FileValidationConfig,
-  processFiles,
-  type UploadConfig,
-  UploadFile,
-  uploadFileWithProgress,
-} from '@/utils/UploadUtils';
-import {CreateDatasetDialog} from './CreateDatasetDialog';
-import {EditDatasetDialog} from './EditDatasetDialog';
-import {EditDataSourceDialog} from './EditDataSourceDialog';
-import {useDebounce} from '@/hooks/useDebounce';
+import { Check, Database, Download, Edit, Eye, Files, FileText, Filter, FolderOpen, Grid3x3, List, MoreHorizontal, Plus, RefreshCw, Search, Trash2, Upload, X, } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, } from '@/components/ui/pagination';
+import { Progress } from '@/components/ui/progress';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, } from '@/components/ui/alert-dialog';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { toast } from 'sonner';
+import { formatDateOnly, formatFileSize, getTagColor } from '@/utils';
+import { downloadFile } from '@/utils/DownloadUtils';
+import { clearAllUploadIntervals, clearUploadInterval, createDragHandlers, type FileValidationConfig, processFiles, type UploadConfig, UploadFile, uploadFileWithProgress, } from '@/utils/UploadUtils';
+import { CreateDatasetDialog } from './CreateDatasetDialog';
+import { EditDatasetDialog } from './EditDatasetDialog';
+import { EditDataSourceDialog } from './EditDataSourceDialog';
+import { useDebounce } from '@/hooks/useDebounce';
 import Datasets from '@/services/Datasets';
 import DatasetsData from '@/services/DatasetsData';
-import {
-  DatasetDetailVo,
-  DatasetListVo,
-  DatasetStatisticsVo,
-  DatasourceTableDataPreviewVo,
-  GetDatasetListOrderByEnum,
-} from '@/services/DatasetsTypes';
-import {DatasetDataListVo} from '@/services/DatasetsDataTypes';
-import {DatasetDataTypeEnum, DatasetTypeEnum, VisibilityEnum} from '@/enums/enums';
-import {useLanguage} from '@/components/ui/LanguageProvider';
+import { DatasetDetailVo, DatasetListVo, DatasetStatisticsVo, DatasourceTableDataPreviewVo, GetDatasetListOrderByEnum, } from '@/services/DatasetsTypes';
+import { DatasetDataListVo } from '@/services/DatasetsDataTypes';
+import { DatasetDataTypeEnum, DatasetTypeEnum, VisibilityEnum } from '@/enums/enums';
+import { useLanguage } from '@/components/ui/LanguageProvider';
 
 interface DatasetItem {
   id: string;
@@ -339,8 +278,7 @@ export function Dataset() {
     };
 
     const type = vo.type || DatasetTypeEnum.FILE;
-    const typeLabelKey =
-      type === DatasetTypeEnum.FILE ? t('dataset.types.file') : t('dataset.types.datasource');
+    const typeLabelKey = type === DatasetTypeEnum.FILE ? t('dataset.types.file') : t('dataset.types.datasource');
 
     const dataCount = vo.dataStatistics?.totalFilesOrTables ? String(vo.dataStatistics.totalFilesOrTables) : '0';
     const size = vo.dataStatistics?.totalRecordsSize || '0 条';
@@ -438,11 +376,12 @@ export function Dataset() {
           },
           {
             label: t('dataset.page.stats.totalData.label'),
-            value: totalRecords >= 1000
-              ? totalRecords >= 1000000
-                ? `${(totalRecords / 1000000).toFixed(1)}M`
-                : `${(totalRecords / 1000).toFixed(1)}K`
-              : String(totalRecords),
+            value:
+              totalRecords >= 1000
+                ? totalRecords >= 1000000
+                  ? `${(totalRecords / 1000000).toFixed(1)}M`
+                  : `${(totalRecords / 1000).toFixed(1)}K`
+                : String(totalRecords),
             subtext: t('dataset.page.stats.totalData.subtext', {
               total: totalFilesOrTables,
               active: activeFilesOrTables,
@@ -464,17 +403,13 @@ export function Dataset() {
           },
           {
             label: t('dataset.page.stats.storage.label'),
-            value: totalStoreSize
-              ? `${usedStoreSize} / ${totalStoreSize}`
-              : `${usedStoreSize} / --`,
+            value: totalStoreSize ? `${usedStoreSize} / ${totalStoreSize}` : `${usedStoreSize} / --`,
             subtext: totalStoreSize
               ? t('dataset.page.stats.storage.subtext', { rate: usedStoreRate || '0%' })
               : t('dataset.page.stats.storage.unlimited'),
             icon: Database,
             iconBg: 'bg-purple-500',
-            progress: usedStoreRate
-              ? parseFloat(usedStoreRate.replace('%', '')) || 0
-              : 0,
+            progress: usedStoreRate ? parseFloat(usedStoreRate.replace('%', '')) || 0 : 0,
             showProgress: !!totalStoreSize,
             trend: undefined,
             trendUp: undefined,
@@ -558,9 +493,7 @@ export function Dataset() {
           return ds;
         })
       );
-      toast.success(
-        newEnabled ? t('dataset.toasts.enableSuccess') : t('dataset.toasts.disableSuccess')
-      );
+      toast.success(newEnabled ? t('dataset.toasts.enableSuccess') : t('dataset.toasts.disableSuccess'));
     } catch (error: any) {
       console.error('Failed to toggle dataset status:', error);
       toast.error(error?.message || t('dataset.toasts.toggleFailed'));
@@ -772,9 +705,7 @@ export function Dataset() {
             filteredDescription ? { description: filteredDescription } : undefined
           );
         } else {
-          toast.success(
-            t('dataset.upload.folderSuccess', { added: result.validFiles.length })
-          );
+          toast.success(t('dataset.upload.folderSuccess', { added: result.validFiles.length }));
         }
       } else {
         toast.success(t('dataset.upload.fileSuccess', { count: result.validFiles.length }));
@@ -784,14 +715,11 @@ export function Dataset() {
         handleUpload(uploadFile);
       });
     } else if (isFolderUpload && result.filteredCount > 0) {
-      toast.warning(
-        t('dataset.upload.noSupportedFiles'),
-        {
-          description: t('dataset.upload.noSupportedFilesDescription', {
-            count: result.filteredCount,
-          }),
-        }
-      );
+      toast.warning(t('dataset.upload.noSupportedFiles'), {
+        description: t('dataset.upload.noSupportedFilesDescription', {
+          count: result.filteredCount,
+        }),
+      });
     }
   };
 
@@ -1276,9 +1204,9 @@ export function Dataset() {
                             className='data-[state=checked]:bg-blue-500'
                           />
                         </div>
-                    <Badge variant='secondary' className={`${dataset.statusColor} text-xs mt-1`}>
-                      {t(dataset.statusKey)}
-                    </Badge>
+                        <Badge variant='secondary' className={`${dataset.statusColor} text-xs mt-1`}>
+                          {t(dataset.statusKey)}
+                        </Badge>
                       </div>
                     </div>
                     <DropdownMenu>
@@ -1312,7 +1240,9 @@ export function Dataset() {
                     </DropdownMenu>
                   </div>
 
-                  <p className='text-sm text-gray-600 dark:text-gray-400 mb-1 line-clamp-2 flex-1'>{dataset.description}</p>
+                  <p className='text-sm text-gray-600 dark:text-gray-400 mb-1 line-clamp-2 flex-1'>
+                    {dataset.description}
+                  </p>
 
                   {/* 标签 */}
                   {dataset.tags && dataset.tags.length > 0 && (
@@ -1415,13 +1345,13 @@ export function Dataset() {
                     {t(selectedDS.statusKey)}
                   </Badge>
                 </div>
-                  <p className='text-sm text-gray-600 dark:text-gray-400 mt-1'>
-                    {t('dataset.page.selected.summary', {
-                      description: selectedDS.description,
-                      count: selectedDS.dataCount,
-                      size: selectedDS.size,
-                    })}
-                  </p>
+                <p className='text-sm text-gray-600 dark:text-gray-400 mt-1'>
+                  {t('dataset.page.selected.summary', {
+                    description: selectedDS.description,
+                    count: selectedDS.dataCount,
+                    size: selectedDS.size,
+                  })}
+                </p>
               </div>
             </div>
             <Button
@@ -1474,9 +1404,7 @@ export function Dataset() {
                   </div>
 
                   <p className='text-sm text-gray-600 dark:text-gray-400'>
-                    {isDragging
-                      ? t('dataset.upload.dropHintActive')
-                      : t('dataset.upload.dropHint')}
+                    {isDragging ? t('dataset.upload.dropHintActive') : t('dataset.upload.dropHint')}
                   </p>
                   <p className='text-xs text-gray-500 dark:text-gray-500 mt-2'>
                     {t('dataset.upload.supportedFormatsDetail', {
@@ -1727,12 +1655,12 @@ export function Dataset() {
                     if (!selectedDS) return;
                     try {
                       await DatasetsData.syncDatasetData(selectedDS.id);
-                    toast.success(t('dataset.toasts.datasourceSyncStarted'));
+                      toast.success(t('dataset.toasts.datasourceSyncStarted'));
                       // 重新加载表列表
                       loadDataSourceTables(selectedDS.id);
                     } catch (error: any) {
-                    console.error('Failed to sync datasource:', error);
-                    toast.error(error?.message || t('dataset.toasts.syncDatasourceFailed'));
+                      console.error('Failed to sync datasource:', error);
+                      toast.error(error?.message || t('dataset.toasts.syncDatasourceFailed'));
                     }
                   }}
                 >
@@ -1798,9 +1726,7 @@ export function Dataset() {
             <div className='col-span-2'>
               <div className='mb-4'>
                 <h3 className='text-lg dark:text-white mb-1'>{t('dataset.datasource.tables.title')}</h3>
-                <p className='text-sm text-gray-600 dark:text-gray-400'>
-                  {t('dataset.datasource.tables.subtitle')}
-                </p>
+                <p className='text-sm text-gray-600 dark:text-gray-400'>{t('dataset.datasource.tables.subtitle')}</p>
               </div>
 
               <Card className='dark:bg-gray-800 dark:border-gray-700'>
@@ -1894,9 +1820,7 @@ export function Dataset() {
                       </div>
                     ) : tablePreviewData && tablePreviewData.success === false ? (
                       <div className='p-8 text-center text-red-500 dark:text-red-400'>
-                        <p className='text-sm'>
-                          {tablePreviewData.message || t('dataset.datasource.preview.failed')}
-                        </p>
+                        <p className='text-sm'>{tablePreviewData.message || t('dataset.datasource.preview.failed')}</p>
                         {tablePreviewData.details && (
                           <p className='text-xs mt-2 text-gray-500 dark:text-gray-400'>{tablePreviewData.details}</p>
                         )}
@@ -2145,9 +2069,7 @@ export function Dataset() {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent className='dark:bg-gray-900 dark:border-gray-700'>
           <AlertDialogHeader>
-            <AlertDialogTitle className='dark:text-white'>
-              {t('dataset.dialogs.deleteDataset.title')}
-            </AlertDialogTitle>
+            <AlertDialogTitle className='dark:text-white'>{t('dataset.dialogs.deleteDataset.title')}</AlertDialogTitle>
             <AlertDialogDescription className='dark:text-gray-400'>
               {t('dataset.dialogs.deleteDataset.description', {
                 name: deletingDataset?.name ?? '',
@@ -2169,9 +2091,7 @@ export function Dataset() {
       <AlertDialog open={deleteFileDialogOpen} onOpenChange={setDeleteFileDialogOpen}>
         <AlertDialogContent className='dark:bg-gray-900 dark:border-gray-700'>
           <AlertDialogHeader>
-            <AlertDialogTitle className='dark:text-white'>
-              {t('dataset.dialogs.deleteFile.title')}
-            </AlertDialogTitle>
+            <AlertDialogTitle className='dark:text-white'>{t('dataset.dialogs.deleteFile.title')}</AlertDialogTitle>
             <AlertDialogDescription className='dark:text-gray-400'>
               {t('dataset.dialogs.deleteFile.description', {
                 name: deletingFile?.name ?? '',

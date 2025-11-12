@@ -91,7 +91,7 @@ export const getCategoryDisplayName = (category: Category, language: string): st
  */
 export const validateCategoryName = (
   name: string,
-  t: (key: string, params?: Record<string, string | number>) => string,
+  t: (key: string, params?: Record<string, string | number>) => string
 ): { isValid: boolean; error?: string } => {
   if (!name.trim()) {
     return { isValid: false, error: t('prompts.categoryNameRequired') };

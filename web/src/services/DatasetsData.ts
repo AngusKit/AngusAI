@@ -110,12 +110,13 @@ export class DatasetsData<SecurityDataType = unknown> {
    * @secure
    */
   batchDeleteData = (
-    id: string, 
+    id: string,
     query?: {
       /** 同步文件或表名 */
       dataIds?: string[];
     },
-    params: RequestParams = {}) =>
+    params: RequestParams = {}
+  ) =>
     this.http.request<void, ApiLocaleResult>({
       path: `${AI}/datasets/${id}/data/batch-delete`,
       method: 'DELETE',

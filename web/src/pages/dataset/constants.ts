@@ -184,4 +184,3 @@ export const PAGINATION = {
   TABLE_PAGE_SIZE: 10,
   DATA_LIST_PAGE_SIZE: 100,
 } as const;
-

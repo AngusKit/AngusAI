@@ -149,7 +149,7 @@ export function PromptDialog({
                   </SelectItem>
                 ))}
                 {categories.filter(isAvailableCategory).length === 0 && (
-                  <SelectItem value="__none__" disabled>
+                  <SelectItem value='__none__' disabled>
                     {t('prompts.noCategories')}
                   </SelectItem>
                 )}

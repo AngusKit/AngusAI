@@ -53,16 +53,7 @@ const targetTypeMap: Record<TargetTypeKey, { labelZh: string; labelEn: string; i
   PROMPT: { labelZh: '提示词', labelEn: 'Prompt', icon: FileText, color: 'text-cyan-500' },
 };
 
-type ActionTypeKey =
-  | 'CREATE'
-  | 'UPDATE'
-  | 'DELETE'
-  | 'VIEW'
-  | 'SHARE'
-  | 'EXPORT'
-  | 'IMPORT'
-  | 'EXECUTE'
-  | 'UNKNOWN';
+type ActionTypeKey = 'CREATE' | 'UPDATE' | 'DELETE' | 'VIEW' | 'SHARE' | 'EXPORT' | 'IMPORT' | 'EXECUTE' | 'UNKNOWN';
 
 const actionTypeMap: Record<ActionTypeKey, { labelZh: string; labelEn: string; icon: any; color: string }> = {
   CREATE: { labelZh: '创建', labelEn: 'Create', icon: Plus, color: 'text-green-500' },
@@ -160,9 +151,7 @@ export function ActivityLog() {
         listData?.map(item => {
           const actionType = inferActionType(item);
           const status = inferStatus(item);
-          const avatarFallback =
-            item.userAvatar ??
-            (item.userName ? item.userName.slice(0, 2).toUpperCase() : 'NA');
+          const avatarFallback = item.userAvatar ?? (item.userName ? item.userName.slice(0, 2).toUpperCase() : 'NA');
           return {
             id: item.id ? String(item.id) : generateActivityId(),
             userId: item.userId ? String(item.userId) : undefined,
@@ -231,10 +220,7 @@ export function ActivityLog() {
   }, [activities, selectedActionType]);
 
   // 分页信息（后端已分页，totalRecords 来源于服务端）
-  const totalPages = useMemo(
-    () => Math.max(1, Math.ceil(totalRecords / itemsPerPage)),
-    [itemsPerPage, totalRecords]
-  );
+  const totalPages = useMemo(() => Math.max(1, Math.ceil(totalRecords / itemsPerPage)), [itemsPerPage, totalRecords]);
   const paginatedActivities = filteredActivities;
 
   const statsCards = useMemo(() => {
@@ -250,14 +236,11 @@ export function ActivityLog() {
     }).length;
 
     const uniqueUsers = new Set(
-      activities
-        .filter(activity => activity.userId)
-        .map(activity => activity.userId as string)
+      activities.filter(activity => activity.userId).map(activity => activity.userId as string)
     ).size;
 
     const successCount = activities.filter(activity => activity.status !== 'failed').length;
-    const successRate =
-      activities.length > 0 ? `${((successCount / activities.length) * 100).toFixed(1)}%` : '--';
+    const successRate = activities.length > 0 ? `${((successCount / activities.length) * 100).toFixed(1)}%` : '--';
 
     return [
       {
@@ -381,9 +364,7 @@ export function ActivityLog() {
       <div>
         <div className='flex items-center justify-between'>
           <div>
-            <h1 className='text-2xl dark:text-white mb-1'>
-              {language === 'zh-CN' ? '活动记录' : 'Activity Log'}
-            </h1>
+            <h1 className='text-2xl dark:text-white mb-1'>{language === 'zh-CN' ? '活动记录' : 'Activity Log'}</h1>
             <p className='text-sm text-gray-600 dark:text-gray-400'>
               {language === 'zh-CN'
                 ? `查看团队成员的所有操作活动记录 · 当前保留 ${retentionDays} 天记录`
@@ -431,11 +412,7 @@ export function ActivityLog() {
               <Input
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                placeholder={
-                  language === 'zh-CN'
-                    ? '搜索用户、目标或操作...'
-                    : 'Search users, targets, or actions...'
-                }
+                placeholder={language === 'zh-CN' ? '搜索用户、目标或操作...' : 'Search users, targets, or actions...'}
                 className='pl-10 dark:bg-gray-800 dark:border-gray-700 dark:text-white'
               />
             </div>
@@ -575,9 +552,7 @@ export function ActivityLog() {
                         </div>
                       </div>
 
-                      <p className='text-sm text-gray-600 dark:text-gray-400 mb-1'>
-                        {activity.description || '--'}
-                      </p>
+                      <p className='text-sm text-gray-600 dark:text-gray-400 mb-1'>{activity.description || '--'}</p>
 
                       <div className='flex items-center gap-2 text-sm'>
                         <span className='text-gray-500 dark:text-gray-500'>
@@ -589,9 +564,7 @@ export function ActivityLog() {
                       {activity.detail && (
                         <div className='mt-2 flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400'>
                           <Info className='w-4 h-4' />
-                          <span>
-                            {language === 'zh-CN' ? '点击查看详细信息' : 'Click to view more details'}
-                          </span>
+                          <span>{language === 'zh-CN' ? '点击查看详细信息' : 'Click to view more details'}</span>
                         </div>
                       )}
                     </div>
@@ -731,9 +704,7 @@ export function ActivityLog() {
                     </Label>
                     <div className='flex items-center gap-2 mt-1'>
                       <Clock className='w-4 h-4 text-gray-400' />
-                      <span className='dark:text-white'>
-                        {selectedActivity.activityDate || '--'}
-                      </span>
+                      <span className='dark:text-white'>{selectedActivity.activityDate || '--'}</span>
                     </div>
                   </div>
 
@@ -795,9 +766,7 @@ export function ActivityLog() {
           <div className='py-6'>
             <div className='space-y-4'>
               <div>
-                <Label className='dark:text-white'>
-                  {language === 'zh-CN' ? '记录保留天数' : 'Retention Days'}
-                </Label>
+                <Label className='dark:text-white'>{language === 'zh-CN' ? '记录保留天数' : 'Retention Days'}</Label>
                 <p className='text-sm text-gray-600 dark:text-gray-400 mt-1 mb-3'>
                   {language === 'zh-CN'
                     ? '设置活动记录的保留期限，建议保留30-180天'
@@ -840,9 +809,7 @@ export function ActivityLog() {
                 <div className='flex gap-3'>
                   <Info className='w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5' />
                   <div>
-                    <p className='text-sm dark:text-white mb-1'>
-                      {language === 'zh-CN' ? '说明' : 'Notes'}
-                    </p>
+                    <p className='text-sm dark:text-white mb-1'>{language === 'zh-CN' ? '说明' : 'Notes'}</p>
                     <p className='text-sm text-gray-600 dark:text-gray-400'>
                       {language === 'zh-CN' ? (
                         <>

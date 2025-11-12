@@ -1,30 +1,6 @@
 import { useCallback, useEffect, useMemo, useState, type ElementType } from 'react';
 import { useLanguage } from '@/components/ui/LanguageProvider';
-import {
-  Database,
-  Search,
-  Filter,
-  Plus,
-  TrendingUp,
-  Activity,
-  Grid3x3,
-  List,
-  Eye,
-  Edit,
-  Trash2,
-  MoreHorizontal,
-  Play,
-  Pause,
-  Settings,
-  Cpu,
-  Zap,
-  Brain,
-  FileText,
-  Image as ImageIcon,
-  Video,
-  Info,
-  Sliders,
-} from 'lucide-react';
+import { Database, Search, Filter, Plus, TrendingUp, Activity, Grid3x3, List, Eye, Edit, Trash2, MoreHorizontal, Play, Pause, Settings, Cpu, Zap, Brain, FileText, Image as ImageIcon, Video, Info, Sliders, } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -35,18 +11,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, XcanPagination} from '@/components/ui/pagination';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, XcanPagination, } from '@/components/ui/pagination';
 import { toast } from 'sonner';
 import { useDebounce } from '@/hooks/useDebounce';
 import ModelsService from '@/services/Models';
-import {
-  GetModelListParamsOrderByEnum,
-  ModelDetailVo,
-  ModelListVo,
-  ModelStatisticsVo,
-  ModelUpdateDto,
-  ModelCreateDto,
-} from '@/services/ModelsTypes';
+import { GetModelListParamsOrderByEnum, ModelDetailVo, ModelListVo, ModelStatisticsVo, ModelUpdateDto, ModelCreateDto, } from '@/services/ModelsTypes';
 import { ModelProviderEnum, ModelStatusEnum, ModelTypeEnum } from '@/enums/enums';
 
 interface ModelListItem {
@@ -317,23 +286,20 @@ export function ModelManagement() {
     []
   );
 
-  const resolveOrderBy = useCallback(
-    (value: SortOption): GetModelListParamsOrderByEnum | undefined => {
-      switch (value) {
-        case 'name':
-          return GetModelListParamsOrderByEnum.Name;
-        case 'provider':
-          return GetModelListParamsOrderByEnum.Provider;
-        case 'status':
-          return GetModelListParamsOrderByEnum.Status;
-        case 'createdDate':
-          return GetModelListParamsOrderByEnum.CreatedDate;
-        default:
-          return undefined;
-      }
-    },
-    []
-  );
+  const resolveOrderBy = useCallback((value: SortOption): GetModelListParamsOrderByEnum | undefined => {
+    switch (value) {
+      case 'name':
+        return GetModelListParamsOrderByEnum.Name;
+      case 'provider':
+        return GetModelListParamsOrderByEnum.Provider;
+      case 'status':
+        return GetModelListParamsOrderByEnum.Status;
+      case 'createdDate':
+        return GetModelListParamsOrderByEnum.CreatedDate;
+      default:
+        return undefined;
+    }
+  }, []);
 
   const statsCards = useMemo(() => {
     const today = stats?.todayGrowthTrend;
@@ -343,8 +309,7 @@ export function ModelManagement() {
     const totalModelsValue = formatNumber(stats?.totalModels);
     const totalCostValue = stats?.totalCost !== undefined ? formatCurrency(stats?.totalCost, language) : '--';
     const totalCallsValue = formatNumber(stats?.totalCalls);
-    const latencyValue =
-      averageLatency !== undefined && averageLatency !== null ? `${averageLatency}ms` : '--';
+    const latencyValue = averageLatency !== undefined && averageLatency !== null ? `${averageLatency}ms` : '--';
 
     return [
       {
@@ -359,12 +324,9 @@ export function ModelManagement() {
             : language === 'zh-CN'
               ? '暂无今日数据'
               : 'No daily data',
-      icon: Database,
-      iconBg: 'bg-blue-500',
-        trend:
-          lastMonth?.addedModels !== undefined
-            ? `+${formatNumber(lastMonth.addedModels)}`
-            : undefined,
+        icon: Database,
+        iconBg: 'bg-blue-500',
+        trend: lastMonth?.addedModels !== undefined ? `+${formatNumber(lastMonth.addedModels)}` : undefined,
         trendUp: (lastMonth?.addedModels ?? 0) >= 0,
       },
       {
@@ -379,12 +341,9 @@ export function ModelManagement() {
             : language === 'zh-CN'
               ? '暂无今日数据'
               : 'No daily data',
-      icon: Activity,
-      iconBg: 'bg-green-500',
-        trend:
-          lastMonth?.addedCost !== undefined
-            ? `+${formatCurrency(lastMonth.addedCost, language)}`
-            : undefined,
+        icon: Activity,
+        iconBg: 'bg-green-500',
+        trend: lastMonth?.addedCost !== undefined ? `+${formatCurrency(lastMonth.addedCost, language)}` : undefined,
         trendUp: (lastMonth?.addedCost ?? 0) >= 0,
       },
       {
@@ -399,12 +358,9 @@ export function ModelManagement() {
             : language === 'zh-CN'
               ? '暂无今日数据'
               : 'No daily data',
-      icon: TrendingUp,
-      iconBg: 'bg-orange-500',
-        trend:
-          lastMonth?.addedCalls !== undefined
-            ? `+${formatNumber(lastMonth.addedCalls)}`
-            : undefined,
+        icon: TrendingUp,
+        iconBg: 'bg-orange-500',
+        trend: lastMonth?.addedCalls !== undefined ? `+${formatNumber(lastMonth.addedCalls)}` : undefined,
         trendUp: (lastMonth?.addedCalls ?? 0) >= 0,
       },
       {
@@ -419,15 +375,15 @@ export function ModelManagement() {
             : language === 'zh-CN'
               ? '暂无数据'
               : 'No data',
-      icon: Zap,
-      iconBg: 'bg-purple-500',
+        icon: Zap,
+        iconBg: 'bg-purple-500',
         trend:
           today?.latencyDecreaseFromYesterdayMs !== undefined
             ? `-${today.latencyDecreaseFromYesterdayMs}ms`
             : undefined,
-      trendUp: true,
-    },
-  ];
+        trendUp: true,
+      },
+    ];
   }, [language, stats]);
 
   const buildModelItem = useCallback(
@@ -440,10 +396,7 @@ export function ModelManagement() {
       const typeConfig = mapTypeToConfig(item.type);
       const statusConfig = mapStatusToConfig(item.status);
       const providerLabel =
-        providerLabelMap.get((item.provider ?? detail?.provider) ?? '') ??
-        item.provider ??
-        detail?.provider ??
-        '--';
+        providerLabelMap.get(item.provider ?? detail?.provider ?? '') ?? item.provider ?? detail?.provider ?? '--';
       const detailStats = detail?.stats;
       const performance = detail?.performance;
       const tokens = detailStats?.totalTokensConsumed ?? detailStats?.totalTokens;
@@ -471,21 +424,18 @@ export function ModelManagement() {
         status: language === 'zh-CN' ? statusConfig.labelZh : statusConfig.labelEn,
         statusEnum: item.status as ModelStatusEnum | undefined,
         statusColor: statusConfig.color,
-      performance: {
+        performance: {
           latency: formatLatency(performance),
           throughput: formatThroughput(performance),
           accuracy: formatAccuracy(performance),
-      },
-      resources: {
+        },
+        resources: {
           cpu: '--',
           memory: '--',
           gpu: '--',
         },
         calls: formatNumber(detailStats?.totalCalls),
-        cost:
-          detailStats?.totalCost !== undefined
-            ? formatCurrency(detailStats.totalCost, language)
-            : '--',
+        cost: detailStats?.totalCost !== undefined ? formatCurrency(detailStats.totalCost, language) : '--',
         tokens: tokens !== undefined ? formatNumber(tokens) : undefined,
         deployed,
         detail,
@@ -607,8 +557,8 @@ export function ModelManagement() {
 
   const handleViewDetails = useCallback(
     async (model: ModelListItem) => {
-    setSelectedModel(model);
-    setDetailsDialogOpen(true);
+      setSelectedModel(model);
+      setDetailsDialogOpen(true);
 
       if (model.detail) {
         return;
@@ -617,10 +567,8 @@ export function ModelManagement() {
       try {
         const detail = await fetchModelDetail(model.id);
         if (detail) {
-          setModels(prev =>
-            prev.map(item => (item.id === model.id ? {...item, detail} : item))
-          );
-          setSelectedModel(prev => (prev && prev.id === model.id ? {...prev, detail} : prev));
+          setModels(prev => prev.map(item => (item.id === model.id ? { ...item, detail } : item)));
+          setSelectedModel(prev => (prev && prev.id === model.id ? { ...prev, detail } : prev));
         }
       } catch (error: any) {
         toast.error(error?.message || '获取模型详情失败');
@@ -631,17 +579,15 @@ export function ModelManagement() {
 
   const handleOpenEdit = useCallback(
     async (model: ModelListItem) => {
-    setSelectedModel(model);
+      setSelectedModel(model);
       let detail = model.detail;
 
       if (!detail) {
         try {
           detail = await fetchModelDetail(model.id);
           if (detail) {
-            setModels(prev =>
-              prev.map(item => (item.id === model.id ? {...item, detail} : item))
-            );
-            setSelectedModel(prev => (prev && prev.id === model.id ? {...prev, detail} : prev));
+            setModels(prev => prev.map(item => (item.id === model.id ? { ...item, detail } : item)));
+            setSelectedModel(prev => (prev && prev.id === model.id ? { ...prev, detail } : prev));
           }
         } catch (error: any) {
           toast.error(error?.message || '获取模型详情失败');
@@ -650,10 +596,9 @@ export function ModelManagement() {
       }
       debugger;
 
-      const providerValue =
-        detail?.provider?.value ?? model.providerEnum ?? ModelProviderEnum.CUSTOM;
+      const providerValue = detail?.provider?.value ?? model.providerEnum ?? ModelProviderEnum.CUSTOM;
 
-    setEditFormData({
+      setEditFormData({
         name: detail?.name ?? model.name ?? '',
         description: detail?.description ?? model.description ?? '',
         type: detail?.type ?? model.typeEnum ?? ModelTypeEnum.CHAT,
@@ -661,16 +606,10 @@ export function ModelManagement() {
         version: detail?.version ?? model.version ?? '',
         apiKey: detail?.config?.apiKey ?? '',
         endpoint: detail?.config?.apiEndpoint ?? '',
-        maxTokens:
-          detail?.config?.maxTokens !== undefined
-            ? String(detail.config.maxTokens)
-            : '',
-        temperature:
-          detail?.config?.temperature !== undefined
-            ? String(detail.config.temperature)
-            : '0.7',
-    });
-    setEditDialogOpen(true);
+        maxTokens: detail?.config?.maxTokens !== undefined ? String(detail.config.maxTokens) : '',
+        temperature: detail?.config?.temperature !== undefined ? String(detail.config.temperature) : '0.7',
+      });
+      setEditDialogOpen(true);
     },
     [fetchModelDetail]
   );
@@ -705,8 +644,8 @@ export function ModelManagement() {
 
     try {
       await ModelsService.updateModel(selectedModel.id, payload);
-    toast.success(`模型 "${editFormData.name}" 配置已更新`);
-    setEditDialogOpen(false);
+      toast.success(`模型 "${editFormData.name}" 配置已更新`);
+      setEditDialogOpen(false);
       await loadModels();
       await loadStatistics();
     } catch (error: any) {
@@ -722,7 +661,7 @@ export function ModelManagement() {
       }
       try {
         await ModelsService.deleteModel(model.id);
-    toast.success(`模型 "${model.name}" 已删除`);
+        toast.success(`模型 "${model.name}" 已删除`);
         await loadModels();
         await loadStatistics();
       } catch (error: any) {
@@ -758,19 +697,19 @@ export function ModelManagement() {
 
     try {
       await ModelsService.createModel(payload);
-    toast.success(`模型 "${formData.name}" 已成功添加！`);
-    setAddModelDialogOpen(false);
-    setFormData({
-      name: '',
-      description: '',
+      toast.success(`模型 "${formData.name}" 已成功添加！`);
+      setAddModelDialogOpen(false);
+      setFormData({
+        name: '',
+        description: '',
         type: ModelTypeEnum.CHAT,
-      provider: '',
-      version: '',
-      apiKey: '',
-      endpoint: '',
-      maxTokens: '',
-      temperature: '0.7',
-    });
+        provider: '',
+        version: '',
+        apiKey: '',
+        endpoint: '',
+        maxTokens: '',
+        temperature: '0.7',
+      });
       setCurrentPage(1);
       await loadModels();
       await loadStatistics();
@@ -865,7 +804,7 @@ export function ModelManagement() {
                           <Icon className='w-4 h-4' />
                           {language === 'zh-CN' ? option.labelZh : option.labelEn}
                         </div>
-                  </SelectItem>
+                      </SelectItem>
                     );
                   })}
                 </SelectContent>
@@ -1006,9 +945,7 @@ export function ModelManagement() {
                           </Label>
                           <Select
                             value={formData.type}
-                            onValueChange={value =>
-                              setFormData({ ...formData, type: value as ModelTypeEnum })
-                            }
+                            onValueChange={value => setFormData({ ...formData, type: value as ModelTypeEnum })}
                           >
                             <SelectTrigger id='model-type' className='dark:bg-gray-700 dark:border-gray-600'>
                               <SelectValue />
@@ -1035,9 +972,7 @@ export function ModelManagement() {
                           </Label>
                           <Select
                             value={formData.provider}
-                            onValueChange={value =>
-                              setFormData({ ...formData, provider: value })
-                            }
+                            onValueChange={value => setFormData({ ...formData, provider: value })}
                           >
                             <SelectTrigger id='model-provider' className='dark:bg-gray-700 dark:border-gray-600'>
                               <SelectValue placeholder='选择提供商' />
@@ -1206,8 +1141,7 @@ export function ModelManagement() {
                   <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
                     {models.map(model => {
                       const Icon = model.icon;
-                      const toggleDisabled =
-                        !model.statusEnum || model.statusEnum === ModelStatusEnum.ERROR;
+                      const toggleDisabled = !model.statusEnum || model.statusEnum === ModelStatusEnum.ERROR;
                       return (
                         <Card
                           key={model.id}
@@ -1375,9 +1309,7 @@ export function ModelManagement() {
                                   onClick={() => handleToggleStatus(model)}
                                   className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
                                   disabled={
-                                    !model.statusEnum ||
-                                    model.statusEnum === ModelStatusEnum.ERROR ||
-                                    modelsLoading
+                                    !model.statusEnum || model.statusEnum === ModelStatusEnum.ERROR || modelsLoading
                                   }
                                 >
                                   {model.statusEnum === ModelStatusEnum.RUNNING ? (
@@ -1417,9 +1349,14 @@ export function ModelManagement() {
           )}
           {/* Table View Pagination */}
           {shouldShowPagination && (
-            <XcanPagination pageSize={itemsPerPage} pageNo={currentPage} total={modelsTotal} onChange={({pageNo}) => {
-              setCurrentPage(pageNo);
-            }} />
+            <XcanPagination
+              pageSize={itemsPerPage}
+              pageNo={currentPage}
+              total={modelsTotal}
+              onChange={({ pageNo }) => {
+                setCurrentPage(pageNo);
+              }}
+            />
           )}
         </TabsContent>
 

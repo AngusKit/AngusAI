@@ -65,7 +65,7 @@ export const enUS = {
       description: 'Enter description',
       tags: 'Enter tags',
       icon: 'Select icon',
-    }
+    },
   },
 
   // Navigation
@@ -843,8 +843,10 @@ export const enUS = {
     cannotEditSystem: 'System templates cannot be edited, please duplicate and modify',
     cannotDeleteSystem: 'System templates cannot be deleted',
     deleteCategory: 'Delete Category',
-    deleteCategoryConfirm: 'Are you sure you want to delete the "{name}" category? Prompts in this category will be moved to "Coding" category. This action cannot be undone.',
-    confirmDeleteCategory: 'Are you sure you want to delete this category? Prompts in this category will be moved to "Coding" category. This action cannot be undone.',
+    deleteCategoryConfirm:
+      'Are you sure you want to delete the "{name}" category? Prompts in this category will be moved to "Coding" category. This action cannot be undone.',
+    confirmDeleteCategory:
+      'Are you sure you want to delete this category? Prompts in this category will be moved to "Coding" category. This action cannot be undone.',
     cannotDeleteSystemCategory: 'System categories cannot be deleted',
     categoryDeleted: 'Category deleted',
     categoryUpdateSuccess: 'Category updated',

@@ -2,12 +2,7 @@ import { useState, useCallback } from 'react';
 import { toast } from 'sonner';
 import { DatasourceConnectionTestDto, DataSourceUpdateDto, DatasourceConfigVo } from '@/services/DatasetsTypes';
 import Datasets from '@/services/Datasets';
-import {
-  DatabaseType,
-  DATABASE_CONFIGS,
-  DATABASE_TYPE_TO_ENUM_MAP,
-  ENUM_TO_DATABASE_TYPE_MAP,
-} from '../constants';
+import { DatabaseType, DATABASE_CONFIGS, DATABASE_TYPE_TO_ENUM_MAP, ENUM_TO_DATABASE_TYPE_MAP } from '../constants';
 import { generateJdbcUrl } from '../utils';
 import { useLanguage } from '@/components/ui/LanguageProvider';
 
@@ -144,53 +139,62 @@ export function useDataSourceForm() {
       return formState.jdbcUrl;
     }
     const config = DATABASE_CONFIGS[formState.dbType];
-    return generateJdbcUrl(formState.dbType, formState.dbHost, formState.dbPort, formState.dbName, config.jdbcUrlTemplate);
+    return generateJdbcUrl(
+      formState.dbType,
+      formState.dbHost,
+      formState.dbPort,
+      formState.dbName,
+      config.jdbcUrlTemplate
+    );
   }, [formState]);
 
   /** 测试连接 */
-  const testConnection = useCallback(async (datasetId?: string) => {
-    if (!validateForm()) {
-      return false;
-    }
-
-    setIsTestingConnection(true);
-    setConnectionStatus('idle');
-
-    try {
-      const finalJdbcUrl = getJdbcUrl();
-
-      const testDto: DatasourceConnectionTestDto = {
-        datasetId: datasetId || undefined,
-        databaseType: DATABASE_TYPE_TO_ENUM_MAP[formState.dbType],
-        database: formState.dbName || undefined,
-        jdbcUrl: finalJdbcUrl || undefined,
-        host: formState.dbHost || undefined,
-        port: formState.dbPort ? Number(formState.dbPort) : undefined,
-        username: formState.dbUser || undefined,
-        password: formState.dbPassword || undefined,
-      };
-
-      const response = await Datasets.testDataSourceConnection(testDto);
-      const responseData = (response as any).data;
-
-      if (responseData?.success) {
-        setConnectionStatus('success');
-        toast.success(responseData?.message || t('dataset.toasts.datasourceTestSuccess'));
-        return true;
-      } else {
-        setConnectionStatus('error');
-        toast.error(responseData?.message || t('dataset.toasts.datasourceTestFailed'));
+  const testConnection = useCallback(
+    async (datasetId?: string) => {
+      if (!validateForm()) {
         return false;
       }
-    } catch (error: any) {
-      console.error('Failed to test datasource connection:', error);
-      setConnectionStatus('error');
-      toast.error(error?.message || t('dataset.toasts.datasourceTestFailed'));
-      return false;
-    } finally {
-      setIsTestingConnection(false);
-    }
-  }, [formState, validateForm, getJdbcUrl]);
+
+      setIsTestingConnection(true);
+      setConnectionStatus('idle');
+
+      try {
+        const finalJdbcUrl = getJdbcUrl();
+
+        const testDto: DatasourceConnectionTestDto = {
+          datasetId: datasetId || undefined,
+          databaseType: DATABASE_TYPE_TO_ENUM_MAP[formState.dbType],
+          database: formState.dbName || undefined,
+          jdbcUrl: finalJdbcUrl || undefined,
+          host: formState.dbHost || undefined,
+          port: formState.dbPort ? Number(formState.dbPort) : undefined,
+          username: formState.dbUser || undefined,
+          password: formState.dbPassword || undefined,
+        };
+
+        const response = await Datasets.testDataSourceConnection(testDto);
+        const responseData = (response as any).data;
+
+        if (responseData?.success) {
+          setConnectionStatus('success');
+          toast.success(responseData?.message || t('dataset.toasts.datasourceTestSuccess'));
+          return true;
+        } else {
+          setConnectionStatus('error');
+          toast.error(responseData?.message || t('dataset.toasts.datasourceTestFailed'));
+          return false;
+        }
+      } catch (error: any) {
+        console.error('Failed to test datasource connection:', error);
+        setConnectionStatus('error');
+        toast.error(error?.message || t('dataset.toasts.datasourceTestFailed'));
+        return false;
+      } finally {
+        setIsTestingConnection(false);
+      }
+    },
+    [formState, validateForm, getJdbcUrl]
+  );
 
   /** 获取提交数据 */
   const getSubmitData = useCallback((): DataSourceUpdateDto => {
@@ -228,4 +232,3 @@ export function useDataSourceForm() {
     getSubmitData,
   };
 }
-

@@ -123,9 +123,7 @@ export function CategoryDialog({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className='dark:bg-gray-800 dark:border-gray-700 max-h-[300px]'>
-                <SelectItem value={DEFAULT_VALUES.PARENT_CATEGORY_NONE}>
-                  {t('prompts.parentCategoryNone')}
-                </SelectItem>
+                <SelectItem value={DEFAULT_VALUES.PARENT_CATEGORY_NONE}>{t('prompts.parentCategoryNone')}</SelectItem>
                 {buildCategoryTree(undefined, 0, editingCategory?.id).map(cat => {
                   const path = getCategoryPath(cat.id);
                   const level = path.length - 1;
@@ -212,7 +210,9 @@ export function CategoryDialog({
           <Button variant='outline' onClick={handleCancel}>
             {t('common.actions.cancel')}
           </Button>
-          <Button onClick={handleSave}>{editingCategory ? t('common.actions.save') : t('common.actions.create')}</Button>
+          <Button onClick={handleSave}>
+            {editingCategory ? t('common.actions.save') : t('common.actions.create')}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

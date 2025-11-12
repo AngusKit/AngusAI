@@ -11,11 +11,7 @@ export const languages = {
 export const defaultLanguage: Language = 'zh-CN';
 
 // Helper function to get nested translation
-export function getNestedTranslation(
-  obj: any,
-  path: string,
-  params?: Record<string, string | number>
-): string {
+export function getNestedTranslation(obj: any, path: string, params?: Record<string, string | number>): string {
   const keys = path.split('.');
   let result = obj;
 

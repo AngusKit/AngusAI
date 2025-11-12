@@ -14,26 +14,10 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { toast } from 'sonner';
 import { useLanguage } from '@/components/ui/LanguageProvider';
 import { useDebounce } from '@/hooks/useDebounce';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-  XcanPagination,
-} from '@/components/ui/pagination';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, XcanPagination, } from '@/components/ui/pagination';
 import VectorStoresService from '@/services/VectorStores';
-import {
-  ConnectionStatusEnum,
-  VectorStoreTypeEnum,
-} from '@/enums/enums';
-import {
-  VectorStoreVo,
-  VectorStoreStatisticsVo,
-  VectorStoreCreateDto,
-  VectorStoreUpdateDto,
-} from '@/services/VectorStoresTypes';
+import { ConnectionStatusEnum, VectorStoreTypeEnum } from '@/enums/enums';
+import { VectorStoreVo, VectorStoreStatisticsVo, VectorStoreCreateDto, VectorStoreUpdateDto, } from '@/services/VectorStoresTypes';
 
 type VectorStoreStatus = ConnectionStatusEnum | 'TESTING';
 
@@ -144,21 +128,18 @@ export function VectorStore() {
     [language]
   );
 
-  const getTypeInfo = useCallback(
-    (type?: VectorStoreTypeEnum | string) => {
-      if (!type) {
-        return { value: 'UNKNOWN', label: 'Unknown', icon: '📦' };
+  const getTypeInfo = useCallback((type?: VectorStoreTypeEnum | string) => {
+    if (!type) {
+      return { value: 'UNKNOWN', label: 'Unknown', icon: '📦' };
+    }
+    return (
+      vectorStoreTypes.find(t => t.value === type) ?? {
+        value: type,
+        label: type,
+        icon: '📦',
       }
-      return (
-        vectorStoreTypes.find(t => t.value === type) ?? {
-          value: type,
-          label: type,
-          icon: '📦',
-        }
-      );
-    },
-    []
-  );
+    );
+  }, []);
 
   const getStatusInfo = useCallback(
     (status: VectorStoreStatus): { label: string; badgeClass: string } => {
@@ -171,7 +152,8 @@ export function VectorStore() {
         case 'TESTING':
           return {
             label: language === 'zh-CN' ? '测试中' : 'Testing',
-            badgeClass: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400 border-0 text-xs w-fit',
+            badgeClass:
+              'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400 border-0 text-xs w-fit',
           };
         case ConnectionStatusEnum.DISCONNECTED:
         default:
@@ -231,8 +213,7 @@ export function VectorStore() {
       const type = store.type ?? VectorStoreTypeEnum.PINECONE;
       const config = store.config;
       const endpoint =
-        config?.endpoint ??
-        (config?.host ? `${config.host}${config.port ? `:${config.port}` : ''}` : undefined);
+        config?.endpoint ?? (config?.host ? `${config.host}${config.port ? `:${config.port}` : ''}` : undefined);
       const dimension = config?.dimension;
 
       return {
@@ -261,7 +242,9 @@ export function VectorStore() {
       setStatistics(responseData ?? null);
     } catch (error: any) {
       console.error('Failed to load vector store statistics:', error);
-      toast.error(error?.message || (language === 'zh-CN' ? '获取向量存储统计失败' : 'Failed to load vector store statistics'));
+      toast.error(
+        error?.message || (language === 'zh-CN' ? '获取向量存储统计失败' : 'Failed to load vector store statistics')
+      );
     } finally {
       setStatisticsLoading(false);
     }
@@ -284,13 +267,14 @@ export function VectorStore() {
 
       setVectorStoresTotal(responseData?.total ?? listData?.length ?? 0);
 
-      const mapped =
-        listData?.map(item => buildVectorStoreItem(item)).filter(Boolean) as VectorStoreItem[] | undefined;
+      const mapped = listData?.map(item => buildVectorStoreItem(item)).filter(Boolean) as VectorStoreItem[] | undefined;
 
       setVectorStores(mapped ?? []);
     } catch (error: any) {
       console.error('Failed to load vector stores:', error);
-      toast.error(error?.message || (language === 'zh-CN' ? '加载向量存储列表失败' : 'Failed to load vector store list'));
+      toast.error(
+        error?.message || (language === 'zh-CN' ? '加载向量存储列表失败' : 'Failed to load vector store list')
+      );
     } finally {
       setVectorStoresLoading(false);
     }
@@ -327,7 +311,9 @@ export function VectorStore() {
         }
       } catch (error: any) {
         console.error('Failed to load vector store detail:', error);
-        toast.error(error?.message || (language === 'zh-CN' ? '获取向量存储详情失败' : 'Failed to load vector store detail'));
+        toast.error(
+          error?.message || (language === 'zh-CN' ? '获取向量存储详情失败' : 'Failed to load vector store detail')
+        );
       }
       return store;
     },
@@ -395,10 +381,10 @@ export function VectorStore() {
       return;
     }
     setTestingConnectionId(store.id);
-    setVectorStores(prev => prev.map(item => (item.id === store.id ? {...item, status: 'TESTING'} : item)));
+    setVectorStores(prev => prev.map(item => (item.id === store.id ? { ...item, status: 'TESTING' } : item)));
     try {
       const detailedStore = await ensureVectorStoreDetail(store);
-      setVectorStores(prev => prev.map(item => (item.id === store.id ? {...item, status: 'TESTING'} : item)));
+      setVectorStores(prev => prev.map(item => (item.id === store.id ? { ...item, status: 'TESTING' } : item)));
       const response = await VectorStoresService.vectorStoreTestConnection(
         { id: detailedStore.id },
         {
@@ -409,9 +395,7 @@ export function VectorStore() {
       const result = (response as any)?.data;
       toast.success(
         result?.message ||
-          (language === 'zh-CN'
-            ? `${detailedStore.name} 测试连接成功`
-            : `${detailedStore.name} connected successfully`)
+          (language === 'zh-CN' ? `${detailedStore.name} 测试连接成功` : `${detailedStore.name} connected successfully`)
       );
       await loadVectorStores();
     } catch (error: any) {
@@ -420,7 +404,7 @@ export function VectorStore() {
       setVectorStores(prev =>
         prev.map(item =>
           item.id === store.id
-            ? {...item, status: store.status === 'TESTING' ? ConnectionStatusEnum.DISCONNECTED : store.status}
+            ? { ...item, status: store.status === 'TESTING' ? ConnectionStatusEnum.DISCONNECTED : store.status }
             : item
         )
       );
@@ -879,9 +863,14 @@ export function VectorStore() {
 
           {shouldShowPagination && (
             <div className='flex items-center justify-center mt-6'>
-              <XcanPagination pageSize={itemsPerPage} pageNo={currentPage} total={vectorStoresTotal} onChange={({pageNo}) => {
-                setCurrentPage(pageNo);
-              }} />
+              <XcanPagination
+                pageSize={itemsPerPage}
+                pageNo={currentPage}
+                total={vectorStoresTotal}
+                onChange={({ pageNo }) => {
+                  setCurrentPage(pageNo);
+                }}
+              />
             </div>
           )}
         </>
@@ -916,9 +905,7 @@ export function VectorStore() {
                   <Label className='dark:text-gray-200'>{language === 'zh-CN' ? '类型' : 'Type'}</Label>
                   <Select
                     value={formData.type}
-                    onValueChange={value =>
-                      setFormData({ ...formData, type: value as VectorStoreTypeEnum })
-                    }
+                    onValueChange={value => setFormData({ ...formData, type: value as VectorStoreTypeEnum })}
                   >
                     <SelectTrigger className='dark:bg-gray-750 dark:border-gray-600'>
                       <SelectValue placeholder={language === 'zh-CN' ? '选择数据库类型' : 'Select database type'} />

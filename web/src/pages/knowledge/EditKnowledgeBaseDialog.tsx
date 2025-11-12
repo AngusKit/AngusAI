@@ -317,9 +317,7 @@ export function EditKnowledgeBaseDialog({
               <div className='flex items-center justify-center py-12'>
                 <div className='flex flex-col items-center gap-3'>
                   <Loader2 className='w-8 h-8 animate-spin text-blue-500' />
-                  <p className='text-sm text-gray-500 dark:text-gray-400'>
-                    {t('knowledge.editDialog.loadingDetail')}
-                  </p>
+                  <p className='text-sm text-gray-500 dark:text-gray-400'>{t('knowledge.editDialog.loadingDetail')}</p>
                 </div>
               </div>
             ) : (

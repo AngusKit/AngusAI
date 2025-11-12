@@ -112,7 +112,7 @@ export function EditDataSourceDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent 
+      <DialogContent
         className='max-h-[90vh] overflow-hidden p-0 dark:bg-gray-900 dark:border-gray-700'
         style={{ width: '600px', maxWidth: '600px' }}
       >
@@ -176,4 +176,3 @@ export function EditDataSourceDialog({
     </Dialog>
   );
 }
-

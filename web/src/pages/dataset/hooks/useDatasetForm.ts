@@ -52,33 +52,36 @@ export function useDatasetForm(initialState?: Partial<DatasetFormState>) {
   }, [initialState]);
 
   /** 添加标签 */
-  const addTag = useCallback((tag: string) => {
-    const newTag = tag.trim();
+  const addTag = useCallback(
+    (tag: string) => {
+      const newTag = tag.trim();
 
-    if (!newTag) return false;
+      if (!newTag) return false;
 
-    if (newTag.length > FORM_VALIDATION.TAG_MAX_LENGTH) {
-      toast.error(t('dataset.form.tags.lengthExceeded', { maxLength: FORM_VALIDATION.TAG_MAX_LENGTH }));
-      return false;
-    }
+      if (newTag.length > FORM_VALIDATION.TAG_MAX_LENGTH) {
+        toast.error(t('dataset.form.tags.lengthExceeded', { maxLength: FORM_VALIDATION.TAG_MAX_LENGTH }));
+        return false;
+      }
 
-    if (formState.tags.length >= FORM_VALIDATION.TAG_MAX_COUNT) {
-      toast.error(t('dataset.form.tags.countExceeded', { maxCount: FORM_VALIDATION.TAG_MAX_COUNT }));
-      return false;
-    }
+      if (formState.tags.length >= FORM_VALIDATION.TAG_MAX_COUNT) {
+        toast.error(t('dataset.form.tags.countExceeded', { maxCount: FORM_VALIDATION.TAG_MAX_COUNT }));
+        return false;
+      }
 
-    if (formState.tags.includes(newTag)) {
-      toast.error(t('dataset.form.tags.duplicate'));
-      return false;
-    }
+      if (formState.tags.includes(newTag)) {
+        toast.error(t('dataset.form.tags.duplicate'));
+        return false;
+      }
 
-    setFormState(prev => ({
-      ...prev,
-      tags: [...prev.tags, newTag],
-      tagInput: '',
-    }));
-    return true;
-  }, [formState.tags]);
+      setFormState(prev => ({
+        ...prev,
+        tags: [...prev.tags, newTag],
+        tagInput: '',
+      }));
+      return true;
+    },
+    [formState.tags]
+  );
 
   /** 移除标签 */
   const removeTag = useCallback((tagToRemove: string) => {
@@ -89,12 +92,15 @@ export function useDatasetForm(initialState?: Partial<DatasetFormState>) {
   }, []);
 
   /** 处理标签输入 */
-  const handleTagInput = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' || e.key === ',') {
-      e.preventDefault();
-      addTag(formState.tagInput);
-    }
-  }, [formState.tagInput, addTag]);
+  const handleTagInput = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter' || e.key === ',') {
+        e.preventDefault();
+        addTag(formState.tagInput);
+      }
+    },
+    [formState.tagInput, addTag]
+  );
 
   /** 验证表单 */
   const validateForm = useCallback((): boolean => {
@@ -134,4 +140,3 @@ export function useDatasetForm(initialState?: Partial<DatasetFormState>) {
     getFormData,
   };
 }
-

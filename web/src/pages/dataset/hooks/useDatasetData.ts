@@ -22,12 +22,7 @@ export function useDatasetList() {
 
   /** 加载数据集列表 */
   const loadDatasets = useCallback(
-    async (params: {
-      keyword?: string;
-      pageNo: number;
-      pageSize: number;
-      orderBy: GetDatasetListOrderByEnum;
-    }) => {
+    async (params: { keyword?: string; pageNo: number; pageSize: number; orderBy: GetDatasetListOrderByEnum }) => {
       setIsLoading(true);
       try {
         const response = await Datasets.getDatasetList(params);
@@ -229,4 +224,3 @@ export function useDataSourceTables() {
     getTableItems,
   };
 }
-

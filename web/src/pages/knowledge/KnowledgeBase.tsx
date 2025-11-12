@@ -92,8 +92,7 @@ export function KnowledgeBase() {
     }
   };
 
-  const getKnowledgeStatusLabel = (enabled: boolean) =>
-    t(enabled ? 'common.status.enabled' : 'common.status.disabled');
+  const getKnowledgeStatusLabel = (enabled: boolean) => t(enabled ? 'common.status.enabled' : 'common.status.disabled');
 
   const getDocumentStatusText = (status: KnowledgeBaseDocStatusEnum) => {
     switch (status) {
@@ -246,7 +245,6 @@ export function KnowledgeBase() {
           trendUp: undefined,
         },
       ];
-
 
   // 知识库列表
   const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeBaseItem[]>([]);
@@ -654,7 +652,7 @@ export function KnowledgeBase() {
 
     if (result.validFiles.length > 0) {
       setUploadFiles(prev => [...prev, ...result.validFiles]);
-      
+
       // 显示成功消息
       if (isFolderUpload) {
         // 文件夹上传：显示有效文件数和被过滤的文件数
@@ -688,14 +686,11 @@ export function KnowledgeBase() {
       uploadFilesInBatches(result.validFiles);
     } else if (isFolderUpload && result.filteredCount > 0) {
       // 文件夹中没有有效文件
-      toast.warning(
-        t('knowledge.upload.noSupportedFiles'),
-        {
-          description: t('knowledge.upload.noSupportedFilesDescription', {
-            count: result.filteredCount,
-          }),
-        }
-      );
+      toast.warning(t('knowledge.upload.noSupportedFiles'), {
+        description: t('knowledge.upload.noSupportedFilesDescription', {
+          count: result.filteredCount,
+        }),
+      });
     }
   };
 
@@ -707,7 +702,7 @@ export function KnowledgeBase() {
   // 分组上传文件（每5个一组）
   const uploadFilesInBatches = async (files: UploadFile[]) => {
     const BATCH_SIZE = 5;
-    
+
     // 如果文件数量小于等于5，直接并行上传
     if (files.length <= BATCH_SIZE) {
       await Promise.all(files.map(file => handleUpload(file)));
@@ -726,18 +721,18 @@ export function KnowledgeBase() {
       if (!batch || batch.length === 0) {
         continue;
       }
-      
+
       console.log(`Uploading batch ${i + 1}/${batches.length}, files: ${batch.length}`);
-      
+
       // 等待当前组的所有文件上传完成
       await Promise.all(batch.map(file => handleUpload(file)));
-      
+
       // 每组之间可以添加短暂延迟，避免服务器压力过大
       if (i < batches.length - 1) {
         await new Promise(resolve => setTimeout(resolve, 500));
       }
     }
-    
+
     console.log(`Finished uploading files. Total: ${files.length}`);
   };
 
@@ -1071,9 +1066,7 @@ export function KnowledgeBase() {
                     <div className='dark:text-white'>{kb.documentCount}</div>
                   </div>
                   <div>
-                    <div className='text-xs text-gray-500 dark:text-gray-400 mb-1'>
-                      {t('knowledge.card.sizeLabel')}
-                    </div>
+                    <div className='text-xs text-gray-500 dark:text-gray-400 mb-1'>{t('knowledge.card.sizeLabel')}</div>
                     <div className='dark:text-white'>{kb.size}</div>
                   </div>
                 </div>
@@ -1582,7 +1575,9 @@ export function KnowledgeBase() {
         <DialogContent className='max-w-2xl dark:bg-gray-800 dark:border-gray-700'>
           <DialogHeader>
             <DialogTitle className='dark:text-white'>{t('knowledge.viewDialog.title')}</DialogTitle>
-            <DialogDescription className='dark:text-gray-400'>{t('knowledge.viewDialog.description')}</DialogDescription>
+            <DialogDescription className='dark:text-gray-400'>
+              {t('knowledge.viewDialog.description')}
+            </DialogDescription>
           </DialogHeader>
           {viewingKB && (
             <div className='space-y-4'>
@@ -1600,7 +1595,9 @@ export function KnowledgeBase() {
 
               <div className='space-y-3'>
                 <div>
-                  <label className='text-sm text-gray-600 dark:text-gray-400'>{t('knowledge.viewDialog.descriptionLabel')}</label>
+                  <label className='text-sm text-gray-600 dark:text-gray-400'>
+                    {t('knowledge.viewDialog.descriptionLabel')}
+                  </label>
                   <p className='text-sm dark:text-white mt-1'>{viewingKB.description}</p>
                 </div>
 

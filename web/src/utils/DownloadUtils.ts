@@ -181,14 +181,14 @@ export async function downloadFile(url: string, options: DownloadOptions = {}): 
       link.style.left = '-9999px';
       document.body.appendChild(link);
       link.click();
-      
+
       // 延迟移除链接元素，确保点击事件完成
       setTimeout(() => {
         document.body.removeChild(link);
       }, 100);
 
       const finalFilename = filename || 'download';
-      
+
       // 更新提示为成功
       if (showToast && downloadToastId) {
         const { toast } = await import('sonner');
@@ -302,4 +302,3 @@ export async function downloadFile(url: string, options: DownloadOptions = {}): 
     throw downloadError;
   }
 }
-

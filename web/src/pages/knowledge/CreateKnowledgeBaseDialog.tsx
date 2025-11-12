@@ -106,7 +106,6 @@ export function CreateKnowledgeBaseDialog({ open, onOpenChange, onSuccess }: Cre
 
     setIsSubmitting(true);
     try {
-
       const createData: any = {
         name: formData.name.trim(),
         icon: selectedIconOption.emoji,

@@ -1,1 +1,1 @@
-export {APICollection} from './APICollection';
+export { APICollection } from './APICollection';

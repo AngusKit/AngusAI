@@ -1,16 +1,7 @@
-import {AI, ApiLocaleResult, PageQuery} from '@xcan-angus/infra';
-import {
-  GetModelListParamsOrderByEnum,
-  ModelConfig,
-  ModelCreateDto,
-  ModelDetailResult,
-  ModelStatisticsResult,
-  ModelTestDto,
-  ModelUpdateDto,
-  PageResultModelListResult,
-} from './ModelsTypes.ts';
-import http, {ContentType, HttpClient, RequestParams} from './HttpClient.ts';
-import {ModelProviderEnum, ModelStatusEnum, ModelTypeEnum} from '@/enums/enums.ts';
+import { AI, ApiLocaleResult, PageQuery } from '@xcan-angus/infra';
+import { GetModelListParamsOrderByEnum, ModelConfig, ModelCreateDto, ModelDetailResult, ModelStatisticsResult, ModelTestDto, ModelUpdateDto, PageResultModelListResult, } from './ModelsTypes.ts';
+import http, { ContentType, HttpClient, RequestParams } from './HttpClient.ts';
+import { ModelProviderEnum, ModelStatusEnum, ModelTypeEnum } from '@/enums/enums.ts';
 
 export class Models<SecurityDataType = unknown> {
   http: HttpClient<SecurityDataType>;

@@ -86,8 +86,7 @@ export function BasicInfoStep({
       {/* 标签 */}
       <div className='mt-5'>
         <Label className='text-sm mb-2 block dark:text-gray-300'>
-          {t('common.labels.tags')}{' '}
-          <span className='text-gray-400'>{tagCountText}</span>
+          {t('common.labels.tags')} <span className='text-gray-400'>{tagCountText}</span>
         </Label>
         <Input
           value={tagInput}

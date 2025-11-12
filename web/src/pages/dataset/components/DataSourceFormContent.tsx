@@ -31,7 +31,19 @@ export function DataSourceFormContent({
   canSubmit,
 }: DataSourceFormContentProps) {
   const { t } = useLanguage();
-  const { dbType, dbHost, dbPort, dbName, dbSchema, dbUser, dbPassword, jdbcUrl, connectionName, useCustomUrl, showPassword } = formState;
+  const {
+    dbType,
+    dbHost,
+    dbPort,
+    dbName,
+    dbSchema,
+    dbUser,
+    dbPassword,
+    jdbcUrl,
+    connectionName,
+    useCustomUrl,
+    showPassword,
+  } = formState;
   const config = DATABASE_CONFIGS[dbType];
   const requiresSchema = DATABASES_REQUIRING_SCHEMA.includes(dbType);
 
@@ -53,9 +65,7 @@ export function DataSourceFormContent({
 
       {/* Database Type Selection */}
       <div>
-        <Label className='text-sm mb-2 block dark:text-gray-300'>
-          {t('dataset.datasource.form.dbTypeLabel')}
-        </Label>
+        <Label className='text-sm mb-2 block dark:text-gray-300'>{t('dataset.datasource.form.dbTypeLabel')}</Label>
         <div className='grid grid-cols-2 md:grid-cols-3 gap-3'>
           {(Object.keys(DATABASE_CONFIGS) as DatabaseType[]).map(type => {
             const dbConfig = DATABASE_CONFIGS[type];
@@ -104,8 +114,7 @@ export function DataSourceFormContent({
           <div className='grid grid-cols-2 gap-4'>
             <div>
               <Label className='text-sm mb-2 block dark:text-gray-300'>
-                {t('dataset.datasource.form.hostLabel')}{' '}
-                <span className='text-red-500'>*</span>
+                {t('dataset.datasource.form.hostLabel')} <span className='text-red-500'>*</span>
               </Label>
               <Input
                 value={dbHost}
@@ -117,8 +126,7 @@ export function DataSourceFormContent({
 
             <div>
               <Label className='text-sm mb-2 block dark:text-gray-300'>
-                {t('dataset.datasource.form.portLabel')}{' '}
-                <span className='text-red-500'>*</span>
+                {t('dataset.datasource.form.portLabel')} <span className='text-red-500'>*</span>
               </Label>
               <Input
                 value={dbPort}
@@ -130,8 +138,7 @@ export function DataSourceFormContent({
 
             <div>
               <Label className='text-sm mb-2 block dark:text-gray-300'>
-                {t('dataset.datasource.form.databaseLabel')}{' '}
-                <span className='text-red-500'>*</span>
+                {t('dataset.datasource.form.databaseLabel')} <span className='text-red-500'>*</span>
               </Label>
               <Input
                 value={dbName}
@@ -181,8 +188,7 @@ export function DataSourceFormContent({
         /* Custom JDBC URL */
         <div>
           <Label className='text-sm mb-2 block dark:text-gray-300'>
-            {t('dataset.datasource.form.customJdbcLabel')}{' '}
-            <span className='text-red-500'>*</span>
+            {t('dataset.datasource.form.customJdbcLabel')} <span className='text-red-500'>*</span>
           </Label>
           <Textarea
             value={jdbcUrl}
@@ -203,8 +209,7 @@ export function DataSourceFormContent({
         <div className='grid grid-cols-2 gap-4'>
           <div>
             <Label className='text-sm mb-2 block dark:text-gray-300'>
-              {t('dataset.datasource.form.usernameLabel')}{' '}
-              <span className='text-red-500'>*</span>
+              {t('dataset.datasource.form.usernameLabel')} <span className='text-red-500'>*</span>
             </Label>
             <Input
               value={dbUser}
@@ -217,8 +222,7 @@ export function DataSourceFormContent({
 
           <div>
             <Label className='text-sm mb-2 block dark:text-gray-300'>
-              {t('dataset.datasource.form.passwordLabel')}{' '}
-              <span className='text-red-500'>*</span>
+              {t('dataset.datasource.form.passwordLabel')} <span className='text-red-500'>*</span>
             </Label>
             <div className='relative'>
               <Input
@@ -298,4 +302,3 @@ export function DataSourceFormContent({
     </div>
   );
 }
-

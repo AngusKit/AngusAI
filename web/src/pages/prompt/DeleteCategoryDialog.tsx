@@ -16,19 +16,16 @@ interface DeleteCategoryDialogProps {
 
 export function DeleteCategoryDialog({ open, onOpenChange, deletingCategory, onConfirm }: DeleteCategoryDialogProps) {
   const { t, language } = useLanguage();
-  const categoryDisplayName = language === 'zh-CN' ? deletingCategory?.name : deletingCategory?.nameEn || deletingCategory?.name;
-  const confirmText = t('prompts.deleteCategoryConfirm', {name: categoryDisplayName || ''});
+  const categoryDisplayName =
+    language === 'zh-CN' ? deletingCategory?.name : deletingCategory?.nameEn || deletingCategory?.name;
+  const confirmText = t('prompts.deleteCategoryConfirm', { name: categoryDisplayName || '' });
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent className='dark:bg-gray-800'>
         <AlertDialogHeader>
-          <AlertDialogTitle className='dark:text-white'>
-            {t('prompts.deleteCategory')}
-          </AlertDialogTitle>
-          <AlertDialogDescription>
-            {confirmText}
-          </AlertDialogDescription>
+          <AlertDialogTitle className='dark:text-white'>{t('prompts.deleteCategory')}</AlertDialogTitle>
+          <AlertDialogDescription>{confirmText}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel onClick={() => onOpenChange(false)}>{t('common.actions.cancel')}</AlertDialogCancel>

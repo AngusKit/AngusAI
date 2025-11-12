@@ -1,23 +1,6 @@
-import {
-  DatasetListVo,
-  DatasetDataListVo,
-  DatasourceTableDataPreviewVo,
-} from '@/services/DatasetsTypes';
-import {
-  DatasetTypeEnum,
-  DatasetDataTypeEnum,
-  DatasetDataStatusEnum,
-  VisibilityEnum,
-} from '@/enums/enums';
-import {
-  DATASET_TYPE_DISPLAY_MAP,
-  VISIBILITY_DISPLAY_MAP,
-  DATA_TYPE_DISPLAY_MAP,
-  DATA_TYPE_ICON_MAP,
-  DATA_STATUS_DISPLAY_MAP,
-  DATA_STATUS_COLOR_MAP,
-  DATA_TYPE_COLOR_MAP,
-} from './constants';
+import { DatasetListVo, DatasetDataListVo, DatasourceTableDataPreviewVo } from '@/services/DatasetsTypes';
+import { DatasetTypeEnum, DatasetDataTypeEnum, DatasetDataStatusEnum, VisibilityEnum } from '@/enums/enums';
+import { DATASET_TYPE_DISPLAY_MAP, VISIBILITY_DISPLAY_MAP, DATA_TYPE_DISPLAY_MAP, DATA_TYPE_ICON_MAP, DATA_STATUS_DISPLAY_MAP, DATA_STATUS_COLOR_MAP, DATA_TYPE_COLOR_MAP, } from './constants';
 
 /** 数据集项接口 */
 export interface DatasetItem {
@@ -181,4 +164,3 @@ export function formatRecordCount(count: number): string {
   }
   return String(count);
 }
-

@@ -292,7 +292,7 @@ export function PromptLibraryPage() {
 
       const response = await Prompts.getPromptList(query);
       console.log('API response:', response); // 调试日志
-      
+
       const { data } = response || {};
       const list = data?.list || [];
       const total = Number(data?.total) || 0;
@@ -301,7 +301,7 @@ export function PromptLibraryPage() {
         ...pre,
         total,
       }));
-      
+
       if (list && Array.isArray(list)) {
         const convertedPrompts = list.map(convertPromptVoToPrompt);
         setPrompts(convertedPrompts);
@@ -558,12 +558,12 @@ export function PromptLibraryPage() {
                       setShowCategoryDialog(true);
                     }}
                     onDelete={category => {
-                            setDeletingCategory(category);
-                            setShowDeleteCategoryDialog(true);
-                          }}
+                      setDeletingCategory(category);
+                      setShowDeleteCategoryDialog(true);
+                    }}
                   />
                 ))}
-                    </div>
+              </div>
             )}
           </div>
         </div>
@@ -630,7 +630,9 @@ export function PromptLibraryPage() {
                               {t('prompts.systemLabel')}
                             </Badge>
                           )}
-                          <Badge variant='outline' className='text-xs'>{formatUsageCount(prompt.usageCount)}</Badge>
+                          <Badge variant='outline' className='text-xs'>
+                            {formatUsageCount(prompt.usageCount)}
+                          </Badge>
                         </div>
                         <div className='flex flex-wrap gap-1.5'>
                           {prompt.tags.map((tag, index) => (
@@ -658,8 +660,8 @@ export function PromptLibraryPage() {
                         {t('common.actions.copy')}
                       </Button>
                       {!prompt.isSystem && (
-                      <Button variant='outline' size='sm' onClick={() => duplicatePrompt(prompt)} className='gap-2'>
-                        <Copy className='w-3 h-3' />
+                        <Button variant='outline' size='sm' onClick={() => duplicatePrompt(prompt)} className='gap-2'>
+                          <Copy className='w-3 h-3' />
                           {t('prompts.duplicateAction')}
                         </Button>
                       )}
@@ -708,7 +710,7 @@ export function PromptLibraryPage() {
 
           {pageParam.total > pageParam.pageSize && <XcanPagination {...pageParam} onChange={handlePageChange} />}
         </div>
-        </div>
+      </div>
 
       {/* 新建/编辑提示词对话框 */}
       <PromptDialog
@@ -749,26 +751,24 @@ export function PromptLibraryPage() {
 
       {/* 查看提示词对话框 */}
       <Dialog open={showViewDialog} onOpenChange={setShowViewDialog} modal={false}>
-        <DialogContent className='max-w-[792px] dark:bg-gray-800 dark:border-gray-700' >
+        <DialogContent className='max-w-[792px] dark:bg-gray-800 dark:border-gray-700'>
           <DialogHeader>
             <DialogTitle className='dark:text-white'>{t('prompts.viewPromptTitle')}</DialogTitle>
-            <DialogDescription className='dark:text-gray-400'>
-              {t('prompts.viewPromptDescription')}
-            </DialogDescription>
+            <DialogDescription className='dark:text-gray-400'>{t('prompts.viewPromptDescription')}</DialogDescription>
           </DialogHeader>
           {viewingPrompt && (
-          <div className='space-y-4'>
+            <div className='space-y-4'>
               <div className='flex items-center gap-3 pb-4 border-b border-gray-200 dark:border-gray-700'>
                 <div className='w-16 h-16 rounded-lg flex items-center justify-center bg-blue-100 dark:bg-blue-900/30'>
                   <Sparkles className='w-8 h-8 text-blue-600 dark:text-blue-400' />
-            </div>
+                </div>
                 <div className='flex-1'>
-                        <div className='flex items-center gap-2'>
+                  <div className='flex items-center gap-2'>
                     <h3 className='text-xl dark:text-white'>{viewingPrompt.title}</h3>
                     {viewingPrompt.isSystem && (
                       <Badge variant='secondary' className='text-xs gap-1'>
                         <Shield className='w-3 h-3' />
-                    {t('prompts.systemLabel')}
+                        {t('prompts.systemLabel')}
                       </Badge>
                     )}
                     <Badge
@@ -781,17 +781,17 @@ export function PromptLibraryPage() {
                     >
                       <Star className={cn('w-3 h-3', viewingPrompt.isFavorite && 'fill-yellow-400')} />
                     </Badge>
-              </div>
+                  </div>
                   <div className='flex items-center gap-2 mt-1'>
                     <Badge variant='outline' className='text-xs'>
                       {formatUsageCount(viewingPrompt.usageCount)}
                     </Badge>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
 
               <div className='space-y-3'>
-            <div>
+                <div>
                   <label className='text-sm text-gray-600 dark:text-gray-400'>{t('prompts.category')}</label>
                   <p className='text-sm dark:text-white mt-1'>
                     {(() => {
@@ -799,22 +799,22 @@ export function PromptLibraryPage() {
                       return category ? getCategoryDisplayName(category, language) : '-';
                     })()}
                   </p>
-            </div>
+                </div>
 
                 {viewingPrompt.tags && viewingPrompt.tags.length > 0 && (
-            <div>
+                  <div>
                     <label className='text-sm text-gray-600 dark:text-gray-400'>{t('prompts.tags')}</label>
                     <div className='flex flex-wrap gap-2 mt-2'>
                       {viewingPrompt.tags.map((tag, index) => (
                         <Badge key={index} variant='secondary' className={cn('text-xs', tag.color)}>
                           {tag.label}
                         </Badge>
-                              ))}
-                            </div>
-                        </div>
+                      ))}
+                    </div>
+                  </div>
                 )}
 
-              <div>
+                <div>
                   <div className='flex items-center justify-between mb-2'>
                     <label className='text-sm text-gray-600 dark:text-gray-400'>{t('prompts.promptContent')}</label>
                     <Button
@@ -830,15 +830,15 @@ export function PromptLibraryPage() {
                       <Copy className='w-3 h-3' />
                       {t('common.actions.copy')}
                     </Button>
-                              </div>
+                  </div>
                   <div className='mt-2 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600'>
                     <p className='text-sm dark:text-gray-300 whitespace-pre-wrap break-words'>
                       {viewingPrompt.content}
                     </p>
-                      </div>
+                  </div>
+                </div>
               </div>
-                      </div>
-                      </div>
+            </div>
           )}
         </DialogContent>
       </Dialog>
