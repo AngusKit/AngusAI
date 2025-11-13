@@ -193,16 +193,17 @@ export function APICollection() {
     setStatisticsLoading(true);
     try {
       const response = await ApiCollectionsService.apiCollectionGetStatistics();
-      const responseData = (response as any).data;
-      if (responseData) {
-        setStatistics(responseData);
-      }
-    } catch (error) {
+      const responseData = (response as any)?.data as ApiCollectionStatisticsVo | undefined;
+      setStatistics(responseData ?? null);
+    } catch (error: any) {
       console.error('Failed to load API collection statistics:', error);
+      toast.error(
+        error?.message || (language === 'zh-CN' ? '获取接口集统计失败' : 'Failed to load API collection statistics')
+      );
     } finally {
       setStatisticsLoading(false);
     }
-  }, []);
+  }, [language]);
 
   const loadCollections = useCallback(
     async (pageNo: number, keywordValue: string) => {
@@ -408,10 +409,17 @@ export function APICollection() {
     [collections, selectedCollectionId]
   );
 
+  const formatNumber = useCallback((value?: number | null) => {
+    if (value === null || value === undefined || Number.isNaN(value)) {
+      return '--';
+    }
+    return Number(value).toLocaleString(language === 'zh-CN' ? 'zh-CN' : 'en-US');
+  }, [language]);
+
   const stats = useMemo(() => {
     const overview = statistics?.overview;
     const previous = statistics?.lastMonthGrowthTrend;
-    const formatNumber = (value?: number) => (typeof value === 'number' ? value.toLocaleString() : '0');
+
     const buildTrend = (current?: number, prev?: number) => {
       if (typeof current !== 'number' || typeof prev !== 'number') {
         return undefined;
@@ -423,63 +431,54 @@ export function APICollection() {
       return { text: `${diff > 0 ? '+' : ''}${diff.toLocaleString()}`, up: diff >= 0 };
     };
 
-    const statsConfig = [
+    const collectionsTrend = buildTrend(overview?.apiCollectionCount, previous?.apiCollectionCount);
+    const totalApisTrend = buildTrend(overview?.apiTotalCount, previous?.apiTotalCount);
+    const enabledApisTrend = buildTrend(overview?.enabledApiCount, previous?.enabledApiCount);
+    const todayCallsTrend = buildTrend(overview?.todayCallCount, previous?.todayCallCount);
+
+    return [
       {
         key: 'collections',
-        labelZh: '接口集数量',
-        labelEn: 'Collections',
-        value: overview?.apiCollectionCount,
-        subtextZh: '全部接口集',
-        subtextEn: 'Total collections',
-        trend: buildTrend(overview?.apiCollectionCount, previous?.apiCollectionCount),
+        label: language === 'zh-CN' ? '接口集数量' : 'Collections',
+        value: formatNumber(overview?.apiCollectionCount),
+        subtext: language === 'zh-CN' ? '全部接口集' : 'Total collections',
+        trend: collectionsTrend,
+        trendUp: collectionsTrend?.up ?? true,
         icon: Database,
         iconBg: 'bg-blue-500',
       },
       {
         key: 'totalApis',
-        labelZh: '接口总数',
-        labelEn: 'Total APIs',
-        value: overview?.apiTotalCount,
-        subtextZh: '跨所有接口集',
-        subtextEn: 'Across all collections',
-        trend: buildTrend(overview?.apiTotalCount, previous?.apiTotalCount),
+        label: language === 'zh-CN' ? '接口总数' : 'Total APIs',
+        value: formatNumber(overview?.apiTotalCount),
+        subtext: language === 'zh-CN' ? '跨所有接口集' : 'Across all collections',
+        trend: totalApisTrend,
+        trendUp: totalApisTrend?.up ?? true,
         icon: Code2,
         iconBg: 'bg-green-500',
       },
       {
         key: 'enabledApis',
-        labelZh: '已启用接口',
-        labelEn: 'Enabled APIs',
-        value: overview?.enabledApiCount,
-        subtextZh: '正在使用中',
-        subtextEn: 'Currently active',
-        trend: buildTrend(overview?.enabledApiCount, previous?.enabledApiCount),
+        label: language === 'zh-CN' ? '已启用接口' : 'Enabled APIs',
+        value: formatNumber(overview?.enabledApiCount),
+        subtext: language === 'zh-CN' ? '正在使用中' : 'Currently active',
+        trend: enabledApisTrend,
+        trendUp: enabledApisTrend?.up ?? true,
         icon: Zap,
         iconBg: 'bg-orange-500',
       },
       {
         key: 'todayCalls',
-        labelZh: '今日调用',
-        labelEn: 'Today Calls',
-        value: overview?.todayCallCount,
-        subtextZh: '相较昨日变化',
-        subtextEn: 'Change vs yesterday',
-        trend: buildTrend(overview?.todayCallCount, previous?.todayCallCount),
+        label: language === 'zh-CN' ? '今日调用' : 'Today Calls',
+        value: formatNumber(overview?.todayCallCount),
+        subtext: language === 'zh-CN' ? '相较昨日变化' : 'Change vs yesterday',
+        trend: todayCallsTrend,
+        trendUp: todayCallsTrend?.up ?? true,
         icon: Activity,
         iconBg: 'bg-purple-500',
       },
     ];
-
-    return statsConfig.map(item => ({
-      label: language === 'zh-CN' ? item.labelZh : item.labelEn,
-      value: formatNumber(item.value),
-      subtext: language === 'zh-CN' ? item.subtextZh : item.subtextEn,
-      icon: item.icon,
-      iconBg: item.iconBg,
-      trend: item.trend?.text,
-      trendUp: item.trend?.up ?? true,
-    }));
-  }, [language, statistics]);
+  }, [language, statistics, formatNumber]);
 
   const buildServerObject = () => {
     if (!serverConfig.url) {
@@ -796,46 +795,6 @@ export function APICollection() {
     };
   };
 
-  // 统计数据
-  // const stats = [
-  //   {
-  //     label: language === 'zh-CN' ? '接口集数量' : 'Collections',
-  //     value: collections.length.toString(),
-  //     subtext: language === 'zh-CN' ? '全部接口集' : 'Total collections',
-  //     icon: Database,
-  //     iconBg: 'bg-blue-500',
-  //     trend: '+2',
-  //     trendUp: true,
-  //   },
-  //   {
-  //     label: language === 'zh-CN' ? '接口总数' : 'Total APIs',
-  //     value: collections.reduce((sum, col) => sum + col.endpointsCount, 0).toString(),
-  //     subtext: language === 'zh-CN' ? '跨所有接口集' : 'Across all collections',
-  //     icon: Code2,
-  //     iconBg: 'bg-green-500',
-  //     trend: '+15',
-  //     trendUp: true,
-  //   },
-  //   {
-  //     label: language === 'zh-CN' ? '已启用接口' : 'Enabled APIs',
-  //     value: collections.reduce((sum, col) => sum + col.enabled, 0).toString(),
-  //     subtext: language === 'zh-CN' ? '正在使用中' : 'Currently active',
-  //     icon: Zap,
-  //     iconBg: 'bg-orange-500',
-  //     trend: '+8',
-  //     trendUp: true,
-  //   },
-  //   {
-  //     label: language === 'zh-CN' ? '今日调用' : 'Today Calls',
-  //     value: '1,247',
-  //     subtext: language === 'zh-CN' ? '相较昨日增长 18%' : 'Up 18% from yesterday',
-  //     icon: Activity,
-  //     iconBg: 'bg-purple-500',
-  //     trend: '+18%',
-  //     trendUp: true,
-  //   },
-  // ];
-
   return (
     <div className='space-y-6'>
       <input
@@ -852,17 +811,17 @@ export function APICollection() {
         </h1>
         <p className='text-sm text-gray-600 dark:text-gray-400'>
           {language === 'zh-CN'
-            ? '用于大模型集成外部API接口，支持OpenAPI、Swagger、Postman等规范'
+            ? '用于大模型基于API接口集成外部系统，支持OpenAPI、Swagger、Postman等规范'
             : 'For LLM integration with external APIs, support OpenAPI, Swagger, Postman, etc.'}
         </p>
       </div>
 
       {/* Stats Cards */}
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4'>
-        {stats.map((stat, index) => {
+        {stats.map(stat => {
           const Icon = stat.icon;
           return (
-            <Card key={index} className='px-5 pt-5 pb-3 dark:bg-gray-800 dark:border-gray-700'>
+            <Card key={stat.key} className='px-5 pt-5 pb-3 dark:bg-gray-800 dark:border-gray-700'>
               <div className='flex items-start justify-between mb-1.5'>
                 <div className={`${stat.iconBg} w-10 h-10 rounded-lg flex items-center justify-center`}>
                   <Icon className='w-5 h-5 text-white' />
@@ -871,12 +830,12 @@ export function APICollection() {
                   <span
                     className={`text-sm ${stat.trendUp ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
                   >
-                    {stat.trend}
+                    {stat.trend.text}
                   </span>
                 )}
               </div>
               <div className='text-base font-semibold text-gray-600 dark:text-gray-400 mb-0.5'>{stat.label}</div>
-              <div className='text-3xl dark:text-white mb-0.5'>{stat.value}</div>
+              <div className='text-3xl dark:text-white mb-0.5'>{statisticsLoading ? '--' : stat.value}</div>
               <div className='text-xs text-gray-500 dark:text-gray-400'>{stat.subtext}</div>
             </Card>
           );
@@ -1621,7 +1580,7 @@ export function APICollection() {
                     <div>
                       <Label>{language === 'zh-CN' ? '接口集名称' : 'Collection Name'}</Label>
                       <Input
-                        defaultValue={collections.find(c => c.id === selectedCollection)?.name}
+                        defaultValue={selectedCollectionItem?.name}
                         className='mt-2 dark:bg-gray-750 dark:border-gray-600'
                       />
                     </div>
@@ -1629,14 +1588,14 @@ export function APICollection() {
                     <div>
                       <Label>{language === 'zh-CN' ? '描述' : 'Description'}</Label>
                       <Textarea
-                        defaultValue={collections.find(c => c.id === selectedCollection)?.description}
+                        defaultValue={selectedCollectionItem?.description}
                         className='mt-2 min-h-[100px] dark:bg-gray-750 dark:border-gray-600'
                       />
                     </div>
 
                     <div>
                       <Label>{language === 'zh-CN' ? '可见性' : 'Visibility'}</Label>
-                      <Select defaultValue={collections.find(c => c.id === selectedCollection)?.visibility}>
+                      <Select defaultValue={selectedCollectionItem?.visibility}>
                         <SelectTrigger className='dark:bg-gray-750 dark:border-gray-600 mt-2'>
                           <SelectValue />
                         </SelectTrigger>
@@ -1819,8 +1778,8 @@ export function APICollection() {
             </DialogTitle>
             <DialogDescription>
               {language === 'zh-CN'
-                ? '支持 OpenAPI、Swagger、Postman 等多种规范格式'
-                : 'Support OpenAPI, Swagger, Postman and more'}
+                ? '支持 OpenAPI、Swagger、Postman 等多种规范格式，最大支持20MB'
+                : 'Supports multiple specification formats such as OpenAPI, Swagger, and Postman, with a maximum support of 20MB.'}
             </DialogDescription>
           </DialogHeader>
 
@@ -1930,7 +1889,7 @@ export function APICollection() {
                   {language === 'zh-CN' ? '点击选择文件或拖拽文件到此处' : 'Click to select file or drag and drop'}
                 </p>
                 <p className='text-xs text-gray-500 dark:text-gray-500 mt-1'>
-                  {language === 'zh-CN' ? '支持 JSON、YAML 格式' : 'Support JSON, YAML formats'}
+                  {language === 'zh-CN' ? '支持 JSON、YAML 格式，最大20MB' : 'Support JSON, YAML formats, Max size: 20MB'}
                 </p>
               </div>
             </div>

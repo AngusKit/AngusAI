@@ -120,5 +120,10 @@ public class ApiEndpointQueryImpl implements ApiEndpointQuery {
     return endpointMap;
   }
 
+  @Override
+  public List<ApiEndpoint> findByCollectionId(Long id) {
+    return apiEndpointRepo.findByCollectionId(id);
+  }
+
 }
 

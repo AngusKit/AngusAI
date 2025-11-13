@@ -1,7 +1,9 @@
 package cloud.xcan.angus.core.ai.domain;
 
+import java.io.File;
+
 /**
- * 应用相关字段长度常量
+ * 应用常量
  */
 public interface Constants {
 
@@ -25,11 +27,11 @@ public interface Constants {
    */
   int APPLICATION_DESCRIPTION_DB_LENGTH = 500;
 
-  // ==================== 聊天相关字段长度常量 ====================
+  // ==================== 聊天常量 ====================
 
   String CHAT_ATTACHMENTS_UPLOAD_BIZ_KEY = "angusAIChatAttachments";
 
-  // ==================== 知识库相关字段长度常量 ====================
+  // ==================== 知识库常量 ====================
 
   String KNOWLEDGE_DOC_UPLOAD_BIZ_KEY = "angusAIKnowledgeBaseDocs";
 
@@ -117,7 +119,7 @@ public interface Constants {
    */
   double SIMILARITY_THRESHOLD_MAX_VALUE = 1.0;
 
-  // ==================== 数据集相关字段长度常量 ====================
+  // ==================== 数据集常量 ====================
 
   String DATASET_UPLOAD_BIZ_KEY = "angusAIDatasetFiles";
 
@@ -136,7 +138,7 @@ public interface Constants {
    */
   int DATASET_TAGS_MAX_COUNT = 5;
 
-  // ==================== 数据源相关字段长度常量 ====================
+  // ==================== 数据源常量 ====================
 
   /**
    * 数据源名称最大长度
@@ -168,4 +170,12 @@ public interface Constants {
    */
   int DATASOURCE_PASSWORD_MAX_LENGTH = 4096;
 
+  // ==================== 接口集常量 ====================
+
+  int API_COLLECTION_MAX_FILE_MB = 20;
+  int API_COLLECTION_MAX_FILE_BYTE = API_COLLECTION_MAX_FILE_MB * 1024 * 1024;
+
+  String IMPORT_OPENAPI_DIR = "importApis" + File.separator + "openapi" + File.separator;
+  String IMPORT_POSTMAN_DIR = "importApis" + File.separator + "postman" + File.separator;
+  String EXPORT_OPENAPI_DIR = "exportApis" + File.separator;
 }

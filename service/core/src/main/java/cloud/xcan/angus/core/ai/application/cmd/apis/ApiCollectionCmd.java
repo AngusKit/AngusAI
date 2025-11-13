@@ -26,7 +26,7 @@ public interface ApiCollectionCmd {
   /**
    * 导入接口集
    */
-  ApiCollection importCollection(ApiCollectionImportDto dto);
+  ApiCollection importCollection(Long id, ApiCollectionImportDto dto);
 
 }
 

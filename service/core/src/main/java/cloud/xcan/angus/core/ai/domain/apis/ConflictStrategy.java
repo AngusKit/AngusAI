@@ -7,26 +7,24 @@ public enum ConflictStrategy {
   /**
    * 覆盖：如果导入的接口已存在，将使用新数据覆盖原有数据
    */
-  OVERWRITE("覆盖"),
+  OVERWRITE,
 
   /**
    * 忽略：如果导入的接口已存在，将跳过该接口
    */
-  IGNORE("忽略"),
+  IGNORE,
 
   /**
    * 合并：如果导入的接口已存在，将合并配置
    */
-  MERGE("合并");
+  MERGE;
 
-  private final String displayName;
-
-  ConflictStrategy(String displayName) {
-    this.displayName = displayName;
+  public boolean isOverwrite() {
+    return this.equals(OVERWRITE);
   }
 
-  public String getDisplayName() {
-    return displayName;
+  public boolean isMerge() {
+    return this.equals(MERGE);
   }
 }
 

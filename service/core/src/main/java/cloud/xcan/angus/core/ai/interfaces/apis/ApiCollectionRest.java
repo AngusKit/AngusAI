@@ -6,7 +6,6 @@ import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionFindDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionImportDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionDetailVo;
-import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionImportVo;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionListVo;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionStatisticsVo;
 import cloud.xcan.angus.remote.ApiLocaleResult;
@@ -102,23 +101,17 @@ public class ApiCollectionRest {
     return ApiLocaleResult.success(apiCollectionFacade.list(dto));
   }
 
-  @Operation(operationId = "getApiCollectionStatistics", summary = "获取统计信息", description = "获取接口集的统计数据，包括总体统计、使用率排行、性能趋势等")
-  @GetMapping("/statistics")
-  public ApiLocaleResult<ApiCollectionStatisticsVo> getStatistics(
-      @ParameterObject SimpleStatisticsDto dto) {
-    return ApiLocaleResult.success(apiCollectionFacade.getStatistics(dto));
-  }
-
   @Operation(operationId = "apiCollectionImport", summary = "导入接口集", description = "从OpenAPI/Swagger/Postman文件导入接口集")
   @ApiResponses({
       @ApiResponse(responseCode = "201", description = "导入成功"),
       @ApiResponse(responseCode = "400", description = "文件格式错误或文件过大")
   })
-  @PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @PostMapping(value = "/{id}/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @ResponseStatus(HttpStatus.CREATED)
-  public ApiLocaleResult<ApiCollectionImportVo> importCollection(
+  public ApiLocaleResult<ApiCollectionDetailVo> importCollection(
+      @Parameter(description = "接口集ID", required = true) @PathVariable Long id,
       @Parameter(content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE), schema = @Schema(type = "object")) @Valid ApiCollectionImportDto dto) {
-    return ApiLocaleResult.success(apiCollectionFacade.importCollection(dto));
+    return ApiLocaleResult.success(apiCollectionFacade.importCollection(id, dto));
   }
 
   @Operation(operationId = "apiCollectionExportOpenApi", summary = "导出OpenAPI规范", description = "导出接口集为OpenAPI 3.1规范")
@@ -133,4 +126,10 @@ public class ApiCollectionRest {
     return apiCollectionFacade.exportOpenApi(id, format, includeDisabled, response);
   }
 
+  @Operation(operationId = "getApiCollectionStatistics", summary = "获取统计信息", description = "获取接口集的统计数据，包括总体统计、使用率排行、性能趋势等")
+  @GetMapping("/statistics")
+  public ApiLocaleResult<ApiCollectionStatisticsVo> getStatistics(
+      @ParameterObject SimpleStatisticsDto dto) {
+    return ApiLocaleResult.success(apiCollectionFacade.getStatistics(dto));
+  }
 }

@@ -19,7 +19,6 @@ import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionImportDt
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.internal.assembler.ApiCollectionAssembler;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionDetailVo;
-import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionImportVo;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionListVo;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionStatisticsVo;
 import cloud.xcan.angus.core.biz.NameJoin;
@@ -76,6 +75,8 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
   public ApiCollectionDetailVo update(Long id, ApiCollectionUpdateDto dto) {
     ApiCollection collection = ApiCollectionAssembler.toUpdateDomain(id, dto);
     ApiCollection saved = apiCollectionCmd.update(collection);
+    // 设置统计信息
+    setStatsInfo(saved);
     return ApiCollectionAssembler.toVo(saved);
   }
 
@@ -87,14 +88,10 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
   @NameJoin
   @Override
   public ApiCollectionDetailVo getDetail(Long id) {
-    ApiCollection collection = apiCollectionQuery.findAndCheck(id);
-
+    ApiCollection saved = apiCollectionQuery.findAndCheck(id);
     // 设置统计信息
-    Long endpointsCount = apiEndpointQuery.countEndpointsByCollectionId(id);
-    Long enabledCount = apiEndpointQuery.countEnabledEndpointsByCollectionId(id);
-    collection.setEndpointsCount(endpointsCount);
-    collection.setEnabledEndpointsCount(enabledCount);
-    return ApiCollectionAssembler.toVo(collection);
+    setStatsInfo(saved);
+    return ApiCollectionAssembler.toVo(saved);
   }
 
   @NameJoin
@@ -117,13 +114,26 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
           collectionIds);
 
       collections.forEach(collection -> {
-        Long endpointsCount = endpointsCountMap.getOrDefault(collection.getId(), 0L);
-        Long enabledCount = enabledEndpointsCountMap.getOrDefault(collection.getId(), 0L);
-        collection.setEndpointsCount(endpointsCount);
-        collection.setEnabledEndpointsCount(enabledCount);
+        setStatsInfo(endpointsCountMap.getOrDefault(collection.getId(), 0L),
+            enabledEndpointsCountMap.getOrDefault(collection.getId(), 0L), collection);
       });
     }
     return buildVoPageResult(page, ApiCollectionAssembler::toListVo);
+  }
+
+  @NameJoin
+  @Override
+  public ApiCollectionDetailVo importCollection(Long id, ApiCollectionImportDto dto) {
+    ApiCollection saved = apiCollectionCmd.importCollection(id, dto);
+    // 设置统计信息
+    setStatsInfo(saved);
+    return ApiCollectionAssembler.toVo(saved);
+  }
+
+  @Override
+  public ResponseEntity<org.springframework.core.io.Resource> exportOpenApi(Long id,
+      String format, Boolean includeDisabled, HttpServletResponse response) {
+    return null; // TODO
   }
 
   /**
@@ -294,18 +304,18 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     return trends;
   }
 
-  @Override
-  public ApiCollectionImportVo importCollection(ApiCollectionImportDto dto) {
-    ApiCollection collection = apiCollectionCmd.importCollection(dto);
-    // TODO
-    ApiCollectionImportVo vo = new ApiCollectionImportVo();
-    return vo;
+  private void setStatsInfo(ApiCollection collection){
+    Long endpointsCount = apiEndpointQuery.countEndpointsByCollectionId(collection.getId());
+    Long enabledCount = apiEndpointQuery.countEnabledEndpointsByCollectionId(collection.getId());
+    collection.setEndpointsCount(endpointsCount);
+    collection.setEnabledEndpointsCount(enabledCount);
   }
 
-  @Override
-  public ResponseEntity<org.springframework.core.io.Resource> exportOpenApi(Long id,
-      String format, Boolean includeDisabled, HttpServletResponse response) {
-    return null; // TODO
+  private static void setStatsInfo(Long endpointsCount, Long enabledCount,
+      ApiCollection collection) {
+    collection.setEndpointsCount(endpointsCount);
+    collection.setEnabledEndpointsCount(enabledCount);
   }
+
 }
 

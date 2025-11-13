@@ -17,6 +17,11 @@
   <dependencies>
     <dependency>
       <groupId>cloud.xcan.angus</groupId>
+      <artifactId>xcan-infra.spec</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>cloud.xcan.angus</groupId>
       <artifactId>xcan-infra.remote</artifactId>
     </dependency>
 
@@ -43,7 +48,15 @@
         <!-- Use the spec module instead -->
         <exclusion>
           <groupId>io.swagger.core.v3</groupId>
+          <artifactId>swagger-models-jakarta</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>io.swagger.core.v3</groupId>
           <artifactId>swagger-models</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>io.swagger.core.v3</groupId>
+          <artifactId>swagger-annotations-jakarta</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -55,6 +68,14 @@
         <exclusion>
           <groupId>io.swagger.core.v3</groupId>
           <artifactId>swagger-models</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>io.swagger.core.v3</groupId>
+          <artifactId>swagger-models-jakarta</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>io.swagger.core.v3</groupId>
+          <artifactId>swagger-annotations-jakarta</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
