@@ -19,6 +19,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useLanguage } from '@/components/ui/LanguageProvider';
 import { ApiCollectionSourceEnum, VisibilityEnum } from '@/enums/enums';
 import type { CollectionFormData } from '../types';
+import { getEnumDescription } from '@/enums/utils';
 
 interface CreateCollectionDialogProps {
   open: boolean;
@@ -37,7 +38,7 @@ export function CreateCollectionDialog({
   onSubmit,
   onReset,
 }: CreateCollectionDialogProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const handleCancel = () => {
     onOpenChange(false);
@@ -59,18 +60,20 @@ export function CreateCollectionDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='dark:bg-gray-800'>
         <DialogHeader>
-          <DialogTitle className='dark:text-white'>{t('apis.createDialog.title')}</DialogTitle>
-          <DialogDescription>{t('apis.createDialog.description')}</DialogDescription>
+          <DialogTitle className='dark:text-white'>{language === 'zh-CN' ? '新建接口集' : 'New API Collection'}</DialogTitle>
+          <DialogDescription>{language === 'zh-CN'
+                ? '创建一个新的接口集来管理相关的API'
+                : 'Create a new collection to manage related APIs'}</DialogDescription>
         </DialogHeader>
 
         <div className='space-y-4'>
           <div>
-            <Label htmlFor='name'>{t('apis.createDialog.nameLabel')}</Label>
+            <Label htmlFor='name'>{language === 'zh-CN' ? '接口集名称' : 'Collection Name'}</Label>
             <Input
               id='name'
               value={formData.name}
               onChange={e => updateField('name', e.target.value)}
-              placeholder={t('apis.createDialog.namePlaceholder')}
+              placeholder={language === 'zh-CN' ? '输入接口集名称...' : 'Enter collection name...'}
               className='dark:bg-gray-750 dark:border-gray-600'
             />
           </div>
@@ -81,18 +84,17 @@ export function CreateCollectionDialog({
               id='description'
               value={formData.description}
               onChange={e => updateField('description', e.target.value)}
-              placeholder={t('apis.createDialog.descriptionPlaceholder')}
+              placeholder={language === 'zh-CN' ? '输入接口集描述...' : 'Enter collection description...'}
               className='dark:bg-gray-750 dark:border-gray-600 min-h-[100px]'
             />
           </div>
 
           <div className='grid grid-cols-2 gap-4'>
             <div>
-              <Label>{t('apis.createDialog.sourceTypeLabel')}</Label>
+              <Label>{language === 'zh-CN' ? '规范类型' : 'Specification Type'}</Label>
               <Select
                 value={formData.source}
-                onValueChange={(value: string) => updateField('source', value as ApiCollectionSourceEnum)}
-              >
+                onValueChange={(value: string) => updateField('source', value as ApiCollectionSourceEnum)}>
                 <SelectTrigger className='dark:bg-gray-750 dark:border-gray-600'>
                   <SelectValue />
                 </SelectTrigger>
@@ -100,17 +102,16 @@ export function CreateCollectionDialog({
                   <SelectItem value={ApiCollectionSourceEnum.OPENAPI}>OpenAPI 3.0</SelectItem>
                   <SelectItem value={ApiCollectionSourceEnum.SWAGGER}>Swagger 2.0</SelectItem>
                   <SelectItem value={ApiCollectionSourceEnum.POSTMAN}>Postman Collection</SelectItem>
-                  <SelectItem value='manual'>{t('apis.createDialog.manual')}</SelectItem>
+                  <SelectItem value='manual'>{language === 'zh-CN' ? '手动创建' : 'Manual'}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div>
-              <Label>{t('apis.createDialog.visibilityLabel')}</Label>
+              <Label>{language === 'zh-CN' ? '可见性' : 'Visibility'}</Label>
               <Select
                 value={formData.visibility}
-                onValueChange={(value: string) => updateField('visibility', value as VisibilityEnum)}
-              >
+                onValueChange={(value: string) => updateField('visibility', value as VisibilityEnum)}>
                 <SelectTrigger className='dark:bg-gray-750 dark:border-gray-600'>
                   <SelectValue />
                 </SelectTrigger>
@@ -118,19 +119,19 @@ export function CreateCollectionDialog({
                   <SelectItem value={VisibilityEnum.PRIVATE}>
                     <div className='flex items-center gap-2'>
                       <Shield className='w-4 h-4' />
-                      {t('apis.visibility.private')}
+                      {getEnumDescription(VisibilityEnum, VisibilityEnum.PRIVATE)}
                     </div>
                   </SelectItem>
                   <SelectItem value={VisibilityEnum.TEAM}>
                     <div className='flex items-center gap-2'>
                       <Eye className='w-4 h-4' />
-                      {t('apis.visibility.team')}
+                      {getEnumDescription(VisibilityEnum, VisibilityEnum.TEAM)}
                     </div>
                   </SelectItem>
                   <SelectItem value={VisibilityEnum.PUBLIC}>
                     <div className='flex items-center gap-2'>
                       <Globe className='w-4 h-4' />
-                      {t('apis.visibility.public')}
+                      {getEnumDescription(VisibilityEnum, VisibilityEnum.PUBLIC)}
                     </div>
                   </SelectItem>
                 </SelectContent>
@@ -144,7 +145,7 @@ export function CreateCollectionDialog({
             {t('common.actions.cancel')}
           </Button>
           <Button onClick={handleSubmit} className='dark:bg-blue-600 dark:hover:bg-blue-700'>
-            {t('apis.createDialog.createButton')}
+            {t('common.actions.create')}
           </Button>
         </DialogFooter>
       </DialogContent>

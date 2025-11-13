@@ -22,7 +22,7 @@ interface ImportDialogProps {
 }
 
 export function ImportDialog({ open, onOpenChange, onImport }: ImportDialogProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const handleImport = (type: ApiCollectionImportTypeEnum) => {
     onImport(type);
@@ -32,8 +32,10 @@ export function ImportDialog({ open, onOpenChange, onImport }: ImportDialogProps
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='dark:bg-gray-800'>
         <DialogHeader>
-          <DialogTitle className='dark:text-white'>{t('apis.importDialog.title')}</DialogTitle>
-          <DialogDescription>{t('apis.importDialog.description')}</DialogDescription>
+          <DialogTitle className='dark:text-white'>{language === 'zh-CN' ? '导入接口规范' : 'Import API Specification'}</DialogTitle>
+          <DialogDescription>{language === 'zh-CN'
+                ? '支持 OpenAPI、Swagger、Postman 等多种规范格式，最大支持20MB'
+                : 'Supports multiple specification formats such as OpenAPI, Swagger, and Postman, with a maximum support of 20MB.'}</DialogDescription>
         </DialogHeader>
 
         <div className='space-y-4'>

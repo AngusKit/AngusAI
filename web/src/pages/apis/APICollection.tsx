@@ -65,37 +65,37 @@ export function APICollection() {
   });
   const { formData, setFormData, resetForm, handleCreateCollection, serverConfig, setServerConfig, securityConfig, setSecurityConfig } = form;
 
-  // 自定义认证参数管理（临时保留在主组件中，后续可提取到 SecurityConfigForm 组件）
-  const [customAuthParams, setCustomAuthParams] = useState<Array<{ id: string; name: string; value: string; location: 'header' | 'query' | 'cookie' }>>([
-    { id: '1', name: '', value: '', location: 'header' },
-  ]);
+  // // 自定义认证参数管理（临时保留在主组件中，后续可提取到 SecurityConfigForm 组件）
+  // const [customAuthParams, setCustomAuthParams] = useState<Array<{ id: string; name: string; value: string; location: 'header' | 'query' | 'cookie' }>>([
+  //   { id: '1', name: '', value: '', location: 'header' },
+  // ]);
 
-  const addCustomAuthParam = () => {
-    const newParam = {
-      id: Date.now().toString(),
-      name: '',
-      value: '',
-      location: 'header' as const,
-    };
-    setCustomAuthParams([...customAuthParams, newParam]);
-  };
+  // const addCustomAuthParam = () => {
+  //   const newParam = {
+  //     id: Date.now().toString(),
+  //     name: '',
+  //     value: '',
+  //     location: 'header' as const,
+  //   };
+  //   setCustomAuthParams([...customAuthParams, newParam]);
+  // };
 
-  const removeCustomAuthParam = (id: string) => {
-    setCustomAuthParams(customAuthParams.filter(param => param.id !== id));
-  };
+  // const removeCustomAuthParam = (id: string) => {
+  //   setCustomAuthParams(customAuthParams.filter(param => param.id !== id));
+  // };
 
-  const updateCustomAuthParam = (id: string, field: 'name' | 'value' | 'location', value: string) => {
-    setCustomAuthParams(
-      customAuthParams.map(param =>
-        param.id === id
-          ? {
-              ...param,
-              [field]: value,
-            }
-          : param
-      )
-    );
-  };
+  // const updateCustomAuthParam = (id: string, field: 'name' | 'value' | 'location', value: string) => {
+  //   setCustomAuthParams(
+  //     customAuthParams.map(param =>
+  //       param.id === id
+  //         ? {
+  //             ...param,
+  //             [field]: value,
+  //           }
+  //         : param
+  //     )
+  //   );
+  // };
 
   const importHook = useAPICollectionImport(formData.visibility, async () => {
     // Hook 内部已经处理了防抖，这里直接使用 searchQuery
@@ -208,6 +208,353 @@ export function APICollection() {
       setShowImportDialog(false);
       resetImport();
     }
+  };
+
+  // 服务器配置
+  interface ServerConfig {
+    id: string;
+    url: string;
+    description: string;
+    enabled: boolean;
+  }
+
+  const [servers, setServers] = useState<ServerConfig[]>([
+    {
+      id: '1',
+      url: 'https://api.example.com',
+      description: '生产环境服务器',
+      enabled: true,
+    },
+    {
+      id: '2',
+      url: 'https://dev-api.example.com',
+      description: '开发环境服务器',
+      enabled: false,
+    },
+  ]);
+
+  const [editingServer, setEditingServer] = useState<ServerConfig | null>(null);
+  const [serverFormData, setServerFormData] = useState({
+    url: '',
+    description: '',
+  });
+
+  const handleAddServer = () => {
+    if (servers.length >= 10) {
+      toast.error(language === 'zh-CN' ? '最多只能配置10个服务器' : 'Maximum 10 servers allowed');
+      return;
+    }
+
+    if (!serverFormData.url.trim()) {
+      toast.error(language === 'zh-CN' ? '请输入服务器URL' : 'Please enter server URL');
+      return;
+    }
+
+    const newServer: ServerConfig = {
+      id: Date.now().toString(),
+      url: serverFormData.url,
+      description: serverFormData.description,
+      enabled: false,
+    };
+
+    setServers([...servers, newServer]);
+    setServerFormData({ url: '', description: '' });
+    toast.success(language === 'zh-CN' ? '服务器添加成功' : 'Server added successfully');
+  };
+
+  const handleUpdateServer = () => {
+    if (!editingServer) return;
+
+    if (!serverFormData.url.trim()) {
+      toast.error(language === 'zh-CN' ? '请输入服务器URL' : 'Please enter server URL');
+      return;
+    }
+
+    setServers(servers.map(s => 
+      s.id === editingServer.id 
+        ? { ...s, url: serverFormData.url, description: serverFormData.description }
+        : s
+    ));
+    setEditingServer(null);
+    setServerFormData({ url: '', description: '' });
+    toast.success(language === 'zh-CN' ? '服务器更新成功' : 'Server updated successfully');
+  };
+
+  const handleEditServer = (server: ServerConfig) => {
+    setEditingServer(server);
+    setServerFormData({
+      url: server.url,
+      description: server.description,
+    });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingServer(null);
+    setServerFormData({ url: '', description: '' });
+  };
+
+  const handleToggleServer = (serverId: string) => {
+    setServers(servers.map(s => ({
+      ...s,
+      enabled: s.id === serverId ? !s.enabled : false, // 只能同时启用一个
+    })));
+  };
+
+  const handleDeleteServer = (serverId: string) => {
+    setServers(servers.filter(s => s.id !== serverId));
+    toast.success(language === 'zh-CN' ? '服务器删除成功' : 'Server deleted successfully');
+  };
+
+  interface CustomAuthParam {
+    id: string;
+    name: string;
+    value: string;
+    location: 'header' | 'query' | 'cookie';
+  }
+
+  // 安全配置
+  interface SecurityConfigItem {
+    id: string;
+    name: string;
+    type: 'apiKey' | 'httpBasic' | 'bearer' | 'oauth2Password' | 'oauth2Client' | 'custom';
+    apiKeyName: string;
+    apiKeyValue: string;
+    apiKeyIn: 'header' | 'query' | 'cookie';
+    basicUsername: string;
+    basicPassword: string;
+    bearerToken: string;
+    oauth2TokenUrl: string;
+    oauth2Username: string;
+    oauth2Password: string;
+    oauth2ClientId: string;
+    oauth2ClientSecret: string;
+    oauth2Scope: string;
+    oauth2ClientTokenUrl: string;
+    oauth2ClientCredentialsId: string;
+    oauth2ClientCredentialsSecret: string;
+    oauth2ClientScope: string;
+    customParams: CustomAuthParam[];
+  }
+
+  const [securityConfigs, setSecurityConfigs] = useState<SecurityConfigItem[]>([
+    {
+      id: '1',
+      name: 'Production API Key',
+      type: 'apiKey',
+      apiKeyName: 'X-API-Key',
+      apiKeyValue: '••••••••••••',
+      apiKeyIn: 'header',
+      basicUsername: '',
+      basicPassword: '',
+      bearerToken: '',
+      oauth2TokenUrl: '',
+      oauth2Username: '',
+      oauth2Password: '',
+      oauth2ClientId: '',
+      oauth2ClientSecret: '',
+      oauth2Scope: '',
+      oauth2ClientTokenUrl: '',
+      oauth2ClientCredentialsId: '',
+      oauth2ClientCredentialsSecret: '',
+      oauth2ClientScope: '',
+      customParams: [],
+    },
+  ]);
+
+  const [editingSecurity, setEditingSecurity] = useState<SecurityConfigItem | null>(null);
+  const [securityFormData, setSecurityFormData] = useState({
+    name: '',
+    type: 'apiKey' as 'apiKey' | 'httpBasic' | 'bearer' | 'oauth2Password' | 'oauth2Client' | 'custom',
+    apiKeyName: '',
+    apiKeyValue: '',
+    apiKeyIn: 'header' as 'header' | 'query' | 'cookie',
+    basicUsername: '',
+    basicPassword: '',
+    bearerToken: '',
+    oauth2TokenUrl: '',
+    oauth2Username: '',
+    oauth2Password: '',
+    oauth2ClientId: '',
+    oauth2ClientSecret: '',
+    oauth2Scope: '',
+    oauth2ClientTokenUrl: '',
+    oauth2ClientCredentialsId: '',
+    oauth2ClientCredentialsSecret: '',
+    oauth2ClientScope: '',
+  });
+
+  // 自定义认证参数
+  const [customAuthParams, setCustomAuthParams] = useState<CustomAuthParam[]>([
+    { id: '1', name: '', value: '', location: 'header' },
+  ]);
+
+  const addCustomAuthParam = () => {
+    const newParam: CustomAuthParam = {
+      id: Date.now().toString(),
+      name: '',
+      value: '',
+      location: 'header',
+    };
+    setCustomAuthParams([...customAuthParams, newParam]);
+  };
+
+  const removeCustomAuthParam = (id: string) => {
+    setCustomAuthParams(customAuthParams.filter(param => param.id !== id));
+  };
+
+  const updateCustomAuthParam = (id: string, field: keyof CustomAuthParam, value: string) => {
+    setCustomAuthParams(customAuthParams.map(param =>
+      param.id === id ? { ...param, [field]: value } : param
+    ));
+  };
+
+  const handleAddSecurity = () => {
+    if (securityConfigs.length >= 10) {
+      toast.error(language === 'zh-CN' ? '最多只能配置10个安全配置' : 'Maximum 10 security configurations allowed');
+      return;
+    }
+
+    if (!securityFormData.name.trim()) {
+      toast.error(language === 'zh-CN' ? '请输入配置名称' : 'Please enter configuration name');
+      return;
+    }
+
+    const newSecurity: SecurityConfigItem = {
+      id: Date.now().toString(),
+      name: securityFormData.name,
+      type: securityFormData.type,
+      apiKeyName: securityFormData.apiKeyName,
+      apiKeyValue: securityFormData.apiKeyValue,
+      apiKeyIn: securityFormData.apiKeyIn,
+      basicUsername: securityFormData.basicUsername,
+      basicPassword: securityFormData.basicPassword,
+      bearerToken: securityFormData.bearerToken,
+      oauth2TokenUrl: securityFormData.oauth2TokenUrl,
+      oauth2Username: securityFormData.oauth2Username,
+      oauth2Password: securityFormData.oauth2Password,
+      oauth2ClientId: securityFormData.oauth2ClientId,
+      oauth2ClientSecret: securityFormData.oauth2ClientSecret,
+      oauth2Scope: securityFormData.oauth2Scope,
+      oauth2ClientTokenUrl: securityFormData.oauth2ClientTokenUrl,
+      oauth2ClientCredentialsId: securityFormData.oauth2ClientCredentialsId,
+      oauth2ClientCredentialsSecret: securityFormData.oauth2ClientCredentialsSecret,
+      oauth2ClientScope: securityFormData.oauth2ClientScope,
+      customParams: [...customAuthParams],
+    };
+
+    setSecurityConfigs([...securityConfigs, newSecurity]);
+    resetSecurityForm();
+    toast.success(language === 'zh-CN' ? '安全配置添加成功' : 'Security configuration added successfully');
+  };
+
+  const handleUpdateSecurity = () => {
+    if (!editingSecurity) return;
+
+    if (!securityFormData.name.trim()) {
+      toast.error(language === 'zh-CN' ? '请输入配置名称' : 'Please enter configuration name');
+      return;
+    }
+
+    setSecurityConfigs(securityConfigs.map(s => 
+      s.id === editingSecurity.id 
+        ? {
+            ...s,
+            name: securityFormData.name,
+            type: securityFormData.type,
+            apiKeyName: securityFormData.apiKeyName,
+            apiKeyValue: securityFormData.apiKeyValue,
+            apiKeyIn: securityFormData.apiKeyIn,
+            basicUsername: securityFormData.basicUsername,
+            basicPassword: securityFormData.basicPassword,
+            bearerToken: securityFormData.bearerToken,
+            oauth2TokenUrl: securityFormData.oauth2TokenUrl,
+            oauth2Username: securityFormData.oauth2Username,
+            oauth2Password: securityFormData.oauth2Password,
+            oauth2ClientId: securityFormData.oauth2ClientId,
+            oauth2ClientSecret: securityFormData.oauth2ClientSecret,
+            oauth2Scope: securityFormData.oauth2Scope,
+            oauth2ClientTokenUrl: securityFormData.oauth2ClientTokenUrl,
+            oauth2ClientCredentialsId: securityFormData.oauth2ClientCredentialsId,
+            oauth2ClientCredentialsSecret: securityFormData.oauth2ClientCredentialsSecret,
+            oauth2ClientScope: securityFormData.oauth2ClientScope,
+            customParams: [...customAuthParams],
+          }
+        : s
+    ));
+    setEditingSecurity(null);
+    resetSecurityForm();
+    toast.success(language === 'zh-CN' ? '安全配置更新成功' : 'Security configuration updated successfully');
+  };
+
+  const handleEditSecurity = (security: SecurityConfigItem) => {
+    setEditingSecurity(security);
+    setSecurityFormData({
+      name: security.name,
+      type: security.type,
+      apiKeyName: security.apiKeyName,
+      apiKeyValue: security.apiKeyValue,
+      apiKeyIn: security.apiKeyIn,
+      basicUsername: security.basicUsername,
+      basicPassword: security.basicPassword,
+      bearerToken: security.bearerToken,
+      oauth2TokenUrl: security.oauth2TokenUrl,
+      oauth2Username: security.oauth2Username,
+      oauth2Password: security.oauth2Password,
+      oauth2ClientId: security.oauth2ClientId,
+      oauth2ClientSecret: security.oauth2ClientSecret,
+      oauth2Scope: security.oauth2Scope,
+      oauth2ClientTokenUrl: security.oauth2ClientTokenUrl,
+      oauth2ClientCredentialsId: security.oauth2ClientCredentialsId,
+      oauth2ClientCredentialsSecret: security.oauth2ClientCredentialsSecret,
+      oauth2ClientScope: security.oauth2ClientScope,
+    });
+    setCustomAuthParams(security.customParams.length > 0 ? [...security.customParams] : [{ id: '1', name: '', value: '', location: 'header' }]);
+  };
+
+  const handleCancelSecurityEdit = () => {
+    setEditingSecurity(null);
+    resetSecurityForm();
+  };
+
+  const handleDeleteSecurity = (securityId: string) => {
+    setSecurityConfigs(securityConfigs.filter(s => s.id !== securityId));
+    toast.success(language === 'zh-CN' ? '安全配置删除成功' : 'Security configuration deleted successfully');
+  };
+
+  const resetSecurityForm = () => {
+    setSecurityFormData({
+      name: '',
+      type: 'apiKey',
+      apiKeyName: '',
+      apiKeyValue: '',
+      apiKeyIn: 'header',
+      basicUsername: '',
+      basicPassword: '',
+      bearerToken: '',
+      oauth2TokenUrl: '',
+      oauth2Username: '',
+      oauth2Password: '',
+      oauth2ClientId: '',
+      oauth2ClientSecret: '',
+      oauth2Scope: '',
+      oauth2ClientTokenUrl: '',
+      oauth2ClientCredentialsId: '',
+      oauth2ClientCredentialsSecret: '',
+      oauth2ClientScope: '',
+    });
+    setCustomAuthParams([{ id: '1', name: '', value: '', location: 'header' }]);
+  };
+
+  const getSecurityTypeLabel = (type: string) => {
+    const labels = {
+      apiKey: 'API Key',
+      httpBasic: 'HTTP Basic',
+      bearer: 'Bearer Token',
+      oauth2Password: 'OAuth 2.0 (Password)',
+      oauth2Client: 'OAuth 2.0 (Client)',
+      custom: language === 'zh-CN' ? '自定义' : 'Custom',
+    };
+    return labels[type as keyof typeof labels] || type;
   };
 
   return (
@@ -575,470 +922,599 @@ export function APICollection() {
                   )}
                 </TabsContent>
 
-                <TabsContent value='servers' className='p-6'>
-                  <div className='space-y-6'>
-                    <div className='p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg'>
-                      <div className='flex items-start gap-3'>
-                        <Server className='w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5' />
-                        <div>
-                          <h3 className='text-sm dark:text-white mb-1'>
-                            {language === 'zh-CN' ? '服务器配置' : 'Server Configuration'}
-                          </h3>
-                          <p className='text-sm text-gray-600 dark:text-gray-400'>
-                            {language === 'zh-CN'
-                              ? '配置API服务器地址，对应OpenAPI Servers Schema规范'
-                              : 'Configure API server addresses, corresponding to OpenAPI Servers Schema'}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div>
-                      <Label>{language === 'zh-CN' ? '服务器URL' : 'Server URL'}</Label>
-                      <Input
-                        value={serverConfig.url}
-                        onChange={e =>
-                          setServerConfig(prev => ({
-                            ...prev,
-                            url: e.target.value,
-                          }))
-                        }
-                        placeholder='https://api.example.com'
-                        className='mt-2 dark:bg-gray-750 dark:border-gray-600'
-                      />
-                    </div>
-
-                    <div>
-                      <Label>{language === 'zh-CN' ? '服务器描述' : 'Server Description'}</Label>
-                      <Input
-                        value={serverConfig.description}
-                        onChange={e =>
-                          setServerConfig(prev => ({
-                            ...prev,
-                            description: e.target.value,
-                          }))
-                        }
-                        placeholder={language === 'zh-CN' ? '生产环境服务器' : 'Production server'}
-                        className='mt-2 dark:bg-gray-750 dark:border-gray-600'
-                      />
-                    </div>
-
-                    <Button className='w-full'>{language === 'zh-CN' ? '保存服务配置' : 'Save Server Config'}</Button>
-                  </div>
-                </TabsContent>
-
-                <TabsContent value='security' className='p-6'>
-                  <ScrollArea className='h-[550px]'>
-                    <div className='space-y-6 pr-4'>
-                      <div className='p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg'>
-                        <div className='flex items-start gap-3'>
-                          <Shield className='w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5' />
-                          <div>
-                            <h3 className='text-sm dark:text-white mb-1'>
-                              {language === 'zh-CN' ? '安全配置' : 'Security Configuration'}
+                <TabsContent value="servers" className="p-0 m-0">
+                  <ScrollArea className="h-[600px]">
+                    <div className="p-6 space-y-6">
+                      <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                        <div className="flex items-start gap-3">
+                          <Server className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
+                          <div className="flex-1">
+                            <h3 className="text-sm dark:text-white mb-1">
+                              {language === 'zh-CN' ? '服务器配置' : 'Server Configuration'}
                             </h3>
-                            <p className='text-sm text-gray-600 dark:text-gray-400'>
-                              {language === 'zh-CN'
-                                ? '配置API认证方式，对应OpenAPI Security Schema规范'
-                                : 'Configure API authentication, corresponding to OpenAPI Security Schema'}
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                              {language === 'zh-CN' 
+                                ? '配置API服务器地址，对应OpenAPI Servers Schema规范。最多可配置10个服务器，同时只能启用一个。' 
+                                : 'Configure API server addresses, corresponding to OpenAPI Servers Schema. Maximum 10 servers, only one can be enabled at a time.'}
                             </p>
                           </div>
                         </div>
                       </div>
 
-                      <div>
-                        <Label>{language === 'zh-CN' ? '认证类型' : 'Authentication Type'}</Label>
-                        <Select
-                          value={securityConfig.type}
-                          onValueChange={(value: any) =>
-                            setSecurityConfig(prev => ({
-                              ...prev,
-                              type: value,
-                            }))
-                          }
-                        >
-                          <SelectTrigger className='dark:bg-gray-750 dark:border-gray-600 mt-2'>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
-                            <SelectItem value='apiKey'>API Key</SelectItem>
-                            <SelectItem value='httpBasic'>HTTP Basic Authentication</SelectItem>
-                            <SelectItem value='bearer'>Bearer Token</SelectItem>
-                            <SelectItem value='oauth2Password'>OAuth 2.0 (Password)</SelectItem>
-                            <SelectItem value='oauth2Client'>OAuth 2.0 (Client Credentials)</SelectItem>
-                            <SelectItem value='custom'>{language === 'zh-CN' ? '自定义' : 'Custom'}</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
+                      {/* 表单区域 */}
+                      <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="text-sm dark:text-white">
+                            {editingServer 
+                              ? (language === 'zh-CN' ? '编辑服务器' : 'Edit Server')
+                              : (language === 'zh-CN' ? '添加服务器' : 'Add Server')}
+                          </h4>
+                          {servers.length >= 10 && !editingServer && (
+                            <Badge variant="secondary" className="text-xs">
+                              {language === 'zh-CN' ? '已达上限 (10/10)' : 'Max limit (10/10)'}
+                            </Badge>
+                          )}
+                        </div>
 
-                      {/* API Key */}
-                      {securityConfig.type === 'apiKey' && (
-                        <>
-                          <div>
-                            <Label>{language === 'zh-CN' ? 'API Key 名称' : 'API Key Name'}</Label>
-                            <Input
-                              value={securityConfig.apiKeyName}
-                              onChange={e =>
-                                setSecurityConfig(prev => ({
-                                  ...prev,
-                                  apiKeyName: e.target.value,
-                                }))
-                              }
-                              placeholder='X-API-Key'
-                              className='mt-2 dark:bg-gray-750 dark:border-gray-600'
-                            />
-                          </div>
-
-                          <div>
-                            <Label>{language === 'zh-CN' ? 'API Key 值' : 'API Key Value'}</Label>
-                            <Input
-                              type='password'
-                              value={securityConfig.apiKeyValue}
-                              onChange={e =>
-                                setSecurityConfig(prev => ({
-                                  ...prev,
-                                  apiKeyValue: e.target.value,
-                                }))
-                              }
-                              placeholder={language === 'zh-CN' ? '输入API Key...' : 'Enter API Key...'}
-                              className='mt-2 dark:bg-gray-750 dark:border-gray-600'
-                            />
-                          </div>
-
-                          <div>
-                            <Label>{language === 'zh-CN' ? 'API Key 位置' : 'API Key Location'}</Label>
-                            <Select
-                              value={securityConfig.apiKeyIn}
-                              onValueChange={(value: any) =>
-                                setSecurityConfig(prev => ({
-                                  ...prev,
-                                  apiKeyIn: value,
-                                }))
-                              }
-                            >
-                              <SelectTrigger className='dark:bg-gray-750 dark:border-gray-600 mt-2'>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
-                                <SelectItem value='header'>Header</SelectItem>
-                                <SelectItem value='query'>Query Parameter</SelectItem>
-                                <SelectItem value='cookie'>Cookie</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </>
-                      )}
-
-                      {/* HTTP Basic */}
-                      {securityConfig.type === 'httpBasic' && (
-                        <>
-                          <div>
-                            <Label>{language === 'zh-CN' ? '用户名' : 'Username'}</Label>
-                            <Input
-                              value={securityConfig.basicUsername}
-                              onChange={e =>
-                                setSecurityConfig(prev => ({
-                                  ...prev,
-                                  basicUsername: e.target.value,
-                                }))
-                              }
-                              placeholder={language === 'zh-CN' ? '输入用户名...' : 'Enter username...'}
-                              className='mt-2 dark:bg-gray-750 dark:border-gray-600'
-                            />
-                          </div>
-
-                          <div>
-                            <Label>{language === 'zh-CN' ? '密码' : 'Password'}</Label>
-                            <Input
-                              type='password'
-                              value={securityConfig.basicPassword}
-                              onChange={e =>
-                                setSecurityConfig(prev => ({
-                                  ...prev,
-                                  basicPassword: e.target.value,
-                                }))
-                              }
-                              placeholder={language === 'zh-CN' ? '输入密码...' : 'Enter password...'}
-                              className='mt-2 dark:bg-gray-750 dark:border-gray-600'
-                            />
-                          </div>
-                        </>
-                      )}
-
-                      {/* Bearer Token */}
-                      {securityConfig.type === 'bearer' && (
                         <div>
-                          <Label>{language === 'zh-CN' ? 'Bearer Token' : 'Bearer Token'}</Label>
+                          <Label>{language === 'zh-CN' ? '服务器URL' : 'Server URL'} *</Label>
                           <Input
-                            type='password'
-                            value={securityConfig.bearerToken}
-                            onChange={e =>
-                              setSecurityConfig(prev => ({
-                                ...prev,
-                                bearerToken: e.target.value,
-                              }))
-                            }
-                            placeholder={language === 'zh-CN' ? '输入Bearer Token...' : 'Enter Bearer Token...'}
-                            className='mt-2 dark:bg-gray-750 dark:border-gray-600'
+                            value={serverFormData.url}
+                            onChange={e => setServerFormData(prev => ({ ...prev, url: e.target.value }))}
+                            placeholder="https://api.example.com"
+                            className="mt-2 dark:bg-gray-750 dark:border-gray-600"
                           />
                         </div>
-                      )}
 
-                      {/* OAuth2 Password */}
-                      {securityConfig.type === 'oauth2Password' && (
-                        <>
-                          <div>
-                            <Label>{language === 'zh-CN' ? 'Token URL' : 'Token URL'}</Label>
-                            <Input
-                              value={securityConfig.oauth2TokenUrl}
-                              onChange={e =>
-                                setSecurityConfig(prev => ({
-                                  ...prev,
-                                  oauth2TokenUrl: e.target.value,
-                                }))
-                              }
-                              placeholder='https://oauth.example.com/token'
-                              className='mt-2 dark:bg-gray-750 dark:border-gray-600'
-                            />
-                          </div>
+                        <div>
+                          <Label>{language === 'zh-CN' ? '服务器描述' : 'Server Description'}</Label>
+                          <Input
+                            value={serverFormData.description}
+                            onChange={e => setServerFormData(prev => ({ ...prev, description: e.target.value }))}
+                            placeholder={language === 'zh-CN' ? '例如：生产环境服务器' : 'e.g., Production server'}
+                            className="mt-2 dark:bg-gray-750 dark:border-gray-600"
+                          />
+                        </div>
 
-                          <div>
-                            <Label>{language === 'zh-CN' ? 'Client ID' : 'Client ID'}</Label>
-                            <Input
-                              value={securityConfig.oauth2ClientId}
-                              onChange={e =>
-                                setSecurityConfig(prev => ({
-                                  ...prev,
-                                  oauth2ClientId: e.target.value,
-                                }))
-                              }
-                              placeholder={language === 'zh-CN' ? '输入Client ID...' : 'Enter Client ID...'}
-                              className='mt-2 dark:bg-gray-750 dark:border-gray-600'
-                            />
-                          </div>
-
-                          <div>
-                            <Label>{language === 'zh-CN' ? 'Client Secret' : 'Client Secret'}</Label>
-                            <Input
-                              type='password'
-                              value={securityConfig.oauth2ClientSecret}
-                              onChange={e =>
-                                setSecurityConfig(prev => ({
-                                  ...prev,
-                                  oauth2ClientSecret: e.target.value,
-                                }))
-                              }
-                              placeholder={language === 'zh-CN' ? '输入Client Secret...' : 'Enter Client Secret...'}
-                              className='mt-2 dark:bg-gray-750 dark:border-gray-600'
-                            />
-                          </div>
-
-                          <div>
-                            <Label>{language === 'zh-CN' ? '用户名' : 'Username'}</Label>
-                            <Input
-                              value={securityConfig.oauth2Username}
-                              onChange={e =>
-                                setSecurityConfig(prev => ({
-                                  ...prev,
-                                  oauth2Username: e.target.value,
-                                }))
-                              }
-                              placeholder={language === 'zh-CN' ? '输入用户名...' : 'Enter username...'}
-                              className='mt-2 dark:bg-gray-750 dark:border-gray-600'
-                            />
-                          </div>
-
-                          <div>
-                            <Label>{language === 'zh-CN' ? '密码' : 'Password'}</Label>
-                            <Input
-                              type='password'
-                              value={securityConfig.oauth2Password}
-                              onChange={e =>
-                                setSecurityConfig(prev => ({
-                                  ...prev,
-                                  oauth2Password: e.target.value,
-                                }))
-                              }
-                              placeholder={language === 'zh-CN' ? '输入密码...' : 'Enter password...'}
-                              className='mt-2 dark:bg-gray-750 dark:border-gray-600'
-                            />
-                          </div>
-
-                          <div>
-                            <Label>{language === 'zh-CN' ? 'Scope（可选）' : 'Scope (Optional)'}</Label>
-                            <Input
-                              value={securityConfig.oauth2Scope}
-                              onChange={e =>
-                                setSecurityConfig(prev => ({
-                                  ...prev,
-                                  oauth2Scope: e.target.value,
-                                }))
-                              }
-                              placeholder='read write'
-                              className='mt-2 dark:bg-gray-750 dark:border-gray-600'
-                            />
-                          </div>
-                        </>
-                      )}
-
-                      {/* OAuth2 Client Credentials */}
-                      {securityConfig.type === 'oauth2Client' && (
-                        <>
-                          <div>
-                            <Label>{language === 'zh-CN' ? 'Token URL' : 'Token URL'}</Label>
-                            <Input
-                              value={securityConfig.oauth2ClientTokenUrl}
-                              onChange={e =>
-                                setSecurityConfig(prev => ({
-                                  ...prev,
-                                  oauth2ClientTokenUrl: e.target.value,
-                                }))
-                              }
-                              placeholder='https://oauth.example.com/token'
-                              className='mt-2 dark:bg-gray-750 dark:border-gray-600'
-                            />
-                          </div>
-
-                          <div>
-                            <Label>{language === 'zh-CN' ? 'Client ID' : 'Client ID'}</Label>
-                            <Input
-                              value={securityConfig.oauth2ClientCredentialsId}
-                              onChange={e =>
-                                setSecurityConfig(prev => ({
-                                  ...prev,
-                                  oauth2ClientCredentialsId: e.target.value,
-                                }))
-                              }
-                              placeholder={language === 'zh-CN' ? '输入Client ID...' : 'Enter Client ID...'}
-                              className='mt-2 dark:bg-gray-750 dark:border-gray-600'
-                            />
-                          </div>
-
-                          <div>
-                            <Label>{language === 'zh-CN' ? 'Client Secret' : 'Client Secret'}</Label>
-                            <Input
-                              type='password'
-                              value={securityConfig.oauth2ClientCredentialsSecret}
-                              onChange={e =>
-                                setSecurityConfig(prev => ({
-                                  ...prev,
-                                  oauth2ClientCredentialsSecret: e.target.value,
-                                }))
-                              }
-                              placeholder={language === 'zh-CN' ? '输入Client Secret...' : 'Enter Client Secret...'}
-                              className='mt-2 dark:bg-gray-750 dark:border-gray-600'
-                            />
-                          </div>
-
-                          <div>
-                            <Label>{language === 'zh-CN' ? 'Scope（可选）' : 'Scope (Optional)'}</Label>
-                            <Input
-                              value={securityConfig.oauth2ClientScope}
-                              onChange={e =>
-                                setSecurityConfig(prev => ({
-                                  ...prev,
-                                  oauth2ClientScope: e.target.value,
-                                }))
-                              }
-                              placeholder='read write'
-                              className='mt-2 dark:bg-gray-750 dark:border-gray-600'
-                            />
-                          </div>
-                        </>
-                      )}
-
-                      {/* Custom */}
-                      {securityConfig.type === 'custom' && (
-                        <div className='space-y-4'>
-                          <div className='flex items-center justify-between'>
-                            <Label>{language === 'zh-CN' ? '自定义认证参数' : 'Custom Auth Parameters'}</Label>
-                            <Button
-                              type='button'
-                              variant='outline'
-                              size='sm'
-                              onClick={addCustomAuthParam}
-                              className='gap-2'
+                        <div className="flex gap-2">
+                          {editingServer ? (
+                            <>
+                              <Button onClick={handleUpdateServer} className="flex-1">
+                                {language === 'zh-CN' ? '更新服务器' : 'Update Server'}
+                              </Button>
+                              <Button onClick={handleCancelEdit} variant="outline" className="flex-1 dark:bg-gray-800 dark:border-gray-700">
+                                {language === 'zh-CN' ? '取消' : 'Cancel'}
+                              </Button>
+                            </>
+                          ) : (
+                            <Button 
+                              onClick={handleAddServer} 
+                              className="w-full"
+                              disabled={servers.length >= 10}
                             >
-                              <Plus className='w-4 h-4' />
-                              {language === 'zh-CN' ? '添加参数' : 'Add Parameter'}
+                              <Plus className="w-4 h-4 mr-2" />
+                              {language === 'zh-CN' ? '添加服务器' : 'Add Server'}
                             </Button>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* 已配置服务器列表 */}
+                      {servers.length > 0 && (
+                        <div>
+                          <div className="flex items-center justify-between mb-3">
+                            <h4 className="text-sm dark:text-white">
+                              {language === 'zh-CN' ? '已配置服务器' : 'Configured Servers'}
+                            </h4>
+                            <Badge variant="secondary" className="text-xs">
+                              {servers.length}/10
+                            </Badge>
                           </div>
-
-                          <div className='space-y-4'>
-                            {customAuthParams.map((param, index) => (
+                          <div className="space-y-3">
+                            {servers.map((server) => (
                               <div
-                                key={param.id}
-                                className='p-4 border border-gray-200 dark:border-gray-700 rounded-lg space-y-3'
+                                key={server.id}
+                                className={cn(
+                                  'border rounded-lg p-4 transition-all',
+                                  server.enabled
+                                    ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+                                    : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
+                                )}
                               >
-                                <div className='flex items-center justify-between mb-2'>
-                                  <span className='text-sm text-gray-600 dark:text-gray-400'>
-                                    {language === 'zh-CN' ? '参数' : 'Parameter'} {index + 1}
-                                  </span>
-                                  {customAuthParams.length > 1 && (
+                                <div className="flex items-start justify-between gap-3">
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 mb-2">
+                                      <code className="text-sm text-gray-900 dark:text-white font-mono break-all">
+                                        {server.url}
+                                      </code>
+                                      {server.enabled && (
+                                        <Badge className="bg-green-500 hover:bg-green-600 text-xs">
+                                          {language === 'zh-CN' ? '已启用' : 'Enabled'}
+                                        </Badge>
+                                      )}
+                                    </div>
+                                    {server.description && (
+                                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                                        {server.description}
+                                      </p>
+                                    )}
+                                  </div>
+                                  <div className="flex items-center gap-2 shrink-0">
+                                    <Switch
+                                      checked={server.enabled}
+                                      onCheckedChange={() => handleToggleServer(server.id)}
+                                    />
                                     <Button
-                                      type='button'
-                                      variant='ghost'
-                                      size='sm'
-                                      onClick={() => removeCustomAuthParam(param.id)}
-                                      className='h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20'
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => handleEditServer(server)}
+                                      className="dark:hover:bg-gray-700"
                                     >
-                                      <X className='w-4 h-4' />
+                                      <Settings className="w-4 h-4" />
                                     </Button>
-                                  )}
-                                </div>
-
-                                <div>
-                                  <Label className='text-xs'>
-                                    {language === 'zh-CN' ? '参数名' : 'Parameter Name'}
-                                  </Label>
-                                  <Input
-                                    value={param.name}
-                                    onChange={e => updateCustomAuthParam(param.id, 'name', e.target.value)}
-                                    placeholder='X-Custom-Auth'
-                                    className='mt-1 dark:bg-gray-750 dark:border-gray-600'
-                                  />
-                                </div>
-
-                                <div>
-                                  <Label className='text-xs'>
-                                    {language === 'zh-CN' ? '参数值' : 'Parameter Value'}
-                                  </Label>
-                                  <Input
-                                    type='password'
-                                    value={param.value}
-                                    onChange={e => updateCustomAuthParam(param.id, 'value', e.target.value)}
-                                    placeholder={language === 'zh-CN' ? '输入参数值...' : 'Enter parameter value...'}
-                                    className='mt-1 dark:bg-gray-750 dark:border-gray-600'
-                                  />
-                                </div>
-
-                                <div>
-                                  <Label className='text-xs'>
-                                    {language === 'zh-CN' ? '参数配置' : 'Parameter Location'}
-                                  </Label>
-                                  <Select
-                                    value={param.location}
-                                    onValueChange={(value: any) => updateCustomAuthParam(param.id, 'location', value)}
-                                  >
-                                    <SelectTrigger className='dark:bg-gray-750 dark:border-gray-600 mt-1'>
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
-                                      <SelectItem value='header'>Header</SelectItem>
-                                      <SelectItem value='query'>Query Parameter</SelectItem>
-                                      <SelectItem value='cookie'>Cookie</SelectItem>
-                                    </SelectContent>
-                                  </Select>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => handleDeleteServer(server.id)}
+                                      className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </Button>
+                                  </div>
                                 </div>
                               </div>
                             ))}
                           </div>
                         </div>
                       )}
+                    </div>
+                  </ScrollArea>
+                </TabsContent>
 
-                      <Button className='w-full'>
-                        {language === 'zh-CN' ? '保存安全配置' : 'Save Security Config'}
-                      </Button>
+                <TabsContent value="security" className="p-0 m-0">
+                  <ScrollArea className="h-[600px]">
+                    <div className="p-6 space-y-6">
+                      <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                        <div className="flex items-start gap-3">
+                          <Shield className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
+                          <div className="flex-1">
+                            <h3 className="text-sm dark:text-white mb-1">
+                              {language === 'zh-CN' ? '安全配置' : 'Security Configuration'}
+                            </h3>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                              {language === 'zh-CN' 
+                                ? '配置API认证方式，对应OpenAPI Security Schema规范。最多可配置10个安全配置。' 
+                                : 'Configure API authentication, corresponding to OpenAPI Security Schema. Maximum 10 security configurations.'}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* 表单区域 */}
+                      <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="text-sm dark:text-white">
+                            {editingSecurity 
+                              ? (language === 'zh-CN' ? '编辑安全配置' : 'Edit Security Configuration')
+                              : (language === 'zh-CN' ? '添加安全配置' : 'Add Security Configuration')}
+                          </h4>
+                          {securityConfigs.length >= 10 && !editingSecurity && (
+                            <Badge variant="secondary" className="text-xs">
+                              {language === 'zh-CN' ? '已达上限 (10/10)' : 'Max limit (10/10)'}
+                            </Badge>
+                          )}
+                        </div>
+
+                        <div>
+                          <Label>{language === 'zh-CN' ? '配置名称' : 'Configuration Name'} *</Label>
+                          <Input
+                            value={securityFormData.name}
+                            onChange={e => setSecurityFormData(prev => ({ ...prev, name: e.target.value }))}
+                            placeholder={language === 'zh-CN' ? '例如：Production API Key' : 'e.g., Production API Key'}
+                            className="mt-2 dark:bg-gray-750 dark:border-gray-600"
+                          />
+                        </div>
+
+                        <div>
+                          <Label>{language === 'zh-CN' ? '认证类型' : 'Authentication Type'}</Label>
+                          <Select 
+                            value={securityFormData.type} 
+                            onValueChange={(value: any) => setSecurityFormData(prev => ({ ...prev, type: value }))}
+                          >
+                            <SelectTrigger className="dark:bg-gray-750 dark:border-gray-600 mt-2">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
+                              <SelectItem value="apiKey">API Key</SelectItem>
+                              <SelectItem value="httpBasic">HTTP Basic Authentication</SelectItem>
+                              <SelectItem value="bearer">Bearer Token</SelectItem>
+                              <SelectItem value="oauth2Password">OAuth 2.0 (Password)</SelectItem>
+                              <SelectItem value="oauth2Client">OAuth 2.0 (Client Credentials)</SelectItem>
+                              <SelectItem value="custom">{language === 'zh-CN' ? '自定义' : 'Custom'}</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        {/* API Key */}
+                        {securityFormData.type === 'apiKey' && (
+                          <>
+                            <div>
+                              <Label>{language === 'zh-CN' ? 'API Key 名称' : 'API Key Name'}</Label>
+                              <Input
+                                value={securityFormData.apiKeyName}
+                                onChange={e => setSecurityFormData(prev => ({ ...prev, apiKeyName: e.target.value }))}
+                                placeholder="X-API-Key"
+                                className="mt-2 dark:bg-gray-750 dark:border-gray-600"
+                              />
+                            </div>
+
+                            <div>
+                              <Label>{language === 'zh-CN' ? 'API Key 值' : 'API Key Value'}</Label>
+                              <Input
+                                type="password"
+                                value={securityFormData.apiKeyValue}
+                                onChange={e => setSecurityFormData(prev => ({ ...prev, apiKeyValue: e.target.value }))}
+                                placeholder={language === 'zh-CN' ? '输入API Key...' : 'Enter API Key...'}
+                                className="mt-2 dark:bg-gray-750 dark:border-gray-600"
+                              />
+                            </div>
+
+                            <div>
+                              <Label>{language === 'zh-CN' ? 'API Key 位置' : 'API Key Location'}</Label>
+                              <Select 
+                                value={securityFormData.apiKeyIn} 
+                                onValueChange={(value: any) => setSecurityFormData(prev => ({ ...prev, apiKeyIn: value }))}
+                              >
+                                <SelectTrigger className="dark:bg-gray-750 dark:border-gray-600 mt-2">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
+                                  <SelectItem value="header">Header</SelectItem>
+                                  <SelectItem value="query">Query Parameter</SelectItem>
+                                  <SelectItem value="cookie">Cookie</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </>
+                        )}
+
+                        {/* HTTP Basic */}
+                        {securityFormData.type === 'httpBasic' && (
+                          <>
+                            <div>
+                              <Label>{language === 'zh-CN' ? '用户名' : 'Username'}</Label>
+                              <Input
+                                value={securityFormData.basicUsername}
+                                onChange={e => setSecurityFormData(prev => ({ ...prev, basicUsername: e.target.value }))}
+                                placeholder={language === 'zh-CN' ? '输入用户名...' : 'Enter username...'}
+                                className="mt-2 dark:bg-gray-750 dark:border-gray-600"
+                              />
+                            </div>
+
+                            <div>
+                              <Label>{language === 'zh-CN' ? '密码' : 'Password'}</Label>
+                              <Input
+                                type="password"
+                                value={securityFormData.basicPassword}
+                                onChange={e => setSecurityFormData(prev => ({ ...prev, basicPassword: e.target.value }))}
+                                placeholder={language === 'zh-CN' ? '输入密码...' : 'Enter password...'}
+                                className="mt-2 dark:bg-gray-750 dark:border-gray-600"
+                              />
+                            </div>
+                          </>
+                        )}
+
+                        {/* Bearer Token */}
+                        {securityFormData.type === 'bearer' && (
+                          <div>
+                            <Label>{language === 'zh-CN' ? 'Bearer Token' : 'Bearer Token'}</Label>
+                            <Input
+                              type="password"
+                              value={securityFormData.bearerToken}
+                              onChange={e => setSecurityFormData(prev => ({ ...prev, bearerToken: e.target.value }))}
+                              placeholder={language === 'zh-CN' ? '输入Bearer Token...' : 'Enter Bearer Token...'}
+                              className="mt-2 dark:bg-gray-750 dark:border-gray-600"
+                            />
+                          </div>
+                        )}
+
+                        {/* OAuth2 Password */}
+                        {securityFormData.type === 'oauth2Password' && (
+                          <>
+                            <div>
+                              <Label>{language === 'zh-CN' ? 'Token URL' : 'Token URL'}</Label>
+                              <Input
+                                value={securityFormData.oauth2TokenUrl}
+                                onChange={e => setSecurityFormData(prev => ({ ...prev, oauth2TokenUrl: e.target.value }))}
+                                placeholder="https://oauth.example.com/token"
+                                className="mt-2 dark:bg-gray-750 dark:border-gray-600"
+                              />
+                            </div>
+
+                            <div>
+                              <Label>{language === 'zh-CN' ? 'Client ID' : 'Client ID'}</Label>
+                              <Input
+                                value={securityFormData.oauth2ClientId}
+                                onChange={e => setSecurityFormData(prev => ({ ...prev, oauth2ClientId: e.target.value }))}
+                                placeholder={language === 'zh-CN' ? '输入Client ID...' : 'Enter Client ID...'}
+                                className="mt-2 dark:bg-gray-750 dark:border-gray-600"
+                              />
+                            </div>
+
+                            <div>
+                              <Label>{language === 'zh-CN' ? 'Client Secret' : 'Client Secret'}</Label>
+                              <Input
+                                type="password"
+                                value={securityFormData.oauth2ClientSecret}
+                                onChange={e => setSecurityFormData(prev => ({ ...prev, oauth2ClientSecret: e.target.value }))}
+                                placeholder={language === 'zh-CN' ? '输入Client Secret...' : 'Enter Client Secret...'}
+                                className="mt-2 dark:bg-gray-750 dark:border-gray-600"
+                              />
+                            </div>
+
+                            <div>
+                              <Label>{language === 'zh-CN' ? '用户名' : 'Username'}</Label>
+                              <Input
+                                value={securityFormData.oauth2Username}
+                                onChange={e => setSecurityFormData(prev => ({ ...prev, oauth2Username: e.target.value }))}
+                                placeholder={language === 'zh-CN' ? '输入用户名...' : 'Enter username...'}
+                                className="mt-2 dark:bg-gray-750 dark:border-gray-600"
+                              />
+                            </div>
+
+                            <div>
+                              <Label>{language === 'zh-CN' ? '密码' : 'Password'}</Label>
+                              <Input
+                                type="password"
+                                value={securityFormData.oauth2Password}
+                                onChange={e => setSecurityFormData(prev => ({ ...prev, oauth2Password: e.target.value }))}
+                                placeholder={language === 'zh-CN' ? '输入密码...' : 'Enter password...'}
+                                className="mt-2 dark:bg-gray-750 dark:border-gray-600"
+                              />
+                            </div>
+
+                            <div>
+                              <Label>{language === 'zh-CN' ? 'Scope（可选）' : 'Scope (Optional)'}</Label>
+                              <Input
+                                value={securityFormData.oauth2Scope}
+                                onChange={e => setSecurityFormData(prev => ({ ...prev, oauth2Scope: e.target.value }))}
+                                placeholder="read write"
+                                className="mt-2 dark:bg-gray-750 dark:border-gray-600"
+                              />
+                            </div>
+                          </>
+                        )}
+
+                        {/* OAuth2 Client Credentials */}
+                        {securityFormData.type === 'oauth2Client' && (
+                          <>
+                            <div>
+                              <Label>{language === 'zh-CN' ? 'Token URL' : 'Token URL'}</Label>
+                              <Input
+                                value={securityFormData.oauth2ClientTokenUrl}
+                                onChange={e => setSecurityFormData(prev => ({ ...prev, oauth2ClientTokenUrl: e.target.value }))}
+                                placeholder="https://oauth.example.com/token"
+                                className="mt-2 dark:bg-gray-750 dark:border-gray-600"
+                              />
+                            </div>
+
+                            <div>
+                              <Label>{language === 'zh-CN' ? 'Client ID' : 'Client ID'}</Label>
+                              <Input
+                                value={securityFormData.oauth2ClientCredentialsId}
+                                onChange={e => setSecurityFormData(prev => ({ ...prev, oauth2ClientCredentialsId: e.target.value }))}
+                                placeholder={language === 'zh-CN' ? '输入Client ID...' : 'Enter Client ID...'}
+                                className="mt-2 dark:bg-gray-750 dark:border-gray-600"
+                              />
+                            </div>
+
+                            <div>
+                              <Label>{language === 'zh-CN' ? 'Client Secret' : 'Client Secret'}</Label>
+                              <Input
+                                type="password"
+                                value={securityFormData.oauth2ClientCredentialsSecret}
+                                onChange={e => setSecurityFormData(prev => ({ ...prev, oauth2ClientCredentialsSecret: e.target.value }))}
+                                placeholder={language === 'zh-CN' ? '输入Client Secret...' : 'Enter Client Secret...'}
+                                className="mt-2 dark:bg-gray-750 dark:border-gray-600"
+                              />
+                            </div>
+
+                            <div>
+                              <Label>{language === 'zh-CN' ? 'Scope（可选）' : 'Scope (Optional)'}</Label>
+                              <Input
+                                value={securityFormData.oauth2ClientScope}
+                                onChange={e => setSecurityFormData(prev => ({ ...prev, oauth2ClientScope: e.target.value }))}
+                                placeholder="read write"
+                                className="mt-2 dark:bg-gray-750 dark:border-gray-600"
+                              />
+                            </div>
+                          </>
+                        )}
+
+                        {/* Custom */}
+                        {securityFormData.type === 'custom' && (
+                          <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                              <Label>{language === 'zh-CN' ? '自定义认证参数' : 'Custom Auth Parameters'}</Label>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={addCustomAuthParam}
+                                className="gap-2 dark:bg-gray-800 dark:border-gray-700"
+                              >
+                                <Plus className="w-4 h-4" />
+                                {language === 'zh-CN' ? '添加参数' : 'Add Parameter'}
+                              </Button>
+                            </div>
+
+                            <div className="space-y-4">
+                              {customAuthParams.map((param, index) => (
+                                <div key={param.id} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg space-y-3">
+                                  <div className="flex items-center justify-between mb-2">
+                                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                                      {language === 'zh-CN' ? '参数' : 'Parameter'} {index + 1}
+                                    </span>
+                                    {customAuthParams.length > 1 && (
+                                      <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => removeCustomAuthParam(param.id)}
+                                        className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                                      >
+                                        <X className="w-4 h-4" />
+                                      </Button>
+                                    )}
+                                  </div>
+
+                                  <div>
+                                    <Label className="text-xs">{language === 'zh-CN' ? '参数名' : 'Parameter Name'}</Label>
+                                    <Input
+                                      value={param.name}
+                                      onChange={e => updateCustomAuthParam(param.id, 'name', e.target.value)}
+                                      placeholder="X-Custom-Auth"
+                                      className="mt-1 dark:bg-gray-750 dark:border-gray-600"
+                                    />
+                                  </div>
+
+                                  <div>
+                                    <Label className="text-xs">{language === 'zh-CN' ? '参数值' : 'Parameter Value'}</Label>
+                                    <Input
+                                      type="password"
+                                      value={param.value}
+                                      onChange={e => updateCustomAuthParam(param.id, 'value', e.target.value)}
+                                      placeholder={language === 'zh-CN' ? '输入参数值...' : 'Enter parameter value...'}
+                                      className="mt-1 dark:bg-gray-750 dark:border-gray-600"
+                                    />
+                                  </div>
+
+                                  <div>
+                                    <Label className="text-xs">{language === 'zh-CN' ? '参数位置' : 'Parameter Location'}</Label>
+                                    <Select
+                                      value={param.location}
+                                      onValueChange={(value: any) => updateCustomAuthParam(param.id, 'location', value)}
+                                    >
+                                      <SelectTrigger className="dark:bg-gray-750 dark:border-gray-600 mt-1">
+                                        <SelectValue />
+                                      </SelectTrigger>
+                                      <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
+                                        <SelectItem value="header">Header</SelectItem>
+                                        <SelectItem value="query">Query Parameter</SelectItem>
+                                        <SelectItem value="cookie">Cookie</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="flex gap-2">
+                          {editingSecurity ? (
+                            <>
+                              <Button onClick={handleUpdateSecurity} className="flex-1">
+                                {language === 'zh-CN' ? '更新配置' : 'Update Configuration'}
+                              </Button>
+                              <Button onClick={handleCancelSecurityEdit} variant="outline" className="flex-1 dark:bg-gray-800 dark:border-gray-700">
+                                {language === 'zh-CN' ? '取消' : 'Cancel'}
+                              </Button>
+                            </>
+                          ) : (
+                            <Button 
+                              onClick={handleAddSecurity} 
+                              className="w-full"
+                              disabled={securityConfigs.length >= 10}
+                            >
+                              <Plus className="w-4 h-4 mr-2" />
+                              {language === 'zh-CN' ? '添加安全配置' : 'Add Security Configuration'}
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* 已配置安全列表 */}
+                      {securityConfigs.length > 0 && (
+                        <div>
+                          <div className="flex items-center justify-between mb-3">
+                            <h4 className="text-sm dark:text-white">
+                              {language === 'zh-CN' ? '已配置安全' : 'Configured Security'}
+                            </h4>
+                            <Badge variant="secondary" className="text-xs">
+                              {securityConfigs.length}/10
+                            </Badge>
+                          </div>
+                          <div className="space-y-3">
+                            {securityConfigs.map((security) => (
+                              <div
+                                key={security.id}
+                                className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-800"
+                              >
+                                <div className="flex items-start justify-between gap-3">
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 mb-2">
+                                      <h5 className="text-sm dark:text-white">
+                                        {security.name}
+                                      </h5>
+                                      <Badge variant="secondary" className="text-xs">
+                                        {getSecurityTypeLabel(security.type)}
+                                      </Badge>
+                                    </div>
+                                    <div className="space-y-1 text-xs text-gray-600 dark:text-gray-400">
+                                      {security.type === 'apiKey' && (
+                                        <>
+                                          <p>{language === 'zh-CN' ? 'Key名称' : 'Key Name'}: {security.apiKeyName}</p>
+                                          <p>{language === 'zh-CN' ? '位置' : 'Location'}: {security.apiKeyIn}</p>
+                                        </>
+                                      )}
+                                      {security.type === 'httpBasic' && (
+                                        <p>{language === 'zh-CN' ? '用户名' : 'Username'}: {security.basicUsername}</p>
+                                      )}
+                                      {security.type === 'bearer' && (
+                                        <p>Bearer Token {language === 'zh-CN' ? '已配置' : 'configured'}</p>
+                                      )}
+                                      {security.type === 'oauth2Password' && (
+                                        <>
+                                          <p>Token URL: {security.oauth2TokenUrl}</p>
+                                          <p>Client ID: {security.oauth2ClientId}</p>
+                                        </>
+                                      )}
+                                      {security.type === 'oauth2Client' && (
+                                        <>
+                                          <p>Token URL: {security.oauth2ClientTokenUrl}</p>
+                                          <p>Client ID: {security.oauth2ClientCredentialsId}</p>
+                                        </>
+                                      )}
+                                      {security.type === 'custom' && (
+                                        <p>{security.customParams.length} {language === 'zh-CN' ? '个自定义参数' : 'custom parameters'}</p>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center gap-2 shrink-0">
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => handleEditSecurity(security)}
+                                      className="dark:hover:bg-gray-700"
+                                    >
+                                      <Settings className="w-4 h-4" />
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => handleDeleteSecurity(security.id)}
+                                      className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </Button>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </ScrollArea>
                 </TabsContent>

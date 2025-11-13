@@ -40,7 +40,7 @@ export function ImportSettingsDialog({
   selectedFileName,
   fileInputRef: externalFileInputRef,
 }: ImportSettingsDialogProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const internalFileInputRef = useRef<HTMLInputElement | null>(null);
   const fileInputRef = externalFileInputRef || internalFileInputRef;
 
@@ -86,13 +86,13 @@ export function ImportSettingsDialog({
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className='dark:bg-gray-800'>
           <DialogHeader>
-            <DialogTitle className='dark:text-white'>{t('apis.importSettingsDialog.title')}</DialogTitle>
-            <DialogDescription>{t('apis.importSettingsDialog.description')}</DialogDescription>
+            <DialogTitle className='dark:text-white'>{language === 'zh-CN' ? '选择导入策略和文件' : 'Select import strategy and file'}</DialogTitle>
+            <DialogDescription>{language === 'zh-CN' ? '选择导入策略和文件' : 'Select import strategy and file'}</DialogDescription>
           </DialogHeader>
 
           <div className='space-y-4'>
             <div>
-              <Label>{t('apis.importSettingsDialog.conflictStrategyLabel')}</Label>
+              <Label>{language === 'zh-CN' ? '重复处理策略' : 'Duplicate Handling Strategy'}</Label>
               <RadioGroup
                 value={conflictStrategy}
                 onValueChange={(value: string) => onConflictStrategyChange(value as ConflictStrategy)}
@@ -102,10 +102,12 @@ export function ImportSettingsDialog({
                   <RadioGroupItem value='overwrite' id='overwrite' className='mt-0.5' />
                   <div className='flex-1'>
                     <Label htmlFor='overwrite' className='cursor-pointer'>
-                      {t('apis.importSettingsDialog.overwriteOption')}
+                      {language === 'zh-CN' ? '覆盖重复' : 'Overwrite Duplicates'}
                     </Label>
                     <p className='text-sm text-gray-500 dark:text-gray-400 mt-1'>
-                      {t('apis.importSettingsDialog.overwriteDescription')}
+                      {language === 'zh-CN'
+                        ? '如果导入的接口已存在，将使用新数据覆盖原有数据'
+                        : 'If an imported API already exists, it will be replaced with new data'}
                     </p>
                   </div>
                 </div>
@@ -114,10 +116,12 @@ export function ImportSettingsDialog({
                   <RadioGroupItem value='ignore' id='ignore' className='mt-0.5' />
                   <div className='flex-1'>
                     <Label htmlFor='ignore' className='cursor-pointer'>
-                      {t('apis.importSettingsDialog.ignoreOption')}
+                      {language === 'zh-CN' ? '忽略重复' : 'Ignore Duplicates'}
                     </Label>
                     <p className='text-sm text-gray-500 dark:text-gray-400 mt-1'>
-                      {t('apis.importSettingsDialog.ignoreDescription')}
+                      {language === 'zh-CN'
+                        ? '如果导入的接口已存在，将跳过该接口，保留原有数据'
+                        : 'If an imported API already exists, it will be skipped'}
                     </p>
                   </div>
                 </div>
@@ -125,17 +129,17 @@ export function ImportSettingsDialog({
             </div>
 
             <div>
-              <Label>{t('apis.importSettingsDialog.selectFileLabel')}</Label>
+              <Label>{language === 'zh-CN' ? '选择文件' : 'Select File'}</Label>
               <div
                 onClick={handleFileSelectClick}
                 className='mt-2 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-blue-500 dark:hover:border-blue-500 transition-colors cursor-pointer'
               >
                 <Upload className='w-8 h-8 mx-auto mb-2 text-gray-400' />
                 <p className='text-sm text-gray-600 dark:text-gray-400'>
-                  {t('apis.importSettingsDialog.fileSelectHint')}
+                  {language === 'zh-CN' ? '点击选择文件或拖拽文件到此处' : 'Click to select file or drag and drop'}
                 </p>
                 <p className='text-xs text-gray-500 dark:text-gray-500 mt-1'>
-                  {t('apis.importSettingsDialog.fileFormatHint')}
+                  {language === 'zh-CN' ? '支持 JSON、YAML 格式，最大20MB' : 'Support JSON, YAML formats, Max size: 20MB'}
                 </p>
                 {selectedFileName && (
                   <p className='text-xs text-blue-600 dark:text-blue-400 mt-2'>{selectedFileName}</p>
@@ -149,7 +153,7 @@ export function ImportSettingsDialog({
               {t('common.actions.cancel')}
             </Button>
             <Button onClick={handleImportClick} disabled={!selectedFileName && !fileInputRef.current?.files?.[0]}>
-              {t('apis.importSettingsDialog.startImportButton')}
+              {language === 'zh-CN' ? '开始导入' : 'Start Import'}
             </Button>
           </DialogFooter>
         </DialogContent>
