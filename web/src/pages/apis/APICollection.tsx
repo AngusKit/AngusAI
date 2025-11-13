@@ -628,16 +628,8 @@ export function APICollection() {
       await ApiCollectionsService.apiCollectionImport({
         file,
         type: selectedImportType,
-        name: file.name,
-        visibility: formData.visibility,
-        importStrategy: {
-          conflictStrategy:
-            importConflictStrategy === 'overwrite' ? ConflictStrategyEnum.OVERWRITE : ConflictStrategyEnum.IGNORE,
-          importSecurity: true,
-          importServers: true,
-          importTags: true,
-          enableByDefault: true,
-        },
+        conflictStrategy: importConflictStrategy === 'overwrite' ? ConflictStrategyEnum.OVERWRITE : ConflictStrategyEnum.IGNORE,
+        enableByDefault: true,
       });
       toast.success(language === 'zh-CN' ? '接口集导入成功' : 'API collection imported successfully');
       setShowImportSettingsDialog(false);

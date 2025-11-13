@@ -2,9 +2,6 @@ package cloud.xcan.angus.core.ai.interfaces.apis.facade.dto;
 
 import cloud.xcan.angus.core.ai.domain.Visibility;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.models.security.SecurityScheme;
-import io.swagger.v3.oas.models.servers.Server;
-import jakarta.validation.Valid;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
@@ -22,14 +19,6 @@ public class ApiCollectionUpdateDto {
 
   @Schema(description = "可见性：PRIVATE-私有，TEAM-团队，PUBLIC-公开")
   private Visibility visibility;
-
-  @Valid
-  @Schema(description = "服务器配置，遵循OpenAPI Server Object规范")
-  private Server server;
-
-  @Valid
-  @Schema(description = "安全配置，遵循OpenAPI Security Scheme Object规范")
-  private SecurityScheme security;
 
 }
 
