@@ -11,12 +11,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, XcanPagination, } from '@/components/ui/pagination';
+import { XcanPagination } from '@/components/ui/pagination';
 import { toast } from 'sonner';
 import { useDebounce } from '@/hooks/useDebounce';
 import ModelsService from '@/services/Models';
 import { GetModelListParamsOrderByEnum, ModelDetailVo, ModelListVo, ModelStatisticsVo, ModelUpdateDto, ModelCreateDto, } from '@/services/ModelsTypes';
 import { ModelProviderEnum, ModelStatusEnum, ModelTypeEnum } from '@/enums/enums';
+import { enumToMessages, getEnumDescription} from '@/enums/utils'
 
 interface ModelListItem {
   id: string;
@@ -239,52 +240,18 @@ export function ModelManagement() {
     temperature: '0.7',
   });
 
-  const providerOptions = useMemo(
-    () => [
-      { value: ModelProviderEnum.OPENAI, label: 'OpenAI', category: '主要提供商' },
-      { value: ModelProviderEnum.ANTHROPIC, label: 'Anthropic Claude', category: '主要提供商' },
-      { value: ModelProviderEnum.AZURE_OPENAI, label: 'Azure OpenAI', category: '主要提供商' },
-      { value: ModelProviderEnum.GOOGLE_VERTEXAI, label: 'Google VertexAI Gemini', category: '主要提供商' },
-      { value: ModelProviderEnum.AMAZON_BEDROCK, label: 'Amazon Bedrock', category: '主要提供商' },
-      { value: ModelProviderEnum.OLLAMA, label: 'Ollama', category: '开源和本地模型' },
-      { value: ModelProviderEnum.HUGGINGFACE, label: 'HuggingFace', category: '开源和本地模型' },
-      { value: ModelProviderEnum.ONNX_TRANSFORMERS, label: 'ONNX Transformers', category: '开源和本地模型' },
-      { value: ModelProviderEnum.POSTGRESML, label: 'PostgresML', category: '开源和本地模型' },
-      { value: ModelProviderEnum.MISTRAL_AI, label: 'Mistral AI', category: '专业AI公司' },
-      { value: ModelProviderEnum.DEEPSEEK, label: 'DeepSeek', category: '专业AI公司' },
-      { value: ModelProviderEnum.MOONSHOT_AI, label: 'Moonshot AI', category: '专业AI公司' },
-      { value: ModelProviderEnum.ZHIPU_AI, label: '智谱AI', category: '专业AI公司' },
-      { value: ModelProviderEnum.MINIMAX, label: 'MiniMax', category: '专业AI公司' },
-      { value: ModelProviderEnum.GROQ, label: 'Groq', category: '云服务提供商' },
-      { value: ModelProviderEnum.NVIDIA, label: 'NVIDIA', category: '云服务提供商' },
-      { value: ModelProviderEnum.OCI_GENAI, label: 'OCI GenAI/Cohere', category: '云服务提供商' },
-      { value: ModelProviderEnum.PERPLEXITY, label: 'Perplexity', category: '云服务提供商' },
-      { value: ModelProviderEnum.QIANFAN, label: '千帆', category: '云服务提供商' },
-      { value: ModelProviderEnum.STABILITY, label: 'Stability AI', category: '云服务提供商' },
-      { value: ModelProviderEnum.LOCAL, label: '本地部署', category: '其他' },
-      { value: ModelProviderEnum.CUSTOM, label: '自定义', category: '其他' },
-    ],
-    []
-  );
+  const providerOptions = enumToMessages(ModelProviderEnum).map(({value, message}) => ({
+    value,
+    label: message,
+  }));
 
-  const providerLabelMap = useMemo(() => {
-    const map = new Map<string, string>();
-    providerOptions.forEach(option => {
-      map.set(option.value, option.label);
-    });
-    return map;
-  }, [providerOptions]);
-
-  const modelTypeOptions = useMemo(
-    () => [
-      { value: ModelTypeEnum.CHAT, labelZh: '对话模型', labelEn: 'Chat', icon: Brain },
-      { value: ModelTypeEnum.IMAGE, labelZh: '图像模型', labelEn: 'Image', icon: ImageIcon },
-      { value: ModelTypeEnum.AUDIO, labelZh: '语音模型', labelEn: 'Audio', icon: FileText },
-      { value: ModelTypeEnum.EMBEDDING, labelZh: '嵌入模型', labelEn: 'Embedding', icon: Cpu },
-      { value: ModelTypeEnum.MODERATION, labelZh: '审核模型', labelEn: 'Moderation', icon: Activity },
-    ],
-    []
-  );
+  const modelTypeOptions = enumToMessages(ModelTypeEnum).map(({value, message}) => {
+    return {
+      value,
+      label: message,
+      icon: mapTypeToConfig(value).icon,
+    }
+  });
 
   const resolveOrderBy = useCallback((value: SortOption): GetModelListParamsOrderByEnum | undefined => {
     switch (value) {
@@ -395,8 +362,7 @@ export function ModelManagement() {
 
       const typeConfig = mapTypeToConfig(item.type);
       const statusConfig = mapStatusToConfig(item.status);
-      const providerLabel =
-        providerLabelMap.get(item.provider ?? detail?.provider ?? '') ?? item.provider ?? detail?.provider ?? '--';
+      const providerLabel = getEnumDescription(ModelProviderEnum, item.provider ?? detail?.provider ?? '');
       const detailStats = detail?.stats;
       const performance = detail?.performance;
       const tokens = detailStats?.totalTokensConsumed ?? detailStats?.totalTokens;
@@ -441,7 +407,7 @@ export function ModelManagement() {
         detail,
       };
     },
-    [language, providerLabelMap]
+    [language]
   );
 
   const loadStatistics = useCallback(async () => {
@@ -594,9 +560,7 @@ export function ModelManagement() {
           return;
         }
       }
-      debugger;
-
-      const providerValue = detail?.provider?.value ?? model.providerEnum ?? ModelProviderEnum.CUSTOM;
+      const providerValue = detail?.provider ?? model.providerEnum ?? ModelProviderEnum.CUSTOM;
 
       setEditFormData({
         name: detail?.name ?? model.name ?? '',
@@ -753,18 +717,8 @@ export function ModelManagement() {
         })}
       </div>
 
-      {/* Tabs */}
-      <Tabs defaultValue='all' className='w-full'>
-        <TabsList className='dark:bg-gray-800'>
-          <TabsTrigger value='all'>全部模型</TabsTrigger>
-          {/* <TabsTrigger value='language'>语言模型</TabsTrigger>
-          <TabsTrigger value='image'>图像模型</TabsTrigger>
-          <TabsTrigger value='video'>视频模型</TabsTrigger> */}
-        </TabsList>
-
-        <TabsContent value='all' className='space-y-4 mt-0'>
-          {/* Action Bar */}
-          <div className='flex items-center justify-between gap-3'>
+      {/* Action Bar */}
+      <div className='flex items-center justify-between gap-3'>
             {/* Search Bar */}
             <div className='relative w-[390px]'>
               <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400' />
@@ -1207,7 +1161,7 @@ export function ModelManagement() {
                           <div className='space-y-2 mb-4 text-xs'>
                             <div className='flex items-center justify-between'>
                               <span className='text-gray-500 dark:text-gray-400'>提供商</span>
-                              <span className='dark:text-white'>{model.provider?.message}</span>
+                              <span className='dark:text-white'>{model.provider}</span>
                             </div>
                             <div className='flex items-center justify-between'>
                               <span className='text-gray-500 dark:text-gray-400'>版本</span>
@@ -1286,7 +1240,7 @@ export function ModelManagement() {
                                 <div>
                                   <div className='dark:text-white'>{model.name}</div>
                                   <div className='text-xs text-gray-500 dark:text-gray-400'>
-                                    {model.provider?.message} · {model.version}
+                                    {model.provider} · {model.version}
                                   </div>
                                 </div>
                               </div>
@@ -1358,40 +1312,6 @@ export function ModelManagement() {
               }}
             />
           )}
-        </TabsContent>
-
-        <TabsContent value='running' className='mt-0'>
-          <Card className='p-8 text-center dark:bg-gray-800 dark:border-gray-700'>
-            <Activity className='w-12 h-12 text-green-500 mx-auto mb-4' />
-            <h3 className='text-lg mb-2 dark:text-white'>运行中的模型</h3>
-            <p className='text-sm text-gray-600 dark:text-gray-400 mb-4'>当前有 16 个模型正在运行</p>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value='language' className='mt-0'>
-          <Card className='p-8 text-center dark:bg-gray-800 dark:border-gray-700'>
-            <Brain className='w-12 h-12 text-blue-500 mx-auto mb-4' />
-            <h3 className='text-lg mb-2 dark:text-white'>语言模型</h3>
-            <p className='text-sm text-gray-600 dark:text-gray-400 mb-4'>查看所有语言理解和生成模型</p>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value='image' className='mt-0'>
-          <Card className='p-8 text-center dark:bg-gray-800 dark:border-gray-700'>
-            <ImageIcon className='w-12 h-12 text-pink-500 mx-auto mb-4' />
-            <h3 className='text-lg mb-2 dark:text-white'>图像模型</h3>
-            <p className='text-sm text-gray-600 dark:text-gray-400 mb-4'>查看所有图像生成和处理模型</p>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value='video' className='mt-0'>
-          <Card className='p-8 text-center dark:bg-gray-800 dark:border-gray-700'>
-            <Video className='w-12 h-12 text-violet-500 mx-auto mb-4' />
-            <h3 className='text-lg mb-2 dark:text-white'>视频模型</h3>
-            <p className='text-sm text-gray-600 dark:text-gray-400 mb-4'>查看所有视频生成和处理模型</p>
-          </Card>
-        </TabsContent>
-      </Tabs>
 
       {/* 查看详情对话框 */}
       <Dialog open={detailsDialogOpen} onOpenChange={setDetailsDialogOpen}>
@@ -1421,7 +1341,7 @@ export function ModelManagement() {
               <div className='grid grid-cols-2 gap-4'>
                 <div className='space-y-1'>
                   <div className='text-xs text-gray-500 dark:text-gray-400'>提供商</div>
-                  <div className='dark:text-white'>{selectedModel.provider?.message}</div>
+                  <div className='dark:text-white'>{selectedModel.provider}</div>
                 </div>
                 <div className='space-y-1'>
                   <div className='text-xs text-gray-500 dark:text-gray-400'>版本</div>
