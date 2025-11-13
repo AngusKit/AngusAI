@@ -1,29 +1,13 @@
 package cloud.xcan.angus.core.ai.application.query.model.impl;
 
-import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.buildPeriodFilters;
-import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.getPeriodRange;
-
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
-import cloud.xcan.angus.core.ai.domain.StatisticsPeriod;
-import cloud.xcan.angus.core.ai.domain.model.LastMonthGrowthTrend;
 import cloud.xcan.angus.core.ai.domain.model.Model;
-import cloud.xcan.angus.core.ai.domain.model.ModelCallRecord;
-import cloud.xcan.angus.core.ai.domain.model.ModelCallRecordRepo;
 import cloud.xcan.angus.core.ai.domain.model.ModelRepo;
 import cloud.xcan.angus.core.ai.domain.model.ModelSearchRepo;
-import cloud.xcan.angus.core.ai.domain.model.ModelStats;
-import cloud.xcan.angus.core.ai.domain.model.ModelStatus;
-import cloud.xcan.angus.core.ai.domain.model.TodayGrowthTrend;
-import cloud.xcan.angus.core.ai.domain.plugin.LongTotalView;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
-import cloud.xcan.angus.remote.search.SearchCriteria;
 import jakarta.annotation.Resource;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Set;
-import lombok.Getter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;

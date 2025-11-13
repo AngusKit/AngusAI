@@ -6,12 +6,15 @@ import cloud.xcan.angus.core.ai.application.cmd.apis.ApiComponentCmd;
 import cloud.xcan.angus.core.ai.application.converter.ApiSchemaConverter;
 import cloud.xcan.angus.core.ai.domain.apis.ApiComponent;
 import cloud.xcan.angus.core.ai.domain.apis.ApiComponentRepo;
+import cloud.xcan.angus.core.ai.domain.apis.ApiComponentType;
 import cloud.xcan.angus.core.ai.domain.apis.ConflictStrategy;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
 import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import jakarta.annotation.Resource;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
@@ -65,8 +68,7 @@ public class ApiComponentCmdImpl extends CommCmd<ApiComponent, Long> implements 
             .collect(Collectors.toMap(x -> x, compsDbMap::get)).values();
         if (isNotEmpty(deletedCompsInDb)) {
           deleteByCollectionIdAndRefIn(collectionId,
-              deletedCompsInDb.stream().map(ApiComponent::getRef)
-                  .collect(Collectors.toSet()));
+              deletedCompsInDb.stream().map(ApiComponent::getRef).collect(Collectors.toSet()));
         }
       }
     } else {
@@ -75,6 +77,15 @@ public class ApiComponentCmdImpl extends CommCmd<ApiComponent, Long> implements 
         deleteByCollectionIdAndRefIn(collectionId, null);
       }
     }
+  }
+
+  @Override
+  public void replaceSecuritiesComponent(Long collectionId, Map<String, SecurityScheme> securities) {
+    apiComponentRepo.deleteByCollectionIdAndType(collectionId, ApiComponentType.securitySchemes);
+    // Convert OpenAPI components to service components
+    List<ApiComponent> openApiComps = ApiSchemaConverter.toCollectionSecurityComp(
+        collectionId, securities);
+    batchInsert0(openApiComps);
   }
 
   @Override

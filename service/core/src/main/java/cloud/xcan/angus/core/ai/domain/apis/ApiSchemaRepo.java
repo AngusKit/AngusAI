@@ -11,5 +11,5 @@ import org.springframework.data.repository.NoRepositoryBean;
 @NoRepositoryBean
 public interface ApiSchemaRepo extends BaseRepository<ApiSchema, Long> {
 
-  ApiSchema findByCollectionId(Long id);
+  Optional<ApiSchema> findByCollectionId(Long id);
 }

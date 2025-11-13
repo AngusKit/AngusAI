@@ -23,6 +23,7 @@ import cloud.xcan.angus.core.ai.application.cmd.apis.ApiSchemaCmd;
 import cloud.xcan.angus.core.ai.application.converter.ApiEndpointConverter;
 import cloud.xcan.angus.core.ai.application.query.apis.ApiCollectionQuery;
 import cloud.xcan.angus.core.ai.application.query.apis.ApiEndpointQuery;
+import cloud.xcan.angus.core.ai.application.query.apis.ApiSchemaQuery;
 import cloud.xcan.angus.core.ai.domain.apis.ApiCollection;
 import cloud.xcan.angus.core.ai.domain.apis.ApiCollectionRepo;
 import cloud.xcan.angus.core.ai.domain.apis.ApiEndpoint;
@@ -72,7 +73,7 @@ public class ApiCollectionCmdImpl extends CommCmd<ApiCollection, Long> implement
   private ApiEndpointQuery apiEndpointQuery;
 
   @Resource
-  private ApiSchemaRepo apiSchemaRepo;
+  private ApiSchemaQuery apiSchemaQuery;
 
   @Resource
   private ApiEndpointCmd apiEndpointCmd;
@@ -266,7 +267,7 @@ public class ApiCollectionCmdImpl extends CommCmd<ApiCollection, Long> implement
     ConflictStrategy conflictStrategy = importStrategy.getConflictStrategy();
 
     // 1. Update service schema
-    ApiSchema apiSchemaDb = apiSchemaRepo.findByCollectionId(id);
+    ApiSchema apiSchemaDb = apiSchemaQuery.findByCollectionId(id);
     // Warning: Multiple files importing the same project will be overwritten by the last imported file
     apiSchemaCmd.updateSchema(apiSchemaDb, openApi, conflictStrategy.isMerge(),
         conflictStrategy.isOverwrite());

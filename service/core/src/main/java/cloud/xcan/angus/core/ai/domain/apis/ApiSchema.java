@@ -1,7 +1,6 @@
 package cloud.xcan.angus.core.ai.domain.apis;
 
 
-import static cloud.xcan.angus.spec.experimental.BizConstant.DEFAULT_ROOT_PID;
 import static java.util.Objects.nonNull;
 
 import cloud.xcan.angus.core.ai.domain.apis.converter.ExtensionsConverter;
@@ -14,11 +13,11 @@ import cloud.xcan.angus.core.ai.domain.team.activity.ActivityResource;
 import cloud.xcan.angus.core.jpa.multitenancy.TenantEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import io.hypersistence.utils.hibernate.type.json.JsonType;
 import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.SpecVersion;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
 import jakarta.persistence.Column;
@@ -29,6 +28,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,7 +38,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.Type;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -89,6 +88,9 @@ public class ApiSchema extends TenantEntity<ApiSchema, Long> implements Activity
   @Column(name = "modified_date")
   @LastModifiedDate
   private LocalDateTime modifiedDate;
+
+  @Transient
+  private Map<String, SecurityScheme> securities;
 
   @Override
   public Long identity() {

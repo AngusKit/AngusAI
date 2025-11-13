@@ -17,7 +17,6 @@ import cloud.xcan.angus.core.ai.application.query.apis.ApiEndpointCallLogQuery;
 import cloud.xcan.angus.core.ai.application.query.apis.ApiEndpointQuery;
 import cloud.xcan.angus.core.ai.application.query.apis.ApiSchemaQuery;
 import cloud.xcan.angus.core.ai.domain.apis.ApiCollection;
-import cloud.xcan.angus.core.ai.domain.apis.ApiComponentType;
 import cloud.xcan.angus.core.ai.domain.apis.ApiEndpoint;
 import cloud.xcan.angus.core.ai.domain.apis.ApiSchema;
 import cloud.xcan.angus.core.ai.domain.apis.ExportApiFormat;
@@ -84,7 +83,7 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
   public ApiCollectionDetailVo create(ApiCollectionCreateDto dto) {
     ApiCollection collection = ApiCollectionAssembler.toCreateDomain(dto);
     ApiCollection saved = apiCollectionCmd.create(collection);
-    return ApiCollectionAssembler.toVo(saved);
+    return ApiCollectionAssembler.toDetailVo(saved);
   }
 
   @NameJoin
@@ -94,7 +93,7 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     ApiCollection saved = apiCollectionCmd.update(collection);
     // 设置统计信息
     setDetailInfo(saved);
-    return ApiCollectionAssembler.toVo(saved);
+    return ApiCollectionAssembler.toDetailVo(saved);
   }
 
   @Override
@@ -108,7 +107,7 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     ApiCollection saved = apiCollectionQuery.findAndCheck(id);
     // 设置统计信息
     setDetailInfo(saved);
-    return ApiCollectionAssembler.toVo(saved);
+    return ApiCollectionAssembler.toDetailVo(saved);
   }
 
   @NameJoin
@@ -144,7 +143,7 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     ApiCollection saved = apiCollectionCmd.imports(id, dto);
     // 设置统计信息
     setDetailInfo(saved);
-    return ApiCollectionAssembler.toVo(saved);
+    return ApiCollectionAssembler.toDetailVo(saved);
   }
 
   @Override
@@ -328,10 +327,8 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     ApiSchema apiSchema = apiSchemaQuery.findByCollectionId(collection.getId());
     collection.setServers(nonNull(apiSchema) ? apiSchema.getServers() : null);
 
-    List<SecurityScheme> securities = apiComponentQuery.findByCollectionIdAndType(
-            collection.getId(), ApiComponentType.securitySchemes)
-        .stream().map(x -> x.toComponent(SecurityScheme.class))
-        .collect(Collectors.toList());
+    Map<String, SecurityScheme> securities = apiSchemaQuery.getSecuritySchemeMap(
+        collection.getId());
     collection.setSecurities(securities);
   }
 
