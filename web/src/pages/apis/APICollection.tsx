@@ -49,6 +49,7 @@ export function APICollection() {
     selectedCollectionId,
     setSelectedCollectionId,
     selectedCollectionItem,
+    collectionDetail,
     endpoints,
     filteredAndSortedEndpoints,
     stats,
@@ -1047,7 +1048,7 @@ export function APICollection() {
                     <div>
                       <Label>{language === 'zh-CN' ? '接口集名称' : 'Collection Name'}</Label>
                       <Input
-                        defaultValue={selectedCollectionItem?.name}
+                        value={collectionDetail?.name}
                         className='mt-2 dark:bg-gray-750 dark:border-gray-600'
                       />
                     </div>
@@ -1055,14 +1056,14 @@ export function APICollection() {
                     <div>
                       <Label>{language === 'zh-CN' ? '描述' : 'Description'}</Label>
                       <Textarea
-                        defaultValue={selectedCollectionItem?.description}
+                        value={collectionDetail?.description}
                         className='mt-2 min-h-[100px] dark:bg-gray-750 dark:border-gray-600'
                       />
                     </div>
 
                     <div>
                       <Label>{language === 'zh-CN' ? '可见性' : 'Visibility'}</Label>
-                      <Select defaultValue={selectedCollectionItem?.visibility}>
+                      <Select value={collectionDetail?.visibility}>
                         <SelectTrigger className='dark:bg-gray-750 dark:border-gray-600 mt-2'>
                           <SelectValue />
                         </SelectTrigger>
@@ -1213,9 +1214,9 @@ export function APICollection() {
         <DialogContent className='max-w-3xl dark:bg-gray-800'>
           <DialogHeader>
             <DialogTitle className='dark:text-white flex items-center gap-2'>
-                                <Badge className={cn('text-xs px-2', selectedEndpoint && getMethodColor(selectedEndpoint.method || ''))}>
-                                  {selectedEndpoint?.method}
-                                </Badge>
+              <Badge className={cn('text-xs px-2', selectedEndpoint && getMethodColor(selectedEndpoint.method || ''))}>
+                {selectedEndpoint?.method}
+              </Badge>
               {selectedEndpoint?.name}
             </DialogTitle>
             <DialogDescription>
