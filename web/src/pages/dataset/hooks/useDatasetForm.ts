@@ -4,6 +4,7 @@ import { VisibilityEnum, DatasetTypeEnum } from '@/enums/enums';
 import { FORM_VALIDATION } from '../constants';
 import { ICON_OPTIONS } from '@/utils';
 import { useLanguage } from '@/components/ui/LanguageProvider';
+import { validateTag } from '../utils'
 
 /** 数据集表单数据类型 */
 export type DatasetFormDataType = DatasetTypeEnum.FILE | DatasetTypeEnum.DATASOURCE;
@@ -58,21 +59,7 @@ export function useDatasetForm(initialState?: Partial<DatasetFormState>) {
 
       if (!newTag) return false;
 
-      // TODO 提成工具方法
-      if (newTag.length > FORM_VALIDATION.TAG_MAX_LENGTH) {
-        toast.error(t('dataset.form.tags.lengthExceeded', { maxLength: FORM_VALIDATION.TAG_MAX_LENGTH }));
-        return false;
-      }
-
-      if (formState.tags.length >= FORM_VALIDATION.TAG_MAX_COUNT) {
-        toast.error(t('dataset.form.tags.countExceeded', { maxCount: FORM_VALIDATION.TAG_MAX_COUNT }));
-        return false;
-      }
-
-      if (formState.tags.includes(newTag)) {
-        toast.error(t('dataset.form.tags.duplicate'));
-        return false;
-      }
+      if (!validateTag(newTag, formState.tags, t)) return false;
 
       setFormState(prev => ({
         ...prev,

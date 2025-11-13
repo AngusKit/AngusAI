@@ -13,6 +13,8 @@ import { DatasetTypeEnum, VisibilityEnum } from '@/enums/enums';
 import { getTagColor, ICON_OPTIONS } from '@/utils';
 import { useLanguage } from '@/components/ui/LanguageProvider';
 import { getEnumDescription } from '@/enums/utils';
+import { MAX_TAGS, MAX_TAG_LENGTH } from './constants';
+import { validateTag } from './utils';
 
 interface CreateDatasetDialogProps {
   open: boolean;
@@ -30,9 +32,6 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const MAX_TAGS = 5; // TODO 提到常量文件
-  const MAX_TAG_LENGTH = 10;
   const tagCountText = t('dataset.form.tags.count', {
     current: tags.length,
     max: MAX_TAGS,
@@ -45,21 +44,7 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
 
       if (!newTag) return;
 
-      // TODO 提到工具方法
-      if (newTag.length > MAX_TAG_LENGTH) {
-        toast.error(t('dataset.form.tags.lengthExceeded', { maxLength: MAX_TAG_LENGTH }));
-        return;
-      }
-
-      if (tags.length >= MAX_TAGS) {
-        toast.error(t('dataset.form.tags.countExceeded', { maxCount: MAX_TAGS }));
-        return;
-      }
-
-      if (tags.includes(newTag)) {
-        toast.error(t('dataset.form.tags.duplicate'));
-        return;
-      }
+      if (!validateTag(newTag, tags, t)) return;
 
       setTags([...tags, newTag]);
       setTagInput('');

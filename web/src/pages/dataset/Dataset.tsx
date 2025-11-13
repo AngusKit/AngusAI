@@ -28,6 +28,7 @@ import { useLanguage } from '@/components/ui/LanguageProvider';
 import { getEnumDescription } from '@/enums/utils';
 import { ENABLED_STATUS_COLOR } from '@/utils/PagesUtils';
 import { FILE_MAX_SIZE_BYTES, FILE_MAX_SIZE_MB } from '@/utils/configConstant';
+import { SUPPORTED_FORMATS_LABEL, ALLOWED_FILE_EXTENSIONS } from './constants';
 
 interface DatasetItem {
   id: string;
@@ -245,12 +246,13 @@ export function Dataset() {
 
   // 将DatasetListVo转换为DatasetItem
   const convertDatasetVoToItem = useCallback((vo: DatasetListVo): DatasetItem => {
+    debugger;
 
     const type = vo.type || DatasetTypeEnum.FILE;
     const typeLabelKey = type === DatasetTypeEnum.FILE ? t('dataset.types.file') : t('dataset.types.datasource');
 
     const dataCount = vo.dataStatistics?.totalFilesOrTables ? String(vo.dataStatistics.totalFilesOrTables) : '0';
-    const size = vo.dataStatistics?.totalRecordsSize || '0 条'; // TODO 国际互漏了
+    const size = vo.dataStatistics?.totalRecordsSize || '0';
     const createdDate = vo.createdDate || '';
     const modifiedDate = vo.modifiedDate || '';
     const creator = vo.creator ? vo.creator : '';
@@ -619,7 +621,6 @@ export function Dataset() {
   }, [selectedDS]);
 
   // 文件验证配置
-  const SUPPORTED_FORMATS_LABEL = 'CSV, JSON, XML, Excel'; // TODO 提到常量文件
   const fileValidationConfig: FileValidationConfig = {
     maxSize: FILE_MAX_SIZE_BYTES, // 50MB 
     allowedTypes: [
@@ -630,7 +631,7 @@ export function Dataset() {
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       'application/vnd.ms-excel',
     ],
-    allowedExtensions: ['.csv', '.json', '.xml', '.xlsx', '.xls'], // TODO 提到常量文件
+    allowedExtensions: ALLOWED_FILE_EXTENSIONS,
     errorMessages: {
       sizeExceeded: t('dataset.upload.errors.sizeExceeded', { maxSize: `${FILE_MAX_SIZE_MB}MB` }),
       formatNotSupported: t('dataset.upload.errors.formatNotSupported', {
@@ -1370,7 +1371,7 @@ export function Dataset() {
                   <p className='text-xs text-gray-500 dark:text-gray-500 mt-2'>
                     {t('dataset.upload.supportedFormatsDetail', {
                       formats: SUPPORTED_FORMATS_LABEL,
-                      maxSize: `${MAX_FILE_SIZE_MB}MB`,
+                      maxSize: `${FILE_MAX_SIZE_MB}MB`,
                     })}
                   </p>
 
@@ -1379,7 +1380,7 @@ export function Dataset() {
                     ref={fileInputRef}
                     type='file'
                     multiple
-                    accept='.csv,.json,.xml,.xlsx,.xls'
+                    accept={ALLOWED_FILE_EXTENSIONS.join(',')}
                     onChange={handleFileInputChange}
                     className='hidden'
                   />
@@ -1390,7 +1391,7 @@ export function Dataset() {
                     webkitdirectory=''
                     directory=''
                     multiple
-                    accept='.csv,.json,.xml,.xlsx,.xls' // TODO 提到常量文件
+                    accept={ALLOWED_FILE_EXTENSIONS.join(',')}
                     onChange={handleFileInputChange}
                     className='hidden'
                   />

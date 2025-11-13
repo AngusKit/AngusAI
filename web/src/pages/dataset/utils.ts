@@ -4,6 +4,8 @@ import { getEnumDescription } from '@/enums/utils';
 import { DatasetTypeEnum, DatasetDataTypeEnum, DatasetDataStatusEnum, VisibilityEnum, EnabledStatusEnum } from '@/enums/enums';
 import { DATA_TYPE_ICON_MAP, DATA_STATUS_COLOR_MAP, DATA_TYPE_COLOR_MAP } from './constants';
 import { ENABLED_STATUS_COLOR } from '@/utils/PagesUtils';
+import { MAX_TAGS, MAX_TAG_LENGTH } from './constants';
+import { toast } from 'sonner';
 
 /** 数据集项接口 */
 export interface DatasetItem {
@@ -57,7 +59,7 @@ export interface DatabaseTable {
 export function convertDatasetVoToItem(vo: DatasetListVo): DatasetItem {
 
   const dataCount = vo.dataStatistics?.totalFilesOrTables ? String(vo.dataStatistics.totalFilesOrTables) : '0';
-  const size = vo.dataStatistics?.totalRecordsSize || '0 条'; // TODO  国际化漏了
+  const size = vo.dataStatistics?.totalRecordsSize || '0';
   const createdDate = vo.createdDate || '';
   const modifiedDate = vo.modifiedDate || '';
   const creator = vo.creator ? vo.creator : '';
@@ -136,4 +138,24 @@ export function generateJdbcUrl(
 ): string {
   if (!host || !port || !database) return '';
   return jdbcUrlTemplate.replace('{host}', host).replace('{port}', port).replace('{database}', database);
+}
+
+
+export function validateTag(newTag: string, tags: string[], t: any): boolean {
+  if (newTag.length > MAX_TAG_LENGTH) {
+    toast.error(t('dataset.form.tags.lengthExceeded', { maxLength: MAX_TAG_LENGTH }));
+    return false;
+  }
+
+  if (tags.length >= MAX_TAGS) {
+    toast.error(t('dataset.form.tags.countExceeded', { maxCount: MAX_TAGS }));
+    return false;
+  }
+
+  if (tags.includes(newTag)) {
+    toast.error(t('dataset.form.tags.duplicate'));
+    return false;
+  }
+
+  return true;
 }

@@ -119,3 +119,9 @@ export const PAGINATION = {
   TABLE_PAGE_SIZE: 10,
   DATA_LIST_PAGE_SIZE: 100,
 } as const;
+
+export const SUPPORTED_FORMATS_LABEL = 'CSV, JSON, XML, Excel';
+export const ALLOWED_FILE_EXTENSIONS = ['.csv', '.json', '.xml', '.xlsx', '.xls'];
+
+export const MAX_TAGS = 5;
+export const MAX_TAG_LENGTH = 10;

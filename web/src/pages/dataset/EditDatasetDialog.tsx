@@ -13,6 +13,7 @@ import { VisibilityEnum, DatasetTypeEnum } from '@/enums/enums';
 import { getTagColor, ICON_OPTIONS } from '@/utils';
 import { useLanguage } from '@/components/ui/LanguageProvider';
 import { getEnumDescription } from '@/enums/utils';
+import { validateTag } from './utils';
 
 interface EditDatasetDialogProps {
   open: boolean;
@@ -78,21 +79,7 @@ export function EditDatasetDialog({ open, onOpenChange, dataset, onSuccess }: Ed
 
       if (!newTag) return;
 
-      // TODO 验证提到工具方法
-      if (newTag.length > MAX_TAG_LENGTH) {
-        toast.error(t('dataset.form.tags.lengthExceeded', { maxLength: MAX_TAG_LENGTH }));
-        return;
-      }
-
-      if (tags.length >= MAX_TAGS) {
-        toast.error(t('dataset.form.tags.countExceeded', { maxCount: MAX_TAGS }));
-        return;
-      }
-
-      if (tags.includes(newTag)) {
-        toast.error(t('dataset.form.tags.duplicate'));
-        return;
-      }
+      if (!validateTag(newTag, tags, t)) return;
 
       setTags([...tags, newTag]);
       setTagInput('');

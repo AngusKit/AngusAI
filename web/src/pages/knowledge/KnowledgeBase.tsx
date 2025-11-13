@@ -83,6 +83,7 @@ import {
 
 import {EditKnowledgeBaseDialog} from './EditKnowledgeBaseDialog';
 import {CreateKnowledgeBaseDialog} from './CreateKnowledgeBaseDialog';
+import { getEnumDescription } from '@/enums/utils';
 
 interface KnowledgeBaseItem {
   id: string;
@@ -138,16 +139,8 @@ export function KnowledgeBase() {
   const folderInputRef = useRef<HTMLInputElement>(null);
   const uploadIntervalsRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
 
-  // TODO 替换成枚举Message
-  const getVisibilityLabel = (visibility?: string) => {
-    switch (visibility) {
-      case VisibilityEnum.TEAM:
-        return t('knowledge.visibility.team');
-      case VisibilityEnum.PRIVATE:
-        return t('knowledge.visibility.private');
-      default:
-        return t('knowledge.visibility.public');
-    }
+  const getVisibilityLabel = (visibility?: VisibilityEnum) => {
+    return getEnumDescription(VisibilityEnum, visibility as VisibilityEnum);
   };
 
   const getKnowledgeStatusLabel = (enabled: boolean) => t(enabled ? 'common.status.enabled' : 'common.status.disabled');
