@@ -144,7 +144,11 @@ export type ApiEndpointTestResult = ApiLocaleResult & {
 /** 导入接口集请求参数 */
 export interface ApiCollectionImportDto {
   /**
-   * 上传的文件
+   * 上传的接口内容，和接口文件必须指定其中一个，大小不超过20MB
+   */
+  content: string;
+  /**
+   * 上传接口文件，和接口内容必须指定其中一个，大小不超过20MB
    * @format binary
    */
   file: File;
@@ -165,21 +169,21 @@ export interface ImportStrategyDto {
    * @example "IGNORE"
    */
   conflictStrategy?: ConflictStrategyEnum;
-  /**
-   * 是否导入安全配置
-   * @example true
-   */
-  importSecurity?: boolean;
-  /**
-   * 是否导入服务器配置
-   * @example true
-   */
-  importServers?: boolean;
-  /**
-   * 是否导入标签
-   * @example true
-   */
-  importTags?: boolean;
+  // /**
+  //  * 是否导入安全配置
+  //  * @example true
+  //  */
+  // importSecurity?: boolean;
+  // /**
+  //  * 是否导入服务器配置
+  //  * @example true
+  //  */
+  // importServers?: boolean;
+  // /**
+  //  * 是否导入标签
+  //  * @example true
+  //  */
+  // importTags?: boolean;
   /**
    * 默认启用所有接口
    * @example false

@@ -419,7 +419,7 @@ export function APICollection() {
   const stats = useMemo(() => {
     const overview = statistics?.overview;
     const previous = statistics?.lastMonthGrowthTrend;
-    
+
     const buildTrend = (current?: number, prev?: number) => {
       if (typeof current !== 'number' || typeof prev !== 'number') {
         return undefined;
@@ -1778,8 +1778,8 @@ export function APICollection() {
             </DialogTitle>
             <DialogDescription>
               {language === 'zh-CN'
-                ? '支持 OpenAPI、Swagger、Postman 等多种规范格式'
-                : 'Support OpenAPI, Swagger, Postman and more'}
+                ? '支持 OpenAPI、Swagger、Postman 等多种规范格式，最大支持20MB'
+                : 'Supports multiple specification formats such as OpenAPI, Swagger, and Postman, with a maximum support of 20MB.'}
             </DialogDescription>
           </DialogHeader>
 
@@ -1889,7 +1889,7 @@ export function APICollection() {
                   {language === 'zh-CN' ? '点击选择文件或拖拽文件到此处' : 'Click to select file or drag and drop'}
                 </p>
                 <p className='text-xs text-gray-500 dark:text-gray-500 mt-1'>
-                  {language === 'zh-CN' ? '支持 JSON、YAML 格式' : 'Support JSON, YAML formats'}
+                  {language === 'zh-CN' ? '支持 JSON、YAML 格式，最大20MB' : 'Support JSON, YAML formats, Max size: 20MB'}
                 </p>
               </div>
             </div>
