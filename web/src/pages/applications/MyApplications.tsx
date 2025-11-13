@@ -5,11 +5,16 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, } from '@/components/ui/pagination';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLanguage } from '@/components/ui/LanguageProvider';
 import { toast } from 'sonner';
 import { EditApplicationDialog } from './EditApplicationDialog';
 import { ShareApplicationDialog } from './ShareApplicationDialog';
+import Applications from '@/services/Applications';
+import { ApplicationDetailVo } from '@/services/ApplicationsTypes';
+import { ApplicationStatusEnum, ApplicationCategoryEnum } from '@/enums/enums';
+import { useDebounce } from '@/hooks/useDebounce';
+import { getEnumDescription } from '@/enums/utils';
 
 type ViewMode = 'grid' | 'list';
 type AppStatus = '草稿' | '已发布' | '已暂停';
@@ -20,12 +25,12 @@ interface Tag {
 }
 
 interface Application {
-  id: number;
+  id: string;
   name: string;
   description: string;
   icon: any;
   iconBgColor: string;
-  status: AppStatus;
+  status: ApplicationStatusEnum;
   isStarred: boolean;
   tags: Tag[];
   visits: string;
@@ -43,319 +48,158 @@ export function MyApplications({
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearchQuery = useDebounce(searchQuery, 500);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12;
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
+  const [applications, setApplications] = useState<Application[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
 
-  const [applications, setApplications] = useState<Application[]>([
-    {
-      id: 1,
-      name: '智能助手',
-      description: '智能客服对话系统，支持多轮对话和知识库问答',
-      icon: MessageSquare,
-      iconBgColor: 'bg-purple-500',
-      status: '已发布',
-      isStarred: false,
-      tags: [
-        {
-          label: '智能助手',
-          color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-        },
-        {
-          label: '对话式',
-          color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
-        },
-      ],
-      visits: '1.2K 次调用',
-      category: 'chatbot',
-    },
-    {
-      id: 2,
-      name: '内容生成器',
-      description: 'AI 内容创作工具，自动生成文章、广告文案和社交媒体内容',
-      icon: Sparkles,
-      iconBgColor: 'bg-purple-600',
-      status: '已发布',
-      isStarred: false,
-      tags: [
-        {
-          label: '文本生成',
-          color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-        },
-      ],
-      visits: '856 次调用',
-      category: 'text-generation',
-    },
-    {
-      id: 3,
-      name: '产品知识库',
-      description: '基于产品文档的智能问答系统，支持多语言和文档管理',
-      icon: Database,
-      iconBgColor: 'bg-green-500',
-      status: '已发布',
-      isStarred: false,
-      tags: [
-        {
-          label: '知识问答',
-          color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
-        },
-        {
-          label: '数据分析',
-          color: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400',
-        },
-      ],
-      visits: '2.8K 次调用',
-      category: 'knowledge',
-    },
-    {
-      id: 4,
-      name: '智能客服代理',
-      description: '多渠道客服管理系统，支持智能路由和情绪分析',
-      icon: Bot,
-      iconBgColor: 'bg-orange-500',
-      status: '已发布',
-      isStarred: true,
-      tags: [
-        {
-          label: '智能助手',
-          color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-        },
-        {
-          label: 'Agent',
-          color: 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400',
-        },
-      ],
-      visits: '5.3K 次调用',
-      category: 'chatbot',
-    },
-    {
-      id: 5,
-      name: '多语言翻译器',
-      description: '支持50+语言的智能翻译服务，保留上下文语义和风格',
-      icon: Globe,
-      iconBgColor: 'bg-pink-500',
-      status: '已发布',
-      isStarred: false,
-      tags: [
-        {
-          label: '文本生成',
-          color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-        },
-        {
-          label: '多语言',
-          color: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
-        },
-      ],
-      visits: '3.5K 次调用',
-      category: 'text-generation',
-    },
-    {
-      id: 6,
-      name: '代码助手',
-      description: 'AI辅助编程，支持代码生成、调试和文档生成',
-      icon: Code,
-      iconBgColor: 'bg-indigo-500',
-      status: '已暂停',
-      isStarred: false,
-      tags: [
-        {
-          label: '代码生成',
-          color: 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400',
-        },
-        {
-          label: '开发工具',
-          color: 'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400',
-        },
-      ],
-      visits: '1.1K 次调用',
-      category: 'other',
-    },
-    {
-      id: 7,
-      name: '营销文案助手',
-      description: '专业的营销文案生成工具，支持多种营销场景',
-      icon: FileText,
-      iconBgColor: 'bg-red-500',
-      status: '草稿',
-      isStarred: false,
-      tags: [
-        {
-          label: '营销',
-          color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-        },
-      ],
-      visits: '',
-      category: 'text-generation',
-    },
-    {
-      id: 8,
-      name: '图片生成器',
-      description: 'AI图片生成工具，根据文字描述创建精美图片',
-      icon: Image,
-      iconBgColor: 'bg-blue-500',
-      status: '已发布',
-      isStarred: true,
-      tags: [
-        {
-          label: '图像生成',
-          color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-        },
-      ],
-      visits: '4.2K 次调用',
-      category: 'other',
-    },
-    {
-      id: 9,
-      name: '文档总结助手',
-      description: '快速提取文档要点，生成精准摘要',
-      icon: Book,
-      iconBgColor: 'bg-teal-500',
-      status: '已发布',
-      isStarred: false,
-      tags: [
-        {
-          label: '文本分析',
-          color: 'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400',
-        },
-      ],
-      visits: '1.8K 次调用',
-      category: 'knowledge',
-    },
-    {
-      id: 10,
-      name: '语音助手',
-      description: '智能语音识别和合成系统',
-      icon: Mic,
-      iconBgColor: 'bg-yellow-500',
-      status: '草稿',
-      isStarred: false,
-      tags: [],
-      visits: '',
-      category: 'other',
-    },
-    {
-      id: 11,
-      name: '视频字幕生成器',
-      description: '自动为视频生成字幕和翻译',
-      icon: Video,
-      iconBgColor: 'bg-purple-400',
-      status: '已暂停',
-      isStarred: false,
-      tags: [
-        {
-          label: '视频处理',
-          color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
-        },
-      ],
-      visits: '682 次调用',
-      category: 'other',
-    },
-    {
-      id: 12,
-      name: '邮件智能回复',
-      description: '自动分析邮件内容并生成专业回复',
-      icon: Mail,
-      iconBgColor: 'bg-green-600',
-      status: '已发布',
-      isStarred: false,
-      tags: [
-        {
-          label: '智能助手',
-          color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-        },
-      ],
-      visits: '2.1K 次调用',
-      category: 'chatbot',
-    },
-    {
-      id: 13,
-      name: '商品描述生成器',
-      description: 'AI生成电商商品详情描述',
-      icon: ShoppingCart,
-      iconBgColor: 'bg-orange-400',
-      status: '已发布',
-      isStarred: false,
-      tags: [
-        {
-          label: '电商',
-          color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
-        },
-      ],
-      visits: '3.6K 次调用',
-      category: 'text-generation',
-    },
-    {
-      id: 14,
-      name: '数据分析助手',
-      description: '智能数据分析和可视化工具',
-      icon: BarChart3,
-      iconBgColor: 'bg-cyan-500',
-      status: '草稿',
-      isStarred: false,
-      tags: [],
-      visits: '',
-      category: 'other',
-    },
-    {
-      id: 15,
-      name: 'SEO优化助手',
-      description: '网站SEO分析和优化建议工具',
-      icon: Zap,
-      iconBgColor: 'bg-yellow-600',
-      status: '已发布',
-      isStarred: true,
-      tags: [
-        {
-          label: '营销',
-          color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-        },
-      ],
-      visits: '1.5K 次调用',
-      category: 'text-generation',
-    },
-  ]);
-
-  const filteredApps = applications.filter(app => {
-    // 搜索过滤
-    const matchesSearch =
-      searchQuery === '' ||
-      app.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      app.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      app.tags.some(tag => tag.label.toLowerCase().includes(searchQuery.toLowerCase()));
-
-    if (!matchesSearch) return false;
-
-    // 分类过滤
-    if (activeTab === 'all') return true;
-    if (activeTab === 'published') return app.status === '已发布';
-    if (activeTab === 'paused') return app.status === '已暂停';
-    if (activeTab === 'draft') return app.status === '草稿';
-    if (activeTab === 'starred') return app.isStarred;
-    if (activeTab === 'chatbot') return app.category === 'chatbot';
-    if (activeTab === 'text-generation') return app.category === 'text-generation';
-    if (activeTab === 'knowledge') return app.category === 'knowledge';
-    return true;
-  });
-
-  const getCategoryCount = (category: string) => {
-    if (category === 'all') return applications.length;
-    if (category === 'published') return applications.filter(app => app.status === '已发布').length;
-    if (category === 'paused') return applications.filter(app => app.status === '已暂停').length;
-    if (category === 'draft') return applications.filter(app => app.status === '草稿').length;
-    if (category === 'starred') return applications.filter(app => app.isStarred).length;
-    if (category === 'chatbot') return applications.filter(app => app.category === 'chatbot').length;
-    if (category === 'text-generation') return applications.filter(app => app.category === 'text-generation').length;
-    if (category === 'knowledge') return applications.filter(app => app.category === 'knowledge').length;
-    return 0;
+  // 状态映射：API状态 -> 页面显示状态
+  const mapStatusToDisplay = (status?: ApplicationStatusEnum): string => {
+    return getEnumDescription(ApplicationStatusEnum, status || ApplicationStatusEnum.DRAFT);
   };
 
-  // 分页计算
-  const totalPages = Math.ceil(filteredApps.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const paginatedApps = filteredApps.slice(startIndex, endIndex);
+  // 状态映射：页面显示状态 -> API状态
+  const mapDisplayToStatus = (status: ApplicationStatusEnum): ApplicationStatusEnum => {
+    if (status === '已发布') return ApplicationStatusEnum.PUBLISHED;
+    if (status === '已暂停') return ApplicationStatusEnum.PAUSED;
+    return ApplicationStatusEnum.DRAFT;
+  };
+
+  // 分类映射：API分类 -> 页面分类
+  const mapCategoryToDisplay = (category?: ApplicationCategoryEnum): string => {
+    if (category === ApplicationCategoryEnum.CHATBOT) return 'chatbot';
+    if (category === ApplicationCategoryEnum.KNOWLEDGE_BASE) return 'knowledge';
+    if (category === ApplicationCategoryEnum.WORKFLOW) return 'text-generation';
+    return 'other';
+  };
+
+  // 图标映射：根据分类或名称返回图标
+  const getIconForApplication = (category?: ApplicationCategoryEnum, name?: string): any => {
+    if (category === ApplicationCategoryEnum.CHATBOT) return MessageSquare;
+    if (category === ApplicationCategoryEnum.KNOWLEDGE_BASE) return Database;
+    if (category === ApplicationCategoryEnum.WORKFLOW) return Zap;
+    return Bot;
+  };
+
+  // 图标背景色映射
+  const getIconBgColor = (category?: ApplicationCategoryEnum): string => {
+    if (category === ApplicationCategoryEnum.CHATBOT) return 'bg-purple-500';
+    if (category === ApplicationCategoryEnum.KNOWLEDGE_BASE) return 'bg-green-500';
+    if (category === ApplicationCategoryEnum.WORKFLOW) return 'bg-yellow-500';
+    return 'bg-blue-500';
+  };
+
+  // 加载应用列表
+  const loadApplications = async () => {
+    setIsLoading(true);
+    try {
+      const queryParams: any = {
+        keyword: debouncedSearchQuery.trim() || undefined,
+        pageNo: currentPage,
+        pageSize: itemsPerPage,
+      };
+
+      // 根据activeTab设置筛选条件
+      if (activeTab === 'published') {
+        queryParams.status = ApplicationStatusEnum.PUBLISHED;
+      } else if (activeTab === 'paused') {
+        queryParams.status = ApplicationStatusEnum.PAUSED;
+      } else if (activeTab === 'draft') {
+        queryParams.status = ApplicationStatusEnum.DRAFT;
+      } else if (activeTab === 'chatbot') {
+        queryParams.category = ApplicationCategoryEnum.CHATBOT;
+      } else if (activeTab === 'text-generation') {
+        queryParams.category = ApplicationCategoryEnum.WORKFLOW;
+      } else if (activeTab === 'knowledge') {
+        queryParams.category = ApplicationCategoryEnum.KNOWLEDGE_BASE;
+      }
+
+      const response = await Applications.getApplicationList(queryParams);
+
+      // 处理响应结构
+      const responseData = (response as any).data;
+      let listData: ApplicationDetailVo[] | undefined;
+      if (responseData) {
+        // 如果responseData有list属性，说明是分页结果
+        if (responseData.list) {
+          listData = responseData.list;
+          setTotalCount(responseData.total || 0);
+          setTotalPages(Math.ceil((responseData.total || 0) / itemsPerPage));
+        } else if (Array.isArray(responseData)) {
+          // 如果直接是数组
+          listData = responseData;
+          setTotalCount(responseData.length);
+          setTotalPages(Math.ceil(responseData.length / itemsPerPage));
+        }
+      }
+
+      if (Array.isArray(listData)) {
+        const mappedList: Application[] = listData.map((app: ApplicationDetailVo) => ({
+          id: app.id || '',
+          name: app.name || '',
+          description: app.description || '',
+          icon: getIconForApplication(app.category, app.name),
+          iconBgColor: getIconBgColor(app.category),
+          status: mapStatusToDisplay(app.status),
+          isStarred: false, // API中没有星标字段，默认为false
+          tags: [], // API中没有标签字段，需要从其他地方获取或留空
+          visits: '0 次调用', // API中没有调用次数字段，需要从统计接口获取
+          category: mapCategoryToDisplay(app.category),
+        }));
+
+        setApplications(mappedList);
+      } else {
+        setApplications([]);
+        setTotalCount(0);
+        setTotalPages(1);
+      }
+    } catch (error: any) {
+      console.error('Failed to load application list:', error);
+      toast.error(error?.data?.message || error?.message || '加载应用列表失败');
+      setApplications([]);
+      setTotalCount(0);
+      setTotalPages(1);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadApplications();
+  }, [currentPage, debouncedSearchQuery, activeTab]);
+
+  // 获取分类数量（从API数据计算）
+  const getCategoryCount = (category: string) => {
+    if (category === 'all') return totalCount;
+    if (category === 'published') {
+      return applications.filter(app => app.status === '已发布').length;
+    }
+    if (category === 'paused') {
+      return applications.filter(app => app.status === '已暂停').length;
+    }
+    if (category === 'draft') {
+      return applications.filter(app => app.status === '草稿').length;
+    }
+    if (category === 'starred') {
+      return applications.filter(app => app.isStarred).length;
+    }
+    if (category === 'chatbot') {
+      return applications.filter(app => app.category === 'chatbot').length;
+    }
+    if (category === 'text-generation') {
+      return applications.filter(app => app.category === 'text-generation').length;
+    }
+    if (category === 'knowledge') {
+      return applications.filter(app => app.category === 'knowledge').length;
+    }
+    return 0;
+  };
 
   // 当筛选条件改变时重置页码
   const handleTabChange = (tab: string) => {
@@ -372,23 +216,37 @@ export function MyApplications({
     toast.success(`打开应用: ${appName}`);
   };
 
-  const handleStarToggle = (e: React.MouseEvent, appId: number) => {
+  const handleStarToggle = async (e: React.MouseEvent, appId: string) => {
     e.stopPropagation();
+    // API中没有星标功能，这里只是本地状态更新
     setApplications(prev => prev.map(app => (app.id === appId ? { ...app, isStarred: !app.isStarred } : app)));
     const app = applications.find(a => a.id === appId);
     toast.success(app?.isStarred ? '已取消星标' : '已添加星标');
   };
 
-  const handleStatusChange = (appId: number, newStatus: AppStatus) => {
-    setApplications(prev => prev.map(app => (app.id === appId ? { ...app, status: newStatus } : app)));
-    const app = applications.find(a => a.id === appId);
-    let message = '';
-    if (newStatus === '已发布') {
-      message = `${app?.name} 已发布`;
-    } else if (newStatus === '已暂停') {
-      message = `${app?.name} 已暂停`;
+  const handleStatusChange = async (appId: string, newStatus: ApplicationStatusEnum) => {
+    try {
+      const statusEnum = newStatus;
+      await Applications.modifyApplicationStatus(appId, { status: statusEnum });
+      
+      // 更新本地状态
+      setApplications(prev => prev.map(app => (app.id === appId ? { ...app, status: newStatus } : app)));
+      
+      const app = applications.find(a => a.id === appId);
+      let message = '';
+      if (newStatus === ApplicationStatusEnum.PUBLISHED) {
+        message = `${app?.name} 已发布`;
+      } else if (newStatus === ApplicationStatusEnum.PAUSED) {
+        message = `${app?.name} 已暂停`;
+      }
+      toast.success(message);
+      
+      // 重新加载列表以获取最新数据
+      await loadApplications();
+    } catch (error: any) {
+      console.error('Failed to change application status:', error);
+      toast.error(error?.data?.message || error?.message || '修改状态失败');
     }
-    toast.success(message);
   };
 
   const handleEdit = (app: Application) => {
@@ -406,39 +264,96 @@ export function MyApplications({
     onNavigate?.('individual-app-settings');
   };
 
-  const handleSaveEdit = (updatedData: Partial<Application>) => {
+  const handleSaveEdit = async (updatedData: Partial<Application>) => {
     if (!selectedApp) return;
-    setApplications(prev => prev.map(app => (app.id === selectedApp.id ? { ...app, ...updatedData } : app)));
-  };
+    
+    try {
+      // 构建更新数据
+      const updateDto: any = {};
+      if (updatedData.name !== undefined) updateDto.name = updatedData.name;
+      if (updatedData.description !== undefined) updateDto.description = updatedData.description;
+      if (updatedData.category !== undefined) {
+        // 将页面分类映射回API分类
+        if (updatedData.category === 'chatbot') {
+          updateDto.category = ApplicationCategoryEnum.CHATBOT;
+        } else if (updatedData.category === 'knowledge') {
+          updateDto.category = ApplicationCategoryEnum.KNOWLEDGE_BASE;
+        } else if (updatedData.category === 'text-generation') {
+          updateDto.category = ApplicationCategoryEnum.WORKFLOW;
+        }
+      }
 
-  const handleMoreAction = (action: string, appName: string) => {
-    if (action === '复制') {
-      toast.success(`${appName} 已复制`);
-    } else if (action === '删除') {
-      toast.success(`${appName} 已删除`);
+      await Applications.updateApplication(selectedApp.id, updateDto);
+      
+      // 更新本地状态
+      setApplications(prev => prev.map(app => (app.id === selectedApp.id ? { ...app, ...updatedData } : app)));
+      
+      toast.success('应用已更新');
+      setEditDialogOpen(false);
+      
+      // 重新加载列表
+      await loadApplications();
+    } catch (error: any) {
+      console.error('Failed to update application:', error);
+      toast.error(error?.data?.message || error?.message || '更新应用失败');
     }
   };
 
-  const getStatusBadgeColor = (status: AppStatus) => {
+  const handleMoreAction = async (action: string, appId: string, appName: string) => {
+    if (action === '复制') {
+      try {
+        await Applications.duplicateApplication(appId, { name: `${appName} 副本` });
+        toast.success(`${appName} 已复制`);
+        // 重新加载列表
+        await loadApplications();
+      } catch (error: any) {
+        console.error('Failed to duplicate application:', error);
+        toast.error(error?.data?.message || error?.message || '复制应用失败');
+      }
+    } else if (action === '删除') {
+      try {
+        await Applications.deleteApplication(appId);
+        toast.success(`${appName} 已删除`);
+        // 重新加载列表
+        await loadApplications();
+      } catch (error: any) {
+        console.error('Failed to delete application:', error);
+        toast.error(error?.data?.message || error?.message || '删除应用失败');
+      }
+    }
+  };
+
+  // 过滤应用（现在主要用于客户端筛选，因为大部分筛选在服务端完成）
+  const filteredApps = applications.filter(app => {
+    // 星标筛选在客户端完成
+    if (activeTab === 'starred' && !app.isStarred) return false;
+    return true;
+  });
+
+  // 分页计算（现在使用服务端分页）
+  const displayApps = filteredApps;
+
+
+  const getStatusBadgeColor = (status: ApplicationStatusEnum) => {
     switch (status) {
-      case '已发布':
+      case ApplicationStatusEnum.PUBLISHED:
         return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400';
-      case '已暂停':
+      case ApplicationStatusEnum.PAUSED:
         return 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400';
-      case '草稿':
+      case ApplicationStatusEnum.DRAFT:
         return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400';
       default:
         return 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400';
     }
   };
 
-  const getStatusIcon = (status: AppStatus) => {
+  const getStatusIcon = (status: ApplicationStatusEnum) => {
     switch (status) {
-      case '已发布':
+      case ApplicationStatusEnum.PUBLISHED:
         return PlayCircle;
-      case '已暂停':
+      case ApplicationStatusEnum.PAUSED:
         return PauseCircle;
-      case '草稿':
+      case ApplicationStatusEnum.DRAFT:
         return FileText;
       default:
         return FileText;
@@ -618,7 +533,7 @@ export function MyApplications({
           viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-2.5' : 'space-y-3 mt-2.5'
         }
       >
-        {paginatedApps.map(app => {
+        {displayApps.map(app => {
           const StatusIcon = getStatusIcon(app.status);
           const Icon = app.icon;
 
@@ -668,7 +583,7 @@ export function MyApplications({
                     </div>
 
                     {/* 状态标签 */}
-                    <Badge className={`text-xs ${getStatusBadgeColor(app.status as AppStatus)}`}>{app.status}</Badge>
+                    <Badge className={`text-xs ${getStatusBadgeColor(app.status as ApplicationStatusEnum)}`}>{getEnumDescription(ApplicationStatusEnum, app.status)}</Badge>
 
                     {/* 进入对话按钮、收藏和菜单 */}
                     <div className='flex items-center gap-2'>
@@ -686,7 +601,7 @@ export function MyApplications({
                         进入对话
                       </Button>
                       <button
-                        onClick={e => handleStarToggle(e, app.id)}
+                        onClick={e => handleStarToggle(e, app.id as string)}
                         className={`p-1 rounded transition-colors ${
                           app.isStarred
                             ? 'text-yellow-500 hover:text-yellow-600'
@@ -705,12 +620,12 @@ export function MyApplications({
                           </button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align='end' className='dark:bg-gray-800 dark:border-gray-700'>
-                          {app.status === '草稿' && (
+                          {app.status === ApplicationStatusEnum.DRAFT && (
                             <>
                               <DropdownMenuItem
                                 onClick={e => {
                                   e.stopPropagation();
-                                  handleStatusChange(app.id, '已发布');
+                                  handleStatusChange(app.id as string, ApplicationStatusEnum.PUBLISHED);
                                 }}
                                 className='dark:text-gray-300'
                               >
@@ -720,12 +635,12 @@ export function MyApplications({
                               <DropdownMenuSeparator className='dark:bg-gray-700' />
                             </>
                           )}
-                          {app.status === '已发布' && (
+                          {app.status === ApplicationStatusEnum.PUBLISHED && (
                             <>
                               <DropdownMenuItem
                                 onClick={e => {
                                   e.stopPropagation();
-                                  handleStatusChange(app.id, '已暂停');
+                                  handleStatusChange(app.id as string, ApplicationStatusEnum.PAUSED);
                                 }}
                                 className='dark:text-gray-300'
                               >
@@ -735,12 +650,12 @@ export function MyApplications({
                               <DropdownMenuSeparator className='dark:bg-gray-700' />
                             </>
                           )}
-                          {app.status === '已暂停' && (
+                          {app.status === ApplicationStatusEnum.PAUSED && (
                             <>
                               <DropdownMenuItem
                                 onClick={e => {
                                   e.stopPropagation();
-                                  handleStatusChange(app.id, '已发布');
+                                  handleStatusChange(app.id as string, ApplicationStatusEnum.PUBLISHED);
                                 }}
                                 className='dark:text-gray-300'
                               >
@@ -771,7 +686,7 @@ export function MyApplications({
                           <DropdownMenuItem
                             onClick={e => {
                               e.stopPropagation();
-                              handleMoreAction('复制', app.name);
+                              handleMoreAction('复制', app.id as string, app.name);
                             }}
                             className='dark:text-gray-300'
                           >
@@ -788,7 +703,7 @@ export function MyApplications({
                           </DropdownMenuItem>
                           <DropdownMenuSeparator className='dark:bg-gray-700' />
                           <DropdownMenuItem
-                            onClick={() => handleMoreAction('删除', app.name)}
+                            onClick={() => handleMoreAction('删除', app.id as string, app.name)}
                             className='text-red-600 dark:text-red-400'
                           >
                             删除
@@ -821,7 +736,7 @@ export function MyApplications({
                     <h3 className='dark:text-white mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors'>
                       {app.name}
                     </h3>
-                    <Badge className={`text-xs ${getStatusBadgeColor(app.status as AppStatus)}`}>{app.status}</Badge>
+                    <Badge className={`text-xs ${getStatusBadgeColor(app.status as ApplicationStatusEnum)}`}>{getEnumDescription(ApplicationStatusEnum, app.status)}</Badge>
                   </div>
                 </div>
                 <DropdownMenu>
@@ -834,12 +749,12 @@ export function MyApplications({
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align='end' className='dark:bg-gray-800 dark:border-gray-700'>
-                    {app.status === '草稿' && (
+                    {app.status === ApplicationStatusEnum.DRAFT && (
                       <>
                         <DropdownMenuItem
                           onClick={e => {
                             e.stopPropagation();
-                            handleStatusChange(app.id, '已发布');
+                            handleStatusChange(app.id, ApplicationStatusEnum.PUBLISHED);
                           }}
                           className='dark:text-gray-300'
                         >
@@ -849,12 +764,12 @@ export function MyApplications({
                         <DropdownMenuSeparator className='dark:bg-gray-700' />
                       </>
                     )}
-                    {app.status === '已发布' && (
+                    {app.status === ApplicationStatusEnum.PUBLISHED && (
                       <>
                         <DropdownMenuItem
                           onClick={e => {
                             e.stopPropagation();
-                            handleStatusChange(app.id, '已暂停');
+                            handleStatusChange(app.id, ApplicationStatusEnum.PAUSED);
                           }}
                           className='dark:text-gray-300'
                         >
@@ -864,12 +779,12 @@ export function MyApplications({
                         <DropdownMenuSeparator className='dark:bg-gray-700' />
                       </>
                     )}
-                    {app.status === '已暂停' && (
+                    {app.status === ApplicationStatusEnum.PAUSED && (
                       <>
                         <DropdownMenuItem
                           onClick={e => {
                             e.stopPropagation();
-                            handleStatusChange(app.id, '已发布');
+                            handleStatusChange(app.id, ApplicationStatusEnum.PUBLISHED);
                           }}
                           className='dark:text-gray-300'
                         >
@@ -900,7 +815,7 @@ export function MyApplications({
                     <DropdownMenuItem
                       onClick={e => {
                         e.stopPropagation();
-                        handleMoreAction('复制', app.name);
+                        handleMoreAction('复制', app.id as string, app.name);
                       }}
                       className='dark:text-gray-300'
                     >
@@ -917,7 +832,7 @@ export function MyApplications({
                     </DropdownMenuItem>
                     <DropdownMenuSeparator className='dark:bg-gray-700' />
                     <DropdownMenuItem
-                      onClick={() => handleMoreAction('删除', app.name)}
+                      onClick={() => handleMoreAction('删除', app.id as string, app.name)}
                       className='text-red-600 dark:text-red-400'
                     >
                       删除
@@ -976,7 +891,7 @@ export function MyApplications({
       </div>
 
       {/* Pagination */}
-      {filteredApps.length > itemsPerPage && (
+      {totalPages > 1 && (
         <div className='flex items-center justify-center mt-6'>
           <Pagination>
             <PaginationContent>
@@ -1009,7 +924,7 @@ export function MyApplications({
       )}
 
       {/* Empty State */}
-      {filteredApps.length === 0 && (
+      {!isLoading && displayApps.length === 0 && (
         <div className='text-center py-12'>
           <div className='w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4'>
             {searchQuery ? (
