@@ -2,16 +2,14 @@ import { useState, useCallback } from 'react';
 import { toast } from 'sonner';
 import { DatasourceConnectionTestDto, DataSourceUpdateDto, DatasourceConfigVo } from '@/services/DatasetsTypes';
 import Datasets from '@/services/Datasets';
-import { DatabaseType, DATABASE_CONFIGS, DATABASE_TYPE_TO_ENUM_MAP, ENUM_TO_DATABASE_TYPE_MAP } from '../constants';
+import { DATABASE_CONFIGS } from '../constants';
 import { generateJdbcUrl } from '../utils';
 import { useLanguage } from '@/components/ui/LanguageProvider';
-
-/** 连接状态 */
-export type ConnectionStatus = 'idle' | 'success' | 'error';  // TODO 使用枚举代替
+import { DatasourceTypeEnum, DatasourceConnectionStatusEnum } from '@/enums/enums';
 
 /** 数据源表单状态 */
 export interface DataSourceFormState {
-  dbType: DatabaseType;
+  dbType: DatasourceTypeEnum;
   dbHost: string;
   dbPort: string;
   dbName: string;
@@ -26,7 +24,7 @@ export interface DataSourceFormState {
 
 /** 初始表单状态 */
 const INITIAL_FORM_STATE: DataSourceFormState = {
-  dbType: 'mysql', // TODO 使用枚举代替
+  dbType: DatasourceTypeEnum.MySQL,
   dbHost: '',
   dbPort: '3306',
   dbName: '',
@@ -45,7 +43,7 @@ const INITIAL_FORM_STATE: DataSourceFormState = {
 export function useDataSourceForm() {
   const [formState, setFormState] = useState<DataSourceFormState>(INITIAL_FORM_STATE);
   const [isTestingConnection, setIsTestingConnection] = useState(false);
-  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('idle');
+  const [connectionStatus, setConnectionStatus] = useState<DatasourceConnectionStatusEnum>(DatasourceConnectionStatusEnum.IDLE);
   const [isLoading, setIsLoading] = useState(false);
   const { t } = useLanguage();
 
@@ -55,7 +53,7 @@ export function useDataSourceForm() {
   }, []);
 
   /** 切换数据库类型 */
-  const changeDbType = useCallback((dbType: DatabaseType) => {
+  const changeDbType = useCallback((dbType: DatasourceTypeEnum) => {
     setFormState(prev => ({
       ...prev,
       dbType,
@@ -76,7 +74,7 @@ export function useDataSourceForm() {
   /** 重置表单 */
   const resetForm = useCallback(() => {
     setFormState(INITIAL_FORM_STATE);
-    setConnectionStatus('idle');
+    setConnectionStatus(DatasourceConnectionStatusEnum.IDLE);
   }, []);
 
   /** 从配置加载表单数据 */
@@ -84,12 +82,11 @@ export function useDataSourceForm() {
     if (config.name !== undefined) {
       setFormState(prev => ({ ...prev, connectionName: config.name ?? '' }));
     }
-    if (config.databaseType && ENUM_TO_DATABASE_TYPE_MAP[config.databaseType]) {
-      const dbType = ENUM_TO_DATABASE_TYPE_MAP[config.databaseType];
+    if (config.databaseType && config.databaseType) {
       setFormState(prev => ({
         ...prev,
-        dbType,
-        dbPort: config.port ? String(config.port) : DATABASE_CONFIGS[dbType].defaultPort,
+        dbType: config.databaseType as DatasourceTypeEnum,
+        dbPort: config.port ? String(config.port) : DATABASE_CONFIGS[config.databaseType as DatasourceTypeEnum].defaultPort,
       }));
     }
 
@@ -156,14 +153,14 @@ export function useDataSourceForm() {
       }
 
       setIsTestingConnection(true);
-      setConnectionStatus('idle');
+      setConnectionStatus(DatasourceConnectionStatusEnum.IDLE);
 
       try {
         const finalJdbcUrl = getJdbcUrl();
 
         const testDto: DatasourceConnectionTestDto = {
           datasetId: datasetId || undefined,
-          databaseType: DATABASE_TYPE_TO_ENUM_MAP[formState.dbType],
+          databaseType: formState.dbType,
           database: formState.dbName || undefined,
           jdbcUrl: finalJdbcUrl || undefined,
           host: formState.dbHost || undefined,
@@ -176,17 +173,17 @@ export function useDataSourceForm() {
         const responseData = (response as any).data;
 
         if (responseData?.success) {
-          setConnectionStatus('success');
+          setConnectionStatus(DatasourceConnectionStatusEnum.SUCCESS);
           toast.success(responseData?.message || t('dataset.toasts.datasourceTestSuccess'));
           return true;
         } else {
-          setConnectionStatus('error');
+          setConnectionStatus(DatasourceConnectionStatusEnum.ERROR);
           toast.error(responseData?.message || t('dataset.toasts.datasourceTestFailed'));
           return false;
         }
       } catch (error: any) {
         console.error('Failed to test datasource connection:', error);
-        setConnectionStatus('error');
+        setConnectionStatus(DatasourceConnectionStatusEnum.ERROR);
         toast.error(error?.message || t('dataset.toasts.datasourceTestFailed'));
         return false;
       } finally {
@@ -205,7 +202,7 @@ export function useDataSourceForm() {
 
     return {
       name: sourceName,
-      databaseType: DATABASE_TYPE_TO_ENUM_MAP[formState.dbType],
+      databaseType: formState.dbType,
       database: formState.dbName || undefined,
       jdbcUrl: finalJdbcUrl || undefined,
       host: formState.dbHost || undefined,

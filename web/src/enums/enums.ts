@@ -359,6 +359,17 @@ export enum VectorStoreTypeEnum {
   WEAVIATE = 'WEAVIATE',
 }
 
+export enum EnabledStatusEnum {
+  ENABLED = 'ENABLED',
+  DISABLED = 'DISABLED',
+}
+
+export enum DatasourceConnectionStatusEnum {
+  IDLE = 'idle',
+  SUCCESS = 'success',
+  ERROR = 'error',
+}
+
 export const enumNamespaceMap = new Map<any, string>([
   [WorkflowTypeEnum, 'enum.WorkflowTypeEnum'],
   [WorkflowStatusEnum, 'enum.WorkflowStatusEnum'],
@@ -398,4 +409,5 @@ export const enumNamespaceMap = new Map<any, string>([
   [ImportStatusEnum, 'enum.ImportStatusEnum'],
   [ConnectionStatusEnum, 'enum.ConnectionStatusEnum'],
   [VectorStoreTypeEnum, 'enum.VectorStoreTypeEnum'],
+  [EnabledStatusEnum, 'enum.EnabledStatusEnum'],
 ]);

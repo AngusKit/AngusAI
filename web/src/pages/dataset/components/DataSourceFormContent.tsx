@@ -3,16 +3,17 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { DataSourceFormState, ConnectionStatus } from '../hooks/useDataSourceForm';
-import { DATABASE_CONFIGS, DATABASES_REQUIRING_SCHEMA, DatabaseType } from '../constants';
+import { DataSourceFormState } from '../hooks/useDataSourceForm';
+import { DATABASE_CONFIGS, DATABASES_REQUIRING_SCHEMA } from '../constants';
 import { useLanguage } from '@/components/ui/LanguageProvider';
+import { DatasourceConnectionStatusEnum, DatasourceTypeEnum } from '@/enums/enums';
 
 interface DataSourceFormContentProps {
   formState: DataSourceFormState;
-  connectionStatus: ConnectionStatus;
+  connectionStatus: DatasourceConnectionStatusEnum;
   isTestingConnection: boolean;
   onFieldChange: <K extends keyof DataSourceFormState>(field: K, value: DataSourceFormState[K]) => void;
-  onDbTypeChange: (dbType: DatabaseType) => void;
+  onDbTypeChange: (dbType: DatasourceTypeEnum) => void;
   onToggleCustomUrl: (useCustomUrl: boolean) => void;
   onTestConnection: () => void;
   getJdbcUrl: () => string;
@@ -67,7 +68,7 @@ export function DataSourceFormContent({
       <div>
         <Label className='text-sm mb-2 block dark:text-gray-300'>{t('dataset.datasource.form.dbTypeLabel')}</Label>
         <div className='grid grid-cols-2 md:grid-cols-3 gap-3'>
-          {(Object.keys(DATABASE_CONFIGS) as DatabaseType[]).map(type => {
+          {(Object.keys(DATABASE_CONFIGS) as DatasourceTypeEnum[]).map(type => {
             const dbConfig = DATABASE_CONFIGS[type];
             return (
               <button
@@ -144,7 +145,7 @@ export function DataSourceFormContent({
                 value={dbName}
                 onChange={e => onFieldChange('dbName', e.target.value)}
                 placeholder={
-                  dbType === 'oracle' // TODO 使用枚举值代替
+                  dbType === DatasourceTypeEnum.Oracle
                     ? t('dataset.datasource.form.databasePlaceholderOracle')
                     : t('dataset.datasource.form.databasePlaceholder')
                 }
@@ -162,7 +163,7 @@ export function DataSourceFormContent({
                   value={dbSchema}
                   onChange={e => onFieldChange('dbSchema', e.target.value)}
                   placeholder={
-                    dbType === 'postgresql' // TODO 使用枚举值代替
+                    dbType === DatasourceTypeEnum.PostgreSQL
                       ? t('dataset.datasource.form.schemaPlaceholderPostgres')
                       : t('dataset.datasource.form.schemaPlaceholderDefault')
                   }
@@ -253,18 +254,17 @@ export function DataSourceFormContent({
           variant='outline'
           className='w-full dark:bg-gray-800 dark:border-gray-700'
         >
-          {/* TODO 使用枚举值代替 */}
           {isTestingConnection ? (
             <>
               <div className='w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mr-2' />
               {t('dataset.datasource.form.testConnection.testing')}
             </>
-          ) : connectionStatus === 'success' ? (
+          ) : connectionStatus === DatasourceConnectionStatusEnum.SUCCESS ? (
             <>
               <CheckCircle className='w-4 h-4 mr-2 text-green-500' />
               {t('dataset.datasource.form.testConnection.success')}
             </>
-          ) : connectionStatus === 'error' ? (
+          ) : connectionStatus === DatasourceConnectionStatusEnum.ERROR ? (
             <>
               <AlertCircle className='w-4 h-4 mr-2 text-red-500' />
               {t('dataset.datasource.form.testConnection.failed')}
@@ -274,7 +274,7 @@ export function DataSourceFormContent({
           )}
         </Button>
 
-        {connectionStatus === 'success' && (
+        {connectionStatus === DatasourceConnectionStatusEnum.SUCCESS && (
           <div className='mt-3 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg'>
             <div className='flex items-center gap-2 text-sm text-green-700 dark:text-green-400'>
               <CheckCircle className='w-4 h-4' />
@@ -283,7 +283,7 @@ export function DataSourceFormContent({
           </div>
         )}
 
-        {connectionStatus === 'error' && (
+        {connectionStatus === DatasourceConnectionStatusEnum.ERROR && (
           <div className='mt-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg'>
             <div className='text-sm text-red-700 dark:text-red-400'>
               <div className='flex items-center gap-2 mb-1'>

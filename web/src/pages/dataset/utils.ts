@@ -1,7 +1,9 @@
-import { DatasetListVo, DatasourceTableDataPreviewVo } from '@/services/DatasetsTypes';
+import { DatasetListVo } from '@/services/DatasetsTypes';
 import {DatasetDataListVo} from '@/services/DatasetsDataTypes.ts';
-import { DatasetTypeEnum, DatasetDataTypeEnum, DatasetDataStatusEnum, VisibilityEnum } from '@/enums/enums';
-import { DATASET_TYPE_DISPLAY_MAP, VISIBILITY_DISPLAY_MAP, DATA_TYPE_DISPLAY_MAP, DATA_TYPE_ICON_MAP, DATA_STATUS_DISPLAY_MAP, DATA_STATUS_COLOR_MAP, DATA_TYPE_COLOR_MAP, } from './constants';
+import { getEnumDescription } from '@/enums/utils';
+import { DatasetTypeEnum, DatasetDataTypeEnum, DatasetDataStatusEnum, VisibilityEnum, EnabledStatusEnum } from '@/enums/enums';
+import { DATA_TYPE_ICON_MAP, DATA_STATUS_COLOR_MAP, DATA_TYPE_COLOR_MAP } from './constants';
+import { DATASET_STATUS_COLORS } from '@/utils/PagesUtils';
 
 /** 数据集项接口 */
 export interface DatasetItem {
@@ -10,13 +12,13 @@ export interface DatasetItem {
   description: string;
   icon: string;
   iconBg: string;
-  type: '文件' | '数据源'; // TODO 使用枚举值代替
+  type: string; 
   dataCount: string;
   size: string;
-  status: '已启用' | '禁用'; // TODO 使用枚举值代替
+  status: string; 
   statusColor: string;
   enabled: boolean;
-  visibility?: string;
+  visibility?: VisibilityEnum;
   modifiedDate: string;
   createdDate: string;
   creator: string;
@@ -32,7 +34,7 @@ export interface DataFileItem {
   typeColor: string;
   typeIcon: string;
   size: string;
-  status: '已处理' | '处理中' | '待处理'; // TODO 使用枚举值代替
+  status: string;
   statusColor: string;
   modifiedDate: string;
   recordCount: string;
@@ -53,10 +55,6 @@ export interface DatabaseTable {
  * 将 DatasetListVo 转换为 DatasetItem
  */
 export function convertDatasetVoToItem(vo: DatasetListVo): DatasetItem {
-  const typeMap: Record<DatasetTypeEnum, '文件' | '数据源'> = { // TODO 使用枚举message代替
-    [DatasetTypeEnum.FILE]: '文件',
-    [DatasetTypeEnum.DATASOURCE]: '数据源',
-  };
 
   const dataCount = vo.dataStatistics?.totalFilesOrTables ? String(vo.dataStatistics.totalFilesOrTables) : '0';
   const size = vo.dataStatistics?.totalRecordsSize || '0 条'; // TODO  国际化漏了
@@ -70,15 +68,17 @@ export function convertDatasetVoToItem(vo: DatasetListVo): DatasetItem {
     description: vo.description || '',
     icon: vo.icon || '📊',
     iconBg: vo.iconBg || 'bg-blue-50 dark:bg-blue-900/20',
-    type: typeMap[vo.type || DatasetTypeEnum.FILE] || '文件', // TODO 漏了
+    type: vo.type || DatasetTypeEnum.FILE,
     dataCount,
     size,
-    status: vo.enabled ? '已启用' : '禁用', // TODO 漏了
-    statusColor: vo.enabled // TODO 使用全局定义的启用和禁用状态message
-      ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-      : 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
+    status: vo.enabled
+      ? getEnumDescription(EnabledStatusEnum, EnabledStatusEnum.ENABLED)
+      : getEnumDescription(EnabledStatusEnum, EnabledStatusEnum.DISABLED),
+    statusColor: vo.enabled
+      ? DATASET_STATUS_COLORS[EnabledStatusEnum.ENABLED]
+      : DATASET_STATUS_COLORS[EnabledStatusEnum.DISABLED],
     enabled: vo.enabled || false,
-    visibility: vo.visibility ? VISIBILITY_DISPLAY_MAP[vo.visibility] : 'private',
+    visibility: vo.visibility || VisibilityEnum.PRIVATE,  
     modifiedDate,
     createdDate,
     creator,
@@ -90,26 +90,9 @@ export function convertDatasetVoToItem(vo: DatasetListVo): DatasetItem {
  * 将 DatasetDataListVo 转换为 DataFileItem
  */
 export function convertDataListVoToFile(vo: DatasetDataListVo): DataFileItem {
-  const stringToEnumMap: Record<string, DatasetDataTypeEnum> = {
-    CSV: DatasetDataTypeEnum.CSV,
-    JSON: DatasetDataTypeEnum.JSON,
-    EXCEL: DatasetDataTypeEnum.EXCEL,
-    XML: DatasetDataTypeEnum.XML,
-    TABLE: DatasetDataTypeEnum.TABLE,
-  };
-
-  // TODO 使用枚举message代替
-  const statusMap: Record<string, '已处理' | '处理中' | '待处理'> = {
-    [DatasetDataStatusEnum.COMPLETED]: '已处理',
-    [DatasetDataStatusEnum.PROCESSING]: '处理中',
-    [DatasetDataStatusEnum.PENDING]: '待处理',
-    [DatasetDataStatusEnum.FAILED]: '待处理', // 失败状态也显示为待处理
-  };
-
-  // TODO 使用枚举值代替
-  const typeEnum = stringToEnumMap[vo.type || 'CSV'] || DatasetDataTypeEnum.CSV;
-  const typeDisplay = DATA_TYPE_DISPLAY_MAP[typeEnum];
-  const status = statusMap[vo.status || DatasetDataStatusEnum.PENDING] || '待处理'; // TODO 使用枚举值代替
+  const typeEnum = vo.type || DatasetDataTypeEnum.CSV;
+  const typeDisplay = getEnumDescription(DatasetDataTypeEnum, typeEnum);
+  const status = vo.status || DatasetDataStatusEnum.PENDING;
 
   return {
     id: vo.id ? String(vo.id) : '',
@@ -119,8 +102,8 @@ export function convertDataListVoToFile(vo: DatasetDataListVo): DataFileItem {
     typeColor: DATA_TYPE_COLOR_MAP[typeEnum],
     typeIcon: DATA_TYPE_ICON_MAP[typeEnum] || '📄',
     size: vo.dataSize || '0 MB',
-    status,
-    statusColor: DATA_STATUS_COLOR_MAP[status] || DATA_STATUS_COLOR_MAP['待处理'],
+    status: getEnumDescription(DatasetDataStatusEnum, status),
+    statusColor: DATA_STATUS_COLOR_MAP[status] || DATA_STATUS_COLOR_MAP[DatasetDataStatusEnum.PENDING],
     modifiedDate: vo.createdDate || '',
     recordCount: vo.dataCount ? vo.dataCount.toLocaleString() : '0',
     filePath: vo.filePath,

@@ -12,6 +12,7 @@ import { DatasetCreateDto } from '@/services/DatasetsTypes';
 import { DatasetTypeEnum, VisibilityEnum } from '@/enums/enums';
 import { getTagColor, ICON_OPTIONS } from '@/utils';
 import { useLanguage } from '@/components/ui/LanguageProvider';
+import { getEnumDescription } from '@/enums/utils';
 
 interface CreateDatasetDialogProps {
   open: boolean;
@@ -23,8 +24,8 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
   const { t } = useLanguage();
   const [datasetName, setDatasetName] = useState('');
   const [description, setDescription] = useState('');
-  const [dataType, setDataType] = useState<'table' | 'datasource'>('table');
-  const [visibility, setVisibility] = useState('private');
+  const [dataType, setDataType] = useState<DatasetTypeEnum>(DatasetTypeEnum.FILE);
+  const [visibility, setVisibility] = useState<VisibilityEnum>(VisibilityEnum.PRIVATE);
   const [selectedIcon, setSelectedIcon] = useState(0);
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
@@ -83,21 +84,11 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
 
     setIsSubmitting(true);
     try {
-      // 映射数据类型：页面上的'text'和'table'都对应FILE类型，'datasource'对应DATASOURCE类型
-      const datasetType = dataType === 'datasource' ? DatasetTypeEnum.DATASOURCE : DatasetTypeEnum.FILE;
-
-      // 映射可见性 // TODO 使用枚举代替
-      const visibilityMap: Record<string, VisibilityEnum> = {
-        private: VisibilityEnum.PRIVATE,
-        team: VisibilityEnum.TEAM,
-        public: VisibilityEnum.PUBLIC,
-      };
-
       const createDto: DatasetCreateDto = {
         name: datasetName.trim(),
         description: description.trim(),
-        type: datasetType,
-        visibility: visibilityMap[visibility] || VisibilityEnum.PRIVATE,
+        type: dataType,
+        visibility: visibility || VisibilityEnum.PRIVATE,
         icon: ICON_OPTIONS[selectedIcon]?.emoji,
         iconBg: ICON_OPTIONS[selectedIcon]?.bg,
         tags: tags.length > 0 ? tags : undefined,
@@ -111,11 +102,11 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
       // 重置表单
       setDatasetName('');
       setDescription('');
-      setVisibility('private');
+      setVisibility(VisibilityEnum.PRIVATE);
       setSelectedIcon(0);
       setTags([]);
       setTagInput('');
-      setDataType('table');
+      setDataType(DatasetTypeEnum.FILE);
     } catch (error: any) {
       console.error('Failed to create dataset:', error);
       toast.error(error?.message || t('dataset.createDialog.createFailed'));
@@ -150,20 +141,19 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
 
             <div>
               <Label className='text-sm mb-2 block dark:text-gray-300'>{t('dataset.form.visibilityLabel')}</Label>
-              <Select value={visibility} onValueChange={setVisibility}>
+              <Select value={visibility} onValueChange={value => setVisibility(value as VisibilityEnum)}>
                 <SelectTrigger className='dark:bg-gray-800 dark:border-gray-700 dark:text-white'>
                   <SelectValue placeholder={t('dataset.form.visibilityPlaceholder')} />
                 </SelectTrigger>
                 <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
-                  <SelectItem value='private' className='dark:text-white'>
-                    {/*TODO 使用枚举Message代替*/}
-                    {t('dataset.visibility.private')}
+                  <SelectItem value={VisibilityEnum.PRIVATE} className='dark:text-white'>
+                    {getEnumDescription(VisibilityEnum, VisibilityEnum.PRIVATE)}
                   </SelectItem>
-                  <SelectItem value='team' className='dark:text-white'>
-                    {t('dataset.visibility.team')}
+                  <SelectItem value={VisibilityEnum.TEAM} className='dark:text-white'>
+                    {getEnumDescription(VisibilityEnum, VisibilityEnum.TEAM)}
                   </SelectItem>
-                  <SelectItem value='public' className='dark:text-white'>
-                    {t('dataset.visibility.public')}
+                  <SelectItem value={VisibilityEnum.PUBLIC} className='dark:text-white'>
+                    {getEnumDescription(VisibilityEnum, VisibilityEnum.PUBLIC)}
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -241,9 +231,9 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
             </Label>
             <div className='grid grid-cols-2 gap-3'>
               <button
-                onClick={() => setDataType('table')}
+                onClick={() => setDataType(DatasetTypeEnum.FILE)}
                 className={`p-3 border-2 rounded-lg text-left transition-all ${
-                  dataType === 'table'
+                  dataType === DatasetTypeEnum.FILE
                     ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                     : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                 }`}
@@ -251,10 +241,10 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
                 <div className='flex items-start gap-3'>
                   <div
                     className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${
-                      dataType === 'table' ? 'border-blue-500' : 'border-gray-300 dark:border-gray-600'
+                      dataType === DatasetTypeEnum.FILE ? 'border-blue-500' : 'border-gray-300 dark:border-gray-600'
                     }`}
                   >
-                    {dataType === 'table' && <div className='w-2.5 h-2.5 rounded-full bg-blue-500' />}
+                    {dataType === DatasetTypeEnum.FILE && <div className='w-2.5 h-2.5 rounded-full bg-blue-500' />}
                   </div>
                   <div>
                     <div className='dark:text-white mb-0.5'>{t('dataset.editDatasetDialog.dataType.tableTitle')}</div>
@@ -266,9 +256,9 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
               </button>
 
               <button
-                onClick={() => setDataType('datasource')}
+                onClick={() => setDataType(DatasetTypeEnum.DATASOURCE)}
                 className={`p-3 border-2 rounded-lg text-left transition-all ${
-                  dataType === 'datasource'
+                  dataType === DatasetTypeEnum.DATASOURCE
                     ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                     : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                 }`}
@@ -276,10 +266,10 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
                 <div className='flex items-start gap-3'>
                   <div
                     className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${
-                      dataType === 'datasource' ? 'border-blue-500' : 'border-gray-300 dark:border-gray-600'
+                      dataType === DatasetTypeEnum.DATASOURCE ? 'border-blue-500' : 'border-gray-300 dark:border-gray-600'
                     }`}
                   >
-                    {dataType === 'datasource' && <div className='w-2.5 h-2.5 rounded-full bg-blue-500' />}
+                    {dataType === DatasetTypeEnum.DATASOURCE && <div className='w-2.5 h-2.5 rounded-full bg-blue-500' />}
                   </div>
                   <div>
                     <div className='dark:text-white mb-0.5'>
@@ -304,11 +294,11 @@ export function CreateDatasetDialog({ open, onOpenChange, onSuccess }: CreateDat
                 onOpenChange(false);
                 setDatasetName('');
                 setDescription('');
-                setVisibility('private');
+                setVisibility(VisibilityEnum.PRIVATE);
                 setSelectedIcon(0);
                 setTags([]);
                 setTagInput('');
-                setDataType('table');
+                setDataType(DatasetTypeEnum.FILE);
               }}
               className='dark:bg-gray-800 dark:border-gray-700 dark:text-white'
             >

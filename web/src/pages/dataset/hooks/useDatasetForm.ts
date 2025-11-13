@@ -1,19 +1,19 @@
 import { useState, useCallback } from 'react';
 import { toast } from 'sonner';
-import { VisibilityEnum } from '@/enums/enums';
-import { VISIBILITY_OPTIONS_MAP, FORM_VALIDATION } from '../constants';
+import { VisibilityEnum, DatasetTypeEnum } from '@/enums/enums';
+import { FORM_VALIDATION } from '../constants';
 import { ICON_OPTIONS } from '@/utils';
 import { useLanguage } from '@/components/ui/LanguageProvider';
 
 /** 数据集表单数据类型 */
-export type DatasetFormDataType = 'table' | 'datasource'; // TODO 使用枚举
+export type DatasetFormDataType = DatasetTypeEnum.FILE | DatasetTypeEnum.DATASOURCE;
 
 /** 数据集表单状态 */
 export interface DatasetFormState {
   datasetName: string;
   description: string;
-  dataType: DatasetFormDataType; // TODO 使用枚举
-  visibility: string; // TODO 使用枚举
+  dataType: DatasetFormDataType; 
+  visibility: VisibilityEnum;
   selectedIcon: number;
   tags: string[];
   tagInput: string;
@@ -23,8 +23,8 @@ export interface DatasetFormState {
 const INITIAL_FORM_STATE: DatasetFormState = {
   datasetName: '',
   description: '',
-  dataType: 'table', // TODO 使用枚举
-  visibility: 'private', // TODO 使用枚举
+  dataType: DatasetTypeEnum.FILE,
+  visibility: VisibilityEnum.PRIVATE,
   selectedIcon: 0,
   tags: [],
   tagInput: '',
@@ -121,7 +121,7 @@ export function useDatasetForm(initialState?: Partial<DatasetFormState>) {
     return {
       name: formState.datasetName.trim(),
       description: formState.description.trim(),
-      visibility: VISIBILITY_OPTIONS_MAP[formState.visibility] || VisibilityEnum.PRIVATE,
+      visibility: formState.visibility || VisibilityEnum.PRIVATE,
       icon: ICON_OPTIONS[formState.selectedIcon]?.emoji,
       iconBg: ICON_OPTIONS[formState.selectedIcon]?.bg,
       tags: formState.tags.length > 0 ? formState.tags : undefined,
