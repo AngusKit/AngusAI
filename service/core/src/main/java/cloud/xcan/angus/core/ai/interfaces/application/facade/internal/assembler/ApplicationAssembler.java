@@ -12,15 +12,11 @@ import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDeta
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.ApplicationStatsVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.ResourcesConfigVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationListVo;
-import cloud.xcan.angus.core.biz.JoinSupplier;
-import cloud.xcan.angus.core.biz.NameJoin;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder;
-import cloud.xcan.angus.core.spring.SpringContextHolder;
 import cloud.xcan.angus.core.utils.CoreUtils;
 import cloud.xcan.angus.remote.search.SearchCriteria;
 import java.time.LocalDateTime;
-import java.util.Objects;
 import java.util.Set;
 
 public class ApplicationAssembler {
@@ -69,7 +65,8 @@ public class ApplicationAssembler {
     return application;
   }
 
-  public static ApplicationDetailVo toDetailVo(Application application) {
+  public static ApplicationDetailVo toDetailVo(Application application,
+      ResourcesConfigVo resourcesConfigVo) {
     ApplicationDetailVo vo = new ApplicationDetailVo();
     vo.setId(application.getId());
     vo.setName(application.getName());
@@ -90,8 +87,7 @@ public class ApplicationAssembler {
     // 设置配置信息
     ApplicationConfigVo configVo = new ApplicationConfigVo();
     CoreUtils.copyProperties(application.getConfig(), configVo);
-    Objects.requireNonNull(SpringContextHolder.getBean(JoinSupplier.class))
-        .execute(() -> joinResourceName(configVo));
+    configVo.setResources(resourcesConfigVo);
     vo.setConfig(configVo);
 
     // 设置分享信息
@@ -105,11 +101,6 @@ public class ApplicationAssembler {
     statsVo.setSuccessRate(application.getSuccessRate());
     vo.setStats(statsVo);
     return vo;
-  }
-
-  @NameJoin
-  public static ResourcesConfigVo joinResourceName(ApplicationConfigVo configVo) {
-    return configVo.getResources();
   }
 
   public static ApplicationListVo toListVo(Application application) {

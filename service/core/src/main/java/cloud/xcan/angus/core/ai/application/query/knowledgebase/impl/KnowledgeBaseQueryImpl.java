@@ -68,4 +68,9 @@ public class KnowledgeBaseQueryImpl implements KnowledgeBaseQuery {
     return knowledgeBases.stream()
         .collect(Collectors.toMap(KnowledgeBase::getId, kb -> kb));
   }
+
+  @Override
+  public List<KnowledgeBase> findById(List<Long> knowledgeBaseIds) {
+    return knowledgeBaseRepo.findAllById(knowledgeBaseIds);
+  }
 }

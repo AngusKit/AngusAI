@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.util.List;
 import lombok.Data;
 
@@ -18,6 +19,7 @@ public class ApplicationConfig {
   @Schema(description = "模型配置", requiredMode = RequiredMode.REQUIRED)
   private ModelConfig model;
 
+  @Valid
   @Schema(description = "关联资源")
   private ResourcesConfig resources;
 
@@ -81,11 +83,17 @@ public class ApplicationConfig {
   @Schema(description = "关联资源配置")
   public static class ResourcesConfig {
 
-    @Schema(description = "关联的知识库ID")
-    private Long knowledgeBaseId;
+    @Size(max = 5)
+    @Schema(description = "关联的知识库ID，最多5个")
+    private List<Long> knowledgeBaseIds;
 
-    @Schema(description = "关联的数据集ID")
-    private Long datasetId;
+    @Size(max = 5)
+    @Schema(description = "关联的数据集ID列表，最多5个")
+    private List<Long> datasetIds;
+
+    @Size(max = 10)
+    @Schema(description = "关联的接口集ID列表，最多10个")
+    private List<Long> apiCollectionIds;
 
     @Schema(description = "关联的工作流ID")
     private Long workflowId;

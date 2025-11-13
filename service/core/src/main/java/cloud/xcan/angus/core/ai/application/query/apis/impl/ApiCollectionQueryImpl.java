@@ -132,5 +132,10 @@ public class ApiCollectionQueryImpl implements ApiCollectionQuery {
     return ExportApiFormat.json.equals(format)
         ? Json31.pretty(openApi) : Yaml31.pretty(openApi);
   }
+
+  @Override
+  public List<ApiCollection> findById(List<Long> apiCollectionIds) {
+    return apiCollectionRepo.findAllById(apiCollectionIds);
+  }
 }
 

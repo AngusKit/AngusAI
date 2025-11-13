@@ -4,6 +4,7 @@ import cloud.xcan.angus.core.ai.domain.application.Application;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationConfig;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationShare;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
+import java.util.List;
 import java.util.UUID;
 
 public class ApplicationConverter {
@@ -27,16 +28,18 @@ public class ApplicationConverter {
 
     // 设置关联资源ID（冗余字段）
     newApplication.setModelId(sourceApplication.getModelId());
-    newApplication.setKnowledgeBaseId(sourceApplication.getKnowledgeBaseId());
-    newApplication.setDatasetId(sourceApplication.getDatasetId());
+    newApplication.setKnowledgeBaseIds(sourceApplication.getKnowledgeBaseIds());
+    newApplication.setDatasetIds(sourceApplication.getDatasetIds());
+    newApplication.setApiCollectionIds(sourceApplication.getApiCollectionIds());
     newApplication.setWorkflowId(sourceApplication.getWorkflowId());
     return newApplication;
   }
 
   public static void updateAssociatedIds(ApplicationConfig config, Application applicationDb) {
     applicationDb.setModelId(config.getModel().getId());
-    applicationDb.setKnowledgeBaseId(config.getResources().getKnowledgeBaseId());
-    applicationDb.setDatasetId(config.getResources().getDatasetId());
+    applicationDb.setKnowledgeBaseIds(config.getResources().getKnowledgeBaseIds());
+    applicationDb.setDatasetIds(config.getResources().getDatasetIds());
+    applicationDb.setApiCollectionIds(config.getResources().getApiCollectionIds());
     applicationDb.setWorkflowId(config.getResources().getWorkflowId());
   }
 

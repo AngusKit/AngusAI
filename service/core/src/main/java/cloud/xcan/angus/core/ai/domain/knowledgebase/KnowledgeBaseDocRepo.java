@@ -24,9 +24,6 @@ public interface KnowledgeBaseDocRepo extends BaseRepository<KnowledgeBaseDoc, L
   /**
    * 统计活跃（被引用）文件数（在应用中被使用的文档）
    */
-  @Query("SELECT COUNT(DISTINCT d.id) FROM KnowledgeBaseDoc d " +
-      "JOIN KnowledgeBase kb ON d.knowledgeBaseId = kb.id " +
-      "JOIN Application app ON app.knowledgeBaseId = kb.id")
   Long countActiveFiles();
 
   /**

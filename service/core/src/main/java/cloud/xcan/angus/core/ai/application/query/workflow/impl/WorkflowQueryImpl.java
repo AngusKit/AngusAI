@@ -46,6 +46,11 @@ public class WorkflowQueryImpl implements WorkflowQuery {
   }
 
   @Override
+  public Workflow findById(Long workflowId) {
+    return workflowRepo.findById(workflowId).orElse(null);
+  }
+
+  @Override
   public boolean existsByName(String name) {
     return workflowRepo.existsByName(name);
   }

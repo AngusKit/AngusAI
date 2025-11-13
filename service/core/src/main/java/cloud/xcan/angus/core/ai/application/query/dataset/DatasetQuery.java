@@ -45,4 +45,8 @@ public interface DatasetQuery {
    */
   Map<Long, Dataset> findByIds(List<Long> datasetIds);
 
+  /**
+   * 批量根据ID查询数据集 返回 List<Dataset>
+   */
+  List<Dataset> findById(List<Long> datasetIds);
 }

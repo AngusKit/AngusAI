@@ -7,8 +7,10 @@ import cloud.xcan.angus.remote.vo.TenantAuditingVo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -104,26 +106,22 @@ public class ApplicationDetailVo extends TenantAuditingVo {
   @Schema(description = "关联资源配置")
   public static class ResourcesConfigVo {
 
-    @Schema(description = "关联的知识库ID")
-    private Long knowledgeBaseId;
-    @Schema(description = "关联的知识库名称")
-    @NameJoinField(id = "knowledgeBaseId", repository = "knowledgeBaseRepo")
-    private String knowledgeBaseName;
+    @Schema(description = "关联的知识库")
+    private List<ResourceInfoVo> knowledgeBases;
 
-    @Schema(description = "关联的数据集ID")
-    private Long datasetId;
-    @Schema(description = "关联的数据集名称")
-    @NameJoinField(id = "datasetId", repository = "datasetRepo")
-    private String datasetName;
+    @Schema(description = "关联的数据集")
+    private List<ResourceInfoVo> datasets;
 
-    @Schema(description = "关联的工作流ID")
-    private Long workflowId;
-    @Schema(description = "关联的工作流名称")
-    @NameJoinField(id = "workflowId", repository = "workflowRepo")
-    private String workflowName;
+    @Schema(description = "关联的接口集")
+    private List<ResourceInfoVo> apiCollections;
+
+    @Schema(description = "关联的工作流")
+    private ResourceInfoVo workflow;
   }
 
   @Data
+  @NoArgsConstructor
+  @AllArgsConstructor
   @Schema(description = "资源信息")
   public static class ResourceInfoVo {
 

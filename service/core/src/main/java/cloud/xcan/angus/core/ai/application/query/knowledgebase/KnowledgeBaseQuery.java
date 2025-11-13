@@ -35,4 +35,8 @@ public interface KnowledgeBaseQuery {
    */
   Map<Long, KnowledgeBase> findByIds(List<Long> knowledgeBaseIds);
 
+  /**
+   * 批量根据ID查询知识库 返回 List<KnowledgeBase>
+   */
+  List<KnowledgeBase> findById(List<Long> knowledgeBaseIds);
 }

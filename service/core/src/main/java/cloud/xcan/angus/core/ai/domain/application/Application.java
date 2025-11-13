@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -75,13 +76,19 @@ public class Application extends TenantAuditingEntity<Application, Long> {
   @Column(name = "model_id")
   private Long modelId;
 
-  @Column(name = "knowledge_base_id")
-  private Long knowledgeBaseId;
+  @Type(JsonType.class)
+  @Column(columnDefinition = "json", name = "knowledge_base_ids")
+  private List<Long> knowledgeBaseIds;
 
-  @Column(name = "dataset_id")
-  private Long datasetId;
+  @Type(JsonType.class)
+  @Column(columnDefinition = "json", name = "dataset_ids")
+  private List<Long> datasetIds;
 
-  @Column(name = "workflow_id")
+  @Type(JsonType.class)
+  @Column(columnDefinition = "json", name = "api_collection_ids")
+  private List<Long> apiCollectionIds;
+
+  @Column( name = "workflow_ids")
   private Long workflowId;
 
   // 发布设置

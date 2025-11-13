@@ -78,4 +78,9 @@ public class DatasetQueryImpl implements DatasetQuery {
     return datasets.stream().collect(Collectors.toMap(Dataset::getId, ds -> ds));
   }
 
+  @Override
+  public List<Dataset> findById(List<Long> datasetIds) {
+    return datasetRepo.findAllById(datasetIds);
+  }
+
 }

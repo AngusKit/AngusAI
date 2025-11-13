@@ -19,6 +19,11 @@ public interface WorkflowQuery {
       boolean fullTextSearch, String[] match);
 
   /**
+   * 根据ID查询工作流
+   */
+  Workflow findById(Long workflowId);
+
+  /**
    * 检查工作流名称是否存在
    */
   boolean existsByName(String name);
@@ -27,5 +32,6 @@ public interface WorkflowQuery {
    * 检查工作流名称是否存在（排除指定ID）
    */
   boolean existsByNameAndIdNot(String name, Long id);
+
 
 }

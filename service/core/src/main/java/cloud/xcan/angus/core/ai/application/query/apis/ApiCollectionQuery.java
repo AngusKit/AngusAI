@@ -3,6 +3,7 @@ package cloud.xcan.angus.core.ai.application.query.apis;
 import cloud.xcan.angus.core.ai.domain.apis.ApiCollection;
 import cloud.xcan.angus.core.ai.domain.apis.ExportApiFormat;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -31,5 +32,10 @@ public interface ApiCollectionQuery {
    * 获取接口集OpenAPI规范详情
    */
   String openapiDetail(Long id, ExportApiFormat format, Boolean includeDisabled);
+
+  /**
+   * 批量根据ID查询接口集 返回 List<ApiCollection>
+   */
+  List<ApiCollection> findById(List<Long> apiCollectionIds);
 }
 
