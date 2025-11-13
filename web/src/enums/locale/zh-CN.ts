@@ -270,4 +270,8 @@ export const enumTranslations = {
     TYPESENSE: 'Typesense',
     WEAVIATE: 'Weaviate',
   },
+  EnabledStatusEnum: {
+    ENABLED: '已启用',
+    DISABLED: '禁用',
+  },
 };

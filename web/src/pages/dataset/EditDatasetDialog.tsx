@@ -9,9 +9,11 @@ import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import Datasets from '@/services/Datasets';
 import { DatasetUpdateDto } from '@/services/DatasetsTypes';
-import { VisibilityEnum } from '@/enums/enums';
+import { VisibilityEnum, DatasetTypeEnum } from '@/enums/enums';
 import { getTagColor, ICON_OPTIONS } from '@/utils';
 import { useLanguage } from '@/components/ui/LanguageProvider';
+import { getEnumDescription } from '@/enums/utils';
+import { validateTag } from './utils';
 
 interface EditDatasetDialogProps {
   open: boolean;
@@ -22,9 +24,9 @@ interface EditDatasetDialogProps {
     description: string;
     icon?: string;
     iconBg?: string;
-    visibility?: string; // TODO 使用枚举代替
+    visibility?: VisibilityEnum;
     tags?: string[];
-    type?: '文件' | '数据源'; // TODO 使用枚举代替
+    type?: DatasetTypeEnum;
   } | null;
   onSuccess?: () => void;
 }
@@ -33,8 +35,8 @@ export function EditDatasetDialog({ open, onOpenChange, dataset, onSuccess }: Ed
   const { t } = useLanguage();
   const [datasetName, setDatasetName] = useState('');
   const [description, setDescription] = useState('');
-  const [dataType, setDataType] = useState<'table' | 'datasource'>('table');
-  const [visibility, setVisibility] = useState('private');
+  const [dataType, setDataType] = useState<DatasetTypeEnum>(DatasetTypeEnum.FILE);
+  const [visibility, setVisibility] = useState<VisibilityEnum>(VisibilityEnum.PRIVATE);
   const [selectedIcon, setSelectedIcon] = useState(0);
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
@@ -45,15 +47,15 @@ export function EditDatasetDialog({ open, onOpenChange, dataset, onSuccess }: Ed
     if (dataset) {
       setDatasetName(dataset.name);
       setDescription(dataset.description);
-      setVisibility(dataset.visibility || 'private');
+      setVisibility(dataset.visibility || VisibilityEnum.PRIVATE);
       setTags(dataset.tags || []);
 
       // 根据数据集类型设置数据类型（编辑时不允许修改）
-      if (dataset.type === '数据源') { // TODO 使用枚举值代替
-        setDataType('datasource');
+      if (dataset.type === DatasetTypeEnum.DATASOURCE) { 
+        setDataType(DatasetTypeEnum.DATASOURCE);
       } else {
         // '文件' 都对应 table 类型
-        setDataType('table'); // TODO 使用枚举值代替
+        setDataType(DatasetTypeEnum.FILE);
       }
 
       // 根据icon找到对应的索引
@@ -77,21 +79,7 @@ export function EditDatasetDialog({ open, onOpenChange, dataset, onSuccess }: Ed
 
       if (!newTag) return;
 
-      // TODO 验证提到工具方法
-      if (newTag.length > MAX_TAG_LENGTH) {
-        toast.error(t('dataset.form.tags.lengthExceeded', { maxLength: MAX_TAG_LENGTH }));
-        return;
-      }
-
-      if (tags.length >= MAX_TAGS) {
-        toast.error(t('dataset.form.tags.countExceeded', { maxCount: MAX_TAGS }));
-        return;
-      }
-
-      if (tags.includes(newTag)) {
-        toast.error(t('dataset.form.tags.duplicate'));
-        return;
-      }
+      if (!validateTag(newTag, tags, t)) return;
 
       setTags([...tags, newTag]);
       setTagInput('');
@@ -121,19 +109,13 @@ export function EditDatasetDialog({ open, onOpenChange, dataset, onSuccess }: Ed
 
     setIsSubmitting(true);
     try {
-      // 映射可见性 // TODO 使用枚举值代替
-      const visibilityMap: Record<string, VisibilityEnum> = {
-        private: VisibilityEnum.PRIVATE,
-        team: VisibilityEnum.TEAM,
-        public: VisibilityEnum.PUBLIC,
-      };
 
       const updateDto: DatasetUpdateDto = {
         name: datasetName.trim(),
         description: description.trim(),
         icon: ICON_OPTIONS[selectedIcon]?.emoji,
         iconBg: ICON_OPTIONS[selectedIcon]?.bg,
-        visibility: visibilityMap[visibility] || VisibilityEnum.PRIVATE,
+        visibility: visibility || VisibilityEnum.PRIVATE,
         tags: tags.length > 0 ? tags : undefined,
       };
 
@@ -175,19 +157,19 @@ export function EditDatasetDialog({ open, onOpenChange, dataset, onSuccess }: Ed
 
             <div>
               <Label className='text-sm mb-2 block dark:text-gray-300'>{t('dataset.form.visibilityLabel')}</Label>
-              <Select value={visibility} onValueChange={setVisibility}>
+              <Select value={visibility} onValueChange={value => setVisibility(value as VisibilityEnum)}>
                 <SelectTrigger className='dark:bg-gray-800 dark:border-gray-700 dark:text-white'>
                   <SelectValue placeholder={t('dataset.form.visibilityPlaceholder')} />
-                </SelectTrigger> {/*// TODO 使用枚举message代替*/}
+                </SelectTrigger>
                 <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
-                  <SelectItem value='private' className='dark:text-white'>
-                    {t('dataset.visibility.private')}
+                  <SelectItem value={VisibilityEnum.PRIVATE} className='dark:text-white'>
+                    {getEnumDescription(VisibilityEnum, VisibilityEnum.PRIVATE)}
                   </SelectItem>
-                  <SelectItem value='team' className='dark:text-white'>
-                    {t('dataset.visibility.team')}
+                  <SelectItem value={VisibilityEnum.TEAM} className='dark:text-white'>
+                    {getEnumDescription(VisibilityEnum, VisibilityEnum.TEAM)}
                   </SelectItem>
-                  <SelectItem value='public' className='dark:text-white'>
-                    {t('dataset.visibility.public')}
+                  <SelectItem value={VisibilityEnum.PUBLIC} className='dark:text-white'>
+                    {getEnumDescription(VisibilityEnum, VisibilityEnum.PUBLIC)}
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -273,13 +255,13 @@ export function EditDatasetDialog({ open, onOpenChange, dataset, onSuccess }: Ed
                   e.stopPropagation();
                   // 编辑时禁用切换
                   if (dataset) return;
-                  setDataType('table');
+                  setDataType(DatasetTypeEnum.FILE);
                 }}
                 disabled={!!dataset}
                 className={`p-3 border-2 rounded-lg text-left transition-all relative ${
                   dataset
                     ? 'opacity-50 cursor-not-allowed bg-gray-50 dark:bg-gray-800/50 border-gray-300 dark:border-gray-600'
-                    : dataType === 'table'
+                    : dataType === DatasetTypeEnum.FILE
                       ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 cursor-pointer'
                       : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 cursor-pointer'
                 }`}
@@ -293,13 +275,13 @@ export function EditDatasetDialog({ open, onOpenChange, dataset, onSuccess }: Ed
                     className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-all ${
                       dataset
                         ? 'border-gray-400 dark:border-gray-500'
-                        : dataType === 'table' // TODO 使用枚举值代替
+                        : dataType === DatasetTypeEnum.FILE
                           ? 'border-blue-500'
                           : 'border-gray-300 dark:border-gray-600'
                     }`}
                   >
-                    {dataType === 'table' && !dataset && <div className='w-2.5 h-2.5 rounded-full bg-blue-500' />}
-                    {dataType === 'table' && dataset && (
+                    {dataType === DatasetTypeEnum.FILE && !dataset && <div className='w-2.5 h-2.5 rounded-full bg-blue-500' />}
+                    {dataType === DatasetTypeEnum.FILE && dataset && (
                       <div className='w-2.5 h-2.5 rounded-full bg-gray-400 dark:bg-gray-500' />
                     )}
                   </div>
@@ -320,13 +302,13 @@ export function EditDatasetDialog({ open, onOpenChange, dataset, onSuccess }: Ed
                   e.stopPropagation();
                   // 编辑时禁用切换
                   if (dataset) return;
-                  setDataType('datasource');
+                  setDataType(DatasetTypeEnum.DATASOURCE);
                 }}
                 disabled={!!dataset}
                 className={`p-3 border-2 rounded-lg text-left transition-all relative ${
                   dataset
                     ? 'opacity-50 cursor-not-allowed bg-gray-50 dark:bg-gray-800/50 border-gray-300 dark:border-gray-600'
-                    : dataType === 'datasource'
+                    : dataType === DatasetTypeEnum.DATASOURCE
                       ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 cursor-pointer'
                       : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 cursor-pointer'
                 }`}
@@ -340,13 +322,13 @@ export function EditDatasetDialog({ open, onOpenChange, dataset, onSuccess }: Ed
                     className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-all ${
                       dataset
                         ? 'border-gray-400 dark:border-gray-500'
-                        : dataType === 'datasource'
+                        : dataType === DatasetTypeEnum.DATASOURCE
                           ? 'border-blue-500'
                           : 'border-gray-300 dark:border-gray-600'
                     }`}
                   >
-                    {dataType === 'datasource' && !dataset && <div className='w-2.5 h-2.5 rounded-full bg-blue-500' />}
-                    {dataType === 'datasource' && dataset && (
+                    {dataType === DatasetTypeEnum.DATASOURCE && !dataset && <div className='w-2.5 h-2.5 rounded-full bg-blue-500' />}
+                    {dataType === DatasetTypeEnum.DATASOURCE && dataset && (
                       <div className='w-2.5 h-2.5 rounded-full bg-gray-400 dark:bg-gray-500' />
                     )}
                   </div>

@@ -7,6 +7,7 @@ import Datasets from '@/services/Datasets';
 import { useDataSourceForm } from './hooks/useDataSourceForm';
 import { DataSourceFormContent } from './components/DataSourceFormContent';
 import { useLanguage } from '@/components/ui/LanguageProvider';
+import { DatasourceConnectionStatusEnum } from '@/enums/enums';
 
 interface AddDataSourceDialogProps {
   open: boolean;
@@ -50,7 +51,7 @@ export function AddDataSourceDialog({
   };
 
   const handleSubmit = async () => {
-    if (!validateForm() || connectionStatus !== 'success') {
+    if (!validateForm() || connectionStatus !== DatasourceConnectionStatusEnum.SUCCESS) {
       toast.error(t('dataset.addDialog.testConnectionRequired'));
       return;
     }
@@ -123,7 +124,7 @@ export function AddDataSourceDialog({
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={!canSubmit() || connectionStatus !== 'success'}
+            disabled={!canSubmit() || connectionStatus !== DatasourceConnectionStatusEnum.SUCCESS}
             className='bg-blue-500 hover:bg-blue-600 text-white'
           >
             <Database className='w-4 h-4 mr-2' />
