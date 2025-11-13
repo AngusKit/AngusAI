@@ -17,7 +17,7 @@ export function UsageDetails() {
           color: 'bg-blue-500',
         },
         {
-          label: '文本生成',
+          label: '内容创作',
           percentage: 28,
           trend: null,
           color: 'bg-purple-500',

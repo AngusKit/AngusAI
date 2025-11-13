@@ -176,4 +176,8 @@ public class ApplicationConfig {
     @Schema(description = "启用API")
     private Boolean apiEnabled;
   }
+
+  public void checkValid(){
+    // TODO
+  }
 }

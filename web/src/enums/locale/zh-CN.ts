@@ -151,9 +151,9 @@ export const enumTranslations = {
   },
   ApplicationCategoryEnum: {
     CHATBOT: '聊天机器人',
-    ASSISTANT: '智能助手',
-    WORKFLOW: '工作流',
-    KNOWLEDGE_BASE: '知识库',
+    CONTENT_CREATION: '内容创作',
+    KNOWLEDGE_QA: '知识问题',
+    AGENT_PROXY: '智能代理',
   },
   ApplicationStatusEnum: {
     DRAFT: '草稿',

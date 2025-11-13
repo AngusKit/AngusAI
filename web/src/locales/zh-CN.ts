@@ -611,7 +611,7 @@ export const zhCN = {
     previewCompleteDesc: '测试并完成',
     chatbot: '聊天助手',
     chatbotDesc: '创建智能对话助手，支持多轮对话和上下文理解',
-    textGen: '文本生成',
+    textGen: '内容创作',
     textGenDesc: '生成各类文本内容，如文章、摘要、翻译等',
     knowledgeBot: '知识问答',
     knowledgeBotDesc: '基于知识库的专业问答系统',

@@ -3,6 +3,7 @@ package cloud.xcan.angus.core.ai.application.cmd.application.impl;
 import static cloud.xcan.angus.core.ai.application.converter.ApplicationConverter.toApplicationShare;
 import static cloud.xcan.angus.core.ai.application.converter.ApplicationConverter.toDuplicateApplication;
 import static cloud.xcan.angus.core.ai.application.converter.ApplicationConverter.updateAssociatedIds;
+import static cloud.xcan.angus.spec.utils.ObjectUtils.isNull;
 
 import cloud.xcan.angus.core.ai.application.cmd.application.ApplicationCmd;
 import cloud.xcan.angus.core.ai.application.query.application.ApplicationQuery;
@@ -13,6 +14,7 @@ import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
+import cloud.xcan.angus.remote.message.ProtocolException;
 import cloud.xcan.angus.remote.message.http.ResourceExisted;
 import cloud.xcan.angus.spec.annotations.DoInFuture;
 import cloud.xcan.angus.spec.utils.ObjectUtils;
@@ -122,7 +124,7 @@ public class ApplicationCmdImpl extends CommCmd<Application, Long> implements Ap
         // 获取源应用并检查是否存在
         applicationDb = applicationQuery.findAndCheck(id);
 
-        // 检查应用关联资源（模型、知识库、数据集、工作流）是否存在 TODO
+        // 检查应用关联资源（模型、知识库、数据集、接口集、工作流）是否存在 TODO
       }
 
       @Override
@@ -148,6 +150,13 @@ public class ApplicationCmdImpl extends CommCmd<Application, Long> implements Ap
       protected void checkParams() {
         // 获取源应用并检查是否存在
         applicationDb = applicationQuery.findAndCheck(id);
+
+        // 检查是否已经正确配置应用
+        if (isNull(applicationDb.getConfig())){
+          throw ProtocolException.of("应用未配置，请先配置应用");
+        }
+        // TODO
+        applicationDb.getConfig().checkValid();
       }
 
       @Override

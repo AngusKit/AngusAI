@@ -82,7 +82,7 @@ export function RecentApplications({ onNavigate }: { onNavigate?: (page: string)
       description: 'AI 内容创作工具，自动生成高质量文章，广泛支持多种写作场景',
       fullDescription:
         'AI 内容创作工具，自动生成高质量文章。支持多种写作风格和场景，包括新闻稿、营销文案、技术文档等。采用GPT-4模型，生成内容流畅自然，符合SEO优化标准。提供多种模板和自定义选项。',
-      tags: [{ label: '文本生成', color: 'bg-green-100 text-green-700' }],
+      tags: [{ label: '内容创作', color: 'bg-green-100 text-green-700' }],
       usage: '已 856 次调用',
       iconBg: 'bg-purple-500',
       createdAt: '2024-01-20',

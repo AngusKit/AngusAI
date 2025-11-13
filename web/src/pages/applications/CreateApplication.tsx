@@ -206,7 +206,7 @@ export function CreateApplication({ onBack }: { onBack: () => void }) {
     },
     {
       id: 'text-generation' as AppType,
-      name: '文本生成',
+      name: '内容创作',
       description: 'AI 内容创作工具，自动生成文章、广告文案等',
       icon: Sparkles,
       iconBg: 'bg-gradient-to-br from-purple-500 to-purple-600',

@@ -88,7 +88,7 @@ public class Application extends TenantAuditingEntity<Application, Long> {
   @Column(columnDefinition = "json", name = "api_collection_ids")
   private List<Long> apiCollectionIds;
 
-  @Column( name = "workflow_ids")
+  @Column( name = "workflow_id")
   private Long workflowId;
 
   // 发布设置

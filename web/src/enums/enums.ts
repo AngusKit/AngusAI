@@ -198,9 +198,9 @@ export enum DatasourceTypeEnum {
 /** 应用分类 */
 export enum ApplicationCategoryEnum {
   CHATBOT = 'CHATBOT',
-  ASSISTANT = 'ASSISTANT',
-  WORKFLOW = 'WORKFLOW',
-  KNOWLEDGE_BASE = 'KNOWLEDGE_BASE',
+  CONTENT_CREATION = 'CONTENT_CREATION',
+  KNOWLEDGE_QA = 'KNOWLEDGE_QA',
+  AGENT_PROXY = 'AGENT_PROXY',
 }
 
 /** 应用状态 */

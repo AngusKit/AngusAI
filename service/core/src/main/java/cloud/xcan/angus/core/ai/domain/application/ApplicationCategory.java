@@ -1,14 +1,10 @@
 package cloud.xcan.angus.core.ai.domain.application;
 
-import cloud.xcan.angus.spec.experimental.EndpointRegister;
-import cloud.xcan.angus.spec.locale.EnumMessage;
-
-@EndpointRegister
-public enum ApplicationCategory implements EnumMessage<String> {
+public enum ApplicationCategory {
   CHATBOT, // 聊天机器人
-  ASSISTANT, // 智能助手
-  WORKFLOW, // 工作流
-  KNOWLEDGE_BASE; // 知识库
+  CONTENT_CREATION, // 内容创作
+  KNOWLEDGE_QA, // 知识问答
+  AGENT_PROXY; // 智能体代理
 
   public String getValue() {
     return this.name();

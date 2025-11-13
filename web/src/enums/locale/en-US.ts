@@ -151,9 +151,9 @@ export const enumTranslations = {
   },
   ApplicationCategoryEnum: {
     CHATBOT: 'Chatbot',
-    ASSISTANT: 'Assistant',
-    WORKFLOW: 'Workflow',
-    KNOWLEDGE_BASE: 'Knowledge Base',
+    CONTENT_CREATION: 'Content Creation',
+    KNOWLEDGE_QA: 'Knowledge QA',
+    AGENT_PROXY: 'Agent Proxy',
   },
   ApplicationStatusEnum: {
     DRAFT: 'Draft',

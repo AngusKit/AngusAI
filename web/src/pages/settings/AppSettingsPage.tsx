@@ -339,7 +339,7 @@ export function AppSettingsPage({ appId, appName = '智能客服助手', onBack 
                     </SelectTrigger>
                     <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
                       <SelectItem value='chatbot'>智能助手</SelectItem>
-                      <SelectItem value='text-generation'>文本生成</SelectItem>
+                      <SelectItem value='text-generation'>内容创作</SelectItem>
                       <SelectItem value='knowledge'>知识问答</SelectItem>
                       <SelectItem value='other'>其他</SelectItem>
                     </SelectContent>
