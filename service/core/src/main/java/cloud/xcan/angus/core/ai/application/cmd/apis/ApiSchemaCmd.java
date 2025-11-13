@@ -5,6 +5,9 @@ import io.swagger.v3.oas.models.OpenAPI;
 
 public interface ApiSchemaCmd {
 
+  void init(Long collectionId);
+
   void updateSchema(ApiSchema apiSchema, OpenAPI openApi, boolean mergeSchema,
       boolean cover);
+
 }

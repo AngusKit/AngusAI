@@ -24,8 +24,6 @@ public class ApiCollectionAssembler {
     collection.setDescription(dto.getDescription());
     collection.setSource(ApiCollectionSource.MANUAL);
     collection.setVisibility(nullSafe(dto.getVisibility(), Visibility.PRIVATE));
-    collection.setServer(dto.getServer());
-    collection.setSecurity(dto.getSecurity());
     return collection;
   }
 
@@ -35,8 +33,6 @@ public class ApiCollectionAssembler {
     collection.setName(dto.getName());
     collection.setDescription(dto.getDescription());
     collection.setVisibility(dto.getVisibility());
-    collection.setServer(dto.getServer());
-    collection.setSecurity(dto.getSecurity());
     return collection;
   }
 
@@ -50,12 +46,12 @@ public class ApiCollectionAssembler {
 
     // 设置服务器配置
     vo.setHasServerConfig(
-        collection.getServer() != null && isNotEmpty(collection.getServer().getUrl()));
-    vo.setServer(collection.getServer());
+        collection.getServers() != null && isNotEmpty(collection.getServers()));
+    vo.setServers(collection.getServers());
 
     // 设置安全配置
-    vo.setHasSecurityConfig(collection.getSecurity() != null);
-    vo.setSecurity(collection.getSecurity());
+    vo.setHasSecurityConfig(collection.getSecurities() != null);
+    vo.setSecurities(collection.getSecurities());
 
     // 设置统计信息
     vo.setEndpointsCount(collection.getEndpointsCount());
@@ -77,9 +73,6 @@ public class ApiCollectionAssembler {
     vo.setDescription(collection.getDescription());
     vo.setSource(collection.getSource());
     vo.setVisibility(collection.getVisibility());
-    vo.setHasServerConfig(
-        collection.getServer() != null && isNotEmpty(collection.getServer().getUrl()));
-    vo.setHasSecurityConfig(collection.getSecurity() != null);
 
     // 设置统计信息
     vo.setEndpointsCount(collection.getEndpointsCount());

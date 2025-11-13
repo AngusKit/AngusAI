@@ -6,6 +6,7 @@ import cloud.xcan.angus.remote.vo.TenantAuditingVo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
+import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -36,13 +37,13 @@ public class ApiCollectionDetailVo extends TenantAuditingVo {
   private Boolean hasServerConfig;
 
   @Schema(description = "服务器配置")
-  private Server server;
+  private List<Server> servers;
 
   @Schema(description = "是否配置了安全认证")
   private Boolean hasSecurityConfig;
 
   @Schema(description = "安全认证配置")
-  private SecurityScheme security;
+  private List<SecurityScheme> securities;
 
   @Schema(description = "端点总数")
   private Long endpointsCount;

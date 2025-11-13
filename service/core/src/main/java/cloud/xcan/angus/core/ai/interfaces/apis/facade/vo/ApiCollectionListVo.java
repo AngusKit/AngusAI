@@ -36,11 +36,5 @@ public class ApiCollectionListVo extends TenantAuditingVo {
   @Schema(description = "可见性")
   private Visibility visibility;
 
-  @Schema(description = "是否配置了服务器")
-  private Boolean hasServerConfig;
-
-  @Schema(description = "是否配置了安全认证")
-  private Boolean hasSecurityConfig;
-
 }
 
