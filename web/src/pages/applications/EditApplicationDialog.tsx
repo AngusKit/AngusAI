@@ -6,17 +6,19 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { ApplicationStatusEnum, ApplicationCategoryEnum } from '@/enums/enums';
+import { getEnumDescription } from '@/enums/utils';
 import { useState, useEffect, useRef } from 'react';
 import { MessageSquare, Sparkles, Database, Bot, Code, Zap, Heart, Star, Users, FileText, Calendar, Settings, Bell, Globe, Lock, Mail, Phone, Camera, Image, Music, Video, BookOpen, Briefcase, Coffee, ShoppingCart, CreditCard, Gift, Trophy, Target, Rocket, Lightbulb, Brain, Cpu, Cloud, Server, Terminal, Package, Wrench, Shield, ChevronLeft, ChevronRight, } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Application {
-  id: number;
+  id: string;
   name: string;
   description: string;
   icon: any;
   iconBgColor: string;
-  status: '草稿' | '已发布' | '已暂停';
+  status: ApplicationStatusEnum;
   isStarred: boolean;
   tags: { label: string; color: string }[];
   visits: string;
@@ -27,7 +29,7 @@ interface EditApplicationDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   application: Application | null;
-  onSave: (updatedApp: Partial<Application>) => void;
+  onSave: (updatedApp: Partial<Application>) => Promise<void>;
 }
 
 const iconOptions = [
@@ -275,14 +277,14 @@ export function EditApplicationDialog({ open, onOpenChange, application, onSave 
                 <div className='text-sm dark:text-gray-300 mb-1'>当前状态</div>
                 <Badge
                   className={
-                    application.status === '已发布'
+                    application.status === ApplicationStatusEnum.PUBLISHED
                       ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                      : application.status === '已暂停'
+                      : application.status === ApplicationStatusEnum.PAUSED
                         ? 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400'
                         : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
                   }
                 >
-                  {application.status}
+                  {getEnumDescription(ApplicationStatusEnum, application.status)}
                 </Badge>
               </div>
               <div>

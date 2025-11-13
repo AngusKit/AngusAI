@@ -6,15 +6,17 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { ApplicationStatusEnum } from '@/enums/enums';
 import { Copy, Link2, Mail, QrCode, Globe, Lock, Users, Eye } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { getEnumDescription } from '@/enums/utils';
 
 interface Application {
-  id: number;
+  id: string;
   name: string;
   description: string;
-  status: '草稿' | '已发布' | '已暂停';
+  status: ApplicationStatusEnum;
 }
 
 interface ShareApplicationDialogProps {
@@ -86,7 +88,7 @@ export function ShareApplicationDialog({ open, onOpenChange, application }: Shar
 
   if (!application) return null;
 
-  const canShare = application.status === '已发布';
+  const canShare = application.status === ApplicationStatusEnum.PUBLISHED;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -102,7 +104,7 @@ export function ShareApplicationDialog({ open, onOpenChange, application }: Shar
               <Lock className='w-5 h-5 text-yellow-600 dark:text-yellow-500 flex-shrink-0 mt-0.5' />
               <div>
                 <p className='text-sm text-yellow-800 dark:text-yellow-200'>
-                  应用当前状态为「{application.status}」，需要发布后才能分享
+                  应用当前状态为「{getEnumDescription(ApplicationStatusEnum, application.status)}」，需要发布后才能分享
                 </p>
                 <p className='text-xs text-yellow-700 dark:text-yellow-300 mt-1'>请先发布应用，然后再进行分享</p>
               </div>
