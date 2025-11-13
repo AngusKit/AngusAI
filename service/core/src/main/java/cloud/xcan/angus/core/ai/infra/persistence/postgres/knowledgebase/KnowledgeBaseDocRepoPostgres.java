@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface KnowledgeBaseDocRepoPostgres extends KnowledgeBaseDocRepo {
 
-  @Query(value = "SELECT COUNT(DISTINCT d.id) FROM knowledge_base_doc d " +
+  @Query(value = "SELECT COUNT(DISTINCT d.id) FROM knowledge_base_document d " +
       "JOIN knowledge_base kb ON d.knowledge_base_id = kb.id " +
       "JOIN application app ON CAST(kb.id AS string) = ANY(CAST(app.knowledge_base_ids AS text[]))", nativeQuery = true)
   Long countActiveFiles();
