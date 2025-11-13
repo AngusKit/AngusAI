@@ -26,7 +26,7 @@ import { DatasetDataListVo } from '@/services/DatasetsDataTypes';
 import { DatasetDataTypeEnum, DatasetTypeEnum, VisibilityEnum, DatasetDataStatusEnum, DatasourceTypeEnum, EnabledStatusEnum } from '@/enums/enums';
 import { useLanguage } from '@/components/ui/LanguageProvider';
 import { getEnumDescription } from '@/enums/utils';
-import { DATASET_STATUS_COLORS } from '@/utils/PagesUtils';
+import { ENABLED_STATUS_COLOR } from '@/utils/PagesUtils';
 import { FILE_MAX_SIZE_BYTES, FILE_MAX_SIZE_MB } from '@/utils/configConstant';
 
 interface DatasetItem {
@@ -266,7 +266,7 @@ export function Dataset() {
       dataCount,
       size,
       statusKey: vo.enabled ? 'common.status.enabled' : 'common.status.disabled',
-      statusColor: vo.enabled ? DATASET_STATUS_COLORS[EnabledStatusEnum.ENABLED] : DATASET_STATUS_COLORS[EnabledStatusEnum.DISABLED],
+      statusColor: vo.enabled ? ENABLED_STATUS_COLOR[EnabledStatusEnum.ENABLED] : ENABLED_STATUS_COLOR[EnabledStatusEnum.DISABLED],
       enabled: vo.enabled || false,
       visibility: vo.visibility || VisibilityEnum.PRIVATE,
       modifiedDate,
@@ -450,7 +450,7 @@ export function Dataset() {
               ...ds,
               enabled: newEnabled,
               statusKey: newEnabled ? 'common.status.enabled' : 'common.status.disabled',
-              statusColor: newEnabled ? DATASET_STATUS_COLORS[EnabledStatusEnum.ENABLED] : DATASET_STATUS_COLORS[EnabledStatusEnum.DISABLED],
+              statusColor: newEnabled ? ENABLED_STATUS_COLOR[EnabledStatusEnum.ENABLED] : ENABLED_STATUS_COLOR[EnabledStatusEnum.DISABLED],
             };
           }
           return ds;

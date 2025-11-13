@@ -3,7 +3,7 @@ import {DatasetDataListVo} from '@/services/DatasetsDataTypes.ts';
 import { getEnumDescription } from '@/enums/utils';
 import { DatasetTypeEnum, DatasetDataTypeEnum, DatasetDataStatusEnum, VisibilityEnum, EnabledStatusEnum } from '@/enums/enums';
 import { DATA_TYPE_ICON_MAP, DATA_STATUS_COLOR_MAP, DATA_TYPE_COLOR_MAP } from './constants';
-import { DATASET_STATUS_COLORS } from '@/utils/PagesUtils';
+import { ENABLED_STATUS_COLOR } from '@/utils/PagesUtils';
 
 /** 数据集项接口 */
 export interface DatasetItem {
@@ -75,8 +75,8 @@ export function convertDatasetVoToItem(vo: DatasetListVo): DatasetItem {
       ? getEnumDescription(EnabledStatusEnum, EnabledStatusEnum.ENABLED)
       : getEnumDescription(EnabledStatusEnum, EnabledStatusEnum.DISABLED),
     statusColor: vo.enabled
-      ? DATASET_STATUS_COLORS[EnabledStatusEnum.ENABLED]
-      : DATASET_STATUS_COLORS[EnabledStatusEnum.DISABLED],
+      ? ENABLED_STATUS_COLOR[EnabledStatusEnum.ENABLED]
+      : ENABLED_STATUS_COLOR[EnabledStatusEnum.DISABLED],
     enabled: vo.enabled || false,
     visibility: vo.visibility || VisibilityEnum.PRIVATE,  
     modifiedDate,

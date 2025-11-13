@@ -75,7 +75,7 @@ export function formatToHumanString(count: number): string {
 /**
  * 启用/禁用状态颜色映射
  */
-export const DATASET_STATUS_COLORS: Record<EnabledStatusEnum, string> = {
+export const ENABLED_STATUS_COLOR: Record<EnabledStatusEnum, string> = {
   [EnabledStatusEnum.ENABLED]: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
   [EnabledStatusEnum.DISABLED]: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
 };
