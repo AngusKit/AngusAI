@@ -5,7 +5,10 @@ import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.parseEndDate;
 import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.parseStartDate;
 import static cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder.getMatchSearchFields;
 import static cloud.xcan.angus.core.utils.CoreUtils.buildVoPageResult;
+import static cloud.xcan.angus.core.utils.ServletUtils.buildDownloadResourceResponseEntity;
+import static cloud.xcan.angus.spec.utils.ObjectUtils.nullSafe;
 import static java.util.Objects.nonNull;
+import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM;
 
 import cloud.xcan.angus.core.ai.application.cmd.apis.ApiCollectionCmd;
 import cloud.xcan.angus.core.ai.application.query.apis.ApiCollectionQuery;
@@ -14,9 +17,9 @@ import cloud.xcan.angus.core.ai.application.query.apis.ApiEndpointCallLogQuery;
 import cloud.xcan.angus.core.ai.application.query.apis.ApiEndpointQuery;
 import cloud.xcan.angus.core.ai.application.query.apis.ApiSchemaQuery;
 import cloud.xcan.angus.core.ai.domain.apis.ApiCollection;
-import cloud.xcan.angus.core.ai.domain.apis.ApiComponentType;
 import cloud.xcan.angus.core.ai.domain.apis.ApiEndpoint;
 import cloud.xcan.angus.core.ai.domain.apis.ApiSchema;
+import cloud.xcan.angus.core.ai.domain.apis.ExportApiFormat;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.ApiCollectionFacade;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionFindDto;
@@ -31,9 +34,9 @@ import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.PageResult;
 import cloud.xcan.angus.remote.dto.SimpleStatisticsDto;
 import io.swagger.v3.oas.models.security.SecurityScheme;
-import io.swagger.v3.oas.models.servers.Server;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -80,7 +83,7 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
   public ApiCollectionDetailVo create(ApiCollectionCreateDto dto) {
     ApiCollection collection = ApiCollectionAssembler.toCreateDomain(dto);
     ApiCollection saved = apiCollectionCmd.create(collection);
-    return ApiCollectionAssembler.toVo(saved);
+    return ApiCollectionAssembler.toDetailVo(saved);
   }
 
   @NameJoin
@@ -90,7 +93,7 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     ApiCollection saved = apiCollectionCmd.update(collection);
     // 设置统计信息
     setDetailInfo(saved);
-    return ApiCollectionAssembler.toVo(saved);
+    return ApiCollectionAssembler.toDetailVo(saved);
   }
 
   @Override
@@ -104,7 +107,7 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     ApiCollection saved = apiCollectionQuery.findAndCheck(id);
     // 设置统计信息
     setDetailInfo(saved);
-    return ApiCollectionAssembler.toVo(saved);
+    return ApiCollectionAssembler.toDetailVo(saved);
   }
 
   @NameJoin
@@ -137,23 +140,21 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
   @NameJoin
   @Override
   public ApiCollectionDetailVo importCollection(Long id, ApiCollectionImportDto dto) {
-    ApiCollection saved = apiCollectionCmd.importCollection(id, dto);
+    ApiCollection saved = apiCollectionCmd.imports(id, dto);
     // 设置统计信息
     setDetailInfo(saved);
-    return ApiCollectionAssembler.toVo(saved);
+    return ApiCollectionAssembler.toDetailVo(saved);
   }
 
   @Override
   public ResponseEntity<org.springframework.core.io.Resource> exportOpenApi(Long id,
-      String format, Boolean includeDisabled, HttpServletResponse response) {
-    return null; // TODO
+      ExportApiFormat format, Boolean includeDisabled, HttpServletResponse response) {
+    File file = apiCollectionCmd.export(id, format, nullSafe(includeDisabled, true));
+    return buildDownloadResourceResponseEntity(-1, APPLICATION_OCTET_STREAM, file);
   }
 
   /**
    * 获取接口集统计信息
-   *
-   * @param dto 统计参数，注意：接口定义中参数类型可能有误，实际应该使用 ActivityStatisticsDto
-   * @return 统计信息VO
    */
   @Override
   public ApiCollectionStatisticsVo getStatistics(SimpleStatisticsDto dto) {
@@ -326,10 +327,8 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     ApiSchema apiSchema = apiSchemaQuery.findByCollectionId(collection.getId());
     collection.setServers(nonNull(apiSchema) ? apiSchema.getServers() : null);
 
-    List<SecurityScheme> securities = apiComponentQuery.findByCollectionIdAndType(
-            collection.getId(), ApiComponentType.securitySchemes)
-        .stream().map(x -> x.toComponent(SecurityScheme.class))
-        .collect(Collectors.toList());
+    Map<String, SecurityScheme> securities = apiSchemaQuery.getSecuritySchemeMap(
+        collection.getId());
     collection.setSecurities(securities);
   }
 

@@ -19,4 +19,9 @@ public class ApiComponentQueryImpl implements ApiComponentQuery {
     return apiComponentRepo.findByCollectionIdAndType(collectionId, type);
   }
 
+  @Override
+  public List<ApiComponent> findByCollectionId(Long collectionId) {
+    return apiComponentRepo.findByCollectionId(collectionId);
+  }
+
 }

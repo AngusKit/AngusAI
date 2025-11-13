@@ -22,4 +22,7 @@ public interface ApiComponentRepo extends BaseRepository<ApiComponent, Long> {
   @Modifying
   void deleteByCollectionId(Long collectionId);
 
+  @Modifying
+  void deleteByCollectionIdAndType(Long collectionId, ApiComponentType type);
+
 }

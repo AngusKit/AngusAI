@@ -433,6 +433,16 @@ public class ApiSchemaConverter {
         .setSchemaHash(extension.hashCode());
   }
 
+  public static List<ApiComponent> toCollectionSecurityComp(Long collectionId,
+      Map<String, SecurityScheme> securities) {
+    List<ApiComponent> comps = new ArrayList<>();
+    for (String key : securities.keySet()) {
+      SecurityScheme securityScheme = securities.get(key);
+      comps.add(toCollectionSecuritySchemaComp(collectionId, key, securityScheme));
+    }
+    return comps;
+  }
+
   /**
    * <p>
    * Convert a JSON model string to a component object.
@@ -456,4 +466,5 @@ public class ApiSchemaConverter {
     assertNotNull(t, "The component model is not in a valid format");
     return t;
   }
+
 }

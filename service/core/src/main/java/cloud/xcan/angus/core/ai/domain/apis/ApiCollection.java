@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import java.util.List;
+import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -46,7 +47,7 @@ public class ApiCollection extends TenantAuditingEntity<ApiCollection, Long> {
   @Transient
   private List<Server> servers;
   @Transient
-  private List<SecurityScheme> securities;
+  private Map<String, SecurityScheme> securities;
   @Transient
   private Long endpointsCount = 0L;
   @Transient

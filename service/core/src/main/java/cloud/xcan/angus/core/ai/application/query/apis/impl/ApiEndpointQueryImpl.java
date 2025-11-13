@@ -121,8 +121,13 @@ public class ApiEndpointQueryImpl implements ApiEndpointQuery {
   }
 
   @Override
-  public List<ApiEndpoint> findByCollectionId(Long id) {
-    return apiEndpointRepo.findByCollectionId(id);
+  public List<ApiEndpoint> findByCollectionId(Long collectionId) {
+    return apiEndpointRepo.findByCollectionId(collectionId);
+  }
+
+  @Override
+  public List<ApiEndpoint> findByCollectionIdAndEnabled(Long collectionId, boolean enabled) {
+    return apiEndpointRepo.findByCollectionIdAndEnabled(collectionId, enabled);
   }
 
 }

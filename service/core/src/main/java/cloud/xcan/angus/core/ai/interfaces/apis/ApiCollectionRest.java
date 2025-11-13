@@ -1,5 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.apis;
 
+import cloud.xcan.angus.core.ai.domain.apis.ExportApiFormat;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.ApiCollectionFacade;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionFindDto;
@@ -120,8 +121,8 @@ public class ApiCollectionRest {
   @PostMapping(value = "/{id}/export")
   public ResponseEntity<org.springframework.core.io.Resource> exportOpenApi(
       @Parameter(description = "接口集ID", required = true) @PathVariable Long id,
-      @Parameter(description = "导出格式") @RequestParam(required = false, defaultValue = "json") String format,
-      @Parameter(description = "是否包含禁用的端点") @RequestParam(required = false, defaultValue = "false") Boolean includeDisabled,
+      @Parameter(description = "导出格式") @RequestParam(required = false, defaultValue = "json") ExportApiFormat format,
+      @Parameter(description = "是否包含禁用的端点") @RequestParam(required = false, defaultValue = "true") Boolean includeDisabled,
       HttpServletResponse response) {
     return apiCollectionFacade.exportOpenApi(id, format, includeDisabled, response);
   }

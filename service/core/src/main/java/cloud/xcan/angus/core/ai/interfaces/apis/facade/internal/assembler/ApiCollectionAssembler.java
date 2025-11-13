@@ -36,7 +36,7 @@ public class ApiCollectionAssembler {
     return collection;
   }
 
-  public static ApiCollectionDetailVo toVo(ApiCollection collection) {
+  public static ApiCollectionDetailVo toDetailVo(ApiCollection collection) {
     ApiCollectionDetailVo vo = new ApiCollectionDetailVo();
     vo.setId(collection.getId());
     vo.setName(collection.getName());

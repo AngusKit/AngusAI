@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
 import java.util.List;
+import java.util.Map;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -43,7 +44,7 @@ public class ApiCollectionDetailVo extends TenantAuditingVo {
   private Boolean hasSecurityConfig;
 
   @Schema(description = "安全认证配置")
-  private List<SecurityScheme> securities;
+  private Map<String, SecurityScheme> securities;
 
   @Schema(description = "端点总数")
   private Long endpointsCount;
