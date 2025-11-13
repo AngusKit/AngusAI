@@ -1,6 +1,7 @@
 package cloud.xcan.angus.core.ai.application.query.apis;
 
 import cloud.xcan.angus.core.ai.domain.apis.ApiCollection;
+import cloud.xcan.angus.core.ai.domain.apis.ExportApiFormat;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,5 +26,10 @@ public interface ApiCollectionQuery {
    * 统计接口集总数
    */
   Long countTotalCollections();
+
+  /**
+   * 获取接口集OpenAPI规范详情
+   */
+  String openapiDetail(Long id, ExportApiFormat format, Boolean includeDisabled);
 }
 

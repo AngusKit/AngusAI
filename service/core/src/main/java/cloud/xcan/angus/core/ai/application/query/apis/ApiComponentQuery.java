@@ -7,4 +7,6 @@ import java.util.List;
 public interface ApiComponentQuery {
 
   List<ApiComponent> findByCollectionIdAndType(Long collectionId, ApiComponentType type);
+
+  List<ApiComponent> findByCollectionId(Long collectionId);
 }

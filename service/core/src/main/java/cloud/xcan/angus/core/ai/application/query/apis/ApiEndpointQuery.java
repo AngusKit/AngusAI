@@ -67,6 +67,11 @@ public interface ApiEndpointQuery {
   /**
    * 根据接口集ID查询所有端点
    */
-  List<ApiEndpoint> findByCollectionId(Long id);
+  List<ApiEndpoint> findByCollectionId(Long collectionId);
+
+  /**
+   * 根据接口集ID和启用状态查询端点
+   */
+  List<ApiEndpoint> findByCollectionIdAndEnabled(Long collectionId, boolean enabled);
 }
 

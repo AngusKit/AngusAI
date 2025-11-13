@@ -1,5 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.apis.facade;
 
+import cloud.xcan.angus.core.ai.domain.apis.ExportApiFormat;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionFindDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionImportDto;
@@ -46,7 +47,7 @@ public interface ApiCollectionFacade {
   /**
    * 导出OpenAPI规范
    */
-  ResponseEntity<Resource> exportOpenApi(Long id, String format, Boolean includeDisabled,
+  ResponseEntity<Resource> exportOpenApi(Long id, ExportApiFormat format, Boolean includeDisabled,
       HttpServletResponse response);
 
   /**

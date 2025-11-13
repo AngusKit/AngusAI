@@ -2,10 +2,12 @@ package cloud.xcan.angus.core.ai.application.cmd.apis.impl;
 
 import static cloud.xcan.angus.core.ai.domain.Constants.API_COLLECTION_MAX_FILE_BYTE;
 import static cloud.xcan.angus.core.ai.domain.Constants.API_COLLECTION_MAX_FILE_MB;
-import static cloud.xcan.angus.core.ai.infra.util.ApiImportUtils.checkAndParseOpenApi;
-import static cloud.xcan.angus.core.ai.infra.util.ApiImportUtils.getImportTmpPath;
+import static cloud.xcan.angus.core.ai.infra.util.ApiUtils.checkAndParseOpenApi;
+import static cloud.xcan.angus.core.ai.infra.util.ApiUtils.getExportTmpPath;
+import static cloud.xcan.angus.core.ai.infra.util.ApiUtils.getImportTmpPath;
 import static cloud.xcan.angus.core.biz.ProtocolAssert.assertNotEmpty;
 import static cloud.xcan.angus.core.biz.ProtocolAssert.assertTrue;
+import static cloud.xcan.angus.spec.experimental.StandardCharsets.UTF_8;
 import static cloud.xcan.angus.spec.utils.ObjectUtils.isEmpty;
 import static cloud.xcan.angus.spec.utils.ObjectUtils.nullSafe;
 import static cloud.xcan.angus.spec.utils.ObjectUtils.stringSafe;
@@ -27,6 +29,7 @@ import cloud.xcan.angus.core.ai.domain.apis.ApiEndpoint;
 import cloud.xcan.angus.core.ai.domain.apis.ApiSchema;
 import cloud.xcan.angus.core.ai.domain.apis.ApiSchemaRepo;
 import cloud.xcan.angus.core.ai.domain.apis.ConflictStrategy;
+import cloud.xcan.angus.core.ai.domain.apis.ExportApiFormat;
 import cloud.xcan.angus.core.ai.domain.apis.ImportApiStrategy;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionImportDto;
 import cloud.xcan.angus.core.biz.BizTemplate;
@@ -152,7 +155,7 @@ public class ApiCollectionCmdImpl extends CommCmd<ApiCollection, Long> implement
   }
 
   @Override
-  public ApiCollection importCollection(Long id, ApiCollectionImportDto dto) {
+  public ApiCollection imports(Long id, ApiCollectionImportDto dto) {
     return new BizTemplate<ApiCollection>() {
       ApiCollection apiCollectionDb;
       final MultipartFile file = dto.getFile();
@@ -223,6 +226,34 @@ public class ApiCollectionCmdImpl extends CommCmd<ApiCollection, Long> implement
         apiCollectionRepo.save(apiCollectionDb);
 
         return apiCollectionDb;
+      }
+    }.execute();
+  }
+
+  @Override
+  public File export(Long id, ExportApiFormat format, Boolean includeDisabled) {
+    return new BizTemplate<File>() {
+      ApiCollection apiCollectionDb;
+
+      @Override
+      protected void checkParams() {
+        // 检查接口集是否存在
+        apiCollectionDb = apiCollectionQuery.findAndCheck(id);
+      }
+
+      @Override
+      protected File process() {
+        File tmpPath = getExportTmpPath(null);
+        File exportFile = new File(tmpPath.getPath() + File.separator
+            + apiCollectionDb.getName() + "." + format.name());
+        String content = apiCollectionQuery.openapiDetail(id, format, includeDisabled);
+        try {
+          FileUtils.writeStringToFile(exportFile, content, UTF_8);
+        } catch (IOException e) {
+          throw SysException.of("Exception write export file, cause: "
+              + e.getMessage(), ExceptionLevel.URGENT);
+        }
+        return exportFile;
       }
     }.execute();
   }

@@ -1,12 +1,18 @@
 package cloud.xcan.angus.core.ai.domain.apis;
 
+import cloud.xcan.angus.core.ai.domain.apis.converter.ExternalDocConverter;
+import cloud.xcan.angus.core.ai.domain.apis.converter.SecurityRequirementConverter;
 import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
+import io.swagger.v3.oas.models.ExternalDocumentation;
+import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem.HttpMethod;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -54,6 +60,11 @@ public class ApiEndpoint extends TenantAuditingEntity<ApiEndpoint, Long> {
   @Column(name = "enabled", nullable = false)
   private Boolean enabled = true;
 
+  /**
+   * @see Operation#getDeprecated()
+   */
+  private Boolean deprecated;
+
   @Type(JsonType.class)
   @Column(columnDefinition = "json", name = "tags")
   private List<String> tags;
@@ -69,6 +80,20 @@ public class ApiEndpoint extends TenantAuditingEntity<ApiEndpoint, Long> {
   @Type(JsonType.class)
   @Column(columnDefinition = "json", name = "responses")
   private Map<String, ApiResponse> responses;
+
+  /**
+   * @see Operation#getSecurity()
+   */
+  @Convert(converter = SecurityRequirementConverter.class)
+  @Column(name = "security")
+  private List<SecurityRequirement> security;
+
+  /**
+   * @see Operation#getExternalDocs()
+   */
+  @Convert(converter = ExternalDocConverter.class)
+  @Column(name = "external_docs")
+  private ExternalDocumentation externalDocs;
 
   @Column(name = "schema_hash")
   private int schemaHash;
