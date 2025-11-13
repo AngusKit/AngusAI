@@ -33,7 +33,7 @@ export function EditVectorStoreDialog({
   onSubmit,
   onReset,
 }: EditVectorStoreDialogProps) {
-  const { language } = useLanguage();
+  const { t } = useLanguage();
 
   const handleCancel = () => {
     onOpenChange(false);
@@ -49,10 +49,10 @@ export function EditVectorStoreDialog({
       <DialogContent className='max-w-2xl dark:bg-gray-800'>
         <DialogHeader>
           <DialogTitle className='dark:text-white'>
-            {language === 'zh-CN' ? '编辑向量存储源' : 'Edit Vector Store'}
+            {t('vector.editDialog.title')}
           </DialogTitle>
           <DialogDescription>
-            {language === 'zh-CN' ? '修改向量数据库配置' : 'Modify vector database configuration'}
+            {t('vector.editDialog.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -60,17 +60,16 @@ export function EditVectorStoreDialog({
           <VectorStoreFormFields
             formData={formData}
             onFormDataChange={onFormDataChange}
-            language={language}
             isEdit={true}
           />
         </ScrollArea>
 
         <DialogFooter>
           <Button variant='outline' onClick={handleCancel}>
-            {language === 'zh-CN' ? '取消' : 'Cancel'}
+            {t('common.actions.cancel')}
           </Button>
           <Button onClick={handleSubmit}>
-            {language === 'zh-CN' ? '保存' : 'Save'}
+            {t('common.actions.save')}
           </Button>
         </DialogFooter>
       </DialogContent>

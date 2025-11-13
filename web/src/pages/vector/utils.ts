@@ -5,6 +5,7 @@
 import { ConnectionStatusEnum, VectorStoreTypeEnum } from '@/enums/enums';
 import { VECTOR_STORE_TYPES, DEFAULT_VECTOR_STORE_TYPE_CONFIG } from './constants';
 import type { VectorStoreStatus, VectorStoreTypeInfo, VectorStoreStatusInfo } from './types';
+import { constantTranslation as t } from '@/lib/i18n';
 
 /**
  * 格式化数字，处理 null/undefined/NaN
@@ -64,24 +65,23 @@ export const getVectorStoreTypeInfo = (type?: VectorStoreTypeEnum | string): Vec
  */
 export const getVectorStoreStatusInfo = (
   status: VectorStoreStatus,
-  language: string = 'zh-CN'
 ): VectorStoreStatusInfo => {
   switch (status) {
     case ConnectionStatusEnum.CONNECTED:
       return {
-        label: language === 'zh-CN' ? '已连接' : 'Connected',
+        label: t('common.status.connected'),
         badgeClass: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-0 text-xs w-fit',
       };
     case 'TESTING':
       return {
-        label: language === 'zh-CN' ? '测试中' : 'Testing',
+        label: t('common.status.processing'),
         badgeClass:
           'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400 border-0 text-xs w-fit',
       };
     case ConnectionStatusEnum.DISCONNECTED:
     default:
       return {
-        label: language === 'zh-CN' ? '未连接' : 'Disconnected',
+        label: t('common.status.disconnected'),
         badgeClass: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-0 text-xs w-fit',
       };
   }

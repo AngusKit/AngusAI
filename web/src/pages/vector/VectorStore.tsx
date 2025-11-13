@@ -20,7 +20,7 @@ import { EditVectorStoreDialog } from './components/EditVectorStoreDialog';
 import type { VectorStoreItem, VectorStoreStatus } from './types';
 
 export function VectorStore() {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editingStore, setEditingStore] = useState<VectorStoreItem | null>(null);
@@ -44,7 +44,7 @@ export function VectorStore() {
     ensureVectorStoreDetail,
     statsCards,
     shouldShowPagination,
-  } = useVectorStoreManagement(language);
+  } = useVectorStoreManagement();
 
   // 使用表单 Hook
   const {
@@ -55,7 +55,7 @@ export function VectorStore() {
     handleUpdateStore,
     handleTestConnection,
     populateFormFromStore,
-  } = useVectorStoreForm(language);
+  } = useVectorStoreForm();
 
   // 获取类型和状态信息的辅助函数
   const getTypeInfo = useCallback((type?: VectorStoreTypeEnum | string) => {
@@ -78,14 +78,12 @@ export function VectorStore() {
     try {
       await VectorStoresService.vectorStoreToggleEnabled(store.id, { enabled: !store.enabled });
       toast.success(
-        language === 'zh-CN'
-          ? `${store.name} 已${store.enabled ? '禁用' : '启用'}`
-          : `${store.name} ${store.enabled ? 'disabled' : 'enabled'}`
+        store.enabled ? t('vector.messages.storeDisabled', { name: store.name }) : t('vector.messages.storeEnabled', { name: store.name })
       );
       await Promise.all([loadVectorStores(), loadStatistics()]);
     } catch (error: any) {
       console.error('Failed to toggle vector store:', error);
-      toast.error(error?.message || (language === 'zh-CN' ? '更新启用状态失败' : 'Failed to update enabled status'));
+      toast.error(error?.message || t('vector.messages.updateEnabledStatusFailed'));
     } finally {
       setTogglingId(null);
     }
@@ -147,11 +145,11 @@ export function VectorStore() {
     setDeletingId(store.id);
     try {
       await VectorStoresService.vectorStoreDelete(store.id);
-      toast.success(language === 'zh-CN' ? `已删除 ${store.name}` : `Deleted ${store.name}`);
+      toast.success(t('vector.messages.storeDeleted', { name: store.name }));
       await Promise.all([loadVectorStores(), loadStatistics()]);
     } catch (error: any) {
       console.error('Failed to delete vector store:', error);
-      toast.error(error?.message || (language === 'zh-CN' ? '删除存储源失败' : 'Failed to delete vector store'));
+      toast.error(error?.message || t('vector.messages.deleteStoreFailed'));
     } finally {
       setDeletingId(null);
     }
@@ -168,11 +166,9 @@ export function VectorStore() {
     <div className='space-y-6'>
       {/* Header */}
       <div>
-        <h1 className='text-2xl mb-1 dark:text-white'>{language === 'zh-CN' ? '向量存储源' : 'Vector Store'}</h1>
+        <h1 className='text-2xl mb-1 dark:text-white'>{t('vector.title')}</h1>
         <p className='text-sm text-gray-600 dark:text-gray-400'>
-          {language === 'zh-CN'
-            ? '管理向量数据库连接，用于AI应用的向量检索和语义搜索'
-            : 'Manage vector database connections for AI applications, vector retrieval and semantic search'}
+          {t('vector.subtitle')}
         </p>
       </div>
 
@@ -200,7 +196,7 @@ export function VectorStore() {
         <div className='relative w-[390px]'>
           <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500' />
           <Input
-            placeholder={language === 'zh-CN' ? '搜索向量存储源...' : 'Search vector stores...'}
+            placeholder={t('vector.searchPlaceholder')}
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             className='pl-10 pr-10 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100'
@@ -223,7 +219,7 @@ export function VectorStore() {
               className={`p-2 rounded transition-colors ${
                 viewMode === 'grid' ? 'bg-white dark:bg-gray-700 shadow-sm' : 'hover:bg-gray-200 dark:hover:bg-gray-700'
               }`}
-              title={language === 'zh-CN' ? '卡片视图' : 'Grid View'}
+              title={t('vector.gridView')}
             >
               <Grid3x3 className='w-4 h-4 text-gray-600 dark:text-gray-400' />
             </button>
@@ -232,7 +228,7 @@ export function VectorStore() {
               className={`p-2 rounded transition-colors ${
                 viewMode === 'list' ? 'bg-white dark:bg-gray-700 shadow-sm' : 'hover:bg-gray-200 dark:hover:bg-gray-700'
               }`}
-              title={language === 'zh-CN' ? '列表视图' : 'List View'}
+              title={t('vector.listView')}
             >
               <List className='w-4 h-4 text-gray-600 dark:text-gray-400' />
             </button>
@@ -240,7 +236,7 @@ export function VectorStore() {
 
           <Button onClick={() => setShowCreateDialog(true)} className='gap-2 dark:bg-blue-600 dark:hover:bg-blue-700'>
             <Plus className='w-4 h-4' />
-            {language === 'zh-CN' ? '添加存储源' : 'Add Store'}
+            {t('vector.addStore')}
           </Button>
         </div>
       </div>
@@ -250,23 +246,17 @@ export function VectorStore() {
         <div className='text-center py-12'>
           <Activity className='w-12 h-12 text-gray-400 dark:text-gray-600 mx-auto mb-3 animate-spin' />
           <p className='text-gray-600 dark:text-gray-400'>
-            {language === 'zh-CN' ? '正在加载向量存储源...' : 'Loading vector stores...'}
+            {t('vector.loadingStores')}
           </p>
         </div>
       ) : vectorStores.length === 0 ? (
         <div className='text-center py-12'>
           <Database className='w-12 h-12 text-gray-400 dark:text-gray-600 mx-auto mb-3' />
           <p className='text-gray-600 dark:text-gray-400'>
-            {language === 'zh-CN' ? '未找到匹配的存储源' : 'No vector stores found'}
+            {t('vector.noStoresFound')}
           </p>
           <p className='text-sm text-gray-500 dark:text-gray-500 mt-1'>
-            {searchQuery
-              ? language === 'zh-CN'
-                ? '尝试使用其他搜索词'
-                : 'Try different search terms'
-              : language === 'zh-CN'
-                ? '点击上方按钮添加新的向量存储源'
-                : 'Click the button above to add a new vector store'}
+            {searchQuery ? t('vector.tryDifferentSearch') : t('vector.clickToAddStore')}
           </p>
         </div>
       ) : (
@@ -314,7 +304,7 @@ export function VectorStore() {
                         <DropdownMenuContent align='end' className='dark:bg-gray-800 dark:border-gray-700'>
                           <DropdownMenuItem onClick={() => void openEditDialog(store)} className='dark:text-gray-300'>
                             <Edit className='w-4 h-4 mr-2' />
-                            {language === 'zh-CN' ? '编辑' : 'Edit'}
+                            {t('common.actions.edit')}
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => handleTestConnectionWrapper(store)}
@@ -322,7 +312,7 @@ export function VectorStore() {
                             className='dark:text-gray-300'
                           >
                             <Play className='w-4 h-4 mr-2' />
-                            {language === 'zh-CN' ? '测试连接' : 'Test Connection'}
+                            {t('vector.actions.testConnection')}
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => handleDeleteStore(store)}
@@ -330,7 +320,7 @@ export function VectorStore() {
                             className='text-red-600 dark:text-red-400'
                           >
                             <Trash2 className='w-4 h-4 mr-2' />
-                            {language === 'zh-CN' ? '删除' : 'Delete'}
+                            {t('common.actions.delete')}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -347,19 +337,19 @@ export function VectorStore() {
                       <div className='grid grid-cols-2 gap-4 text-sm'>
                         <div>
                           <div className='text-gray-500 dark:text-gray-400 mb-1'>
-                            {language === 'zh-CN' ? '端点' : 'Endpoint'}
+                            {t('vector.details.endpoint')}
                           </div>
                           <div className='text-gray-700 dark:text-gray-300 truncate'>{store.endpoint ?? '--'}</div>
                         </div>
                         <div>
                           <div className='text-gray-500 dark:text-gray-400 mb-1'>
-                            {language === 'zh-CN' ? '维度' : 'Dimension'}
+                            {t('vector.details.dimension')}
                           </div>
                           <div className='text-gray-700 dark:text-gray-300'>{store.dimension ?? '--'}</div>
                         </div>
                         <div>
                           <div className='text-gray-500 dark:text-gray-400 mb-1'>
-                            {language === 'zh-CN' ? '向量数' : 'Vectors'}
+                            {t('vector.details.vectors')}
                           </div>
                           <div className='text-gray-700 dark:text-gray-300'>
                             {store.indexCount !== undefined ? formatNumber(store.indexCount) : '--'}
@@ -367,7 +357,7 @@ export function VectorStore() {
                         </div>
                         <div>
                           <div className='text-gray-500 dark:text-gray-400 mb-1'>
-                            {language === 'zh-CN' ? '最后同步' : 'Last Sync'}
+                            {t('vector.details.lastSync')}
                           </div>
                           <div className='text-gray-700 dark:text-gray-300'>{store.lastSync}</div>
                         </div>
@@ -396,25 +386,25 @@ export function VectorStore() {
                   <thead className='bg-gray-50 dark:bg-gray-900'>
                     <tr>
                       <th className='px-4 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>
-                        {language === 'zh-CN' ? '存储源' : 'Store'}
+                        {t('vector.table.store')}
                       </th>
                       <th className='px-4 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>
-                        {language === 'zh-CN' ? '类型' : 'Type'}
+                        {t('common.labels.type')}
                       </th>
                       <th className='px-4 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>
-                        {language === 'zh-CN' ? '状态' : 'Status'}
+                        {t('vector.table.status')}
                       </th>
                       <th className='px-4 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>
-                        {language === 'zh-CN' ? '端点' : 'Endpoint'}
+                        {t('vector.table.endpoint')}
                       </th>
                       <th className='px-4 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>
-                        {language === 'zh-CN' ? '维度' : 'Dim'}
+                        {t('vector.table.dimensionShort')}
                       </th>
                       <th className='px-4 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>
-                        {language === 'zh-CN' ? '向量数' : 'Vectors'}
+                        {t('vector.table.vectors')}
                       </th>
                       <th className='px-4 py-3 text-center text-xs text-gray-600 dark:text-gray-400'>
-                        {language === 'zh-CN' ? '操作' : 'Actions'}
+                        {t('vector.table.actions')}
                       </th>
                     </tr>
                   </thead>
@@ -472,14 +462,14 @@ export function VectorStore() {
                                 onClick={() => handleTestConnectionWrapper(store)}
                                 disabled={isTesting}
                                 className='p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors'
-                                title={language === 'zh-CN' ? '测试连接' : 'Test Connection'}
+                                title={t('vector.actions.testConnection')}
                               >
                                 <Play className='w-3.5 h-3.5 text-green-500' />
                               </button>
                               <button
                                 onClick={() => void openEditDialog(store)}
                                 className='p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors'
-                                title={language === 'zh-CN' ? '编辑' : 'Edit'}
+                                title={t('common.actions.edit')}
                               >
                                 <Edit className='w-3.5 h-3.5 text-gray-600 dark:text-gray-400' />
                               </button>
@@ -487,7 +477,7 @@ export function VectorStore() {
                                 onClick={() => handleDeleteStore(store)}
                                 disabled={isDeleting}
                                 className='p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors'
-                                title={language === 'zh-CN' ? '删除' : 'Delete'}
+                                title={t('common.actions.delete')}
                               >
                                 <Trash2 className='w-3.5 h-3.5 text-red-500' />
                               </button>

@@ -6,23 +6,22 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { VectorStoreTypeEnum } from '@/enums/enums';
 import { VECTOR_STORE_TYPES } from '../constants';
+import { useLanguage } from '@/components/ui/LanguageProvider';
 import type { VectorStoreFormData } from '../types';
 
 interface VectorStoreFormFieldsProps {
   formData: VectorStoreFormData;
   onFormDataChange: (data: Partial<VectorStoreFormData>) => void;
-  language: string;
   isEdit?: boolean;
 }
 
 export function VectorStoreFormFields({
   formData,
   onFormDataChange,
-  language,
   isEdit = false,
 }: VectorStoreFormFieldsProps) {
+  const { t } = useLanguage();
   const updateField = (field: keyof VectorStoreFormData, value: string) => {
     onFormDataChange({ [field]: value });
   };
@@ -32,9 +31,9 @@ export function VectorStoreFormFields({
       {!isEdit && (
         <div className='grid grid-cols-2 gap-4'>
           <div className='space-y-2'>
-            <Label className='dark:text-gray-200'>{language === 'zh-CN' ? '名称' : 'Name'}</Label>
+            <Label className='dark:text-gray-200'>{t('common.labels.name')}</Label>
             <Input
-              placeholder={language === 'zh-CN' ? '输入存储源名称' : 'Enter store name'}
+              placeholder={t('vector.formFields.storeNamePlaceholder')}
               value={formData.name}
               onChange={e => updateField('name', e.target.value)}
               className='dark:bg-gray-750 dark:border-gray-600'
@@ -42,13 +41,13 @@ export function VectorStoreFormFields({
           </div>
 
           <div className='space-y-2'>
-            <Label className='dark:text-gray-200'>{language === 'zh-CN' ? '类型' : 'Type'}</Label>
+            <Label className='dark:text-gray-200'>{t('common.labels.type')}</Label>
             <Select
               value={formData.type}
               onValueChange={value => updateField('type', value)}
             >
               <SelectTrigger className='dark:bg-gray-750 dark:border-gray-600'>
-                <SelectValue placeholder={language === 'zh-CN' ? '选择数据库类型' : 'Select database type'} />
+                <SelectValue placeholder={t('vector.formFields.selectDatabaseType')} />
               </SelectTrigger>
               <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
                 {VECTOR_STORE_TYPES.map(type => (
@@ -64,7 +63,7 @@ export function VectorStoreFormFields({
 
       {isEdit && (
         <div className='space-y-2'>
-          <Label className='dark:text-gray-200'>{language === 'zh-CN' ? '名称' : 'Name'}</Label>
+          <Label className='dark:text-gray-200'>{t('common.labels.name')}</Label>
           <Input
             value={formData.name}
             onChange={e => updateField('name', e.target.value)}
@@ -74,9 +73,9 @@ export function VectorStoreFormFields({
       )}
 
       <div className='space-y-2'>
-        <Label className='dark:text-gray-200'>{language === 'zh-CN' ? '描述' : 'Description'}</Label>
+        <Label className='dark:text-gray-200'>{t('common.labels.description')}</Label>
         <Textarea
-          placeholder={language === 'zh-CN' ? '输入描述信息' : 'Enter description'}
+          placeholder={t('vector.formFields.descriptionPlaceholder')}
           value={formData.description}
           onChange={e => updateField('description', e.target.value)}
           className='dark:bg-gray-750 dark:border-gray-600'
@@ -85,7 +84,7 @@ export function VectorStoreFormFields({
       </div>
 
       <div className='space-y-2'>
-        <Label className='dark:text-gray-200'>{language === 'zh-CN' ? '端点地址' : 'Endpoint'}</Label>
+        <Label className='dark:text-gray-200'>{t('vector.formFields.endpoint')}</Label>
         <Input
           placeholder='https://...'
           value={formData.endpoint}
@@ -96,7 +95,7 @@ export function VectorStoreFormFields({
 
       <div className='grid grid-cols-2 gap-4'>
         <div className='space-y-2'>
-          <Label className='dark:text-gray-200'>{language === 'zh-CN' ? 'API密钥' : 'API Key'}</Label>
+          <Label className='dark:text-gray-200'>{t('vector.formFields.apiKey')}</Label>
           <Input
             type='password'
             placeholder='sk-...'
@@ -107,7 +106,7 @@ export function VectorStoreFormFields({
         </div>
 
         <div className='space-y-2'>
-          <Label className='dark:text-gray-200'>{language === 'zh-CN' ? '向量维度' : 'Dimension'}</Label>
+          <Label className='dark:text-gray-200'>{t('vector.formFields.dimension')}</Label>
           <Input
             type='number'
             placeholder='1536'
@@ -120,9 +119,9 @@ export function VectorStoreFormFields({
 
       <div className='grid grid-cols-2 gap-4'>
         <div className='space-y-2'>
-          <Label className='dark:text-gray-200'>{language === 'zh-CN' ? '数据库' : 'Database'}</Label>
+          <Label className='dark:text-gray-200'>{t('vector.formFields.database')}</Label>
           <Input
-            placeholder={language === 'zh-CN' ? '数据库名称' : 'Database name'}
+            placeholder={t('vector.formFields.databaseNamePlaceholder')}
             value={formData.database}
             onChange={e => updateField('database', e.target.value)}
             className='dark:bg-gray-750 dark:border-gray-600'
@@ -131,10 +130,10 @@ export function VectorStoreFormFields({
 
         <div className='space-y-2'>
           <Label className='dark:text-gray-200'>
-            {language === 'zh-CN' ? '集合/索引' : 'Collection/Index'}
+            {t('vector.formFields.collection')}
           </Label>
           <Input
-            placeholder={language === 'zh-CN' ? '集合名称' : 'Collection name'}
+            placeholder={t('vector.formFields.collectionNamePlaceholder')}
             value={formData.collection}
             onChange={e => updateField('collection', e.target.value)}
             className='dark:bg-gray-750 dark:border-gray-600'
@@ -145,9 +144,9 @@ export function VectorStoreFormFields({
       {!isEdit && (
         <div className='grid grid-cols-2 gap-4'>
           <div className='space-y-2'>
-            <Label className='dark:text-gray-200'>{language === 'zh-CN' ? '用户名' : 'Username'}</Label>
+            <Label className='dark:text-gray-200'>{t('vector.formFields.username')}</Label>
             <Input
-              placeholder={language === 'zh-CN' ? '用户名(可选)' : 'Username (optional)'}
+              placeholder={t('vector.formFields.usernamePlaceholder')}
               value={formData.username}
               onChange={e => updateField('username', e.target.value)}
               className='dark:bg-gray-750 dark:border-gray-600'
@@ -155,10 +154,10 @@ export function VectorStoreFormFields({
           </div>
 
           <div className='space-y-2'>
-            <Label className='dark:text-gray-200'>{language === 'zh-CN' ? '密码' : 'Password'}</Label>
+            <Label className='dark:text-gray-200'>{t('common.labels.password')}</Label>
             <Input
               type='password'
-              placeholder={language === 'zh-CN' ? '密码(可选)' : 'Password (optional)'}
+              placeholder={t('vector.formFields.passwordPlaceholder')}
               value={formData.password}
               onChange={e => updateField('password', e.target.value)}
               className='dark:bg-gray-750 dark:border-gray-600'

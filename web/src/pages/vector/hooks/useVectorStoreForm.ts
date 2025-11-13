@@ -9,6 +9,7 @@ import { VectorStoreTypeEnum } from '@/enums/enums';
 import type { VectorStoreCreateDto, VectorStoreUpdateDto } from '@/services/VectorStoresTypes';
 import { DEFAULT_FORM_DATA, CONNECTION_TEST_TIMEOUT } from '../constants';
 import { parseDimension } from '../utils';
+import { useLanguage } from '@/components/ui/LanguageProvider';
 import type { VectorStoreFormData, VectorStoreItem } from '../types';
 
 interface UseVectorStoreFormReturn {
@@ -24,7 +25,8 @@ interface UseVectorStoreFormReturn {
   populateFormFromStore: (store: VectorStoreItem) => void;
 }
 
-export const useVectorStoreForm = (language: string): UseVectorStoreFormReturn => {
+export const useVectorStoreForm = (): UseVectorStoreFormReturn => {
+  const { t } = useLanguage();
   const [formData, setFormData] = useState<VectorStoreFormData>(DEFAULT_FORM_DATA);
 
   const resetForm = useCallback(() => {
@@ -33,24 +35,24 @@ export const useVectorStoreForm = (language: string): UseVectorStoreFormReturn =
 
   const validateForm = useCallback((): boolean => {
     if (!formData.name.trim()) {
-      toast.error(language === 'zh-CN' ? '请输入名称' : 'Please enter a name');
+      toast.error(t('vector.validation.nameRequired'));
       return false;
     }
     if (!formData.type) {
-      toast.error(language === 'zh-CN' ? '请选择类型' : 'Please select a type');
+      toast.error(t('vector.validation.typeRequired'));
       return false;
     }
     return true;
-  }, [formData, language]);
+  }, [formData, t]);
 
   const validateDimension = useCallback((): number | null => {
     const dimensionValue = parseDimension(formData.dimension);
     if (!dimensionValue) {
-      toast.error(language === 'zh-CN' ? '请输入有效的向量维度' : 'Please enter a valid dimension');
+      toast.error(t('vector.validation.dimensionRequired'));
       return null;
     }
     return dimensionValue;
-  }, [formData.dimension, language]);
+  }, [formData.dimension, t]);
 
   const createConfigFromFormData = useCallback(
     (type: VectorStoreTypeEnum, dimension: number): VectorStoreCreateDto['config'] => ({
@@ -90,7 +92,7 @@ export const useVectorStoreForm = (language: string): UseVectorStoreFormReturn =
 
       try {
         await VectorStoresService.vectorStoreCreate(payload);
-        toast.success(language === 'zh-CN' ? '向量存储源创建成功' : 'Vector store created successfully');
+        toast.success(t('vector.messages.createSuccess'));
         resetForm();
         if (onSuccess) {
           await onSuccess();
@@ -98,17 +100,17 @@ export const useVectorStoreForm = (language: string): UseVectorStoreFormReturn =
         return true;
       } catch (error: any) {
         console.error('Failed to create vector store:', error);
-        toast.error(error?.message || (language === 'zh-CN' ? '创建存储源失败' : 'Failed to create vector store'));
+        toast.error(error?.message || t('vector.messages.createFailed'));
         return false;
       }
     },
-    [formData, validateForm, validateDimension, createConfigFromFormData, language, resetForm]
+    [formData, validateForm, validateDimension, createConfigFromFormData, resetForm, t]
   );
 
   const handleUpdateStore = useCallback(
     async (storeId: string, storeType: VectorStoreTypeEnum, onSuccess?: () => Promise<void>): Promise<boolean> => {
       if (!formData.name.trim()) {
-        toast.error(language === 'zh-CN' ? '请输入名称' : 'Please enter a name');
+        toast.error(t('vector.validation.nameRequired'));
         return false;
       }
 
@@ -125,7 +127,7 @@ export const useVectorStoreForm = (language: string): UseVectorStoreFormReturn =
 
       try {
         await VectorStoresService.vectorStoreUpdate(storeId, payload);
-        toast.success(language === 'zh-CN' ? '向量存储源更新成功' : 'Vector store updated successfully');
+        toast.success(t('vector.messages.updateSuccess'));
         resetForm();
         if (onSuccess) {
           await onSuccess();
@@ -133,11 +135,11 @@ export const useVectorStoreForm = (language: string): UseVectorStoreFormReturn =
         return true;
       } catch (error: any) {
         console.error('Failed to update vector store:', error);
-        toast.error(error?.message || (language === 'zh-CN' ? '更新存储源失败' : 'Failed to update vector store'));
+        toast.error(error?.message || t('vector.messages.updateFailed'));
         return false;
       }
     },
-    [formData, validateDimension, createConfigFromFormData, language, resetForm]
+    [formData, validateDimension, createConfigFromFormData, resetForm, t]
   );
 
   const handleTestConnection = useCallback(
@@ -159,8 +161,7 @@ export const useVectorStoreForm = (language: string): UseVectorStoreFormReturn =
         );
         const result = (response as any)?.data;
         toast.success(
-          result?.message ||
-            (language === 'zh-CN' ? `${store.name} 测试连接成功` : `${store.name} connected successfully`)
+          result?.message || t('vector.messages.testConnectionSuccess', { name: store.name })
         );
         if (onStatusUpdate) {
           onStatusUpdate('CONNECTED');
@@ -168,14 +169,14 @@ export const useVectorStoreForm = (language: string): UseVectorStoreFormReturn =
         return true;
       } catch (error: any) {
         console.error('Failed to test vector store connection:', error);
-        toast.error(error?.message || (language === 'zh-CN' ? '连接测试失败' : 'Connection test failed'));
+        toast.error(error?.message || t('vector.messages.testConnectionFailed'));
         if (onStatusUpdate) {
           onStatusUpdate('DISCONNECTED');
         }
         return false;
       }
     },
-    [language]
+    [t]
   );
 
   const populateFormFromStore = useCallback((store: VectorStoreItem) => {

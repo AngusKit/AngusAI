@@ -33,7 +33,7 @@ export function CreateVectorStoreDialog({
   onSubmit,
   onReset,
 }: CreateVectorStoreDialogProps) {
-  const { language } = useLanguage();
+  const { t } = useLanguage();
 
   const handleCancel = () => {
     onOpenChange(false);
@@ -52,10 +52,10 @@ export function CreateVectorStoreDialog({
       <DialogContent className='max-w-2xl dark:bg-gray-800'>
         <DialogHeader>
           <DialogTitle className='dark:text-white'>
-            {language === 'zh-CN' ? '添加向量存储源' : 'Add Vector Store'}
+            {t('vector.createDialog.title')}
           </DialogTitle>
           <DialogDescription>
-            {language === 'zh-CN' ? '配置新的向量数据库连接' : 'Configure a new vector database connection'}
+            {t('vector.createDialog.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -63,17 +63,16 @@ export function CreateVectorStoreDialog({
           <VectorStoreFormFields
             formData={formData}
             onFormDataChange={onFormDataChange}
-            language={language}
             isEdit={false}
           />
         </ScrollArea>
 
         <DialogFooter>
           <Button variant='outline' onClick={handleCancel}>
-            {language === 'zh-CN' ? '取消' : 'Cancel'}
+            {t('common.actions.cancel')}
           </Button>
           <Button onClick={handleSubmit} disabled={!isFormValid}>
-            {language === 'zh-CN' ? '创建' : 'Create'}
+            {t('common.actions.create')}
           </Button>
         </DialogFooter>
       </DialogContent>

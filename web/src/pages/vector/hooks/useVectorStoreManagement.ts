@@ -19,6 +19,7 @@ import {
 } from '../utils';
 import type { VectorStoreItem, VectorStoreStatus } from '../types';
 import { Database, CheckCircle2, Activity, Zap } from 'lucide-react';
+import { useLanguage } from '@/components/ui/LanguageProvider';
 
 interface UseVectorStoreManagementReturn {
   // State
@@ -53,11 +54,12 @@ interface UseVectorStoreManagementReturn {
   shouldShowPagination: boolean;
 }
 
-export const useVectorStoreManagement = (language: string): UseVectorStoreManagementReturn => {
+export const useVectorStoreManagement = (): UseVectorStoreManagementReturn => {
+  const { language, t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearchQuery = useDebounce(searchQuery, SEARCH_DEBOUNCE_MS);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [currentPage, setCurrentPage] = useState(PAGINATION_CONFIG.DEFAULT_PAGE);
+  const [currentPage, setCurrentPage] = useState<number>(PAGINATION_CONFIG.DEFAULT_PAGE);
   const itemsPerPage = PAGINATION_CONFIG.DEFAULT_PAGE_SIZE;
 
   const [vectorStores, setVectorStores] = useState<VectorStoreItem[]>([]);
@@ -102,13 +104,11 @@ export const useVectorStoreManagement = (language: string): UseVectorStoreManage
       setStatistics(responseData ?? null);
     } catch (error: any) {
       console.error('Failed to load vector store statistics:', error);
-      toast.error(
-        error?.message || (language === 'zh-CN' ? '获取向量存储统计失败' : 'Failed to load vector store statistics')
-      );
+      toast.error(error?.message || t('vector.messages.loadStatisticsFailed'));
     } finally {
       setStatisticsLoading(false);
     }
-  }, [language]);
+  }, [t]);
 
   const loadVectorStores = useCallback(async () => {
     setVectorStoresLoading(true);
@@ -132,13 +132,11 @@ export const useVectorStoreManagement = (language: string): UseVectorStoreManage
       setVectorStores(mapped ?? []);
     } catch (error: any) {
       console.error('Failed to load vector stores:', error);
-      toast.error(
-        error?.message || (language === 'zh-CN' ? '加载向量存储列表失败' : 'Failed to load vector store list')
-      );
+      toast.error(error?.message || t('vector.messages.loadStoresFailed'));
     } finally {
       setVectorStoresLoading(false);
     }
-  }, [normalizeVectorStoreItem, currentPage, debouncedSearchQuery, itemsPerPage, language]);
+  }, [normalizeVectorStoreItem, currentPage, debouncedSearchQuery, itemsPerPage, language, t]);
 
   const ensureVectorStoreDetail = useCallback(
     async (store: VectorStoreItem): Promise<VectorStoreItem> => {
@@ -157,13 +155,11 @@ export const useVectorStoreManagement = (language: string): UseVectorStoreManage
         }
       } catch (error: any) {
         console.error('Failed to load vector store detail:', error);
-        toast.error(
-          error?.message || (language === 'zh-CN' ? '获取向量存储详情失败' : 'Failed to load vector store detail')
-        );
+        toast.error(error?.message || t('vector.messages.loadDetailFailed'));
       }
       return store;
     },
-    [normalizeVectorStoreItem, language]
+    [normalizeVectorStoreItem, t]
   );
 
   const statsCards = useMemo(() => {
@@ -172,38 +168,38 @@ export const useVectorStoreManagement = (language: string): UseVectorStoreManage
     return [
       {
         key: 'totalStores',
-        label: language === 'zh-CN' ? '存储源总数' : 'Total Sources',
+        label: t('vector.stats.totalStores'),
         value: formatNumber(overview?.totalStores, language),
-        subtext: language === 'zh-CN' ? '已配置向量数据库' : 'Configured databases',
+        subtext: t('vector.stats.totalStoresSubtext'),
         icon: Database,
         iconBg: 'bg-blue-500',
       },
       {
         key: 'connectedStores',
-        label: language === 'zh-CN' ? '已连接' : 'Connected',
+        label: t('vector.stats.connectedStores'),
         value: formatNumber(overview?.connectedStores, language),
-        subtext: language === 'zh-CN' ? '正常运行中' : 'Currently active',
+        subtext: t('vector.stats.connectedStoresSubtext'),
         icon: CheckCircle2,
         iconBg: 'bg-green-500',
       },
       {
         key: 'totalVectors',
-        label: language === 'zh-CN' ? '向量总数' : 'Total Vectors',
+        label: t('vector.stats.totalVectors'),
         value: formatVectorCount(overview?.totalVectors, language),
-        subtext: language === 'zh-CN' ? '跨所有存储源' : 'Across all sources',
+        subtext: t('vector.stats.totalVectorsSubtext'),
         icon: Activity,
         iconBg: 'bg-purple-500',
       },
       {
         key: 'todayQueries',
-        label: language === 'zh-CN' ? '今日查询' : 'Today Queries',
+        label: t('vector.stats.todayQueries'),
         value: formatNumber(overview?.todayQueries, language),
-        subtext: language === 'zh-CN' ? '今日累计查询次数' : 'Queries today',
+        subtext: t('vector.stats.todayQueriesSubtext'),
         icon: Zap,
         iconBg: 'bg-orange-500',
       },
     ];
-  }, [language, statistics]);
+  }, [language, statistics, t]);
 
   const shouldShowPagination = useMemo(() => {
     return vectorStoresTotal > itemsPerPage;
