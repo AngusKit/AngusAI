@@ -67,9 +67,6 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
   private ApiEndpointQuery apiEndpointQuery;
 
   @Resource
-  private ApiComponentQuery apiComponentQuery;
-
-  @Resource
   private ApiSchemaQuery apiSchemaQuery;
 
   @Resource
@@ -140,7 +137,8 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
   @NameJoin
   @Override
   public ApiCollectionDetailVo importCollection(Long id, ApiCollectionImportDto dto) {
-    ApiCollection saved = apiCollectionCmd.imports(id, dto);
+    ApiCollection saved = apiCollectionCmd.imports(id, dto.getType(), dto.getContent(),
+        dto.getFile(), dto.getConflictStrategy(), dto.getEnableByDefault());
     // 设置统计信息
     setDetailInfo(saved);
     return ApiCollectionAssembler.toDetailVo(saved);

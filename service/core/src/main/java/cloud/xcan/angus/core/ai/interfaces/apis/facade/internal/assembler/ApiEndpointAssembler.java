@@ -23,6 +23,7 @@ public class ApiEndpointAssembler {
     endpoint.setOperationId(dto.getOperationId());
     endpoint.setTags(dto.getTags());
     endpoint.setEnabled(true);
+    endpoint.setDeprecated(false);
     endpoint.setParameters(dto.getParameters());
     endpoint.setRequestBody(dto.getRequestBody());
     endpoint.setResponses(dto.getResponses());
@@ -50,8 +51,9 @@ public class ApiEndpointAssembler {
     vo.setPath(endpoint.getPath());
     vo.setOperationId(endpoint.getOperationId());
     vo.setDescription(endpoint.getDescription());
-    vo.setTags(endpoint.getTags());
     vo.setEnabled(endpoint.getEnabled());
+    vo.setDeprecated(endpoint.getDeprecated());
+    vo.setTags(endpoint.getTags());
 
     // 设置端点参数、请求体和响应
     vo.setParameters(endpoint.getParameters());
@@ -76,8 +78,9 @@ public class ApiEndpointAssembler {
     vo.setPath(endpoint.getPath());
     vo.setOperationId(endpoint.getOperationId());
     vo.setDescription(endpoint.getDescription());
-    vo.setTags(endpoint.getTags());
     vo.setEnabled(endpoint.getEnabled());
+    vo.setDeprecated(endpoint.getDeprecated());
+    vo.setTags(endpoint.getTags());
 
     // 设置审计信息
     vo.setTenantId(endpoint.getTenantId());

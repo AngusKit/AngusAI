@@ -1,9 +1,12 @@
 package cloud.xcan.angus.core.ai.application.cmd.apis;
 
 import cloud.xcan.angus.core.ai.domain.apis.ApiCollection;
+import cloud.xcan.angus.core.ai.domain.apis.ApiCollectionSource;
+import cloud.xcan.angus.core.ai.domain.apis.ConflictStrategy;
 import cloud.xcan.angus.core.ai.domain.apis.ExportApiFormat;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionImportDto;
 import java.io.File;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 接口集命令服务
@@ -28,11 +31,13 @@ public interface ApiCollectionCmd {
   /**
    * 导入接口集
    */
-  ApiCollection imports(Long id, ApiCollectionImportDto dto);
+  ApiCollection imports(Long id, ApiCollectionSource type, String content, MultipartFile file,
+      ConflictStrategy conflictStrategy, Boolean enableByDefault);
 
   /**
    * 导出OpenAPI规范
    */
   File export(Long id, ExportApiFormat format, Boolean includeDisabled);
+
 }
 

@@ -17,6 +17,7 @@ import cloud.xcan.angus.core.ai.domain.apis.ApiSchema;
 import cloud.xcan.angus.core.ai.domain.apis.ExportApiFormat;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
+import cloud.xcan.angus.remote.message.BizException;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import io.swagger.v3.core.util.Json31;
 import io.swagger.v3.core.util.Yaml31;
@@ -91,6 +92,10 @@ public class ApiCollectionQueryImpl implements ApiCollectionQuery {
 
     // Merge apis and project component servers
     ApiSchema schemaDb = apiSchemaQuery.findByCollectionId(id);
+    if (schemaDb == null){
+      throw BizException.of("接口集中接口未定义为空，请先导入接口");
+    }
+
     List<ApiEndpoint> apis = includeDisabled
         ? apiEndpointQuery.findByCollectionId(id)
         : apiEndpointQuery.findByCollectionIdAndEnabled(id, true);

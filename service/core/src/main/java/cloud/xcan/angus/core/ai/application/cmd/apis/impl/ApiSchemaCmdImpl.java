@@ -4,12 +4,14 @@ import cloud.xcan.angus.core.ai.application.cmd.apis.ApiComponentCmd;
 import cloud.xcan.angus.core.ai.application.cmd.apis.ApiSchemaCmd;
 import cloud.xcan.angus.core.ai.application.converter.ApiSchemaConverter;
 import cloud.xcan.angus.core.ai.application.query.apis.ApiSchemaQuery;
+import cloud.xcan.angus.core.ai.domain.apis.ApiCollection;
 import cloud.xcan.angus.core.ai.domain.apis.ApiSchema;
 import cloud.xcan.angus.core.ai.domain.apis.ApiSchemaRepo;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
 import jakarta.annotation.Resource;
@@ -71,16 +73,22 @@ public class ApiSchemaCmdImpl extends CommCmd<ApiSchema, Long> implements ApiSch
   }
 
   @Override
-  public void init(Long collectionId) {
+  public void init(ApiCollection collection) {
     ApiSchema apiSchema = new ApiSchema();
-    apiSchema.setCollectionId(collectionId);
+    apiSchema.setCollectionId(collection.getId());
+    apiSchema.setOpenapi("3.0.1");
+
+    Info info = new Info();
+    info.setTitle(collection.getName());
+    info.setDescription(collection.getDescription());
+    apiSchema.setInfo(info);
     insert(apiSchema);
   }
 
   @Override
-  public void updateSchema(ApiSchema apiSchema, OpenAPI openApi, boolean mergeSchema,
+  public void updateImportSchema(ApiSchema apiSchema, OpenAPI openApi, boolean mergeSchema,
       boolean cover) {
-    ApiSchemaConverter.updateSchema(apiSchema, openApi, mergeSchema, cover);
+    ApiSchemaConverter.updateImportSchema(apiSchema, openApi, mergeSchema, cover);
     apiSchemaRepo.save(apiSchema);
   }
 

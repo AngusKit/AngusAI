@@ -122,7 +122,7 @@ public class ApiEndpointCmdImpl extends CommCmd<ApiEndpoint, Long> implements Ap
   }
 
   @Override
-  public void updateSyncApis(Map<String, ApiEndpoint> updatedApisDbMap,
+  public void updateImportApis(Map<String, ApiEndpoint> updatedApisDbMap,
       Map<String, ApiEndpoint> openApisMap) {
     for (String uniqueKey : updatedApisDbMap.keySet()) {
       ApiEndpointConverter.assembleSchemaToUpdateApis(updatedApisDbMap.get(uniqueKey),

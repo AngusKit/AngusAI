@@ -1,6 +1,9 @@
 package cloud.xcan.angus.core.ai.domain.apis;
 
+import cloud.xcan.angus.core.ai.domain.apis.converter.ApiResponseConverter;
 import cloud.xcan.angus.core.ai.domain.apis.converter.ExternalDocConverter;
+import cloud.xcan.angus.core.ai.domain.apis.converter.ParameterConverter;
+import cloud.xcan.angus.core.ai.domain.apis.converter.RequestBodyConverter;
 import cloud.xcan.angus.core.ai.domain.apis.converter.SecurityRequirementConverter;
 import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
@@ -69,15 +72,15 @@ public class ApiEndpoint extends TenantAuditingEntity<ApiEndpoint, Long> {
   @Column(columnDefinition = "json", name = "tags")
   private List<String> tags;
 
-  @Type(JsonType.class)
+  @Convert(converter = ParameterConverter.class)
   @Column(columnDefinition = "json", name = "parameters")
   private List<Parameter> parameters;
 
-  @Type(JsonType.class)
+  @Convert(converter = RequestBodyConverter.class)
   @Column(columnDefinition = "json", name = "request_body")
   private RequestBody requestBody;
 
-  @Type(JsonType.class)
+  @Convert(converter = ApiResponseConverter.class)
   @Column(columnDefinition = "json", name = "responses")
   private Map<String, ApiResponse> responses;
 

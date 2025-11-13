@@ -41,7 +41,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ApiSchemaConverter {
 
-  public static void updateSchema(
+  public static void updateImportSchema(
       ApiSchema schemaDb, OpenAPI openApi, boolean mergeSchema, boolean cover) {
     schemaDb.setOpenapi(openApi.getOpenapi())
         .setInfo(openApi.getInfo())
