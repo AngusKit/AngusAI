@@ -1,7 +1,9 @@
-package cloud.xcan.angus.core.ai.application.cmd.apis;
+package cloud.xcan.angus.core.ai.application.cmd.apis.impl;
 
 import static cloud.xcan.angus.spec.utils.ObjectUtils.nullSafe;
 
+import cloud.xcan.angus.core.ai.application.cmd.apis.ApiEndpointCmd;
+import cloud.xcan.angus.core.ai.application.converter.ApiEndpointConverter;
 import cloud.xcan.angus.core.ai.application.query.apis.ApiEndpointQuery;
 import cloud.xcan.angus.core.ai.domain.apis.ApiEndpoint;
 import cloud.xcan.angus.core.ai.domain.apis.ApiEndpointRepo;
@@ -11,6 +13,10 @@ import cloud.xcan.angus.core.jpa.repository.BaseRepository;
 import cloud.xcan.angus.remote.message.http.ResourceExisted;
 import io.swagger.v3.oas.models.PathItem.HttpMethod;
 import jakarta.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 import org.springframework.stereotype.Service;
 
 /**
@@ -111,8 +117,28 @@ public class ApiEndpointCmdImpl extends CommCmd<ApiEndpoint, Long> implements Ap
   }
 
   @Override
+  public void add(Collection<ApiEndpoint> newApis) {
+    batchInsert(newApis);
+  }
+
+  @Override
+  public void updateSyncApis(Map<String, ApiEndpoint> updatedApisDbMap,
+      Map<String, ApiEndpoint> openApisMap) {
+    for (String uniqueKey : updatedApisDbMap.keySet()) {
+      ApiEndpointConverter.assembleSchemaToUpdateApis(updatedApisDbMap.get(uniqueKey),
+          openApisMap.get(uniqueKey));
+    }
+    batchUpdate0(updatedApisDbMap.values());
+  }
+
+  @Override
   public void deleteByCollectionId(Long id) {
     apiEndpointRepo.deleteByCollectionId(id);
+  }
+
+  @Override
+  public void deleteByIds(Set<Long> ids) {
+    apiEndpointRepo.deleteAllById(ids);
   }
 
   @Override

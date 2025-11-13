@@ -40,6 +40,17 @@ public interface ApiCollectionFacade {
   ApiCollectionDetailVo getDetail(Long id);
 
   /**
+   * 导入接口集
+   */
+  ApiCollectionImportVo importCollection(Long id, ApiCollectionImportDto dto);
+
+  /**
+   * 导出OpenAPI规范
+   */
+  ResponseEntity<Resource> exportOpenApi(Long id, String format, Boolean includeDisabled,
+      HttpServletResponse response);
+
+  /**
    * 获取接口集列表
    */
   PageResult<ApiCollectionListVo> list(ApiCollectionFindDto dto);
@@ -48,17 +59,6 @@ public interface ApiCollectionFacade {
    * 获取接口集统计数据
    */
   ApiCollectionStatisticsVo getStatistics(SimpleStatisticsDto dto);
-
-  /**
-   * 导入接口集
-   */
-  ApiCollectionImportVo importCollection(ApiCollectionImportDto dto);
-
-  /**
-   * 导出OpenAPI规范
-   */
-  ResponseEntity<Resource> exportOpenApi(Long id, String format, Boolean includeDisabled,
-      HttpServletResponse response);
 
 }
 

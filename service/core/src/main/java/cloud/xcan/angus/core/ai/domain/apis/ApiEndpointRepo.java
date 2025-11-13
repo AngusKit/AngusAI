@@ -12,6 +12,8 @@ import org.springframework.data.repository.query.Param;
 @NoRepositoryBean
 public interface ApiEndpointRepo extends BaseRepository<ApiEndpoint, Long> {
 
+  List<ApiEndpoint> findByCollectionId(Long id);
+
   Optional<ApiEndpoint> findByIdAndCollectionId(Long id, Long collectionId);
 
   @Query("SELECT COUNT(e) FROM ApiEndpoint e WHERE e.collectionId = :collectionId")

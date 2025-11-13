@@ -2,6 +2,7 @@ package cloud.xcan.angus.core.ai.application.cmd.apis;
 
 import cloud.xcan.angus.core.ai.domain.apis.ApiCollection;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionImportDto;
+import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionImportVo;
 
 /**
  * 接口集命令服务
@@ -26,7 +27,7 @@ public interface ApiCollectionCmd {
   /**
    * 导入接口集
    */
-  ApiCollection importCollection(ApiCollectionImportDto dto);
+  ApiCollectionImportVo importCollection(Long id, ApiCollectionImportDto dto);
 
 }
 

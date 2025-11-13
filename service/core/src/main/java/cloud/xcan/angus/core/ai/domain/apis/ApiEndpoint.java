@@ -70,6 +70,9 @@ public class ApiEndpoint extends TenantAuditingEntity<ApiEndpoint, Long> {
   @Column(columnDefinition = "json", name = "responses")
   private Map<String, ApiResponse> responses;
 
+  @Column(name = "schema_hash")
+  private int schemaHash;
+
   public Long identity() {
     return this.id;
   }

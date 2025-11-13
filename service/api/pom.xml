@@ -48,6 +48,10 @@
         <!-- Use the spec module instead -->
         <exclusion>
           <groupId>io.swagger.core.v3</groupId>
+          <artifactId>swagger-models-jakarta</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>io.swagger.core.v3</groupId>
           <artifactId>swagger-models</artifactId>
         </exclusion>
         <exclusion>
@@ -64,6 +68,14 @@
         <exclusion>
           <groupId>io.swagger.core.v3</groupId>
           <artifactId>swagger-models</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>io.swagger.core.v3</groupId>
+          <artifactId>swagger-models-jakarta</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>io.swagger.core.v3</groupId>
+          <artifactId>swagger-annotations-jakarta</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
