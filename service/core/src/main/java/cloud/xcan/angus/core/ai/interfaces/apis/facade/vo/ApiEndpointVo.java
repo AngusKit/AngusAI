@@ -33,11 +33,13 @@ public class ApiEndpointVo extends TenantAuditingVo {
   @Schema(description = "描述")
   private String description;
 
-  @Schema(description = "标签")
-  private List<String> tags;
-
   @Schema(description = "是否启用")
   private Boolean enabled;
 
+  @Schema(description = "过期标志")
+  private Boolean deprecated;
+
+  @Schema(description = "标签")
+  private List<String> tags;
 }
 

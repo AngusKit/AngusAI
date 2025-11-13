@@ -26,13 +26,11 @@ import cloud.xcan.angus.core.ai.application.query.apis.ApiEndpointQuery;
 import cloud.xcan.angus.core.ai.application.query.apis.ApiSchemaQuery;
 import cloud.xcan.angus.core.ai.domain.apis.ApiCollection;
 import cloud.xcan.angus.core.ai.domain.apis.ApiCollectionRepo;
+import cloud.xcan.angus.core.ai.domain.apis.ApiCollectionSource;
 import cloud.xcan.angus.core.ai.domain.apis.ApiEndpoint;
 import cloud.xcan.angus.core.ai.domain.apis.ApiSchema;
-import cloud.xcan.angus.core.ai.domain.apis.ApiSchemaRepo;
 import cloud.xcan.angus.core.ai.domain.apis.ConflictStrategy;
 import cloud.xcan.angus.core.ai.domain.apis.ExportApiFormat;
-import cloud.xcan.angus.core.ai.domain.apis.ImportApiStrategy;
-import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionImportDto;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
@@ -45,7 +43,6 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.extension.OpenAPIUtils;
 import jakarta.annotation.Resource;
-import jakarta.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -100,7 +97,7 @@ public class ApiCollectionCmdImpl extends CommCmd<ApiCollection, Long> implement
       protected ApiCollection process() {
         insert(apiCollection);
 
-        apiSchemaCmd.init(apiCollection.getId());
+        apiSchemaCmd.init(apiCollection);
         return apiCollection;
       }
     }.execute();
@@ -156,11 +153,10 @@ public class ApiCollectionCmdImpl extends CommCmd<ApiCollection, Long> implement
   }
 
   @Override
-  public ApiCollection imports(Long id, ApiCollectionImportDto dto) {
+  public ApiCollection imports(Long id, ApiCollectionSource type, String content,
+      MultipartFile file, ConflictStrategy conflictStrategy, Boolean enableByDefault) {
     return new BizTemplate<ApiCollection>() {
       ApiCollection apiCollectionDb;
-      final MultipartFile file = dto.getFile();
-      final String content = dto.getContent();
 
       @Override
       protected void checkParams() {
@@ -192,10 +188,10 @@ public class ApiCollectionCmdImpl extends CommCmd<ApiCollection, Long> implement
       @Override
       protected ApiCollection process() {
         // Import by file
-        if (nonNull(dto.getFile())) {
+        if (nonNull(file)) {
           // Get import files, If it is a multi file import decompression zip file
           String srcFileName = file.getOriginalFilename();
-          File tmpPath = getImportTmpPath(dto.getType(), null);
+          File tmpPath = getImportTmpPath(type, null);
           File importFile = new File(tmpPath.getPath() + File.separator + srcFileName);
           try {
             file.transferTo(importFile);
@@ -208,7 +204,7 @@ public class ApiCollectionCmdImpl extends CommCmd<ApiCollection, Long> implement
           // Save import schema, components and apis
           try {
             openapiReplace(apiCollectionDb.getId(), readAsString(importFile),
-                dto.getImportStrategy());
+                conflictStrategy, enableByDefault);
           } catch (IOException e) {
             log.error("Reading import file exception", e);
             throw SysException.of("Reading import file exception, cause: "
@@ -219,11 +215,11 @@ public class ApiCollectionCmdImpl extends CommCmd<ApiCollection, Long> implement
           FileUtils.deleteQuietly(importFile);
         } else {
           // Import by text
-          openapiReplace(apiCollectionDb.getId(), content, dto.getImportStrategy());
+          openapiReplace(apiCollectionDb.getId(), content, conflictStrategy, enableByDefault);
         }
 
         // Update collection source
-        apiCollectionDb.setSource(dto.getType());
+        apiCollectionDb.setSource(type);
         apiCollectionRepo.save(apiCollectionDb);
 
         return apiCollectionDb;
@@ -259,17 +255,15 @@ public class ApiCollectionCmdImpl extends CommCmd<ApiCollection, Long> implement
     }.execute();
   }
 
-  private void openapiReplace(Long id, String content,
-      @NotNull ImportApiStrategy importStrategy) {
+  private void openapiReplace(Long id, String content, ConflictStrategy conflictStrategy,
+      Boolean enableByDefault) {
 
     OpenAPI openApi = checkAndParseOpenApi(content, null, null);
-
-    ConflictStrategy conflictStrategy = importStrategy.getConflictStrategy();
 
     // 1. Update service schema
     ApiSchema apiSchemaDb = apiSchemaQuery.findByCollectionId(id);
     // Warning: Multiple files importing the same project will be overwritten by the last imported file
-    apiSchemaCmd.updateSchema(apiSchemaDb, openApi, conflictStrategy.isMerge(),
+    apiSchemaCmd.updateImportSchema(apiSchemaDb, openApi, conflictStrategy.isMerge(),
         conflictStrategy.isOverwrite());
 
     // 2. Update APIs (Operation Object Schema)
@@ -290,7 +284,7 @@ public class ApiCollectionCmdImpl extends CommCmd<ApiCollection, Long> implement
                 apisDbMap.get(x).getSchemaHash() != openApisMap.get(x).getSchemaHash())
             .collect(Collectors.toMap(x -> x, apisDbMap::get));
         if (ObjectUtils.isNotEmpty(updatedApisDbMap)) {
-          apiEndpointCmd.updateSyncApis(updatedApisDbMap, openApisMap);
+          apiEndpointCmd.updateImportApis(updatedApisDbMap, openApisMap);
         }
       }
 
@@ -313,7 +307,7 @@ public class ApiCollectionCmdImpl extends CommCmd<ApiCollection, Long> implement
       if (ObjectUtils.isNotEmpty(newApis)) {
         for (ApiEndpoint x : newApis) {
           x.setCollectionId(id);
-          x.setEnabled(importStrategy.getEnableByDefault());
+          x.setEnabled(enableByDefault);
         }
         apiEndpointCmd.add(newApis);
       }

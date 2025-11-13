@@ -48,7 +48,7 @@ public interface ApiEndpointCmd {
   /**
    * 同步更新接口端点
    */
-  void updateSyncApis(Map<String, ApiEndpoint> updatedApisDbMap,
+  void updateImportApis(Map<String, ApiEndpoint> updatedApisDbMap,
       Map<String, ApiEndpoint> openApisMap);
 
 }
