@@ -36,7 +36,7 @@ export function CreateModelDialog({
   onReset,
   providerOptions,
 }: CreateModelDialogProps) {
-  const { language } = useLanguage();
+  const { t } = useLanguage();
 
   const handleCancel = () => {
     onOpenChange(false);
@@ -54,23 +54,22 @@ export function CreateModelDialog({
       <DialogTrigger asChild>
         <Button className='bg-blue-500 hover:bg-blue-600'>
           <Plus className='w-4 h-4 mr-2' />
-          {language === 'zh-CN' ? '添加模型' : 'Add Model'}
+          {t('models.addModel')}
         </Button>
       </DialogTrigger>
       <DialogContent className='dark:bg-gray-800 dark:border-gray-700 sm:max-w-[600px] max-h-[90vh] overflow-y-auto'>
         <DialogHeader>
           <DialogTitle className='dark:text-white'>
-            {language === 'zh-CN' ? '添加新模型' : 'Add New Model'}
+            {t('models.createDialog.title')}
           </DialogTitle>
           <DialogDescription className='dark:text-gray-400'>
-            {language === 'zh-CN' ? '配置并添加一个新的AI模型到您的工作空间' : 'Configure and add a new AI model to your workspace'}
+            {t('models.createDialog.description')}
           </DialogDescription>
         </DialogHeader>
 
         <ModelFormFields
           formData={formData}
           onFormDataChange={onFormDataChange}
-          language={language}
           providerOptions={providerOptions}
           isEdit={false}
         />
@@ -81,10 +80,10 @@ export function CreateModelDialog({
             onClick={handleCancel}
             className='dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300'
           >
-            {language === 'zh-CN' ? '取消' : 'Cancel'}
+            {t('common.actions.cancel')}
           </Button>
           <Button onClick={handleSubmit} disabled={!isFormValid} className='bg-blue-500 hover:bg-blue-600'>
-            {language === 'zh-CN' ? '添加模型' : 'Add Model'}
+            {t('models.addModel')}
           </Button>
         </DialogFooter>
       </DialogContent>

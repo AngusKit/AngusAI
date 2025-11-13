@@ -404,17 +404,19 @@ export function ActivityLog() {
 
       {/* Filters */}
       <Card className='p-6 dark:bg-gray-900 dark:border-gray-800'>
-        <div className='grid grid-cols-1 md:grid-cols-5 gap-4'>
+        <div className='flex gap-2'>
           {/* Search */}
-          <div className='md:col-span-2'>
-            <div className='relative'>
-              <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4' />
-              <Input
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                placeholder={language === 'zh-CN' ? '搜索用户、目标或操作...' : 'Search users, targets, or actions...'}
-                className='pl-10 dark:bg-gray-800 dark:border-gray-700 dark:text-white'
-              />
+          <div className='flex-1'>
+            <div className='md:col-span-2 w-[300px]'>
+              <div className='relative'>
+                <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4' />
+                <Input
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  placeholder={language === 'zh-CN' ? '搜索用户、目标或操作...' : 'Search users, targets, or actions...'}
+                  className='pl-10 dark:bg-gray-800 dark:border-gray-700 dark:text-white'
+                />
+              </div>
             </div>
           </div>
 

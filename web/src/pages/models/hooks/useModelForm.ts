@@ -9,6 +9,7 @@ import { ModelCreateDto, ModelUpdateDto } from '@/services/ModelsTypes';
 import { ModelProviderEnum } from '@/enums/enums';
 import { DEFAULT_FORM_DATA } from '../constants';
 import { parseNumber } from '../utils';
+import { useLanguage } from '@/components/ui/LanguageProvider';
 import type { ModelFormData } from '../types';
 
 interface UseModelFormReturn {
@@ -21,9 +22,9 @@ interface UseModelFormReturn {
 }
 
 export const useModelForm = (
-  language: string,
   onSuccess?: () => Promise<void>
 ): UseModelFormReturn => {
+  const { t } = useLanguage();
   const [formData, setFormData] = useState<ModelFormData>(DEFAULT_FORM_DATA);
 
   const resetForm = useCallback(() => {
@@ -32,11 +33,11 @@ export const useModelForm = (
 
   const validateForm = useCallback((): boolean => {
     if (!formData.name.trim() || !formData.provider || !formData.version.trim()) {
-      toast.error(language === 'zh-CN' ? '请填写必填字段' : 'Please fill in required fields');
+      toast.error(t('models.validation.requiredFields'));
       return false;
     }
     return true;
-  }, [formData, language]);
+  }, [formData, t]);
 
   const handleCreateModel = useCallback(async (): Promise<boolean> => {
     if (!validateForm()) {
@@ -60,9 +61,7 @@ export const useModelForm = (
 
     try {
       await ModelsService.createModel(payload);
-      toast.success(
-        language === 'zh-CN' ? `模型 "${formData.name}" 已成功添加！` : `Model "${formData.name}" added successfully!`
-      );
+      toast.success(t('models.messages.createSuccess', { name: formData.name }));
       resetForm();
       if (onSuccess) {
         await onSuccess();
@@ -70,10 +69,10 @@ export const useModelForm = (
       return true;
     } catch (error: any) {
       console.error('Failed to add model:', error);
-      toast.error(error?.message || (language === 'zh-CN' ? '添加模型失败' : 'Failed to add model'));
+      toast.error(error?.message || t('models.messages.createFailed'));
       return false;
     }
-  }, [formData, validateForm, language, resetForm, onSuccess]);
+  }, [formData, validateForm, resetForm, onSuccess, t]);
 
   const handleUpdateModel = useCallback(
     async (modelId: string): Promise<boolean> => {
@@ -98,20 +97,18 @@ export const useModelForm = (
 
       try {
         await ModelsService.updateModel(modelId, payload);
-        toast.success(
-          language === 'zh-CN' ? `模型 "${formData.name}" 配置已更新` : `Model "${formData.name}" updated successfully`
-        );
+        toast.success(t('models.messages.updateSuccess', { name: formData.name }));
         if (onSuccess) {
           await onSuccess();
         }
         return true;
       } catch (error: any) {
         console.error('Failed to update model:', error);
-        toast.error(error?.message || (language === 'zh-CN' ? '更新模型失败' : 'Failed to update model'));
+        toast.error(error?.message || t('models.messages.updateFailed'));
         return false;
       }
     },
-    [formData, validateForm, language, onSuccess]
+    [formData, validateForm, onSuccess, t]
   );
 
   return {

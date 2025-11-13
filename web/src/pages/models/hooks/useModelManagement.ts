@@ -22,6 +22,7 @@ import {
 } from '../utils';
 import { ModelListItem } from '../types.ts';
 import { getEnumDescription } from '@/enums/utils';
+import { useLanguage } from '@/components/ui/LanguageProvider';
 
 export type SortOption = 'default' | 'name' | 'provider' | 'status' | 'createdDate';
 
@@ -66,14 +67,15 @@ interface UseModelManagementReturn {
   shouldShowPagination: boolean;
 }
 
-export const useModelManagement = (language: string): UseModelManagementReturn => {
+export const useModelManagement = (): UseModelManagementReturn => {
+  const { language, t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearchQuery = useDebounce(searchQuery, SEARCH_DEBOUNCE_MS);
   const [typeFilter, setTypeFilter] = useState<'all' | ModelTypeEnum>('all');
   const [statusFilter, setStatusFilter] = useState<'all' | ModelStatusEnum>('all');
   const [sortBy, setSortBy] = useState<SortOption>('default');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [currentPage, setCurrentPage] = useState(PAGINATION_CONFIG.DEFAULT_PAGE);
+  const [currentPage, setCurrentPage] = useState<number>(PAGINATION_CONFIG.DEFAULT_PAGE);
   const itemsPerPage = PAGINATION_CONFIG.DEFAULT_PAGE_SIZE;
 
   const [models, setModels] = useState<ModelListItem[]>([]);
@@ -155,9 +157,9 @@ export const useModelManagement = (language: string): UseModelManagementReturn =
       setStats(responseData ?? null);
     } catch (error: any) {
       console.error('Failed to load model statistics:', error);
-      toast.error(error?.message || (language === 'zh-CN' ? '获取模型统计失败' : 'Failed to load statistics'));
+      toast.error(error?.message || t('models.messages.loadStatisticsFailed'));
     }
-  }, [language]);
+  }, [t]);
 
   const loadModels = useCallback(async () => {
     setModelsLoading(true);
@@ -198,7 +200,7 @@ export const useModelManagement = (language: string): UseModelManagementReturn =
       setModels(normalized.filter(Boolean) as ModelListItem[]);
     } catch (error: any) {
       console.error('Failed to load models:', error);
-      toast.error(error?.message || (language === 'zh-CN' ? '加载模型列表失败' : 'Failed to load models'));
+      toast.error(error?.message || t('models.messages.loadModelsFailed'));
     } finally {
       setModelsLoading(false);
     }
@@ -212,6 +214,7 @@ export const useModelManagement = (language: string): UseModelManagementReturn =
     statusFilter,
     typeFilter,
     language,
+    t,
   ]);
 
   const fetchModelDetail = useCallback(async (modelId: string) => {
@@ -233,23 +236,19 @@ export const useModelManagement = (language: string): UseModelManagementReturn =
       try {
         if (model.statusEnum === ModelStatusEnum.RUNNING) {
           await ModelsService.stopModel(model.id, { graceful: true });
-          toast.success(
-            language === 'zh-CN' ? `${model.name} 已停止` : `${model.name} stopped`
-          );
+          toast.success(t('models.messages.modelStopped', { name: model.name }));
         } else {
           await ModelsService.startModel(model.id);
-          toast.success(
-            language === 'zh-CN' ? `${model.name} 已启动` : `${model.name} started`
-          );
+          toast.success(t('models.messages.modelStarted', { name: model.name }));
         }
         await loadModels();
         await loadStatistics();
       } catch (error: any) {
         console.error('Failed to toggle model status:', error);
-        toast.error(error?.message || (language === 'zh-CN' ? '更新模型状态失败' : 'Failed to update status'));
+        toast.error(error?.message || t('models.messages.updateStatusFailed'));
       }
     },
-    [loadModels, loadStatistics, language]
+    [loadModels, loadStatistics, t]
   );
 
   const statsCards = useMemo(() => {
@@ -265,16 +264,12 @@ export const useModelManagement = (language: string): UseModelManagementReturn =
     return [
       {
         key: 'totalModels',
-        label: language === 'zh-CN' ? '模型总数' : 'Total Models',
+        label: t('models.stats.totalModels'),
         value: totalModelsValue,
         subtext:
           today?.addedModels !== undefined
-            ? language === 'zh-CN'
-              ? `今日新增 ${formatNumber(today.addedModels)}`
-              : `Added today ${formatNumber(today.addedModels)}`
-            : language === 'zh-CN'
-              ? '暂无今日数据'
-              : 'No daily data',
+            ? t('models.stats.addedToday', { value: formatNumber(today.addedModels) })
+            : t('models.stats.noDailyData'),
         icon: Database,
         iconBg: 'bg-blue-500',
         trend: lastMonth?.addedModels !== undefined ? `+${formatNumber(lastMonth.addedModels)}` : undefined,
@@ -282,16 +277,12 @@ export const useModelManagement = (language: string): UseModelManagementReturn =
       },
       {
         key: 'totalCost',
-        label: language === 'zh-CN' ? '总成本' : 'Total Cost',
+        label: t('models.stats.totalCost'),
         value: totalCostValue,
         subtext:
           today?.addedCost !== undefined
-            ? language === 'zh-CN'
-              ? `今日新增 ${formatCurrency(today.addedCost, language)}`
-              : `Added today ${formatCurrency(today.addedCost, language)}`
-            : language === 'zh-CN'
-              ? '暂无今日数据'
-              : 'No daily data',
+            ? t('models.stats.addedToday', { value: formatCurrency(today.addedCost, language) })
+            : t('models.stats.noDailyData'),
         icon: Activity,
         iconBg: 'bg-green-500',
         trend: lastMonth?.addedCost !== undefined ? `+${formatCurrency(lastMonth.addedCost, language)}` : undefined,
@@ -299,16 +290,12 @@ export const useModelManagement = (language: string): UseModelManagementReturn =
       },
       {
         key: 'totalCalls',
-        label: language === 'zh-CN' ? '总调用次数' : 'Total Calls',
+        label: t('models.stats.totalCalls'),
         value: totalCallsValue,
         subtext:
           today?.addedCalls !== undefined
-            ? language === 'zh-CN'
-              ? `今日新增 ${formatNumber(today.addedCalls)}`
-              : `Added today ${formatNumber(today.addedCalls)}`
-            : language === 'zh-CN'
-              ? '暂无今日数据'
-              : 'No daily data',
+            ? t('models.stats.addedToday', { value: formatNumber(today.addedCalls) })
+            : t('models.stats.noDailyData'),
         icon: TrendingUp,
         iconBg: 'bg-orange-500',
         trend: lastMonth?.addedCalls !== undefined ? `+${formatNumber(lastMonth.addedCalls)}` : undefined,
@@ -316,16 +303,12 @@ export const useModelManagement = (language: string): UseModelManagementReturn =
       },
       {
         key: 'latency',
-        label: language === 'zh-CN' ? '平均延迟' : 'Avg Latency',
+        label: t('models.stats.avgLatency'),
         value: latencyValue,
         subtext:
           today?.latencyDecreaseFromYesterdayMs !== undefined
-            ? language === 'zh-CN'
-              ? `较昨日改善 ${today.latencyDecreaseFromYesterdayMs}ms`
-              : `Improved ${today.latencyDecreaseFromYesterdayMs}ms vs yesterday`
-            : language === 'zh-CN'
-              ? '暂无数据'
-              : 'No data',
+            ? t('models.stats.improvedVsYesterday', { value: today.latencyDecreaseFromYesterdayMs })
+            : t('models.stats.noData'),
         icon: Zap,
         iconBg: 'bg-purple-500',
         trend:
@@ -335,7 +318,7 @@ export const useModelManagement = (language: string): UseModelManagementReturn =
         trendUp: true,
       },
     ];
-  }, [language, stats]);
+  }, [language, stats, t]);
 
   const shouldShowPagination = useMemo(() => {
     return modelsTotal > itemsPerPage;

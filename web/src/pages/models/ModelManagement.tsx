@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState, type ElementType } from 'react';
 import { useLanguage } from '@/components/ui/LanguageProvider';
-import { Database, Search, Filter, TrendingUp, Activity, Grid3x3, List, Eye, Edit, Trash2, MoreHorizontal, Play, Pause, Cpu, Zap, Brain, FileText, Image as ImageIcon } from 'lucide-react';
+import { Database, Search, Filter, TrendingUp, Activity, Grid3x3, List, Eye, Edit, Trash2, MoreHorizontal, Play, Pause, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -145,7 +145,7 @@ const mapStatusToConfig = (status?: ModelStatusEnum | string) => {
 };
 
 export function ModelManagement() {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
   const [typeFilter, setTypeFilter] = useState<'all' | ModelTypeEnum>('all');
@@ -229,16 +229,12 @@ export function ModelManagement() {
     return [
       {
         key: 'totalModels',
-        label: language === 'zh-CN' ? '模型总数' : 'Total Models',
+        label: t('models.stats.totalModels'),
         value: totalModelsValue,
         subtext:
           today?.addedModels !== undefined
-            ? language === 'zh-CN'
-              ? `今日新增 ${formatNumber(today.addedModels)}`
-              : `Added today ${formatNumber(today.addedModels)}`
-            : language === 'zh-CN'
-              ? '暂无今日数据'
-              : 'No daily data',
+            ? t('models.stats.addedToday', { value: formatNumber(today.addedModels) })
+            : t('models.stats.noDailyData'),
         icon: Database,
         iconBg: 'bg-blue-500',
         trend: lastMonth?.addedModels !== undefined ? `+${formatNumber(lastMonth.addedModels)}` : undefined,
@@ -246,16 +242,12 @@ export function ModelManagement() {
       },
       {
         key: 'totalCost',
-        label: language === 'zh-CN' ? '总成本' : 'Total Cost',
+        label: t('models.stats.totalCost'),
         value: totalCostValue,
         subtext:
           today?.addedCost !== undefined
-            ? language === 'zh-CN'
-              ? `今日新增 ${formatCurrency(today.addedCost, language)}`
-              : `Added today ${formatCurrency(today.addedCost, language)}`
-            : language === 'zh-CN'
-              ? '暂无今日数据'
-              : 'No daily data',
+            ? t('models.stats.addedToday', { value: formatCurrency(today.addedCost, language) })
+            : t('models.stats.noDailyData'),
         icon: Activity,
         iconBg: 'bg-green-500',
         trend: lastMonth?.addedCost !== undefined ? `+${formatCurrency(lastMonth.addedCost, language)}` : undefined,
@@ -263,16 +255,12 @@ export function ModelManagement() {
       },
       {
         key: 'totalCalls',
-        label: language === 'zh-CN' ? '总调用次数' : 'Total Calls',
+        label: t('models.stats.totalCalls'),
         value: totalCallsValue,
         subtext:
           today?.addedCalls !== undefined
-            ? language === 'zh-CN'
-              ? `今日新增 ${formatNumber(today.addedCalls)}`
-              : `Added today ${formatNumber(today.addedCalls)}`
-            : language === 'zh-CN'
-              ? '暂无今日数据'
-              : 'No daily data',
+            ? t('models.stats.addedToday', { value: formatNumber(today.addedCalls) })
+            : t('models.stats.noDailyData'),
         icon: TrendingUp,
         iconBg: 'bg-orange-500',
         trend: lastMonth?.addedCalls !== undefined ? `+${formatNumber(lastMonth.addedCalls)}` : undefined,
@@ -280,16 +268,12 @@ export function ModelManagement() {
       },
       {
         key: 'latency',
-        label: language === 'zh-CN' ? '平均延迟' : 'Avg Latency',
+        label: t('models.stats.avgLatency'),
         value: latencyValue,
         subtext:
           today?.latencyDecreaseFromYesterdayMs !== undefined
-            ? language === 'zh-CN'
-              ? `较昨日改善 ${today.latencyDecreaseFromYesterdayMs}ms`
-              : `Improved ${today.latencyDecreaseFromYesterdayMs}ms vs yesterday`
-            : language === 'zh-CN'
-              ? '暂无数据'
-              : 'No data',
+            ? t('models.stats.improvedVsYesterday', { value: today.latencyDecreaseFromYesterdayMs })
+            : t('models.stats.noData'),
         icon: Zap,
         iconBg: 'bg-purple-500',
         trend:
@@ -299,7 +283,7 @@ export function ModelManagement() {
         trendUp: true,
       },
     ];
-  }, [language, stats]);
+  }, [language, stats, t]);
 
   const buildModelItem = useCallback(
     (item: ModelListVo, detail?: ModelDetailVo): ModelListItem | null => {
@@ -365,9 +349,9 @@ export function ModelManagement() {
       setStats(responseData ?? null);
     } catch (error: any) {
       console.error('Failed to load model statistics:', error);
-      toast.error(error?.message || '获取模型统计失败');
+      toast.error(error?.message || t('models.messages.loadStatisticsFailed'));
     }
-  }, []);
+  }, [t]);
 
   const loadModels = useCallback(async () => {
     setModelsLoading(true);
@@ -408,7 +392,7 @@ export function ModelManagement() {
       setModels(normalized.filter(Boolean) as ModelListItem[]);
     } catch (error: any) {
       console.error('Failed to load models:', error);
-      toast.error(error?.message || '加载模型列表失败');
+      toast.error(error?.message || t('models.messages.loadModelsFailed'));
     } finally {
       setModelsLoading(false);
     }
@@ -421,6 +405,7 @@ export function ModelManagement() {
     sortBy,
     statusFilter,
     typeFilter,
+    t,
   ]);
 
   useEffect(() => {
@@ -454,19 +439,19 @@ export function ModelManagement() {
       try {
         if (model.statusEnum === ModelStatusEnum.RUNNING) {
           await ModelsService.stopModel(model.id, { graceful: true });
-          toast.success(`${model.name} 已停止`);
+          toast.success(t('models.messages.modelStopped', { name: model.name }));
         } else {
           await ModelsService.startModel(model.id);
-          toast.success(`${model.name} 已启动`);
+          toast.success(t('models.messages.modelStarted', { name: model.name }));
         }
         await loadModels();
         await loadStatistics();
       } catch (error: any) {
         console.error('Failed to toggle model status:', error);
-        toast.error(error?.message || '更新模型状态失败');
+        toast.error(error?.message || t('models.messages.updateStatusFailed'));
       }
     },
-    [loadModels, loadStatistics]
+    [loadModels, loadStatistics, t]
   );
 
   const handleViewDetails = useCallback(
@@ -485,10 +470,10 @@ export function ModelManagement() {
           setSelectedModel(prev => (prev && prev.id === model.id ? { ...prev, detail } : prev));
         }
       } catch (error: any) {
-        toast.error(error?.message || '获取模型详情失败');
+        toast.error(error?.message || t('models.messages.getDetailFailed'));
       }
     },
-    [fetchModelDetail]
+    [fetchModelDetail, t]
   );
 
   const handleOpenEdit = useCallback(
@@ -504,7 +489,7 @@ export function ModelManagement() {
             setSelectedModel(prev => (prev && prev.id === model.id ? { ...prev, detail } : prev));
           }
         } catch (error: any) {
-          toast.error(error?.message || '获取模型详情失败');
+          toast.error(error?.message || t('models.messages.getDetailFailed'));
           return;
         }
       }
@@ -528,12 +513,12 @@ export function ModelManagement() {
 
   const handleSaveEdit = useCallback(async () => {
     if (!selectedModel) {
-      toast.error(language === 'zh-CN' ? '未选择模型' : 'No model selected');
+      toast.error(t('models.messages.noModelSelected'));
       return;
     }
 
     if (!editFormData.name.trim() || !editFormData.provider || !editFormData.version.trim()) {
-      toast.error(language === 'zh-CN' ? '请填写必填字段' : 'Please fill in required fields');
+      toast.error(t('models.validation.requiredFields'));
       return;
     }
 
@@ -556,17 +541,15 @@ export function ModelManagement() {
 
     try {
       await ModelsService.updateModel(selectedModel.id, payload);
-      toast.success(
-        language === 'zh-CN' ? `模型 "${editFormData.name}" 配置已更新` : `Model "${editFormData.name}" updated successfully`
-      );
+      toast.success(t('models.messages.updateSuccess', { name: editFormData.name }));
       setEditDialogOpen(false);
       await loadModels();
       await loadStatistics();
     } catch (error: any) {
       console.error('Failed to update model:', error);
-      toast.error(error?.message || (language === 'zh-CN' ? '更新模型失败' : 'Failed to update model'));
+      toast.error(error?.message || t('models.messages.updateFailed'));
     }
-  }, [editFormData, language, loadModels, loadStatistics, selectedModel]);
+  }, [editFormData, loadModels, loadStatistics, selectedModel, t]);
 
   const handleDeleteModel = useCallback(
     async (model: ModelListItem) => {
@@ -575,20 +558,20 @@ export function ModelManagement() {
       }
       try {
         await ModelsService.deleteModel(model.id);
-        toast.success(`模型 "${model.name}" 已删除`);
+        toast.success(t('models.messages.deleteSuccess', { name: model.name }));
         await loadModels();
         await loadStatistics();
       } catch (error: any) {
         console.error('Failed to delete model:', error);
-        toast.error(error?.message || '删除模型失败');
+        toast.error(error?.message || t('models.messages.deleteFailed'));
       }
     },
-    [loadModels, loadStatistics]
+    [loadModels, loadStatistics, t]
   );
 
   const handleAddModel = useCallback(async () => {
     if (!formData.name.trim() || !formData.provider || !formData.version.trim()) {
-      toast.error(language === 'zh-CN' ? '请填写必填字段' : 'Please fill in required fields');
+      toast.error(t('models.validation.requiredFields'));
       return;
     }
 
@@ -611,9 +594,7 @@ export function ModelManagement() {
 
     try {
       await ModelsService.createModel(payload);
-      toast.success(
-        language === 'zh-CN' ? `模型 "${formData.name}" 已成功添加！` : `Model "${formData.name}" added successfully!`
-      );
+      toast.success(t('models.messages.createSuccess', { name: formData.name }));
       setAddModelDialogOpen(false);
       setFormData({
         name: '',
@@ -631,9 +612,9 @@ export function ModelManagement() {
       await loadStatistics();
     } catch (error: any) {
       console.error('Failed to add model:', error);
-      toast.error(error?.message || (language === 'zh-CN' ? '添加模型失败' : 'Failed to add model'));
+      toast.error(error?.message || t('models.messages.createFailed'));
     }
-  }, [formData, language, loadModels, loadStatistics]);
+  }, [formData, loadModels, loadStatistics, t]);
 
   const handleFormDataChange = (data: Partial<typeof formData>) => {
     setFormData(prev => ({ ...prev, ...data }));
@@ -675,8 +656,8 @@ export function ModelManagement() {
     <div className='space-y-6'>
       {/* Header */}
       <div>
-        <h1 className='text-2xl mb-1 dark:text-white'>模型管理</h1>
-        <p className='text-sm text-gray-600 dark:text-gray-400'>管理和监控AI模型的部署和性能</p>
+        <h1 className='text-2xl mb-1 dark:text-white'>{t('models.title')}</h1>
+        <p className='text-sm text-gray-600 dark:text-gray-400'>{t('models.subtitle')}</p>
       </div>
 
       {/* Stats Cards */}
@@ -711,7 +692,7 @@ export function ModelManagement() {
             <div className='relative w-[390px]'>
               <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400' />
               <Input
-                placeholder='搜索模型...'
+                placeholder={t('models.searchPlaceholder')}
                 value={searchQuery}
                 onChange={e => {
                   setSearchQuery(e.target.value);
@@ -732,11 +713,11 @@ export function ModelManagement() {
               >
                 <SelectTrigger className='w-[140px] dark:bg-gray-800 dark:border-gray-700'>
                   <Filter className='w-4 h-4 mr-2' />
-                  <SelectValue placeholder='类型筛选' />
+                  <SelectValue placeholder={t('models.filters.typeFilterPlaceholder')} />
                 </SelectTrigger>
                 <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
                   <SelectItem value='all' className='dark:text-gray-300'>
-                    {language === 'zh-CN' ? '全部类型' : 'All Types'}
+                    {t('models.filters.allTypes')}
                   </SelectItem>
                   {modelTypeOptions.map(option => {
                     const Icon = option.icon;
@@ -760,20 +741,20 @@ export function ModelManagement() {
                 }}
               >
                 <SelectTrigger className='w-[140px] dark:bg-gray-800 dark:border-gray-700'>
-                  <SelectValue placeholder='状态筛选' />
+                  <SelectValue placeholder={t('models.filters.statusFilterPlaceholder')} />
                 </SelectTrigger>
                 <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
                   <SelectItem value='all' className='dark:text-gray-300'>
-                    {language === 'zh-CN' ? '全部状态' : 'All Statuses'}
+                    {t('models.filters.allStatuses')}
                   </SelectItem>
                   <SelectItem value={ModelStatusEnum.RUNNING} className='dark:text-gray-300'>
-                    {language === 'zh-CN' ? '运行中' : 'Running'}
+                    {t('models.filters.running')}
                   </SelectItem>
                   <SelectItem value={ModelStatusEnum.STOPPED} className='dark:text-gray-300'>
-                    {language === 'zh-CN' ? '已停止' : 'Stopped'}
+                    {t('models.filters.stopped')}
                   </SelectItem>
                   <SelectItem value={ModelStatusEnum.ERROR} className='dark:text-gray-300'>
-                    {language === 'zh-CN' ? '异常' : 'Error'}
+                    {t('models.filters.error')}
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -790,19 +771,19 @@ export function ModelManagement() {
                 </SelectTrigger>
                 <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
                   <SelectItem value='default' className='dark:text-gray-300'>
-                    {language === 'zh-CN' ? '默认排序' : 'Default'}
+                    {t('models.filters.defaultSort')}
                   </SelectItem>
                   <SelectItem value='name' className='dark:text-gray-300'>
-                    {language === 'zh-CN' ? '名称' : 'Name'}
+                    {t('common.labels.name')}
                   </SelectItem>
                   <SelectItem value='provider' className='dark:text-gray-300'>
-                    {language === 'zh-CN' ? '提供商' : 'Provider'}
+                    {t('models.provider')}
                   </SelectItem>
                   <SelectItem value='status' className='dark:text-gray-300'>
-                    {language === 'zh-CN' ? '状态' : 'Status'}
+                    {t('models.status')}
                   </SelectItem>
                   <SelectItem value='createdDate' className='dark:text-gray-300'>
-                    {language === 'zh-CN' ? '创建时间' : 'Created'}
+                    {t('models.filters.createdDate')}
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -845,17 +826,17 @@ export function ModelManagement() {
                 <Card className='p-12 text-center dark:bg-gray-800 dark:border-gray-700 col-span-full'>
                   <Database className='w-12 h-12 text-gray-400 mx-auto mb-4' />
                   <h3 className='text-lg mb-2 dark:text-white'>
-                    {language === 'zh-CN' ? '正在加载模型...' : 'Loading models...'}
+                    {t('models.empty.loadingModels')}
                   </h3>
                 </Card>
               ) : models.length === 0 ? (
                 <Card className='p-12 text-center dark:bg-gray-800 dark:border-gray-700 col-span-full'>
                   <Database className='w-12 h-12 text-gray-400 mx-auto mb-4' />
                   <h3 className='text-lg mb-2 dark:text-white'>
-                    {language === 'zh-CN' ? '未找到模型' : 'No models found'}
+                    {t('models.empty.noModelsFound')}
                   </h3>
                   <p className='text-sm text-gray-600 dark:text-gray-400'>
-                    {language === 'zh-CN' ? '尝试调整搜索条件或筛选器' : 'Try adjusting search or filters'}
+                    {t('models.empty.tryAdjustingSearch')}
                   </p>
                 </Card>
               ) : (
@@ -893,18 +874,18 @@ export function ModelManagement() {
                                   className='dark:text-gray-300'
                                 >
                                   <Eye className='w-4 h-4 mr-2' />
-                                  查看详情
+                                  {t('models.actions.viewDetails')}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => handleOpenEdit(model)} className='dark:text-gray-300'>
                                   <Edit className='w-4 h-4 mr-2' />
-                                  编辑配置
+                                  {t('models.actions.editConfig')}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                   onClick={() => handleDeleteModel(model)}
                                   className='text-red-600 dark:text-red-400'
                                 >
                                   <Trash2 className='w-4 h-4 mr-2' />
-                                  删除
+                                  {t('models.actions.delete')}
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
@@ -928,26 +909,26 @@ export function ModelManagement() {
 
                           <div className='space-y-2 mb-4 text-xs'>
                             <div className='flex items-center justify-between'>
-                              <span className='text-gray-500 dark:text-gray-400'>提供商</span>
+                              <span className='text-gray-500 dark:text-gray-400'>{t('models.table.provider')}</span>
                               <span className='dark:text-white'>{model.provider}</span>
                             </div>
                             <div className='flex items-center justify-between'>
-                              <span className='text-gray-500 dark:text-gray-400'>版本</span>
+                              <span className='text-gray-500 dark:text-gray-400'>{t('models.table.version')}</span>
                               <span className='dark:text-white'>{model.version}</span>
                             </div>
                             <div className='flex items-center justify-between'>
-                              <span className='text-gray-500 dark:text-gray-400'>延迟</span>
+                              <span className='text-gray-500 dark:text-gray-400'>{t('models.table.latency')}</span>
                               <span className='dark:text-white'>{model.performance.latency}</span>
                             </div>
                           </div>
 
                           <div className='flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700 text-sm'>
                             <div>
-                              <div className='text-gray-500 dark:text-gray-400 text-xs'>今日调用</div>
+                              <div className='text-gray-500 dark:text-gray-400 text-xs'>{t('models.table.todayCalls')}</div>
                               <div className='dark:text-white'>{model.calls}</div>
                             </div>
                             <div className='text-right'>
-                              <div className='text-gray-500 dark:text-gray-400 text-xs'>今日成本</div>
+                              <div className='text-gray-500 dark:text-gray-400 text-xs'>{t('models.table.todayCost')}</div>
                               <div className='dark:text-white'>{model.cost}</div>
                             </div>
                           </div>
@@ -967,17 +948,17 @@ export function ModelManagement() {
                 <div className='p-12 text-center'>
                   <Database className='w-12 h-12 text-gray-400 mx-auto mb-4' />
                   <h3 className='text-lg mb-2 dark:text-white'>
-                    {language === 'zh-CN' ? '正在加载模型...' : 'Loading models...'}
+                    {t('models.empty.loadingModels')}
                   </h3>
                 </div>
               ) : models.length === 0 ? (
                 <div className='p-12 text-center'>
                   <Database className='w-12 h-12 text-gray-400 mx-auto mb-4' />
                   <h3 className='text-lg mb-2 dark:text-white'>
-                    {language === 'zh-CN' ? '未找到模型' : 'No models found'}
+                    {t('models.empty.noModelsFound')}
                   </h3>
                   <p className='text-sm text-gray-600 dark:text-gray-400'>
-                    {language === 'zh-CN' ? '尝试调整搜索条件或筛选器' : 'Try adjusting search or filters'}
+                    {t('models.empty.tryAdjustingSearch')}
                   </p>
                 </div>
               ) : (
@@ -985,12 +966,12 @@ export function ModelManagement() {
                   <table className='w-full'>
                     <thead className='bg-gray-50 dark:bg-gray-900'>
                       <tr>
-                        <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>模型</th>
-                        <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>类型</th>
-                        <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>状态</th>
-                        <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>性能</th>
-                        <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>调用/成本</th>
-                        <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>操作</th>
+                        <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>{t('models.table.model')}</th>
+                        <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>{t('models.table.type')}</th>
+                        <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>{t('models.table.status')}</th>
+                        <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>{t('models.table.performance')}</th>
+                        <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>{t('models.table.callsCost')}</th>
+                        <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>{t('models.table.actions')}</th>
                       </tr>
                     </thead>
                     <tbody className='divide-y divide-gray-200 dark:divide-gray-700'>
@@ -1085,8 +1066,8 @@ export function ModelManagement() {
       <Dialog open={detailsDialogOpen} onOpenChange={setDetailsDialogOpen}>
         <DialogContent className='dark:bg-gray-800 dark:border-gray-700 sm:max-w-[700px] max-h-[90vh] overflow-y-auto'>
           <DialogHeader>
-            <DialogTitle className='dark:text-white'>模型详情</DialogTitle>
-            <DialogDescription className='dark:text-gray-400'>查看模型的详细信息和性能指标</DialogDescription>
+            <DialogTitle className='dark:text-white'>{t('models.details.title')}</DialogTitle>
+            <DialogDescription className='dark:text-gray-400'>{t('models.details.description')}</DialogDescription>
           </DialogHeader>
 
           {selectedModel && (
@@ -1108,37 +1089,37 @@ export function ModelManagement() {
               {/* 模型信息 */}
               <div className='grid grid-cols-2 gap-4'>
                 <div className='space-y-1'>
-                  <div className='text-xs text-gray-500 dark:text-gray-400'>提供商</div>
+                  <div className='text-xs text-gray-500 dark:text-gray-400'>{t('models.table.provider')}</div>
                   <div className='dark:text-white'>{selectedModel.provider}</div>
                 </div>
                 <div className='space-y-1'>
-                  <div className='text-xs text-gray-500 dark:text-gray-400'>版本</div>
+                  <div className='text-xs text-gray-500 dark:text-gray-400'>{t('models.table.version')}</div>
                   <div className='dark:text-white'>{selectedModel.version}</div>
                 </div>
                 <div className='space-y-1'>
-                  <div className='text-xs text-gray-500 dark:text-gray-400'>类型</div>
+                  <div className='text-xs text-gray-500 dark:text-gray-400'>{t('models.table.type')}</div>
                   <div className='dark:text-white'>{selectedModel.type}</div>
                 </div>
                 <div className='space-y-1'>
-                  <div className='text-xs text-gray-500 dark:text-gray-400'>添加时间</div>
+                  <div className='text-xs text-gray-500 dark:text-gray-400'>{t('models.details.addedAt')}</div>
                   <div className='dark:text-white'>{selectedModel.deployed}</div>
                 </div>
               </div>
 
               {/* 性能指标 */}
               <div className='pt-4 border-t border-gray-200 dark:border-gray-700'>
-                <h4 className='text-sm mb-3 dark:text-white'>性能指标</h4>
+                <h4 className='text-sm mb-3 dark:text-white'>{t('models.details.performanceMetrics')}</h4>
                 <div className='grid grid-cols-3 gap-4'>
                   <Card className='p-4 dark:bg-gray-900 dark:border-gray-700'>
-                    <div className='text-xs text-gray-500 dark:text-gray-400 mb-1'>延迟</div>
+                    <div className='text-xs text-gray-500 dark:text-gray-400 mb-1'>{t('models.table.latency')}</div>
                     <div className='text-lg dark:text-white'>{selectedModel.performance.latency}</div>
                   </Card>
                   <Card className='p-4 dark:bg-gray-900 dark:border-gray-700'>
-                    <div className='text-xs text-gray-500 dark:text-gray-400 mb-1'>吞吐量</div>
+                    <div className='text-xs text-gray-500 dark:text-gray-400 mb-1'>{t('models.details.throughput')}</div>
                     <div className='text-lg dark:text-white'>{selectedModel.performance.throughput}</div>
                   </Card>
                   <Card className='p-4 dark:bg-gray-900 dark:border-gray-700'>
-                    <div className='text-xs text-gray-500 dark:text-gray-400 mb-1'>准确率</div>
+                    <div className='text-xs text-gray-500 dark:text-gray-400 mb-1'>{t('models.details.accuracy')}</div>
                     <div className='text-lg dark:text-white'>{selectedModel.performance.accuracy}</div>
                   </Card>
                 </div>
@@ -1146,18 +1127,18 @@ export function ModelManagement() {
 
               {/* 使用统计 */}
               <div className='pt-4 border-t border-gray-200 dark:border-gray-700'>
-                <h4 className='text-sm mb-3 dark:text-white'>使用统计</h4>
+                <h4 className='text-sm mb-3 dark:text-white'>{t('models.details.usageStats')}</h4>
                 <div className='grid grid-cols-3 gap-4'>
                   <div className='space-y-1'>
-                    <div className='text-xs text-gray-500 dark:text-gray-400'>累计调用次数</div>
+                    <div className='text-xs text-gray-500 dark:text-gray-400'>{t('models.details.totalCalls')}</div>
                     <div className='text-xl dark:text-white'>{selectedModel.calls}</div>
                   </div>
                   <div className='space-y-1'>
-                    <div className='text-xs text-gray-500 dark:text-gray-400'>累计成本</div>
+                    <div className='text-xs text-gray-500 dark:text-gray-400'>{t('models.details.totalCost')}</div>
                     <div className='text-xl dark:text-white'>{selectedModel.cost}</div>
                   </div>
                   <div className='space-y-1'>
-                    <div className='text-xs text-gray-500 dark:text-gray-400'>累计使用Tokens</div>
+                    <div className='text-xs text-gray-500 dark:text-gray-400'>{t('models.details.totalTokens')}</div>
                     <div className='text-xl dark:text-white'>{selectedModel.tokens || '2.5M'}</div>
                   </div>
                 </div>
@@ -1171,7 +1152,7 @@ export function ModelManagement() {
               onClick={() => setDetailsDialogOpen(false)}
               className='dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300'
             >
-              关闭
+              {t('models.actions.close')}
             </Button>
             <Button
               onClick={() => {
@@ -1180,7 +1161,7 @@ export function ModelManagement() {
               }}
               className='bg-blue-500 hover:bg-blue-600'
             >
-              编辑配置
+              {t('models.actions.editConfig')}
             </Button>
           </DialogFooter>
         </DialogContent>

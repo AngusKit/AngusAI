@@ -10,12 +10,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ModelTypeEnum } from '@/enums/enums';
 import { MODEL_TYPE_CONFIG } from '../constants';
 import { enumToMessages } from '@/enums/utils';
+import { useLanguage } from '@/components/ui/LanguageProvider';
 import type { ModelFormData } from '../types';
 
 interface ModelFormFieldsProps {
   formData: ModelFormData;
   onFormDataChange: (data: Partial<ModelFormData>) => void;
-  language: string;
   providerOptions: Array<{ value: string; label: string }>;
   isEdit?: boolean;
 }
@@ -23,10 +23,10 @@ interface ModelFormFieldsProps {
 export function ModelFormFields({
   formData,
   onFormDataChange,
-  language,
   providerOptions,
   isEdit = false,
 }: ModelFormFieldsProps) {
+  const { t } = useLanguage();
   const updateField = (field: keyof ModelFormData, value: string | ModelTypeEnum) => {
     onFormDataChange({ [field]: value });
   };
@@ -46,16 +46,16 @@ export function ModelFormFields({
       <div className='space-y-3'>
         <h3 className='text-sm dark:text-white flex items-center gap-2'>
           <Info className='w-4 h-4 text-blue-500' />
-          {language === 'zh-CN' ? '基本信息' : 'Basic Information'}
+          {t('models.formFields.basicInfo')}
         </h3>
 
         <div className='space-y-2'>
           <Label htmlFor={isEdit ? 'edit-model-name' : 'model-name'} className='dark:text-gray-300'>
-            {language === 'zh-CN' ? '模型名称' : 'Model Name'} <span className='text-red-500'>*</span>
+            {t('models.formFields.modelName')} <span className='text-red-500'>*</span>
           </Label>
           <Input
             id={isEdit ? 'edit-model-name' : 'model-name'}
-            placeholder={language === 'zh-CN' ? '例如: GPT-4 Turbo' : 'e.g., GPT-4 Turbo'}
+            placeholder={t('models.formFields.namePlaceholder')}
             value={formData.name}
             onChange={e => updateField('name', e.target.value)}
             className='dark:bg-gray-700 dark:border-gray-600'
@@ -64,11 +64,11 @@ export function ModelFormFields({
 
         <div className='space-y-2'>
           <Label htmlFor={isEdit ? 'edit-model-description' : 'model-description'} className='dark:text-gray-300'>
-            {language === 'zh-CN' ? '描述' : 'Description'}
+            {t('common.labels.description')}
           </Label>
           <Textarea
             id={isEdit ? 'edit-model-description' : 'model-description'}
-            placeholder={language === 'zh-CN' ? '简要描述这个模型的功能和用途...' : 'Brief description of the model...'}
+            placeholder={t('models.formFields.descriptionPlaceholder')}
             value={formData.description}
             onChange={e => updateField('description', e.target.value)}
             className='dark:bg-gray-700 dark:border-gray-600 min-h-[80px]'
@@ -79,7 +79,7 @@ export function ModelFormFields({
           {!isEdit && (
             <div className='space-y-2'>
               <Label htmlFor='model-type' className='dark:text-gray-300'>
-                {language === 'zh-CN' ? '模型类型' : 'Model Type'} <span className='text-red-500'>*</span>
+                {t('models.formFields.modelType')} <span className='text-red-500'>*</span>
               </Label>
               <Select
                 value={formData.type}
@@ -107,14 +107,14 @@ export function ModelFormFields({
 
           <div className='space-y-2'>
             <Label htmlFor={isEdit ? 'edit-model-provider' : 'model-provider'} className='dark:text-gray-300'>
-              {language === 'zh-CN' ? '提供商' : 'Provider'} <span className='text-red-500'>*</span>
+              {t('models.provider')} <span className='text-red-500'>*</span>
             </Label>
             <Select
               value={formData.provider}
               onValueChange={value => updateField('provider', value)}
             >
               <SelectTrigger id={isEdit ? 'edit-model-provider' : 'model-provider'} className='dark:bg-gray-700 dark:border-gray-600'>
-                <SelectValue placeholder={language === 'zh-CN' ? '选择提供商' : 'Select provider'} />
+                <SelectValue placeholder={t('models.formFields.selectProvider')} />
               </SelectTrigger>
               <SelectContent className='dark:bg-gray-800 dark:border-gray-700 max-h-[300px]'>
                 {providerOptions.map(option => (
@@ -129,11 +129,11 @@ export function ModelFormFields({
 
         <div className='space-y-2'>
           <Label htmlFor={isEdit ? 'edit-model-version' : 'model-version'} className='dark:text-gray-300'>
-            {language === 'zh-CN' ? '版本' : 'Version'} <span className='text-red-500'>*</span>
+            {t('models.formFields.version')} <span className='text-red-500'>*</span>
           </Label>
           <Input
             id={isEdit ? 'edit-model-version' : 'model-version'}
-            placeholder={language === 'zh-CN' ? '例如: gpt-4-turbo-2024-04' : 'e.g., gpt-4-turbo-2024-04'}
+            placeholder={t('models.formFields.versionPlaceholder')}
             value={formData.version}
             onChange={e => updateField('version', e.target.value)}
             className='dark:bg-gray-700 dark:border-gray-600'
@@ -145,12 +145,12 @@ export function ModelFormFields({
       <div className='space-y-3 pt-4 border-t border-gray-200 dark:border-gray-700'>
         <h3 className='text-sm dark:text-white flex items-center gap-2'>
           <Settings className='w-4 h-4 text-green-500' />
-          {language === 'zh-CN' ? 'API配置' : 'API Configuration'}
+          {t('models.formFields.apiConfiguration')}
         </h3>
 
         <div className='space-y-2'>
           <Label htmlFor={isEdit ? 'edit-model-endpoint' : 'model-endpoint'} className='dark:text-gray-300'>
-            {language === 'zh-CN' ? 'API端点' : 'API Endpoint'}
+            {t('models.formFields.apiEndpoint')}
           </Label>
           <Input
             id={isEdit ? 'edit-model-endpoint' : 'model-endpoint'}
@@ -163,12 +163,12 @@ export function ModelFormFields({
 
         <div className='space-y-2'>
           <Label htmlFor={isEdit ? 'edit-model-apikey' : 'model-apikey'} className='dark:text-gray-300'>
-            {language === 'zh-CN' ? 'API密钥' : 'API Key'}
+            {t('models.formFields.apiKey')}
           </Label>
           <Input
             id={isEdit ? 'edit-model-apikey' : 'model-apikey'}
             type='password'
-            placeholder={isEdit ? (language === 'zh-CN' ? '留空则不修改' : 'Leave blank to keep unchanged') : 'sk-...'}
+            placeholder={isEdit ? t('models.formFields.leaveBlankToKeepUnchanged') : 'sk-...'}
             value={formData.apiKey}
             onChange={e => updateField('apiKey', e.target.value)}
             className='dark:bg-gray-700 dark:border-gray-600'
@@ -180,13 +180,13 @@ export function ModelFormFields({
       <div className='space-y-3 pt-4 border-t border-gray-200 dark:border-gray-700'>
         <h3 className='text-sm dark:text-white flex items-center gap-2'>
           <Sliders className='w-4 h-4 text-purple-500' />
-          {language === 'zh-CN' ? '模型参数' : 'Model Parameters'}
+          {t('models.formFields.modelParameters')}
         </h3>
 
         <div className='grid grid-cols-2 gap-3'>
           <div className='space-y-2'>
             <Label htmlFor={isEdit ? 'edit-model-maxTokens' : 'model-maxTokens'} className='dark:text-gray-300'>
-              {language === 'zh-CN' ? '最大Tokens' : 'Max Tokens'}
+              {t('models.formFields.maxTokens')}
             </Label>
             <Input
               id={isEdit ? 'edit-model-maxTokens' : 'model-maxTokens'}

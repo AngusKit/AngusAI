@@ -34,7 +34,7 @@ export function EditModelDialog({
   onReset,
   providerOptions,
 }: EditModelDialogProps) {
-  const { language } = useLanguage();
+  const { t } = useLanguage();
 
   const handleCancel = () => {
     onOpenChange(false);
@@ -52,17 +52,16 @@ export function EditModelDialog({
       <DialogContent className='dark:bg-gray-800 dark:border-gray-700 sm:max-w-[600px] max-h-[90vh] overflow-y-auto'>
         <DialogHeader>
           <DialogTitle className='dark:text-white'>
-            {language === 'zh-CN' ? '编辑模型配置' : 'Edit Model Configuration'}
+            {t('models.editDialog.title')}
           </DialogTitle>
           <DialogDescription className='dark:text-gray-400'>
-            {language === 'zh-CN' ? '修改模型的配置信息' : 'Modify model configuration'}
+            {t('models.editDialog.description')}
           </DialogDescription>
         </DialogHeader>
 
         <ModelFormFields
           formData={formData}
           onFormDataChange={onFormDataChange}
-          language={language}
           providerOptions={providerOptions}
           isEdit={true}
         />
@@ -73,10 +72,10 @@ export function EditModelDialog({
             onClick={handleCancel}
             className='dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300'
           >
-            {language === 'zh-CN' ? '取消' : 'Cancel'}
+            {t('common.actions.cancel')}
           </Button>
           <Button onClick={handleSubmit} disabled={!isFormValid} className='bg-blue-500 hover:bg-blue-600'>
-            {language === 'zh-CN' ? '保存修改' : 'Save Changes'}
+            {t('models.editDialog.saveButton')}
           </Button>
         </DialogFooter>
       </DialogContent>
