@@ -23,10 +23,5 @@ public interface DatasetRepo extends BaseRepository<Dataset, Long> {
   @Query("SELECT COUNT(d) FROM Dataset d")
   Long countTotalDatasets();
 
-  /**
-   * 统计活跃（被引用）数据集数（在应用中被使用的数据集）
-   */
-  @Query("SELECT COUNT(DISTINCT d.id) FROM Dataset d " +
-      "JOIN Application app ON app.datasetId = d.id")
   Long countActiveDatasets();
 }

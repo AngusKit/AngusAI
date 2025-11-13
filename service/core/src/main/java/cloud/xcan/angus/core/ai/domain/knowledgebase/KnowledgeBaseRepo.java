@@ -21,7 +21,5 @@ public interface KnowledgeBaseRepo extends BaseRepository<KnowledgeBase, Long> {
   /**
    * 统计活跃（被引用）知识库数（在应用中被使用的知识库）
    */
-  @Query("SELECT COUNT(DISTINCT kb.id) FROM KnowledgeBase kb " +
-      "JOIN Application app ON app.knowledgeBaseId = kb.id")
   Long countActiveKnowledgeBases();
 }
