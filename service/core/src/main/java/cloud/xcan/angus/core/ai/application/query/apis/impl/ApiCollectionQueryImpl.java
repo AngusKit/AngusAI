@@ -1,7 +1,6 @@
 package cloud.xcan.angus.core.ai.application.query.apis.impl;
 
 import static cloud.xcan.angus.spec.utils.ObjectUtils.isNotEmpty;
-import static java.util.Objects.nonNull;
 
 import cloud.xcan.angus.core.ai.application.converter.ApiEndpointConverter;
 import cloud.xcan.angus.core.ai.application.converter.ApiSchemaConverter;
@@ -24,7 +23,6 @@ import io.swagger.v3.core.util.Yaml31;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Paths;
-import io.swagger.v3.oas.models.servers.Server;
 import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -126,7 +124,8 @@ public class ApiCollectionQueryImpl implements ApiCollectionQuery {
     }
 
     // Format output
-    return ExportApiFormat.json.equals(format) ? Json31.pretty(openApi) : Yaml31.pretty(openApi);
+    return ExportApiFormat.json.equals(format)
+        ? Json31.pretty(openApi) : Yaml31.pretty(openApi);
   }
 }
 
