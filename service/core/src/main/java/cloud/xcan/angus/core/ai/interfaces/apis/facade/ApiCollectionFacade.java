@@ -5,7 +5,6 @@ import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionFindDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionImportDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionDetailVo;
-import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionImportVo;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionListVo;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionStatisticsVo;
 import cloud.xcan.angus.remote.PageResult;
@@ -42,7 +41,7 @@ public interface ApiCollectionFacade {
   /**
    * 导入接口集
    */
-  ApiCollectionImportVo importCollection(Long id, ApiCollectionImportDto dto);
+  ApiCollectionDetailVo importCollection(Long id, ApiCollectionImportDto dto);
 
   /**
    * 导出OpenAPI规范

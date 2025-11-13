@@ -19,7 +19,6 @@ import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionImportDt
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.internal.assembler.ApiCollectionAssembler;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionDetailVo;
-import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionImportVo;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionListVo;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionStatisticsVo;
 import cloud.xcan.angus.core.biz.NameJoin;
@@ -122,9 +121,13 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     return buildVoPageResult(page, ApiCollectionAssembler::toListVo);
   }
 
+  @NameJoin
   @Override
-  public ApiCollectionImportVo importCollection(Long id, ApiCollectionImportDto dto) {
-    return apiCollectionCmd.importCollection(id, dto);
+  public ApiCollectionDetailVo importCollection(Long id, ApiCollectionImportDto dto) {
+    ApiCollection saved = apiCollectionCmd.importCollection(id, dto);
+    // 设置统计信息
+    setStatsInfo(saved);
+    return ApiCollectionAssembler.toVo(saved);
   }
 
   @Override

@@ -6,7 +6,6 @@ import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionFindDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionImportDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionDetailVo;
-import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionImportVo;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionListVo;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionStatisticsVo;
 import cloud.xcan.angus.remote.ApiLocaleResult;
@@ -109,7 +108,7 @@ public class ApiCollectionRest {
   })
   @PostMapping(value = "/{id}/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @ResponseStatus(HttpStatus.CREATED)
-  public ApiLocaleResult<ApiCollectionImportVo> importCollection(
+  public ApiLocaleResult<ApiCollectionDetailVo> importCollection(
       @Parameter(description = "接口集ID", required = true) @PathVariable Long id,
       @Parameter(content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE), schema = @Schema(type = "object")) @Valid ApiCollectionImportDto dto) {
     return ApiLocaleResult.success(apiCollectionFacade.importCollection(id, dto));

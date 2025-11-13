@@ -29,7 +29,6 @@ import cloud.xcan.angus.core.ai.domain.apis.ApiSchemaRepo;
 import cloud.xcan.angus.core.ai.domain.apis.ConflictStrategy;
 import cloud.xcan.angus.core.ai.domain.apis.ImportApiStrategy;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionImportDto;
-import cloud.xcan.angus.core.ai.interfaces.apis.facade.vo.ApiCollectionImportVo;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
@@ -151,8 +150,8 @@ public class ApiCollectionCmdImpl extends CommCmd<ApiCollection, Long> implement
   }
 
   @Override
-  public ApiCollectionImportVo importCollection(Long id, ApiCollectionImportDto dto) {
-    return new BizTemplate<ApiCollectionImportVo>() {
+  public ApiCollection importCollection(Long id, ApiCollectionImportDto dto) {
+    return new BizTemplate<ApiCollection>() {
       ApiCollection apiCollectionDb;
       final MultipartFile file = dto.getFile();
       final String content = dto.getContent();
@@ -185,7 +184,7 @@ public class ApiCollectionCmdImpl extends CommCmd<ApiCollection, Long> implement
       }
 
       @Override
-      protected ApiCollectionImportVo process() {
+      protected ApiCollection process() {
         // Import by file
         if (nonNull(dto.getFile())) {
           // Get import files, If it is a multi file import decompression zip file
@@ -201,9 +200,8 @@ public class ApiCollectionCmdImpl extends CommCmd<ApiCollection, Long> implement
           }
 
           // Save import schema, components and apis
-          ApiCollectionImportVo vo;
           try {
-            vo = openapiReplace(apiCollectionDb.getId(), readAsString(importFile),
+            openapiReplace(apiCollectionDb.getId(), readAsString(importFile),
                 dto.getImportStrategy());
           } catch (IOException e) {
             log.error("Reading import file exception", e);
@@ -213,18 +211,17 @@ public class ApiCollectionCmdImpl extends CommCmd<ApiCollection, Long> implement
 
           // Delete tmp import files
           FileUtils.deleteQuietly(importFile);
-          return vo;
         } else {
           // Import by text
-          return openapiReplace(apiCollectionDb.getId(), content, dto.getImportStrategy());
+          openapiReplace(apiCollectionDb.getId(), content, dto.getImportStrategy());
         }
+        return apiCollectionDb;
       }
     }.execute();
   }
 
-  private ApiCollectionImportVo openapiReplace(Long id, String content,
+  private void openapiReplace(Long id, String content,
       @NotNull ImportApiStrategy importStrategy) {
-    ApiCollectionImportVo importVo = new ApiCollectionImportVo();
 
     OpenAPI openApi = checkAndParseOpenApi(content, null, null);
 
@@ -294,7 +291,6 @@ public class ApiCollectionCmdImpl extends CommCmd<ApiCollection, Long> implement
     if (isNotEmpty(openApi.getComponents())) {
       apiComponentCmd.replaceByOpenApi(id, openApi.getComponents(), conflictStrategy);
     }
-    return importVo;
   }
 
   @Override
