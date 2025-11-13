@@ -13,10 +13,6 @@ export interface ApiCollectionCreateDto {
    * @example "PRIVATE"
    */
   visibility?: VisibilityEnum;
-  /** 服务器配置，遵循OpenAPI Server Object规范 */
-  server?: OpenAPIV3_1.ServerObject;
-  /** 安全配置，遵循OpenAPI Security Scheme Object规范 */
-  security?: OpenAPIV3_1.SecuritySchemeObject;
 }
 
 /** 接口集详情 */
@@ -39,11 +35,11 @@ export interface ApiCollectionDetailVo extends TenantAuditingVo {
   /** 是否配置了服务器 */
   hasServerConfig?: boolean;
   /** 服务器配置 */
-  server?: OpenAPIV3_1.ServerObject;
+  server?: OpenAPIV3_1.ServerObject[];
   /** 是否配置了安全认证 */
   hasSecurityConfig?: boolean;
   /** 安全认证配置 */
-  security?: OpenAPIV3_1.SecuritySchemeObject;
+  security?: Record<string, OpenAPIV3_1.SecuritySchemeObject>;
   /**
    * 端点总数
    * @format int64
@@ -146,24 +142,15 @@ export interface ApiCollectionImportDto {
   /**
    * 上传的接口内容，和接口文件必须指定其中一个，大小不超过20MB
    */
-  content: string;
+  content?: string;
   /**
    * 上传接口文件，和接口内容必须指定其中一个，大小不超过20MB
    * @format binary
    */
-  file: File;
+  file?: File;
   /** 文件类型 */
   type: ApiCollectionImportTypeEnum;
-  /** 自定义名称（不填则使用文件中的名称） */
-  name?: string;
-  /** 可见性 */
-  visibility?: VisibilityEnum;
   /** 导入策略 */
-  importStrategy?: ImportStrategyDto;
-}
-
-/** 导入策略 */
-export interface ImportStrategyDto {
   /**
    * 冲突处理策略：OVERWRITE-覆盖现有接口，IGNORE-跳过重复接口，MERGE-合并配置
    * @example "IGNORE"
@@ -199,10 +186,6 @@ export interface ApiCollectionUpdateDto {
   description?: string;
   /** 可见性：PRIVATE-私有，TEAM-团队，PUBLIC-公开 */
   visibility?: VisibilityEnum;
-  /** 服务器配置，遵循OpenAPI Server Object规范 */
-  server?: OpenAPIV3_1.ServerObject;
-  /** 安全配置，遵循OpenAPI Security Scheme Object规范 */
-  security?: OpenAPIV3_1.SecuritySchemeObject;
 }
 
 /** 接口集列表项 */
