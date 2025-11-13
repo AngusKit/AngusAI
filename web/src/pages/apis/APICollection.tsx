@@ -965,68 +965,114 @@ export function APICollection() {
                 </div>
 
                 <TabsContent value='endpoints' className='p-0 m-0'>
-                  <div className='p-4 border-b border-gray-200 dark:border-gray-700'>
-                    <div className='flex items-center gap-3'>
-                      <div className='relative flex-1'>
-                        <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
-                        <Input
-                          placeholder={language === 'zh-CN' ? '搜索接口...' : 'Search endpoints...'}
-                          value={endpointSearchQuery}
-                          onChange={e => setEndpointSearchQuery(e.target.value)}
-                          className='pl-10 pr-10 dark:bg-gray-800 dark:border-gray-700'
-                        />
-                        {endpointSearchQuery && (
+                  {filteredAndSortedEndpoints.length === 0 ? (
+                    <div className='h-[600px] flex items-center justify-center'>
+                      <div className='w-full max-w-2xl px-6'>
+                        <div className='text-center mb-8'>
+                          <Code2 className='w-16 h-16 mx-auto mb-4 text-gray-300 dark:text-gray-600' />
+                          <h3 className='text-xl font-semibold dark:text-white mb-2'>
+                            {language === 'zh-CN' ? '导入接口规范' : 'Import API Specification'}
+                          </h3>
+                          <p className='text-sm text-gray-500 dark:text-gray-400'>
+                            {language === 'zh-CN'
+                              ? '支持 OpenAPI、Swagger、Postman 等多种规范格式，最大支持20MB'
+                              : 'Supports multiple specification formats such as OpenAPI, Swagger, and Postman, with a maximum support of 20MB.'}
+                          </p>
+                        </div>
+                        <div className='grid grid-cols-2 gap-4'>
                           <button
-                            onClick={() => setEndpointSearchQuery('')}
-                            className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors'
+                            onClick={() => handleImport(ApiCollectionImportTypeEnum.OPENAPI)}
+                            className='p-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 transition-colors group'
                           >
-                            <X className='w-4 h-4' />
+                            <FileJson className='w-8 h-8 mx-auto mb-2 text-gray-400 group-hover:text-blue-500' />
+                            <div className='text-sm dark:text-white'>OpenAPI 3.0</div>
+                            <div className='text-xs text-gray-500 dark:text-gray-400 mt-1'>JSON / YAML</div>
                           </button>
+
+                          <button
+                            onClick={() => handleImport(ApiCollectionImportTypeEnum.SWAGGER)}
+                            className='p-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 transition-colors group'
+                          >
+                            <Code2 className='w-8 h-8 mx-auto mb-2 text-gray-400 group-hover:text-blue-500' />
+                            <div className='text-sm dark:text-white'>Swagger 2.0</div>
+                            <div className='text-xs text-gray-500 dark:text-gray-400 mt-1'>JSON / YAML</div>
+                          </button>
+
+                          <button
+                            onClick={() => handleImport(ApiCollectionImportTypeEnum.POSTMAN)}
+                            className='p-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 transition-colors group'
+                          >
+                            <Globe className='w-8 h-8 mx-auto mb-2 text-gray-400 group-hover:text-blue-500' />
+                            <div className='text-sm dark:text-white'>Postman</div>
+                            <div className='text-xs text-gray-500 dark:text-gray-400 mt-1'>Collection JSON</div>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className='p-4 border-b border-gray-200 dark:border-gray-700'>
+                        <div className='flex items-center gap-3'>
+                          <div className='relative flex-1'>
+                            <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
+                            <Input
+                              placeholder={language === 'zh-CN' ? '搜索接口...' : 'Search endpoints...'}
+                              value={endpointSearchQuery}
+                              onChange={e => setEndpointSearchQuery(e.target.value)}
+                              className='pl-10 pr-10 dark:bg-gray-800 dark:border-gray-700'
+                            />
+                            {endpointSearchQuery && (
+                              <button
+                                onClick={() => setEndpointSearchQuery('')}
+                                className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors'
+                              >
+                                <X className='w-4 h-4' />
+                              </button>
+                            )}
+                          </div>
+
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant='outline' size='sm' className='dark:bg-gray-800 dark:border-gray-700'>
+                                <Filter className='w-4 h-4 mr-2' />
+                                {language === 'zh-CN' ? '筛选' : 'Filter'}
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align='end' className='dark:bg-gray-800 dark:border-gray-700'>
+                              <DropdownMenuItem onClick={() => handleSort('name')} className='dark:text-gray-300'>
+                                {language === 'zh-CN' ? '按名称排序' : 'Sort by Name'}
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleSort('method')} className='dark:text-gray-300'>
+                                {language === 'zh-CN' ? '按方法排序' : 'Sort by Method'}
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleSort('lastUsed')} className='dark:text-gray-300'>
+                                {language === 'zh-CN' ? '按最后使用排序' : 'Sort by Last Used'}
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+
+                          <Button
+                            variant='outline'
+                            size='sm'
+                            className='gap-2 dark:bg-gray-800 dark:border-gray-700'
+                            onClick={() => setShowOpenAPIPreview(true)}
+                          >
+                            <FileJson className='w-4 h-4' />
+                            {language === 'zh-CN' ? 'OpenAPI' : 'OpenAPI'}
+                          </Button>
+                        </div>
+
+                        {(sortBy !== 'name' || sortOrder !== 'asc') && (
+                          <div className='mt-2 text-xs text-gray-500 dark:text-gray-400'>
+                            {language === 'zh-CN' ? '当前排序：' : 'Current sort: '}
+                            {getSortLabel()}
+                          </div>
                         )}
                       </div>
 
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant='outline' size='sm' className='dark:bg-gray-800 dark:border-gray-700'>
-                            <Filter className='w-4 h-4 mr-2' />
-                            {language === 'zh-CN' ? '筛选' : 'Filter'}
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align='end' className='dark:bg-gray-800 dark:border-gray-700'>
-                          <DropdownMenuItem onClick={() => handleSort('name')} className='dark:text-gray-300'>
-                            {language === 'zh-CN' ? '按名称排序' : 'Sort by Name'}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleSort('method')} className='dark:text-gray-300'>
-                            {language === 'zh-CN' ? '按方法排序' : 'Sort by Method'}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleSort('lastUsed')} className='dark:text-gray-300'>
-                            {language === 'zh-CN' ? '按最后使用排序' : 'Sort by Last Used'}
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-
-                      <Button
-                        variant='outline'
-                        size='sm'
-                        className='gap-2 dark:bg-gray-800 dark:border-gray-700'
-                        onClick={() => setShowOpenAPIPreview(true)}
-                      >
-                        <FileJson className='w-4 h-4' />
-                        {language === 'zh-CN' ? 'OpenAPI' : 'OpenAPI'}
-                      </Button>
-                    </div>
-
-                    {(sortBy !== 'name' || sortOrder !== 'asc') && (
-                      <div className='mt-2 text-xs text-gray-500 dark:text-gray-400'>
-                        {language === 'zh-CN' ? '当前排序：' : 'Current sort: '}
-                        {getSortLabel()}
-                      </div>
-                    )}
-                  </div>
-
-                  <ScrollArea className='h-[520px]'>
-                    <div className='p-4 space-y-3'>
-                      {filteredAndSortedEndpoints.map(endpoint => (
+                      <ScrollArea className='h-[520px]'>
+                        <div className='p-4 space-y-3'>
+                          {filteredAndSortedEndpoints.map(endpoint => (
                         <div
                           key={endpoint.id}
                           className='p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md transition-shadow'
@@ -1103,8 +1149,10 @@ export function APICollection() {
                           </div>
                         </div>
                       ))}
-                    </div>
-                  </ScrollArea>
+                        </div>
+                      </ScrollArea>
+                    </>
+                  )}
                 </TabsContent>
 
                 <TabsContent value='servers' className='p-6'>
@@ -1810,15 +1858,6 @@ export function APICollection() {
                 <Globe className='w-8 h-8 mx-auto mb-2 text-gray-400 group-hover:text-blue-500' />
                 <div className='text-sm dark:text-white'>Postman</div>
                 <div className='text-xs text-gray-500 dark:text-gray-400 mt-1'>Collection JSON</div>
-              </button>
-
-              <button
-                onClick={() => handleImport('URL')}
-                className='p-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 transition-colors group'
-              >
-                <ExternalLink className='w-8 h-8 mx-auto mb-2 text-gray-400 group-hover:text-blue-500' />
-                <div className='text-sm dark:text-white'>{language === 'zh-CN' ? '从URL导入' : 'Import from URL'}</div>
-                <div className='text-xs text-gray-500 dark:text-gray-400 mt-1'>API Schema URL</div>
               </button>
             </div>
           </div>

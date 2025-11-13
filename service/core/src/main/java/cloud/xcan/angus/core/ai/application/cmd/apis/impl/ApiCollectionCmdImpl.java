@@ -95,6 +95,8 @@ public class ApiCollectionCmdImpl extends CommCmd<ApiCollection, Long> implement
       @Override
       protected ApiCollection process() {
         insert(apiCollection);
+
+        apiSchemaCmd.init(apiCollection.getId());
         return apiCollection;
       }
     }.execute();
@@ -215,6 +217,11 @@ public class ApiCollectionCmdImpl extends CommCmd<ApiCollection, Long> implement
           // Import by text
           openapiReplace(apiCollectionDb.getId(), content, dto.getImportStrategy());
         }
+
+        // Update collection source
+        apiCollectionDb.setSource(dto.getType());
+        apiCollectionRepo.save(apiCollectionDb);
+
         return apiCollectionDb;
       }
     }.execute();

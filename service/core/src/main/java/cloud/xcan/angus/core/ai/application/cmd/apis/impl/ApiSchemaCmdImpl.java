@@ -17,6 +17,13 @@ public class ApiSchemaCmdImpl extends CommCmd<ApiSchema, Long> implements ApiSch
   private ApiSchemaRepo apiSchemaRepo;
 
   @Override
+  public void init(Long collectionId) {
+    ApiSchema apiSchema = new ApiSchema();
+    apiSchema.setCollectionId(collectionId);
+    insert(apiSchema);
+  }
+
+  @Override
   public void updateSchema(ApiSchema apiSchema, OpenAPI openApi, boolean mergeSchema,
       boolean cover) {
     ApiSchemaConverter.updateSchema(apiSchema, openApi, mergeSchema, cover);

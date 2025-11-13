@@ -2,7 +2,6 @@ package cloud.xcan.angus.core.ai.domain.apis;
 
 import cloud.xcan.angus.core.ai.domain.Visibility;
 import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
-import io.hypersistence.utils.hibernate.type.json.JsonType;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
 import jakarta.persistence.Column;
@@ -12,10 +11,10 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import org.hibernate.annotations.Type;
 
 /**
  * 接口集实体
@@ -44,14 +43,10 @@ public class ApiCollection extends TenantAuditingEntity<ApiCollection, Long> {
   @Column(name = "visibility", nullable = false)
   private Visibility visibility;
 
-  @Type(JsonType.class)
-  @Column(columnDefinition = "json", name = "server")
-  private Server server;
-
-  @Type(JsonType.class)
-  @Column(columnDefinition = "json", name = "security")
-  private SecurityScheme security;
-
+  @Transient
+  private List<Server> servers;
+  @Transient
+  private List<SecurityScheme> securities;
   @Transient
   private Long endpointsCount = 0L;
   @Transient

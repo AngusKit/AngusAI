@@ -5,13 +5,18 @@ import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.parseEndDate;
 import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.parseStartDate;
 import static cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder.getMatchSearchFields;
 import static cloud.xcan.angus.core.utils.CoreUtils.buildVoPageResult;
+import static java.util.Objects.nonNull;
 
 import cloud.xcan.angus.core.ai.application.cmd.apis.ApiCollectionCmd;
 import cloud.xcan.angus.core.ai.application.query.apis.ApiCollectionQuery;
+import cloud.xcan.angus.core.ai.application.query.apis.ApiComponentQuery;
 import cloud.xcan.angus.core.ai.application.query.apis.ApiEndpointCallLogQuery;
 import cloud.xcan.angus.core.ai.application.query.apis.ApiEndpointQuery;
+import cloud.xcan.angus.core.ai.application.query.apis.ApiSchemaQuery;
 import cloud.xcan.angus.core.ai.domain.apis.ApiCollection;
+import cloud.xcan.angus.core.ai.domain.apis.ApiComponentType;
 import cloud.xcan.angus.core.ai.domain.apis.ApiEndpoint;
+import cloud.xcan.angus.core.ai.domain.apis.ApiSchema;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.ApiCollectionFacade;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.apis.facade.dto.ApiCollectionFindDto;
@@ -25,6 +30,8 @@ import cloud.xcan.angus.core.biz.NameJoin;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.PageResult;
 import cloud.xcan.angus.remote.dto.SimpleStatisticsDto;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.servers.Server;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import java.time.LocalDate;
@@ -57,6 +64,12 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
   private ApiEndpointQuery apiEndpointQuery;
 
   @Resource
+  private ApiComponentQuery apiComponentQuery;
+
+  @Resource
+  private ApiSchemaQuery apiSchemaQuery;
+
+  @Resource
   private ApiEndpointCallLogQuery apiEndpointCallLogQuery;
 
   private static final int TOP_N = 10;
@@ -76,7 +89,7 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     ApiCollection collection = ApiCollectionAssembler.toUpdateDomain(id, dto);
     ApiCollection saved = apiCollectionCmd.update(collection);
     // 设置统计信息
-    setStatsInfo(saved);
+    setDetailInfo(saved);
     return ApiCollectionAssembler.toVo(saved);
   }
 
@@ -90,7 +103,7 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
   public ApiCollectionDetailVo getDetail(Long id) {
     ApiCollection saved = apiCollectionQuery.findAndCheck(id);
     // 设置统计信息
-    setStatsInfo(saved);
+    setDetailInfo(saved);
     return ApiCollectionAssembler.toVo(saved);
   }
 
@@ -126,7 +139,7 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
   public ApiCollectionDetailVo importCollection(Long id, ApiCollectionImportDto dto) {
     ApiCollection saved = apiCollectionCmd.importCollection(id, dto);
     // 设置统计信息
-    setStatsInfo(saved);
+    setDetailInfo(saved);
     return ApiCollectionAssembler.toVo(saved);
   }
 
@@ -219,8 +232,8 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
       LocalDateTime end) {
     // 获取调用次数和平均响应时间数据（按端点分组，TOP N）
     // 返回格式：[0]=endpointId, [1]=count, [2]=avgResponseTime
-    List<Object[]> callCountRows = apiEndpointCallLogQuery.getTopEndpointsByCallCount(start, end,
-        TOP_N);
+    List<Object[]> callCountRows = apiEndpointCallLogQuery.getTopEndpointsByCallCount(
+        start, end, TOP_N);
 
     if (callCountRows == null || callCountRows.isEmpty()) {
       return new ArrayList<>();
@@ -304,11 +317,20 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     return trends;
   }
 
-  private void setStatsInfo(ApiCollection collection){
+  private void setDetailInfo(ApiCollection collection) {
     Long endpointsCount = apiEndpointQuery.countEndpointsByCollectionId(collection.getId());
     Long enabledCount = apiEndpointQuery.countEnabledEndpointsByCollectionId(collection.getId());
     collection.setEndpointsCount(endpointsCount);
     collection.setEnabledEndpointsCount(enabledCount);
+
+    ApiSchema apiSchema = apiSchemaQuery.findByCollectionId(collection.getId());
+    collection.setServers(nonNull(apiSchema) ? apiSchema.getServers() : null);
+
+    List<SecurityScheme> securities = apiComponentQuery.findByCollectionIdAndType(
+            collection.getId(), ApiComponentType.securitySchemes)
+        .stream().map(x -> x.toComponent(SecurityScheme.class))
+        .collect(Collectors.toList());
+    collection.setSecurities(securities);
   }
 
   private static void setStatsInfo(Long endpointsCount, Long enabledCount,
@@ -316,6 +338,5 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     collection.setEndpointsCount(endpointsCount);
     collection.setEnabledEndpointsCount(enabledCount);
   }
-
 }
 
