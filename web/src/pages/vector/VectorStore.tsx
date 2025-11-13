@@ -1,359 +1,74 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Database, Plus, Search, X, Settings, Trash2, Play, CheckCircle2, Activity, Zap, Grid3x3, List, Edit, } from 'lucide-react';
+import { useCallback, useState } from 'react';
+import { Database, Plus, Search, X, Settings, Trash2, Play, Grid3x3, List, Edit, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
 import { useLanguage } from '@/components/ui/LanguageProvider';
-import { useDebounce } from '@/hooks/useDebounce';
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, XcanPagination, } from '@/components/ui/pagination';
+import { XcanPagination } from '@/components/ui/pagination';
 import VectorStoresService from '@/services/VectorStores';
-import { ConnectionStatusEnum, VectorStoreTypeEnum } from '@/enums/enums';
-import { VectorStoreVo, VectorStoreStatisticsVo, VectorStoreCreateDto, VectorStoreUpdateDto, } from '@/services/VectorStoresTypes';
-
-type VectorStoreStatus = ConnectionStatusEnum | 'TESTING';
-
-type VectorStoreItem = {
-  id: string;
-  name: string;
-  type: VectorStoreTypeEnum;
-  description: string;
-  endpoint?: string;
-  status: VectorStoreStatus;
-  enabled: boolean;
-  dimension?: number;
-  indexCount?: number;
-  createdTime: string;
-  lastSync: string;
-  config?: VectorStoreVo['config'];
-};
-
-const vectorStoreTypes = [
-  { value: VectorStoreTypeEnum.AZURE_AI_SERVICE, label: 'Azure AI Service', icon: '☁️' },
-  { value: VectorStoreTypeEnum.AZURE_COSMOS_DB, label: 'Azure Cosmos DB', icon: '🌐' },
-  { value: VectorStoreTypeEnum.APACHE_CASSANDRA, label: 'Apache Cassandra Vector Store', icon: '📊' },
-  { value: VectorStoreTypeEnum.CHROMA, label: 'Chroma', icon: '🎨' },
-  { value: VectorStoreTypeEnum.COUCHBASE, label: 'Couchbase', icon: '🛋️' },
-  { value: VectorStoreTypeEnum.ELASTICSEARCH, label: 'Elasticsearch', icon: '🔍' },
-  { value: VectorStoreTypeEnum.GEMFIRE, label: 'GemFire', icon: '💎' },
-  { value: VectorStoreTypeEnum.MARIADB, label: 'MariaDB Vector Store', icon: '🗄️' },
-  { value: VectorStoreTypeEnum.MILVUS, label: 'Milvus', icon: '🦅' },
-  { value: VectorStoreTypeEnum.MONGODB_ATLAS, label: 'MongoDB Atlas', icon: '🍃' },
-  { value: VectorStoreTypeEnum.NEO4J, label: 'Neo4j', icon: '🔗' },
-  { value: VectorStoreTypeEnum.OPENSEARCH, label: 'OpenSearch', icon: '🔎' },
-  { value: VectorStoreTypeEnum.ORACLE, label: 'Oracle', icon: '🏛️' },
-  { value: VectorStoreTypeEnum.PGVECTOR, label: 'PGvector', icon: '🐘' },
-  { value: VectorStoreTypeEnum.PINECONE, label: 'Pinecone', icon: '🌲' },
-  { value: VectorStoreTypeEnum.QDRANT, label: 'Qdrant', icon: '⚡' },
-  { value: VectorStoreTypeEnum.REDIS, label: 'Redis', icon: '🔴' },
-  { value: VectorStoreTypeEnum.SAP_HANA, label: 'SAP Hana', icon: '💼' },
-  { value: VectorStoreTypeEnum.TYPESENSE, label: 'Typesense', icon: '⚙️' },
-  { value: VectorStoreTypeEnum.WEAVIATE, label: 'Weaviate', icon: '🕸️' },
-] as const;
+import { VectorStoreTypeEnum } from '@/enums/enums';
+import { PAGINATION_CONFIG } from './constants';
+import { formatNumber, formatVectorCount, getVectorStoreTypeInfo, getVectorStoreStatusInfo } from './utils';
+import { useVectorStoreManagement } from './hooks/useVectorStoreManagement';
+import { useVectorStoreForm } from './hooks/useVectorStoreForm';
+import { CreateVectorStoreDialog } from './components/CreateVectorStoreDialog';
+import { EditVectorStoreDialog } from './components/EditVectorStoreDialog';
+import type { VectorStoreItem, VectorStoreStatus } from './types';
 
 export function VectorStore() {
   const { language } = useLanguage();
-  const [searchQuery, setSearchQuery] = useState('');
-  const debouncedSearchQuery = useDebounce(searchQuery, 500);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editingStore, setEditingStore] = useState<VectorStoreItem | null>(null);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-
-  const [vectorStores, setVectorStores] = useState<VectorStoreItem[]>([]);
-  const [vectorStoresLoading, setVectorStoresLoading] = useState(false);
-  const [vectorStoresTotal, setVectorStoresTotal] = useState(0);
-  const [statistics, setStatistics] = useState<VectorStoreStatisticsVo | null>(null);
-  const [statisticsLoading, setStatisticsLoading] = useState(false);
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8;
-
-  const [creating, setCreating] = useState(false);
-  const [updating, setUpdating] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [testingConnectionId, setTestingConnectionId] = useState<string | null>(null);
 
-  // 表单状态
-  const [formData, setFormData] = useState({
-    name: '',
-    type: '' as '' | VectorStoreTypeEnum,
-    description: '',
-    endpoint: '',
-    apiKey: '',
-    dimension: '1536',
-    database: '',
-    collection: '',
-    username: '',
-    password: '',
-  });
+  // 使用业务逻辑 Hook
+  const {
+    vectorStores,
+    vectorStoresLoading,
+    vectorStoresTotal,
+    currentPage,
+    searchQuery,
+    viewMode,
+    setCurrentPage,
+    setSearchQuery,
+    setViewMode,
+    loadVectorStores,
+    loadStatistics,
+    ensureVectorStoreDetail,
+    statsCards,
+    shouldShowPagination,
+  } = useVectorStoreManagement(language);
 
-  const formatNumber = (value?: number | null) => {
-    if (value === null || value === undefined || Number.isNaN(value)) {
-      return '--';
-    }
-    return Number(value).toLocaleString(language === 'zh-CN' ? 'zh-CN' : 'en-US');
-  };
+  // 使用表单 Hook
+  const {
+    formData,
+    setFormData,
+    resetForm,
+    handleCreateStore,
+    handleUpdateStore,
+    handleTestConnection,
+    populateFormFromStore,
+  } = useVectorStoreForm(language);
 
-  const formatVectorCount = (value?: number | null) => {
-    if (value === null || value === undefined || Number.isNaN(value)) {
-      return '--';
-    }
-    if (value >= 1000) {
-      return `${(value / 1000).toFixed(1)}K`;
-    }
-    return formatNumber(value);
-  };
-
-  const formatDateTime = useCallback(
-    (value?: string | number | Date | null) => {
-      if (!value) {
-        return '--';
-      }
-      const date = new Date(value);
-      if (Number.isNaN(date.getTime())) {
-        return '--';
-      }
-      return date.toLocaleString(language === 'zh-CN' ? 'zh-CN' : 'en-US');
-    },
-    [language]
-  );
-
+  // 获取类型和状态信息的辅助函数
   const getTypeInfo = useCallback((type?: VectorStoreTypeEnum | string) => {
-    if (!type) {
-      return { value: 'UNKNOWN', label: 'Unknown', icon: '📦' };
-    }
-    return (
-      vectorStoreTypes.find(t => t.value === type) ?? {
-        value: type,
-        label: type,
-        icon: '📦',
-      }
-    );
+    return getVectorStoreTypeInfo(type);
   }, []);
 
   const getStatusInfo = useCallback(
-    (status: VectorStoreStatus): { label: string; badgeClass: string } => {
-      switch (status) {
-        case ConnectionStatusEnum.CONNECTED:
-          return {
-            label: language === 'zh-CN' ? '已连接' : 'Connected',
-            badgeClass: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-0 text-xs w-fit',
-          };
-        case 'TESTING':
-          return {
-            label: language === 'zh-CN' ? '测试中' : 'Testing',
-            badgeClass:
-              'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400 border-0 text-xs w-fit',
-          };
-        case ConnectionStatusEnum.DISCONNECTED:
-        default:
-          return {
-            label: language === 'zh-CN' ? '未连接' : 'Disconnected',
-            badgeClass: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-0 text-xs w-fit',
-          };
-      }
+    (status: VectorStoreStatus) => {
+      return getVectorStoreStatusInfo(status, language);
     },
     [language]
   );
 
-  const statsCards = useMemo(() => {
-    const overview = statistics?.overview;
-
-    return [
-      {
-        key: 'totalStores',
-        label: language === 'zh-CN' ? '存储源总数' : 'Total Sources',
-        value: formatNumber(overview?.totalStores),
-        subtext: language === 'zh-CN' ? '已配置向量数据库' : 'Configured databases',
-        icon: Database,
-        iconBg: 'bg-blue-500',
-      },
-      {
-        key: 'connectedStores',
-        label: language === 'zh-CN' ? '已连接' : 'Connected',
-        value: formatNumber(overview?.connectedStores),
-        subtext: language === 'zh-CN' ? '正常运行中' : 'Currently active',
-        icon: CheckCircle2,
-        iconBg: 'bg-green-500',
-      },
-      {
-        key: 'totalVectors',
-        label: language === 'zh-CN' ? '向量总数' : 'Total Vectors',
-        value: formatVectorCount(overview?.totalVectors),
-        subtext: language === 'zh-CN' ? '跨所有存储源' : 'Across all sources',
-        icon: Activity,
-        iconBg: 'bg-purple-500',
-      },
-      {
-        key: 'todayQueries',
-        label: language === 'zh-CN' ? '今日查询' : 'Today Queries',
-        value: formatNumber(overview?.todayQueries),
-        subtext: language === 'zh-CN' ? '今日累计查询次数' : 'Queries today',
-        icon: Zap,
-        iconBg: 'bg-orange-500',
-      },
-    ];
-  }, [language, statistics]);
-
-  const buildVectorStoreItem = useCallback(
-    (store?: VectorStoreVo): VectorStoreItem | null => {
-      if (!store?.id) {
-        return null;
-      }
-      const type = store.type ?? VectorStoreTypeEnum.PINECONE;
-      const config = store.config;
-      const endpoint =
-        config?.endpoint ?? (config?.host ? `${config.host}${config.port ? `:${config.port}` : ''}` : undefined);
-      const dimension = config?.dimension;
-
-      return {
-        id: String(store.id),
-        name: store.name ?? String(store.id),
-        type,
-        description: store.description ?? '--',
-        endpoint,
-        status: store.status ?? ConnectionStatusEnum.DISCONNECTED,
-        enabled: Boolean(store.enabled),
-        dimension: dimension ?? undefined,
-        indexCount: store.indexCount ?? undefined,
-        createdTime: formatDateTime((store as any)?.createdDate),
-        lastSync: formatDateTime((store as any)?.updatedDate),
-        config,
-      };
-    },
-    [formatDateTime]
-  );
-
-  const loadStatistics = useCallback(async () => {
-    setStatisticsLoading(true);
-    try {
-      const response = await VectorStoresService.vectorStoreGetStatistics();
-      const responseData = (response as any)?.data as VectorStoreStatisticsVo | undefined;
-      setStatistics(responseData ?? null);
-    } catch (error: any) {
-      console.error('Failed to load vector store statistics:', error);
-      toast.error(
-        error?.message || (language === 'zh-CN' ? '获取向量存储统计失败' : 'Failed to load vector store statistics')
-      );
-    } finally {
-      setStatisticsLoading(false);
-    }
-  }, [language]);
-
-  const loadVectorStores = useCallback(async () => {
-    setVectorStoresLoading(true);
-    try {
-      const response = await VectorStoresService.vectorStoreList({
-        keyword: debouncedSearchQuery.trim() || undefined,
-        pageNo: currentPage,
-        pageSize: itemsPerPage,
-      });
-
-      const responseData = (response as any).data;
-      let listData: VectorStoreVo[] | undefined;
-      if (responseData) {
-        listData = responseData.list;
-      }
-
-      setVectorStoresTotal(responseData?.total ?? listData?.length ?? 0);
-
-      const mapped = listData?.map(item => buildVectorStoreItem(item)).filter(Boolean) as VectorStoreItem[] | undefined;
-
-      setVectorStores(mapped ?? []);
-    } catch (error: any) {
-      console.error('Failed to load vector stores:', error);
-      toast.error(
-        error?.message || (language === 'zh-CN' ? '加载向量存储列表失败' : 'Failed to load vector store list')
-      );
-    } finally {
-      setVectorStoresLoading(false);
-    }
-  }, [buildVectorStoreItem, currentPage, debouncedSearchQuery, itemsPerPage, language]);
-
-  useEffect(() => {
-    loadStatistics();
-  }, [loadStatistics]);
-
-  useEffect(() => {
-    loadVectorStores();
-  }, [loadVectorStores]);
-
-  useEffect(() => {
-    setCurrentPage(prev => (prev === 1 ? prev : 1));
-  }, [debouncedSearchQuery]);
-
-  const shouldShowPagination = vectorStoresTotal > itemsPerPage;
-
-  const ensureVectorStoreDetail = useCallback(
-    async (store: VectorStoreItem): Promise<VectorStoreItem> => {
-      if (store.config && store.config.dimension) {
-        return store;
-      }
-      try {
-        const response = await VectorStoresService.vectorStoreGetDetail(store.id);
-        const detail = (response as any)?.data as VectorStoreVo | undefined;
-        if (detail) {
-          const normalized = buildVectorStoreItem(detail);
-          if (normalized) {
-            setVectorStores(prev => prev.map(item => (item.id === normalized.id ? normalized : item)));
-            return normalized;
-          }
-        }
-      } catch (error: any) {
-        console.error('Failed to load vector store detail:', error);
-        toast.error(
-          error?.message || (language === 'zh-CN' ? '获取向量存储详情失败' : 'Failed to load vector store detail')
-        );
-      }
-      return store;
-    },
-    [buildVectorStoreItem, language]
-  );
-
-  const resetForm = () => {
-    setFormData({
-      name: '',
-      type: '' as '' | VectorStoreTypeEnum,
-      description: '',
-      endpoint: '',
-      apiKey: '',
-      dimension: '1536',
-      database: '',
-      collection: '',
-      username: '',
-      password: '',
-    });
-  };
-
-  const parseDimension = () => {
-    const dimensionValue = Number.parseInt(formData.dimension, 10);
-    if (!Number.isFinite(dimensionValue) || dimensionValue <= 0) {
-      toast.error(language === 'zh-CN' ? '请输入有效的向量维度' : 'Please enter a valid dimension');
-      return null;
-    }
-    return dimensionValue;
-  };
-
-  const buildConfigFromForm = (type: VectorStoreTypeEnum, dimension: number) => ({
-    type,
-    endpoint: formData.endpoint.trim() || undefined,
-    apiKey: formData.apiKey.trim() || undefined,
-    database: formData.database.trim() || undefined,
-    collection: formData.collection.trim() || undefined,
-    username: formData.username.trim() || undefined,
-    password: formData.password.trim() || undefined,
-    dimension,
-  });
 
   const handleToggleStore = async (store: VectorStoreItem) => {
     if (togglingId === store.id) {
@@ -376,114 +91,53 @@ export function VectorStore() {
     }
   };
 
-  const handleTestConnection = async (store: VectorStoreItem) => {
+  const handleTestConnectionWrapper = async (store: VectorStoreItem) => {
     if (testingConnectionId === store.id) {
       return;
     }
     setTestingConnectionId(store.id);
-    setVectorStores(prev => prev.map(item => (item.id === store.id ? { ...item, status: 'TESTING' } : item)));
     try {
       const detailedStore = await ensureVectorStoreDetail(store);
-      setVectorStores(prev => prev.map(item => (item.id === store.id ? { ...item, status: 'TESTING' } : item)));
-      const response = await VectorStoresService.vectorStoreTestConnection(
-        { id: detailedStore.id },
-        {
-          config: detailedStore.config,
-          timeout: 30,
-        }
-      );
-      const result = (response as any)?.data;
-      toast.success(
-        result?.message ||
-          (language === 'zh-CN' ? `${detailedStore.name} 测试连接成功` : `${detailedStore.name} connected successfully`)
-      );
-      await loadVectorStores();
+      const success = await handleTestConnection(detailedStore, () => {
+        // Status update callback - could be used to update local state if needed
+      });
+      if (success) {
+        await loadVectorStores();
+      }
     } catch (error: any) {
       console.error('Failed to test vector store connection:', error);
-      toast.error(error?.message || (language === 'zh-CN' ? '连接测试失败' : 'Connection test failed'));
-      setVectorStores(prev =>
-        prev.map(item =>
-          item.id === store.id
-            ? { ...item, status: store.status === 'TESTING' ? ConnectionStatusEnum.DISCONNECTED : store.status }
-            : item
-        )
-      );
     } finally {
       setTestingConnectionId(null);
     }
   };
 
-  const handleCreateStore = async () => {
-    if (!formData.name.trim()) {
-      toast.error(language === 'zh-CN' ? '请输入名称' : 'Please enter a name');
-      return;
-    }
-    if (!formData.type) {
-      toast.error(language === 'zh-CN' ? '请选择类型' : 'Please select a type');
-      return;
-    }
-    const dimensionValue = parseDimension();
-    if (!dimensionValue) {
-      return;
-    }
-
-    const payload: VectorStoreCreateDto = {
-      name: formData.name.trim(),
-      type: formData.type,
-      description: formData.description.trim() || undefined,
-      config: buildConfigFromForm(formData.type, dimensionValue),
-    };
-
-    setCreating(true);
-    try {
-      await VectorStoresService.vectorStoreCreate(payload);
-      toast.success(language === 'zh-CN' ? '向量存储源创建成功' : 'Vector store created successfully');
-      setShowCreateDialog(false);
-      resetForm();
+  const handleCreateStoreSubmit = async () => {
+    const success = await handleCreateStore(async () => {
+    setShowCreateDialog(false);
       setCurrentPage(1);
       await Promise.all([loadVectorStores(), loadStatistics()]);
-    } catch (error: any) {
-      console.error('Failed to create vector store:', error);
-      toast.error(error?.message || (language === 'zh-CN' ? '创建存储源失败' : 'Failed to create vector store'));
-    } finally {
-      setCreating(false);
+    });
+    if (!success) {
+      // Error already handled in hook
     }
   };
 
-  const handleEditStore = async () => {
+  const handleEditStoreSubmit = async () => {
     if (!editingStore) {
       return;
     }
-    if (!formData.name.trim()) {
-      toast.error(language === 'zh-CN' ? '请输入名称' : 'Please enter a name');
-      return;
-    }
-
-    const dimensionValue = parseDimension();
-    if (!dimensionValue) {
-      return;
-    }
-
-    const payload: VectorStoreUpdateDto = {
-      name: formData.name.trim(),
-      description: formData.description.trim() || undefined,
-      config: buildConfigFromForm(editingStore.type, dimensionValue),
-    };
-
-    setUpdating(true);
-    try {
-      await VectorStoresService.vectorStoreUpdate(editingStore.id, payload);
-      toast.success(language === 'zh-CN' ? '向量存储源更新成功' : 'Vector store updated successfully');
-      setShowEditDialog(false);
-      setEditingStore(null);
-      resetForm();
+    const success = await handleUpdateStore(editingStore.id, editingStore.type, async () => {
+    setShowEditDialog(false);
+    setEditingStore(null);
       await Promise.all([loadVectorStores(), loadStatistics()]);
-    } catch (error: any) {
-      console.error('Failed to update vector store:', error);
-      toast.error(error?.message || (language === 'zh-CN' ? '更新存储源失败' : 'Failed to update vector store'));
-    } finally {
-      setUpdating(false);
+    });
+    if (!success) {
+      // Error already handled in hook
     }
+  };
+
+  const handleFormDataChange = (data: Partial<typeof formData>) => {
+    setFormData(prev => ({ ...prev, ...data }));
   };
 
   const handleDeleteStore = async (store: VectorStoreItem) => {
@@ -506,22 +160,9 @@ export function VectorStore() {
   const openEditDialog = async (store: VectorStoreItem) => {
     const detailedStore = await ensureVectorStoreDetail(store);
     setEditingStore(detailedStore);
-    setFormData({
-      name: detailedStore.name,
-      type: detailedStore.type,
-      description: detailedStore.description === '--' ? '' : detailedStore.description,
-      endpoint: detailedStore.config?.endpoint ?? '',
-      apiKey: detailedStore.config?.apiKey ?? '',
-      dimension: detailedStore.config?.dimension ? String(detailedStore.config.dimension) : '1536',
-      database: detailedStore.config?.database ?? '',
-      collection: detailedStore.config?.collection ?? '',
-      username: detailedStore.config?.username ?? '',
-      password: detailedStore.config?.password ?? '',
-    });
+    populateFormFromStore(detailedStore);
     setShowEditDialog(true);
   };
-
-  const storesToDisplay = vectorStores;
 
   return (
     <div className='space-y-6'>
@@ -547,7 +188,7 @@ export function VectorStore() {
                 </div>
               </div>
               <div className='text-base font-semibold text-gray-600 dark:text-gray-400 mb-0.5'>{card.label}</div>
-              <div className='text-3xl dark:text-white mb-0.5'>{statisticsLoading ? '--' : card.value}</div>
+              <div className='text-3xl dark:text-white mb-0.5'>{card.value}</div>
               <div className='text-xs text-gray-500 dark:text-gray-400'>{card.subtext}</div>
             </Card>
           );
@@ -612,7 +253,7 @@ export function VectorStore() {
             {language === 'zh-CN' ? '正在加载向量存储源...' : 'Loading vector stores...'}
           </p>
         </div>
-      ) : storesToDisplay.length === 0 ? (
+      ) : vectorStores.length === 0 ? (
         <div className='text-center py-12'>
           <Database className='w-12 h-12 text-gray-400 dark:text-gray-600 mx-auto mb-3' />
           <p className='text-gray-600 dark:text-gray-400'>
@@ -633,7 +274,7 @@ export function VectorStore() {
           {/* Grid View */}
           {viewMode === 'grid' && (
             <div className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
-              {storesToDisplay.map(store => {
+              {vectorStores.map(store => {
                 const typeInfo = getTypeInfo(store.type);
                 const statusInfo = getStatusInfo(store.status);
                 const isToggling = togglingId === store.id;
@@ -676,7 +317,7 @@ export function VectorStore() {
                             {language === 'zh-CN' ? '编辑' : 'Edit'}
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={() => handleTestConnection(store)}
+                            onClick={() => handleTestConnectionWrapper(store)}
                             disabled={isTesting}
                             className='dark:text-gray-300'
                           >
@@ -778,7 +419,7 @@ export function VectorStore() {
                     </tr>
                   </thead>
                   <tbody className='divide-y divide-gray-200 dark:divide-gray-700'>
-                    {storesToDisplay.map(store => {
+                    {vectorStores.map(store => {
                       const typeInfo = getTypeInfo(store.type);
                       const statusInfo = getStatusInfo(store.status);
                       const isToggling = togglingId === store.id;
@@ -828,7 +469,7 @@ export function VectorStore() {
                           <td className='px-4 py-3'>
                             <div className='flex items-center justify-center gap-1'>
                               <button
-                                onClick={() => handleTestConnection(store)}
+                                onClick={() => handleTestConnectionWrapper(store)}
                                 disabled={isTesting}
                                 className='p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors'
                                 title={language === 'zh-CN' ? '测试连接' : 'Test Connection'}
@@ -864,7 +505,7 @@ export function VectorStore() {
           {shouldShowPagination && (
             <div className='flex items-center justify-center mt-6'>
               <XcanPagination
-                pageSize={itemsPerPage}
+                pageSize={PAGINATION_CONFIG.DEFAULT_PAGE_SIZE}
                 pageNo={currentPage}
                 total={vectorStoresTotal}
                 onChange={({ pageNo }) => {
@@ -877,275 +518,29 @@ export function VectorStore() {
       )}
 
       {/* Create Dialog */}
-      <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-        <DialogContent className='max-w-2xl dark:bg-gray-800'>
-          <DialogHeader>
-            <DialogTitle className='dark:text-white'>
-              {language === 'zh-CN' ? '添加向量存储源' : 'Add Vector Store'}
-            </DialogTitle>
-            <DialogDescription>
-              {language === 'zh-CN' ? '配置新的向量数据库连接' : 'Configure a new vector database connection'}
-            </DialogDescription>
-          </DialogHeader>
-
-          <ScrollArea className='max-h-[500px] pr-4'>
-            <div className='space-y-4'>
-              <div className='grid grid-cols-2 gap-4'>
-                <div className='space-y-2'>
-                  <Label className='dark:text-gray-200'>{language === 'zh-CN' ? '名称' : 'Name'}</Label>
-                  <Input
-                    placeholder={language === 'zh-CN' ? '输入存储源名称' : 'Enter store name'}
-                    value={formData.name}
-                    onChange={e => setFormData({ ...formData, name: e.target.value })}
-                    className='dark:bg-gray-750 dark:border-gray-600'
-                  />
-                </div>
-
-                <div className='space-y-2'>
-                  <Label className='dark:text-gray-200'>{language === 'zh-CN' ? '类型' : 'Type'}</Label>
-                  <Select
-                    value={formData.type}
-                    onValueChange={value => setFormData({ ...formData, type: value as VectorStoreTypeEnum })}
-                  >
-                    <SelectTrigger className='dark:bg-gray-750 dark:border-gray-600'>
-                      <SelectValue placeholder={language === 'zh-CN' ? '选择数据库类型' : 'Select database type'} />
-                    </SelectTrigger>
-                    <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
-                      {vectorStoreTypes.map(type => (
-                        <SelectItem key={type.value} value={type.value} className='dark:text-gray-300'>
-                          {type.icon} {type.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className='space-y-2'>
-                <Label className='dark:text-gray-200'>{language === 'zh-CN' ? '描述' : 'Description'}</Label>
-                <Textarea
-                  placeholder={language === 'zh-CN' ? '输入描述信息' : 'Enter description'}
-                  value={formData.description}
-                  onChange={e => setFormData({ ...formData, description: e.target.value })}
-                  className='dark:bg-gray-750 dark:border-gray-600'
-                  rows={2}
-                />
-              </div>
-
-              <div className='space-y-2'>
-                <Label className='dark:text-gray-200'>{language === 'zh-CN' ? '端点地址' : 'Endpoint'}</Label>
-                <Input
-                  placeholder='https://...'
-                  value={formData.endpoint}
-                  onChange={e => setFormData({ ...formData, endpoint: e.target.value })}
-                  className='dark:bg-gray-750 dark:border-gray-600'
-                />
-              </div>
-
-              <div className='grid grid-cols-2 gap-4'>
-                <div className='space-y-2'>
-                  <Label className='dark:text-gray-200'>{language === 'zh-CN' ? 'API密钥' : 'API Key'}</Label>
-                  <Input
-                    type='password'
-                    placeholder='sk-...'
-                    value={formData.apiKey}
-                    onChange={e => setFormData({ ...formData, apiKey: e.target.value })}
-                    className='dark:bg-gray-750 dark:border-gray-600'
-                  />
-                </div>
-
-                <div className='space-y-2'>
-                  <Label className='dark:text-gray-200'>{language === 'zh-CN' ? '向量维度' : 'Dimension'}</Label>
-                  <Input
-                    type='number'
-                    placeholder='1536'
-                    value={formData.dimension}
-                    onChange={e => setFormData({ ...formData, dimension: e.target.value })}
-                    className='dark:bg-gray-750 dark:border-gray-600'
-                  />
-                </div>
-              </div>
-
-              <div className='grid grid-cols-2 gap-4'>
-                <div className='space-y-2'>
-                  <Label className='dark:text-gray-200'>{language === 'zh-CN' ? '数据库' : 'Database'}</Label>
-                  <Input
-                    placeholder={language === 'zh-CN' ? '数据库名称' : 'Database name'}
-                    value={formData.database}
-                    onChange={e => setFormData({ ...formData, database: e.target.value })}
-                    className='dark:bg-gray-750 dark:border-gray-600'
-                  />
-                </div>
-
-                <div className='space-y-2'>
-                  <Label className='dark:text-gray-200'>
-                    {language === 'zh-CN' ? '集合/索引' : 'Collection/Index'}
-                  </Label>
-                  <Input
-                    placeholder={language === 'zh-CN' ? '集合名称' : 'Collection name'}
-                    value={formData.collection}
-                    onChange={e => setFormData({ ...formData, collection: e.target.value })}
-                    className='dark:bg-gray-750 dark:border-gray-600'
-                  />
-                </div>
-              </div>
-
-              <div className='grid grid-cols-2 gap-4'>
-                <div className='space-y-2'>
-                  <Label className='dark:text-gray-200'>{language === 'zh-CN' ? '用户名' : 'Username'}</Label>
-                  <Input
-                    placeholder={language === 'zh-CN' ? '用户名(可选)' : 'Username (optional)'}
-                    value={formData.username}
-                    onChange={e => setFormData({ ...formData, username: e.target.value })}
-                    className='dark:bg-gray-750 dark:border-gray-600'
-                  />
-                </div>
-
-                <div className='space-y-2'>
-                  <Label className='dark:text-gray-200'>{language === 'zh-CN' ? '密码' : 'Password'}</Label>
-                  <Input
-                    type='password'
-                    placeholder={language === 'zh-CN' ? '密码(可选)' : 'Password (optional)'}
-                    value={formData.password}
-                    onChange={e => setFormData({ ...formData, password: e.target.value })}
-                    className='dark:bg-gray-750 dark:border-gray-600'
-                  />
-                </div>
-              </div>
-            </div>
-          </ScrollArea>
-
-          <DialogFooter>
-            <Button
-              variant='outline'
-              onClick={() => {
-                setShowCreateDialog(false);
-                resetForm();
-              }}
-            >
-              {language === 'zh-CN' ? '取消' : 'Cancel'}
-            </Button>
-            <Button
-              onClick={handleCreateStore}
-              disabled={
-                creating ||
-                !formData.name.trim() ||
-                !formData.type ||
-                !formData.endpoint.trim() ||
-                !formData.dimension.trim()
-              }
-            >
-              {language === 'zh-CN' ? '创建' : 'Create'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <CreateVectorStoreDialog
+        open={showCreateDialog}
+        onOpenChange={setShowCreateDialog}
+        formData={formData}
+        onFormDataChange={handleFormDataChange}
+        onSubmit={handleCreateStoreSubmit}
+        onReset={resetForm}
+      />
 
       {/* Edit Dialog */}
-      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-        <DialogContent className='max-w-2xl dark:bg-gray-800'>
-          <DialogHeader>
-            <DialogTitle className='dark:text-white'>
-              {language === 'zh-CN' ? '编辑向量存储源' : 'Edit Vector Store'}
-            </DialogTitle>
-            <DialogDescription>
-              {language === 'zh-CN' ? '修改向量数据库配置' : 'Modify vector database configuration'}
-            </DialogDescription>
-          </DialogHeader>
-
-          <ScrollArea className='max-h-[500px] pr-4'>
-            <div className='space-y-4'>
-              <div className='space-y-2'>
-                <Label className='dark:text-gray-200'>{language === 'zh-CN' ? '名称' : 'Name'}</Label>
-                <Input
-                  value={formData.name}
-                  onChange={e => setFormData({ ...formData, name: e.target.value })}
-                  className='dark:bg-gray-750 dark:border-gray-600'
-                />
-              </div>
-
-              <div className='space-y-2'>
-                <Label className='dark:text-gray-200'>{language === 'zh-CN' ? '描述' : 'Description'}</Label>
-                <Textarea
-                  value={formData.description}
-                  onChange={e => setFormData({ ...formData, description: e.target.value })}
-                  className='dark:bg-gray-750 dark:border-gray-600'
-                  rows={2}
-                />
-              </div>
-
-              <div className='space-y-2'>
-                <Label className='dark:text-gray-200'>{language === 'zh-CN' ? '端点地址' : 'Endpoint'}</Label>
-                <Input
-                  value={formData.endpoint}
-                  onChange={e => setFormData({ ...formData, endpoint: e.target.value })}
-                  className='dark:bg-gray-750 dark:border-gray-600'
-                />
-              </div>
-
-              <div className='grid grid-cols-2 gap-4'>
-                <div className='space-y-2'>
-                  <Label className='dark:text-gray-200'>{language === 'zh-CN' ? 'API密钥' : 'API Key'}</Label>
-                  <Input
-                    type='password'
-                    value={formData.apiKey}
-                    onChange={e => setFormData({ ...formData, apiKey: e.target.value })}
-                    className='dark:bg-gray-750 dark:border-gray-600'
-                  />
-                </div>
-
-                <div className='space-y-2'>
-                  <Label className='dark:text-gray-200'>{language === 'zh-CN' ? '向量维度' : 'Dimension'}</Label>
-                  <Input
-                    type='number'
-                    value={formData.dimension}
-                    onChange={e => setFormData({ ...formData, dimension: e.target.value })}
-                    className='dark:bg-gray-750 dark:border-gray-600'
-                  />
-                </div>
-              </div>
-
-              <div className='grid grid-cols-2 gap-4'>
-                <div className='space-y-2'>
-                  <Label className='dark:text-gray-200'>{language === 'zh-CN' ? '数据库' : 'Database'}</Label>
-                  <Input
-                    value={formData.database}
-                    onChange={e => setFormData({ ...formData, database: e.target.value })}
-                    className='dark:bg-gray-750 dark:border-gray-600'
-                  />
-                </div>
-
-                <div className='space-y-2'>
-                  <Label className='dark:text-gray-200'>
-                    {language === 'zh-CN' ? '集合/索引' : 'Collection/Index'}
-                  </Label>
-                  <Input
-                    value={formData.collection}
-                    onChange={e => setFormData({ ...formData, collection: e.target.value })}
-                    className='dark:bg-gray-750 dark:border-gray-600'
-                  />
-                </div>
-              </div>
-            </div>
-          </ScrollArea>
-
-          <DialogFooter>
-            <Button
-              variant='outline'
-              onClick={() => {
-                setShowEditDialog(false);
+      <EditVectorStoreDialog
+        open={showEditDialog}
+        onOpenChange={(open) => {
+          setShowEditDialog(open);
+          if (!open) {
                 setEditingStore(null);
-                resetForm();
-              }}
-            >
-              {language === 'zh-CN' ? '取消' : 'Cancel'}
-            </Button>
-            <Button onClick={handleEditStore} disabled={updating}>
-              {language === 'zh-CN' ? '保存' : 'Save'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          }
+        }}
+        formData={formData}
+        onFormDataChange={handleFormDataChange}
+        onSubmit={handleEditStoreSubmit}
+        onReset={resetForm}
+      />
     </div>
   );
 }

@@ -1,23 +1,22 @@
 import { useCallback, useEffect, useMemo, useState, type ElementType } from 'react';
 import { useLanguage } from '@/components/ui/LanguageProvider';
-import { Database, Search, Filter, Plus, TrendingUp, Activity, Grid3x3, List, Eye, Edit, Trash2, MoreHorizontal, Play, Pause, Settings, Cpu, Zap, Brain, FileText, Image as ImageIcon, Video, Info, Sliders, } from 'lucide-react';
+import { Database, Search, Filter, TrendingUp, Activity, Grid3x3, List, Eye, Edit, Trash2, MoreHorizontal, Play, Pause, Cpu, Zap, Brain, FileText, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from '@/components/ui/dropdown-menu';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { XcanPagination } from '@/components/ui/pagination';
 import { toast } from 'sonner';
 import { useDebounce } from '@/hooks/useDebounce';
 import ModelsService from '@/services/Models';
 import { GetModelListParamsOrderByEnum, ModelDetailVo, ModelListVo, ModelStatisticsVo, ModelUpdateDto, ModelCreateDto, } from '@/services/ModelsTypes';
 import { ModelProviderEnum, ModelStatusEnum, ModelTypeEnum } from '@/enums/enums';
-import { enumToMessages, getEnumDescription} from '@/enums/utils'
+import { enumToMessages, getEnumDescription } from '@/enums/utils';
+import { CreateModelDialog } from './components/CreateModelDialog';
+import { EditModelDialog } from './components/EditModelDialog';
 
 interface ModelListItem {
   id: string;
@@ -580,12 +579,12 @@ export function ModelManagement() {
 
   const handleSaveEdit = useCallback(async () => {
     if (!selectedModel) {
-      toast.error('未选择模型');
+      toast.error(language === 'zh-CN' ? '未选择模型' : 'No model selected');
       return;
     }
 
     if (!editFormData.name.trim() || !editFormData.provider || !editFormData.version.trim()) {
-      toast.error('请填写必填字段');
+      toast.error(language === 'zh-CN' ? '请填写必填字段' : 'Please fill in required fields');
       return;
     }
 
@@ -608,15 +607,17 @@ export function ModelManagement() {
 
     try {
       await ModelsService.updateModel(selectedModel.id, payload);
-      toast.success(`模型 "${editFormData.name}" 配置已更新`);
+      toast.success(
+        language === 'zh-CN' ? `模型 "${editFormData.name}" 配置已更新` : `Model "${editFormData.name}" updated successfully`
+      );
       setEditDialogOpen(false);
       await loadModels();
       await loadStatistics();
     } catch (error: any) {
       console.error('Failed to update model:', error);
-      toast.error(error?.message || '更新模型失败');
+      toast.error(error?.message || (language === 'zh-CN' ? '更新模型失败' : 'Failed to update model'));
     }
-  }, [editFormData, loadModels, loadStatistics, selectedModel]);
+  }, [editFormData, language, loadModels, loadStatistics, selectedModel]);
 
   const handleDeleteModel = useCallback(
     async (model: ModelListItem) => {
@@ -638,7 +639,7 @@ export function ModelManagement() {
 
   const handleAddModel = useCallback(async () => {
     if (!formData.name.trim() || !formData.provider || !formData.version.trim()) {
-      toast.error('请填写必填字段');
+      toast.error(language === 'zh-CN' ? '请填写必填字段' : 'Please fill in required fields');
       return;
     }
 
@@ -661,7 +662,9 @@ export function ModelManagement() {
 
     try {
       await ModelsService.createModel(payload);
-      toast.success(`模型 "${formData.name}" 已成功添加！`);
+      toast.success(
+        language === 'zh-CN' ? `模型 "${formData.name}" 已成功添加！` : `Model "${formData.name}" added successfully!`
+      );
       setAddModelDialogOpen(false);
       setFormData({
         name: '',
@@ -679,9 +682,45 @@ export function ModelManagement() {
       await loadStatistics();
     } catch (error: any) {
       console.error('Failed to add model:', error);
-      toast.error(error?.message || '添加模型失败');
+      toast.error(error?.message || (language === 'zh-CN' ? '添加模型失败' : 'Failed to add model'));
     }
-  }, [formData, loadModels, loadStatistics]);
+  }, [formData, language, loadModels, loadStatistics]);
+
+  const handleFormDataChange = (data: Partial<typeof formData>) => {
+    setFormData(prev => ({ ...prev, ...data }));
+  };
+
+  const handleEditFormDataChange = (data: Partial<typeof editFormData>) => {
+    setEditFormData(prev => ({ ...prev, ...data }));
+  };
+
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      description: '',
+      type: ModelTypeEnum.CHAT,
+      provider: '',
+      version: '',
+      apiKey: '',
+      endpoint: '',
+      maxTokens: '',
+      temperature: '0.7',
+    });
+  };
+
+  const resetEditForm = () => {
+    setEditFormData({
+      name: '',
+      description: '',
+      type: ModelTypeEnum.CHAT,
+      provider: '',
+      version: '',
+      apiKey: '',
+      endpoint: '',
+      maxTokens: '',
+      temperature: '0.7',
+    });
+  };
 
   return (
     <div className='space-y-6'>
@@ -756,7 +795,7 @@ export function ModelManagement() {
                       <SelectItem key={option.value} value={option.value} className='dark:text-gray-300'>
                         <div className='flex items-center gap-2'>
                           <Icon className='w-4 h-4' />
-                          {language === 'zh-CN' ? option.labelZh : option.labelEn}
+                          {option.label}
                         </div>
                       </SelectItem>
                     );
@@ -838,235 +877,15 @@ export function ModelManagement() {
                 </Button>
               </div>
 
-              <Dialog open={addModelDialogOpen} onOpenChange={setAddModelDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button className='bg-blue-500 hover:bg-blue-600'>
-                    <Plus className='w-4 h-4 mr-2' />
-                    添加模型
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className='dark:bg-gray-800 dark:border-gray-700 sm:max-w-[600px] max-h-[90vh] overflow-y-auto'>
-                  <DialogHeader>
-                    <DialogTitle className='dark:text-white'>添加新模型</DialogTitle>
-                    <DialogDescription className='dark:text-gray-400'>
-                      配置并添加一个新的AI模型到您的工作空间
-                    </DialogDescription>
-                  </DialogHeader>
-
-                  <div className='space-y-4 py-4'>
-                    {/* 基本信息 */}
-                    <div className='space-y-3'>
-                      <h3 className='text-sm dark:text-white flex items-center gap-2'>
-                        <Info className='w-4 h-4 text-blue-500' />
-                        基本信息
-                      </h3>
-
-                      <div className='space-y-2'>
-                        <Label htmlFor='model-name' className='dark:text-gray-300'>
-                          模型名称 <span className='text-red-500'>*</span>
-                        </Label>
-                        <Input
-                          id='model-name'
-                          placeholder='例如: GPT-4 Turbo'
-                          value={formData.name}
-                          onChange={e => setFormData({ ...formData, name: e.target.value })}
-                          className='dark:bg-gray-700 dark:border-gray-600'
-                        />
-                      </div>
-
-                      <div className='space-y-2'>
-                        <Label htmlFor='model-description' className='dark:text-gray-300'>
-                          描述
-                        </Label>
-                        <Textarea
-                          id='model-description'
-                          placeholder='简要描述这个模型的功能和用途...'
-                          value={formData.description}
-                          onChange={e =>
-                            setFormData({
-                              ...formData,
-                              description: e.target.value,
-                            })
-                          }
-                          className='dark:bg-gray-700 dark:border-gray-600 min-h-[80px]'
-                        />
-                      </div>
-
-                      <div className='grid grid-cols-2 gap-3'>
-                        <div className='space-y-2'>
-                          <Label htmlFor='model-type' className='dark:text-gray-300'>
-                            模型类型 <span className='text-red-500'>*</span>
-                          </Label>
-                          <Select
-                            value={formData.type}
-                            onValueChange={value => setFormData({ ...formData, type: value as ModelTypeEnum })}
-                          >
-                            <SelectTrigger id='model-type' className='dark:bg-gray-700 dark:border-gray-600'>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
-                              {modelTypeOptions.map(option => {
-                                const Icon = option.icon;
-                                return (
-                                  <SelectItem key={option.value} value={option.value} className='dark:text-gray-300'>
-                                    <div className='flex items-center gap-2'>
-                                      <Icon className='w-4 h-4' />
-                                      {language === 'zh-CN' ? option.labelZh : option.labelEn}
-                                    </div>
-                                  </SelectItem>
-                                );
-                              })}
-                            </SelectContent>
-                          </Select>
-                        </div>
-
-                        <div className='space-y-2'>
-                          <Label htmlFor='model-provider' className='dark:text-gray-300'>
-                            提供商 <span className='text-red-500'>*</span>
-                          </Label>
-                          <Select
-                            value={formData.provider}
-                            onValueChange={value => setFormData({ ...formData, provider: value })}
-                          >
-                            <SelectTrigger id='model-provider' className='dark:bg-gray-700 dark:border-gray-600'>
-                              <SelectValue placeholder='选择提供商' />
-                            </SelectTrigger>
-                            <SelectContent className='dark:bg-gray-800 dark:border-gray-700 max-h-[300px]'>
-                              {providerOptions.map(option => (
-                                <SelectItem key={option.value} value={option.value} className='dark:text-gray-300'>
-                                  {option.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-
-                      <div className='space-y-2'>
-                        <Label htmlFor='model-version' className='dark:text-gray-300'>
-                          版本 <span className='text-red-500'>*</span>
-                        </Label>
-                        <Input
-                          id='model-version'
-                          placeholder='例如: gpt-4-turbo-2024-04'
-                          value={formData.version}
-                          onChange={e =>
-                            setFormData({
-                              ...formData,
-                              version: e.target.value,
-                            })
-                          }
-                          className='dark:bg-gray-700 dark:border-gray-600'
-                        />
-                      </div>
-                    </div>
-
-                    {/* API配置 */}
-                    <div className='space-y-3 pt-4 border-t border-gray-200 dark:border-gray-700'>
-                      <h3 className='text-sm dark:text-white flex items-center gap-2'>
-                        <Settings className='w-4 h-4 text-green-500' />
-                        API配置
-                      </h3>
-
-                      <div className='space-y-2'>
-                        <Label htmlFor='model-endpoint' className='dark:text-gray-300'>
-                          API端点
-                        </Label>
-                        <Input
-                          id='model-endpoint'
-                          placeholder='https://api.example.com/v1'
-                          value={formData.endpoint}
-                          onChange={e =>
-                            setFormData({
-                              ...formData,
-                              endpoint: e.target.value,
-                            })
-                          }
-                          className='dark:bg-gray-700 dark:border-gray-600'
-                        />
-                      </div>
-
-                      <div className='space-y-2'>
-                        <Label htmlFor='model-apikey' className='dark:text-gray-300'>
-                          API密钥
-                        </Label>
-                        <Input
-                          id='model-apikey'
-                          type='password'
-                          placeholder='sk-...'
-                          value={formData.apiKey}
-                          onChange={e => setFormData({ ...formData, apiKey: e.target.value })}
-                          className='dark:bg-gray-700 dark:border-gray-600'
-                        />
-                      </div>
-                    </div>
-
-                    {/* 模型参数 */}
-                    <div className='space-y-3 pt-4 border-t border-gray-200 dark:border-gray-700'>
-                      <h3 className='text-sm dark:text-white flex items-center gap-2'>
-                        <Sliders className='w-4 h-4 text-purple-500' />
-                        模型参数
-                      </h3>
-
-                      <div className='grid grid-cols-2 gap-3'>
-                        <div className='space-y-2'>
-                          <Label htmlFor='model-maxTokens' className='dark:text-gray-300'>
-                            最大Tokens
-                          </Label>
-                          <Input
-                            id='model-maxTokens'
-                            type='number'
-                            placeholder='4096'
-                            value={formData.maxTokens}
-                            onChange={e =>
-                              setFormData({
-                                ...formData,
-                                maxTokens: e.target.value,
-                              })
-                            }
-                            className='dark:bg-gray-700 dark:border-gray-600'
-                          />
-                        </div>
-
-                        <div className='space-y-2'>
-                          <Label htmlFor='model-temperature' className='dark:text-gray-300'>
-                            Temperature
-                          </Label>
-                          <Input
-                            id='model-temperature'
-                            type='number'
-                            step='0.1'
-                            min='0'
-                            max='2'
-                            placeholder='0.7'
-                            value={formData.temperature}
-                            onChange={e =>
-                              setFormData({
-                                ...formData,
-                                temperature: e.target.value,
-                              })
-                            }
-                            className='dark:bg-gray-700 dark:border-gray-600'
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <DialogFooter>
-                    <Button
-                      variant='outline'
-                      onClick={() => setAddModelDialogOpen(false)}
-                      className='dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300'
-                    >
-                      取消
-                    </Button>
-                    <Button onClick={handleAddModel} className='bg-blue-500 hover:bg-blue-600'>
-                      添加模型
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
+              <CreateModelDialog
+                open={addModelDialogOpen}
+                onOpenChange={setAddModelDialogOpen}
+                formData={formData}
+                onFormDataChange={handleFormDataChange}
+                onSubmit={handleAddModel}
+                onReset={resetForm}
+                providerOptions={providerOptions}
+              />
             </div>
           </div>
 
@@ -1419,196 +1238,15 @@ export function ModelManagement() {
       </Dialog>
 
       {/* 编辑配置对话框 */}
-      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-        <DialogContent className='dark:bg-gray-800 dark:border-gray-700 sm:max-w-[600px] max-h-[90vh] overflow-y-auto'>
-          <DialogHeader>
-            <DialogTitle className='dark:text-white'>编辑模型配置</DialogTitle>
-            <DialogDescription className='dark:text-gray-400'>修改模型的配置信息</DialogDescription>
-          </DialogHeader>
-
-          <div className='space-y-4 py-4'>
-            {/* 基本信息 */}
-            <div className='space-y-3'>
-              <h3 className='text-sm dark:text-white flex items-center gap-2'>
-                <Info className='w-4 h-4 text-blue-500' />
-                基本信息
-              </h3>
-
-              <div className='space-y-2'>
-                <Label htmlFor='edit-model-name' className='dark:text-gray-300'>
-                  模型名称 <span className='text-red-500'>*</span>
-                </Label>
-                <Input
-                  id='edit-model-name'
-                  value={editFormData.name}
-                  onChange={e => setEditFormData({ ...editFormData, name: e.target.value })}
-                  className='dark:bg-gray-700 dark:border-gray-600'
-                />
-              </div>
-
-              <div className='space-y-2'>
-                <Label htmlFor='edit-model-description' className='dark:text-gray-300'>
-                  描述
-                </Label>
-                <Textarea
-                  id='edit-model-description'
-                  value={editFormData.description}
-                  onChange={e =>
-                    setEditFormData({
-                      ...editFormData,
-                      description: e.target.value,
-                    })
-                  }
-                  className='dark:bg-gray-700 dark:border-gray-600 min-h-[80px]'
-                />
-              </div>
-
-              <div className='grid grid-cols-2 gap-3'>
-                <div className='space-y-2'>
-                  <Label htmlFor='edit-model-provider' className='dark:text-gray-300'>
-                    提供商 <span className='text-red-500'>*</span>
-                  </Label>
-                  <Select
-                    value={editFormData.provider}
-                    onValueChange={value => setEditFormData({ ...editFormData, provider: value })}
-                  >
-                    <SelectTrigger id='edit-model-provider' className='dark:bg-gray-700 dark:border-gray-600'>
-                      <SelectValue placeholder='选择提供商' />
-                    </SelectTrigger>
-                    <SelectContent className='dark:bg-gray-800 dark:border-gray-700 max-h-[300px]'>
-                      {providerOptions.map(option => (
-                        <SelectItem key={option.value} value={option.value} className='dark:text-gray-300'>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className='space-y-2'>
-                  <Label htmlFor='edit-model-version' className='dark:text-gray-300'>
-                    版本 <span className='text-red-500'>*</span>
-                  </Label>
-                  <Input
-                    id='edit-model-version'
-                    value={editFormData.version}
-                    onChange={e =>
-                      setEditFormData({
-                        ...editFormData,
-                        version: e.target.value,
-                      })
-                    }
-                    className='dark:bg-gray-700 dark:border-gray-600'
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* API配置 */}
-            <div className='space-y-3 pt-4 border-t border-gray-200 dark:border-gray-700'>
-              <h3 className='text-sm dark:text-white flex items-center gap-2'>
-                <Settings className='w-4 h-4 text-green-500' />
-                API配置
-              </h3>
-
-              <div className='space-y-2'>
-                <Label htmlFor='edit-model-endpoint' className='dark:text-gray-300'>
-                  API端点
-                </Label>
-                <Input
-                  id='edit-model-endpoint'
-                  placeholder='https://api.example.com/v1'
-                  value={editFormData.endpoint}
-                  onChange={e =>
-                    setEditFormData({
-                      ...editFormData,
-                      endpoint: e.target.value,
-                    })
-                  }
-                  className='dark:bg-gray-700 dark:border-gray-600'
-                />
-              </div>
-
-              <div className='space-y-2'>
-                <Label htmlFor='edit-model-apikey' className='dark:text-gray-300'>
-                  API密钥
-                </Label>
-                <Input
-                  id='edit-model-apikey'
-                  type='password'
-                  placeholder='留空则不修改'
-                  value={editFormData.apiKey}
-                  onChange={e => setEditFormData({ ...editFormData, apiKey: e.target.value })}
-                  className='dark:bg-gray-700 dark:border-gray-600'
-                />
-              </div>
-            </div>
-
-            {/* 模型参数 */}
-            <div className='space-y-3 pt-4 border-t border-gray-200 dark:border-gray-700'>
-              <h3 className='text-sm dark:text-white flex items-center gap-2'>
-                <Sliders className='w-4 h-4 text-purple-500' />
-                模型参数
-              </h3>
-
-              <div className='grid grid-cols-2 gap-3'>
-                <div className='space-y-2'>
-                  <Label htmlFor='edit-model-maxTokens' className='dark:text-gray-300'>
-                    最大Tokens
-                  </Label>
-                  <Input
-                    id='edit-model-maxTokens'
-                    type='number'
-                    placeholder='4096'
-                    value={editFormData.maxTokens}
-                    onChange={e =>
-                      setEditFormData({
-                        ...editFormData,
-                        maxTokens: e.target.value,
-                      })
-                    }
-                    className='dark:bg-gray-700 dark:border-gray-600'
-                  />
-                </div>
-
-                <div className='space-y-2'>
-                  <Label htmlFor='edit-model-temperature' className='dark:text-gray-300'>
-                    Temperature
-                  </Label>
-                  <Input
-                    id='edit-model-temperature'
-                    type='number'
-                    step='0.1'
-                    min='0'
-                    max='2'
-                    value={editFormData.temperature}
-                    onChange={e =>
-                      setEditFormData({
-                        ...editFormData,
-                        temperature: e.target.value,
-                      })
-                    }
-                    className='dark:bg-gray-700 dark:border-gray-600'
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button
-              variant='outline'
-              onClick={() => setEditDialogOpen(false)}
-              className='dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300'
-            >
-              取消
-            </Button>
-            <Button onClick={handleSaveEdit} className='bg-blue-500 hover:bg-blue-600'>
-              保存修改
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <EditModelDialog
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        formData={editFormData}
+        onFormDataChange={handleEditFormDataChange}
+        onSubmit={handleSaveEdit}
+        onReset={resetEditForm}
+        providerOptions={providerOptions}
+      />
     </div>
   );
 }
