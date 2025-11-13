@@ -17,6 +17,7 @@ import { ModelProviderEnum, ModelStatusEnum, ModelTypeEnum } from '@/enums/enums
 import { enumToMessages, getEnumDescription } from '@/enums/utils';
 import { CreateModelDialog } from './components/CreateModelDialog';
 import { EditModelDialog } from './components/EditModelDialog';
+import { MODEL_TYPE_CONFIG, DEFAULT_MODEL_TYPE_CONFIG, MODEL_STATUS_CONFIG, DEFAULT_MODEL_STATUS_CONFIG } from './constants';
 
 interface ModelListItem {
   id: string;
@@ -116,82 +117,30 @@ const formatAccuracy = (performance?: ModelDetailVo['performance']) => {
 const mapTypeToConfig = (type?: ModelTypeEnum | string) => {
   switch (type) {
     case ModelTypeEnum.CHAT:
-      return {
-        labelZh: '对话模型',
-        labelEn: 'Chat',
-        icon: Brain,
-        iconBg: 'bg-blue-50 dark:bg-blue-900/20',
-        iconColor: 'text-blue-500',
-      };
+      return MODEL_TYPE_CONFIG[ModelTypeEnum.CHAT];
     case ModelTypeEnum.IMAGE:
-      return {
-        labelZh: '图像模型',
-        labelEn: 'Image',
-        icon: ImageIcon,
-        iconBg: 'bg-pink-50 dark:bg-pink-900/20',
-        iconColor: 'text-pink-500',
-      };
+      return MODEL_TYPE_CONFIG[ModelTypeEnum.IMAGE];
     case ModelTypeEnum.AUDIO:
-      return {
-        labelZh: '语音模型',
-        labelEn: 'Audio',
-        icon: FileText,
-        iconBg: 'bg-green-50 dark:bg-green-900/20',
-        iconColor: 'text-green-500',
-      };
+      return MODEL_TYPE_CONFIG[ModelTypeEnum.AUDIO];
     case ModelTypeEnum.EMBEDDING:
-      return {
-        labelZh: '嵌入模型',
-        labelEn: 'Embedding',
-        icon: Cpu,
-        iconBg: 'bg-indigo-50 dark:bg-indigo-900/20',
-        iconColor: 'text-indigo-500',
-      };
+      return MODEL_TYPE_CONFIG[ModelTypeEnum.EMBEDDING];
     case ModelTypeEnum.MODERATION:
-      return {
-        labelZh: '审核模型',
-        labelEn: 'Moderation',
-        icon: Activity,
-        iconBg: 'bg-orange-50 dark:bg-orange-900/20',
-        iconColor: 'text-orange-500',
-      };
+      return MODEL_TYPE_CONFIG[ModelTypeEnum.MODERATION];
     default:
-      return {
-        labelZh: '其他模型',
-        labelEn: 'Other',
-        icon: Cpu,
-        iconBg: 'bg-gray-100 dark:bg-gray-800',
-        iconColor: 'text-gray-500',
-      };
+      return DEFAULT_MODEL_TYPE_CONFIG;
   }
 };
 
 const mapStatusToConfig = (status?: ModelStatusEnum | string) => {
   switch (status) {
     case ModelStatusEnum.RUNNING:
-      return {
-        labelZh: '运行中',
-        labelEn: 'Running',
-        color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-      };
+      return MODEL_STATUS_CONFIG[ModelStatusEnum.RUNNING];
     case ModelStatusEnum.STOPPED:
-      return {
-        labelZh: '已停止',
-        labelEn: 'Stopped',
-        color: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300',
-      };
+      return MODEL_STATUS_CONFIG[ModelStatusEnum.STOPPED];
     case ModelStatusEnum.ERROR:
-      return {
-        labelZh: '异常',
-        labelEn: 'Error',
-        color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-      };
+      return MODEL_STATUS_CONFIG[ModelStatusEnum.ERROR];
     default:
-      return {
-        labelZh: '未知',
-        labelEn: 'Unknown',
-        color: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300',
-      };
+      return DEFAULT_MODEL_STATUS_CONFIG;
   }
 };
 
@@ -378,7 +327,7 @@ export function ModelManagement() {
         id,
         name: item.name ?? detail?.name ?? '--',
         description: item.description ?? detail?.description ?? '--',
-        type: language === 'zh-CN' ? typeConfig.labelZh : typeConfig.labelEn,
+        type: typeConfig.label,
         typeEnum: item.type as ModelTypeEnum | undefined,
         icon: typeConfig.icon,
         iconBg: typeConfig.iconBg,
@@ -386,7 +335,7 @@ export function ModelManagement() {
         provider: providerLabel,
         providerEnum: item.provider as ModelProviderEnum | undefined,
         version: item.version ?? detail?.version ?? '--',
-        status: language === 'zh-CN' ? statusConfig.labelZh : statusConfig.labelEn,
+        status: statusConfig.label,
         statusEnum: item.status as ModelStatusEnum | undefined,
         statusColor: statusConfig.color,
         performance: {
