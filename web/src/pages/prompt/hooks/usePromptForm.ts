@@ -24,7 +24,7 @@ interface UsePromptFormProps {
 export const usePromptForm = ({ editingPrompt, categories, defaultCategoryId, isDialogOpen }: UsePromptFormProps) => {
   const [formData, setFormData] = useState<PromptFormData>(INITIAL_FORM_DATA);
   const [newTagLabel, setNewTagLabel] = useState('');
-  const [newTagColor, setNewTagColor] = useState<string>(DEFAULT_VALUES.TAG_COLOR);
+  // const [newTagColor, setNewTagColor] = useState<string>(DEFAULT_VALUES.TAG_COLOR);
 
   // 当对话框打开或编辑的提示词变化时，初始化表单
   useEffect(() => {
@@ -54,7 +54,7 @@ export const usePromptForm = ({ editingPrompt, categories, defaultCategoryId, is
         }); // TODO 类型不兼容
       }
       setNewTagLabel('');
-      setNewTagColor(DEFAULT_VALUES.TAG_COLOR);
+      // setNewTagColor(DEFAULT_VALUES.TAG_COLOR);
     }
   }, [isDialogOpen, editingPrompt, defaultCategoryId, categories]);
 
@@ -68,7 +68,7 @@ export const usePromptForm = ({ editingPrompt, categories, defaultCategoryId, is
       tags: [...prev.tags, { label: tagLabel.trim(), color: tagColor }],
     }));
     setNewTagLabel('');
-    setNewTagColor(DEFAULT_VALUES.TAG_COLOR);
+    // setNewTagColor(DEFAULT_VALUES.TAG_COLOR);
   };
 
   const removeTag = (index: number) => {
@@ -81,15 +81,15 @@ export const usePromptForm = ({ editingPrompt, categories, defaultCategoryId, is
   const resetForm = () => {
     setFormData(INITIAL_FORM_DATA);
     setNewTagLabel('');
-    setNewTagColor(DEFAULT_VALUES.TAG_COLOR);
+    // setNewTagColor(DEFAULT_VALUES.TAG_COLOR);
   };
 
   return {
     formData,
     newTagLabel,
-    newTagColor,
+    // newTagColor,
     setNewTagLabel,
-    setNewTagColor,
+    // setNewTagColor,
     updateFormField,
     addTag,
     removeTag,

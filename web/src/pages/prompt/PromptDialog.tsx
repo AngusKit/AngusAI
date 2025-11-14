@@ -12,7 +12,7 @@ import Prompts from '../../services/Prompts';
 import { Category, Prompt } from './types';
 import { TAG_COLORS } from './constants';
 import { usePromptForm } from './hooks/usePromptForm';
-import { validatePromptForm, validateTag, isAvailableCategory } from './utils';
+import { validatePromptForm, validateTag, isAvailableCategory, getTagColorByIndex } from './utils';
 
 interface PromptDialogProps {
   open: boolean;
@@ -37,9 +37,9 @@ export function PromptDialog({
   const {
     formData,
     newTagLabel,
-    newTagColor,
+    // newTagColor,
     setNewTagLabel,
-    setNewTagColor,
+    // setNewTagColor,
     updateFormField,
     addTag: addTagToForm,
     removeTag,
@@ -56,7 +56,7 @@ export function PromptDialog({
       toast.error(validation.error);
       return;
     }
-    addTagToForm(newTagLabel, newTagColor);
+    addTagToForm(newTagLabel, getTagColorByIndex(newTagLabel));
   };
 
   const handleSave = async () => {
@@ -183,7 +183,7 @@ export function PromptDialog({
                   }
                 }}
               />
-              <Select value={newTagColor} onValueChange={setNewTagColor}>
+              {/* <Select value={newTagColor} onValueChange={setNewTagColor}>
                 <SelectTrigger className='w-32 dark:bg-gray-900 dark:border-gray-700'>
                   <SelectValue />
                 </SelectTrigger>
@@ -197,7 +197,7 @@ export function PromptDialog({
                     </SelectItem>
                   ))}
                 </SelectContent>
-              </Select>
+              </Select> */}
               <Button onClick={handleAddTag} variant='outline'>
                 <Plus className='w-4 h-4' />
               </Button>

@@ -9,8 +9,9 @@ import { constantTranslation as t } from '@/lib/i18n';
 /**
  * 根据索引获取标签颜色（循环分配）
  */
-export const getTagColorByIndex = (index: number): string => {
-  const color = TAG_COLORS[index % TAG_COLORS.length] ?? TAG_COLORS[0];
+export const getTagColorByIndex = (tagStr: string): string => {
+
+  const color = TAG_COLORS[tagStr.length % TAG_COLORS.length] ?? TAG_COLORS[0];
   return color?.value ?? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400';
 };
 

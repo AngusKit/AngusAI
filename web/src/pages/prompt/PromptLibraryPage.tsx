@@ -216,9 +216,9 @@ export function PromptLibraryPage() {
       content: vo.content || '',
       category: vo.categoryId ? String(vo.categoryId) : '',
       categoryId: vo.categoryId,
-      tags: (vo.tags || []).map((tag, index) => ({
+      tags: (vo.tags || []).map((tag) => ({
         label: tag,
-        color: getTagColorByIndex(index),
+        color: getTagColorByIndex(tag),
       })),
       isFavorite: vo.isFavorite || false,
       usageCount: vo.stats?.totalUses || 0,
