@@ -47,9 +47,10 @@ interface Session {
 
 interface ChatProps {
   onBack?: () => void;
+  content: string;
 }
 
-export function Chat({ onBack }: ChatProps) {
+export function Chat({ onBack, content = '' }: ChatProps) {
   const { t } = useLanguage();
   const [sessions, setSessions] = useState<Session[]>([
     {
@@ -63,7 +64,7 @@ export function Chat({ onBack }: ChatProps) {
     },
   ]);
   const [currentSessionId, setCurrentSessionId] = useState('1');
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState(content);
   const [isRecording, setIsRecording] = useState(false);
   const [attachments, setAttachments] = useState<File[]>([]);
   const [showPromptLibrary, setShowPromptLibrary] = useState(false);

@@ -13,6 +13,7 @@ export default function App() {
   });
   const [activePage, setActivePage] = useState('home');
   const appUserInfo = appContext.getUser();
+  const [chatContent, setChatContent] = useState<string>('');
   const [userInfo, setUserInfo] = useState(
     appUserInfo?.id
       ? appUserInfo
@@ -37,21 +38,20 @@ export default function App() {
         <MyContext.Provider value={{ userInfo }}>
           <div className='flex h-screen bg-gray-50 dark:bg-gray-900'>
             <Toaster richColors position='top-right' />
-            {activePage !== 'chat' && <Sidebar activePage={activePage} onPageChange={setActivePage} />}
-
+            {activePage !== 'chat' && <Sidebar activePage={activePage} onPageChange={(page) => {setActivePage(page); setChatContent('')}} />}
             <div className='flex-1 flex flex-col overflow-hidden'>
               {activePage !== 'chat' && <Header />}
 
               <main className='flex-1 overflow-y-auto hide-scrollbar'>
                 {activePage === 'chat' ? (
-                  <Chat onBack={() => setActivePage('home')} />
+                  <Chat content={chatContent} onBack={() => setActivePage('home')} />
                 ) : (
                   <div className='px-7 py-6 space-y-6'>
                     {activePage === 'home' && (
                       <>
                         <WelcomeBanner />
                         <StatsCards />
-                        <RecentApplications onNavigate={setActivePage} />
+                        <RecentApplications onNavigate={(page) => {setActivePage(page); setChatContent('')}} />
                         <UsageDetails />
                       </>
                     )}
@@ -84,7 +84,11 @@ export default function App() {
                     {activePage === 'plugins' && <PluginMarket />}
                     {activePage === 'models' && <ModelManagement />}
                     {activePage === 'vector-store' && <VectorStore />}
-                    {activePage === 'prompts' && <PromptLibraryPage />}
+                    {activePage === 'prompts' && <PromptLibraryPage goChat={(promptContent) => {
+                      setChatContent(promptContent);
+                      setActivePage('chat');
+                      
+                    }} />}
                     {activePage === 'team-members' && <TeamMembers />}
                     {activePage === 'activity-log' && <ActivityLog />}
                     {activePage === 'resource-sharing' && <ResourceSharing />}

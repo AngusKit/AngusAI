@@ -146,7 +146,7 @@ export function MyApplications({
           description: app.description || '',
           icon: getIconForApplication(app.category, app.name),
           iconBgColor: getIconBgColor(app.category),
-          status: mapStatusToDisplay(app.status),
+          status: app.status,
           isStarred: false, // API中没有星标字段，默认为false
           tags: [], // API中没有标签字段，需要从其他地方获取或留空
           visits: '0 次调用', // API中没有调用次数字段，需要从统计接口获取
@@ -178,13 +178,13 @@ export function MyApplications({
   const getCategoryCount = (category: string) => {
     if (category === 'all') return totalCount;
     if (category === 'published') {
-      return applications.filter(app => app.status === '已发布').length;
+      return applications.filter(app => app.status === ApplicationStatusEnum.PUBLISHED).length;
     }
     if (category === 'paused') {
-      return applications.filter(app => app.status === '已暂停').length;
+      return applications.filter(app => app.status === ApplicationStatusEnum.PAUSED).length;
     }
     if (category === 'draft') {
-      return applications.filter(app => app.status === '草稿').length;
+      return applications.filter(app => app.status === ApplicationStatusEnum.DRAFT).length;
     }
     if (category === 'starred') {
       return applications.filter(app => app.isStarred).length;

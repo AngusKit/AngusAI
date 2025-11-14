@@ -138,7 +138,7 @@ function CategoryItem({
   );
 }
 
-export function PromptLibraryPage() {
+export function PromptLibraryPage({ goChat }: { goChat: (value: string) => void }) {
   const { t, language } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearchQuery = useDebounce(searchQuery, LIMITS.SEARCH_DEBOUNCE_MS);
@@ -398,6 +398,7 @@ export function PromptLibraryPage() {
       await loadPrompts();
       copyPrompt(prompt.content);
       toast.success(t('prompts.promptCopied'));
+      goChat(prompt.content);
     } catch (error: any) {
       console.error('Failed to use prompt:', error);
       // 即使API调用失败，也复制内容
