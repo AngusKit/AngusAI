@@ -29,7 +29,6 @@ import { ImportSettingsDialog } from './components/ImportSettingsDialog';
 import { getMethodColor, getSourceIcon, getVisibilityIcon, getVisibilityLabel } from './utils';
 import type { EndpointItem } from './types';
 import type { OpenAPIV3_1 } from 'openapi-types';
-import { ContentType } from '@/services/HttpClient';
 
 
 export function APICollection() {
@@ -70,7 +69,7 @@ export function APICollection() {
   });
   const { formData, setFormData, resetForm, handleCreateCollection } = form;
 
-  const importHook = useAPICollectionImport(formData.visibility, async () => {
+  const importHook = useAPICollectionImport(async () => {
     // Hook 内部已经处理了防抖，这里直接使用 searchQuery
     await loadCollections(collectionsPage, management.searchQuery);
   });
@@ -88,11 +87,13 @@ export function APICollection() {
 
   const getSortLabel = () => {
     const labels = {
-      name: t('apis.sort.name'),
+      name: t('common.labels.name'),
       method: t('apis.sort.method'),
       lastUsed: t('apis.sort.lastUsed'),
     };
-    const orderLabel = management.sortOrder === 'asc' ? t('apis.sort.ascending') : t('apis.sort.descending');
+    const orderLabel = management.sortOrder === 'asc'
+    ? t('apis.sort.ascending')
+    : t('apis.sort.descending');
     return `${labels[management.sortBy]} (${orderLabel})`;
   };
 
@@ -257,12 +258,12 @@ export function APICollection() {
 
   const handleAddServer = async () => {
     if (servers.length >= 10) {
-      toast.error(language === 'zh-CN' ? '最多只能配置10个服务器' : 'Maximum 10 servers allowed');
+      toast.error(t('apis.validation.maxServers'));
       return;
     }
 
     if (!serverFormData.url.trim()) {
-      toast.error(language === 'zh-CN' ? '请输入服务器URL' : 'Please enter server URL');
+      toast.error(t('apis.validation.serverUrlRequired'));
       return;
     }
 
@@ -276,7 +277,7 @@ export function APICollection() {
       await ApiSettingService.apiServersUpdate(selectedCollectionId as string, [...servers, newServer] as OpenAPIV3_1.ServerObject[]);
       setServers([...servers, newServer]);
       setServerFormData({ url: '', description: '' });
-      toast.success(language === 'zh-CN' ? '服务器添加成功' : 'Server added successfully');
+      toast.success(t('apis.messages.serverAdded'));
     } catch {}
     
   };
@@ -285,7 +286,7 @@ export function APICollection() {
     if (!editingServer) return;
 
     if (!serverFormData.url.trim()) {
-      toast.error(language === 'zh-CN' ? '请输入服务器URL' : 'Please enter server URL');
+      toast.error(t('apis.validation.serverUrlRequired'));
       return;
     }
 
@@ -299,7 +300,7 @@ export function APICollection() {
       setServers([...newServers]);
       setEditingServer(null);
       setServerFormData({ url: '', description: '' });
-      toast.success(language === 'zh-CN' ? '服务器更新成功' : 'Server updated successfully');
+      toast.success(t('apis.messages.serverUpdated'));
     } catch {}
   };
 
@@ -307,7 +308,7 @@ export function APICollection() {
     setEditingServer(server);
     setServerFormData({
       url: server.url,
-      description: server.description,
+      description: server.description || '',
     });
   };
 
@@ -333,7 +334,7 @@ export function APICollection() {
     try {
       await ApiSettingService.apiServersUpdate(selectedCollectionId as string, [...newServers] as OpenAPIV3_1.ServerObject[]);
       setServers(newServers);
-      toast.success(language === 'zh-CN' ? '服务器删除成功' : 'Server deleted successfully');
+      toast.success(t('apis.messages.serverDeleted'));
     } catch {}
   };
 
@@ -555,7 +556,7 @@ export function APICollection() {
           id: key,
           name: key,
           type: 'custom',
-          customParams: (security?.extensions?.[API_EXTENSION_KEYS.securityApiKeyPrefix] || []).map(i => ({
+          customParams: (security?.extensions?.[API_EXTENSION_KEYS.securityApiKeyPrefix] || []).map((i: any) => ({
             id: i.name,
             name: i.name,
             value: i[API_EXTENSION_KEYS.valueKey],
@@ -589,12 +590,12 @@ export function APICollection() {
 
   const handleAddSecurity = async () => {
     if (securityConfigs.length >= 10) {
-      toast.error(language === 'zh-CN' ? '最多只能配置10个安全配置' : 'Maximum 10 security configurations allowed');
+      toast.error(t('apis.validation.maxSecurity'));
       return;
     }
 
     if (!securityFormData.name.trim()) {
-      toast.error(language === 'zh-CN' ? '请输入配置名称' : 'Please enter configuration name');
+      toast.error(t('apis.validation.configNameRequired'));
       return;
     }
 
@@ -622,10 +623,10 @@ export function APICollection() {
     };
 
     try {
-      await ApiSettingService.apiSecuritiesUpdate(selectedCollectionId as string, getSecurityConfigs([...securityConfigs, newSecurity]));
+      await ApiSettingService.apiSecuritiesUpdate(selectedCollectionId as string, getSecurityConfigs([...securityConfigs, newSecurity]) as any);
       setSecurityConfigs([...securityConfigs, newSecurity]);
       resetSecurityForm();
-      toast.success(language === 'zh-CN' ? '安全配置添加成功' : 'Security configuration added successfully');
+      toast.success(t('apis.messages.securityAdded'));
     } catch {}
   };
 
@@ -633,7 +634,7 @@ export function APICollection() {
     if (!editingSecurity) return;
 
     if (!securityFormData.name.trim()) {
-      toast.error(language === 'zh-CN' ? '请输入配置名称' : 'Please enter configuration name');
+      toast.error(t('apis.validation.configNameRequired'));
       return;
     }
 
@@ -648,11 +649,11 @@ export function APICollection() {
     ) as SecurityConfigItem[];
 
     try {
-      await ApiSettingService.apiSecuritiesUpdate(selectedCollectionId as string, getSecurityConfigs(newSecurityConfigs));
+      await ApiSettingService.apiSecuritiesUpdate(selectedCollectionId as string, getSecurityConfigs(newSecurityConfigs) as any);
       setSecurityConfigs(newSecurityConfigs);
       setEditingSecurity(null);
       resetSecurityForm();
-      toast.success(language === 'zh-CN' ? '安全配置更新成功' : 'Security configuration updated successfully');
+      toast.success(t('apis.messages.securityUpdated'));
     } catch {}
   
   };
@@ -691,9 +692,9 @@ export function APICollection() {
 
     const newSecurityConfigs = securityConfigs.filter(s => s.id !== securityId);
     try {
-      await ApiSettingService.apiSecuritiesUpdate(selectedCollectionId as string, getSecurityConfigs(newSecurityConfigs));
+      await ApiSettingService.apiSecuritiesUpdate(selectedCollectionId as string, getSecurityConfigs(newSecurityConfigs) as any);
       setSecurityConfigs(newSecurityConfigs);
-      toast.success(language === 'zh-CN' ? '安全配置删除成功' : 'Security configuration deleted successfully');
+      toast.success(t('apis.messages.securityDeleted'));
     } catch {}
     
   };
@@ -729,7 +730,7 @@ export function APICollection() {
       bearer: 'Bearer Token',
       oauth2Password: 'OAuth 2.0 (Password)',
       oauth2Client: 'OAuth 2.0 (Client)',
-      custom: language === 'zh-CN' ? '自定义' : 'Custom',
+      custom: t('apis.security.customAuth'),
     };
     return labels[type as keyof typeof labels] || type;
   };
@@ -746,12 +747,10 @@ export function APICollection() {
       {/* Header */}
       <div>
         <h1 className='text-2xl mb-1 dark:text-white'>
-          {language === 'zh-CN' ? '接口集管理' : 'API Collection Management'}
+          {t('apis.title')}
         </h1>
         <p className='text-sm text-gray-600 dark:text-gray-400'>
-          {language === 'zh-CN'
-            ? '用于大模型基于API接口集成外部系统，支持OpenAPI、Swagger、Postman等规范'
-            : 'For LLM integration with external APIs, support OpenAPI, Swagger, Postman, etc.'}
+          {t('apis.subtitle')}
         </p>
       </div>
 
@@ -786,7 +785,7 @@ export function APICollection() {
         <div className='relative w-[390px]'>
           <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
           <Input
-            placeholder={language === 'zh-CN' ? '搜索接口集...' : 'Search collections...'}
+            placeholder={t('apis.searchPlaceholder')}
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             className='pl-10 pr-10 dark:bg-gray-800 dark:border-gray-700'
@@ -807,11 +806,11 @@ export function APICollection() {
             className='gap-2 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-750'
           >
             <Upload className='w-4 h-4' />
-            {language === 'zh-CN' ? '导入' : 'Import'}
+            {t('apis.import')}
           </Button>
           <Button onClick={() => setShowCreateDialog(true)} className='gap-2 dark:bg-blue-600 dark:hover:bg-blue-700'>
             <Plus className='w-4 h-4' />
-            {language === 'zh-CN' ? '新建接口集' : 'New Collection'}
+            {t('apis.newCollection')}
           </Button>
         </div>
       </div>
@@ -821,9 +820,9 @@ export function APICollection() {
         <div className='lg:col-span-1'>
           <div className='bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg'>
             <div className='p-4 border-b border-gray-200 dark:border-gray-700'>
-              <h2 className='dark:text-white'>{language === 'zh-CN' ? '接口集列表' : 'Collections'}</h2>
+              <h2 className='dark:text-white'>{t('apis.collections')}</h2>
               <p className='text-sm text-gray-500 dark:text-gray-400 mt-1'>
-                {collectionsTotal.toLocaleString()} {language === 'zh-CN' ? '个接口集' : 'collections'}
+                {collectionsTotal.toLocaleString()} {t('apis.collectionCount')}
               </p>
             </div>
             <ScrollArea className='h-[600px]'>
@@ -868,12 +867,12 @@ export function APICollection() {
                     </p>
                     <div className='flex items-center justify-between text-xs'>
                       <span className='text-gray-500 dark:text-gray-400'>
-                        {collection.endpointsCount} {language === 'zh-CN' ? '个接口' : 'APIs'}
+                        {collection.endpointsCount} {t('apis.apisCount')}
                       </span>
                       <Badge variant='secondary' className='text-xs'>
                         {(collection.enabledEndpointsCount ?? 0).toLocaleString()}/
                         {collection.endpointsCount?.toLocaleString() ?? '0'}{' '}
-                        {language === 'zh-CN' ? '已启用' : 'enabled'}
+                        {t('apis.enabled')}
                       </Badge>
                     </div>
                   </button>
@@ -892,19 +891,19 @@ export function APICollection() {
                   <TabsList className='bg-transparent'>
                     <TabsTrigger value='endpoints' className='gap-2'>
                       <Code2 className='w-4 h-4' />
-                      {language === 'zh-CN' ? '接口列表' : 'Endpoints'}
+                      {t('apis.tabs.endpoints')}
                     </TabsTrigger>
                     <TabsTrigger value='servers' className='gap-2'>
                       <Server className='w-4 h-4' />
-                      {language === 'zh-CN' ? '服务配置' : 'Servers'}
+                      {t('apis.tabs.servers')}
                     </TabsTrigger>
                     <TabsTrigger value='security' className='gap-2'>
                       <Shield className='w-4 h-4' />
-                      {language === 'zh-CN' ? '安全配置' : 'Security'}
+                      {t('apis.tabs.security')}
                     </TabsTrigger>
                     <TabsTrigger value='settings' className='gap-2'>
                       <Settings className='w-4 h-4' />
-                      {language === 'zh-CN' ? '设置' : 'Settings'}
+                      {t('apis.tabs.settings')}
                     </TabsTrigger>
                   </TabsList>
                 </div>
@@ -916,12 +915,10 @@ export function APICollection() {
                         <div className='text-center mb-8'>
                           <Code2 className='w-16 h-16 mx-auto mb-4 text-gray-300 dark:text-gray-600' />
                           <h3 className='text-xl font-semibold dark:text-white mb-2'>
-                            {language === 'zh-CN' ? '导入接口规范' : 'Import API Specification'}
+                            {t('apis.endpoints.emptyTitle')}
                           </h3>
                           <p className='text-sm text-gray-500 dark:text-gray-400'>
-                            {language === 'zh-CN'
-                              ? '支持 OpenAPI、Swagger、Postman 等多种规范格式，最大支持20MB'
-                              : 'Supports multiple specification formats such as OpenAPI, Swagger, and Postman, with a maximum support of 20MB.'}
+                            {t('apis.endpoints.emptyDescription')}
                           </p>
                         </div>
                         <div className='grid grid-cols-2 gap-4'>
@@ -961,7 +958,7 @@ export function APICollection() {
                           <div className='relative flex-1'>
                             <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
                             <Input
-                              placeholder={language === 'zh-CN' ? '搜索接口...' : 'Search endpoints...'}
+                              placeholder={t('apis.endpoints.searchPlaceholder')}
                               value={endpointSearchQuery}
                               onChange={e => setEndpointSearchQuery(e.target.value)}
                               className='pl-10 pr-10 dark:bg-gray-800 dark:border-gray-700'
@@ -980,18 +977,18 @@ export function APICollection() {
                             <DropdownMenuTrigger asChild>
                               <Button variant='outline' size='sm' className='dark:bg-gray-800 dark:border-gray-700'>
                                 <Filter className='w-4 h-4 mr-2' />
-                                {language === 'zh-CN' ? '筛选' : 'Filter'}
+                                {t('apis.endpoints.filter')}
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align='end' className='dark:bg-gray-800 dark:border-gray-700'>
                               <DropdownMenuItem onClick={() => handleSort('name')} className='dark:text-gray-300'>
-                                {language === 'zh-CN' ? '按名称排序' : 'Sort by Name'}
+                                {t('apis.endpoints.sortByName')}
                               </DropdownMenuItem>
                               <DropdownMenuItem onClick={() => handleSort('method')} className='dark:text-gray-300'>
-                                {language === 'zh-CN' ? '按方法排序' : 'Sort by Method'}
+                                {t('apis.endpoints.sortByMethod')}
                               </DropdownMenuItem>
                               <DropdownMenuItem onClick={() => handleSort('lastUsed')} className='dark:text-gray-300'>
-                                {language === 'zh-CN' ? '按最后使用排序' : 'Sort by Last Used'}
+                                {t('apis.endpoints.sortByLastUsed')}
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -1003,13 +1000,13 @@ export function APICollection() {
                             onClick={() => setShowOpenAPIPreview(true)}
                           >
                             <FileJson className='w-4 h-4' />
-                            {language === 'zh-CN' ? 'OpenAPI' : 'OpenAPI'}
+                            OpenAPI
                           </Button>
                         </div>
 
                         {(management.sortBy !== 'name' || management.sortOrder !== 'asc') && (
                           <div className='mt-2 text-xs text-gray-500 dark:text-gray-400'>
-                            {t('apis.sort.currentSort')}: {getSortLabel()}
+                            {t('apis.endpoints.currentSort')}: {getSortLabel()}
                           </div>
                         )}
                       </div>
@@ -1040,13 +1037,7 @@ export function APICollection() {
                                 onCheckedChange={() => toggleEndpointStatus(endpoint.id, endpoint.enabled)}
                               />
                               <span className='text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap'>
-                                {endpoint.enabled
-                                  ? language === 'zh-CN'
-                                    ? '已启用'
-                                    : 'Enabled'
-                                  : language === 'zh-CN'
-                                    ? '已禁用'
-                                    : 'Disabled'}
+                                {endpoint.enabled ? t('apis.endpoints.enabled') : t('apis.endpoints.disabled')}
                               </span>
                             </div>
                           </div>
@@ -1085,7 +1076,7 @@ export function APICollection() {
                                 variant='ghost'
                                 size='icon'
                                 className='h-8 w-8'
-                                onClick={() => toast.success(language === 'zh-CN' ? '测试接口...' : 'Testing API...')}
+                                onClick={() => toast.success(t('apis.endpoints.testing'))}
                               >
                                 <Play className='w-4 h-4' />
                               </Button>
@@ -1107,12 +1098,10 @@ export function APICollection() {
                           <Server className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
                           <div className="flex-1">
                             <h3 className="text-sm dark:text-white mb-1">
-                              {language === 'zh-CN' ? '服务器配置' : 'Server Configuration'}
+                              {t('apis.servers.title')}
                             </h3>
                             <p className="text-sm text-gray-600 dark:text-gray-400">
-                              {language === 'zh-CN' 
-                                ? '配置API服务器地址，对应OpenAPI Servers Schema规范。最多可配置10个服务器，同时只能启用一个。' 
-                                : 'Configure API server addresses, corresponding to OpenAPI Servers Schema. Maximum 10 servers, only one can be enabled at a time.'}
+                              {t('apis.servers.description')}
                             </p>
                           </div>
                         </div>
@@ -1122,33 +1111,31 @@ export function APICollection() {
                       <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-4">
                         <div className="flex items-center justify-between mb-2">
                           <h4 className="text-sm dark:text-white">
-                            {editingServer 
-                              ? (language === 'zh-CN' ? '编辑服务器' : 'Edit Server')
-                              : (language === 'zh-CN' ? '添加服务器' : 'Add Server')}
+                            {editingServer ? t('apis.servers.editServer') : t('apis.servers.addServer')}
                           </h4>
                           {servers.length >= 10 && !editingServer && (
                             <Badge variant="secondary" className="text-xs">
-                              {language === 'zh-CN' ? '已达上限 (10/10)' : 'Max limit (10/10)'}
+                              {t('apis.servers.maxLimit')}
                             </Badge>
                           )}
                         </div>
 
                         <div>
-                          <Label>{language === 'zh-CN' ? '服务器URL' : 'Server URL'} *</Label>
+                          <Label>{t('apis.servers.serverUrl')} *</Label>
                           <Input
                             value={serverFormData.url}
                             onChange={e => setServerFormData(prev => ({ ...prev, url: e.target.value }))}
-                            placeholder="https://api.example.com"
+                            placeholder={t('apis.servers.serverUrlPlaceholder')}
                             className="mt-2 dark:bg-gray-750 dark:border-gray-600"
                           />
                         </div>
 
                         <div>
-                          <Label>{language === 'zh-CN' ? '服务器描述' : 'Server Description'}</Label>
+                          <Label>{t('apis.servers.serverDescription')}</Label>
                           <Input
                             value={serverFormData.description}
                             onChange={e => setServerFormData(prev => ({ ...prev, description: e.target.value }))}
-                            placeholder={language === 'zh-CN' ? '例如：生产环境服务器' : 'e.g., Production server'}
+                            placeholder={t('apis.servers.serverDescriptionPlaceholder')}
                             className="mt-2 dark:bg-gray-750 dark:border-gray-600"
                           />
                         </div>
@@ -1157,10 +1144,10 @@ export function APICollection() {
                           {editingServer ? (
                             <>
                               <Button onClick={handleUpdateServer} className="flex-1">
-                                {language === 'zh-CN' ? '更新服务器' : 'Update Server'}
+                                {t('apis.servers.updateServer')}
                               </Button>
                               <Button onClick={handleCancelEdit} variant="outline" className="flex-1 dark:bg-gray-800 dark:border-gray-700">
-                                {language === 'zh-CN' ? '取消' : 'Cancel'}
+                                {t('common.actions.cancel')}
                               </Button>
                             </>
                           ) : (
@@ -1170,7 +1157,7 @@ export function APICollection() {
                               disabled={servers.length >= 10}
                             >
                               <Plus className="w-4 h-4 mr-2" />
-                              {language === 'zh-CN' ? '添加服务器' : 'Add Server'}
+                              {t('apis.servers.addServer')}
                             </Button>
                           )}
                         </div>
@@ -1181,7 +1168,7 @@ export function APICollection() {
                         <div>
                           <div className="flex items-center justify-between mb-3">
                             <h4 className="text-sm dark:text-white">
-                              {language === 'zh-CN' ? '已配置服务器' : 'Configured Servers'}
+                              {t('apis.servers.configuredServers')}
                             </h4>
                             <Badge variant="secondary" className="text-xs">
                               {servers.length}/10
@@ -1206,7 +1193,7 @@ export function APICollection() {
                                       </code>
                                       {server.enabled && (
                                         <Badge className="bg-green-500 hover:bg-green-600 text-xs">
-                                          {language === 'zh-CN' ? '已启用' : 'Enabled'}
+                                          {t('apis.servers.enabled')}
                                         </Badge>
                                       )}
                                     </div>
@@ -1219,7 +1206,7 @@ export function APICollection() {
                                   <div className="flex items-center gap-2 shrink-0">
                                     <Switch
                                       checked={server.enabled}
-                                      onCheckedChange={() => handleToggleServer(server.id)}
+                                      onCheckedChange={() => server.id && handleToggleServer(server.id)}
                                     />
                                     <Button
                                       variant="ghost"
@@ -1232,7 +1219,7 @@ export function APICollection() {
                                     <Button
                                       variant="ghost"
                                       size="sm"
-                                      onClick={() => handleDeleteServer(server.id)}
+                                      onClick={() => server.id && handleDeleteServer(server.id)}
                                       className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
                                     >
                                       <Trash2 className="w-4 h-4" />
@@ -1256,12 +1243,10 @@ export function APICollection() {
                           <Shield className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
                           <div className="flex-1">
                             <h3 className="text-sm dark:text-white mb-1">
-                              {language === 'zh-CN' ? '安全配置' : 'Security Configuration'}
+                              {t('apis.security.title')}
                             </h3>
                             <p className="text-sm text-gray-600 dark:text-gray-400">
-                              {language === 'zh-CN' 
-                                ? '配置API认证方式，对应OpenAPI Security Schema规范。最多可配置10个安全配置。' 
-                                : 'Configure API authentication, corresponding to OpenAPI Security Schema. Maximum 10 security configurations.'}
+                              {t('apis.security.description')}
                             </p>
                           </div>
                         </div>
@@ -1271,29 +1256,27 @@ export function APICollection() {
                       <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-4">
                         <div className="flex items-center justify-between mb-2">
                           <h4 className="text-sm dark:text-white">
-                            {editingSecurity 
-                              ? (language === 'zh-CN' ? '编辑安全配置' : 'Edit Security Configuration')
-                              : (language === 'zh-CN' ? '添加安全配置' : 'Add Security Configuration')}
+                            {editingSecurity ? t('apis.security.editSecurity') : t('apis.security.addSecurity')}
                           </h4>
                           {securityConfigs.length >= 10 && !editingSecurity && (
                             <Badge variant="secondary" className="text-xs">
-                              {language === 'zh-CN' ? '已达上限 (10/10)' : 'Max limit (10/10)'}
+                              {t('apis.servers.maxLimit')}
                             </Badge>
                           )}
                         </div>
 
                         <div>
-                          <Label>{language === 'zh-CN' ? '配置名称' : 'Configuration Name'} *</Label>
+                          <Label>{t('apis.security.configName')} *</Label>
                           <Input
                             value={securityFormData.name}
                             onChange={e => setSecurityFormData(prev => ({ ...prev, name: e.target.value }))}
-                            placeholder={language === 'zh-CN' ? '例如：Production API Key' : 'e.g., Production API Key'}
+                            placeholder={t('apis.security.configNamePlaceholder')}
                             className="mt-2 dark:bg-gray-750 dark:border-gray-600"
                           />
                         </div>
 
                         <div>
-                          <Label>{language === 'zh-CN' ? '认证类型' : 'Authentication Type'}</Label>
+                          <Label>{t('apis.security.authType')}</Label>
                           <Select 
                             value={securityFormData.type} 
                             onValueChange={(value: any) => setSecurityFormData(prev => ({ ...prev, type: value }))}
@@ -1307,7 +1290,7 @@ export function APICollection() {
                               <SelectItem value="bearer">Bearer Token</SelectItem>
                               <SelectItem value="oauth2Password">OAuth 2.0 (Password)</SelectItem>
                               <SelectItem value="oauth2Client">OAuth 2.0 (Client Credentials)</SelectItem>
-                              <SelectItem value="custom">{language === 'zh-CN' ? '自定义' : 'Custom'}</SelectItem>
+                              <SelectItem value="custom">{t('apis.security.customAuth')}</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -1316,28 +1299,28 @@ export function APICollection() {
                         {securityFormData.type === 'apiKey' && (
                           <>
                             <div>
-                              <Label>{language === 'zh-CN' ? 'API Key 名称' : 'API Key Name'}</Label>
+                              <Label>{t('apis.security.apiKeyName')}</Label>
                               <Input
                                 value={securityFormData.apiKeyName}
                                 onChange={e => setSecurityFormData(prev => ({ ...prev, apiKeyName: e.target.value }))}
-                                placeholder="X-API-Key"
+                                placeholder={t('apis.security.apiKeyNamePlaceholder')}
                                 className="mt-2 dark:bg-gray-750 dark:border-gray-600"
                               />
                             </div>
 
                             <div>
-                              <Label>{language === 'zh-CN' ? 'API Key 值' : 'API Key Value'}</Label>
+                              <Label>{t('apis.security.apiKeyValue')}</Label>
                               <Input
                                 type="password"
                                 value={securityFormData.apiKeyValue}
                                 onChange={e => setSecurityFormData(prev => ({ ...prev, apiKeyValue: e.target.value }))}
-                                placeholder={language === 'zh-CN' ? '输入API Key...' : 'Enter API Key...'}
+                                placeholder={t('apis.security.apiKeyValuePlaceholder')}
                                 className="mt-2 dark:bg-gray-750 dark:border-gray-600"
                               />
                             </div>
 
                             <div>
-                              <Label>{language === 'zh-CN' ? 'API Key 位置' : 'API Key Location'}</Label>
+                              <Label>{t('apis.security.apiKeyLocation')}</Label>
                               <Select 
                                 value={securityFormData.apiKeyIn} 
                                 onValueChange={(value: any) => setSecurityFormData(prev => ({ ...prev, apiKeyIn: value }))}
@@ -1359,22 +1342,22 @@ export function APICollection() {
                         {securityFormData.type === 'httpBasic' && (
                           <>
                             <div>
-                              <Label>{language === 'zh-CN' ? '用户名' : 'Username'}</Label>
+                              <Label>{t('apis.security.username')}</Label>
                               <Input
                                 value={securityFormData.basicUsername}
                                 onChange={e => setSecurityFormData(prev => ({ ...prev, basicUsername: e.target.value }))}
-                                placeholder={language === 'zh-CN' ? '输入用户名...' : 'Enter username...'}
+                                placeholder={t('apis.security.usernamePlaceholder')}
                                 className="mt-2 dark:bg-gray-750 dark:border-gray-600"
                               />
                             </div>
 
                             <div>
-                              <Label>{language === 'zh-CN' ? '密码' : 'Password'}</Label>
+                              <Label>{t('common.labels.password')}</Label>
                               <Input
                                 type="password"
                                 value={securityFormData.basicPassword}
                                 onChange={e => setSecurityFormData(prev => ({ ...prev, basicPassword: e.target.value }))}
-                                placeholder={language === 'zh-CN' ? '输入密码...' : 'Enter password...'}
+                                placeholder={t('apis.security.passwordPlaceholder')}
                                 className="mt-2 dark:bg-gray-750 dark:border-gray-600"
                               />
                             </div>
@@ -1384,12 +1367,12 @@ export function APICollection() {
                         {/* Bearer Token */}
                         {securityFormData.type === 'bearer' && (
                           <div>
-                            <Label>{language === 'zh-CN' ? 'Bearer Token' : 'Bearer Token'}</Label>
+                            <Label>{t('apis.security.bearerToken')}</Label>
                             <Input
                               type="password"
                               value={securityFormData.bearerToken}
                               onChange={e => setSecurityFormData(prev => ({ ...prev, bearerToken: e.target.value }))}
-                              placeholder={language === 'zh-CN' ? '输入Bearer Token...' : 'Enter Bearer Token...'}
+                              placeholder={t('apis.security.bearerTokenPlaceholder')}
                               className="mt-2 dark:bg-gray-750 dark:border-gray-600"
                             />
                           </div>
@@ -1399,63 +1382,63 @@ export function APICollection() {
                         {securityFormData.type === 'oauth2Password' && (
                           <>
                             <div>
-                              <Label>{language === 'zh-CN' ? 'Token URL' : 'Token URL'}</Label>
+                              <Label>{t('apis.security.tokenUrl')}</Label>
                               <Input
                                 value={securityFormData.oauth2TokenUrl}
                                 onChange={e => setSecurityFormData(prev => ({ ...prev, oauth2TokenUrl: e.target.value }))}
-                                placeholder="https://oauth.example.com/token"
+                                placeholder={t('apis.security.tokenUrlPlaceholder')}
                                 className="mt-2 dark:bg-gray-750 dark:border-gray-600"
                               />
                             </div>
 
                             <div>
-                              <Label>{language === 'zh-CN' ? 'Client ID' : 'Client ID'}</Label>
+                              <Label>{t('apis.security.clientId')}</Label>
                               <Input
                                 value={securityFormData.oauth2ClientId}
                                 onChange={e => setSecurityFormData(prev => ({ ...prev, oauth2ClientId: e.target.value }))}
-                                placeholder={language === 'zh-CN' ? '输入Client ID...' : 'Enter Client ID...'}
+                                placeholder={t('apis.security.clientIdPlaceholder')}
                                 className="mt-2 dark:bg-gray-750 dark:border-gray-600"
                               />
                             </div>
 
                             <div>
-                              <Label>{language === 'zh-CN' ? 'Client Secret' : 'Client Secret'}</Label>
+                              <Label>{t('apis.security.clientSecret')}</Label>
                               <Input
                                 type="password"
                                 value={securityFormData.oauth2ClientSecret}
                                 onChange={e => setSecurityFormData(prev => ({ ...prev, oauth2ClientSecret: e.target.value }))}
-                                placeholder={language === 'zh-CN' ? '输入Client Secret...' : 'Enter Client Secret...'}
+                                placeholder={t('apis.security.clientSecretPlaceholder')}
                                 className="mt-2 dark:bg-gray-750 dark:border-gray-600"
                               />
                             </div>
 
                             <div>
-                              <Label>{language === 'zh-CN' ? '用户名' : 'Username'}</Label>
+                              <Label>{t('apis.security.username')}</Label>
                               <Input
                                 value={securityFormData.oauth2Username}
                                 onChange={e => setSecurityFormData(prev => ({ ...prev, oauth2Username: e.target.value }))}
-                                placeholder={language === 'zh-CN' ? '输入用户名...' : 'Enter username...'}
+                                placeholder={t('apis.security.usernamePlaceholder')}
                                 className="mt-2 dark:bg-gray-750 dark:border-gray-600"
                               />
                             </div>
 
                             <div>
-                              <Label>{language === 'zh-CN' ? '密码' : 'Password'}</Label>
+                              <Label>{t('common.labels.password')}</Label>
                               <Input
                                 type="password"
                                 value={securityFormData.oauth2Password}
                                 onChange={e => setSecurityFormData(prev => ({ ...prev, oauth2Password: e.target.value }))}
-                                placeholder={language === 'zh-CN' ? '输入密码...' : 'Enter password...'}
+                                placeholder={t('apis.security.passwordPlaceholder')}
                                 className="mt-2 dark:bg-gray-750 dark:border-gray-600"
                               />
                             </div>
 
                             <div>
-                              <Label>{language === 'zh-CN' ? 'Scope（可选）' : 'Scope (Optional)'}</Label>
+                              <Label>{t('apis.security.scope')}</Label>
                               <Input
                                 value={securityFormData.oauth2Scope}
                                 onChange={e => setSecurityFormData(prev => ({ ...prev, oauth2Scope: e.target.value }))}
-                                placeholder="read write"
+                                placeholder={t('apis.security.scopePlaceholder')}
                                 className="mt-2 dark:bg-gray-750 dark:border-gray-600"
                               />
                             </div>
@@ -1466,42 +1449,42 @@ export function APICollection() {
                         {securityFormData.type === 'oauth2Client' && (
                           <>
                             <div>
-                              <Label>{language === 'zh-CN' ? 'Token URL' : 'Token URL'}</Label>
+                              <Label>{t('apis.security.tokenUrl')}</Label>
                               <Input
                                 value={securityFormData.oauth2ClientTokenUrl}
                                 onChange={e => setSecurityFormData(prev => ({ ...prev, oauth2ClientTokenUrl: e.target.value }))}
-                                placeholder="https://oauth.example.com/token"
+                                placeholder={t('apis.security.tokenUrlPlaceholder')}
                                 className="mt-2 dark:bg-gray-750 dark:border-gray-600"
                               />
                             </div>
 
                             <div>
-                              <Label>{language === 'zh-CN' ? 'Client ID' : 'Client ID'}</Label>
+                              <Label>{t('apis.security.clientId')}</Label>
                               <Input
                                 value={securityFormData.oauth2ClientCredentialsId}
                                 onChange={e => setSecurityFormData(prev => ({ ...prev, oauth2ClientCredentialsId: e.target.value }))}
-                                placeholder={language === 'zh-CN' ? '输入Client ID...' : 'Enter Client ID...'}
+                                placeholder={t('apis.security.clientIdPlaceholder')}
                                 className="mt-2 dark:bg-gray-750 dark:border-gray-600"
                               />
                             </div>
 
                             <div>
-                              <Label>{language === 'zh-CN' ? 'Client Secret' : 'Client Secret'}</Label>
+                              <Label>{t('apis.security.clientSecret')}</Label>
                               <Input
                                 type="password"
                                 value={securityFormData.oauth2ClientCredentialsSecret}
                                 onChange={e => setSecurityFormData(prev => ({ ...prev, oauth2ClientCredentialsSecret: e.target.value }))}
-                                placeholder={language === 'zh-CN' ? '输入Client Secret...' : 'Enter Client Secret...'}
+                                placeholder={t('apis.security.clientSecretPlaceholder')}
                                 className="mt-2 dark:bg-gray-750 dark:border-gray-600"
                               />
                             </div>
 
                             <div>
-                              <Label>{language === 'zh-CN' ? 'Scope（可选）' : 'Scope (Optional)'}</Label>
+                              <Label>{t('apis.security.scope')}</Label>
                               <Input
                                 value={securityFormData.oauth2ClientScope}
                                 onChange={e => setSecurityFormData(prev => ({ ...prev, oauth2ClientScope: e.target.value }))}
-                                placeholder="read write"
+                                placeholder={t('apis.security.scopePlaceholder')}
                                 className="mt-2 dark:bg-gray-750 dark:border-gray-600"
                               />
                             </div>
@@ -1512,7 +1495,7 @@ export function APICollection() {
                         {securityFormData.type === 'custom' && (
                           <div className="space-y-4">
                             <div className="flex items-center justify-between">
-                              <Label>{language === 'zh-CN' ? '自定义认证参数' : 'Custom Auth Parameters'}</Label>
+                              <Label>{t('apis.security.customAuthParams')}</Label>
                               <Button
                                 type="button"
                                 variant="outline"
@@ -1521,7 +1504,7 @@ export function APICollection() {
                                 className="gap-2 dark:bg-gray-800 dark:border-gray-700"
                               >
                                 <Plus className="w-4 h-4" />
-                                {language === 'zh-CN' ? '添加参数' : 'Add Parameter'}
+                                {t('apis.security.addParameter')}
                               </Button>
                             </div>
 
@@ -1530,7 +1513,7 @@ export function APICollection() {
                                 <div key={param.id} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg space-y-3">
                                   <div className="flex items-center justify-between mb-2">
                                     <span className="text-sm text-gray-600 dark:text-gray-400">
-                                      {language === 'zh-CN' ? '参数' : 'Parameter'} {index + 1}
+                                      {t('apis.security.parameter')} {index + 1}
                                     </span>
                                     {customAuthParams.length > 1 && (
                                       <Button
@@ -1546,28 +1529,28 @@ export function APICollection() {
                                   </div>
 
                                   <div>
-                                    <Label className="text-xs">{language === 'zh-CN' ? '参数名' : 'Parameter Name'}</Label>
+                                    <Label className="text-xs">{t('apis.security.parameterName')}</Label>
                                     <Input
                                       value={param.name}
                                       onChange={e => updateCustomAuthParam(param.id, 'name', e.target.value)}
-                                      placeholder="X-Custom-Auth"
+                                      placeholder={t('apis.security.parameterNamePlaceholder')}
                                       className="mt-1 dark:bg-gray-750 dark:border-gray-600"
                                     />
                                   </div>
 
                                   <div>
-                                    <Label className="text-xs">{language === 'zh-CN' ? '参数值' : 'Parameter Value'}</Label>
+                                    <Label className="text-xs">{t('apis.security.parameterValue')}</Label>
                                     <Input
                                       type="password"
                                       value={param.value}
                                       onChange={e => updateCustomAuthParam(param.id, 'value', e.target.value)}
-                                      placeholder={language === 'zh-CN' ? '输入参数值...' : 'Enter parameter value...'}
+                                      placeholder={t('apis.security.parameterValuePlaceholder')}
                                       className="mt-1 dark:bg-gray-750 dark:border-gray-600"
                                     />
                                   </div>
 
                                   <div>
-                                    <Label className="text-xs">{language === 'zh-CN' ? '参数位置' : 'Parameter Location'}</Label>
+                                    <Label className="text-xs">{t('apis.security.parameterLocation')}</Label>
                                     <Select
                                       value={param.location}
                                       onValueChange={(value: any) => updateCustomAuthParam(param.id, 'location', value)}
@@ -1592,10 +1575,10 @@ export function APICollection() {
                           {editingSecurity ? (
                             <>
                               <Button onClick={handleUpdateSecurity} className="flex-1">
-                                {language === 'zh-CN' ? '更新配置' : 'Update Configuration'}
+                                {t('apis.security.updateConfig')}
                               </Button>
                               <Button onClick={handleCancelSecurityEdit} variant="outline" className="flex-1 dark:bg-gray-800 dark:border-gray-700">
-                                {language === 'zh-CN' ? '取消' : 'Cancel'}
+                                {t('common.actions.cancel')}
                               </Button>
                             </>
                           ) : (
@@ -1605,7 +1588,7 @@ export function APICollection() {
                               disabled={securityConfigs.length >= 10}
                             >
                               <Plus className="w-4 h-4 mr-2" />
-                              {language === 'zh-CN' ? '添加安全配置' : 'Add Security Configuration'}
+                              {t('apis.security.addSecurity')}
                             </Button>
                           )}
                         </div>
@@ -1616,7 +1599,7 @@ export function APICollection() {
                         <div>
                           <div className="flex items-center justify-between mb-3">
                             <h4 className="text-sm dark:text-white">
-                              {language === 'zh-CN' ? '已配置安全' : 'Configured Security'}
+                              {t('apis.security.configuredSecurity')}
                             </h4>
                             <Badge variant="secondary" className="text-xs">
                               {securityConfigs.length}/10
@@ -1640,15 +1623,15 @@ export function APICollection() {
                                     <div className="space-y-1 text-xs text-gray-600 dark:text-gray-400">
                                       {security.type === 'apiKey' && (
                                         <>
-                                          <p>{language === 'zh-CN' ? 'Key名称' : 'Key Name'}: {security.apiKeyName}</p>
-                                          <p>{language === 'zh-CN' ? '位置' : 'Location'}: {security.apiKeyIn}</p>
+                                          <p>{t('apis.security.keyName')}: {security.apiKeyName}</p>
+                                          <p>{t('apis.security.location')}: {security.apiKeyIn}</p>
                                         </>
                                       )}
                                       {security.type === 'httpBasic' && (
-                                        <p>{language === 'zh-CN' ? '用户名' : 'Username'}: {security.basicUsername}</p>
+                                        <p>{t('apis.security.username')}: {security.basicUsername}</p>
                                       )}
                                       {security.type === 'bearer' && (
-                                        <p>Bearer Token {language === 'zh-CN' ? '已配置' : 'configured'}</p>
+                                        <p>Bearer Token {t('apis.security.configured')}</p>
                                       )}
                                       {security.type === 'oauth2Password' && (
                                         <>
@@ -1663,7 +1646,7 @@ export function APICollection() {
                                         </>
                                       )}
                                       {security.type === 'custom' && (
-                                        <p>{security.customParams.length} {language === 'zh-CN' ? '个自定义参数' : 'custom parameters'}</p>
+                                        <p>{security.customParams.length} {t('apis.security.customParameters')}</p>
                                       )}
                                     </div>
                                   </div>
@@ -1698,7 +1681,7 @@ export function APICollection() {
                 <TabsContent value='settings' className='p-6'>
                   <div className='space-y-6'>
                     <div>
-                      <Label>{language === 'zh-CN' ? '接口集名称' : 'Collection Name'}</Label>
+                      <Label>{t('apis.settings.collectionName')}</Label>
                       <Input
                         value={collectionDetail?.name}
                         readOnly
@@ -1707,7 +1690,7 @@ export function APICollection() {
                     </div>
 
                     <div>
-                      <Label>{language === 'zh-CN' ? '描述' : 'Description'}</Label>
+                      <Label>{t('common.labels.description')}</Label>
                       <Textarea
                         value={collectionDetail?.description}
                         readOnly
@@ -1716,7 +1699,7 @@ export function APICollection() {
                     </div>
 
                     <div>
-                      <Label>{language === 'zh-CN' ? '可见性' : 'Visibility'}</Label>
+                      <Label>{t('apis.settings.visibility')}</Label>
                       <Select value={collectionDetail?.visibility}>
                         <SelectTrigger className='dark:bg-gray-750 dark:border-gray-600 mt-2'>
                           <SelectValue />
@@ -1725,19 +1708,19 @@ export function APICollection() {
                           <SelectItem value='private'>
                             <div className='flex items-center gap-2'>
                               <Shield className='w-4 h-4' />
-                              {language === 'zh-CN' ? '私有' : 'Private'}
+                              {t('apis.settings.private')}
                             </div>
                           </SelectItem>
                           <SelectItem value='team'>
                             <div className='flex items-center gap-2'>
                               <Eye className='w-4 h-4' />
-                              {language === 'zh-CN' ? '团队可见' : 'Team'}
+                              {t('apis.settings.team')}
                             </div>
                           </SelectItem>
                           <SelectItem value='public'>
                             <div className='flex items-center gap-2'>
                               <Globe className='w-4 h-4' />
-                              {language === 'zh-CN' ? '公开' : 'Public'}
+                              {t('apis.settings.public')}
                             </div>
                           </SelectItem>
                         </SelectContent>
@@ -1751,18 +1734,18 @@ export function APICollection() {
                         onClick={() => setShowImportSettingsDialog(true)}
                       >
                         <Upload className='w-4 h-4' />
-                        {language === 'zh-CN' ? '导入接口规范' : 'Import API Specification'}
+                        {t('apis.settings.importSpec')}
                       </Button>
                     </div>
 
                     <div className='flex gap-3'>
                       <Button variant='outline' className='flex-1 gap-2'>
                         <Download className='w-4 h-4' />
-                        {language === 'zh-CN' ? '导出' : 'Export'}
+                        {t('apis.settings.export')}
                       </Button>
                       <Button variant='outline' className='flex-1 gap-2 text-red-600 hover:text-red-700'>
                         <Trash2 className='w-4 h-4' />
-                        {language === 'zh-CN' ? '删除' : 'Delete'}
+                        {t('common.actions.delete')}
                       </Button>
                     </div>
                   </div>
@@ -1774,7 +1757,7 @@ export function APICollection() {
               <div className='text-center'>
                 <Code2 className='w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600' />
                 <p className='text-gray-500 dark:text-gray-400'>
-                  {language === 'zh-CN' ? '选择一个接口集查看详情' : 'Select a collection to view details'}
+                  {t('apis.selectCollection')}
                 </p>
               </div>
             </div>
@@ -1816,12 +1799,10 @@ export function APICollection() {
           <DialogHeader>
             <DialogTitle className='dark:text-white flex items-center gap-2'>
               <FileJson className='w-5 h-5' />
-              {language === 'zh-CN' ? 'OpenAPI 规范预览' : 'OpenAPI Specification Preview'}
+              {t('apis.openAPIPreview.title')}
             </DialogTitle>
             <DialogDescription>
-              {language === 'zh-CN'
-                ? '查看当前接口集的OpenAPI规范脚本'
-                : 'View OpenAPI specification for current collection'}
+              {t('apis.openAPIPreview.description')}
             </DialogDescription>
           </DialogHeader>
 
@@ -1839,13 +1820,13 @@ export function APICollection() {
               onClick={async () => {
                 const success = await copyToClipboard(JSON.stringify(generateOpenAPISpec(), null, 2));
                 if (success) {
-                  toast.success(language === 'zh-CN' ? '已复制到剪贴板' : 'Copied to clipboard');
+                  toast.success(t('apis.openAPIPreview.copied'));
                 } else {
-                  toast.error(language === 'zh-CN' ? '复制失败' : 'Failed to copy');
+                  toast.error(t('apis.openAPIPreview.copyFailed'));
                 }
               }}
             >
-              {language === 'zh-CN' ? '复制' : 'Copy'}
+              {t('apis.openAPIPreview.copy')}
             </Button>
             <Button
               variant='outline'
@@ -1856,13 +1837,13 @@ export function APICollection() {
                 a.href = url;
                 a.download = 'openapi.json';
                 a.click();
-                toast.success(language === 'zh-CN' ? '已下载' : 'Downloaded');
+                toast.success(t('apis.openAPIPreview.downloaded'));
               }}
             >
               <Download className='w-4 h-4 mr-2' />
-              {language === 'zh-CN' ? '下载' : 'Download'}
+              {t('apis.openAPIPreview.download')}
             </Button>
-            <Button onClick={() => setShowOpenAPIPreview(false)}>{language === 'zh-CN' ? '关闭' : 'Close'}</Button>
+            <Button onClick={() => setShowOpenAPIPreview(false)}>{t('apis.openAPIPreview.close')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -1884,15 +1865,15 @@ export function APICollection() {
 
           <Tabs defaultValue='details' className='w-full'>
             <TabsList>
-              <TabsTrigger value='details'>{language === 'zh-CN' ? '详情' : 'Details'}</TabsTrigger>
-              <TabsTrigger value='request'>{language === 'zh-CN' ? '请求' : 'Request'}</TabsTrigger>
-              <TabsTrigger value='response'>{language === 'zh-CN' ? '响应' : 'Response'}</TabsTrigger>
-              <TabsTrigger value='test'>{language === 'zh-CN' ? '测试' : 'Test'}</TabsTrigger>
+              <TabsTrigger value='details'>{t('apis.endpointDialog.details')}</TabsTrigger>
+              <TabsTrigger value='request'>{t('apis.endpointDialog.request')}</TabsTrigger>
+              <TabsTrigger value='response'>{t('apis.endpointDialog.response')}</TabsTrigger>
+              <TabsTrigger value='test'>{t('apis.endpointDialog.test')}</TabsTrigger>
             </TabsList>
 
             <TabsContent value='details' className='space-y-4 mt-4'>
               <div>
-                <Label>{language === 'zh-CN' ? '描述' : 'Description'}</Label>
+                <Label>{t('common.labels.description')}</Label>
                 <p className='text-sm text-gray-600 dark:text-gray-400 mt-2'>{selectedEndpoint?.description}</p>
               </div>
               <div>
@@ -1910,17 +1891,11 @@ export function APICollection() {
                 </div>
               </div>
               <div>
-                <Label>{language === 'zh-CN' ? '状态' : 'Status'}</Label>
+                <Label>{t('apis.endpointDialog.status')}</Label>
                 <div className='flex items-center gap-2 mt-2'>
                   <Switch checked={selectedEndpoint?.enabled} />
                   <span className='text-sm text-gray-600 dark:text-gray-400'>
-                    {selectedEndpoint?.enabled
-                      ? language === 'zh-CN'
-                        ? '已启用'
-                        : 'Enabled'
-                      : language === 'zh-CN'
-                        ? '已禁用'
-                        : 'Disabled'}
+                    {selectedEndpoint?.enabled ? t('apis.endpoints.enabled') : t('apis.endpoints.disabled')}
                   </span>
                 </div>
               </div>
@@ -1929,7 +1904,7 @@ export function APICollection() {
             <TabsContent value='request' className='mt-4'>
               <div className='p-4 bg-gray-50 dark:bg-gray-750 rounded-lg'>
                 <code className='text-sm text-gray-700 dark:text-gray-300'>
-                  {language === 'zh-CN' ? '请求参数配置...' : 'Request parameters configuration...'}
+                  {t('apis.endpointDialog.requestParams')}
                 </code>
               </div>
             </TabsContent>
@@ -1937,7 +1912,7 @@ export function APICollection() {
             <TabsContent value='response' className='mt-4'>
               <div className='p-4 bg-gray-50 dark:bg-gray-750 rounded-lg'>
                 <code className='text-sm text-gray-700 dark:text-gray-300'>
-                  {language === 'zh-CN' ? '响应数据示例...' : 'Response data example...'}
+                  {t('apis.endpointDialog.responseExample')}
                 </code>
               </div>
             </TabsContent>
@@ -1946,11 +1921,11 @@ export function APICollection() {
               <div className='space-y-4'>
                 <Button className='w-full gap-2'>
                   <Play className='w-4 h-4' />
-                  {language === 'zh-CN' ? '发送测试请求' : 'Send Test Request'}
+                  {t('apis.endpointDialog.sendTestRequest')}
                 </Button>
                 <div className='p-4 bg-gray-50 dark:bg-gray-750 rounded-lg'>
                   <code className='text-sm text-gray-700 dark:text-gray-300'>
-                    {language === 'zh-CN' ? '测试结果将显示在这里...' : 'Test results will be displayed here...'}
+                    {t('apis.endpointDialog.testResult')}
                   </code>
                 </div>
               </div>
@@ -1959,9 +1934,9 @@ export function APICollection() {
 
           <DialogFooter>
             <Button variant='outline' onClick={() => setShowEndpointDialog(false)}>
-              {language === 'zh-CN' ? '关闭' : 'Close'}
+              {t('apis.endpointDialog.close')}
             </Button>
-            <Button>{language === 'zh-CN' ? '保存' : 'Save'}</Button>
+            <Button>{t('apis.endpointDialog.save')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

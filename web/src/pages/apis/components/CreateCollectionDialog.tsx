@@ -38,7 +38,7 @@ export function CreateCollectionDialog({
   onSubmit,
   onReset,
 }: CreateCollectionDialogProps) {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
 
   const handleCancel = () => {
     onOpenChange(false);
@@ -60,20 +60,18 @@ export function CreateCollectionDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='dark:bg-gray-800'>
         <DialogHeader>
-          <DialogTitle className='dark:text-white'>{language === 'zh-CN' ? '新建接口集' : 'New API Collection'}</DialogTitle>
-          <DialogDescription>{language === 'zh-CN'
-                ? '创建一个新的接口集来管理相关的API'
-                : 'Create a new collection to manage related APIs'}</DialogDescription>
+          <DialogTitle className='dark:text-white'>{t('apis.createDialog.title')}</DialogTitle>
+          <DialogDescription>{t('apis.createDialog.description')}</DialogDescription>
         </DialogHeader>
 
         <div className='space-y-4'>
           <div>
-            <Label htmlFor='name'>{language === 'zh-CN' ? '接口集名称' : 'Collection Name'}</Label>
+            <Label htmlFor='name'>{t('apis.createDialog.collectionName')}</Label>
             <Input
               id='name'
               value={formData.name}
               onChange={e => updateField('name', e.target.value)}
-              placeholder={language === 'zh-CN' ? '输入接口集名称...' : 'Enter collection name...'}
+              placeholder={t('apis.createDialog.collectionNamePlaceholder')}
               className='dark:bg-gray-750 dark:border-gray-600'
             />
           </div>
@@ -84,14 +82,14 @@ export function CreateCollectionDialog({
               id='description'
               value={formData.description}
               onChange={e => updateField('description', e.target.value)}
-              placeholder={language === 'zh-CN' ? '输入接口集描述...' : 'Enter collection description...'}
+              placeholder={t('apis.createDialog.descriptionPlaceholder')}
               className='dark:bg-gray-750 dark:border-gray-600 min-h-[100px]'
             />
           </div>
 
           <div className='grid grid-cols-2 gap-4'>
             <div>
-              <Label>{language === 'zh-CN' ? '规范类型' : 'Specification Type'}</Label>
+              <Label>{t('apis.createDialog.specificationType')}</Label>
               <Select
                 value={formData.source}
                 onValueChange={(value: string) => updateField('source', value as ApiCollectionSourceEnum)}>
@@ -102,13 +100,13 @@ export function CreateCollectionDialog({
                   <SelectItem value={ApiCollectionSourceEnum.OPENAPI}>OpenAPI 3.0</SelectItem>
                   <SelectItem value={ApiCollectionSourceEnum.SWAGGER}>Swagger 2.0</SelectItem>
                   <SelectItem value={ApiCollectionSourceEnum.POSTMAN}>Postman Collection</SelectItem>
-                  <SelectItem value='manual'>{language === 'zh-CN' ? '手动创建' : 'Manual'}</SelectItem>
+                  <SelectItem value='manual'>{t('apis.createDialog.manual')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div>
-              <Label>{language === 'zh-CN' ? '可见性' : 'Visibility'}</Label>
+              <Label>{t('apis.createDialog.visibility')}</Label>
               <Select
                 value={formData.visibility}
                 onValueChange={(value: string) => updateField('visibility', value as VisibilityEnum)}>

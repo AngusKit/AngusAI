@@ -6,7 +6,7 @@ import { useState, useRef, useCallback, ChangeEvent } from 'react';
 import { toast } from 'sonner';
 import { useLanguage } from '@/components/ui/LanguageProvider';
 import ApiCollectionsService from '@/services/ApiCollections';
-import { ApiCollectionImportTypeEnum, ConflictStrategyEnum, VisibilityEnum } from '@/enums/enums';
+import { ApiCollectionImportTypeEnum, ConflictStrategyEnum } from '@/enums/enums';
 import { FILE_UPLOAD_CONFIG } from '../constants';
 import type { ConflictStrategy, ImportMode } from '../types';
 
@@ -23,7 +23,7 @@ interface UseAPICollectionImportReturn {
   strategyFile: File | null;
   setStrategyFile: (file: File | null) => void;
   isImporting: boolean;
-  fileInputRef: React.RefObject<HTMLInputElement>;
+  fileInputRef: React.RefObject<HTMLInputElement | null>;
   // Actions
   handleImport: (type: ApiCollectionImportTypeEnum) => void;
   handleFileInputChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>;
@@ -32,10 +32,9 @@ interface UseAPICollectionImportReturn {
 }
 
 export const useAPICollectionImport = (
-  visibility: VisibilityEnum,
   onSuccess?: () => Promise<void>
 ): UseAPICollectionImportReturn => {
-  const { language, t } = useLanguage();
+  const { t } = useLanguage();
   const [selectedImportType, setSelectedImportType] = useState<ApiCollectionImportTypeEnum>(
     ApiCollectionImportTypeEnum.OPENAPI
   );
@@ -68,7 +67,7 @@ export const useAPICollectionImport = (
 
       // Validate file size
       if (file.size > FILE_UPLOAD_CONFIG.MAX_SIZE_MB * 1024 * 1024) {
-        toast.error(t('apis.validation.fileSizeExceeded', { maxSize: FILE_UPLOAD_CONFIG.MAX_SIZE_MB }));
+        toast.error(t('apis.validation.fileSizeExceeded'));
         return;
       }
 
@@ -97,13 +96,9 @@ export const useAPICollectionImport = (
         await ApiCollectionsService.apiCollectionImport({
           file: targetFile,
           type: selectedImportType,
-          name: targetFile.name,
-          visibility,
-          importStrategy: {
-            conflictStrategy:
-              importConflictStrategy === 'overwrite' ? ConflictStrategyEnum.OVERWRITE : ConflictStrategyEnum.IGNORE,
-            enableByDefault: true,
-          },
+          conflictStrategy:
+            importConflictStrategy === 'overwrite' ? ConflictStrategyEnum.OVERWRITE : ConflictStrategyEnum.IGNORE,
+          enableByDefault: true,
         });
         toast.success(t('apis.messages.importSuccess'));
         setSelectedImportFileName('');
@@ -120,7 +115,7 @@ export const useAPICollectionImport = (
         setIsImporting(false);
       }
     },
-    [selectedImportType, importConflictStrategy, visibility, strategyFile, onSuccess, t]
+    [selectedImportType, importConflictStrategy, strategyFile, onSuccess, t]
   );
 
   const resetImport = useCallback(() => {

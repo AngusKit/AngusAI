@@ -71,14 +71,14 @@ export const useAPICollectionManagement = (): UseAPICollectionManagementReturn =
   const [collections, setCollections] = useState<CollectionListItem[]>([]);
   const [collectionsLoading, setCollectionsLoading] = useState(false);
   const [collectionsTotal, setCollectionsTotal] = useState(0);
-  const [collectionsPage, setCollectionsPage] = useState(PAGINATION_CONFIG.DEFAULT_PAGE);
+  const [collectionsPage, setCollectionsPage] = useState<number>(PAGINATION_CONFIG.DEFAULT_PAGE);
   const [collectionDetail, setCollectionDetail] = useState<ApiCollectionDetailVo | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [statistics, setStatistics] = useState<ApiCollectionStatisticsVo | null>(null);
   const [statisticsLoading, setStatisticsLoading] = useState(false);
   const [endpoints, setEndpoints] = useState<EndpointItem[]>([]);
   const [endpointTotal, setEndpointTotal] = useState(0);
-  const [endpointPage, setEndpointPage] = useState(PAGINATION_CONFIG.DEFAULT_PAGE);
+  const [endpointPage, setEndpointPage] = useState<number>(PAGINATION_CONFIG.DEFAULT_PAGE);
   const [endpointsLoading, setEndpointsLoading] = useState(false);
   const [sortBy, setSortBy] = useState<SortField>('name');
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
@@ -91,7 +91,7 @@ export const useAPICollectionManagement = (): UseAPICollectionManagementReturn =
       setStatistics(responseData ?? null);
     } catch (error: any) {
       console.error('Failed to load API collection statistics:', error);
-      toast.error(error?.message || t('apis.messages.loadStatisticsFailed'));
+      // toast.error(error?.message || t('apis.messages.loadStatisticsFailed'));
     } finally {
       setStatisticsLoading(false);
     }
@@ -119,12 +119,15 @@ export const useAPICollectionManagement = (): UseAPICollectionManagementReturn =
           setEndpoints([]);
           setEndpointTotal(0);
         } else if (!selectedCollectionId || !mappedList.some(item => item.id === selectedCollectionId)) {
-          setSelectedCollectionId(mappedList[0].id);
-          setEndpointPage(PAGINATION_CONFIG.DEFAULT_PAGE);
+          const firstId = mappedList[0]?.id;
+          if (firstId) {
+            setSelectedCollectionId(firstId);
+            setEndpointPage(PAGINATION_CONFIG.DEFAULT_PAGE);
+          }
         }
       } catch (error: any) {
         console.error('Failed to load API collections:', error);
-        toast.error(error?.message || t('apis.messages.loadCollectionsFailed'));
+        // toast.error(error?.message || t('apis.messages.loadCollectionsFailed'));
       } finally {
         setCollectionsLoading(false);
       }
@@ -141,7 +144,7 @@ export const useAPICollectionManagement = (): UseAPICollectionManagementReturn =
         setCollectionDetail(responseData ?? null);
       } catch (error: any) {
         console.error('Failed to load API collection detail:', error);
-        toast.error(error?.message || t('apis.messages.loadDetailFailed'));
+        // toast.error(error?.message || t('apis.messages.loadDetailFailed'));
       } finally {
         setDetailLoading(false);
       }
@@ -179,7 +182,7 @@ export const useAPICollectionManagement = (): UseAPICollectionManagementReturn =
         setEndpointTotal(responseData?.total ?? mappedList.length);
       } catch (error: any) {
         console.error('Failed to load API endpoints:', error);
-        toast.error(error?.message || t('apis.messages.loadEndpointsFailed'));
+        // toast.error(error?.message || t('apis.messages.loadEndpointsFailed'));
       } finally {
         setEndpointsLoading(false);
       }
@@ -196,7 +199,9 @@ export const useAPICollectionManagement = (): UseAPICollectionManagementReturn =
         await ApiCollectionsService.apiEndpointToggle(selectedCollectionId, endpointId, {
           enabled: !currentlyEnabled,
         });
-        toast.success(t('apis.messages.endpointToggled', { enabled: !currentlyEnabled }));
+        toast.success(
+          currentlyEnabled ? t('apis.messages.endpointDisabled') : t('apis.messages.endpointEnabled')
+        );
         await loadEndpoints(selectedCollectionId, endpointPage, debouncedEndpointSearchQuery);
       } catch (error: any) {
         console.error('Failed to toggle endpoint status:', error);
@@ -249,37 +254,48 @@ export const useAPICollectionManagement = (): UseAPICollectionManagementReturn =
     const enabledApisTrend = buildTrend(overview?.enabledApiCount, previous?.enabledApiCount);
     const todayCallsTrend = buildTrend(overview?.todayCallCount, previous?.todayCallCount);
 
+    const statDataArray = [
+      {
+        key: 'collections',
+        label: t('apis.stats.totalCollections'),
+        value: formatNumber(overview?.apiCollectionCount, language),
+        subtext: t('apis.stats.totalCollectionsSubtext'),
+        trend: collectionsTrend,
+      },
+      {
+        key: 'totalApis',
+        label: t('apis.stats.totalApis'),
+        value: formatNumber(overview?.apiTotalCount, language),
+        subtext: t('apis.stats.totalApisSubtext'),
+        trend: totalApisTrend,
+      },
+      {
+        key: 'enabledApis',
+        label: t('apis.stats.enabledApis'),
+        value: formatNumber(overview?.enabledApiCount, language),
+        subtext: t('apis.stats.enabledApisSubtext'),
+        trend: enabledApisTrend,
+      },
+      {
+        key: 'todayCalls',
+        label: t('apis.stats.todayCalls'),
+        value: formatNumber(overview?.todayCallCount, language),
+        subtext: t('apis.stats.todayCallsSubtext'),
+        trend: todayCallsTrend,
+      },
+    ];
+
     return STATS_CARDS_CONFIG.map((config, index) => {
-      const statData = [
-        {
-          key: 'collections',
-          label: language === 'zh-CN' ? '接口总数' : 'Total APIs',
-          value: formatNumber(overview?.apiCollectionCount, language),
-          subtext: language === 'zh-CN' ? '跨所有接口集' : 'Across all collections',
-          trend: collectionsTrend,
-        },
-        {
-          key: 'totalApis',
-          label: language === 'zh-CN' ? '接口总数' : 'Total APIs',
-          value: formatNumber(overview?.apiTotalCount, language),
-          subtext: language === 'zh-CN' ? '跨所有接口集' : 'Across all collections',
-          trend: totalApisTrend,
-        },
-        {
-          key: 'enabledApis',
-          label:  language === 'zh-CN' ? '已启用接口' : 'Enabled APIs',
-          value: formatNumber(overview?.enabledApiCount, language),
-          subtext: language === 'zh-CN' ? '正在使用中' : 'Currently active',
-          trend: enabledApisTrend,
-        },
-        {
-          key: 'todayCalls',
-          label: language === 'zh-CN' ? '今日调用' : 'Today Calls',
-          value: formatNumber(overview?.todayCallCount, language),
-          subtext: language === 'zh-CN' ? '相较昨日变化' : 'Change vs yesterday',
-          trend: todayCallsTrend,
-        },
-      ][index];
+      const statData = statDataArray[index];
+      if (!statData) {
+        return {
+          ...config,
+          label: '',
+          value: '--',
+          subtext: '',
+          trendUp: true,
+        };
+      }
 
       return {
         ...config,

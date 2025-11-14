@@ -6,8 +6,8 @@ import { useState, useCallback } from 'react';
 import { toast } from 'sonner';
 import { useLanguage } from '@/components/ui/LanguageProvider';
 import ApiCollectionsService from '@/services/ApiCollections';
-import { DEFAULT_COLLECTION_FORM_DATA, DEFAULT_SERVER_CONFIG, DEFAULT_SECURITY_CONFIG } from '../constants';
-import type { CollectionFormData, ServerConfig, SecurityConfig } from '../types';
+import { DEFAULT_COLLECTION_FORM_DATA } from '../constants';
+import type { CollectionFormData } from '../types';
 
 interface UseAPICollectionFormReturn {
   formData: CollectionFormData;
@@ -19,7 +19,7 @@ interface UseAPICollectionFormReturn {
 export const useAPICollectionForm = (
   onSuccess?: () => Promise<void>
 ): UseAPICollectionFormReturn => {
-  const { language, t } = useLanguage();
+  const { t } = useLanguage();
   const [formData, setFormData] = useState<CollectionFormData>(DEFAULT_COLLECTION_FORM_DATA);
 
   const resetForm = useCallback(() => {
@@ -28,7 +28,7 @@ export const useAPICollectionForm = (
 
   const handleCreateCollection = useCallback(async (): Promise<boolean> => {
     if (!formData.name.trim()) {
-      toast.error(t('apis.validation.nameRequired'));
+      toast.error(t('apis.validation.collectionNameRequired'));
       return false;
     }
 
