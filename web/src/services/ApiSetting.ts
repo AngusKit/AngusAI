@@ -1,6 +1,6 @@
 import {AI, ApiLocaleResult} from '@xcan-angus/infra';
 import { OpenAPIV3_1 } from '@/types/openapi-types';
-import { ContentType, HttpClient, RequestParams } from './HttpClient.ts';
+import httpClient, { ContentType, HttpClient, RequestParams } from './HttpClient.ts';
 import {ApiSchemaResult} from "@/services/ApiSettingTypes.ts";
 
 export class ApiSetting<SecurityDataType = unknown> {
@@ -20,12 +20,12 @@ export class ApiSetting<SecurityDataType = unknown> {
    * @secure
    */
   apiServersUpdate = (
-    collectionId: number,
+    collectionId: string,
     data: OpenAPIV3_1.ServerObject[],
     params: RequestParams = {},
   ) =>
     this.http.request<ApiSchemaResult, ApiLocaleResult>({
-      path: `${AI}/api/v1/api-collections/${collectionId}/servers`,
+      path: `${AI}/api-collections/${collectionId}/servers`,
       method: "PUT",
       body: data,
       secure: true,
@@ -47,7 +47,7 @@ export class ApiSetting<SecurityDataType = unknown> {
     params: RequestParams = {},
   ) =>
     this.http.request<ApiSchemaResult, ApiLocaleResult>({
-      path: `${AI}/api/v1/api-collections/${collectionId}/securities`,
+      path: `${AI}/api-collections/${collectionId}/securities`,
       method: "PUT",
       body: data,
       secure: true,
@@ -55,3 +55,6 @@ export class ApiSetting<SecurityDataType = unknown> {
       ...params,
     });
 }
+
+
+export default new ApiSetting(httpClient);

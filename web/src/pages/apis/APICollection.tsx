@@ -15,8 +15,10 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { toast } from 'sonner';
 import { useLanguage } from '@/components/ui/LanguageProvider';
 import { cn } from '@/components/ui/utils';
+import { copyToClipboard } from '@/lib/clipboard';
+import ApiSettingService from '@/services/ApiSetting';
 
-import { HttpMethodEnum, ApiCollectionImportTypeEnum } from '@/enums/enums';
+import { ApiCollectionImportTypeEnum } from '@/enums/enums';
 import { useAPICollectionManagement } from './hooks/useAPICollectionManagement';
 import { useAPICollectionForm } from './hooks/useAPICollectionForm';
 import { useAPICollectionImport } from './hooks/useAPICollectionImport';
@@ -25,6 +27,7 @@ import { ImportDialog } from './components/ImportDialog';
 import { ImportSettingsDialog } from './components/ImportSettingsDialog';
 import { getMethodColor, getSourceIcon, getVisibilityIcon, getVisibilityLabel } from './utils';
 import type { EndpointItem } from './types';
+import type { OpenAPIV3_1 } from 'openapi-types';
 
 
 export function APICollection() {
@@ -63,39 +66,7 @@ export function APICollection() {
     // Hook 内部已经处理了防抖，这里直接使用 searchQuery
     await loadCollections(collectionsPage, management.searchQuery);
   });
-  const { formData, setFormData, resetForm, handleCreateCollection, serverConfig, setServerConfig, securityConfig, setSecurityConfig } = form;
-
-  // // 自定义认证参数管理（临时保留在主组件中，后续可提取到 SecurityConfigForm 组件）
-  // const [customAuthParams, setCustomAuthParams] = useState<Array<{ id: string; name: string; value: string; location: 'header' | 'query' | 'cookie' }>>([
-  //   { id: '1', name: '', value: '', location: 'header' },
-  // ]);
-
-  // const addCustomAuthParam = () => {
-  //   const newParam = {
-  //     id: Date.now().toString(),
-  //     name: '',
-  //     value: '',
-  //     location: 'header' as const,
-  //   };
-  //   setCustomAuthParams([...customAuthParams, newParam]);
-  // };
-
-  // const removeCustomAuthParam = (id: string) => {
-  //   setCustomAuthParams(customAuthParams.filter(param => param.id !== id));
-  // };
-
-  // const updateCustomAuthParam = (id: string, field: 'name' | 'value' | 'location', value: string) => {
-  //   setCustomAuthParams(
-  //     customAuthParams.map(param =>
-  //       param.id === id
-  //         ? {
-  //             ...param,
-  //             [field]: value,
-  //           }
-  //         : param
-  //     )
-  //   );
-  // };
+  const { formData, setFormData, resetForm, handleCreateCollection } = form;
 
   const importHook = useAPICollectionImport(formData.visibility, async () => {
     // Hook 内部已经处理了防抖，这里直接使用 searchQuery
@@ -142,44 +113,69 @@ export function APICollection() {
 
     const securitySchemes: any = {};
     const security: any[] = [];
-    const configuredSecurity = management.collectionDetail?.security ?? form.buildSecurityScheme();
-
-    if (configuredSecurity) {
-      securitySchemes.PrimaryAuth = configuredSecurity;
-      security.push({ PrimaryAuth: [] });
-    }
-
-    const serverObject =
-      (management.collectionDetail?.server as any) ??
-      (selectedCol?.server as any) ??
-      form.buildServerObject() ??
-      (form.serverConfig.url
-        ? {
-            url: form.serverConfig.url,
-            description: form.serverConfig.description || t('apis.serverConfig.productionServer'),
-          }
-        : undefined);
-
-    const sourceEndpoints = filteredAndSortedEndpoints.length > 0 ? filteredAndSortedEndpoints : endpoints;
-
-    const paths = sourceEndpoints.reduce((acc, endpoint) => {
-      const pathKey = endpoint.path || '/';
-      const methodKey = (endpoint.method || HttpMethodEnum.GET).toLowerCase();
-      acc[pathKey] = {
-        ...(acc[pathKey] || {}),
-        [methodKey]: {
-          summary: endpoint.name || '',
-          description: endpoint.description || '',
-          tags: endpoint.tags || [],
-          responses: {
-            '200': {
-              description: 'Successful response',
+    
+    // 处理所有安全配置
+    securityConfigs.forEach((config, configIndex) => {
+      if (config.type === 'apiKey') {
+        const schemeName = `ApiKeyAuth${configIndex + 1}`;
+        securitySchemes[schemeName] = {
+          type: 'apiKey',
+          in: config.apiKeyIn,
+          name: config.apiKeyName || 'X-API-Key',
+        };
+        security.push({ [schemeName]: [] });
+      } else if (config.type === 'httpBasic') {
+        const schemeName = `BasicAuth${configIndex + 1}`;
+        securitySchemes[schemeName] = {
+          type: 'http',
+          scheme: 'basic',
+        };
+        security.push({ [schemeName]: [] });
+      } else if (config.type === 'bearer') {
+        const schemeName = `BearerAuth${configIndex + 1}`;
+        securitySchemes[schemeName] = {
+          type: 'http',
+          scheme: 'bearer',
+        };
+        security.push({ [schemeName]: [] });
+      } else if (config.type === 'oauth2Password') {
+        const schemeName = `OAuth2Password${configIndex + 1}`;
+        securitySchemes[schemeName] = {
+          type: 'oauth2',
+          flows: {
+            password: {
+              tokenUrl: config.oauth2TokenUrl,
+              scopes: config.oauth2Scope ? { [config.oauth2Scope]: config.oauth2Scope } : {},
             },
           },
-        },
-      };
-      return acc;
-    }, {} as any);
+        };
+        security.push({ [schemeName]: [] });
+      } else if (config.type === 'oauth2Client') {
+        const schemeName = `OAuth2ClientCredentials${configIndex + 1}`;
+        securitySchemes[schemeName] = {
+          type: 'oauth2',
+          flows: {
+            clientCredentials: {
+              tokenUrl: config.oauth2ClientTokenUrl,
+              scopes: config.oauth2ClientScope ? { [config.oauth2ClientScope]: config.oauth2ClientScope } : {},
+            },
+          },
+        };
+        security.push({ [schemeName]: [] });
+      } else if (config.type === 'custom') {
+        config.customParams.forEach((param, index) => {
+          if (param.name) {
+            const schemeName = `CustomAuth${configIndex + 1}_${index + 1}`;
+            securitySchemes[schemeName] = {
+              type: 'apiKey',
+              in: param.location,
+              name: param.name,
+            };
+            security.push({ [schemeName]: [] });
+          }
+        });
+      }
+    });
 
     return {
       openapi: '3.0.0',
@@ -188,10 +184,31 @@ export function APICollection() {
         description: selectedCol?.description || '',
         version: '1.0.0',
       },
-      servers: serverObject ? [serverObject] : [],
+      servers: servers.length > 0 
+        ? servers.map(s => ({ url: s.url, description: s.description }))
+        : [{ url: 'https://api.example.com', description: 'Default server' }],
       security,
-      components: Object.keys(securitySchemes).length > 0 ? { securitySchemes } : undefined,
-      paths,
+      components: {
+        securitySchemes,
+      },
+      paths: endpoints.reduce((acc, endpoint) => {
+        if (!endpoint.path || !endpoint.method) {
+          return acc;
+        }
+        acc[endpoint.path] = {
+          [endpoint.method.toLowerCase()]: {
+            summary: endpoint.name,
+            description: endpoint.description,
+            tags: endpoint.tags,
+            responses: {
+              '200': {
+                description: 'Successful response',
+              },
+            },
+          },
+        };
+        return acc;
+      }, {} as any),
     };
   };
 
@@ -212,26 +229,23 @@ export function APICollection() {
 
   // 服务器配置
   interface ServerConfig {
-    id: string;
+    id?: string;
     url: string;
-    description: string;
+    description?: string;
     enabled: boolean;
   }
 
-  const [servers, setServers] = useState<ServerConfig[]>([
-    {
-      id: '1',
-      url: 'https://api.example.com',
-      description: '生产环境服务器',
-      enabled: true,
-    },
-    {
-      id: '2',
-      url: 'https://dev-api.example.com',
-      description: '开发环境服务器',
-      enabled: false,
-    },
-  ]);
+
+  const [servers, setServers] = useState<ServerConfig[]>([]);
+
+  useEffect(() => {
+    setServers((collectionDetail?.servers || []).map(server => ({
+      id: server.id?.toString(),
+      url: server.url,
+      description: server.description || '',
+      enabled: (server.enabled as unknown as boolean) || false
+    })));
+  }, [collectionDetail?.servers]);
 
   const [editingServer, setEditingServer] = useState<ServerConfig | null>(null);
   const [serverFormData, setServerFormData] = useState({
@@ -239,7 +253,7 @@ export function APICollection() {
     description: '',
   });
 
-  const handleAddServer = () => {
+  const handleAddServer = async () => {
     if (servers.length >= 10) {
       toast.error(language === 'zh-CN' ? '最多只能配置10个服务器' : 'Maximum 10 servers allowed');
       return;
@@ -256,13 +270,16 @@ export function APICollection() {
       description: serverFormData.description,
       enabled: false,
     };
-
-    setServers([...servers, newServer]);
-    setServerFormData({ url: '', description: '' });
-    toast.success(language === 'zh-CN' ? '服务器添加成功' : 'Server added successfully');
+    try {
+      await ApiSettingService.apiServersUpdate(selectedCollectionId as string, [...servers, newServer] as OpenAPIV3_1.ServerObject[]);
+      setServers([...servers, newServer]);
+      setServerFormData({ url: '', description: '' });
+      toast.success(language === 'zh-CN' ? '服务器添加成功' : 'Server added successfully');
+    } catch {}
+    
   };
 
-  const handleUpdateServer = () => {
+  const handleUpdateServer = async () => {
     if (!editingServer) return;
 
     if (!serverFormData.url.trim()) {
@@ -270,14 +287,18 @@ export function APICollection() {
       return;
     }
 
-    setServers(servers.map(s => 
+    const newServers = servers.map(s => 
       s.id === editingServer.id 
         ? { ...s, url: serverFormData.url, description: serverFormData.description }
         : s
-    ));
-    setEditingServer(null);
-    setServerFormData({ url: '', description: '' });
-    toast.success(language === 'zh-CN' ? '服务器更新成功' : 'Server updated successfully');
+    )
+    try {
+      await ApiSettingService.apiServersUpdate(selectedCollectionId as string, [...newServers] as OpenAPIV3_1.ServerObject[]);
+      setServers([...newServers]);
+      setEditingServer(null);
+      setServerFormData({ url: '', description: '' });
+      toast.success(language === 'zh-CN' ? '服务器更新成功' : 'Server updated successfully');
+    } catch {}
   };
 
   const handleEditServer = (server: ServerConfig) => {
@@ -293,16 +314,25 @@ export function APICollection() {
     setServerFormData({ url: '', description: '' });
   };
 
-  const handleToggleServer = (serverId: string) => {
-    setServers(servers.map(s => ({
+  const handleToggleServer = async (serverId: string) => {
+
+    const newServers = servers.map(s => ({
       ...s,
       enabled: s.id === serverId ? !s.enabled : false, // 只能同时启用一个
-    })));
+    }));
+    try {
+      await ApiSettingService.apiServersUpdate(selectedCollectionId as string, [...newServers] as OpenAPIV3_1.ServerObject[]);
+      setServers(newServers);
+    } catch {}
   };
 
-  const handleDeleteServer = (serverId: string) => {
-    setServers(servers.filter(s => s.id !== serverId));
-    toast.success(language === 'zh-CN' ? '服务器删除成功' : 'Server deleted successfully');
+  const handleDeleteServer = async (serverId: string) => {
+    const newServers = servers.filter(s => s.id !== serverId);
+    try {
+      await ApiSettingService.apiServersUpdate(selectedCollectionId as string, [...newServers] as OpenAPIV3_1.ServerObject[]);
+      setServers(newServers);
+      toast.success(language === 'zh-CN' ? '服务器删除成功' : 'Server deleted successfully');
+    } catch {}
   };
 
   interface CustomAuthParam {
@@ -387,6 +417,12 @@ export function APICollection() {
   const [customAuthParams, setCustomAuthParams] = useState<CustomAuthParam[]>([
     { id: '1', name: '', value: '', location: 'header' },
   ]);
+  useEffect(() => {
+    setSecurityConfigs(Object.keys(collectionDetail?.securities || {}).map(key => ({
+      id: key,
+      ...collectionDetail?.securities?.[key]
+    }) as SecurityConfigItem));
+  }, [collectionDetail?.securities]);
 
   const addCustomAuthParam = () => {
     const newParam: CustomAuthParam = {
@@ -1525,6 +1561,7 @@ export function APICollection() {
                       <Label>{language === 'zh-CN' ? '接口集名称' : 'Collection Name'}</Label>
                       <Input
                         value={collectionDetail?.name}
+                        readOnly
                         className='mt-2 dark:bg-gray-750 dark:border-gray-600'
                       />
                     </div>
@@ -1533,6 +1570,7 @@ export function APICollection() {
                       <Label>{language === 'zh-CN' ? '描述' : 'Description'}</Label>
                       <Textarea
                         value={collectionDetail?.description}
+                        readOnly
                         className='mt-2 min-h-[100px] dark:bg-gray-750 dark:border-gray-600'
                       />
                     </div>
@@ -1633,7 +1671,7 @@ export function APICollection() {
       />
 
       {/* OpenAPI Preview Dialog */}
-      <Dialog open={showOpenAPIPreview} onOpenChange={setShowOpenAPIPreview}>
+      <Dialog open={showOpenAPIPreview} onOpenChange={setShowOpenAPIPreview} modal={false}>
         <DialogContent className='max-w-[1200px] dark:bg-gray-800'>
           <DialogHeader>
             <DialogTitle className='dark:text-white flex items-center gap-2'>
@@ -1658,9 +1696,13 @@ export function APICollection() {
           <DialogFooter>
             <Button
               variant='outline'
-              onClick={() => {
-                navigator.clipboard.writeText(JSON.stringify(generateOpenAPISpec(), null, 2));
-                toast.success(language === 'zh-CN' ? '已复制到剪贴板' : 'Copied to clipboard');
+              onClick={async () => {
+                const success = await copyToClipboard(JSON.stringify(generateOpenAPISpec(), null, 2));
+                if (success) {
+                  toast.success(language === 'zh-CN' ? '已复制到剪贴板' : 'Copied to clipboard');
+                } else {
+                  toast.error(language === 'zh-CN' ? '复制失败' : 'Failed to copy');
+                }
               }}
             >
               {language === 'zh-CN' ? '复制' : 'Copy'}
@@ -1718,7 +1760,7 @@ export function APICollection() {
                 <p className='text-sm text-gray-600 dark:text-gray-400 mt-2'>-</p>
               </div>
               <div>
-                <Label>{t('apis.endpointDialog.tags')}</Label>
+                <Label>{t('common.labels.tags')}</Label>
                 <div className='flex flex-wrap gap-2 mt-2'>
                   {(selectedEndpoint?.tags || []).map((tag, index) => (
                     <Badge key={index} variant='secondary'>

@@ -13,6 +13,8 @@ export interface ApiCollectionCreateDto {
    * @example "PRIVATE"
    */
   visibility?: VisibilityEnum;
+
+  source: ApiCollectionSourceEnum;
 }
 
 /** 接口集详情 */
@@ -35,11 +37,11 @@ export interface ApiCollectionDetailVo extends TenantAuditingVo {
   /** 是否配置了服务器 */
   hasServerConfig?: boolean;
   /** 服务器配置 */
-  server?: OpenAPIV3_1.ServerObject[];
+  servers?: OpenAPIV3_1.ServerObject[];
   /** 是否配置了安全认证 */
   hasSecurityConfig?: boolean;
   /** 安全认证配置 */
-  security?: Record<string, OpenAPIV3_1.SecuritySchemeObject>;
+  securities?: Record<string, OpenAPIV3_1.SecuritySchemeObject>;
   /**
    * 端点总数
    * @format int64
