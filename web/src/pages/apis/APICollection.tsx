@@ -17,6 +17,7 @@ import { useLanguage } from '@/components/ui/LanguageProvider';
 import { cn } from '@/components/ui/utils';
 import { copyToClipboard } from '@/lib/clipboard';
 import ApiSettingService from '@/services/ApiSetting';
+import { API_EXTENSION_KEYS } from '@/types/openapi-types';
 
 import { ApiCollectionImportTypeEnum } from '@/enums/enums';
 import { useAPICollectionManagement } from './hooks/useAPICollectionManagement';
@@ -28,6 +29,7 @@ import { ImportSettingsDialog } from './components/ImportSettingsDialog';
 import { getMethodColor, getSourceIcon, getVisibilityIcon, getVisibilityLabel } from './utils';
 import type { EndpointItem } from './types';
 import type { OpenAPIV3_1 } from 'openapi-types';
+import { ContentType } from '@/services/HttpClient';
 
 
 export function APICollection() {
@@ -417,11 +419,152 @@ export function APICollection() {
   const [customAuthParams, setCustomAuthParams] = useState<CustomAuthParam[]>([
     { id: '1', name: '', value: '', location: 'header' },
   ]);
+
+
+  const getSecurityConfigs = (securities: SecurityConfigItem[]): Record<string, OpenAPIV3_1.SecuritySchemeObject> => {
+    return securities.reduce((acc, security) => {
+      if (security.type === 'httpBasic') {
+        acc[security.name] = {
+          type: 'http',
+          scheme: 'basic',
+          [API_EXTENSION_KEYS.valueKey]: `${security.basicUsername}:${security.basicPassword}`,
+        };
+      }
+      if (security.type === 'bearer') {
+        acc[security.name] = {          
+          type: 'http',
+          scheme: 'bearer',
+          [API_EXTENSION_KEYS.valueKey]: security.bearerToken,
+        };
+      }
+      if (security.type === 'oauth2Password') {
+        acc[security.name] = {
+          type: 'oauth2',
+          flows: {
+            password: {
+              tokenUrl: security.oauth2TokenUrl,
+              [API_EXTENSION_KEYS.oAuth2ClientIdKey]: security.oauth2ClientId,
+              [API_EXTENSION_KEYS.oAuth2ClientSecretKey]: security.oauth2ClientSecret,
+              [API_EXTENSION_KEYS.oAuth2UsernameKey]: security.oauth2Username,
+              [API_EXTENSION_KEYS.oAuth2PasswordKey]: security.oauth2Password,
+              scopes: {
+                [security.oauth2Scope]: security.oauth2Scope,
+              },
+            },
+          },
+        };
+      }
+      if (security.type === 'oauth2Client') {
+        acc[security.name] = {
+          type: 'oauth2',
+          flows: {
+            clientCredentials: {
+              tokenUrl: security.oauth2ClientTokenUrl,
+              [API_EXTENSION_KEYS.oAuth2ClientIdKey]: security.oauth2ClientCredentialsId,
+              [API_EXTENSION_KEYS.oAuth2ClientSecretKey]: security.oauth2ClientCredentialsSecret,
+              scopes: {
+                [security.oauth2ClientScope]: security.oauth2ClientScope,
+              },
+            },
+          },
+        };
+      }
+      if (security.type === 'custom') {
+        const [firstParam] = security.customParams;
+        acc[security.name] = {
+          type: 'apiKey',
+          name: firstParam?.name || '',
+          in: firstParam?.location as 'header' | 'query' | 'cookie',
+          [API_EXTENSION_KEYS.valueKey]: firstParam?.value,
+          [API_EXTENSION_KEYS.securityApiKeyPrefix]: (security.customParams || []).map(i => ({name: i.name, [API_EXTENSION_KEYS.valueKey]: i.value, in: i.location})),
+        };
+      }
+      if (security.type === 'apiKey') {
+        acc[security.name] = {
+          type: 'apiKey',
+          name: security.apiKeyName,
+          in: security.apiKeyIn,
+          [API_EXTENSION_KEYS.valueKey]: security.apiKeyValue,
+        };
+      }
+      return acc;
+    }, {} as Record<string, OpenAPIV3_1.SecuritySchemeObject>);
+  };
+
   useEffect(() => {
-    setSecurityConfigs(Object.keys(collectionDetail?.securities || {}).map(key => ({
-      id: key,
-      ...collectionDetail?.securities?.[key]
-    }) as SecurityConfigItem));
+    setSecurityConfigs(Object.keys(collectionDetail?.securities || {}).map(key => {
+      const security = collectionDetail?.securities?.[key];
+      if (security?.type === 'http') {
+        if (security.scheme === 'basic') {
+          const [username, password] = security?.extensions?.[API_EXTENSION_KEYS.valueKey]?.split(':') || [];
+          return {
+            id: key,
+            name: key,
+            type: 'httpBasic',
+            basicUsername: username,
+            basicPassword: password,
+          } as SecurityConfigItem;
+        }
+        if (security.scheme === 'bearer') {
+          return {
+            id: key,
+            name: key,
+            type: 'bearer',
+            bearerToken: security?.extensions?.[API_EXTENSION_KEYS.valueKey],
+          } as SecurityConfigItem;
+        }
+      }
+      if (security?.type === 'oauth2') {
+        if (security?.flows?.password) {
+          return {
+            id: key,
+            name: key,
+            type: 'oauth2Password',
+            oauth2TokenUrl: security.flows.password.tokenUrl || '',
+            oauth2ClientSecret: security.flows.password?.extensions?.[API_EXTENSION_KEYS.oAuth2ClientSecretKey] || '',
+            oauth2ClientId: security.flows.password?.extensions?.[API_EXTENSION_KEYS.oAuth2ClientIdKey] || '',
+            oauth2Username: security.flows.password?.extensions?.[API_EXTENSION_KEYS.oAuth2UsernameKey] || '',
+            oauth2Password: security.flows.password?.extensions?.[API_EXTENSION_KEYS.oAuth2PasswordKey] || '',
+            oauth2Scope: Object.keys(security.flows.password.scopes || {}).join(','),
+          } as SecurityConfigItem;
+        }
+        if (security?.flows?.clientCredentials) {
+          return {
+            id: key,
+            name: key,
+            type: 'oauth2Client',
+            oauth2ClientTokenUrl: security.flows.clientCredentials.tokenUrl || '',
+            oauth2ClientCredentialsId: security.flows.clientCredentials?.extensions?.[API_EXTENSION_KEYS.oAuth2ClientIdKey] || '',
+            oauth2ClientCredentialsSecret: security.flows.clientCredentials?.extensions?.[API_EXTENSION_KEYS.oAuth2ClientSecretKey] || '',
+            oauth2ClientScope: Object.keys(security.flows.clientCredentials.scopes || {}).join(','),
+          } as SecurityConfigItem;
+        }
+      }
+      if (security?.type === 'apiKey') {
+        if (!security?.extensions?.[API_EXTENSION_KEYS.securityApiKeyPrefix]?.length) {
+          return {
+            id: key,
+            name: key,
+            type: 'apiKey',
+            apiKeyName: security.name || '',
+            apiKeyValue: security?.extensions?.[API_EXTENSION_KEYS.valueKey] || '',
+            apiKeyIn: security.in || 'header',
+          } as SecurityConfigItem;
+        }
+        return {
+          id: key,
+          name: key,
+          type: 'custom',
+          customParams: (security?.extensions?.[API_EXTENSION_KEYS.securityApiKeyPrefix] || []).map(i => ({
+            id: i.name,
+            name: i.name,
+            value: i[API_EXTENSION_KEYS.valueKey],
+            location: i.in as 'header' | 'query' | 'cookie',
+          })),
+        } as SecurityConfigItem;
+      }
+      return security
+    }) as SecurityConfigItem[]);
   }, [collectionDetail?.securities]);
 
   const addCustomAuthParam = () => {
@@ -444,7 +587,7 @@ export function APICollection() {
     ));
   };
 
-  const handleAddSecurity = () => {
+  const handleAddSecurity = async () => {
     if (securityConfigs.length >= 10) {
       toast.error(language === 'zh-CN' ? '最多只能配置10个安全配置' : 'Maximum 10 security configurations allowed');
       return;
@@ -478,12 +621,15 @@ export function APICollection() {
       customParams: [...customAuthParams],
     };
 
-    setSecurityConfigs([...securityConfigs, newSecurity]);
-    resetSecurityForm();
-    toast.success(language === 'zh-CN' ? '安全配置添加成功' : 'Security configuration added successfully');
+    try {
+      await ApiSettingService.apiSecuritiesUpdate(selectedCollectionId as string, getSecurityConfigs([...securityConfigs, newSecurity]));
+      setSecurityConfigs([...securityConfigs, newSecurity]);
+      resetSecurityForm();
+      toast.success(language === 'zh-CN' ? '安全配置添加成功' : 'Security configuration added successfully');
+    } catch {}
   };
 
-  const handleUpdateSecurity = () => {
+  const handleUpdateSecurity = async () => {
     if (!editingSecurity) return;
 
     if (!securityFormData.name.trim()) {
@@ -491,35 +637,24 @@ export function APICollection() {
       return;
     }
 
-    setSecurityConfigs(securityConfigs.map(s => 
+    const newSecurityConfigs = securityConfigs.map(s => 
       s.id === editingSecurity.id 
         ? {
             ...s,
             name: securityFormData.name,
             type: securityFormData.type,
-            apiKeyName: securityFormData.apiKeyName,
-            apiKeyValue: securityFormData.apiKeyValue,
-            apiKeyIn: securityFormData.apiKeyIn,
-            basicUsername: securityFormData.basicUsername,
-            basicPassword: securityFormData.basicPassword,
-            bearerToken: securityFormData.bearerToken,
-            oauth2TokenUrl: securityFormData.oauth2TokenUrl,
-            oauth2Username: securityFormData.oauth2Username,
-            oauth2Password: securityFormData.oauth2Password,
-            oauth2ClientId: securityFormData.oauth2ClientId,
-            oauth2ClientSecret: securityFormData.oauth2ClientSecret,
-            oauth2Scope: securityFormData.oauth2Scope,
-            oauth2ClientTokenUrl: securityFormData.oauth2ClientTokenUrl,
-            oauth2ClientCredentialsId: securityFormData.oauth2ClientCredentialsId,
-            oauth2ClientCredentialsSecret: securityFormData.oauth2ClientCredentialsSecret,
-            oauth2ClientScope: securityFormData.oauth2ClientScope,
-            customParams: [...customAuthParams],
           }
         : s
-    ));
-    setEditingSecurity(null);
-    resetSecurityForm();
-    toast.success(language === 'zh-CN' ? '安全配置更新成功' : 'Security configuration updated successfully');
+    ) as SecurityConfigItem[];
+
+    try {
+      await ApiSettingService.apiSecuritiesUpdate(selectedCollectionId as string, getSecurityConfigs(newSecurityConfigs));
+      setSecurityConfigs(newSecurityConfigs);
+      setEditingSecurity(null);
+      resetSecurityForm();
+      toast.success(language === 'zh-CN' ? '安全配置更新成功' : 'Security configuration updated successfully');
+    } catch {}
+  
   };
 
   const handleEditSecurity = (security: SecurityConfigItem) => {
@@ -552,9 +687,15 @@ export function APICollection() {
     resetSecurityForm();
   };
 
-  const handleDeleteSecurity = (securityId: string) => {
-    setSecurityConfigs(securityConfigs.filter(s => s.id !== securityId));
-    toast.success(language === 'zh-CN' ? '安全配置删除成功' : 'Security configuration deleted successfully');
+  const handleDeleteSecurity = async (securityId: string) => {
+
+    const newSecurityConfigs = securityConfigs.filter(s => s.id !== securityId);
+    try {
+      await ApiSettingService.apiSecuritiesUpdate(selectedCollectionId as string, getSecurityConfigs(newSecurityConfigs));
+      setSecurityConfigs(newSecurityConfigs);
+      toast.success(language === 'zh-CN' ? '安全配置删除成功' : 'Security configuration deleted successfully');
+    } catch {}
+    
   };
 
   const resetSecurityForm = () => {
@@ -1485,8 +1626,7 @@ export function APICollection() {
                             {securityConfigs.map((security) => (
                               <div
                                 key={security.id}
-                                className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-800"
-                              >
+                                className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-800">
                                 <div className="flex items-start justify-between gap-3">
                                   <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2 mb-2">

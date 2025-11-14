@@ -42,7 +42,7 @@ export class ApiSetting<SecurityDataType = unknown> {
    * @secure
    */
   apiSecuritiesUpdate = (
-    collectionId: number,
+    collectionId: string,
     data: Record<string, OpenAPIV3_1.SecuritySchemeObject>,
     params: RequestParams = {},
   ) =>
