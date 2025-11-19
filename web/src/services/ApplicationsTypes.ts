@@ -29,6 +29,8 @@ export interface ApplicationDetailVo extends TenantAuditingVo {
   config?: ApplicationConfigVo;
   /** 分享信息 */
   shareInfo?: ApplicationShareInfoVo;
+
+  apiCalls?: number;
 }
 
 /** The API response result of supporting international message. */

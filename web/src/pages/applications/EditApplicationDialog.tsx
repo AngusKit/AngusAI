@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ApplicationStatusEnum, ApplicationCategoryEnum } from '@/enums/enums';
-import { getEnumDescription } from '@/enums/utils';
+import { getEnumDescription, enumToMessages } from '@/enums/utils';
 import { useState, useEffect, useRef } from 'react';
 import { MessageSquare, Sparkles, Database, Bot, Code, Zap, Heart, Star, Users, FileText, Calendar, Settings, Bell, Globe, Lock, Mail, Phone, Camera, Image, Music, Video, BookOpen, Briefcase, Coffee, ShoppingCart, CreditCard, Gift, Trophy, Target, Rocket, Lightbulb, Brain, Cpu, Cloud, Server, Terminal, Package, Wrench, Shield, ChevronLeft, ChevronRight, } from 'lucide-react';
 import { toast } from 'sonner';
@@ -22,7 +22,7 @@ interface Application {
   isStarred: boolean;
   tags: { label: string; color: string }[];
   visits: string;
-  category: string;
+  category: ApplicationCategoryEnum;
 }
 
 interface EditApplicationDialogProps {
@@ -94,17 +94,17 @@ const iconOptions = [
   { id: 'shield', icon: Shield, label: '盾牌', bgColor: 'bg-blue-700' },
 ];
 
-const categories = [
-  { value: 'chatbot', label: '聊天助手' },
-  { value: 'text-generation', label: '文本生成' },
-  { value: 'knowledge', label: '知识问答' },
-  { value: 'other', label: '其他' },
-];
+const categories = enumToMessages(ApplicationCategoryEnum).map(cat => {
+  return {
+    value: cat.value,
+    label: cat.message,
+  };
+});
 
 export function EditApplicationDialog({ open, onOpenChange, application, onSave }: EditApplicationDialogProps) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('');
+  const [category, setCategory] = useState<ApplicationCategoryEnum>(ApplicationCategoryEnum.CHATBOT);
   const [selectedIconId, setSelectedIconId] = useState('message');
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 

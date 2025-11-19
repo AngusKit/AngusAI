@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLanguage } from '@/components/ui/LanguageProvider';
 import { Share2, Search, Filter, Workflow, Database, Zap, FileText, Users, Lock, Unlock, Eye, Edit, Trash2, MoreHorizontal, TrendingUp, Clock, Shield, CheckCircle, Globe, UserCheck, Plus, } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { XcanPagination } from '@/components/ui/pagination';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
@@ -13,22 +14,28 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, } from '@/components/ui/pagination';
 import { toast } from 'sonner';
+import Sharing from '@/services/Sharing';
+import { ResourceSharingListVo } from '@/services/SharingTypes';
+import { ResourceTypeEnum, MemberPermissionEnum, SharedWithEnum } from '@/enums/enums';
+import { useDebounce } from '@/hooks/useDebounce';
+import { getEnumDescription } from '@/enums/utils';
 
 interface SharedResource {
-  id: number;
+  id: string;
   name: string;
-  type: '应用' | '知识库' | '工作流' | '模型' | '数据集';
+  type: ResourceTypeEnum;
   icon: React.ElementType;
   iconBg: string;
   iconColor: string;
   owner: string;
-  sharedWith: 'all' | 'specific';
+  sharedWith: SharedWithEnum;
   memberCount: number;
-  permission: 'view' | 'edit' | 'manage';
+  permission: MemberPermissionEnum;
   lastShared: string;
   views: number;
   edits: number;
   createdDate: string;
+  enabled?: boolean;
 }
 
 interface TeamMember {
@@ -42,182 +49,161 @@ interface TeamMember {
 export function ResourceSharing() {
   const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearchQuery = useDebounce(searchQuery, 500);
   const [typeFilter, setTypeFilter] = useState('all');
   const [permissionFilter, setPermissionFilter] = useState('all');
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [selectedResource, setSelectedResource] = useState<SharedResource | null>(null);
-  const [shareType, setShareType] = useState<'all' | 'specific'>('all');
-  const [sharePermission, setSharePermission] = useState('view');
+  const [shareType, setShareType] = useState<SharedWithEnum>(SharedWithEnum.ALL);
+  const [sharePermission, setSharePermission] = useState<MemberPermissionEnum>(MemberPermissionEnum.VIEW);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
+  const [isLoading, setIsLoading] = useState(false);
+  const [totalCount, setTotalCount] = useState(0);
 
   // 共享弹窗状态
-  const [selectedResourceType, setSelectedResourceType] = useState('');
+  const [selectedResourceType, setSelectedResourceType] = useState<ResourceTypeEnum | ''>('');
   const [selectedResourceId, setSelectedResourceId] = useState('');
 
-  const [resources, setResources] = useState<SharedResource[]>([
-    {
-      id: 1,
-      name: '智能客服应用',
-      type: '应用',
-      icon: Zap,
-      iconBg: 'bg-blue-100 dark:bg-blue-900/30',
-      iconColor: 'text-blue-600 dark:text-blue-400',
-      owner: '张伟',
-      sharedWith: 'all',
-      memberCount: 12,
-      permission: 'edit',
-      lastShared: '2小时前',
-      views: 156,
-      edits: 23,
-      createdDate: '2024-03-15',
-    },
-    {
-      id: 2,
-      name: '产品知识库',
-      type: '知识库',
-      icon: Database,
-      iconBg: 'bg-purple-100 dark:bg-purple-900/30',
-      iconColor: 'text-purple-600 dark:text-purple-400',
-      owner: '李娜',
-      sharedWith: 'specific',
-      memberCount: 5,
-      permission: 'view',
-      lastShared: '1天前',
-      views: 89,
-      edits: 0,
-      createdDate: '2024-02-20',
-    },
-    {
-      id: 3,
-      name: '自动化审批流程',
-      type: '工作流',
-      icon: Workflow,
-      iconBg: 'bg-green-100 dark:bg-green-900/30',
-      iconColor: 'text-green-600 dark:text-green-400',
-      owner: '王芳',
-      sharedWith: 'all',
-      memberCount: 12,
-      permission: 'manage',
-      lastShared: '3天前',
-      views: 67,
-      edits: 12,
-      createdDate: '2024-03-01',
-    },
-    {
-      id: 4,
-      name: 'GPT-4 模型',
-      type: '模型',
-      icon: Zap,
-      iconBg: 'bg-orange-100 dark:bg-orange-900/30',
-      iconColor: 'text-orange-600 dark:text-orange-400',
-      owner: '张伟',
-      sharedWith: 'specific',
-      memberCount: 8,
-      permission: 'view',
-      lastShared: '5天前',
-      views: 234,
-      edits: 0,
-      createdDate: '2024-01-10',
-    },
-    {
-      id: 5,
-      name: '客户数据集',
-      type: '数据集',
-      icon: FileText,
-      iconBg: 'bg-pink-100 dark:bg-pink-900/30',
-      iconColor: 'text-pink-600 dark:text-pink-400',
-      owner: '刘强',
-      sharedWith: 'specific',
-      memberCount: 3,
-      permission: 'edit',
-      lastShared: '1周前',
-      views: 45,
-      edits: 8,
-      createdDate: '2024-02-15',
-    },
-    {
-      id: 6,
-      name: '营销活动应用',
-      type: '应用',
-      icon: Zap,
-      iconBg: 'bg-blue-100 dark:bg-blue-900/30',
-      iconColor: 'text-blue-600 dark:text-blue-400',
-      owner: '李娜',
-      sharedWith: 'all',
-      memberCount: 12,
-      permission: 'edit',
-      lastShared: '2周前',
-      views: 78,
-      edits: 15,
-      createdDate: '2024-01-25',
-    },
-    {
-      id: 7,
-      name: '技术文档知识库',
-      type: '知识库',
-      icon: Database,
-      iconBg: 'bg-purple-100 dark:bg-purple-900/30',
-      iconColor: 'text-purple-600 dark:text-purple-400',
-      owner: '周洋',
-      sharedWith: 'specific',
-      memberCount: 6,
-      permission: 'edit',
-      lastShared: '3天前',
-      views: 112,
-      edits: 18,
-      createdDate: '2024-03-05',
-    },
-    {
-      id: 8,
-      name: '数据分析工作流',
-      type: '工作流',
-      icon: Workflow,
-      iconBg: 'bg-green-100 dark:bg-green-900/30',
-      iconColor: 'text-green-600 dark:text-green-400',
-      owner: '孙明',
-      sharedWith: 'all',
-      memberCount: 12,
-      permission: 'view',
-      lastShared: '4天前',
-      views: 93,
-      edits: 0,
-      createdDate: '2024-02-28',
-    },
-    {
-      id: 9,
-      name: '图像识别模型',
-      type: '模型',
-      icon: Zap,
-      iconBg: 'bg-orange-100 dark:bg-orange-900/30',
-      iconColor: 'text-orange-600 dark:text-orange-400',
-      owner: '吴秀英',
-      sharedWith: 'specific',
-      memberCount: 4,
-      permission: 'view',
-      lastShared: '6天前',
-      views: 145,
-      edits: 0,
-      createdDate: '2024-01-20',
-    },
-    {
-      id: 10,
-      name: '用户行为数据集',
-      type: '数据集',
-      icon: FileText,
-      iconBg: 'bg-pink-100 dark:bg-pink-900/30',
-      iconColor: 'text-pink-600 dark:text-pink-400',
-      owner: '郑杰',
-      sharedWith: 'specific',
-      memberCount: 7,
-      permission: 'manage',
-      lastShared: '1天前',
-      views: 67,
-      edits: 11,
-      createdDate: '2024-03-20',
-    },
-  ]);
+  const [resources, setResources] = useState<SharedResource[]>([]);
+  
+  // 资源类型映射
+  const mapResourceTypeToDisplay = (type?: ResourceTypeEnum): string => {
+    if (!type) return '';
+    return getEnumDescription(ResourceTypeEnum, type);
+  };
 
+  // 获取资源图标
+  const getResourceIcon = (type?: ResourceTypeEnum): React.ElementType => {
+    if (type === ResourceTypeEnum.APPLICATION) return Zap;
+    if (type === ResourceTypeEnum.KNOWLEDGE) return Database;
+    if (type === ResourceTypeEnum.WORKFLOW) return Workflow;
+    if (type === ResourceTypeEnum.MODEL) return Zap;
+    if (type === ResourceTypeEnum.DATASET) return FileText;
+    return FileText;
+  };
+
+  // 获取资源图标背景色
+  const getResourceIconBg = (type?: ResourceTypeEnum): string => {
+    if (type === ResourceTypeEnum.APPLICATION) return 'bg-blue-100 dark:bg-blue-900/30';
+    if (type === ResourceTypeEnum.KNOWLEDGE) return 'bg-purple-100 dark:bg-purple-900/30';
+    if (type === ResourceTypeEnum.WORKFLOW) return 'bg-green-100 dark:bg-green-900/30';
+    if (type === ResourceTypeEnum.MODEL) return 'bg-orange-100 dark:bg-orange-900/30';
+    if (type === ResourceTypeEnum.DATASET) return 'bg-pink-100 dark:bg-pink-900/30';
+    return 'bg-gray-100 dark:bg-gray-900/30';
+  };
+
+  // 获取资源图标颜色
+  const getResourceIconColor = (type?: ResourceTypeEnum): string => {
+    if (type === ResourceTypeEnum.APPLICATION) return 'text-blue-600 dark:text-blue-400';
+    if (type === ResourceTypeEnum.KNOWLEDGE) return 'text-purple-600 dark:text-purple-400';
+    if (type === ResourceTypeEnum.WORKFLOW) return 'text-green-600 dark:text-green-400';
+    if (type === ResourceTypeEnum.MODEL) return 'text-orange-600 dark:text-orange-400';
+    if (type === ResourceTypeEnum.DATASET) return 'text-pink-600 dark:text-pink-400';
+    return 'text-gray-600 dark:text-gray-400';
+  };
+
+  // 格式化日期
+  const formatDate = (date?: string): string => {
+    if (!date) return '';
+    try {
+      const d = new Date(date);
+      const now = new Date();
+      const diff = now.getTime() - d.getTime();
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor(diff / (1000 * 60));
+      
+      if (days > 0) return `${days}天前`;
+      if (hours > 0) return `${hours}小时前`;
+      if (minutes > 0) return `${minutes}分钟前`;
+      return '刚刚';
+    } catch {
+      return date;
+    }
+  };
+
+  // 加载资源共享列表
+  const loadResourceSharingList = async () => {
+    setIsLoading(true);
+    try {
+      const queryParams: any = {
+        keyword: debouncedSearchQuery.trim() || undefined,
+        pageNo: currentPage,
+        pageSize: itemsPerPage,
+      };
+
+      // 根据筛选条件设置参数
+      if (typeFilter !== 'all') {
+        // 将页面类型映射到API类型
+        const typeMap: Record<string, ResourceTypeEnum> = {
+          '应用': ResourceTypeEnum.APPLICATION,
+          '知识库': ResourceTypeEnum.KNOWLEDGE,
+          '工作流': ResourceTypeEnum.WORKFLOW,
+          '模型': ResourceTypeEnum.MODEL,
+          '数据集': ResourceTypeEnum.DATASET,
+        };
+        queryParams.type = typeMap[typeFilter];
+      }
+
+      if (permissionFilter !== 'all') {
+        const permissionMap: Record<string, MemberPermissionEnum> = {
+          'view': MemberPermissionEnum.VIEW,
+          'edit': MemberPermissionEnum.EDIT,
+          'manage': MemberPermissionEnum.MANAGE,
+        };
+        queryParams.permission = permissionMap[permissionFilter];
+      }
+
+      const response = await Sharing.getResourceSharingList(queryParams);
+
+      // 处理响应结构
+      const responseData = (response as any).data;
+      let listData: ResourceSharingListVo[] | undefined;
+      if (responseData) {
+        listData = responseData.list;
+        setTotalCount(responseData.total || 0);
+      }
+
+      if (Array.isArray(listData)) {
+        const mappedList: SharedResource[] = listData.map((item: ResourceSharingListVo) => ({
+          id: item.id || '',
+          name: item.resourceName || '',
+          type: item.resourceType || ResourceTypeEnum.APPLICATION,
+          icon: getResourceIcon(item.resourceType),
+          iconBg: getResourceIconBg(item.resourceType),
+          iconColor: getResourceIconColor(item.resourceType),
+          owner: item.ownerName || '',
+          sharedWith: item.sharedWith || SharedWithEnum.ALL,
+          memberCount: item.memberCount || 0,
+          permission: item.permission || MemberPermissionEnum.VIEW,
+          lastShared: formatDate(item.modifiedDate || item.createdDate),
+          views: item.views || 0,
+          edits: item.edits || 0,
+          createdDate: item.createdDate || '',
+          enabled: item.enabled,
+        }));
+
+        setResources(mappedList);
+      } else {
+        setResources([]);
+        setTotalCount(0);
+      }
+    } catch (error: any) {
+      console.error('Failed to load resource sharing list:', error);
+      toast.error(error?.data?.message || error?.message || '加载资源共享列表失败');
+      setResources([]);
+      setTotalCount(0);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadResourceSharingList();
+  }, [currentPage, debouncedSearchQuery, typeFilter, permissionFilter]);
+
+  // 团队成员列表（暂时保留模拟数据，因为API中没有获取团队成员列表的接口）
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([
     {
       id: 1,
@@ -263,76 +249,57 @@ export function ResourceSharing() {
     },
   ]);
 
-  // 模拟各类型的可共享资源
-  const availableResources = {
-    应用: [
+  // 可共享资源列表（需要从对应的资源接口获取，暂时保留模拟数据）
+  const [availableResources, setAvailableResources] = useState<Record<string, Array<{ id: string; name: string; icon: React.ElementType }>>>({
+    [ResourceTypeEnum.APPLICATION]: [
       { id: 'app-1', name: '智能客服应用', icon: Zap },
       { id: 'app-2', name: '营销活动应用', icon: Zap },
-      { id: 'app-3', name: '数据分析助手', icon: Zap },
-      { id: 'app-4', name: '内容生成工具', icon: Zap },
     ],
-    知识库: [
+    [ResourceTypeEnum.KNOWLEDGE]: [
       { id: 'kb-1', name: '产品知识库', icon: Database },
       { id: 'kb-2', name: '技术文档知识库', icon: Database },
-      { id: 'kb-3', name: '客户案例库', icon: Database },
-      { id: 'kb-4', name: '培训资料库', icon: Database },
     ],
-    工作流: [
+    [ResourceTypeEnum.WORKFLOW]: [
       { id: 'wf-1', name: '自动化审批流程', icon: Workflow },
       { id: 'wf-2', name: '数据分析工作流', icon: Workflow },
-      { id: 'wf-3', name: '内容审核流程', icon: Workflow },
-      { id: 'wf-4', name: '订单处理流程', icon: Workflow },
     ],
-    模型: [
+    [ResourceTypeEnum.MODEL]: [
       { id: 'model-1', name: 'GPT-4 模型', icon: Zap },
       { id: 'model-2', name: '图像识别模型', icon: Zap },
-      { id: 'model-3', name: '文本分类模型', icon: Zap },
-      { id: 'model-4', name: '情感分析模型', icon: Zap },
     ],
-    数据集: [
+    [ResourceTypeEnum.DATASET]: [
       { id: 'ds-1', name: '客户数据集', icon: FileText },
       { id: 'ds-2', name: '用户行为数据集', icon: FileText },
-      { id: 'ds-3', name: '产品销售数据', icon: FileText },
-      { id: 'ds-4', name: '市场调研数据', icon: FileText },
     ],
-  };
+  });
 
-  const getPermissionBadge = (permission: string) => {
+  const getPermissionBadge = (permission: MemberPermissionEnum) => {
     const badges = {
-      view: {
+      [MemberPermissionEnum.VIEW]: {
         label: '查看',
         color: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
         icon: Eye,
       },
-      edit: {
+      [MemberPermissionEnum.EDIT]: {
         label: '编辑',
         color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
         icon: Edit,
       },
-      manage: {
+      [MemberPermissionEnum.MANAGE]: {
         label: '管理',
         color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
         icon: Shield,
       },
     };
-    return badges[permission as keyof typeof badges];
+    return badges[permission] || badges[MemberPermissionEnum.VIEW];
   };
 
-  const filteredResources = resources.filter(resource => {
-    const matchesSearch = resource.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesType = typeFilter === 'all' || resource.type === typeFilter;
-    const matchesPermission = permissionFilter === 'all' || resource.permission === permissionFilter;
-    return matchesSearch && matchesType && matchesPermission;
-  });
+  // 分页逻辑（现在使用服务端分页）
+  const totalPages = Math.ceil(totalCount / itemsPerPage);
+  const currentResources = resources;
+  const shouldShowPagination = totalCount > itemsPerPage;
 
-  // 分页逻辑
-  const totalPages = Math.ceil(filteredResources.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentResources = filteredResources.slice(startIndex, endIndex);
-  const shouldShowPagination = filteredResources.length > itemsPerPage;
-
-  const handleShare = () => {
+  const handleShare = async () => {
     // 验证资源类型
     if (!selectedResourceType) {
       toast.error('请选择资源类型');
@@ -345,45 +312,83 @@ export function ResourceSharing() {
       return;
     }
 
-    if (shareType === 'specific') {
+    if (shareType === SharedWithEnum.SPECIFIC) {
       const selectedCount = teamMembers.filter(m => m.selected).length;
       if (selectedCount === 0) {
         toast.error('请至少选择一个成员');
         return;
       }
-      const resourceName = availableResources[selectedResourceType as keyof typeof availableResources]?.find(
-        r => r.id === selectedResourceId
-      )?.name;
-      toast.success(`已将"${resourceName}"与 ${selectedCount} 名成员共享`);
-    } else {
-      const resourceName = availableResources[selectedResourceType as keyof typeof availableResources]?.find(
-        r => r.id === selectedResourceId
-      )?.name;
-      toast.success(`已将"${resourceName}"与所有团队成员共享`);
     }
+
+    try {
+      const memberIds = shareType === SharedWithEnum.SPECIFIC 
+        ? teamMembers.filter(m => m.selected).map(m => String(m.id))
+        : undefined;
+
+      await Sharing.createResourceSharing({
+        resourceId: selectedResourceId,
+        resourceType: selectedResourceType as ResourceTypeEnum,
+        sharedWith: shareType,
+        permission: sharePermission,
+        memberIds: memberIds,
+      });
+
+      const resourceName = availableResources[selectedResourceType]?.find(
+        r => r.id === selectedResourceId
+      )?.name;
+      
+      toast.success(`已将"${resourceName}"共享成功`);
 
     // 重置状态
     setShareDialogOpen(false);
     setTeamMembers(teamMembers.map(m => ({ ...m, selected: false })));
     setSelectedResourceType('');
     setSelectedResourceId('');
+      setShareType(SharedWithEnum.ALL);
+      setSharePermission(MemberPermissionEnum.VIEW);
+      
+      // 重新加载列表
+      await loadResourceSharingList();
+    } catch (error: any) {
+      console.error('Failed to create resource sharing:', error);
+      toast.error(error?.data?.message || error?.message || '创建资源共享失败');
+    }
   };
 
-  const handleRemoveSharing = (resource: SharedResource) => {
-    setResources(resources.filter(r => r.id !== resource.id));
+  const handleRemoveSharing = async (resource: SharedResource) => {
+    try {
+      await Sharing.deleteResourceSharing(resource.id);
     toast.success(`已停止共享: ${resource.name}`);
+      // 重新加载列表
+      await loadResourceSharingList();
+    } catch (error: any) {
+      console.error('Failed to delete resource sharing:', error);
+      toast.error(error?.data?.message || error?.message || '停止共享失败');
+    }
   };
 
-  const handleChangePermission = (resource: SharedResource, newPermission: string) => {
-    setResources(resources.map(r => (r.id === resource.id ? { ...r, permission: newPermission as any } : r)));
+  const handleChangePermission = async (resource: SharedResource, newPermission: MemberPermissionEnum) => {
+    try {
+      await Sharing.updateResourceSharing(resource.id, {
+        sharedWith: resource.sharedWith,
+        permission: newPermission,
+        memberIds: resource.sharedWith === SharedWithEnum.SPECIFIC ? [] : undefined, // 如果是特定成员，需要传递成员ID列表
+      });
     toast.success(`已更改权限为: ${getPermissionBadge(newPermission).label}`);
+      // 重新加载列表
+      await loadResourceSharingList();
+    } catch (error: any) {
+      console.error('Failed to update resource sharing:', error);
+      toast.error(error?.data?.message || error?.message || '更新权限失败');
+    }
   };
 
+  // 统计数据（从列表数据计算）
   const stats = [
     {
       label: '共享资源',
-      value: resources.length,
-      subtext: `${resources.filter(r => r.sharedWith === 'all').length} 个全员共享`,
+      value: totalCount,
+      subtext: `${resources.filter(r => r.sharedWith === SharedWithEnum.ALL).length} 个全员共享`,
       icon: Share2,
       color: 'text-blue-600',
     },
@@ -530,13 +535,13 @@ export function ResourceSharing() {
                       </td>
                       <td className='px-6 py-4'>
                         <Badge className='text-xs bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400 border-0'>
-                          {resource.type}
+                          {mapResourceTypeToDisplay(resource.type)}
                         </Badge>
                       </td>
                       <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{resource.owner}</td>
                       <td className='px-6 py-4'>
                         <div className='flex items-center gap-2'>
-                          {resource.sharedWith === 'all' ? (
+                          {resource.sharedWith === SharedWithEnum.ALL ? (
                             <>
                               <Globe className='w-4 h-4 text-blue-500' />
                               <span className='text-sm text-gray-600 dark:text-gray-400'>
@@ -581,21 +586,21 @@ export function ResourceSharing() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align='end' className='dark:bg-gray-800 dark:border-gray-700'>
                             <DropdownMenuItem
-                              onClick={() => handleChangePermission(resource, 'view')}
+                              onClick={() => handleChangePermission(resource, MemberPermissionEnum.VIEW)}
                               className='dark:text-gray-300'
                             >
                               <Eye className='w-4 h-4 mr-2' />
                               设为查看权限
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              onClick={() => handleChangePermission(resource, 'edit')}
+                              onClick={() => handleChangePermission(resource, MemberPermissionEnum.EDIT)}
                               className='dark:text-gray-300'
                             >
                               <Edit className='w-4 h-4 mr-2' />
                               设为编辑权限
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              onClick={() => handleChangePermission(resource, 'manage')}
+                              onClick={() => handleChangePermission(resource, MemberPermissionEnum.MANAGE)}
                               className='dark:text-gray-300'
                             >
                               <Shield className='w-4 h-4 mr-2' />
@@ -622,37 +627,7 @@ export function ResourceSharing() {
         {/* Pagination */}
         {shouldShowPagination && (
           <div className='flex items-center justify-center px-6 py-4 border-t border-gray-200 dark:border-gray-700'>
-            <Pagination>
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious
-                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                    className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                  >
-                    上一页
-                  </PaginationPrevious>
-                </PaginationItem>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                  <PaginationItem key={page}>
-                    <PaginationLink
-                      onClick={() => setCurrentPage(page)}
-                      isActive={currentPage === page}
-                      className='cursor-pointer'
-                    >
-                      {page}
-                    </PaginationLink>
-                  </PaginationItem>
-                ))}
-                <PaginationItem>
-                  <PaginationNext
-                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                    className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                  >
-                    下一页
-                  </PaginationNext>
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
+            <XcanPagination total={totalCount} pageNo={currentPage} pageSize={itemsPerPage} onChange={({pageNo}) => setCurrentPage(pageNo)} />
           </div>
         )}
       </Card>
@@ -672,7 +647,7 @@ export function ResourceSharing() {
               <Select
                 value={selectedResourceType}
                 onValueChange={value => {
-                  setSelectedResourceType(value);
+                  setSelectedResourceType(value as ResourceTypeEnum);
                   setSelectedResourceId(''); // 重置资源选择
                 }}
               >
@@ -680,34 +655,34 @@ export function ResourceSharing() {
                   <SelectValue placeholder='请选择资源类型' />
                 </SelectTrigger>
                 <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
-                  <SelectItem value='应用' className='dark:text-white'>
+                  <SelectItem value={ResourceTypeEnum.APPLICATION} className='dark:text-white'>
                     <div className='flex items-center gap-2'>
                       <Zap className='w-4 h-4 text-blue-500' />
-                      应用
+                      {getEnumDescription(ResourceTypeEnum, ResourceTypeEnum.APPLICATION)}
                     </div>
                   </SelectItem>
-                  <SelectItem value='知识库' className='dark:text-white'>
+                  <SelectItem value={ResourceTypeEnum.KNOWLEDGE} className='dark:text-white'>
                     <div className='flex items-center gap-2'>
                       <Database className='w-4 h-4 text-purple-500' />
-                      知识库
+                      {getEnumDescription(ResourceTypeEnum, ResourceTypeEnum.KNOWLEDGE)}
                     </div>
                   </SelectItem>
-                  <SelectItem value='工作流' className='dark:text-white'>
+                  <SelectItem value={ResourceTypeEnum.WORKFLOW} className='dark:text-white'>
                     <div className='flex items-center gap-2'>
                       <Workflow className='w-4 h-4 text-green-500' />
-                      工作流
+                      {getEnumDescription(ResourceTypeEnum, ResourceTypeEnum.WORKFLOW)}
                     </div>
                   </SelectItem>
-                  <SelectItem value='模型' className='dark:text-white'>
+                  <SelectItem value={ResourceTypeEnum.MODEL} className='dark:text-white'>
                     <div className='flex items-center gap-2'>
                       <Zap className='w-4 h-4 text-orange-500' />
-                      模型
+                      {getEnumDescription(ResourceTypeEnum, ResourceTypeEnum.MODEL)}
                     </div>
                   </SelectItem>
-                  <SelectItem value='数据集' className='dark:text-white'>
+                  <SelectItem value={ResourceTypeEnum.DATASET} className='dark:text-white'>
                     <div className='flex items-center gap-2'>
                       <FileText className='w-4 h-4 text-pink-500' />
-                      数据集
+                      {getEnumDescription(ResourceTypeEnum, ResourceTypeEnum.DATASET)}
                     </div>
                   </SelectItem>
                 </SelectContent>
@@ -723,7 +698,7 @@ export function ResourceSharing() {
                     <SelectValue placeholder='请选择要共享的资源' />
                   </SelectTrigger>
                   <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
-                    {availableResources[selectedResourceType as keyof typeof availableResources]?.map(resource => {
+                    {availableResources[selectedResourceType]?.map(resource => {
                       const Icon = resource.icon;
                       return (
                         <SelectItem key={resource.id} value={resource.id} className='dark:text-white'>
@@ -744,11 +719,11 @@ export function ResourceSharing() {
               <div className='grid grid-cols-2 gap-3'>
                 <Card
                   className={`p-4 cursor-pointer transition-all ${
-                    shareType === 'all'
+                    shareType === SharedWithEnum.ALL
                       ? 'border-blue-500 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                       : 'dark:bg-gray-900 dark:border-gray-700'
                   }`}
-                  onClick={() => setShareType('all')}
+                  onClick={() => setShareType(SharedWithEnum.ALL)}
                 >
                   <div className='flex items-center gap-3'>
                     <Globe className='w-5 h-5 text-blue-500' />
@@ -761,11 +736,11 @@ export function ResourceSharing() {
 
                 <Card
                   className={`p-4 cursor-pointer transition-all ${
-                    shareType === 'specific'
+                    shareType === SharedWithEnum.SPECIFIC
                       ? 'border-blue-500 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                       : 'dark:bg-gray-900 dark:border-gray-700'
                   }`}
-                  onClick={() => setShareType('specific')}
+                  onClick={() => setShareType(SharedWithEnum.SPECIFIC)}
                 >
                   <div className='flex items-center gap-3'>
                     <UserCheck className='w-5 h-5 text-green-500' />
@@ -778,7 +753,7 @@ export function ResourceSharing() {
               </div>
             </div>
 
-            {shareType === 'specific' && (
+            {shareType === SharedWithEnum.SPECIFIC && (
               <div className='space-y-2'>
                 <Label className='dark:text-gray-300'>选择成员</Label>
                 <div className='border border-gray-200 dark:border-gray-700 rounded-lg p-4 max-h-[200px] overflow-y-auto space-y-2'>
@@ -817,12 +792,15 @@ export function ResourceSharing() {
               <Label htmlFor='share-permission' className='dark:text-gray-300'>
                 权限设置 *
               </Label>
-              <Select value={sharePermission} onValueChange={setSharePermission}>
+              <Select 
+                value={sharePermission} 
+                onValueChange={(value) => setSharePermission(value as MemberPermissionEnum)}
+              >
                 <SelectTrigger className='dark:bg-gray-700 dark:border-gray-600'>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
-                  <SelectItem value='view'>
+                  <SelectItem value={MemberPermissionEnum.VIEW}>
                     <div className='flex items-center gap-2'>
                       <Eye className='w-4 h-4' />
                       <div>
@@ -831,7 +809,7 @@ export function ResourceSharing() {
                       </div>
                     </div>
                   </SelectItem>
-                  <SelectItem value='edit'>
+                  <SelectItem value={MemberPermissionEnum.EDIT}>
                     <div className='flex items-center gap-2'>
                       <Edit className='w-4 h-4' />
                       <div>
@@ -840,7 +818,7 @@ export function ResourceSharing() {
                       </div>
                     </div>
                   </SelectItem>
-                  <SelectItem value='manage'>
+                  <SelectItem value={MemberPermissionEnum.MANAGE}>
                     <div className='flex items-center gap-2'>
                       <Shield className='w-4 h-4' />
                       <div>
@@ -862,6 +840,8 @@ export function ResourceSharing() {
                 setTeamMembers(teamMembers.map(m => ({ ...m, selected: false })));
                 setSelectedResourceType('');
                 setSelectedResourceId('');
+                setShareType(SharedWithEnum.ALL);
+                setSharePermission(MemberPermissionEnum.VIEW);
               }}
               className='dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300'
             >

@@ -1,6 +1,6 @@
 import { ApiLocaleResult, PageQuery, AI } from '@xcan-angus/infra';
 import { GetResourceSharingListOrderByEnum, ResourceAccessCheckResult, ResourceInfoListSharePermissionResult, ResourceSharingCreateDto, ResourceSharingDetailResult, ResourceSharingListResult, ResourceSharingStatisticsResult, ResourceSharingToggleDto, ResourceSharingUpdateDto, } from './SharingTypes.ts';
-import http, { ContentType, HttpClient, RequestParams } from './HttpClient.ts';
+import httpClient, { ContentType, HttpClient, RequestParams } from './HttpClient.ts';
 import { MemberPermissionEnum, ResourceTypeEnum, SharedWithEnum, StatisticsPeriodEnum } from '@/enums/enums.ts';
 
 export class Sharing<SecurityDataType = unknown> {
@@ -212,4 +212,4 @@ export class Sharing<SecurityDataType = unknown> {
     });
 }
 
-export default new Sharing(http);
+export default new Sharing(httpClient);

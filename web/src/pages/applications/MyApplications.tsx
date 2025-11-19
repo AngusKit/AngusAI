@@ -17,7 +17,6 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { getEnumDescription } from '@/enums/utils';
 
 type ViewMode = 'grid' | 'list';
-type AppStatus = '草稿' | '已发布' | '已暂停';
 
 interface Tag {
   label: string;
@@ -34,7 +33,7 @@ interface Application {
   isStarred: boolean;
   tags: Tag[];
   visits: string;
-  category: string;
+  category: ApplicationCategoryEnum;
 }
 
 export function MyApplications({
@@ -59,39 +58,20 @@ export function MyApplications({
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
 
-  // 状态映射：API状态 -> 页面显示状态
-  const mapStatusToDisplay = (status?: ApplicationStatusEnum): string => {
-    return getEnumDescription(ApplicationStatusEnum, status || ApplicationStatusEnum.DRAFT);
-  };
-
-  // 状态映射：页面显示状态 -> API状态
-  const mapDisplayToStatus = (status: ApplicationStatusEnum): ApplicationStatusEnum => {
-    if (status === '已发布') return ApplicationStatusEnum.PUBLISHED;
-    if (status === '已暂停') return ApplicationStatusEnum.PAUSED;
-    return ApplicationStatusEnum.DRAFT;
-  };
-
-  // 分类映射：API分类 -> 页面分类
-  const mapCategoryToDisplay = (category?: ApplicationCategoryEnum): string => {
-    if (category === ApplicationCategoryEnum.CHATBOT) return 'chatbot';
-    if (category === ApplicationCategoryEnum.KNOWLEDGE_BASE) return 'knowledge';
-    if (category === ApplicationCategoryEnum.WORKFLOW) return 'text-generation';
-    return 'other';
-  };
 
   // 图标映射：根据分类或名称返回图标
   const getIconForApplication = (category?: ApplicationCategoryEnum, name?: string): any => {
     if (category === ApplicationCategoryEnum.CHATBOT) return MessageSquare;
-    if (category === ApplicationCategoryEnum.KNOWLEDGE_BASE) return Database;
-    if (category === ApplicationCategoryEnum.WORKFLOW) return Zap;
+    if (category === ApplicationCategoryEnum.KNOWLEDGE_QA) return Database;
+    if (category === ApplicationCategoryEnum.CONTENT_CREATION) return Zap;
     return Bot;
   };
 
   // 图标背景色映射
   const getIconBgColor = (category?: ApplicationCategoryEnum): string => {
     if (category === ApplicationCategoryEnum.CHATBOT) return 'bg-purple-500';
-    if (category === ApplicationCategoryEnum.KNOWLEDGE_BASE) return 'bg-green-500';
-    if (category === ApplicationCategoryEnum.WORKFLOW) return 'bg-yellow-500';
+    if (category === ApplicationCategoryEnum.KNOWLEDGE_QA) return 'bg-green-500';
+    if (category === ApplicationCategoryEnum.CONTENT_CREATION) return 'bg-yellow-500';
     return 'bg-blue-500';
   };
 
@@ -115,9 +95,9 @@ export function MyApplications({
       } else if (activeTab === 'chatbot') {
         queryParams.category = ApplicationCategoryEnum.CHATBOT;
       } else if (activeTab === 'text-generation') {
-        queryParams.category = ApplicationCategoryEnum.WORKFLOW;
+        queryParams.category = ApplicationCategoryEnum.CONTENT_CREATION;
       } else if (activeTab === 'knowledge') {
-        queryParams.category = ApplicationCategoryEnum.KNOWLEDGE_BASE;
+        queryParams.category = ApplicationCategoryEnum.KNOWLEDGE_QA;
       }
 
       const response = await Applications.getApplicationList(queryParams);
@@ -149,8 +129,8 @@ export function MyApplications({
           status: app.status,
           isStarred: false, // API中没有星标字段，默认为false
           tags: [], // API中没有标签字段，需要从其他地方获取或留空
-          visits: '0 次调用', // API中没有调用次数字段，需要从统计接口获取
-          category: mapCategoryToDisplay(app.category),
+          visits: `${app.apiCalls || 0} 次调用`, // API中没有调用次数字段，需要从统计接口获取
+          category: app.category,
         }));
 
         setApplications(mappedList);
@@ -190,13 +170,13 @@ export function MyApplications({
       return applications.filter(app => app.isStarred).length;
     }
     if (category === 'chatbot') {
-      return applications.filter(app => app.category === 'chatbot').length;
+      return applications.filter(app => app.category === ApplicationCategoryEnum.CHATBOT).length;
     }
     if (category === 'text-generation') {
-      return applications.filter(app => app.category === 'text-generation').length;
+      return applications.filter(app => app.category === ApplicationCategoryEnum.CONTENT_CREATION).length;
     }
     if (category === 'knowledge') {
-      return applications.filter(app => app.category === 'knowledge').length;
+      return applications.filter(app => app.category === ApplicationCategoryEnum.KNOWLEDGE_QA).length;
     }
     return 0;
   };
@@ -273,14 +253,7 @@ export function MyApplications({
       if (updatedData.name !== undefined) updateDto.name = updatedData.name;
       if (updatedData.description !== undefined) updateDto.description = updatedData.description;
       if (updatedData.category !== undefined) {
-        // 将页面分类映射回API分类
-        if (updatedData.category === 'chatbot') {
-          updateDto.category = ApplicationCategoryEnum.CHATBOT;
-        } else if (updatedData.category === 'knowledge') {
-          updateDto.category = ApplicationCategoryEnum.KNOWLEDGE_BASE;
-        } else if (updatedData.category === 'text-generation') {
-          updateDto.category = ApplicationCategoryEnum.WORKFLOW;
-        }
+        updateDto.category = updatedData.category;
       }
 
       await Applications.updateApplication(selectedApp.id, updateDto);
