@@ -14,9 +14,9 @@
   <name>AngusAI :: Service</name>
   <version>1.0.0</version>
   <packaging>pom</packaging>
-  <description>AngusAI (referred to as AT) helps software development teams conduct software
-    development and testing activities efficiently and sustainably, while meeting the requirements
-    of agile development and agile testing for clients.
+  <description>AngusAI is an open-source development platform for large language models (LLM) built
+    with Java and React. It allows developers to swiftly create production-level generative AI
+    applications.
   </description>
 
   <modules>
