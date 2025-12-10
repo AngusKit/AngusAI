@@ -94,7 +94,7 @@ public class DatasetDataCmdImpl extends CommCmd<DatasetData, Long> implements Da
         // 上传文件到文件存储服务
         List<FileUploadVo> uploadResult = fileRemote.upload(
             new MultipartFile[]{file}, null, DATASET_UPLOAD_BIZ_KEY,
-            null, false).orElseContentThrow();
+            null, null, false).orElseContentThrow();
 
         DatasetData data = toDatasetData(datasetId, file, uploadResult.get(0));
         insert(data);
