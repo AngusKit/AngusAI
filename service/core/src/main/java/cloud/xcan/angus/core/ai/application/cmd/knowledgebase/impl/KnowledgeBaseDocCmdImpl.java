@@ -80,7 +80,7 @@ public class KnowledgeBaseDocCmdImpl extends CommCmd<KnowledgeBaseDoc, Long> imp
         // 上传文件到文件存储服务
         List<FileUploadVo> uploadResult = fileRemote.upload(
             new MultipartFile[]{file}, null, KNOWLEDGE_DOC_UPLOAD_BIZ_KEY,
-            null).orElseContentThrow();
+            null, false).orElseContentThrow();
 
         KnowledgeBaseDoc doc = toUploadDomain(knowledgeBaseId, file, uploadResult.get(0));
         insert(doc);
