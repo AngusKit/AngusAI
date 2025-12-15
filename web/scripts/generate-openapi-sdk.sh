@@ -9,5 +9,5 @@ swagger-typescript-api generate  \
 --modular \
 --single-http-client \
 --module-name-index="2" \
---path="../docs/AngusGit-Apis-V1.json" \
+--path="../docs/AngusAI-Apis-V1.json" \
  --output="./temp/openapi-sdk"
