@@ -27,7 +27,7 @@ import { DatasetDataTypeEnum, DatasetTypeEnum, VisibilityEnum, DatasetDataStatus
 import { useLanguage } from '@/components/ui/LanguageProvider';
 import { getEnumDescription } from '@/enums/utils';
 import { ENABLED_STATUS_COLOR } from '@/utils/PagesUtils';
-import { FILE_MAX_SIZE_BYTES, FILE_MAX_SIZE_MB } from '@/utils/Constant';
+import { FILE_MAX_SIZE_BYTES, FILE_MAX_SIZE_MB } from '@/utils/Constants';
 import { SUPPORTED_FORMATS_LABEL, ALLOWED_FILE_EXTENSIONS } from './constants';
 
 interface DatasetItem {
