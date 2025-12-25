@@ -27,7 +27,7 @@ import { DatasetDataTypeEnum, DatasetTypeEnum, VisibilityEnum, DatasetDataStatus
 import { useLanguage } from '@/components/ui/LanguageProvider';
 import { getEnumDescription } from '@/enums/utils';
 import { ENABLED_STATUS_COLOR } from '@/utils/PagesUtils';
-import { FILE_MAX_SIZE_BYTES, FILE_MAX_SIZE_MB } from '@/utils/configConstant';
+import { FILE_MAX_SIZE_BYTES, FILE_MAX_SIZE_MB } from '@/utils/Constant';
 import { SUPPORTED_FORMATS_LABEL, ALLOWED_FILE_EXTENSIONS } from './constants';
 
 interface DatasetItem {
@@ -163,7 +163,7 @@ export function Dataset() {
       typeIcon: typeIconMap[typeEnum] || '📄',
       size: vo.dataSize || '0 MB',
       statusKey,
-      statusColor: 
+      statusColor:
         statusRaw === DatasetDataStatusEnum.COMPLETED
           ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
           : statusRaw === DatasetDataStatusEnum.PROCESSING
@@ -622,7 +622,7 @@ export function Dataset() {
 
   // 文件验证配置
   const fileValidationConfig: FileValidationConfig = {
-    maxSize: FILE_MAX_SIZE_BYTES, // 50MB 
+    maxSize: FILE_MAX_SIZE_BYTES, // 50MB
     allowedTypes: [
       'text/csv',
       'application/json',
