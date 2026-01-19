@@ -246,7 +246,6 @@ export function Dataset() {
 
   // 将DatasetListVo转换为DatasetItem
   const convertDatasetVoToItem = useCallback((vo: DatasetListVo): DatasetItem => {
-    debugger;
 
     const type = vo.type || DatasetTypeEnum.FILE;
     const typeLabelKey = type === DatasetTypeEnum.FILE ? t('dataset.types.file') : t('dataset.types.datasource');

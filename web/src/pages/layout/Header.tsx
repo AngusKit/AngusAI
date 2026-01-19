@@ -12,6 +12,7 @@ import { languages, Language } from '@/lib/i18n';
 import { toast } from 'sonner';
 import { copyToClipboard } from '@/lib/clipboard';
 import { MyContext } from '@/components/ui/utils';
+import { app } from '@xcan-angus/infra';
 
 export function Header() {
   const { language, setLanguage, t } = useLanguage();
@@ -183,8 +184,7 @@ export function Header() {
   };
 
   const handleLogout = () => {
-    toast.success('已退出登录');
-    setUserPopoverOpen(false);
+    app.signOut();
   };
 
   const handleNotificationClick = (id: number) => {
