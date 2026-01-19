@@ -155,18 +155,18 @@ export const enUS = {
     knowledge: 'Knowledge Base',
     dataset: 'Dataset',
     apiCollection: 'API Collection',
-    models: 'Model Management',
+    models: 'Model',
     vectorStore: 'Vector Store',
-    prompts: 'Prompt Library',
-    team: 'Team Collaboration',
-    members: 'Member Management',
-    sharing: 'Resource Sharing',
-    appSettings: 'App Settings',
+    prompts: 'Prompt',
+    team: 'Team',
+    members: 'Member',
+    sharing: 'Sharing',
+    appSettings: 'Settings',
     apiKeys: 'API Keys',
-    billing: 'Billing & Subscription',
-    teamSettings: 'Team Settings',
-    plugins: 'Plugin Market',
-    activityLog: 'Activity Log',
+    billing: 'Subscription',
+    teamSettings: 'Team',
+    plugins: 'Plugin',
+    activityLog: 'Activities',
   },
 
   // Welcome Banner
@@ -1252,7 +1252,7 @@ export const enUS = {
 
   // Usage Analytics
   analytics: {
-    title: 'Usage Analytics',
+    title: 'Analytics',
     subtitle: 'View detailed usage data and performance metrics',
     overview: 'Overview',
     apiCalls: 'API Calls',

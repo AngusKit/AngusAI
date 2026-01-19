@@ -147,7 +147,7 @@ export const zhCN = {
   // 侧边栏导航
   nav: {
     dashboard: '工作台',
-    chat: 'AI 对话',
+    chat: 'AI对话',
     applications: '应用',
     myApps: '我的应用',
     createApp: '创建应用',
@@ -155,18 +155,18 @@ export const zhCN = {
     knowledge: '知识库',
     dataset: '数据集',
     apiCollection: '接口集',
-    models: '模型管理',
-    vectorStore: '向量存储源',
-    prompts: '提示词库',
-    team: '团队协作',
-    members: '成员管理',
-    sharing: '资源共享',
+    models: '模型',
+    vectorStore: '向量源',
+    prompts: '提示词',
+    team: '团队',
+    members: '成员',
+    sharing: '共享',
     appSettings: '应用设置',
     apiKeys: 'API密钥',
-    billing: '计费订阅',
-    teamSettings: '团队设置',
-    plugins: '插件市场',
-    activityLog: '活动日志',
+    billing: '订阅',
+    teamSettings: '团队',
+    plugins: '插件',
+    activityLog: '活动',
   },
 
   // AI 对话
@@ -1253,7 +1253,7 @@ export const zhCN = {
 
   // 使用分析
   analytics: {
-    title: '使用分析',
+    title: '分析',
     subtitle: '查看详细的使用数据和性能指标',
     overview: '概览',
     apiCalls: 'API调用',
