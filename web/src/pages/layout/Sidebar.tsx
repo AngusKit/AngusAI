@@ -17,12 +17,26 @@ export function Sidebar({ activePage, onPageChange }: SidebarProps) {
   const accessApps = appContextInfo?.authApps || [];
   const currentEditionType = appContextInfo.accessApp?.editionType?.value;
 
+  const applicationIcons = {
+      AngusGit: '🚀',
+      AngusAI: '🤖',
+      chatbot: '💬',
+      analytics: '📊',
+      AngusTester: '🧪',
+      AngusGM: '🌍',
+  };
+
   const applications: AppInfo[] = accessApps.filter(app => {
     return (
       app.editionType?.value === currentEditionType &&
       (app.tags || [])?.some(tag => tag.name === WebTagValue.DISPLAY_ON_NAVIGATOR)
     );
-  });
+  })
+  .map(app => ({
+    ...app,
+    icon: applicationIcons[app.code as keyof typeof applicationIcons],
+    iconText: app.name?.split('Angus')[1]?.[0],
+  })) as AppInfo[];
 
   const currentApplication = appContextInfo?.accessApp;
 
@@ -106,13 +120,13 @@ export function Sidebar({ activePage, onPageChange }: SidebarProps) {
                   <DropdownMenuItem
                     key={app.code}
                     onClick={() => handleSelectApplication(app.url)}
-                    className={`flex items-center gap-3 px-2 py-2.5 cursor-pointer ${
-                      currentApplication.code === app.code ? 'bg-blue-50 dark:bg-blue-900/30' : ''
-                    }`}
+                    className={`flex items-center gap-3 py-2 `}
                   >
-                    <span className='text-2xl'>
-                      <SlidersVertical />
-                    </span>
+                    <div className='size-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0'>
+                      <span className='text-white font-semibold'>
+                        {app.iconText}
+                      </span>
+                    </div>
                     <div className='flex-1 min-w-0'>
                       <div className='flex items-center gap-2'>
                         <span className='text-sm dark:text-white'>{app.name}</span>
