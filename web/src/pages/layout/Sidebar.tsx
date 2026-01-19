@@ -153,13 +153,14 @@ export function Sidebar({ activePage, onPageChange }: SidebarProps) {
       <nav className='flex-1 overflow-y-auto hide-scrollbar'>
         <div className='px-2 py-2 space-y-1'>
           {mainMenuItems.map(item => (
-            <button
+            <Button
               key={item.id}
+              variant={activePage === item.id ? 'default' : 'ghost'}
               onClick={() => onPageChange(item.id)}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+              className={`w-full justify-start ${
                 activePage === item.id
-                  ? 'bg-blue-50 dark:bg-blue-900 text-blue-600 dark:text-blue-400'
-                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  ? 'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
+                  : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
               }`}
             >
               <item.icon className='w-4 h-4' />
@@ -169,52 +170,54 @@ export function Sidebar({ activePage, onPageChange }: SidebarProps) {
                   {item.badge}
                 </Badge>
               )}
-            </button>
+            </Button>
           ))}
         </div>
 
         {/* Team Section */}
-        <div className='mt-6 border-t border-gray-200 dark:border-gray-700 pt-4'>
+        <div className='border-gray-200 dark:border-gray-700 pt-4'>
           <div className='px-4 mb-2'>
             <span className='text-xs text-gray-500 dark:text-gray-400'>{t('nav.team')}</span>
           </div>
           <div className='px-2 space-y-1'>
             {teamMenuItems.map(item => (
-              <button
+              <Button
                 key={item.id}
+                variant={activePage === item.id ? 'default' : 'ghost'}
                 onClick={() => onPageChange(item.id)}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+                className={`w-full justify-start ${
                   activePage === item.id
-                    ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
-                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                    ? 'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
+                    : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
                 }`}
               >
                 <item.icon className='w-4 h-4' />
                 <span className='flex-1 text-left text-sm'>{item.label}</span>
-              </button>
+              </Button>
             ))}
           </div>
         </div>
 
         {/* Settings Section */}
-        <div className='mt-6 border-t border-gray-200 dark:border-gray-700 pt-4'>
+        <div className='border-gray-200 dark:border-gray-700 pt-4'>
           <div className='px-4 mb-2'>
             <span className='text-xs text-gray-500 dark:text-gray-400'>{t('common.actions.settings')}</span>
           </div>
           <div className='px-2 space-y-1'>
             {settingsMenuItems.map(item => (
-              <button
+              <Button
                 key={item.label}
+                variant={activePage === item.id ? 'default' : 'ghost'}
                 onClick={() => item.id && onPageChange(item.id)}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
-                  item.id && activePage === item.id
-                    ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
-                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                }`}
+                className={`w-full justify-start ${
+                activePage === item.id
+                  ? 'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
+                  : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
+              }`}
               >
                 <item.icon className='w-4 h-4' />
                 <span className='flex-1 text-left text-sm'>{item.label}</span>
-              </button>
+              </Button>
             ))}
           </div>
         </div>

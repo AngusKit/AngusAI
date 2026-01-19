@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { copyToClipboard } from '@/lib/clipboard';
 import { MyContext } from '@/components/ui/utils';
 import { app } from '@xcan-angus/infra';
+import { getGreeting, getFormattedDate } from '@/utils/FormatUtils';
 
 export function Header() {
   const { language, setLanguage, t } = useLanguage();
@@ -236,10 +237,22 @@ export function Header() {
     <header className='h-[57px] bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 flex items-center'>
       <div className='flex items-center justify-between w-full'>
         {/* Breadcrumb */}
-        <div className='flex items-center gap-2 text-sm'>
+        {/* <div className='flex items-center gap-2 text-sm'>
           <span className='text-gray-600 dark:text-gray-300'>工作台</span>
           <span className='text-gray-400 dark:text-gray-500'>/</span>
           <span className='text-gray-600 dark:text-gray-300'>欢迎回来，{userInfo.fullName}</span>
+        </div> */}
+        {/* Left Section - Greeting */}
+        <div className='flex items-center gap-3'>
+          <div className='flex items-center gap-2'>
+            <span className='text-gray-900 dark:text-white font-semibold'>
+              {getGreeting(language)}, {userInfo.fullName?.split(' ')[0]}
+            </span>
+            <span className='text-xl'>👋</span>
+            <span className='text-sm text-gray-500 dark:text-gray-400'>
+              {getFormattedDate(language)}
+            </span>
+          </div>
         </div>
 
         {/* Right Section */}
