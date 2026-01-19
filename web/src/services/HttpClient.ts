@@ -1,17 +1,51 @@
-import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, HeadersDefaults, ResponseType, AxiosError, InternalAxiosRequestConfig, } from 'axios';
-import axios from 'axios';
-import { routerUtils as RouterUtils, API_SERVER_ERROR_CODE, API_SUCCESS_CODE, ApiType, ApiLocaleResult, app, appContext, cookieUtils, DomainManager, eventQueue, httpUtils, LockUtils, REFRESH_TOKEN_AUTH_KEY, SYSTEM_ERROR_MESSAGE, typeUtils, IFRAME_ACCESS_TOKEN_NAME, IFRAME_EXPIRES_IN_NAME, IFRAME_REFRESH_TOKEN_NAME, IFRAME_REQUEST_AUTH_TIME_NAME, AppOrServiceRoute, DEFAULT_API_VERSION, TokenInfo, } from '@xcan-angus/infra';
+import axios, {
+  type AxiosError,
+  type AxiosInstance,
+  type AxiosRequestConfig,
+  type AxiosResponse,
+  type HeadersDefaults,
+  type InternalAxiosRequestConfig,
+  type ResponseType,
+} from 'axios';
+import {
+  API_SERVER_ERROR_CODE,
+  API_SUCCESS_CODE,
+  ApiLocaleResult,
+  ApiType,
+  app,
+  appContext,
+  AppOrServiceRoute,
+  cookieUtils,
+  DEFAULT_API_VERSION,
+  DomainManager,
+  eventQueue,
+  httpUtils,
+  IFRAME_ACCESS_TOKEN_NAME,
+  IFRAME_EXPIRES_IN_NAME,
+  IFRAME_REFRESH_TOKEN_NAME,
+  IFRAME_REQUEST_AUTH_TIME_NAME,
+  LockUtils,
+  REFRESH_TOKEN_AUTH_KEY,
+  routerUtils as RouterUtils,
+  SYSTEM_ERROR_MESSAGE,
+  TokenInfo,
+  typeUtils,
+} from '@xcan-angus/infra';
+import { HttpApiResult } from './HttpApiResult.ts';
 
-export type QueryParamsType = Record<string | number, any>;
+export type QueryParamsType = Record<string | number, unknown>;
 
 // File upload/download endpoint paths
-let filePaths: string[] = [
+const filePaths: string[] = [
   `/${ApiType.API}/${DEFAULT_API_VERSION}/file/upload`, // Upload file endpoint
   `/${ApiType.API}/${DEFAULT_API_VERSION}/file`, // Download file endpoint
   `/${ApiType.PUB_API}/${DEFAULT_API_VERSION}/file`, // Download file endpoint
 ];
 
-export interface FullRequestParams extends Omit<AxiosRequestConfig, 'data' | 'params' | 'url' | 'responseType'> {
+export interface FullRequestParams extends Omit<
+  AxiosRequestConfig,
+  'data' | 'params' | 'url' | 'responseType'
+> {
   /** set parameter to `true` for call `securityWorker` for this request */
   secure?: boolean;
   /** request path */
@@ -26,9 +60,15 @@ export interface FullRequestParams extends Omit<AxiosRequestConfig, 'data' | 'pa
   body?: unknown;
 }
 
-export type RequestParams = Omit<FullRequestParams, 'body' | 'method' | 'query' | 'path'>;
+export type RequestParams = Omit<
+  FullRequestParams,
+  'body' | 'method' | 'query' | 'path'
+>;
 
-export interface ApiConfig<SecurityDataType = unknown> extends Omit<AxiosRequestConfig, 'data' | 'cancelToken'> {
+export interface ApiConfig<SecurityDataType = unknown> extends Omit<
+  AxiosRequestConfig,
+  'data' | 'cancelToken'
+> {
   securityWorker?: (
     securityData: SecurityDataType | null
   ) => Promise<AxiosRequestConfig | void> | AxiosRequestConfig | void;
@@ -53,7 +93,12 @@ export class HttpClient<SecurityDataType = unknown> {
   private secure?: boolean;
   private format?: ResponseType;
 
-  constructor({ securityWorker, secure, format, ...axiosConfig }: ApiConfig<SecurityDataType> = {}) {
+  constructor({
+    securityWorker,
+    secure,
+    format,
+    ...axiosConfig
+  }: ApiConfig<SecurityDataType> = {}) {
     this.instance = axios.create({
       ...axiosConfig,
       baseURL: axiosConfig.baseURL || '{env}.xcan.cloud/ai',
@@ -66,7 +111,7 @@ export class HttpClient<SecurityDataType = unknown> {
 
   // Refresh token logic, updates cookies and iframe params if needed
   refreshToken = async () => {
-    let refreshToken = httpUtils.isInIframe()
+    const refreshToken = httpUtils.isInIframe()
       ? httpUtils.getParamsFromIframeUrl(IFRAME_ACCESS_TOKEN_NAME)
       : cookieUtils.get(REFRESH_TOKEN_AUTH_KEY);
 
@@ -75,19 +120,19 @@ export class HttpClient<SecurityDataType = unknown> {
       app.toSignIn(true);
     }
 
-    let url = RouterUtils.getRefreshTokenUrl();
-    let env = appContext.getContext().env;
-    let body = {
+    const url = RouterUtils.getRefreshTokenUrl();
+    const env = appContext.getContext().env;
+    const body = {
       refreshToken,
       clientId: env.oauthClientId,
       clientSecret: env.oauthClientSecret,
     };
 
     const response = await this.request({
-      url: url,
+      url,
       method: 'post',
       query: body,
-    } as any);
+    } as FullRequestParams);
 
     if (!response.data) {
       app.toSignIn(true);
@@ -96,24 +141,35 @@ export class HttpClient<SecurityDataType = unknown> {
 
     const _resData = (response as AxiosResponse).data?.data as ApiLocaleResult;
 
-    let tokenInfo: TokenInfo = {
+    const tokenInfo: TokenInfo = {
       request_auth_time: new Date().toISOString(),
       ..._resData,
-    } as any;
+    } as TokenInfo;
     cookieUtils.setTokenInfo(tokenInfo);
 
     if (httpUtils.isInIframe()) {
-      const _url = new URL(location.href);
-      _url.searchParams.set(IFRAME_ACCESS_TOKEN_NAME, tokenInfo.access_token as string);
-      _url.searchParams.set(IFRAME_REFRESH_TOKEN_NAME, tokenInfo.refresh_token as string);
+      const _url = new URL(window.location.href);
+      _url.searchParams.set(
+        IFRAME_ACCESS_TOKEN_NAME,
+        tokenInfo.access_token as string
+      );
+      _url.searchParams.set(
+        IFRAME_REFRESH_TOKEN_NAME,
+        tokenInfo.refresh_token as string
+      );
       _url.searchParams.set(IFRAME_EXPIRES_IN_NAME, tokenInfo.expires_in + '');
-      _url.searchParams.set(IFRAME_REQUEST_AUTH_TIME_NAME, tokenInfo.request_auth_time as string);
-      location.href = _url.href;
+      _url.searchParams.set(
+        IFRAME_REQUEST_AUTH_TIME_NAME,
+        tokenInfo.request_auth_time as string
+      );
+      window.location.href = _url.href;
     }
   };
 
   initInstanceUse = () => {
-    let domainManager: DomainManager = DomainManager.getInstance(appContext.getProfile());
+    const domainManager: DomainManager = DomainManager.getInstance(
+      appContext.getProfile()
+    );
     this.instance?.interceptors.request.use(
       async config => await this.requestInterceptor(config, domainManager),
       err => {
@@ -122,23 +178,36 @@ export class HttpClient<SecurityDataType = unknown> {
     );
 
     this.instance?.interceptors.response.use(
-      (response: AxiosResponse): Promise<AxiosResponse<ApiLocaleResult>> => this.responseInterceptor(response),
+      (response: AxiosResponse): AxiosResponse =>
+        this.responseInterceptor(response),
       (err: AxiosError) => this.responseErrorInterceptor(err)
     );
   };
-  requestInterceptor = async (config: InternalAxiosRequestConfig, domainManager: DomainManager) => {
+  requestInterceptor = async (
+    config: InternalAxiosRequestConfig,
+    domainManager: DomainManager
+  ) => {
     // Set language and device headers
     config.headers['Accept-Language'] = cookieUtils.getCurrentLanguage();
     config.headers['Vary'] = 'Accept-Language';
     config.headers['XC-Auth-Device-Id'] = await httpUtils.preloadVisitorId();
 
+    // Ensure config.url exists
+    if (!config.url) {
+      return config;
+    }
+
+    const url = config.url; // 保存 url 的引用，确保类型安全
+
     // Token logic for API endpoints
-    if (config.url.includes(ApiType.API)) {
+    if (url.includes(ApiType.API)) {
       if (appContext.isTokenExpiringOrExpired()) {
-        await lockUtils.executeWithLock('refreshToken', () => this.refreshToken());
+        await lockUtils.executeWithLock('refreshToken', () =>
+          this.refreshToken()
+        );
       }
 
-      let accessToken = httpUtils.isInIframe()
+      const accessToken = httpUtils.isInIframe()
         ? httpUtils.getParamsFromIframeUrl(IFRAME_ACCESS_TOKEN_NAME) || ''
         : cookieUtils.get('access_token');
       config.headers.Authorization = `Bearer ${accessToken}`;
@@ -146,24 +215,29 @@ export class HttpClient<SecurityDataType = unknown> {
 
     // Domain routing logic
     const isPrivateEdition = appContext.isPrivateEdition();
-    const hasDomainInUrl = /^(https?:|\/\/)/.test(config.url);
+    const hasDomainInUrl = /^(https?:|\/\/)/.test(url);
 
     if (!hasDomainInUrl) {
-      let isFile = filePaths.some(item => (config.url as string).includes(item));
-      const domain = isPrivateEdition || !isFile ? domainManager.getApiDomain() : domainManager.getFileApiDomain();
-      config.url = domain + config.url;
+      const isFile = filePaths.some(item => url.includes(item));
+      const domain =
+        isPrivateEdition || !isFile
+          ? domainManager.getApiDomain()
+          : domainManager.getFileApiDomain();
+      config.url = domain + url;
     }
 
     // Private edition: adjust URL based on route
     if (isPrivateEdition) {
-      const route: AppOrServiceRoute | null = RouterUtils.getRouteByUrl(config.url);
+      const route: AppOrServiceRoute | null = RouterUtils.getRouteByUrl(
+        config.url
+      );
       if (!route) {
         return config;
       }
 
-      const { pathname, origin, search } = new URL(config.url);
+      const { pathname, search } = new URL(config.url);
       let _origin: string;
-      let domainManager = DomainManager.getInstance(appContext.getProfile());
+      const domainManager = DomainManager.getInstance(appContext.getProfile());
       switch (route) {
         case AppOrServiceRoute.tester: {
           _origin = domainManager.getApiDomain(AppOrServiceRoute.tester);
@@ -173,15 +247,15 @@ export class HttpClient<SecurityDataType = unknown> {
           _origin = domainManager.getApiDomain(AppOrServiceRoute.gm);
         }
       }
-      let _pathname = pathname.replace('/' + route, '');
+      const _pathname = pathname.replace('/' + route, '');
       config.url = _origin + _pathname + search;
     }
     return config;
   };
 
   // Response interceptor: formats response and attaches filename if present
-  responseInterceptor = (response: AxiosResponse) => {
-    let filename = httpUtils.getFilenameFromResponse(response);
+  responseInterceptor = (response: AxiosResponse): AxiosResponse => {
+    const filename = httpUtils.getFilenameFromResponse(response);
     const headers = { ...response.headers, filename };
     const status = response.status;
     // TODO: If code != 'S', should show a prompt
@@ -198,34 +272,37 @@ export class HttpClient<SecurityDataType = unknown> {
     if (status === 401) {
       app.toSignIn(true);
     }
-    return {
+    // 将响应转换为 HttpApiResult 结构并存储在 response.data 中
+    const httpApiResult: HttpApiResult = {
       status,
       headers,
       code: API_SUCCESS_CODE,
       data: response?.data,
       ...(response?.data || {}),
     };
+    // 返回 AxiosResponse，但 data 字段包含 HttpApiResult 结构
+    return {
+      ...response,
+      data: httpApiResult,
+    };
   };
 
-  // Response error interceptor: formats error as ApiLocaleResult
-  responseErrorInterceptor = (err: AxiosError) => {
+  // Response error interceptor: formats error as HttpApiResult
+  responseErrorInterceptor = (err: AxiosError): never => {
     if (!err?.response) {
       throw {
-        status: err.status,
-        config: err.config,
+        status: err.status || 0,
+        headers: {},
         code: API_SERVER_ERROR_CODE,
         message: err.message,
-      } as ApiLocaleResult;
+      } as HttpApiResult;
     }
 
     const response = err.response;
     const data = response.data as ApiLocaleResult;
     const result =
       data && data.code
-        ? {
-            ...data,
-            message: data.message || data.msg,
-          }
+        ? data
         : {
             code: API_SERVER_ERROR_CODE,
             message: SYSTEM_ERROR_MESSAGE,
@@ -239,16 +316,42 @@ export class HttpClient<SecurityDataType = unknown> {
     throw {
       status: response.status,
       headers: response.headers,
-      config: response.config,
       ...result,
-    } as ApiLocaleResult;
+    } as HttpApiResult;
   };
 
   setSecurityData = (data: SecurityDataType | null) => {
     this.securityData = data;
   };
 
-  protected mergeRequestParams(params1: AxiosRequestConfig, params2?: AxiosRequestConfig): AxiosRequestConfig {
+  /**
+   * 检查响应结果，如果 code !== 'S'，抛出包含后端 message 的错误
+   *
+   * @param response HTTP API 响应结果
+   * @param defaultErrorMessage 默认错误信息（当 response.message 不存在时使用）
+   * @throws {Error} 如果 code !== 'S'，抛出包含后端 message 的错误
+   *
+   * @example
+   * ```ts
+   * const response = await httpClient.request(...);
+   * httpClient.checkResponseCode(response, '操作失败');
+   * // 如果 code !== 'S'，会抛出错误，错误信息优先使用 response.message
+   * ```
+   */
+  public checkResponseCode = <T = unknown>(
+    response: HttpApiResult<T>,
+    defaultErrorMessage: string
+  ): void => {
+    if (response.code !== API_SUCCESS_CODE) {
+      const errorMessage = response.message || defaultErrorMessage;
+      throw new Error(errorMessage);
+    }
+  };
+
+  protected mergeRequestParams(
+    params1: AxiosRequestConfig,
+    params2?: AxiosRequestConfig
+  ): AxiosRequestConfig {
     const method = params1.method || (params2 && params2.method);
 
     return {
@@ -256,11 +359,15 @@ export class HttpClient<SecurityDataType = unknown> {
       ...params1,
       ...(params2 || {}),
       headers: {
-        ...((method && this.instance.defaults.headers[method.toLowerCase() as keyof HeadersDefaults]) || {}),
+        ...((method &&
+          this.instance.defaults.headers[
+            method.toLowerCase() as keyof HeadersDefaults
+          ]) ||
+          {}),
         ...(params1.headers || {}),
         ...((params2 && params2.headers) || {}),
       },
-    } as any;
+    } as FullRequestParams;
   }
 
   protected stringifyFormItem(formItem: unknown) {
@@ -271,24 +378,30 @@ export class HttpClient<SecurityDataType = unknown> {
     }
   }
 
-  protected createFormData(input: Record<string, unknown>): FormData {
-    if (input instanceof FormData) {
+  protected createFormData(
+    input: Record<string, unknown>
+  ): globalThis.FormData {
+    if (input instanceof globalThis.FormData) {
       return input;
     }
     return Object.keys(input || {}).reduce((formData, key) => {
       const property = input[key];
-      const propertyContent: any[] = property instanceof Array ? property : [property];
+      const propertyContent: unknown[] =
+        property instanceof Array ? property : [property];
 
       for (const formItem of propertyContent) {
         const isFileType = formItem instanceof Blob || formItem instanceof File;
-        formData.append(key, isFileType ? formItem : this.stringifyFormItem(formItem));
+        formData.append(
+          key,
+          isFileType ? formItem : this.stringifyFormItem(formItem)
+        );
       }
 
       return formData;
-    }, new FormData());
+    }, new globalThis.FormData());
   }
 
-  public request = async <T = any, _E = any>({
+  public request = async <T = unknown>({
     secure,
     path,
     type,
@@ -296,7 +409,7 @@ export class HttpClient<SecurityDataType = unknown> {
     format,
     body,
     ...params
-  }: FullRequestParams): Promise<AxiosResponse<T>['data'] | { message?: string; data?: null }> => {
+  }: FullRequestParams): Promise<HttpApiResult<T>> => {
     const secureParams =
       ((typeof secure === 'boolean' ? secure : this.secure) &&
         this.securityWorker &&
@@ -312,28 +425,38 @@ export class HttpClient<SecurityDataType = unknown> {
     if (type === ContentType.Text && body && typeof body !== 'string') {
       body = JSON.stringify(body);
     }
-
+    const _params = query ? httpUtils.getURLSearchParams(query) : undefined;
     try {
-      return await this.instance.request({
+      const axiosResponse = await this.instance.request({
         ...requestParams,
         headers: {
           ...(requestParams.headers || {}),
           ...(type ? { 'Content-Type': type } : {}),
         },
-        params: query,
+        params: _params,
         responseType: responseFormat,
         data: body,
         url: path,
       } as any);
+      // 响应拦截器已经将 response.data 转换为 HttpApiResult 结构
+      return axiosResponse.data as HttpApiResult<T>;
     } catch (err) {
       if (requestParams.method !== 'get') {
-        eventQueue.commit('http_error', err?.message || SYSTEM_ERROR_MESSAGE);
+        eventQueue.commit(
+          'http_error',
+          (err as any)?.message || SYSTEM_ERROR_MESSAGE
+        );
         throw err;
       } else {
+        // GET 请求错误时，返回包含完整 HttpApiResult 结构的对象
+        const errorResult = err as HttpApiResult;
         return {
-          ...(err || {}),
+          status: errorResult?.status || 0,
+          headers: errorResult?.headers || {},
+          code: errorResult?.code || API_SERVER_ERROR_CODE,
+          message: errorResult?.message || SYSTEM_ERROR_MESSAGE,
           data: null,
-        };
+        } as HttpApiResult<T>;
       }
     }
   };
