@@ -163,10 +163,12 @@ export function Sidebar({ activePage, onPageChange }: SidebarProps) {
                   : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
               }`}
             >
-              <item.icon className='w-4 h-4' />
+              <item.icon className='w-4 h-4 mr-2' />
               <span className='flex-1 text-left text-sm'>{item.label}</span>
               {item.badge && (
-                <Badge variant='secondary' className='text-xs'>
+                <Badge
+                  variant={activePage === item.id ? 'secondary' : 'default'}
+                  className={`ml-2 ${activePage === item.id ? 'bg-blue-700 text-white' : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300'}`}>
                   {item.badge}
                 </Badge>
               )}
@@ -191,7 +193,7 @@ export function Sidebar({ activePage, onPageChange }: SidebarProps) {
                     : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
                 }`}
               >
-                <item.icon className='w-4 h-4' />
+                <item.icon className='w-4 h-4  mr-2' />
                 <span className='flex-1 text-left text-sm'>{item.label}</span>
               </Button>
             ))}
@@ -215,7 +217,7 @@ export function Sidebar({ activePage, onPageChange }: SidebarProps) {
                   : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
               }`}
               >
-                <item.icon className='w-4 h-4' />
+                <item.icon className='w-4 h-4 mr-2' />
                 <span className='flex-1 text-left text-sm'>{item.label}</span>
               </Button>
             ))}
