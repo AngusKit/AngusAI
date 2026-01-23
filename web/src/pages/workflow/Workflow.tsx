@@ -11,6 +11,7 @@ import { useLanguage } from '@/components/ui/LanguageProvider';
 import { toast } from 'sonner';
 import { CreateWorkflowDialog } from './CreateWorkflowDialog';
 import { WorkflowInfoDialog } from './WorkflowInfoDialog';
+import { useNavigate } from 'react-router-dom';
 
 interface WorkflowItem {
   id: number;
@@ -35,12 +36,9 @@ interface ActivityLog {
   createdTime: string;
 }
 
-interface WorkflowProps {
-  onDesignWorkflow: (workflow: { id: number; name: string; status: '运行中' | '已停止' }) => void;
-}
-
-export function Workflow({ onDesignWorkflow }: WorkflowProps) {
+export function Workflow() {
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortBy, setSort] = useState('default');
@@ -59,6 +57,10 @@ export function Workflow({ onDesignWorkflow }: WorkflowProps) {
   // 日志搜索和过滤状态
   const [logSearchQuery, setLogSearchQuery] = useState('');
   const [logWorkflowFilter, setLogWorkflowFilter] = useState('all');
+
+  const handleDesignWorkflow = (workflow: { id: number; name: string; status: '运行中' | '已停止' }) => {
+    navigate(`/workflow-design?workflowId=${workflow.id}&workflowName=${workflow.name}&workflowStatus=${workflow.status}`);
+  };
 
   // 统计数据
   const stats = [
@@ -470,7 +472,7 @@ export function Workflow({ onDesignWorkflow }: WorkflowProps) {
                           className='p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors'
                           onClick={e => {
                             e.stopPropagation();
-                            onDesignWorkflow({
+                            handleDesignWorkflow({
                               id: workflow.id,
                               name: workflow.name,
                               status: workflow.status,
@@ -661,7 +663,7 @@ export function Workflow({ onDesignWorkflow }: WorkflowProps) {
                                 className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
                                 onClick={e => {
                                   e.stopPropagation();
-                                  onDesignWorkflow({
+                                  handleDesignWorkflow({
                                     id: workflow.id,
                                     name: workflow.name,
                                     status: workflow.status,

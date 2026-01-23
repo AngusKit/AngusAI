@@ -14,6 +14,7 @@ import { Separator } from '@/components/ui/separator';
 import { Slider } from '@/components/ui/slider';
 import { toast } from 'sonner';
 import { copyToClipboard } from '../../lib/clipboard';
+import { useNavigate } from 'react-router-dom';
 
 interface KnowledgeBaseItem {
   id: number;
@@ -47,17 +48,14 @@ interface APIKey {
   status: 'active' | 'inactive';
 }
 
-interface AppSettingsPageProps {
-  appId?: number;
-  appName?: string;
-  onBack?: () => void;
-}
-
-export function AppSettingsPage({ appId, appName = '智能客服助手', onBack }: AppSettingsPageProps) {
+export function AppSettingsPage() {
   const { t } = useLanguage();
-
+  const navigate = useNavigate();
+  const handleBack = () => {
+    navigate('/apps');
+  };
   // 基本信息
-  const [name, setName] = useState(appName);
+  const [name, setName] = useState('智能客服助手');
   const [description, setDescription] = useState('基于AI的智能客服应用，提供24/7在线服务');
   const [category, setCategory] = useState('chatbot');
   const [language, setLanguage] = useState('zh-CN');
@@ -253,8 +251,8 @@ export function AppSettingsPage({ appId, appName = '智能客服助手', onBack 
       {/* Header with Back Button */}
       <div className='bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-800 rounded-xl p-6 border border-blue-100 dark:border-gray-700'>
         <div className='flex items-center gap-3 mb-2'>
-          {onBack && (
-            <Button variant='ghost' size='sm' onClick={onBack} className='dark:text-gray-300 dark:hover:bg-gray-700'>
+          {(
+            <Button variant='ghost' size='sm' onClick={handleBack} className='dark:text-gray-300 dark:hover:bg-gray-700'>
               <ArrowLeft className='w-4 h-4 mr-2' />
               返回
             </Button>

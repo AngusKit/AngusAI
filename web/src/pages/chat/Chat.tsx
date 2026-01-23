@@ -17,6 +17,7 @@ import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, } from '@/components/ui/dropdown-menu';
 import { cn } from '@/components/ui/utils';
+import { useNavigate } from 'react-router-dom';
 
 type TemplateType = 'modern-blue' | 'minimal-gray' | 'elegant-purple' | 'warm-orange';
 
@@ -45,13 +46,10 @@ interface Session {
   updatedAt: Date;
 }
 
-interface ChatProps {
-  onBack?: () => void;
-  content: string;
-}
 
-export function Chat({ onBack, content = '' }: ChatProps) {
+export function Chat() {
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const [sessions, setSessions] = useState<Session[]>([
     {
       id: '1',
@@ -64,7 +62,9 @@ export function Chat({ onBack, content = '' }: ChatProps) {
     },
   ]);
   const [currentSessionId, setCurrentSessionId] = useState('1');
-  const [input, setInput] = useState(content);
+  const defaultContent = sessionStorage.getItem('chatContent') || '';
+  const [input, setInput] = useState(defaultContent);
+  sessionStorage.removeItem('chatContent');
   const [isRecording, setIsRecording] = useState(false);
   const [attachments, setAttachments] = useState<File[]>([]);
   const [showPromptLibrary, setShowPromptLibrary] = useState(false);
@@ -76,6 +76,10 @@ export function Chat({ onBack, content = '' }: ChatProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleBack = () => {
+    navigate('/home');
+  };
 
   // Settings state
   const [settings, setSettings] = useState({
@@ -333,12 +337,12 @@ export function Chat({ onBack, content = '' }: ChatProps) {
         {/* Top Bar */}
         <div className='h-14 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 flex items-center justify-between'>
           <div className='flex items-center gap-3'>
-            {onBack && (
+            {(
               <>
                 <Button
                   variant='ghost'
                   size='icon'
-                  onClick={onBack}
+                  onClick={handleBack}
                   className='hover:bg-gray-100 dark:hover:bg-gray-700'
                 >
                   <ArrowLeft className='w-5 h-5' />

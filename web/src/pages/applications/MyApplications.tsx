@@ -15,6 +15,7 @@ import { ApplicationDetailVo } from '@/services/ApplicationsTypes';
 import { ApplicationStatusEnum, ApplicationCategoryEnum } from '@/enums/enums';
 import { useDebounce } from '@/hooks/useDebounce';
 import { getEnumDescription } from '@/enums/utils';
+import { useNavigate } from 'react-router-dom'; 
 
 type ViewMode = 'grid' | 'list';
 
@@ -36,14 +37,9 @@ interface Application {
   category: ApplicationCategoryEnum;
 }
 
-export function MyApplications({
-  onCreateNew,
-  onNavigate,
-}: {
-  onCreateNew?: () => void;
-  onNavigate?: (page: string) => void;
-}) {
+export function MyApplications() {
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -73,6 +69,10 @@ export function MyApplications({
     if (category === ApplicationCategoryEnum.KNOWLEDGE_QA) return 'bg-green-500';
     if (category === ApplicationCategoryEnum.CONTENT_CREATION) return 'bg-yellow-500';
     return 'bg-blue-500';
+  };
+
+  const handleNavigate = (page: string) => {
+    navigate(`/${page}`);
   };
 
   // 加载应用列表
@@ -241,7 +241,7 @@ export function MyApplications({
 
   const handleSettings = (app: Application) => {
     setSelectedApp(app);
-    onNavigate?.('individual-app-settings');
+    handleNavigate('individual-app-settings');
   };
 
   const handleSaveEdit = async (updatedData: Partial<Application>) => {
@@ -493,7 +493,7 @@ export function MyApplications({
             </button>
           </div>
 
-          <Button size='sm' className='bg-blue-500 hover:bg-blue-600 text-white' onClick={onCreateNew}>
+          <Button size='sm' className='bg-blue-500 hover:bg-blue-600 text-white' onClick={() => handleNavigate('create-app')}>
             <Plus className='w-4 h-4 mr-2' />
             新建应用
           </Button>
@@ -565,7 +565,7 @@ export function MyApplications({
                         variant='outline'
                         onClick={e => {
                           e.stopPropagation();
-                          onNavigate?.('chat');
+                          handleNavigate('chat');
                           toast.success(`正在打开 ${app.name} 对话...`);
                         }}
                         className='gap-2 h-8'
@@ -838,7 +838,7 @@ export function MyApplications({
                     variant='outline'
                     onClick={e => {
                       e.stopPropagation();
-                      onNavigate?.('chat');
+                      handleNavigate('chat');
                       toast.success(`正在打开 ${app.name} 对话...`);
                     }}
                     className='gap-2 h-8'
@@ -911,7 +911,7 @@ export function MyApplications({
             {searchQuery ? `没有找到包含"${searchQuery}"的应用` : '开始创建您的第一个AI应用'}
           </p>
           {!searchQuery && (
-            <Button className='bg-blue-500 hover:bg-blue-600 text-white' onClick={onCreateNew}>
+            <Button className='bg-blue-500 hover:bg-blue-600 text-white' onClick={() => handleNavigate('create-app')}>
               <Plus className='w-4 h-4 mr-2' />
               创建应用
             </Button>

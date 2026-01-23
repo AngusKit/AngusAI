@@ -21,6 +21,7 @@ import { Prompt, Category } from './types';
 import { ICON_MAP, SYSTEM_CATEGORY_IDS, LIMITS } from './constants';
 import { getTagColorByIndex, buildCategoryTree, getCategoryPath, getTopLevelCategories, getChildCategories, getDefaultCategoryId, } from './utils';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useNavigate } from 'react-router-dom';
 
 // 递归渲染分类树组件（支持多级分组）
 interface CategoryItemProps {
@@ -138,8 +139,9 @@ function CategoryItem({
   );
 }
 
-export function PromptLibraryPage({ goChat }: { goChat: (value: string) => void }) {
+export function PromptLibraryPage() {
   const { t, language } = useLanguage();
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearchQuery = useDebounce(searchQuery, LIMITS.SEARCH_DEBOUNCE_MS);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>(SYSTEM_CATEGORY_IDS.ALL);
@@ -164,7 +166,6 @@ export function PromptLibraryPage({ goChat }: { goChat: (value: string) => void 
   const [isLoadingCategories, setIsLoadingCategories] = useState(false);
   const [favoriteCount, setFavoriteCount] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
-
   const [pageParam, setPageParam] = useState({
     pageSize: 10,
     pageNo: 1,
@@ -182,6 +183,11 @@ export function PromptLibraryPage({ goChat }: { goChat: (value: string) => void 
   const [deletingPrompt, setDeletingPrompt] = useState<Prompt | null>(null);
   const [deletingCategory, setDeletingCategory] = useState<Category | null>(null);
   const [viewingPrompt, setViewingPrompt] = useState<Prompt | null>(null);
+
+  const goChat = (content: string) => {
+    sessionStorage.setItem('chatContent', content);
+    navigate('/chat');
+  };
 
   const formatUsageCount = useCallback(
     (count: number) => {

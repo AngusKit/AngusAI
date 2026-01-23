@@ -12,6 +12,7 @@ import { Separator } from '@/components/ui/separator';
 import { useState } from 'react';
 import { useLanguage } from '@/components/ui/LanguageProvider';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
 type AppType = 'chatbot' | 'text-generation' | 'knowledge' | 'agent';
 type ModelType =
@@ -147,7 +148,8 @@ function StepIndicator({ currentStep, steps }: StepIndicatorProps) {
   );
 }
 
-export function CreateApplication({ onBack }: { onBack: () => void }) {
+export function CreateApplication() {
+  const navigate = useNavigate();
   const { t } = useLanguage();
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedType, setSelectedType] = useState<AppType | null>(null);
@@ -167,6 +169,10 @@ export function CreateApplication({ onBack }: { onBack: () => void }) {
   const [selectedDataset, setSelectedDataset] = useState<number | null>(null);
   const [selectedWorkflow, setSelectedWorkflow] = useState<number | null>(null);
   const [selectedAPICollection, setSelectedAPICollection] = useState<number | null>(null);
+
+  const onBack = () => {
+    navigate('/apps');
+  };
 
   const steps = [
     {

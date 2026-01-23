@@ -1,20 +1,22 @@
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { WorkflowEditor } from './WorkflowEditor';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
-interface WorkflowDesignPageProps {
-  workflowId: number;
-  workflowName: string;
-  workflowStatus: '运行中' | '已停止';
-  onBack: () => void;
-}
-
-export function WorkflowDesignPage({ workflowId, workflowName, workflowStatus, onBack }: WorkflowDesignPageProps) {
+export function WorkflowDesignPage() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const workflowId = searchParams.get('workflowId');
+  const workflowName = searchParams.get('workflowName');
+  const workflowStatus = searchParams.get('workflowStatus');
+  const handleBack = () => {
+    navigate('/workflow');
+  };
   return (
     <div className='h-full flex flex-col'>
       {/* Header with Back Button */}
       <div className='flex items-center gap-4 mb-6'>
-        <Button variant='ghost' size='sm' onClick={onBack} className='dark:text-gray-300 dark:hover:bg-gray-800'>
+        <Button variant='ghost' size='sm' onClick={handleBack} className='dark:text-gray-300 dark:hover:bg-gray-800'>
           <ArrowLeft className='w-4 h-4 mr-2' />
           返回工作流列表
         </Button>
@@ -27,10 +29,10 @@ export function WorkflowDesignPage({ workflowId, workflowName, workflowStatus, o
       {/* Workflow Editor - Full Height */}
       <div className='flex-1 overflow-hidden'>
         <WorkflowEditor
-          workflowId={workflowId}
-          workflowName={workflowName}
-          workflowStatus={workflowStatus}
-          onClose={onBack}
+          workflowId={workflowId || ''}
+          workflowName={workflowName || ''}
+          workflowStatus={workflowStatus || ''}
+          onClose={handleBack}
         />
       </div>
     </div>

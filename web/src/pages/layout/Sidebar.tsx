@@ -5,18 +5,16 @@ import { AngusAILogo } from './AngusAILogo';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from '@/components/ui/dropdown-menu';
 import { useLanguage } from '@/components/ui/LanguageProvider';
 import { appContext, WebTagValue, AppInfo } from '@xcan-angus/infra';
+import { useNavigate, useLocation } from 'react-router-dom';
 
-interface SidebarProps {
-  activePage: string;
-  onPageChange: (page: string) => void;
-}
 
-export function Sidebar({ activePage, onPageChange }: SidebarProps) {
+export function Sidebar() {
   const { t } = useLanguage();
   const appContextInfo = appContext.getContext();
   const accessApps = appContextInfo?.authApps || [];
   const currentEditionType = appContextInfo.accessApp?.editionType?.value;
-
+  const navigate = useNavigate();
+  const location = useLocation();
   const applicationIcons = {
       AngusGit: '🚀',
       AngusAI: '🤖',
@@ -24,6 +22,10 @@ export function Sidebar({ activePage, onPageChange }: SidebarProps) {
       analytics: '📊',
       AngusTester: '🧪',
       AngusGM: '🌍',
+  };
+
+  const handlePageChange = (page: string) => {
+    navigate(`/${page}`);
   };
 
   const applications: AppInfo[] = accessApps.filter(app => {
@@ -144,7 +146,7 @@ export function Sidebar({ activePage, onPageChange }: SidebarProps) {
 
       {/* Create Button */}
       <div className='p-4'>
-        <Button className='w-full bg-blue-500 hover:bg-blue-600' onClick={() => onPageChange('create-app')}>
+        <Button className='w-full bg-blue-500 hover:bg-blue-600' onClick={() => handlePageChange('create-app')}>
           + {t('quickActions.createApp')}
         </Button>
       </div>
@@ -152,28 +154,29 @@ export function Sidebar({ activePage, onPageChange }: SidebarProps) {
       {/* Main Menu */}
       <nav className='flex-1 overflow-y-auto hide-scrollbar'>
         <div className='px-2 py-2 space-y-1'>
-          {mainMenuItems.map(item => (
-            <Button
+          {mainMenuItems.map(item => {
+            const isActive = location.pathname === `/${item.id}`;
+            return <Button
               key={item.id}
-              variant={activePage === item.id ? 'default' : 'ghost'}
-              onClick={() => onPageChange(item.id)}
+              variant={isActive ? 'default' : 'ghost'}
               className={`w-full justify-start ${
-                activePage === item.id
+                isActive
                   ? 'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
                   : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
               }`}
+              onClick={() => handlePageChange(item.id)}
             >
               <item.icon className='w-4 h-4 mr-2' />
               <span className='flex-1 text-left text-sm'>{item.label}</span>
               {item.badge && (
                 <Badge
-                  variant={activePage === item.id ? 'secondary' : 'default'}
-                  className={`ml-2 ${activePage === item.id ? 'bg-blue-700 text-white' : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300'}`}>
+                  variant={isActive ? 'secondary' : 'default'}
+                  className={`ml-2 ${isActive ? 'bg-blue-700 text-white' : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300'}`}>
                   {item.badge}
                 </Badge>
               )}
             </Button>
-          ))}
+          })}
         </div>
 
         {/* Team Section */}
@@ -182,13 +185,14 @@ export function Sidebar({ activePage, onPageChange }: SidebarProps) {
             <span className='text-xs text-gray-500 dark:text-gray-400'>{t('nav.team')}</span>
           </div>
           <div className='px-2 space-y-1'>
-            {teamMenuItems.map(item => (
-              <Button
+            {teamMenuItems.map(item => {
+              const isActive = location.pathname === `/${item.id}`;
+              return <Button
                 key={item.id}
-                variant={activePage === item.id ? 'default' : 'ghost'}
-                onClick={() => onPageChange(item.id)}
+                variant={isActive ? 'default' : 'ghost'}
+                onClick={() => handlePageChange(item.id)}
                 className={`w-full justify-start ${
-                  activePage === item.id
+                  isActive
                     ? 'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
                     : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
                 }`}
@@ -196,7 +200,7 @@ export function Sidebar({ activePage, onPageChange }: SidebarProps) {
                 <item.icon className='w-4 h-4  mr-2' />
                 <span className='flex-1 text-left text-sm'>{item.label}</span>
               </Button>
-            ))}
+            })}
           </div>
         </div>
 
@@ -206,13 +210,13 @@ export function Sidebar({ activePage, onPageChange }: SidebarProps) {
             <span className='text-xs text-gray-500 dark:text-gray-400'>{t('common.actions.settings')}</span>
           </div>
           <div className='px-2 space-y-1'>
-            {settingsMenuItems.map(item => (
-              <Button
-                key={item.label}
-                variant={activePage === item.id ? 'default' : 'ghost'}
-                onClick={() => item.id && onPageChange(item.id)}
+            {settingsMenuItems.map(item => {
+              const isActive = location.pathname === `/${item.id}`; return <Button
+                key={item.id}
+                variant={isActive ? 'default' : 'ghost'}
+                onClick={() => item.id && handlePageChange(item.id)}
                 className={`w-full justify-start ${
-                activePage === item.id
+                  isActive
                   ? 'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
                   : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
               }`}
@@ -220,7 +224,7 @@ export function Sidebar({ activePage, onPageChange }: SidebarProps) {
                 <item.icon className='w-4 h-4 mr-2' />
                 <span className='flex-1 text-left text-sm'>{item.label}</span>
               </Button>
-            ))}
+            })}
           </div>
         </div>
       </nav>

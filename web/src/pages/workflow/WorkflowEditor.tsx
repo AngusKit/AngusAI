@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 
 interface WorkflowEditorProps {
-  workflowId: number;
+  workflowId: string;
   workflowName: string;
   workflowStatus: string;
   onClose: () => void;
