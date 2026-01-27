@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, } from '@/components/ui/pagination';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, XcanPagination } from '@/components/ui/pagination';
 import { toast } from 'sonner';
 
 interface TeamMember {
@@ -596,37 +596,12 @@ export function TeamMembers() {
             {/* Members Pagination */}
             {shouldShowPagination && (
               <div className='flex items-center justify-center px-6 py-4 border-t border-gray-200 dark:border-gray-700'>
-                <Pagination>
-                  <PaginationContent>
-                    <PaginationItem>
-                      <PaginationPrevious
-                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                        className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                      >
-                        上一页
-                      </PaginationPrevious>
-                    </PaginationItem>
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                      <PaginationItem key={page}>
-                        <PaginationLink
-                          onClick={() => setCurrentPage(page)}
-                          isActive={currentPage === page}
-                          className='cursor-pointer'
-                        >
-                          {page}
-                        </PaginationLink>
-                      </PaginationItem>
-                    ))}
-                    <PaginationItem>
-                      <PaginationNext
-                        onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                        className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                      >
-                        下一页
-                      </PaginationNext>
-                    </PaginationItem>
-                  </PaginationContent>
-                </Pagination>
+                <XcanPagination 
+                  pageSize={itemsPerPage}
+                  pageNo={currentPage}
+                  total={filteredMembers.length}
+                  onChange={({pageNo}) => setCurrentPage(pageNo)}
+                />
               </div>
             )}
           </Card>

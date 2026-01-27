@@ -119,6 +119,41 @@ function XcanPagination(props: XcanPage) {
     });
   };
 
+  const renderPageNumbers = () => {
+    let numbers = [];
+    let showleftEllipsis = false;
+    let showrightEllipsis = false;
+    if (totalPages <= 6) {
+      numbers = Array.from({ length: totalPages -1  }, (_, i) => i + 2);
+    } else {
+      if (currentPage <= 4) {
+        numbers = Array.from({ length: 4 }, (_, i) => i + 2);
+        showrightEllipsis = true;
+      } else if (currentPage >= totalPages - 3) {
+        numbers = Array.from({ length: 4 }, (_, i) => totalPages + i - 4);
+        showleftEllipsis = true;
+      } else {
+        numbers = Array.from({ length: 5 }, (_, i) => currentPage - 2 + i);
+        showleftEllipsis = true;
+        showrightEllipsis = true;
+      }
+    }
+
+    return (
+      <>
+        {showleftEllipsis && <PaginationEllipsis />}
+        {numbers.map(page => (
+          <PaginationItem key={page}>
+            <PaginationLink onClick={() => handlePageChange(page)} isActive={currentPage === page} className='cursor-pointer'>
+              {page}
+            </PaginationLink>
+          </PaginationItem>
+        ))}
+        {showrightEllipsis && <PaginationEllipsis />}
+      </>
+    );
+  };
+
   return (
     <Pagination>
       <PaginationContent>
@@ -130,7 +165,36 @@ function XcanPagination(props: XcanPage) {
             上一页
           </PaginationPrevious>
         </PaginationItem>
-        {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+        {
+          totalPages > 1 && (
+            <PaginationItem key={1}>
+              <PaginationLink
+                onClick={() => handlePageChange(1)}
+                isActive={currentPage === 1}
+                className='cursor-pointer'
+              >
+                {1}
+              </PaginationLink>
+            </PaginationItem>
+          )
+        }
+        {
+          renderPageNumbers()
+        }
+        {
+          totalPages > 6 && (
+            <PaginationItem key={totalPages}>
+              <PaginationLink
+                onClick={() => handlePageChange(totalPages)}
+                isActive={currentPage === totalPages}
+                className='cursor-pointer'
+              >
+                {totalPages}
+              </PaginationLink>
+            </PaginationItem>
+          )
+        }
+        {/* {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
           <PaginationItem key={page}>
             <PaginationLink
               onClick={() => handlePageChange(page)}
@@ -140,7 +204,7 @@ function XcanPagination(props: XcanPage) {
               {page}
             </PaginationLink>
           </PaginationItem>
-        ))}
+        ))} */}
         <PaginationItem>
           <PaginationNext
             onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
