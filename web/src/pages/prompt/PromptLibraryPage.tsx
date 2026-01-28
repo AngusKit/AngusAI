@@ -67,7 +67,7 @@ function CategoryItem({
           isSelected ? 'bg-blue-50 dark:bg-blue-900/20' : 'hover:bg-gray-100 dark:hover:bg-gray-750'
         )}
       >
-        <button onClick={() => onSelect(category.id)} className='flex items-center gap-2 text-left min-w-0'>
+        <button onClick={() => onSelect(category.id)} className='flex items-center gap-2 text-left min-w-0 flex-1'>
           <Icon className={cn('w-4 h-4 shrink-0', category.color, isSelected && 'text-blue-600 dark:text-blue-400')} />
           <span
             className={cn(

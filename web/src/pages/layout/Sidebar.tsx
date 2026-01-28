@@ -145,11 +145,11 @@ export function Sidebar() {
       </div>
 
       {/* Create Button */}
-      <div className='p-4'>
+      {/* <div className='p-4'>
         <Button className='w-full bg-blue-500 hover:bg-blue-600' onClick={() => handlePageChange('create-app')}>
           + {t('quickActions.createApp')}
         </Button>
-      </div>
+      </div> */}
 
       {/* Main Menu */}
       <nav className='flex-1 overflow-y-auto hide-scrollbar'>
