@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "团队设置", description = "团队配置信息维护")
+@Tag(name = "TeamSettings", description = "团队配置信息维护")
 @Validated
 @RestController
 @RequestMapping("/api/v1/team/settings")

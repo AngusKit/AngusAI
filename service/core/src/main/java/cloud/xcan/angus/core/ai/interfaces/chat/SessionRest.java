@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "对话会话", description = "对话会话管理 - 会话创建、更新、删除、切换等功能")
+@Tag(name = "ChatSessions", description = "对话会话管理 - 会话创建、更新、删除、切换等功能")
 @Validated
 @RestController
 @RequestMapping("/api/v1/chat/sessions")

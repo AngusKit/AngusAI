@@ -18,7 +18,6 @@ import static cloud.xcan.angus.core.spring.env.ConfigurableApplicationAndEnvLoad
 import static cloud.xcan.angus.core.spring.env.ConfigurableApplicationAndEnvLoader.getProductInfo;
 import static cloud.xcan.angus.core.spring.env.ConfigurableApplicationAndEnvLoader.getTesterApisUrlPrefix;
 import static cloud.xcan.angus.core.spring.env.ConfigurableApplicationAndEnvLoader.getTesterWebsite;
-import static cloud.xcan.angus.core.spring.env.ConfigurableApplicationAndEnvLoader.localDCaches;
 import static cloud.xcan.angus.core.spring.env.EnvHelper.getBoolean;
 import static cloud.xcan.angus.core.spring.env.EnvHelper.getEnum;
 import static cloud.xcan.angus.core.spring.env.EnvHelper.getInt;
@@ -186,16 +185,15 @@ public class ConfigurableAIApplication implements ConfigurableApplication {
 
   private void installApplication() throws Exception {
     // Configure all license info
-    Pair<String, DCache> mainAppDCache = localDCaches.getOrDefault(AI_SERVICE, new Pair<>());
-    Long tenantId = getFinalTenantId(mainAppDCache.value);
+    Long tenantId = getFinalTenantId(null);
 
-    addEnvForInstallSql(mainAppDCache.getValue());
+    addEnvForInstallSql(null);
 
     initDatabaseAndRedis();
 
     initDatabase();
 
-    modifyApplicationConfiguration(tenantId, mainAppDCache);
+    modifyApplicationConfiguration(tenantId, null);
 
     removeInstalledApplication();
   }
@@ -253,18 +251,18 @@ public class ConfigurableAIApplication implements ConfigurableApplication {
     }
   }
 
-  private void modifyApplicationConfiguration(Long tenantId, Pair<String, DCache> mainAppDCache)
+  private void modifyApplicationConfiguration(Long tenantId, Object mainAppDCache)
       throws Exception {
     // Configure the openapi2p client of store
     // saveStoreClient(dCache, gmDbConn);
 
-    saveLicense(localDCaches);
+    saveLicense(null);
 
     // Configure the installation info of main application.
-    saveMainApplicationInstallation(tenantId, mainAppDCache.getKey(), mainAppDCache.getValue());
+    saveMainApplicationInstallation(tenantId, /*mainAppDCache.getKey(), mainAppDCache.getValue()*/ null, null);
 
     // Configure the open info of AngusGM
-    saveApplicationOpen(tenantId, mainAppDCache.getValue());
+    saveApplicationOpen(tenantId,/* mainAppDCache.getValue()*/ null);
 
     // Configure the main node
     Long nodeId = saveMainNode(tenantId, getInstallTesterHost());
@@ -535,8 +533,8 @@ public class ConfigurableAIApplication implements ConfigurableApplication {
   }
 
   private void addEnvForInstallSql(DCache mainDCache) {
-    envs.put(TENANT_ID, getFinalTenantId(mainDCache).toString());
-    envs.put(TENANT_NAME, getFinalTenantName(mainDCache));
+    envs.put(TENANT_ID, getFinalTenantId(null).toString());
+    envs.put(TENANT_NAME, getFinalTenantName(null));
 
     //envs.put(GM_APP_OPEN_DATE, formatByDateTimePattern(new Date()));
     //envs.put(GM_APP_EXPIRATION_DATE, formatByDateTimePattern(getMaxFreeOpenDate()));
