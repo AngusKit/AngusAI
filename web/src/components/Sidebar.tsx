@@ -66,7 +66,7 @@ export function Sidebar({ activePage, onPageChange, collapsed = false }: Sidebar
             }`}
           />
         )}
-        <span>{item.label}</span>
+        <span className='flex-1 text-left'>{item.label}</span>
         {item.badge && (
           <Badge
             variant={activePage === item.id ? 'secondary' : 'default'}
