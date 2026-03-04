@@ -7,7 +7,7 @@ import static java.util.Objects.nonNull;
 import cloud.xcan.angus.core.ai.application.cmd.chat.SessionCmd;
 import cloud.xcan.angus.core.ai.application.query.application.ApplicationQuery;
 import cloud.xcan.angus.core.ai.application.query.chat.SessionQuery;
-import cloud.xcan.angus.core.ai.domain.application.Application;
+import cloud.xcan.angus.core.ai.domain.application.AIApplication;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationConfig;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRepo;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRole;
@@ -46,7 +46,7 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
   @Transactional
   public Session create(Session session) {
     return new BizTemplate<Session>() {
-      Application application;
+      AIApplication application;
       Model currentModel;
 
       @Override
@@ -120,7 +120,7 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
   public void switchApp(Long id, Long appId) {
     new BizTemplate<Void>() {
       Session session;
-      Application application;
+      AIApplication application;
 
       @Override
       protected void checkParams() {

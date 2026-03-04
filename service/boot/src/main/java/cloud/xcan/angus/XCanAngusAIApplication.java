@@ -9,7 +9,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 @EnableFeignClients(basePackages = {
     "cloud.xcan.angus.api",
-    "cloud.xcan.angus.security"
+    "cloud.xcan.angus.security",
+    "cloud.xcan.angus.core.event.remote"
 })
 @EnableDiscoveryClient
 @SpringBootApplication

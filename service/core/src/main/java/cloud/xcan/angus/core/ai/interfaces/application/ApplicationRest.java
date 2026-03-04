@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "Application", description = "应用管理 - 应用的创建、编辑、删除、配置、发布等功能")
+@Tag(name = "AIApplication", description = "应用管理 - 应用的创建、编辑、删除、配置、发布等功能")
 @Validated
 @RestController
 @RequestMapping("/api/v1/applications")

@@ -21,7 +21,7 @@ if [ -f "$APP_PID" ]; then
         if [ $? -gt 0 ]; then
             echo "PID file found but no matching process was found."
         else
-            PID=`cat "$APP_PID"` # Application process exists
+            PID=`cat "$APP_PID"` # AIApplication process exists
             rm -f "$APP_PID" >/dev/null 2>&1
         fi
     else

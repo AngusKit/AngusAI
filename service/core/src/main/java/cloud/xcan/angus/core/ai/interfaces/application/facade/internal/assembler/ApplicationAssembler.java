@@ -1,6 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.application.facade.internal.assembler;
 
-import cloud.xcan.angus.core.ai.domain.application.Application;
+import cloud.xcan.angus.core.ai.domain.application.AIApplication;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.dto.ApplicationCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.dto.ApplicationFindDto;
@@ -21,8 +21,8 @@ import java.util.Set;
 
 public class ApplicationAssembler {
 
-  public static Application toCreateDomain(ApplicationCreateDto dto) {
-    Application application = new Application()
+  public static AIApplication toCreateDomain(ApplicationCreateDto dto) {
+    AIApplication application = new AIApplication()
         .setName(dto.getName())
         .setIcon(dto.getIcon())
         .setDescription(dto.getDescription())
@@ -41,8 +41,8 @@ public class ApplicationAssembler {
     return application;
   }
 
-  public static Application toUpdateDomain(Long id, ApplicationUpdateDto dto) {
-    Application application = new Application();
+  public static AIApplication toUpdateDomain(Long id, ApplicationUpdateDto dto) {
+    AIApplication application = new AIApplication();
     application.setId(id);
     application.setName(dto.getName());
     application.setIcon(dto.getIcon());
@@ -52,8 +52,8 @@ public class ApplicationAssembler {
     return application;
   }
 
-  public static Application shareDomain(Long id, ApplicationShareDto dto) {
-    Application application = new Application();
+  public static AIApplication shareDomain(Long id, ApplicationShareDto dto) {
+    AIApplication application = new AIApplication();
     application.setId(id);
     application.setSharePublicAccess(dto.isPublicAccess());
     application.setShareAnonymousAccess(dto.isAnonymousAccess());
@@ -65,7 +65,7 @@ public class ApplicationAssembler {
     return application;
   }
 
-  public static ApplicationDetailVo toDetailVo(Application application,
+  public static ApplicationDetailVo toDetailVo(AIApplication application,
       ResourcesConfigVo resourcesConfigVo) {
     ApplicationDetailVo vo = new ApplicationDetailVo();
     vo.setId(application.getId());
@@ -103,7 +103,7 @@ public class ApplicationAssembler {
     return vo;
   }
 
-  public static ApplicationListVo toListVo(Application application) {
+  public static ApplicationListVo toListVo(AIApplication application) {
     ApplicationListVo vo = new ApplicationListVo();
     vo.setId(application.getId());
     vo.setName(application.getName());
@@ -126,7 +126,7 @@ public class ApplicationAssembler {
     return vo;
   }
 
-  public static GenericSpecification<Application> getSpecification(ApplicationFindDto dto) {
+  public static GenericSpecification<AIApplication> getSpecification(ApplicationFindDto dto) {
     // Build the final filters
     Set<SearchCriteria> filters = new SearchCriteriaBuilder<>(dto)
         .rangeSearchFields("id", "createdDate", "modifiedDate")

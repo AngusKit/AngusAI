@@ -4,6 +4,6 @@ import cloud.xcan.angus.core.jpa.repository.CustomBaseRepository;
 import org.springframework.data.repository.NoRepositoryBean;
 
 @NoRepositoryBean
-public interface ApplicationSearchRepo extends CustomBaseRepository<Application> {
+public interface AIApplicationSearchRepo extends CustomBaseRepository<AIApplication> {
 
 }

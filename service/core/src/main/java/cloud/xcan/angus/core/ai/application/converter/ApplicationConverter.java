@@ -1,16 +1,15 @@
 package cloud.xcan.angus.core.ai.application.converter;
 
-import cloud.xcan.angus.core.ai.domain.application.Application;
+import cloud.xcan.angus.core.ai.domain.application.AIApplication;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationConfig;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationShare;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
-import java.util.List;
 import java.util.UUID;
 
 public class ApplicationConverter {
 
-  public static Application toDuplicateApplication(String newName, Application sourceApplication) {
-    Application newApplication = new Application()
+  public static AIApplication toDuplicateApplication(String newName, AIApplication sourceApplication) {
+    AIApplication newApplication = new AIApplication()
         .setName(newName)
         .setStatus(ApplicationStatus.DRAFT)
         .setApiCalls(0L)
@@ -35,7 +34,7 @@ public class ApplicationConverter {
     return newApplication;
   }
 
-  public static void updateAssociatedIds(ApplicationConfig config, Application applicationDb) {
+  public static void updateAssociatedIds(ApplicationConfig config, AIApplication applicationDb) {
     applicationDb.setModelId(config.getModel().getId());
     applicationDb.setKnowledgeBaseIds(config.getResources().getKnowledgeBaseIds());
     applicationDb.setDatasetIds(config.getResources().getDatasetIds());
@@ -43,7 +42,7 @@ public class ApplicationConverter {
     applicationDb.setWorkflowId(config.getResources().getWorkflowId());
   }
 
-  public static void toApplicationShare(Application application, Application applicationDb) {
+  public static void toApplicationShare(AIApplication application, AIApplication applicationDb) {
     String shareId = UUID.randomUUID().toString();
     applicationDb.setShareId(shareId);
     applicationDb.setShareExpiresAt(applicationDb.getShareExpiresAt());

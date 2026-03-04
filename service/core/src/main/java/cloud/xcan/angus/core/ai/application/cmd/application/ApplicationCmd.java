@@ -1,6 +1,6 @@
 package cloud.xcan.angus.core.ai.application.cmd.application;
 
-import cloud.xcan.angus.core.ai.domain.application.Application;
+import cloud.xcan.angus.core.ai.domain.application.AIApplication;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationConfig;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
 
@@ -9,32 +9,32 @@ public interface ApplicationCmd {
   /**
    * 创建应用
    */
-  Application create(Application application);
+  AIApplication create(AIApplication application);
 
   /**
    * 复制应用
    */
-  Application duplicate(Long sourceId, String name);
+  AIApplication duplicate(Long sourceId, String name);
 
   /**
    * 更新应用基本信息
    */
-  Application update(Application application);
+  AIApplication update(AIApplication application);
 
   /**
    * 更新应用配置
    */
-  Application updateConfig(Long id, ApplicationConfig config);
+  AIApplication updateConfig(Long id, ApplicationConfig config);
 
   /**
    * 发布应用
    */
-  Application modifyStatus(Long id, ApplicationStatus status);
+  AIApplication modifyStatus(Long id, ApplicationStatus status);
 
   /**
    * 分享应用
    */
-  Application share(Application application);
+  AIApplication share(AIApplication application);
 
   /**
    * 删除应用

@@ -26,7 +26,7 @@ import org.hibernate.annotations.Type;
 @Setter
 @Getter
 @Accessors(chain = true)
-public class Application extends TenantAuditingEntity<Application, Long> {
+public class AIApplication extends TenantAuditingEntity<AIApplication, Long> {
 
   @Id
   private Long id;

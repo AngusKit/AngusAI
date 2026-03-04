@@ -12,7 +12,7 @@ import cloud.xcan.angus.core.ai.application.query.dataset.DatasetQuery;
 import cloud.xcan.angus.core.ai.application.query.knowledgebase.KnowledgeBaseQuery;
 import cloud.xcan.angus.core.ai.application.query.workflow.WorkflowQuery;
 import cloud.xcan.angus.core.ai.domain.apis.ApiCollection;
-import cloud.xcan.angus.core.ai.domain.application.Application;
+import cloud.xcan.angus.core.ai.domain.application.AIApplication;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationConfig;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
 import cloud.xcan.angus.core.ai.domain.dataset.Dataset;
@@ -62,40 +62,40 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
 
   @Override
   public ApplicationDetailVo create(ApplicationCreateDto dto) {
-    Application application = ApplicationAssembler.toCreateDomain(dto);
-    Application saved = applicationCmd.create(application);
+    AIApplication application = ApplicationAssembler.toCreateDomain(dto);
+    AIApplication saved = applicationCmd.create(application);
     return ApplicationAssembler.toDetailVo(saved, null);
   }
 
   @Override
   public ApplicationDetailVo duplicate(Long id, ApplicationDuplicateDto dto) {
-    Application saved = applicationCmd.duplicate(id, dto.getName());
+    AIApplication saved = applicationCmd.duplicate(id, dto.getName());
     return ApplicationAssembler.toDetailVo(saved, getResourcesConfigVo(saved));
   }
 
   @Override
   public ApplicationDetailVo update(Long id, ApplicationUpdateDto dto) {
-    Application application = ApplicationAssembler.toUpdateDomain(id, dto);
-    Application saved = applicationCmd.update(application);
+    AIApplication application = ApplicationAssembler.toUpdateDomain(id, dto);
+    AIApplication saved = applicationCmd.update(application);
     return ApplicationAssembler.toDetailVo(saved, getResourcesConfigVo(saved));
   }
 
   @Override
   public ApplicationDetailVo updateConfig(Long id, ApplicationConfig config) {
-    Application saved = applicationCmd.updateConfig(id, config);
+    AIApplication saved = applicationCmd.updateConfig(id, config);
     return ApplicationAssembler.toDetailVo(saved, getResourcesConfigVo(saved));
   }
 
   @Override
   public ApplicationDetailVo modifyStatus(Long id, ApplicationStatus status) {
-    Application saved = applicationCmd.modifyStatus(id, status);
+    AIApplication saved = applicationCmd.modifyStatus(id, status);
     return ApplicationAssembler.toDetailVo(saved, getResourcesConfigVo(saved));
   }
 
   @Override
   public ApplicationDetailVo share(Long id, ApplicationShareDto dto) {
-    Application application = ApplicationAssembler.shareDomain(id, dto);
-    Application saved = applicationCmd.share(application);
+    AIApplication application = ApplicationAssembler.shareDomain(id, dto);
+    AIApplication saved = applicationCmd.share(application);
     return ApplicationAssembler.toDetailVo(saved, getResourcesConfigVo(saved));
   }
 
@@ -107,15 +107,15 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
   @NameJoin
   @Override
   public ApplicationDetailVo getDetail(Long id) {
-    Application saved = applicationQuery.findAndCheck(id);
+    AIApplication saved = applicationQuery.findAndCheck(id);
     return ApplicationAssembler.toDetailVo(saved, getResourcesConfigVo(saved));
   }
 
   @NameJoin
   @Override
   public PageResult<ApplicationListVo> list(ApplicationFindDto dto) {
-    GenericSpecification<Application> spec = ApplicationAssembler.getSpecification(dto);
-    Page<Application> page = applicationQuery.find(spec, dto.tranPage(),
+    GenericSpecification<AIApplication> spec = ApplicationAssembler.getSpecification(dto);
+    Page<AIApplication> page = applicationQuery.find(spec, dto.tranPage(),
         dto.fullTextSearch, getMatchSearchFields(dto.getClass()));
     return buildVoPageResult(page, ApplicationAssembler::toListVo);
   }
@@ -130,7 +130,7 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
     return statistics;
   }
 
-  private ResourcesConfigVo getResourcesConfigVo(Application saved) {
+  private ResourcesConfigVo getResourcesConfigVo(AIApplication saved) {
     ResourcesConfigVo vo = new ResourcesConfigVo();
     if (isNotEmpty(saved.getWorkflowId())) {
       Workflow workflow = workflowQuery.findById(saved.getWorkflowId());

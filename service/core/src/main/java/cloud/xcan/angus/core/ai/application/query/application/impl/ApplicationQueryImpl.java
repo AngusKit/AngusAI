@@ -5,9 +5,9 @@ import static java.util.Objects.nonNull;
 
 import cloud.xcan.angus.core.ai.application.query.application.ApplicationQuery;
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
-import cloud.xcan.angus.core.ai.domain.application.Application;
-import cloud.xcan.angus.core.ai.domain.application.ApplicationRepo;
-import cloud.xcan.angus.core.ai.domain.application.ApplicationSearchRepo;
+import cloud.xcan.angus.core.ai.domain.application.AIApplication;
+import cloud.xcan.angus.core.ai.domain.application.AIApplicationRepo;
+import cloud.xcan.angus.core.ai.domain.application.AIApplicationSearchRepo;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
 import cloud.xcan.angus.core.ai.domain.model.Model;
 import cloud.xcan.angus.core.biz.BizTemplate;
@@ -27,19 +27,19 @@ import org.springframework.stereotype.Service;
 public class ApplicationQueryImpl implements ApplicationQuery {
 
   @Resource
-  private ApplicationRepo applicationRepo;
+  private AIApplicationRepo applicationRepo;
 
   @Resource
-  private ApplicationSearchRepo applicationSearchRepo;
+  private AIApplicationSearchRepo applicationSearchRepo;
 
   @Resource
   private ModelQuery modelQuery;
 
   @Override
-  public Application findAndCheck(Long id) {
-    return new BizTemplate<Application>() {
+  public AIApplication findAndCheck(Long id) {
+    return new BizTemplate<AIApplication>() {
       @Override
-      protected Application process() {
+      protected AIApplication process() {
         return applicationRepo.findById(id)
             .orElseThrow(() -> ResourceNotFound.of("应用不存在", new Object[]{}));
       }
@@ -47,9 +47,9 @@ public class ApplicationQueryImpl implements ApplicationQuery {
   }
 
   @Override
-  public Application findAndCheck(Long id, @Nullable Long currentUseModelId) {
-    return new BizTemplate<Application>() {
-      Application application;
+  public AIApplication findAndCheck(Long id, @Nullable Long currentUseModelId) {
+    return new BizTemplate<AIApplication>() {
+      AIApplication application;
       Model currentUseMode;
       Model appDefaultModel;
 
@@ -79,7 +79,7 @@ public class ApplicationQueryImpl implements ApplicationQuery {
       }
 
       @Override
-      protected Application process() {
+      protected AIApplication process() {
         application.setAppDefaultModel(appDefaultModel);
         application.setCurrentUseMode(nullSafe(currentUseMode, appDefaultModel));
         return application;
@@ -88,23 +88,23 @@ public class ApplicationQueryImpl implements ApplicationQuery {
   }
 
   @Override
-  public Page<Application> find(GenericSpecification<Application> spec, PageRequest pageable,
+  public Page<AIApplication> find(GenericSpecification<AIApplication> spec, PageRequest pageable,
       boolean fullTextSearch, String[] match) {
-    return new BizTemplate<Page<Application>>() {
+    return new BizTemplate<Page<AIApplication>>() {
       @Override
-      protected Page<Application> process() {
+      protected Page<AIApplication> process() {
         return fullTextSearch
-            ? applicationSearchRepo.find(spec.getCriteria(), pageable, Application.class, match)
+            ? applicationSearchRepo.find(spec.getCriteria(), pageable, AIApplication.class, match)
             : applicationRepo.findAll(spec, pageable);
       }
     }.execute();
   }
 
   @Override
-  public Application findByShareId(String shareId) {
-    return new BizTemplate<Application>() {
+  public AIApplication findByShareId(String shareId) {
+    return new BizTemplate<AIApplication>() {
       @Override
-      protected Application process() {
+      protected AIApplication process() {
         return applicationRepo.findByShareId(shareId).orElse(null);
       }
     }.execute();
@@ -131,44 +131,44 @@ public class ApplicationQueryImpl implements ApplicationQuery {
   }
 
   @Override
-  public Page<Application> findPublicApplications(PageRequest pageable) {
-    GenericSpecification<Application> specification = new GenericSpecification<>(
+  public Page<AIApplication> findPublicApplications(PageRequest pageable) {
+    GenericSpecification<AIApplication> specification = new GenericSpecification<>(
         SearchCriteria.criteria(SearchCriteria.equal("status", ApplicationStatus.PUBLISHED)));
     return applicationRepo.findAll(specification, pageable);
   }
 
   @Override
-  public Page<Application> findByTemplateId(Long templateId, PageRequest pageable) {
-    GenericSpecification<Application> specification = new GenericSpecification<>(
+  public Page<AIApplication> findByTemplateId(Long templateId, PageRequest pageable) {
+    GenericSpecification<AIApplication> specification = new GenericSpecification<>(
         SearchCriteria.criteria(SearchCriteria.equal("templateId", templateId)));
     return applicationRepo.findAll(specification, pageable);
   }
 
   @Override
-  public Page<Application> findExpiredShareApplications(PageRequest pageable) {
-    GenericSpecification<Application> specification = new GenericSpecification<>(
+  public Page<AIApplication> findExpiredShareApplications(PageRequest pageable) {
+    GenericSpecification<AIApplication> specification = new GenericSpecification<>(
         SearchCriteria.criteria(SearchCriteria.isNotNull("shareExpiresAt"),
             SearchCriteria.lessThanEqual("shareExpiresAt", LocalDateTime.now())));
     return applicationRepo.findAll(specification, pageable);
   }
 
   @Override
-  public Page<Application> findByKnowledgeBaseId(Long knowledgeBaseId, PageRequest pageable) {
-    GenericSpecification<Application> specification = new GenericSpecification<>(
+  public Page<AIApplication> findByKnowledgeBaseId(Long knowledgeBaseId, PageRequest pageable) {
+    GenericSpecification<AIApplication> specification = new GenericSpecification<>(
         SearchCriteria.criteria(SearchCriteria.equal("knowledgeBaseId", knowledgeBaseId)));
     return applicationRepo.findAll(specification, pageable);
   }
 
   @Override
-  public Page<Application> findByDatasetId(Long datasetId, PageRequest pageable) {
-    GenericSpecification<Application> specification = new GenericSpecification<>(
+  public Page<AIApplication> findByDatasetId(Long datasetId, PageRequest pageable) {
+    GenericSpecification<AIApplication> specification = new GenericSpecification<>(
         SearchCriteria.criteria(SearchCriteria.equal("datasetId", datasetId)));
     return applicationRepo.findAll(specification, pageable);
   }
 
   @Override
-  public Page<Application> findByWorkflowId(Long workflowId, PageRequest pageable) {
-    GenericSpecification<Application> specification = new GenericSpecification<>(
+  public Page<AIApplication> findByWorkflowId(Long workflowId, PageRequest pageable) {
+    GenericSpecification<AIApplication> specification = new GenericSpecification<>(
         SearchCriteria.criteria(SearchCriteria.equal("workflowId", workflowId)));
     return applicationRepo.findAll(specification, pageable);
   }

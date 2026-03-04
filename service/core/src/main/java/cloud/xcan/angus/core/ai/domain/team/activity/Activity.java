@@ -22,7 +22,7 @@ import lombok.experimental.Accessors;
  * operations
  */
 @Entity
-@Table(name = "ai_team_activity")
+@Table(name = "ai_activity")
 @EntityListeners({TenantListener.class})
 @Setter
 @Getter

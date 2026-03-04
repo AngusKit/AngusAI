@@ -30,7 +30,7 @@ public class ActivityClearJob {
   /**
    * Only {@link ActivityClearJob#RESERVED_NUM} activities are reserved for each target
    */
-  @Scheduled(fixedDelay = 31 * 1000, initialDelay = 1000)
+  @Scheduled(fixedDelay = 5 * 60 * 1000, initialDelay = 60000)
   public void execute() {
     jobTemplate.execute(LOCK_KEY, 6, TimeUnit.MINUTES, () -> {
       long reservedNum = RESERVED_NUM;

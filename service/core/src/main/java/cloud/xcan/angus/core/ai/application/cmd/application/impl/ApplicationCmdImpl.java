@@ -7,9 +7,9 @@ import static cloud.xcan.angus.spec.utils.ObjectUtils.isNull;
 
 import cloud.xcan.angus.core.ai.application.cmd.application.ApplicationCmd;
 import cloud.xcan.angus.core.ai.application.query.application.ApplicationQuery;
-import cloud.xcan.angus.core.ai.domain.application.Application;
+import cloud.xcan.angus.core.ai.domain.application.AIApplication;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationConfig;
-import cloud.xcan.angus.core.ai.domain.application.ApplicationRepo;
+import cloud.xcan.angus.core.ai.domain.application.AIApplicationRepo;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;
@@ -26,18 +26,18 @@ import org.springframework.util.StringUtils;
 
 @DoInFuture("添加权限校验")
 @Service
-public class ApplicationCmdImpl extends CommCmd<Application, Long> implements ApplicationCmd {
+public class ApplicationCmdImpl extends CommCmd<AIApplication, Long> implements ApplicationCmd {
 
   @Resource
-  private ApplicationRepo applicationRepo;
+  private AIApplicationRepo applicationRepo;
 
   @Resource
   private ApplicationQuery applicationQuery;
 
   @Override
   @Transactional
-  public Application create(Application application) {
-    return new BizTemplate<Application>() {
+  public AIApplication create(AIApplication application) {
+    return new BizTemplate<AIApplication>() {
       @Override
       protected void checkParams() {
         // 检查名称是否已存在
@@ -47,7 +47,7 @@ public class ApplicationCmdImpl extends CommCmd<Application, Long> implements Ap
       }
 
       @Override
-      protected Application process() {
+      protected AIApplication process() {
         insert0(application);
         return application;
       }
@@ -56,9 +56,9 @@ public class ApplicationCmdImpl extends CommCmd<Application, Long> implements Ap
 
   @Override
   @Transactional
-  public Application duplicate(Long sourceId, String name) {
-    return new BizTemplate<Application>() {
-      Application applicationDb;
+  public AIApplication duplicate(Long sourceId, String name) {
+    return new BizTemplate<AIApplication>() {
+      AIApplication applicationDb;
 
       @Override
       protected void checkParams() {
@@ -67,7 +67,7 @@ public class ApplicationCmdImpl extends CommCmd<Application, Long> implements Ap
       }
 
       @Override
-      protected Application process() {
+      protected AIApplication process() {
         // 复制源应用的配置
         String newName = StringUtils.hasText(name) ? name : applicationDb.getName() + "-Copy";
         // 检查新名称是否已存在
@@ -75,7 +75,7 @@ public class ApplicationCmdImpl extends CommCmd<Application, Long> implements Ap
           newName = newName + "-" + RandomStringUtils.randomAlphabetic(5);
         }
 
-        Application newApplication = toDuplicateApplication(newName, applicationDb);
+        AIApplication newApplication = toDuplicateApplication(newName, applicationDb);
         return applicationRepo.save(newApplication);
       }
     }.execute();
@@ -83,9 +83,9 @@ public class ApplicationCmdImpl extends CommCmd<Application, Long> implements Ap
 
   @Override
   @Transactional
-  public Application update(Application application) {
-    return new BizTemplate<Application>() {
-      Application applicationDb;
+  public AIApplication update(AIApplication application) {
+    return new BizTemplate<AIApplication>() {
+      AIApplication applicationDb;
 
       @Override
       protected void checkParams() {
@@ -103,7 +103,7 @@ public class ApplicationCmdImpl extends CommCmd<Application, Long> implements Ap
       }
 
       @Override
-      protected Application process() {
+      protected AIApplication process() {
         // 设置关联资源ID（冗余字段）
         updateAssociatedIds(application.getConfig(), applicationDb);
 
@@ -115,9 +115,9 @@ public class ApplicationCmdImpl extends CommCmd<Application, Long> implements Ap
 
   @Override
   @Transactional
-  public Application updateConfig(Long id, ApplicationConfig config) {
-    return new BizTemplate<Application>() {
-      Application applicationDb;
+  public AIApplication updateConfig(Long id, ApplicationConfig config) {
+    return new BizTemplate<AIApplication>() {
+      AIApplication applicationDb;
 
       @Override
       protected void checkParams() {
@@ -128,7 +128,7 @@ public class ApplicationCmdImpl extends CommCmd<Application, Long> implements Ap
       }
 
       @Override
-      protected Application process() {
+      protected AIApplication process() {
         // TODO 如果信息应用模型被修改，同步更新已有会话默认模型
 
         // 更新配置
@@ -142,9 +142,9 @@ public class ApplicationCmdImpl extends CommCmd<Application, Long> implements Ap
   }
 
   @Override
-  public Application modifyStatus(Long id, ApplicationStatus status) {
-    return new BizTemplate<Application>() {
-      Application applicationDb;
+  public AIApplication modifyStatus(Long id, ApplicationStatus status) {
+    return new BizTemplate<AIApplication>() {
+      AIApplication applicationDb;
 
       @Override
       protected void checkParams() {
@@ -160,7 +160,7 @@ public class ApplicationCmdImpl extends CommCmd<Application, Long> implements Ap
       }
 
       @Override
-      protected Application process() {
+      protected AIApplication process() {
         applicationDb.setStatus(status);
         return applicationRepo.save(applicationDb);
       }
@@ -169,9 +169,9 @@ public class ApplicationCmdImpl extends CommCmd<Application, Long> implements Ap
 
   @Override
   @Transactional
-  public Application share(Application application) {
-    return new BizTemplate<Application>() {
-      Application applicationDb;
+  public AIApplication share(AIApplication application) {
+    return new BizTemplate<AIApplication>() {
+      AIApplication applicationDb;
 
       @Override
       protected void checkParams() {
@@ -180,7 +180,7 @@ public class ApplicationCmdImpl extends CommCmd<Application, Long> implements Ap
       }
 
       @Override
-      protected Application process() {
+      protected AIApplication process() {
         toApplicationShare(application, applicationDb);
         return applicationRepo.save(applicationDb);
       }
@@ -200,7 +200,7 @@ public class ApplicationCmdImpl extends CommCmd<Application, Long> implements Ap
   }
 
   @Override
-  protected BaseRepository<Application, Long> getRepository() {
+  protected BaseRepository<AIApplication, Long> getRepository() {
     return applicationRepo;
   }
 }
