@@ -118,10 +118,8 @@
     <xcan-infra.bom.version>2.0.0</xcan-infra.bom.version>
     <spring-ai-bom.version>1.0.3</spring-ai-bom.version>
 
-    <xcan-angusgm.api.version>1.0.0</xcan-angusgm.api.version>
-    <xcan-angusstorage.api.version>1.0.0</xcan-angusstorage.api.version>
-    <xcan-angusess.api.version>1.0.0</xcan-angusess.api.version>
-    <xcan-angusexpense.api.version>1.0.0</xcan-angusexpense.api.version>
+    <xcan-angusgm.api.version>2.0.0</xcan-angusgm.api.version>
+    <xcan-angusstorage.api.version>2.0.0</xcan-angusstorage.api.version>
 
     <!-- Databases, datasource, jdbc drivers -->
     <db2.version>11.5.8.0</db2.version>
@@ -173,17 +171,6 @@
         <version>${xcan-angusstorage.api.version}</version>
       </dependency>
 
-      <dependency>
-        <groupId>cloud.xcan.angus</groupId>
-        <artifactId>xcan-angusess.api</artifactId>
-        <version>${xcan-angusess.api.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>cloud.xcan.angus</groupId>
-        <artifactId>xcan-angusexpense.api</artifactId>
-        <version>${xcan-angusexpense.api.version}</version>
-      </dependency>
     </dependencies>
   </dependencyManagement>
 

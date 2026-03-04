@@ -2,8 +2,6 @@ package cloud.xcan.angus.core.ai.infra.job;
 
 import static cloud.xcan.angus.spec.utils.ObjectUtils.isNotEmpty;
 
-import cloud.xcan.angus.api.commonlink.setting.Setting;
-import cloud.xcan.angus.api.commonlink.setting.SettingKey;
 import cloud.xcan.angus.api.manager.SettingManager;
 import cloud.xcan.angus.core.ai.domain.team.activity.ActivityRepo;
 import cloud.xcan.angus.core.job.JobTemplate;
@@ -29,16 +27,13 @@ public class ActivityClearJob {
   @Resource
   private ActivityRepo activityRepo;
 
-  @Resource
-  private SettingManager settingManager;
-
   /**
    * Only {@link ActivityClearJob#RESERVED_NUM} activities are reserved for each target
    */
   @Scheduled(fixedDelay = 31 * 1000, initialDelay = 1000)
   public void execute() {
     jobTemplate.execute(LOCK_KEY, 6, TimeUnit.MINUTES, () -> {
-      long reservedNum = getReservedNum();
+      long reservedNum = RESERVED_NUM;
       List<Long> targetIds = activityRepo.getResourceIdsHavingCount(reservedNum, COUNT);
       if (isNotEmpty(targetIds)) {
         for (Long targetId : targetIds) {
@@ -51,19 +46,6 @@ public class ActivityClearJob {
         }
       }
     });
-  }
-
-  private long getReservedNum() {
-    long reservedNum = RESERVED_NUM;
-    try {
-      Setting setting = settingManager.setting(SettingKey.MAX_RESOURCE_ACTIVITIES);
-      reservedNum = setting.getMaxResourceActivities() > 0
-          ? setting.getMaxResourceActivities() : RESERVED_NUM;
-    } catch (Exception e) {
-      log.error("The maximum number of resource activities is not configured, SettingKey: {}",
-          SettingKey.MAX_RESOURCE_ACTIVITIES.getValue());
-    }
-    return reservedNum;
   }
 
 }
