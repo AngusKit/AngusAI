@@ -151,6 +151,7 @@ export default function App() {
                       activePage !== 'prompts' &&
                       activePage !== 'notifications' &&
                       activePage !== 'team-members' &&
+                      activePage !== 'activity-log' &&
                       activePage !== 'resource-sharing' &&
                       activePage !== 'individual-app-settings' &&
                       activePage !== 'usage-analytics' &&

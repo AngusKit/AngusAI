@@ -93,9 +93,6 @@ export function ActivityLog() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedActivity, setSelectedActivity] = useState<ActivityRecord | null>(null);
   const [showDetailDialog, setShowDetailDialog] = useState(false);
-  const [showSettingsDialog, setShowSettingsDialog] = useState(false);
-  const [retentionDays, setRetentionDays] = useState(90); // 默认保存90天
-  const [tempRetentionDays, setTempRetentionDays] = useState(90);
   const itemsPerPage = 20;
   const [activities, setActivities] = useState<ActivityRecord[]>([]);
   const [totalRecords, setTotalRecords] = useState(0);
@@ -279,21 +276,6 @@ export function ActivityLog() {
     setShowDetailDialog(true);
   };
 
-  const handleOpenSettings = () => {
-    setTempRetentionDays(retentionDays);
-    setShowSettingsDialog(true);
-  };
-
-  const handleSaveSettings = () => {
-    setRetentionDays(tempRetentionDays);
-    setShowSettingsDialog(false);
-    toast.success(
-      language === 'zh-CN'
-        ? `活动记录保留期限已设置为 ${tempRetentionDays} 天`
-        : `Retention period set to ${tempRetentionDays} days`
-    );
-  };
-
   const getActionIcon = (actionType: string) => {
     const action = actionTypeMap[actionType as ActionTypeKey];
     if (!action) return Activity;
@@ -362,23 +344,13 @@ export function ActivityLog() {
     <div className='space-y-6'>
       {/* Header */}
       <div>
-        <div className='flex items-center justify-between'>
-          <div>
-            <h1 className='text-2xl dark:text-white mb-1'>{language === 'zh-CN' ? '活动记录' : 'Activity Log'}</h1>
-            <p className='text-sm text-gray-600 dark:text-gray-400'>
-              {language === 'zh-CN'
-                ? `查看团队成员的所有操作活动记录 · 当前保留 ${retentionDays} 天记录`
-                : `Review all team activity. Currently retaining ${retentionDays} days of history.`}
-            </p>
-          </div>
-          <Button
-            onClick={handleOpenSettings}
-            variant='outline'
-            className='dark:bg-gray-900 dark:border-gray-700 dark:text-white'
-          >
-            <Settings className='w-4 h-4 mr-2' />
-            {language === 'zh-CN' ? '记录设置' : 'Log Settings'}
-          </Button>
+        <div>
+          <h1 className='text-2xl dark:text-white mb-1'>{language === 'zh-CN' ? '活动记录' : 'Activity Log'}</h1>
+          <p className='text-sm text-gray-600 dark:text-gray-400'>
+            {language === 'zh-CN'
+              ? '查看团队成员的所有操作活动记录'
+              : 'Review all team activity'}
+          </p>
         </div>
       </div>
 
@@ -407,7 +379,7 @@ export function ActivityLog() {
         <div className='flex gap-2'>
           {/* Search */}
           <div className='flex-1'>
-            <div className='md:col-span-2 w-[300px]'>
+            <div className='md:col-span-2 w-[390px]'>
               <div className='relative'>
                 <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4' />
                 <Input
@@ -487,7 +459,7 @@ export function ActivityLog() {
           </div>
         </div>
 
-        <div className='flex items-center justify-between mt-4 pt-4 border-t border-gray-200 dark:border-gray-700'>
+        <div className='flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700'>
           <p className='text-sm text-gray-600 dark:text-gray-400'>
             {language === 'zh-CN' ? '找到 ' : 'Found '}
             <span className='dark:text-white'>
@@ -513,6 +485,53 @@ export function ActivityLog() {
 
       {/* Activity List */}
       <Card className='dark:bg-gray-900 dark:border-gray-800'>
+        {(loading || paginatedActivities.length === 0) ? (
+          <div className='h-[600px] flex flex-col items-center justify-center px-6'>
+            {loading && paginatedActivities.length === 0 ? (
+              <>
+                <div className='w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4'>
+                  <Activity className='w-8 h-8 text-gray-400 dark:text-gray-500 animate-pulse' />
+                </div>
+                <p className='text-gray-500 dark:text-gray-400'>
+                  {language === 'zh-CN' ? '加载中...' : 'Loading...'}
+                </p>
+              </>
+            ) : (
+              <>
+                <div className='w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4'>
+                  <Activity className='w-8 h-8 text-gray-400 dark:text-gray-500' />
+                </div>
+                <p className='text-base text-gray-600 dark:text-gray-300 mb-2'>
+                  {language === 'zh-CN' ? '暂无活动记录' : 'No activity records yet'}
+                </p>
+                <p className='text-sm text-gray-500 dark:text-gray-400 text-center max-w-sm'>
+                  {searchQuery || selectedUser !== 'all' || selectedTargetType !== 'all' || selectedActionType !== 'all'
+                    ? (language === 'zh-CN'
+                        ? '未找到符合筛选条件的记录，尝试调整筛选条件'
+                        : 'No matching records. Try adjusting your filters.')
+                    : (language === 'zh-CN'
+                        ? '团队成员的操作将在这里显示'
+                        : 'Team member activities will appear here')}
+                </p>
+                {(searchQuery || selectedUser !== 'all' || selectedTargetType !== 'all' || selectedActionType !== 'all') && (
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    className='mt-4 dark:bg-gray-800 dark:border-gray-700 dark:text-white'
+                    onClick={() => {
+                      setSearchQuery('');
+                      setSelectedUser('all');
+                      setSelectedTargetType('all');
+                      setSelectedActionType('all');
+                    }}
+                  >
+                    {language === 'zh-CN' ? '清除筛选' : 'Clear Filters'}
+                  </Button>
+                )}
+              </>
+            )}
+          </div>
+        ) : (
         <ScrollArea className='h-[600px]'>
           <div className='divide-y divide-gray-200 dark:divide-gray-800'>
             {paginatedActivities.map(activity => {
@@ -578,6 +597,7 @@ export function ActivityLog() {
             })}
           </div>
         </ScrollArea>
+        )}
 
         {/* Pagination */}
         {totalPages > 1 && (
@@ -746,105 +766,6 @@ export function ActivityLog() {
               className='dark:bg-gray-800 dark:border-gray-700 dark:text-white'
             >
               {language === 'zh-CN' ? '关闭' : 'Close'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Settings Dialog */}
-      <Dialog open={showSettingsDialog} onOpenChange={setShowSettingsDialog}>
-        <DialogContent className='dark:bg-gray-900 dark:border-gray-800 sm:max-w-[500px]'>
-          <DialogHeader>
-            <DialogTitle className='dark:text-white'>
-              {language === 'zh-CN' ? '活动记录设置' : 'Activity Log Settings'}
-            </DialogTitle>
-            <DialogDescription className='dark:text-gray-400'>
-              {language === 'zh-CN'
-                ? '配置活动记录的保留时间，超过保留期限的记录将被自动清理'
-                : 'Configure how long activity logs are retained before automatic cleanup.'}
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className='py-6'>
-            <div className='space-y-4'>
-              <div>
-                <Label className='dark:text-white'>{language === 'zh-CN' ? '记录保留天数' : 'Retention Days'}</Label>
-                <p className='text-sm text-gray-600 dark:text-gray-400 mt-1 mb-3'>
-                  {language === 'zh-CN'
-                    ? '设置活动记录的保留期限，建议保留30-180天'
-                    : 'Set the retention window for activity logs (recommended 30-180 days).'}
-                </p>
-                <Select
-                  value={tempRetentionDays.toString()}
-                  onValueChange={value => setTempRetentionDays(parseInt(value))}
-                >
-                  <SelectTrigger className='dark:bg-gray-800 dark:border-gray-700 dark:text-white'>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
-                    <SelectItem value='7' className='dark:text-white'>
-                      {language === 'zh-CN' ? '7 天' : '7 days'}
-                    </SelectItem>
-                    <SelectItem value='15' className='dark:text-white'>
-                      {language === 'zh-CN' ? '15 天' : '15 days'}
-                    </SelectItem>
-                    <SelectItem value='30' className='dark:text-white'>
-                      {language === 'zh-CN' ? '30 天' : '30 days'}
-                    </SelectItem>
-                    <SelectItem value='60' className='dark:text-white'>
-                      {language === 'zh-CN' ? '60 天' : '60 days'}
-                    </SelectItem>
-                    <SelectItem value='90' className='dark:text-white'>
-                      {language === 'zh-CN' ? '90 天（推荐）' : '90 days (recommended)'}
-                    </SelectItem>
-                    <SelectItem value='180' className='dark:text-white'>
-                      {language === 'zh-CN' ? '180 天' : '180 days'}
-                    </SelectItem>
-                    <SelectItem value='365' className='dark:text-white'>
-                      {language === 'zh-CN' ? '365 天' : '365 days'}
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className='p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg'>
-                <div className='flex gap-3'>
-                  <Info className='w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5' />
-                  <div>
-                    <p className='text-sm dark:text-white mb-1'>{language === 'zh-CN' ? '说明' : 'Notes'}</p>
-                    <p className='text-sm text-gray-600 dark:text-gray-400'>
-                      {language === 'zh-CN' ? (
-                        <>
-                          • 系统将定期清理超过保留期限的活动记录
-                          <br />
-                          • 较长的保留期限有助于审计和追踪历史操作
-                          <br />• 较短的保留期限可以节省存储空间
-                        </>
-                      ) : (
-                        <>
-                          • Logs older than the retention window will be purged automatically
-                          <br />
-                          • Longer retention supports audits and compliance reviews
-                          <br />• Shorter retention saves storage and improves performance
-                        </>
-                      )}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button
-              variant='outline'
-              onClick={() => setShowSettingsDialog(false)}
-              className='dark:bg-gray-800 dark:border-gray-700 dark:text-white'
-            >
-              {language === 'zh-CN' ? '取消' : 'Cancel'}
-            </Button>
-            <Button onClick={handleSaveSettings} className='bg-blue-500 hover:bg-blue-600 text-white'>
-              {language === 'zh-CN' ? '保存设置' : 'Save'}
             </Button>
           </DialogFooter>
         </DialogContent>
