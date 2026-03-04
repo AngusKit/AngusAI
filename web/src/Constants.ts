@@ -41,6 +41,12 @@ export const TENANT_HEADER_WHITELIST_PATTERNS = [
 /** 搜索防抖延迟（毫秒） */
 export const SEARCH_DEBOUNCE_DELAY = 300;
 
+/** 文件上传大小限制：50MB（字节） */
+export const FILE_MAX_SIZE_BYTES = 50 * 1024 * 1024;
+
+/** 文件上传大小限制：50MB */
+export const FILE_MAX_SIZE_MB = 50;
+
 /** 不需要添加操作租户请求头的路径白名单（命中时不添加，优先级高于需添加白名单） */
 export const TENANT_HEADER_EXCLUDED_PATTERNS = [
   '/api/v1/users/current', // 查询当前租户统计

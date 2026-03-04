@@ -87,7 +87,6 @@ export function ActivityLog() {
   const { language } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
-  const [selectedUser, setSelectedUser] = useState('all');
   const [selectedTargetType, setSelectedTargetType] = useState('all');
   const [selectedActionType, setSelectedActionType] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
@@ -96,7 +95,6 @@ export function ActivityLog() {
   const itemsPerPage = 20;
   const [activities, setActivities] = useState<ActivityRecord[]>([]);
   const [totalRecords, setTotalRecords] = useState(0);
-  const [availableUsers, setAvailableUsers] = useState<{ value: string; label: string }[]>([]);
   const [loading, setLoading] = useState(false);
 
   const inferActionType = useCallback((record: ActivityDetailVo): string => {
@@ -130,7 +128,6 @@ export function ActivityLog() {
         keyword: debouncedSearchQuery.trim() || undefined,
         pageNo: currentPage,
         pageSize: itemsPerPage,
-        userId: selectedUser !== 'all' ? selectedUser : undefined,
         resourceType: selectedTargetType !== 'all' ? selectedTargetType : undefined,
         detail: selectedActionType !== 'all' ? selectedActionType : undefined,
         orderBy: ActivityListOrderByEnum.ActivityDate,
@@ -166,18 +163,6 @@ export function ActivityLog() {
         }) ?? [];
 
       setActivities(mapped);
-
-      const userOptions = Array.from(
-        new Map(
-          mapped
-            .filter(item => item.userId && item.userName)
-            .map(item => [item.userId!, { value: item.userId!, label: item.userName! }])
-        ).values()
-      );
-      setAvailableUsers(userOptions);
-      if (selectedUser !== 'all' && userOptions.every(option => option.value !== selectedUser)) {
-        setSelectedUser('all');
-      }
     } catch (error: any) {
       console.error('Failed to load activity logs:', error);
       toast.error(error?.message || (language === 'zh-CN' ? '加载活动记录失败' : 'Failed to load activity logs'));
@@ -193,12 +178,11 @@ export function ActivityLog() {
     language,
     selectedActionType,
     selectedTargetType,
-    selectedUser,
   ]);
 
   useEffect(() => {
     setCurrentPage(prev => (prev === 1 ? prev : 1));
-  }, [selectedUser, selectedTargetType, selectedActionType]);
+  }, [selectedTargetType, selectedActionType]);
 
   useEffect(() => {
     setCurrentPage(prev => (prev === 1 ? prev : 1));
@@ -392,31 +376,6 @@ export function ActivityLog() {
             </div>
           </div>
 
-          {/* User Filter */}
-          <div>
-            <Select value={selectedUser} onValueChange={value => setSelectedUser(value)}>
-              <SelectTrigger className='dark:bg-gray-800 dark:border-gray-700 dark:text-white'>
-                <SelectValue placeholder={language === 'zh-CN' ? '所有用户' : 'All Users'} />
-              </SelectTrigger>
-              <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
-                <SelectItem value='all' className='dark:text-white'>
-                  所有用户
-                </SelectItem>
-                {availableUsers.length === 0 ? (
-                  <SelectItem value='__none__' disabled className='dark:text-gray-400'>
-                    {language === 'zh-CN' ? '暂无数据' : 'No options'}
-                  </SelectItem>
-                ) : (
-                  availableUsers.map(user => (
-                    <SelectItem key={user.value} value={user.value} className='dark:text-white'>
-                      {user.label || user.value}
-                    </SelectItem>
-                  ))
-                )}
-              </SelectContent>
-            </Select>
-          </div>
-
           {/* Target Type Filter */}
           <div>
             <Select value={selectedTargetType} onValueChange={setSelectedTargetType}>
@@ -472,7 +431,6 @@ export function ActivityLog() {
             size='sm'
             onClick={() => {
               setSearchQuery('');
-              setSelectedUser('all');
               setSelectedTargetType('all');
               setSelectedActionType('all');
             }}
@@ -505,7 +463,7 @@ export function ActivityLog() {
                   {language === 'zh-CN' ? '暂无活动记录' : 'No activity records yet'}
                 </p>
                 <p className='text-sm text-gray-500 dark:text-gray-400 text-center max-w-sm'>
-                  {searchQuery || selectedUser !== 'all' || selectedTargetType !== 'all' || selectedActionType !== 'all'
+                  {searchQuery || selectedTargetType !== 'all' || selectedActionType !== 'all'
                     ? (language === 'zh-CN'
                         ? '未找到符合筛选条件的记录，尝试调整筛选条件'
                         : 'No matching records. Try adjusting your filters.')
@@ -513,17 +471,16 @@ export function ActivityLog() {
                         ? '团队成员的操作将在这里显示'
                         : 'Team member activities will appear here')}
                 </p>
-                {(searchQuery || selectedUser !== 'all' || selectedTargetType !== 'all' || selectedActionType !== 'all') && (
+                {(searchQuery || selectedTargetType !== 'all' || selectedActionType !== 'all') && (
                   <Button
                     variant='outline'
                     size='sm'
                     className='mt-4 dark:bg-gray-800 dark:border-gray-700 dark:text-white'
-                    onClick={() => {
-                      setSearchQuery('');
-                      setSelectedUser('all');
-                      setSelectedTargetType('all');
-                      setSelectedActionType('all');
-                    }}
+            onClick={() => {
+              setSearchQuery('');
+              setSelectedTargetType('all');
+              setSelectedActionType('all');
+            }}
                   >
                     {language === 'zh-CN' ? '清除筛选' : 'Clear Filters'}
                   </Button>
