@@ -19,7 +19,7 @@ export class PromptCategories<SecurityDataType = unknown> {
    * @secure
    */
   createPromptCategory = (data: PromptCategoryCreateDto, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResult, ApiLocaleResult>({
+    this.http.request<ApiLocaleResult>({
       path: `${AI}/prompt-categories`,
       method: 'POST',
       body: data,
@@ -37,7 +37,7 @@ export class PromptCategories<SecurityDataType = unknown> {
    * @secure
    */
   getPromptCategoryDetail = (id: string, params: RequestParams = {}) =>
-    this.http.request<PromptCategoryResult, ApiLocaleResult>({
+    this.http.request<PromptCategoryResult>({
       path: `${AI}/prompt-categories/${id}`,
       method: 'GET',
       secure: true,
@@ -53,7 +53,7 @@ export class PromptCategories<SecurityDataType = unknown> {
    * @secure
    */
   deletePromptCategory = (id: string, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResult, ApiLocaleResult>({
+    this.http.request<ApiLocaleResult>({
       path: `${AI}/prompt-categories/${id}`,
       method: 'DELETE',
       secure: true,
@@ -69,7 +69,7 @@ export class PromptCategories<SecurityDataType = unknown> {
    * @secure
    */
   updatePromptCategory = (id: string, data: PromptCategoryUpdateDto, params: RequestParams = {}) =>
-    this.http.request<PromptCategoryResult, ApiLocaleResult>({
+    this.http.request<PromptCategoryResult>({
       path: `${AI}/prompt-categories/${id}`,
       method: 'PATCH',
       body: data,
@@ -97,7 +97,7 @@ export class PromptCategories<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<PromptCategoryResult, ApiLocaleResult>({
+    this.http.request<PromptCategoryResult>({
       path: `${AI}/prompt-categories/${id}/order`,
       method: 'PATCH',
       query: query,
@@ -114,7 +114,7 @@ export class PromptCategories<SecurityDataType = unknown> {
    * @secure
    */
   getPromptCategoryTree = (params: RequestParams = {}) =>
-    this.http.request<ListPromptCategoryResult, ApiLocaleResult>({
+    this.http.request<ListPromptCategoryResult>({
       path: `${AI}/prompt-categories/tree`,
       method: 'GET',
       secure: true,
@@ -136,7 +136,7 @@ export class PromptCategories<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<ApiLocaleResult, ApiLocaleResult>({
+    this.http.request<ApiLocaleResult>({
       path: `${AI}/prompt-categories/batch`,
       method: 'DELETE',
       query: query,

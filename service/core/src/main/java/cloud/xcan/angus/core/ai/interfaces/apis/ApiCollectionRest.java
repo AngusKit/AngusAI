@@ -38,7 +38,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "接口集", description = "接口集管理")
+@Tag(name = "ApiCollection", description = "接口集管理")
 @Validated
 @RestController
 @RequestMapping("/api/v1/api-collections")

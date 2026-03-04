@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "接口集设置", description = "接口集安全方案和服务器管理")
+@Tag(name = "ApiSchema", description = "接口集安全方案和服务器管理")
 @Validated
 @RestController
 @RequestMapping("/api/v1/api-collections")

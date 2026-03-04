@@ -1,6 +1,6 @@
 import { ApiLocaleResult, PageQuery, AI } from '@xcan-angus/infra';
 import { ApiCollectionCreateDto, ApiCollectionDetailResult, ApiCollectionImportDto, ApiCollectionListParamsOrderByEnum, ApiCollectionListResult, ApiCollectionStatisticsResult, ApiCollectionUpdateDto, ApiEndpointCreateDto, ApiEndpointDetailResult, ApiEndpointListParamsOrderByEnum, ApiEndpointResult, ApiEndpointTestDto, ApiEndpointTestResult, ApiEndpointUpdateDto, ResultApiEndpointVo, } from './ApiCollectionsTypes.ts';
-import http, { ContentType, HttpClient, RequestParams } from './HttpClient.ts';
+import http, { ContentType, HttpClient, QueryParamsType, RequestParams } from './HttpClient.ts';
 import { ApiCollectionSourceEnum, HttpMethodEnum, VisibilityEnum } from '@/enums/enums.ts';
 
 export class ApiCollections<SecurityDataType = unknown> {
@@ -20,7 +20,7 @@ export class ApiCollections<SecurityDataType = unknown> {
    * @secure
    */
   apiEndpointGetDetail = (collectionId: string, endpointId: string, params: RequestParams = {}) =>
-    this.http.request<ApiEndpointDetailResult, ApiLocaleResult>({
+    this.http.request<ApiEndpointDetailResult>({
       path: `${AI}/api-collections/${collectionId}/endpoints/${endpointId}`,
       method: 'GET',
       secure: true,
@@ -41,7 +41,7 @@ export class ApiCollections<SecurityDataType = unknown> {
     data: ApiEndpointUpdateDto,
     params: RequestParams = {}
   ) =>
-    this.http.request<ApiEndpointResult, ApiLocaleResult>({
+    this.http.request<ApiEndpointResult>({
       path: `${AI}/api-collections/${collectionId}/endpoints/${endpointId}`,
       method: 'PUT',
       body: data,
@@ -59,7 +59,7 @@ export class ApiCollections<SecurityDataType = unknown> {
    * @secure
    */
   apiEndpointDelete = (collectionId: string, endpointId: string, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResult, ApiLocaleResult>({
+    this.http.request<ApiLocaleResult>({
       path: `${AI}/api-collections/${collectionId}/endpoints/${endpointId}`,
       method: 'DELETE',
       secure: true,
@@ -92,10 +92,10 @@ export class ApiCollections<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<ApiCollectionListResult, ApiLocaleResult>({
+    this.http.request<ApiCollectionListResult>({
       path: `${AI}/api-collections`,
       method: 'GET',
-      query: query,
+      query: query as unknown as QueryParamsType,
       secure: true,
       ...params,
     });
@@ -109,7 +109,7 @@ export class ApiCollections<SecurityDataType = unknown> {
    * @secure
    */
   apiCollectionCreate = (data: ApiCollectionCreateDto, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResult, ApiLocaleResult>({
+    this.http.request<ApiLocaleResult>({
       path: `${AI}/api-collections`,
       method: 'POST',
       body: data,
@@ -142,7 +142,7 @@ export class ApiCollections<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<File, ApiLocaleResult>({
+    this.http.request<File>({
       path: `${AI}/api-collections/${id}/export`,
       method: 'POST',
       query: query,
@@ -181,10 +181,10 @@ export class ApiCollections<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<ResultApiEndpointVo, ApiLocaleResult>({
+    this.http.request<ResultApiEndpointVo>({
       path: `${AI}/api-collections/${collectionId}/endpoints`,
       method: 'GET',
-      query: query,
+      query: query as unknown as QueryParamsType,
       secure: true,
       ...params,
     });
@@ -198,7 +198,7 @@ export class ApiCollections<SecurityDataType = unknown> {
    * @secure
    */
   apiEndpointCreate = (collectionId: string, data: ApiEndpointCreateDto, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResult, ApiLocaleResult>({
+    this.http.request<ApiLocaleResult>({
       path: `${AI}/api-collections/${collectionId}/endpoints`,
       method: 'POST',
       body: data,
@@ -216,7 +216,7 @@ export class ApiCollections<SecurityDataType = unknown> {
    * @secure
    */
   apiEndpointTest = (collectionId: string, endpointId: string, data: ApiEndpointTestDto, params: RequestParams = {}) =>
-    this.http.request<ApiEndpointTestResult, ApiLocaleResult>({
+    this.http.request<ApiEndpointTestResult>({
       path: `${AI}/api-collections/${collectionId}/endpoints/${endpointId}/test`,
       method: 'POST',
       body: data,
@@ -234,7 +234,7 @@ export class ApiCollections<SecurityDataType = unknown> {
    * @secure
    */
   apiCollectionImport = (data: ApiCollectionImportDto, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResult, ApiLocaleResult>({
+    this.http.request<ApiLocaleResult>({
       path: `${AI}/api-collections/import`,
       method: 'POST',
       body: data,
@@ -252,7 +252,7 @@ export class ApiCollections<SecurityDataType = unknown> {
    * @secure
    */
   apiCollectionGetDetail = (id: string, params: RequestParams = {}) =>
-    this.http.request<ApiCollectionDetailResult, ApiLocaleResult>({
+    this.http.request<ApiCollectionDetailResult>({
       path: `${AI}/api-collections/${id}`,
       method: 'GET',
       secure: true,
@@ -275,7 +275,7 @@ export class ApiCollections<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<ApiLocaleResult, ApiLocaleResult>({
+    this.http.request<ApiLocaleResult>({
       path: `${AI}/api-collections/${id}`,
       method: 'DELETE',
       query: query,
@@ -292,7 +292,7 @@ export class ApiCollections<SecurityDataType = unknown> {
    * @secure
    */
   apiCollectionUpdate = (id: string, data: ApiCollectionUpdateDto, params: RequestParams = {}) =>
-    this.http.request<ApiCollectionDetailResult, ApiLocaleResult>({
+    this.http.request<ApiCollectionDetailResult>({
       path: `${AI}/api-collections/${id}`,
       method: 'PATCH',
       body: data,
@@ -318,7 +318,7 @@ export class ApiCollections<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<ApiEndpointResult, ApiLocaleResult>({
+    this.http.request<ApiEndpointResult>({
       path: `${AI}/api-collections/${collectionId}/endpoints/${endpointId}/toggle`,
       method: 'PATCH',
       query: query,
@@ -349,7 +349,7 @@ export class ApiCollections<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<ApiCollectionStatisticsResult, ApiLocaleResult>({
+    this.http.request<ApiCollectionStatisticsResult>({
       path: `${AI}/api-collections/statistics`,
       method: 'GET',
       query: query,

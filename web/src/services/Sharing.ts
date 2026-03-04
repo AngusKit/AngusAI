@@ -1,6 +1,6 @@
 import { ApiLocaleResult, PageQuery, AI } from '@xcan-angus/infra';
 import { GetResourceSharingListOrderByEnum, ResourceAccessCheckResult, ResourceInfoListSharePermissionResult, ResourceSharingCreateDto, ResourceSharingDetailResult, ResourceSharingListResult, ResourceSharingStatisticsResult, ResourceSharingToggleDto, ResourceSharingUpdateDto, } from './SharingTypes.ts';
-import httpClient, { ContentType, HttpClient, RequestParams } from './HttpClient.ts';
+import httpClient, { ContentType, HttpClient, QueryParamsType, RequestParams } from './HttpClient.ts';
 import { MemberPermissionEnum, ResourceTypeEnum, SharedWithEnum, StatisticsPeriodEnum } from '@/enums/enums.ts';
 
 export class Sharing<SecurityDataType = unknown> {
@@ -20,7 +20,7 @@ export class Sharing<SecurityDataType = unknown> {
    * @secure
    */
   toggleResourceSharingStatus = (id: string, data: ResourceSharingToggleDto, params: RequestParams = {}) =>
-    this.http.request<ResourceSharingDetailResult, ApiLocaleResult>({
+    this.http.request<ResourceSharingDetailResult>({
       path: `${AI}/sharing/${id}/toggle`,
       method: 'PUT',
       body: data,
@@ -38,7 +38,7 @@ export class Sharing<SecurityDataType = unknown> {
    * @secure
    */
   getResourceSharingDetail = (id: string, params: RequestParams = {}) =>
-    this.http.request<ResourceSharingDetailResult, ApiLocaleResult>({
+    this.http.request<ResourceSharingDetailResult>({
       path: `${AI}/sharing/resources/${id}`,
       method: 'GET',
       secure: true,
@@ -54,7 +54,7 @@ export class Sharing<SecurityDataType = unknown> {
    * @secure
    */
   updateResourceSharing = (id: string, data: ResourceSharingUpdateDto, params: RequestParams = {}) =>
-    this.http.request<ResourceSharingDetailResult, ApiLocaleResult>({
+    this.http.request<ResourceSharingDetailResult>({
       path: `${AI}/sharing/resources/${id}`,
       method: 'PUT',
       body: data,
@@ -72,7 +72,7 @@ export class Sharing<SecurityDataType = unknown> {
    * @secure
    */
   deleteResourceSharing = (id: string, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResult, ApiLocaleResult>({
+    this.http.request<ApiLocaleResult>({
       path: `${AI}/sharing/resources/${id}`,
       method: 'DELETE',
       secure: true,
@@ -105,10 +105,10 @@ export class Sharing<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<ResourceSharingListResult, ApiLocaleResult>({
+    this.http.request<ResourceSharingListResult>({
       path: `${AI}/sharing/resources`,
       method: 'GET',
-      query: query,
+      query: query as unknown as QueryParamsType,
       secure: true,
       ...params,
     });
@@ -122,7 +122,7 @@ export class Sharing<SecurityDataType = unknown> {
    * @secure
    */
   createResourceSharing = (data: ResourceSharingCreateDto, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResult, ApiLocaleResult>({
+    this.http.request<ApiLocaleResult>({
       path: `${AI}/sharing/resources`,
       method: 'POST',
       body: data,
@@ -147,7 +147,7 @@ export class Sharing<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<ResourceSharingStatisticsResult, ApiLocaleResult>({
+    this.http.request<ResourceSharingStatisticsResult>({
       path: `${AI}/sharing/resources/${id}/statistics`,
       method: 'GET',
       query: query,
@@ -175,7 +175,7 @@ export class Sharing<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<ResourceAccessCheckResult, ApiLocaleResult>({
+    this.http.request<ResourceAccessCheckResult>({
       path: `${AI}/sharing/check-access`,
       method: 'GET',
       query: query,
@@ -203,7 +203,7 @@ export class Sharing<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<ResourceInfoListSharePermissionResult, ApiLocaleResult>({
+    this.http.request<ResourceInfoListSharePermissionResult>({
       path: `${AI}/sharing/access-permissions`,
       method: 'GET',
       query: query,

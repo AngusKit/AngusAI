@@ -38,7 +38,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "Resource Sharing", description = "资源共享管理 - 团队资源共享、权限控制、访问统计。注意：资源可访问性由资源可见性和资源共享两种方式控制")
+@Tag(name = "ResourceSharing", description = "资源共享管理 - 团队资源共享、权限控制、访问统计。注意：资源可访问性由资源可见性和资源共享两种方式控制")
 @Validated
 @RestController
 @RequestMapping("/api/v1/sharing")

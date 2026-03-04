@@ -1,6 +1,6 @@
 import { ApiLocaleResult, PageQuery, AI } from '@xcan-angus/infra';
 import { GetKnowledgeBaseListOrderByEnum, KnowledgeBaseCreateDto, KnowledgeBaseDetailResult, KnowledgeBaseStatisticsResult, KnowledgeBaseToggleDto, KnowledgeBaseUpdateDto, PageResultKnowledgeBaseListResult, } from './KnowledgeBasesTypes.ts';
-import http, { ContentType, HttpClient, RequestParams } from './HttpClient.ts';
+import http, { ContentType, HttpClient, QueryParamsType, RequestParams } from './HttpClient.ts';
 import { VisibilityEnum } from '@/enums/enums.ts';
 
 export class KnowledgeBases<SecurityDataType = unknown> {
@@ -27,7 +27,7 @@ export class KnowledgeBases<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<KnowledgeBaseDetailResult, ApiLocaleResult>({
+    this.http.request<KnowledgeBaseDetailResult>({
       path: `${AI}/knowledge-bases/${id}/visibility`,
       method: 'PUT',
       query: query,
@@ -44,7 +44,7 @@ export class KnowledgeBases<SecurityDataType = unknown> {
    * @secure
    */
   toggleKnowledgeStatus = (id: string, data: KnowledgeBaseToggleDto, params: RequestParams = {}) =>
-    this.http.request<KnowledgeBaseDetailResult, ApiLocaleResult>({
+    this.http.request<KnowledgeBaseDetailResult>({
       path: `${AI}/knowledge-bases/${id}/toggle`,
       method: 'PUT',
       body: data,
@@ -97,10 +97,10 @@ export class KnowledgeBases<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<PageResultKnowledgeBaseListResult, ApiLocaleResult>({
+    this.http.request<PageResultKnowledgeBaseListResult>({
       path: `${AI}/knowledge-bases`,
       method: 'GET',
-      query: query,
+      query: query as unknown as QueryParamsType,
       secure: true,
       ...params,
     });
@@ -114,7 +114,7 @@ export class KnowledgeBases<SecurityDataType = unknown> {
    * @secure
    */
   createKnowledgeBase = (data: KnowledgeBaseCreateDto, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResult, ApiLocaleResult>({
+    this.http.request<ApiLocaleResult>({
       path: `${AI}/knowledge-bases`,
       method: 'POST',
       body: data,
@@ -132,7 +132,7 @@ export class KnowledgeBases<SecurityDataType = unknown> {
    * @secure
    */
   getKnowledgeBaseDetail = (id: string, params: RequestParams = {}) =>
-    this.http.request<KnowledgeBaseDetailResult, ApiLocaleResult>({
+    this.http.request<KnowledgeBaseDetailResult>({
       path: `${AI}/knowledge-bases/${id}`,
       method: 'GET',
       secure: true,
@@ -148,7 +148,7 @@ export class KnowledgeBases<SecurityDataType = unknown> {
    * @secure
    */
   deleteKnowledgeBase = (id: string, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResult, ApiLocaleResult>({
+    this.http.request<ApiLocaleResult>({
       path: `${AI}/knowledge-bases/${id}`,
       method: 'DELETE',
       secure: true,
@@ -164,7 +164,7 @@ export class KnowledgeBases<SecurityDataType = unknown> {
    * @secure
    */
   toggleKnowledge = (id: string, data: KnowledgeBaseUpdateDto, params: RequestParams = {}) =>
-    this.http.request<KnowledgeBaseDetailResult, ApiLocaleResult>({
+    this.http.request<KnowledgeBaseDetailResult>({
       path: `${AI}/knowledge-bases/${id}`,
       method: 'PATCH',
       body: data,
@@ -196,7 +196,7 @@ export class KnowledgeBases<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<KnowledgeBaseStatisticsResult, ApiLocaleResult>({
+    this.http.request<KnowledgeBaseStatisticsResult>({
       path: `${AI}/knowledge-bases/statistics`,
       method: 'GET',
       query: query,

@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-@Tag(name = "对话消息", description = "对话消息管理 - 消息发送、接收、历史查询、反馈等功能")
+@Tag(name = "ChatMessages", description = "对话消息管理 - 消息发送、接收、历史查询、反馈等功能")
 @Validated
 @RestController
 @RequestMapping("/api/v1/chat/sessions")

@@ -1,6 +1,6 @@
 import { AI, ApiLocaleResult, PageQuery } from '@xcan-angus/infra';
 import { GetModelListParamsOrderByEnum, ModelConfig, ModelCreateDto, ModelDetailResult, ModelStatisticsResult, ModelTestDto, ModelUpdateDto, PageResultModelListResult, } from './ModelsTypes.ts';
-import http, { ContentType, HttpClient, RequestParams } from './HttpClient.ts';
+import http, { ContentType, HttpClient, QueryParamsType, RequestParams } from './HttpClient.ts';
 import { ModelProviderEnum, ModelStatusEnum, ModelTypeEnum } from '@/enums/enums.ts';
 
 export class Models<SecurityDataType = unknown> {
@@ -20,7 +20,7 @@ export class Models<SecurityDataType = unknown> {
    * @secure
    */
   updateModelConfig = (id: string, data: ModelConfig, params: RequestParams = {}) =>
-    this.http.request<ModelDetailResult, ApiLocaleResult>({
+    this.http.request<ModelDetailResult>({
       path: `${AI}/models/${id}/config`,
       method: 'PUT',
       body: data,
@@ -60,10 +60,10 @@ export class Models<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<PageResultModelListResult, ApiLocaleResult>({
+    this.http.request<PageResultModelListResult>({
       path: `${AI}/models`,
       method: 'GET',
-      query: query,
+      query: query as unknown as QueryParamsType,
       secure: true,
       ...params,
     });
@@ -77,7 +77,7 @@ export class Models<SecurityDataType = unknown> {
    * @secure
    */
   createModel = (data: ModelCreateDto, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResult, ApiLocaleResult>({
+    this.http.request<ApiLocaleResult>({
       path: `${AI}/models`,
       method: 'POST',
       body: data,
@@ -95,7 +95,7 @@ export class Models<SecurityDataType = unknown> {
    * @secure
    */
   testModel = (id: string, data: ModelTestDto, params: RequestParams = {}) =>
-    this.http.request<ModelDetailResult, ApiLocaleResult>({
+    this.http.request<ModelDetailResult>({
       path: `${AI}/models/${id}/test`,
       method: 'POST',
       body: data,
@@ -123,7 +123,7 @@ export class Models<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<ModelDetailResult, ApiLocaleResult>({
+    this.http.request<ModelDetailResult>({
       path: `${AI}/models/${id}/stop`,
       method: 'POST',
       query: query,
@@ -140,7 +140,7 @@ export class Models<SecurityDataType = unknown> {
    * @secure
    */
   startModel = (id: string, params: RequestParams = {}) =>
-    this.http.request<ModelDetailResult, ApiLocaleResult>({
+    this.http.request<ModelDetailResult>({
       path: `${AI}/models/${id}/start`,
       method: 'POST',
       secure: true,
@@ -156,7 +156,7 @@ export class Models<SecurityDataType = unknown> {
    * @secure
    */
   restartModel = (id: string, params: RequestParams = {}) =>
-    this.http.request<ModelDetailResult, ApiLocaleResult>({
+    this.http.request<ModelDetailResult>({
       path: `${AI}/models/${id}/restart`,
       method: 'POST',
       secure: true,
@@ -172,7 +172,7 @@ export class Models<SecurityDataType = unknown> {
    * @secure
    */
   getModelDetail = (id: string, params: RequestParams = {}) =>
-    this.http.request<ModelDetailResult, ApiLocaleResult>({
+    this.http.request<ModelDetailResult>({
       path: `${AI}/models/${id}`,
       method: 'GET',
       secure: true,
@@ -188,7 +188,7 @@ export class Models<SecurityDataType = unknown> {
    * @secure
    */
   deleteModel = (id: string, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResult, ApiLocaleResult>({
+    this.http.request<ApiLocaleResult>({
       path: `${AI}/models/${id}`,
       method: 'DELETE',
       secure: true,
@@ -204,7 +204,7 @@ export class Models<SecurityDataType = unknown> {
    * @secure
    */
   updateModel = (id: string, data: ModelUpdateDto, params: RequestParams = {}) =>
-    this.http.request<ModelDetailResult, ApiLocaleResult>({
+    this.http.request<ModelDetailResult>({
       path: `${AI}/models/${id}`,
       method: 'PATCH',
       body: data,
@@ -236,7 +236,7 @@ export class Models<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<ModelStatisticsResult, ApiLocaleResult>({
+    this.http.request<ModelStatisticsResult>({
       path: `${AI}/models/statistics`,
       method: 'GET',
       query: query,

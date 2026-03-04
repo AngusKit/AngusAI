@@ -1,6 +1,6 @@
 import { ApiLocaleResult, PageQuery } from '@xcan-angus/infra';
 import { DatasetDataBatchDeleteDto, ListSyncDataResult, PageDatasetDataListResult, GetDatasetDataListOrderByEnum, } from './DatasetsDataTypes.ts';
-import http, { ContentType, HttpClient, RequestParams } from './HttpClient.ts';
+import http, { ContentType, HttpClient, QueryParamsType, RequestParams } from './HttpClient.ts';
 import { DatasetDataStatusEnum, DatasetDataTypeEnum } from '@/enums/enums.ts';
 import { AI } from '@xcan-angus/infra';
 
@@ -28,7 +28,7 @@ export class DatasetsData<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<ApiLocaleResult, ApiLocaleResult>({
+    this.http.request<ApiLocaleResult>({
       path: `${AI}/datasets/${id}/data/upload`,
       method: 'POST',
       query: query,
@@ -53,7 +53,7 @@ export class DatasetsData<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<ListSyncDataResult, ApiLocaleResult>({
+    this.http.request<ListSyncDataResult>({
       path: `${AI}/datasets/${id}/data/sync`,
       method: 'POST',
       query: query,
@@ -92,10 +92,10 @@ export class DatasetsData<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<PageDatasetDataListResult, ApiLocaleResult>({
+    this.http.request<PageDatasetDataListResult>({
       path: `${AI}/datasets/${id}/data`,
       method: 'GET',
-      query: query,
+      query: query as unknown as QueryParamsType,
       secure: true,
       ...params,
     });
@@ -117,7 +117,7 @@ export class DatasetsData<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<void, ApiLocaleResult>({
+    this.http.request<void>({
       path: `${AI}/datasets/${id}/data/batch-delete`,
       method: 'DELETE',
       query: query,

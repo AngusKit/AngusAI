@@ -144,6 +144,37 @@ export const zhCN = {
     },
   },
 
+  // 侧边栏
+  sidebar: {
+    appSwitcher: {
+      switchApp: '切换应用',
+    },
+    expand: '展开',
+    collapse: '收起',
+  },
+
+  // 通用 UI
+  ui: {
+    notifications: '通知中心',
+    markAllAsRead: '清空全部',
+    noNotifications: '暂无通知',
+    noNotificationsDesc: '您还没有收到任何通知',
+    viewAllNotifications: '查看全部通知',
+    chinese: '中文',
+    english: 'English',
+    lightMode: '浅色模式',
+    darkMode: '深色模式',
+    adminAccount: '个人中心',
+    quickAccess: '快速访问',
+    profile: '基本信息',
+    accountSecurity: '安全设置',
+    notificationSettings: '我的消息',
+    userTokens: '访问令牌',
+    logout: '退出登录',
+    copyIdSuccess: 'ID 已复制到剪贴板',
+    copyFailed: '复制失败',
+  },
+
   // 侧边栏导航
   nav: {
     dashboard: '工作台',

@@ -5,7 +5,7 @@ import axios, {
   type AxiosResponse,
   type HeadersDefaults,
   type InternalAxiosRequestConfig,
-  type ResponseType,
+  type ResponseType
 } from 'axios';
 import {
   API_SERVER_ERROR_CODE,
@@ -25,13 +25,24 @@ import {
   IFRAME_REFRESH_TOKEN_NAME,
   IFRAME_REQUEST_AUTH_TIME_NAME,
   LockUtils,
-  REFRESH_TOKEN_AUTH_KEY,
   routerUtils as RouterUtils,
   SYSTEM_ERROR_MESSAGE,
   TokenInfo,
-  typeUtils,
+  typeUtils
 } from '@xcan-angus/infra';
 import { HttpApiResult } from './HttpApiResult.ts';
+import {
+  AUTH_BEARER_PREFIX,
+  HEADER_ACCEPT_LANGUAGE,
+  HEADER_AUTHORIZATION,
+  HEADER_VARY,
+  HEADER_DEVICE_ID,
+  LOCK_KEY_REFRESH_TOKEN,
+  HEADER_OPT_TENANT_ID,
+  TENANT_HEADER_EXCLUDED_PATTERNS,
+  TENANT_HEADER_WHITELIST_PATTERNS
+} from '@/Constants';
+import { getOptTenantId } from '@/lib/tenantRequestStore';
 
 export type QueryParamsType = Record<string | number, unknown>;
 
@@ -39,7 +50,7 @@ export type QueryParamsType = Record<string | number, unknown>;
 const filePaths: string[] = [
   `/${ApiType.API}/${DEFAULT_API_VERSION}/file/upload`, // Upload file endpoint
   `/${ApiType.API}/${DEFAULT_API_VERSION}/file`, // Download file endpoint
-  `/${ApiType.PUB_API}/${DEFAULT_API_VERSION}/file`, // Download file endpoint
+  `/${ApiType.PUB_API}/${DEFAULT_API_VERSION}/file` // Download file endpoint
 ];
 
 export interface FullRequestParams extends Omit<
@@ -86,6 +97,18 @@ export enum ContentType {
 
 const lockUtils = new LockUtils();
 
+/**
+ * 判断该请求是否需要添加 X-Opt-Tenant-Id 请求头
+ * 需命中需添加白名单，且未命中不需要添加白名单
+ */
+function shouldAddTenantHeader(url: string): boolean {
+  if (!url) return false;
+  const lower = url.toLowerCase();
+  const inWhitelist = TENANT_HEADER_WHITELIST_PATTERNS.some(p => lower.includes(p));
+  const inExcluded = TENANT_HEADER_EXCLUDED_PATTERNS.some(p => lower.includes(p));
+  return inWhitelist && !inExcluded;
+}
+
 export class HttpClient<SecurityDataType = unknown> {
   public instance: AxiosInstance;
   private securityData: SecurityDataType | null = null;
@@ -101,7 +124,7 @@ export class HttpClient<SecurityDataType = unknown> {
   }: ApiConfig<SecurityDataType> = {}) {
     this.instance = axios.create({
       ...axiosConfig,
-      baseURL: axiosConfig.baseURL || '{env}.xcan.cloud/ai',
+      baseURL: axiosConfig.baseURL || '{env}.xcan.cloud/ai'
     });
     this.initInstanceUse();
     this.secure = secure;
@@ -113,7 +136,7 @@ export class HttpClient<SecurityDataType = unknown> {
   refreshToken = async () => {
     const refreshToken = httpUtils.isInIframe()
       ? httpUtils.getParamsFromIframeUrl(IFRAME_ACCESS_TOKEN_NAME)
-      : cookieUtils.get(REFRESH_TOKEN_AUTH_KEY);
+      : cookieUtils.getTokenInfo()?.refresh_token;
 
     // No refresh token, redirect to signin
     if (!refreshToken) {
@@ -125,17 +148,17 @@ export class HttpClient<SecurityDataType = unknown> {
     const body = {
       refreshToken,
       clientId: env.oauthClientId,
-      clientSecret: env.oauthClientSecret,
+      clientSecret: env.oauthClientSecret
     };
 
     const response = await this.request({
-      url,
-      method: 'post',
-      query: body,
-    } as FullRequestParams);
+      path: url,
+      method: 'POST',
+      query: body
+    });
 
     if (!response.data) {
-      app.toSignIn(true);
+      // app.toSignIn(true);
       return;
     }
 
@@ -143,7 +166,7 @@ export class HttpClient<SecurityDataType = unknown> {
 
     const tokenInfo: TokenInfo = {
       request_auth_time: new Date().toISOString(),
-      ..._resData,
+      ..._resData
     } as TokenInfo;
     cookieUtils.setTokenInfo(tokenInfo);
 
@@ -183,14 +206,15 @@ export class HttpClient<SecurityDataType = unknown> {
       (err: AxiosError) => this.responseErrorInterceptor(err)
     );
   };
+
   requestInterceptor = async (
     config: InternalAxiosRequestConfig,
     domainManager: DomainManager
   ) => {
     // Set language and device headers
-    config.headers['Accept-Language'] = cookieUtils.getCurrentLanguage();
-    config.headers['Vary'] = 'Accept-Language';
-    config.headers['XC-Auth-Device-Id'] = await httpUtils.preloadVisitorId();
+    config.headers[HEADER_ACCEPT_LANGUAGE] = cookieUtils.getCurrentLanguage();
+    config.headers[HEADER_VARY] = HEADER_ACCEPT_LANGUAGE;
+    config.headers[HEADER_DEVICE_ID] = await httpUtils.preloadVisitorId();
 
     // Ensure config.url exists
     if (!config.url) {
@@ -199,18 +223,26 @@ export class HttpClient<SecurityDataType = unknown> {
 
     const url = config.url; // 保存 url 的引用，确保类型安全
 
+    // 仅对需要租户上下文的业务接口添加可选租户 ID 请求头
+    if (shouldAddTenantHeader(url)) {
+      const optTenantId = getOptTenantId();
+      if (optTenantId) {
+        config.headers[HEADER_OPT_TENANT_ID] = optTenantId;
+      }
+    }
+
     // Token logic for API endpoints
     if (url.includes(ApiType.API)) {
       if (appContext.isTokenExpiringOrExpired()) {
-        await lockUtils.executeWithLock('refreshToken', () =>
+        await lockUtils.executeWithLock(LOCK_KEY_REFRESH_TOKEN, () =>
           this.refreshToken()
         );
       }
 
       const accessToken = httpUtils.isInIframe()
         ? httpUtils.getParamsFromIframeUrl(IFRAME_ACCESS_TOKEN_NAME) || ''
-        : cookieUtils.get('access_token');
-      config.headers.Authorization = `Bearer ${accessToken}`;
+        : cookieUtils.getTokenInfo()?.access_token ?? '';
+      config.headers[HEADER_AUTHORIZATION] = `${AUTH_BEARER_PREFIX}${accessToken}`;
     }
 
     // Domain routing logic
@@ -258,16 +290,13 @@ export class HttpClient<SecurityDataType = unknown> {
     const filename = httpUtils.getFilenameFromResponse(response);
     const headers = { ...response.headers, filename };
     const status = response.status;
-    // TODO: If code != 'S', should show a prompt
     if (
       response?.data &&
       typeUtils.isObject(response.data) &&
       (response.data?.message || response.data?.msg) &&
       response.data?.code !== API_SUCCESS_CODE
     ) {
-      throw {
-        message: response.data.message || response.data.msg,
-      };
+      throw new Error(response.data.message || response.data.msg);
     }
     if (status === 401) {
       app.toSignIn(true);
@@ -278,24 +307,19 @@ export class HttpClient<SecurityDataType = unknown> {
       headers,
       code: API_SUCCESS_CODE,
       data: response?.data,
-      ...(response?.data || {}),
+      ...(response?.data || {})
     };
     // 返回 AxiosResponse，但 data 字段包含 HttpApiResult 结构
     return {
       ...response,
-      data: httpApiResult,
+      data: httpApiResult
     };
   };
 
   // Response error interceptor: formats error as HttpApiResult
   responseErrorInterceptor = (err: AxiosError): never => {
     if (!err?.response) {
-      throw {
-        status: err.status || 0,
-        headers: {},
-        code: API_SERVER_ERROR_CODE,
-        message: err.message,
-      } as HttpApiResult;
+      throw new Error(err.message || 'Network error');
     }
 
     const response = err.response;
@@ -305,7 +329,7 @@ export class HttpClient<SecurityDataType = unknown> {
         ? data
         : {
             code: API_SERVER_ERROR_CODE,
-            message: SYSTEM_ERROR_MESSAGE,
+            message: SYSTEM_ERROR_MESSAGE
           };
     const resConfig = response.config || {};
     const isApi = (resConfig.url || '')?.includes('/api/');
@@ -313,11 +337,7 @@ export class HttpClient<SecurityDataType = unknown> {
       app.toSignIn(true);
     }
 
-    throw {
-      status: response.status,
-      headers: response.headers,
-      ...result,
-    } as HttpApiResult;
+    throw new Error(result.message || 'Request failed');
   };
 
   setSecurityData = (data: SecurityDataType | null) => {
@@ -360,13 +380,13 @@ export class HttpClient<SecurityDataType = unknown> {
       ...(params2 || {}),
       headers: {
         ...((method &&
-          this.instance.defaults.headers[
-            method.toLowerCase() as keyof HeadersDefaults
-          ]) ||
+            this.instance.defaults.headers[
+              method.toLowerCase() as keyof HeadersDefaults
+            ]) ||
           {}),
         ...(params1.headers || {}),
-        ...((params2 && params2.headers) || {}),
-      },
+        ...((params2 && params2.headers) || {})
+      }
     } as FullRequestParams;
   }
 
@@ -431,12 +451,12 @@ export class HttpClient<SecurityDataType = unknown> {
         ...requestParams,
         headers: {
           ...(requestParams.headers || {}),
-          ...(type ? { 'Content-Type': type } : {}),
+          ...(type ? { 'Content-Type': type } : {})
         },
         params: _params,
         responseType: responseFormat,
         data: body,
-        url: path,
+        url: path
       } as any);
       // 响应拦截器已经将 response.data 转换为 HttpApiResult 结构
       return axiosResponse.data as HttpApiResult<T>;
@@ -455,7 +475,7 @@ export class HttpClient<SecurityDataType = unknown> {
           headers: errorResult?.headers || {},
           code: errorResult?.code || API_SERVER_ERROR_CODE,
           message: errorResult?.message || SYSTEM_ERROR_MESSAGE,
-          data: null,
+          data: null
         } as HttpApiResult<T>;
       }
     }

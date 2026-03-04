@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "Prompt Category", description = "提示词分类管理 - 分类的创建、管理、排序等功能")
+@Tag(name = "PromptCategory", description = "提示词分类管理 - 分类的创建、管理、排序等功能")
 @Validated
 @RestController
 @RequestMapping("/api/v1/prompt-categories")

@@ -1,6 +1,6 @@
 import { ApiLocaleResult, PageQuery, AI } from '@xcan-angus/infra';
 import { ApplicationConfig, ApplicationCreateDto, ApplicationDetailResult, ApplicationDuplicateDto, ApplicationShareDto, ApplicationStatisticsResult, ApplicationUpdateDto, GetApplicationListOrderByEnum, } from './ApplicationsTypes.ts';
-import http, { ContentType, HttpClient, RequestParams } from './HttpClient.ts';
+import http, { ContentType, HttpClient, QueryParamsType, RequestParams } from './HttpClient.ts';
 import { ApplicationCategoryEnum, ApplicationStatusEnum } from '@/enums/enums.ts';
 
 export class Applications<SecurityDataType = unknown> {
@@ -27,7 +27,7 @@ export class Applications<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<ApplicationDetailResult, ApiLocaleResult>({
+    this.http.request<ApplicationDetailResult>({
       path: `${AI}/applications/${id}/status`,
       method: 'PUT',
       query: query,
@@ -44,7 +44,7 @@ export class Applications<SecurityDataType = unknown> {
    * @secure
    */
   updateApplicationConfig = (id: string, data: ApplicationConfig, params: RequestParams = {}) =>
-    this.http.request<ApplicationDetailResult, ApiLocaleResult>({
+    this.http.request<ApplicationDetailResult>({
       path: `${AI}/applications/${id}/config`,
       method: 'PUT',
       body: data,
@@ -83,10 +83,10 @@ export class Applications<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<ApiLocaleResult, ApiLocaleResult>({
+    this.http.request<ApiLocaleResult>({
       path: `${AI}/applications`,
       method: 'GET',
-      query: query,
+      query: query as unknown as QueryParamsType,
       secure: true,
       ...params,
     });
@@ -100,7 +100,7 @@ export class Applications<SecurityDataType = unknown> {
    * @secure
    */
   createApplication = (data: ApplicationCreateDto, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResult, ApiLocaleResult>({
+    this.http.request<ApiLocaleResult>({
       path: `${AI}/applications`,
       method: 'POST',
       body: data,
@@ -118,7 +118,7 @@ export class Applications<SecurityDataType = unknown> {
    * @secure
    */
   shareApplication = (id: string, data: ApplicationShareDto, params: RequestParams = {}) =>
-    this.http.request<ApplicationDetailResult, ApiLocaleResult>({
+    this.http.request<ApplicationDetailResult>({
       path: `${AI}/applications/${id}/share`,
       method: 'POST',
       body: data,
@@ -136,7 +136,7 @@ export class Applications<SecurityDataType = unknown> {
    * @secure
    */
   duplicateApplication = (id: string, data: ApplicationDuplicateDto, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResult, ApiLocaleResult>({
+    this.http.request<ApiLocaleResult>({
       path: `${AI}/applications/${id}/duplicate`,
       method: 'POST',
       body: data,
@@ -154,7 +154,7 @@ export class Applications<SecurityDataType = unknown> {
    * @secure
    */
   getApplicationDetail = (id: string, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResult, ApiLocaleResult>({
+    this.http.request<ApiLocaleResult>({
       path: `${AI}/applications/${id}`,
       method: 'GET',
       secure: true,
@@ -170,7 +170,7 @@ export class Applications<SecurityDataType = unknown> {
    * @secure
    */
   deleteApplication = (id: string, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResult, ApiLocaleResult>({
+    this.http.request<ApiLocaleResult>({
       path: `${AI}/applications/${id}`,
       method: 'DELETE',
       secure: true,
@@ -186,7 +186,7 @@ export class Applications<SecurityDataType = unknown> {
    * @secure
    */
   updateApplication = (id: string, data: ApplicationUpdateDto, params: RequestParams = {}) =>
-    this.http.request<ApplicationDetailResult, ApiLocaleResult>({
+    this.http.request<ApplicationDetailResult>({
       path: `${AI}/applications/${id}`,
       method: 'PATCH',
       body: data,
@@ -215,7 +215,7 @@ export class Applications<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<ApplicationStatisticsResult, ApiLocaleResult>({
+    this.http.request<ApplicationStatisticsResult>({
       path: `${AI}/applications/${id}/statistics`,
       method: 'GET',
       query: query,
