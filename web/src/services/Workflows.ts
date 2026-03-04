@@ -1,6 +1,6 @@
 import { ApiLocaleResult, PageQuery, AI } from '@xcan-angus/infra';
 import { ExecutionDetailResult, ExecutionLogResult, GetWorkflowListOrderByEnum, WorkflowConfigUpdateDto, WorkflowCreateDto, WorkflowDetailResult, WorkflowExecuteDto, WorkflowListResult, WorkflowStatisticsResult, WorkflowUpdateDto, } from './WorkflowsTypes.ts';
-import http, { ContentType, HttpClient, RequestParams } from './HttpClient.ts';
+import http, { ContentType, HttpClient, QueryParamsType, RequestParams } from './HttpClient.ts';
 import { VisibilityEnum, WorkflowStatusEnum, WorkflowTypeEnum } from '@/enums/enums.ts';
 
 export class Workflows<SecurityDataType = unknown> {
@@ -27,7 +27,7 @@ export class Workflows<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<WorkflowDetailResult, ApiLocaleResult>({
+    this.http.request<WorkflowDetailResult>({
       path: `${AI}/workflows/${id}/visibility`,
       method: 'PUT',
       query: query,
@@ -44,7 +44,7 @@ export class Workflows<SecurityDataType = unknown> {
    * @secure
    */
   updateWorkflowConfig = (id: string, data: WorkflowConfigUpdateDto, params: RequestParams = {}) =>
-    this.http.request<WorkflowDetailResult, ApiLocaleResult>({
+    this.http.request<WorkflowDetailResult>({
       path: `${AI}/workflows/${id}/config`,
       method: 'PUT',
       body: data,
@@ -82,10 +82,10 @@ export class Workflows<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<WorkflowListResult, ApiLocaleResult>({
+    this.http.request<WorkflowListResult>({
       path: `${AI}/workflows`,
       method: 'GET',
-      query: query,
+      query: query as unknown as QueryParamsType,
       secure: true,
       ...params,
     });
@@ -99,7 +99,7 @@ export class Workflows<SecurityDataType = unknown> {
    * @secure
    */
   createWorkflow = (data: WorkflowCreateDto, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResult, ApiLocaleResult>({
+    this.http.request<ApiLocaleResult>({
       path: `${AI}/workflows`,
       method: 'POST',
       body: data,
@@ -117,7 +117,7 @@ export class Workflows<SecurityDataType = unknown> {
    * @secure
    */
   stopWorkflow = (id: string, params: RequestParams = {}) =>
-    this.http.request<WorkflowDetailResult, ApiLocaleResult>({
+    this.http.request<WorkflowDetailResult>({
       path: `${AI}/workflows/${id}/stop`,
       method: 'POST',
       secure: true,
@@ -133,7 +133,7 @@ export class Workflows<SecurityDataType = unknown> {
    * @secure
    */
   startWorkflow = (id: string, params: RequestParams = {}) =>
-    this.http.request<WorkflowDetailResult, ApiLocaleResult>({
+    this.http.request<WorkflowDetailResult>({
       path: `${AI}/workflows/${id}/start`,
       method: 'POST',
       secure: true,
@@ -149,7 +149,7 @@ export class Workflows<SecurityDataType = unknown> {
    * @secure
    */
   executeWorkflow = (id: string, data: WorkflowExecuteDto, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResult, ApiLocaleResult>({
+    this.http.request<ApiLocaleResult>({
       path: `${AI}/workflows/${id}/execute`,
       method: 'POST',
       body: data,
@@ -167,7 +167,7 @@ export class Workflows<SecurityDataType = unknown> {
    * @secure
    */
   getWorkflowDetail = (id: string, params: RequestParams = {}) =>
-    this.http.request<WorkflowDetailResult, ApiLocaleResult>({
+    this.http.request<WorkflowDetailResult>({
       path: `${AI}/workflows/${id}`,
       method: 'GET',
       secure: true,
@@ -183,7 +183,7 @@ export class Workflows<SecurityDataType = unknown> {
    * @secure
    */
   deleteWorkflow = (id: string, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResult, ApiLocaleResult>({
+    this.http.request<ApiLocaleResult>({
       path: `${AI}/workflows/${id}`,
       method: 'DELETE',
       secure: true,
@@ -199,7 +199,7 @@ export class Workflows<SecurityDataType = unknown> {
    * @secure
    */
   updateWorkflow = (id: string, data: WorkflowUpdateDto, params: RequestParams = {}) =>
-    this.http.request<WorkflowDetailResult, ApiLocaleResult>({
+    this.http.request<WorkflowDetailResult>({
       path: `${AI}/workflows/${id}`,
       method: 'PATCH',
       body: data,
@@ -223,7 +223,7 @@ export class Workflows<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<WorkflowStatisticsResult, ApiLocaleResult>({
+    this.http.request<WorkflowStatisticsResult>({
       path: `${AI}/workflows/statistics`,
       method: 'GET',
       query: query,
@@ -240,7 +240,7 @@ export class Workflows<SecurityDataType = unknown> {
    * @secure
    */
   getExecutionDetail = (executionId: string, params: RequestParams = {}) =>
-    this.http.request<ExecutionDetailResult, ApiLocaleResult>({
+    this.http.request<ExecutionDetailResult>({
       path: `${AI}/workflows/executions/${executionId}`,
       method: 'GET',
       secure: true,
@@ -269,10 +269,10 @@ export class Workflows<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<ExecutionLogResult, ApiLocaleResult>({
+    this.http.request<ExecutionLogResult>({
       path: `${AI}/workflows/execution-logs`,
       method: 'GET',
-      query: query,
+      query: query as unknown as QueryParamsType,
       secure: true,
       ...params,
     });

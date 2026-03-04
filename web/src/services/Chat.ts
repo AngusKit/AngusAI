@@ -1,6 +1,6 @@
 import { ApiLocaleResult, PageQuery, AI } from '@xcan-angus/infra';
 import { ChatStatisticsResult, MessageFeedbackDto, MessageResult, MessageSendDto, PageMessageResult, PageSessionListResult, SessionBatchDeleteDto, SessionCreateDto, SessionDetailResult, SessionStarDto, SessionSwitchAppDto, SessionSwitchModelDto, SessionUpdateDto, SseEmitter, } from './ChatTypes.ts';
-import http, { ContentType, HttpClient, RequestParams } from './HttpClient.ts';
+import http, { ContentType, HttpClient, QueryParamsType, RequestParams } from './HttpClient.ts';
 
 export class Chat<SecurityDataType = unknown> {
   http: HttpClient<SecurityDataType>;
@@ -39,10 +39,10 @@ export class Chat<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<PageSessionListResult, ApiLocaleResult>({
+    this.http.request<PageSessionListResult>({
       path: `${AI}/chat/sessions`,
       method: 'GET',
-      query: query,
+      query: query as unknown as QueryParamsType,
       secure: true,
       ...params,
     });
@@ -56,7 +56,7 @@ export class Chat<SecurityDataType = unknown> {
    * @secure
    */
   createSession = (data: SessionCreateDto, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResult, ApiLocaleResult>({
+    this.http.request<ApiLocaleResult>({
       path: `${AI}/chat/sessions`,
       method: 'POST',
       body: data,
@@ -74,7 +74,7 @@ export class Chat<SecurityDataType = unknown> {
    * @secure
    */
   stopGeneration = (sessionId: string, params: RequestParams = {}) =>
-    this.http.request<MessageResult, ApiLocaleResult>({
+    this.http.request<MessageResult>({
       path: `${AI}/chat/sessions/${sessionId}/stop`,
       method: 'POST',
       secure: true,
@@ -117,7 +117,7 @@ export class Chat<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<PageMessageResult, ApiLocaleResult>({
+    this.http.request<PageMessageResult>({
       path: `${AI}/chat/sessions/${sessionId}/messages`,
       method: 'GET',
       query: query,
@@ -134,7 +134,7 @@ export class Chat<SecurityDataType = unknown> {
    * @secure
    */
   sendMessage = (sessionId: string, data: MessageSendDto, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResult, ApiLocaleResult>({
+    this.http.request<ApiLocaleResult>({
       path: `${AI}/chat/sessions/${sessionId}/messages`,
       method: 'POST',
       body: data,
@@ -152,7 +152,7 @@ export class Chat<SecurityDataType = unknown> {
    * @secure
    */
   clearMessages = (sessionId: string, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResult, ApiLocaleResult>({
+    this.http.request<ApiLocaleResult>({
       path: `${AI}/chat/sessions/${sessionId}/messages`,
       method: 'DELETE',
       secure: true,
@@ -168,7 +168,7 @@ export class Chat<SecurityDataType = unknown> {
    * @secure
    */
   regenerateMessage = (sessionId: string, messageId: string, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResult, ApiLocaleResult>({
+    this.http.request<ApiLocaleResult>({
       path: `${AI}/chat/sessions/${sessionId}/messages/${messageId}/regenerate`,
       method: 'POST',
       secure: true,
@@ -184,7 +184,7 @@ export class Chat<SecurityDataType = unknown> {
    * @secure
    */
   feedbackMessage = (sessionId: string, messageId: string, data: MessageFeedbackDto, params: RequestParams = {}) =>
-    this.http.request<MessageResult, ApiLocaleResult>({
+    this.http.request<MessageResult>({
       path: `${AI}/chat/sessions/${sessionId}/messages/${messageId}/feedback`,
       method: 'POST',
       body: data,
@@ -202,7 +202,7 @@ export class Chat<SecurityDataType = unknown> {
    * @secure
    */
   sendMessageStream = (sessionId: string, data: MessageSendDto, params: RequestParams = {}) =>
-    this.http.request<SseEmitter, ApiLocaleResult>({
+    this.http.request<SseEmitter>({
       path: `${AI}/chat/sessions/${sessionId}/messages/stream`,
       method: 'POST',
       body: data,
@@ -233,7 +233,7 @@ export class Chat<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<ApiLocaleResult, ApiLocaleResult>({
+    this.http.request<ApiLocaleResult>({
       path: `${AI}/chat/sessions/voice-to-text`,
       method: 'POST',
       query: query,
@@ -252,7 +252,7 @@ export class Chat<SecurityDataType = unknown> {
    * @secure
    */
   batchDeleteSessions = (data: SessionBatchDeleteDto, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResult, ApiLocaleResult>({
+    this.http.request<ApiLocaleResult>({
       path: `${AI}/chat/sessions/batch-delete`,
       method: 'POST',
       body: data,
@@ -286,7 +286,7 @@ export class Chat<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<ApiLocaleResult, ApiLocaleResult>({
+    this.http.request<ApiLocaleResult>({
       path: `${AI}/chat/sessions/attachments`,
       method: 'POST',
       query: query,
@@ -305,7 +305,7 @@ export class Chat<SecurityDataType = unknown> {
    * @secure
    */
   switchModel = (sessionId: string, data: SessionSwitchModelDto, params: RequestParams = {}) =>
-    this.http.request<SessionDetailResult, ApiLocaleResult>({
+    this.http.request<SessionDetailResult>({
       path: `${AI}/chat/sessions/${sessionId}/switch-model`,
       method: 'PATCH',
       body: data,
@@ -323,7 +323,7 @@ export class Chat<SecurityDataType = unknown> {
    * @secure
    */
   switchApp = (sessionId: string, data: SessionSwitchAppDto, params: RequestParams = {}) =>
-    this.http.request<SessionDetailResult, ApiLocaleResult>({
+    this.http.request<SessionDetailResult>({
       path: `${AI}/chat/sessions/${sessionId}/switch-app`,
       method: 'PATCH',
       body: data,
@@ -341,7 +341,7 @@ export class Chat<SecurityDataType = unknown> {
    * @secure
    */
   starSession = (sessionId: string, data: SessionStarDto, params: RequestParams = {}) =>
-    this.http.request<SessionDetailResult, ApiLocaleResult>({
+    this.http.request<SessionDetailResult>({
       path: `${AI}/chat/sessions/${sessionId}/star`,
       method: 'PATCH',
       body: data,
@@ -359,7 +359,7 @@ export class Chat<SecurityDataType = unknown> {
    * @secure
    */
   getSessionDetail = (id: string, params: RequestParams = {}) =>
-    this.http.request<SessionDetailResult, ApiLocaleResult>({
+    this.http.request<SessionDetailResult>({
       path: `${AI}/chat/sessions/${id}`,
       method: 'GET',
       secure: true,
@@ -375,7 +375,7 @@ export class Chat<SecurityDataType = unknown> {
    * @secure
    */
   deleteSession = (id: string, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResult, ApiLocaleResult>({
+    this.http.request<ApiLocaleResult>({
       path: `${AI}/chat/sessions/${id}`,
       method: 'DELETE',
       secure: true,
@@ -391,7 +391,7 @@ export class Chat<SecurityDataType = unknown> {
    * @secure
    */
   updateSession = (id: string, data: SessionUpdateDto, params: RequestParams = {}) =>
-    this.http.request<SessionDetailResult, ApiLocaleResult>({
+    this.http.request<SessionDetailResult>({
       path: `${AI}/chat/sessions/${id}`,
       method: 'PATCH',
       body: data,
@@ -419,7 +419,7 @@ export class Chat<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<void, ApiLocaleResult>({
+    this.http.request<void>({
       path: `${AI}/chat/sessions/${sessionId}/export`,
       method: 'GET',
       query: query,
@@ -445,7 +445,7 @@ export class Chat<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<ChatStatisticsResult, ApiLocaleResult>({
+    this.http.request<ChatStatisticsResult>({
       path: `${AI}/chat/sessions/statistics`,
       method: 'GET',
       query: query,
@@ -462,7 +462,7 @@ export class Chat<SecurityDataType = unknown> {
    * @secure
    */
   deleteAttachment = (id: string, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResult, ApiLocaleResult>({
+    this.http.request<ApiLocaleResult>({
       path: `${AI}/chat/sessions/attachments/${id}`,
       method: 'DELETE',
       secure: true,

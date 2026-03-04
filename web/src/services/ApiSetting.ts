@@ -24,7 +24,7 @@ export class ApiSetting<SecurityDataType = unknown> {
     data: OpenAPIV3_1.ServerObject[],
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiSchemaResult, ApiLocaleResult>({
+    this.http.request<ApiSchemaResult>({
       path: `${AI}/api-collections/${collectionId}/servers`,
       method: "PUT",
       body: data,
@@ -46,7 +46,7 @@ export class ApiSetting<SecurityDataType = unknown> {
     data: Record<string, OpenAPIV3_1.SecuritySchemeObject>,
     params: RequestParams = {},
   ) =>
-    this.http.request<ApiSchemaResult, ApiLocaleResult>({
+    this.http.request<ApiSchemaResult>({
       path: `${AI}/api-collections/${collectionId}/securities`,
       method: "PUT",
       body: data,

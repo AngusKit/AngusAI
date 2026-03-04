@@ -1,5 +1,5 @@
 import { ApiLocaleResult, PageQuery, AI } from '@xcan-angus/infra';
-import httpClient, { HttpClient, RequestParams } from './HttpClient.ts';
+import httpClient, { HttpClient, QueryParamsType, RequestParams } from './HttpClient.ts';
 import { ActivityDetailResult, ActivityListOrderByEnum } from './ActivityTypes.ts';
 
 export class Activity<SecurityDataType = unknown> {
@@ -51,10 +51,10 @@ export class Activity<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<ActivityDetailResult, ApiLocaleResult>({
+    this.http.request<ActivityDetailResult>({
       path: `${AI}/activity`,
       method: 'GET',
-      query: query,
+      query: query as unknown as QueryParamsType,
       secure: true,
       ...params,
     });

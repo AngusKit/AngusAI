@@ -19,7 +19,7 @@ export class Team<SecurityDataType = unknown> {
    * @secure
    */
   getTeamSettingsDetail = (params: RequestParams = {}) =>
-    this.http.request<TeamSettingsResult, ApiLocaleResult>({
+    this.http.request<TeamSettingsResult>({
       path: `${AI}/team/settings`,
       method: 'GET',
       secure: true,
@@ -35,7 +35,7 @@ export class Team<SecurityDataType = unknown> {
    * @secure
    */
   updateTeamSettings = (data: TeamSettingsDto, params: RequestParams = {}) =>
-    this.http.request<TeamSettingsResult, ApiLocaleResult>({
+    this.http.request<TeamSettingsResult>({
       path: `${AI}/team/settings`,
       method: 'PUT',
       body: data,
