@@ -46,19 +46,8 @@ export default function App() {
     setSidebarCollapsed((prev) => !prev);
   }, []);
 
-  const appUserInfo = appContext.getUser();
+  const userInfo = appContext.getUser()!;
   const [chatContent, setChatContent] = useState<string>('');
-  const [userInfo, setUserInfo] = useState(
-    appUserInfo?.id
-      ? appUserInfo
-      : {
-          fullName: '柳小龙',
-          id: '100001',
-          avatar:
-            'https://images.unsplash.com/photo-1652795385761-7ac287d0cd03?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBhdmF0YXIlMjBjYXJ0b29ufGVufDF8fHx8MTc2MTEwMTExNXww&ixlib=rb-4.1.0&q=80&w=1080',
-          verified: true,
-        }
-  );
 
   const [selectedWorkflowForDesign, setSelectedWorkflowForDesign] = useState<{
     id: number;
@@ -82,13 +71,14 @@ export default function App() {
                 collapsed={sidebarCollapsed}
               />
             )}
-            <div className='flex-1 flex flex-col min-w-0 relative overflow-hidden'>
+            <div className='flex-1 flex flex-col min-w-0 relative'>
               {activePage !== 'chat' && (
                 <SidebarToggle collapsed={sidebarCollapsed} onToggle={toggleSidebar} />
               )}
-              {activePage !== 'chat' && <Header />}
+              <div className='flex-1 flex flex-col overflow-hidden min-h-0'>
+                {activePage !== 'chat' && <Header />}
 
-              <main className='flex-1 overflow-y-auto hide-scrollbar'>
+                <main className='flex-1 overflow-y-auto hide-scrollbar min-h-0'>
                 {activePage === 'chat' ? (
                   <Chat content={chatContent} onBack={() => setActivePage('home')} />
                 ) : (
@@ -172,6 +162,7 @@ export default function App() {
                   </div>
                 )}
               </main>
+              </div>
             </div>
           </div>
         </MyContext.Provider>

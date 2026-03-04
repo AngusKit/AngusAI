@@ -46,8 +46,12 @@ interface Session {
   updatedAt: Date;
 }
 
+interface ChatProps {
+  content?: string;
+  onBack?: () => void;
+}
 
-export function Chat() {
+export function Chat({ content = '', onBack }: ChatProps = {}) {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const [sessions, setSessions] = useState<Session[]>([
@@ -62,7 +66,7 @@ export function Chat() {
     },
   ]);
   const [currentSessionId, setCurrentSessionId] = useState('1');
-  const defaultContent = sessionStorage.getItem('chatContent') || '';
+  const defaultContent = content || sessionStorage.getItem('chatContent') || '';
   const [input, setInput] = useState(defaultContent);
   sessionStorage.removeItem('chatContent');
   const [isRecording, setIsRecording] = useState(false);
@@ -78,7 +82,7 @@ export function Chat() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleBack = () => {
-    navigate('/home');
+    onBack ? onBack() : navigate('/home');
   };
 
   // Settings state
