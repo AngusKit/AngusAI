@@ -1,4 +1,20 @@
 export const enumTranslations = {
+  NotificationTypeEnum: {
+    SUCCESS: '成功',
+    WARNING: '警告',
+    INFO: '信息',
+  },
+  NotificationPriorityEnum: {
+    HIGH: '高优先级',
+    MEDIUM: '中优先级',
+    LOW: '低优先级',
+  },
+  NotificationCategoryEnum: {
+    ALL: '全部消息',
+    UNREAD: '未读消息',
+    STARRED: '星标消息',
+    ARCHIVED: '已归档',
+  },
   WorkflowTypeEnum: {
     SINGLE_TASK: '处理单次任务的流程',
     MULTI_TURN: '支持多轮对话和记忆的流程',

@@ -457,6 +457,24 @@ CREATE TABLE "resource_sharing_member" (
   PRIMARY KEY ("id")
 );
 
+-- Table: ai_notification
+CREATE TABLE "ai_notification" (
+  "id" BIGINT NOT NULL,
+  "type" VARCHAR(20) NOT NULL,
+  "title" VARCHAR(200) NOT NULL,
+  "description" VARCHAR(1000) NOT NULL,
+  "category" VARCHAR(100) NOT NULL,
+  "is_read" BOOLEAN NOT NULL DEFAULT FALSE,
+  "is_starred" BOOLEAN NOT NULL DEFAULT FALSE,
+  "is_archived" BOOLEAN NOT NULL DEFAULT FALSE,
+  "is_email_sent" BOOLEAN NOT NULL DEFAULT FALSE,
+  "priority" VARCHAR(20) NOT NULL DEFAULT 'MEDIUM',
+  "timestamp" TIMESTAMP NOT NULL,
+  "target_user_id" BIGINT NULL,
+  "tenant_id" BIGINT NULL,
+  PRIMARY KEY ("id")
+);
+
 -- Table: team_activity
 CREATE TABLE "team_activity" (
   "id" BIGINT NOT NULL,
@@ -598,6 +616,17 @@ CREATE INDEX idx_ai_prompt_category_name_fulltext ON "ai_prompt_category" USING 
 CREATE INDEX idx_ai_prompt_favorites_created_by ON "ai_prompt_favorites" ("created_by");
 CREATE INDEX idx_ai_prompt_favorites_created_date ON "ai_prompt_favorites" ("created_date");
 CREATE INDEX idx_ai_prompt_favorites_prompt_id ON "ai_prompt_favorites" ("prompt_id");
+
+-- Indexes for ai_notification
+CREATE INDEX idx_ai_notification_tenant_id ON "ai_notification" ("tenant_id");
+CREATE INDEX idx_ai_notification_is_read ON "ai_notification" ("is_read");
+CREATE INDEX idx_ai_notification_is_starred ON "ai_notification" ("is_starred");
+CREATE INDEX idx_ai_notification_is_archived ON "ai_notification" ("is_archived");
+CREATE INDEX idx_ai_notification_is_email_sent ON "ai_notification" ("is_email_sent");
+CREATE INDEX idx_ai_notification_category ON "ai_notification" ("category");
+CREATE INDEX idx_ai_notification_priority ON "ai_notification" ("priority");
+CREATE INDEX idx_ai_notification_timestamp ON "ai_notification" ("timestamp");
+CREATE INDEX idx_ai_notification_title_description_fulltext ON "ai_notification" USING GIN (to_tsvector('english', COALESCE("title", '') || ' ' || COALESCE("description", '')));
 
 -- Indexes for api_collection
 CREATE INDEX idx_api_collection_tenant_id ON "api_collection" ("tenant_id");

@@ -1,3 +1,25 @@
+/** 通知类型：SUCCESS-成功, WARNING-警告, INFO-信息 */
+export enum NotificationTypeEnum {
+  SUCCESS = 'SUCCESS',
+  WARNING = 'WARNING',
+  INFO = 'INFO',
+}
+
+/** 通知优先级：HIGH-高优先级, MEDIUM-中优先级, LOW-低优先级 */
+export enum NotificationPriorityEnum {
+  HIGH = 'HIGH',
+  MEDIUM = 'MEDIUM',
+  LOW = 'LOW',
+}
+
+/** 通知分类：ALL-全部消息, UNREAD-未读消息, STARRED-星标消息, ARCHIVED-已归档 */
+export enum NotificationCategoryEnum {
+  ALL = 'ALL',
+  UNREAD = 'UNREAD',
+  STARRED = 'STARRED',
+  ARCHIVED = 'ARCHIVED',
+}
+
 /** 工作流类型 */
 export enum WorkflowTypeEnum {
   SINGLE_TASK = 'SINGLE_TASK',
@@ -371,6 +393,9 @@ export enum DatasourceConnectionStatusEnum {
 }
 
 export const enumNamespaceMap = new Map<any, string>([
+  [NotificationTypeEnum, 'enum.NotificationTypeEnum'],
+  [NotificationPriorityEnum, 'enum.NotificationPriorityEnum'],
+  [NotificationCategoryEnum, 'enum.NotificationCategoryEnum'],
   [WorkflowTypeEnum, 'enum.WorkflowTypeEnum'],
   [WorkflowStatusEnum, 'enum.WorkflowStatusEnum'],
   [TeamScaleEnum, 'enum.TeamScaleEnum'],

@@ -15,6 +15,7 @@ import { AppSettingsPage, UsageAnalytics, APIKeys, BillingSubscription } from '@
 import { PromptLibraryPage } from '@/pages/prompt/PromptLibraryPage';
 import { Chat } from '@/pages/chat';
 import { ActivityLog } from '@/pages/activity/ActivityLog';
+import { NotificationsPage } from '@/pages/notifications/NotificationsPage';
 import { appContext, eventQueue } from '@xcan-angus/infra';
 import { ThemeProvider } from '@/components/ui/ThemeProvider';
 import { LanguageProvider } from '@/components/ui/LanguageProvider';
@@ -125,6 +126,7 @@ export default function App() {
                       setActivePage('chat');
                       
                     }} />}
+                    {activePage === 'notifications' && <NotificationsPage />}
                     {activePage === 'team-members' && <TeamMembers />}
                     {activePage === 'activity-log' && <ActivityLog />}
                     {activePage === 'resource-sharing' && <ResourceSharing />}
@@ -147,6 +149,7 @@ export default function App() {
                       activePage !== 'models' &&
                       activePage !== 'vector-store' &&
                       activePage !== 'prompts' &&
+                      activePage !== 'notifications' &&
                       activePage !== 'team-members' &&
                       activePage !== 'resource-sharing' &&
                       activePage !== 'team-settings' &&

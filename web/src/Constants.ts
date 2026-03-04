@@ -38,6 +38,9 @@ export const TENANT_HEADER_WHITELIST_PATTERNS = [
   '/api/v1/logs' // 操作日志接口
 ];
 
+/** 搜索防抖延迟（毫秒） */
+export const SEARCH_DEBOUNCE_DELAY = 300;
+
 /** 不需要添加操作租户请求头的路径白名单（命中时不添加，优先级高于需添加白名单） */
 export const TENANT_HEADER_EXCLUDED_PATTERNS = [
   '/api/v1/users/current', // 查询当前租户统计

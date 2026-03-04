@@ -1,4 +1,20 @@
 export const enumTranslations = {
+  NotificationTypeEnum: {
+    SUCCESS: 'Success',
+    WARNING: 'Warning',
+    INFO: 'Info',
+  },
+  NotificationPriorityEnum: {
+    HIGH: 'High',
+    MEDIUM: 'Medium',
+    LOW: 'Low',
+  },
+  NotificationCategoryEnum: {
+    ALL: 'All',
+    UNREAD: 'Unread',
+    STARRED: 'Starred',
+    ARCHIVED: 'Archived',
+  },
   WorkflowTypeEnum: {
     SINGLE_TASK: 'Single task processing workflow',
     MULTI_TURN: 'Multi-turn conversation workflow with memory',

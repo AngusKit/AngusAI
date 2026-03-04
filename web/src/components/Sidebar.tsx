@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, FileText, Workflow, BookOpen, Package, Database, Settings, Users, Share2, BarChart3, Key, CreditCard, MessageSquare, Sparkles, Code2, Server, Activity } from 'lucide-react';
+import { Home, FileText, Workflow, BookOpen, Package, Database, Settings, Users, Share2, BarChart3, Key, CreditCard, MessageSquare, Sparkles, Code2, Server, Activity, Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button.tsx';
 import { Badge } from '@/components/ui/badge.tsx';
 import { AppNavigator } from './AppNavigator.tsx';
@@ -31,6 +31,7 @@ export function Sidebar({ activePage, onPageChange, collapsed = false }: Sidebar
   ];
 
   const teamMenuItems = [
+    { id: 'notifications', icon: Bell, label: t('nav.notifications') },
     { id: 'team-members', icon: Users, label: t('nav.members') },
     { id: 'activity-log', icon: Activity, label: t('nav.activityLog') },
     { id: 'resource-sharing', icon: Share2, label: t('nav.sharing') },
