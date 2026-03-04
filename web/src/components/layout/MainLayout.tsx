@@ -1,30 +1,14 @@
-import { appContext, eventQueue } from '@xcan-angus/infra';
+import { appContext } from '@xcan-angus/infra';
 import { ThemeProvider } from '@/components/ThemeProvider.tsx';
 import { LanguageProvider } from '@/components/LanguageProvider.tsx';
 import { Sidebar } from '@/components/Sidebar';
 import { Header } from '@/components/Header';
 import { MyContext } from '@/components/ui/utils';
-import { useState } from 'react';
-import { toast } from 'sonner';
 import { Toaster } from '@/components/ui/sonner';
 import { Outlet } from 'react-router-dom';
 
 export function MainLayout() {
-    eventQueue.register('http_error', (msg: string) => {
-    toast.error(msg);
-    });
-    const appUserInfo = appContext.getUser();
-    const [userInfo, setUserInfo] = useState(
-        appUserInfo?.id
-          ? appUserInfo
-          : {
-              fullName: '柳小龙',
-              id: '100001',
-              avatar:
-                'https://images.unsplash.com/photo-1652795385761-7ac287d0cd03?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBhdmF0YXIlMjBjYXJ0b29ufGVufDF8fHx8MTc2MTEwMTExNXww&ixlib=rb-4.1.0&q=80&w=1080',
-              verified: true,
-            }
-      );
+    const userInfo = appContext.getUser();
     return (
         <ThemeProvider>
             <LanguageProvider>
