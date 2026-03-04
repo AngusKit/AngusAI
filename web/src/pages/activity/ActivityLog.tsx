@@ -14,7 +14,12 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
 import { useDebounce } from '@/hooks/useDebounce';
 import ActivityService from '@/services/Activity';
-import { ActivityDetailVo, ActivityListOrderByEnum } from '@/services/ActivityTypes';
+import {
+  ActivityDetailVo,
+  ActivityListOrderByEnum,
+  ActivityStatisticsVo,
+  SimpleStatisticsDto,
+} from '@/services/ActivityTypes';
 
 interface ActivityRecord {
   id: string;
@@ -96,6 +101,17 @@ export function ActivityLog() {
   const [activities, setActivities] = useState<ActivityRecord[]>([]);
   const [totalRecords, setTotalRecords] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [statistics, setStatistics] = useState<ActivityStatisticsVo | null>(null);
+  const [statisticsLoading, setStatisticsLoading] = useState(false);
+  const [statDateRange, setStatDateRange] = useState<SimpleStatisticsDto>(() => {
+    const end = new Date();
+    const start = new Date();
+    start.setDate(start.getDate() - 30);
+    return {
+      startDate: start.toISOString().slice(0, 10),
+      endDate: end.toISOString().slice(0, 10),
+    };
+  });
 
   const inferActionType = useCallback((record: ActivityDetailVo): string => {
     const candidates = `${record.description ?? ''}${record.detail ?? ''}`;
@@ -192,6 +208,50 @@ export function ActivityLog() {
     loadActivities();
   }, [loadActivities]);
 
+  const loadStatistics = useCallback(async () => {
+    setStatisticsLoading(true);
+    try {
+      const response = await ActivityService.getActivityStatistics(statDateRange);
+      const data = (response as any)?.data;
+      setStatistics(data ?? null);
+    } catch (error: any) {
+      console.error('Failed to load activity statistics:', error);
+      toast.error(
+        error?.message || (language === 'zh-CN' ? '加载统计失败' : 'Failed to load statistics')
+      );
+    } finally {
+      setStatisticsLoading(false);
+    }
+  }, [statDateRange, language]);
+
+  useEffect(() => {
+    loadStatistics();
+  }, [loadStatistics]);
+
+  const handleStatDateRangeChange = (preset: 'today' | 'week' | 'month') => {
+    const end = new Date();
+    const start = new Date();
+    if (preset === 'today') {
+      start.setHours(0, 0, 0, 0);
+      setStatDateRange({
+        startDate: start.toISOString().slice(0, 10),
+        endDate: end.toISOString().slice(0, 10),
+      });
+    } else if (preset === 'week') {
+      start.setDate(start.getDate() - 7);
+      setStatDateRange({
+        startDate: start.toISOString().slice(0, 10),
+        endDate: end.toISOString().slice(0, 10),
+      });
+    } else {
+      start.setDate(start.getDate() - 30);
+      setStatDateRange({
+        startDate: start.toISOString().slice(0, 10),
+        endDate: end.toISOString().slice(0, 10),
+      });
+    }
+  };
+
   // 客户端补充筛选（例如动作类型推断）
   const filteredActivities = useMemo(() => {
     if (selectedActionType === 'all') {
@@ -205,55 +265,46 @@ export function ActivityLog() {
   const paginatedActivities = filteredActivities;
 
   const statsCards = useMemo(() => {
-    const today = new Date();
-    const todayISO = today.toISOString().slice(0, 10);
-    const todayCount = activities.filter(activity => {
-      if (!activity.activityDate) return false;
-      try {
-        return new Date(activity.activityDate).toISOString().slice(0, 10) === todayISO;
-      } catch {
-        return false;
-      }
-    }).length;
+    const overview = statistics?.overview;
+    const todayActivities = overview?.todayActivities ?? 0;
+    const activeUsers = overview?.activeUsers ?? 0;
+    const successRate =
+      overview?.successRate != null ? `${overview.successRate.toFixed(1)}%` : '--';
+    const totalActivities = overview?.totalActivities ?? 0;
 
-    const uniqueUsers = new Set(
-      activities.filter(activity => activity.userId).map(activity => activity.userId as string)
-    ).size;
-
-    const successCount = activities.filter(activity => activity.status !== 'failed').length;
-    const successRate = activities.length > 0 ? `${((successCount / activities.length) * 100).toFixed(1)}%` : '--';
+    const isLoading = statisticsLoading;
 
     return [
       {
         key: 'todayActivities',
         label: language === 'zh-CN' ? '今日活动' : 'Activities Today',
-        value: loading ? '--' : todayCount.toString(),
+        value: isLoading ? '--' : todayActivities.toLocaleString(),
         icon: Activity,
         iconBg: 'bg-blue-500',
       },
       {
         key: 'activeUsers',
         label: language === 'zh-CN' ? '活跃用户' : 'Active Users',
-        value: loading ? '--' : uniqueUsers.toString(),
+        value: isLoading ? '--' : activeUsers.toLocaleString(),
         icon: User,
         iconBg: 'bg-green-500',
       },
       {
         key: 'successRate',
         label: language === 'zh-CN' ? '操作成功率' : 'Success Rate',
-        value: loading ? '--' : successRate,
+        value: isLoading ? '--' : successRate,
         icon: CheckCircle,
         iconBg: 'bg-purple-500',
       },
       {
-        key: 'totalRecords',
-        label: language === 'zh-CN' ? '总记录数' : 'Total Records',
-        value: loading ? '--' : totalRecords.toLocaleString(),
+        key: 'totalActivities',
+        label: language === 'zh-CN' ? '总活动数' : 'Total Activities',
+        value: isLoading ? '--' : totalActivities.toLocaleString(),
         icon: FileText,
         iconBg: 'bg-orange-500',
       },
     ];
-  }, [activities, language, loading, totalRecords]);
+  }, [statistics, language, statisticsLoading]);
 
   const handleViewDetail = (activity: ActivityRecord) => {
     setSelectedActivity(activity);
@@ -327,7 +378,7 @@ export function ActivityLog() {
   return (
     <div className='space-y-6'>
       {/* Header */}
-      <div>
+      <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4'>
         <div>
           <h1 className='text-2xl dark:text-white mb-1'>{language === 'zh-CN' ? '活动记录' : 'Activity Log'}</h1>
           <p className='text-sm text-gray-600 dark:text-gray-400'>
@@ -335,6 +386,32 @@ export function ActivityLog() {
               ? '查看团队成员的所有操作活动记录'
               : 'Review all team activity'}
           </p>
+        </div>
+        <div className='flex gap-2'>
+          <Button
+            variant='outline'
+            size='sm'
+            onClick={() => handleStatDateRangeChange('today')}
+            className='dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:bg-gray-700'
+          >
+            {language === 'zh-CN' ? '今日' : 'Today'}
+          </Button>
+          <Button
+            variant='outline'
+            size='sm'
+            onClick={() => handleStatDateRangeChange('week')}
+            className='dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:bg-gray-700'
+          >
+            {language === 'zh-CN' ? '最近7天' : 'Last 7 days'}
+          </Button>
+          <Button
+            variant='outline'
+            size='sm'
+            onClick={() => handleStatDateRangeChange('month')}
+            className='dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:bg-gray-700'
+          >
+            {language === 'zh-CN' ? '最近30天' : 'Last 30 days'}
+          </Button>
         </div>
       </div>
 

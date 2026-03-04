@@ -1,6 +1,11 @@
-import { ApiLocaleResult, PageQuery, AI } from '@xcan-angus/infra';
+import { PageQuery, AI } from '@xcan-angus/infra';
 import httpClient, { HttpClient, QueryParamsType, RequestParams } from './HttpClient.ts';
-import { ActivityDetailResult, ActivityListOrderByEnum } from './ActivityTypes.ts';
+import {
+  ActivityDetailResult,
+  ActivityListOrderByEnum,
+  ActivityStatisticsResult,
+  SimpleStatisticsDto,
+} from './ActivityTypes.ts';
 
 export class Activity<SecurityDataType = unknown> {
   http: HttpClient<SecurityDataType>;
@@ -53,6 +58,25 @@ export class Activity<SecurityDataType = unknown> {
   ) =>
     this.http.request<ActivityDetailResult>({
       path: `${AI}/activity`,
+      method: 'GET',
+      query: query as unknown as QueryParamsType,
+      secure: true,
+      ...params,
+    });
+
+  /**
+   * @description 获取活动模块统计数据
+   * @tags Activity
+   * @summary 获取活动统计
+   * @request GET:/api/v1/activity/statistics
+   * @secure
+   */
+  getActivityStatistics = (
+    query?: SimpleStatisticsDto,
+    params: RequestParams = {}
+  ) =>
+    this.http.request<ActivityStatisticsResult>({
+      path: `${AI}/activity/statistics`,
       method: 'GET',
       query: query as unknown as QueryParamsType,
       secure: true,
