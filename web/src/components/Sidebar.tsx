@@ -32,10 +32,10 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
   ];
 
   const teamMenuItems = [
-    { id: 'notifications', icon: Bell, label: t('nav.notifications') },
     { id: 'team-members', icon: Users, label: t('nav.members') },
-    { id: 'activity-log', icon: Activity, label: t('nav.activityLog') },
     { id: 'resource-sharing', icon: Share2, label: t('nav.sharing') },
+    { id: 'notifications', icon: Bell, label: t('nav.notifications') },
+    { id: 'activity-log', icon: Activity, label: t('nav.activityLog') },
   ];
 
   const settingsMenuItems = [
