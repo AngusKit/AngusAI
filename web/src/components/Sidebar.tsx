@@ -1,72 +1,20 @@
-import { Home, FileText, Workflow, BookOpen, Package, Database, Settings, Users, Share2, BarChart3, Key, CreditCard, ChevronDown, Check, MessageSquare, Sparkles, Code2, Server, Activity, SlidersVertical, } from 'lucide-react';
+import React from 'react';
+import { Home, FileText, Workflow, BookOpen, Package, Database, Settings, Users, Share2, BarChart3, Key, CreditCard, MessageSquare, Sparkles, Code2, Server, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button.tsx';
 import { Badge } from '@/components/ui/badge.tsx';
-import { AngusAILogo } from './AngusAILogo.tsx';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from '@/components/ui/dropdown-menu.tsx';
+import { AppNavigator } from './AppNavigator.tsx';
 import { useLanguage } from '@/components/ui/LanguageProvider.tsx';
-import { appContext, WebTagValue, AppInfo } from '@xcan-angus/infra';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip.tsx';
 
 interface SidebarProps {
   activePage: string;
   onPageChange: (page: string) => void;
+  /** 侧边栏是否收起 */
+  collapsed?: boolean;
 }
 
-export function Sidebar({ activePage, onPageChange }: SidebarProps) {
+export function Sidebar({ activePage, onPageChange, collapsed = false }: SidebarProps) {
   const { t } = useLanguage();
-  const appContextInfo = appContext.getContext();
-  const accessApps = appContextInfo?.authApps || [];
-  const currentEditionType = appContextInfo.accessApp?.editionType?.value;
-
-  const applicationIcons = {
-      AngusGit: '🚀',
-      AngusAI: '🤖',
-      chatbot: '💬',
-      analytics: '📊',
-      AngusTester: '🧪',
-      AngusGM: '🌍',
-  };
-
-  const applications: AppInfo[] = accessApps.filter(app => {
-    return (
-      app.editionType?.value === currentEditionType &&
-      (app.tags || [])?.some(tag => tag.name === WebTagValue.DISPLAY_ON_NAVIGATOR)
-    );
-  })
-  .map(app => ({
-    ...app,
-    icon: applicationIcons[app.code as keyof typeof applicationIcons],
-    iconText: app.name?.split('Angus')[1]?.[0],
-  })) as AppInfo[];
-
-  const currentApplication = appContextInfo?.accessApp;
-
-  const handleSelectApplication = (url?: string) => {
-    if (url) {
-      window.open(url, '_blank');
-    }
-  };
-
-  // const applications = [
-  //   { id: 'angusai', name: 'AngusAI', icon: '🤖', description: 'AI 工作平台' },
-  //   {
-  //     id: 'chatbot',
-  //     name: '智能客服',
-  //     icon: '💬',
-  //     description: '客服对话系统',
-  //   },
-  //   {
-  //     id: 'content',
-  //     name: '内容创作',
-  //     icon: '✨',
-  //     description: '内容生成工具',
-  //   },
-  //   {
-  //     id: 'analytics',
-  //     name: '数据分析',
-  //     icon: '📊',
-  //     description: '数据可视化',
-  //   },
-  // ];
 
   const mainMenuItems = [
     { id: 'home', icon: Home, label: t('nav.dashboard') },
@@ -95,133 +43,92 @@ export function Sidebar({ activePage, onPageChange }: SidebarProps) {
     { id: 'billing', icon: CreditCard, label: t('nav.billing') },
   ];
 
-  return (
-    <aside className='w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col'>
-      {/* Logo with App Navigator - 与Header高度一致 */}
-      <div className='h-[57px] px-4 border-b border-gray-200 dark:border-gray-700 flex items-center'>
-        <div className='flex items-center gap-2 flex-1'>
-          <AngusAILogo className='w-10 h-10 flex-shrink-0' />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className='flex items-center gap-2 flex-1 min-w-0 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg px-2 py-1.5 transition-colors'>
-                <div className='flex-1 min-w-0 text-left'>
-                  <div className='font-semibold dark:text-white truncate'>{currentApplication?.showName}</div>
-                  <div className='text-xs text-gray-500 dark:text-gray-400 truncate'>
-                    {currentApplication?.description}
-                  </div>
-                </div>
-                <ChevronDown className='w-4 h-4 text-gray-400 flex-shrink-0' />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align='start' className='w-64 dark:bg-gray-800 dark:border-gray-700'>
-              <div className='p-2'>
-                <div className='text-xs text-gray-500 dark:text-gray-400 px-2 py-1.5 mb-1'>切换应用</div>
-                {applications.map(app => (
-                  <DropdownMenuItem
-                    key={app.code}
-                    onClick={() => handleSelectApplication(app.url)}
-                    className={`flex items-center gap-3 py-2 `}
-                  >
-                    <div className='size-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0'>
-                      <span className='text-white font-semibold'>
-                        {app.iconText}
-                      </span>
-                    </div>
-                    <div className='flex-1 min-w-0'>
-                      <div className='flex items-center gap-2'>
-                        <span className='text-sm dark:text-white'>{app.name}</span>
-                        {currentApplication.code === app.code && <Check className='w-4 h-4 text-blue-500' />}
-                      </div>
-                      <div className='text-xs text-gray-500 dark:text-gray-400'>{app.description}</div>
-                    </div>
-                  </DropdownMenuItem>
-                ))}
-              </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
+  const renderMenuItem = (item: {
+    id: string;
+    icon: React.ComponentType<{ className?: string }>;
+    label: string;
+    badge?: string;
+  }) => (
+    <div key={item.id} className="relative">
+      <Button
+        onClick={() => onPageChange(item.id)}
+        variant={activePage === item.id ? 'default' : 'ghost'}
+        className={`w-full justify-start ${
+          activePage === item.id
+            ? 'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
+            : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
+        }`}
+      >
+        {item.icon && (
+          <item.icon
+            className={`w-4 h-4 shrink-0 mr-2 ${
+              activePage === item.id ? 'dark:text-blue-400 text-white' : ''
+            }`}
+          />
+        )}
+        <span>{item.label}</span>
+        {item.badge && (
+          <Badge
+            variant={activePage === item.id ? 'secondary' : 'default'}
+            className={`ml-2 ${activePage === item.id ? 'bg-blue-700 text-white' : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300'}`}
+          >
+            {item.badge}
+          </Badge>
+        )}
+      </Button>
+    </div>
+  );
 
-      {/* Create Button */}
-      <div className='p-4'>
-        <Button className='w-full bg-blue-500 hover:bg-blue-600' onClick={() => onPageChange('create-app')}>
-          + {t('quickActions.createApp')}
-        </Button>
-      </div>
+  const allMenuItems = [...mainMenuItems, ...teamMenuItems, ...settingsMenuItems];
+
+  return (
+    <aside
+      className={`relative overflow-visible bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col shrink-0 transition-all duration-200 ${
+        collapsed ? 'w-16' : 'w-64'
+      }`}
+    >
+      <AppNavigator collapsed={collapsed} />
 
       {/* Main Menu */}
-      <nav className='flex-1 overflow-y-auto hide-scrollbar'>
-        <div className='px-2 py-2 space-y-1'>
-          {mainMenuItems.map(item => (
-            <Button
-              key={item.id}
-              variant={activePage === item.id ? 'default' : 'ghost'}
-              onClick={() => onPageChange(item.id)}
-              className={`w-full justify-start ${
-                activePage === item.id
-                  ? 'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
-                  : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
-              }`}
-            >
-              <item.icon className='w-4 h-4 mr-2' />
-              <span className='flex-1 text-left text-sm'>{item.label}</span>
-              {item.badge && (
-                <Badge
-                  variant={activePage === item.id ? 'secondary' : 'default'}
-                  className={`ml-2 ${activePage === item.id ? 'bg-blue-700 text-white' : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300'}`}>
-                  {item.badge}
-                </Badge>
-              )}
-            </Button>
-          ))}
-        </div>
-
-        {/* Team Section */}
-        <div className='border-gray-200 dark:border-gray-700 pt-4'>
-          <div className='px-4 mb-2'>
-            <span className='text-xs text-gray-500 dark:text-gray-400'>{t('nav.team')}</span>
-          </div>
-          <div className='px-2 space-y-1'>
-            {teamMenuItems.map(item => (
-              <Button
-                key={item.id}
-                variant={activePage === item.id ? 'default' : 'ghost'}
-                onClick={() => onPageChange(item.id)}
-                className={`w-full justify-start ${
-                  activePage === item.id
-                    ? 'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
-                    : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
-                }`}
-              >
-                <item.icon className='w-4 h-4  mr-2' />
-                <span className='flex-1 text-left text-sm'>{item.label}</span>
-              </Button>
-            ))}
-          </div>
-        </div>
-
-        {/* Settings Section */}
-        <div className='border-gray-200 dark:border-gray-700 pt-4'>
-          <div className='px-4 mb-2'>
-            <span className='text-xs text-gray-500 dark:text-gray-400'>{t('common.actions.settings')}</span>
-          </div>
-          <div className='px-2 space-y-1'>
-            {settingsMenuItems.map(item => (
-              <Button
-                key={item.label}
-                variant={activePage === item.id ? 'default' : 'ghost'}
-                onClick={() => item.id && onPageChange(item.id)}
-                className={`w-full justify-start ${
-                activePage === item.id
-                  ? 'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
-                  : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
-              }`}
-              >
-                <item.icon className='w-4 h-4 mr-2' />
-                <span className='flex-1 text-left text-sm'>{item.label}</span>
-              </Button>
-            ))}
-          </div>
+      <nav className="flex-1 overflow-y-auto hide-scrollbar">
+        <div className={`py-4 space-y-1 ${collapsed ? 'px-2' : 'px-2'}`}>
+          {collapsed ? (
+            allMenuItems.map((item) => (
+              <div key={item.id}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className={`w-full h-9 ${activePage === item.id ? 'bg-blue-600 text-white' : ''}`}
+                      onClick={() => onPageChange(item.id)}
+                    >
+                      <item.icon className="w-5 h-5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">{item.label}</TooltipContent>
+                </Tooltip>
+              </div>
+            ))
+          ) : (
+            <>
+              <div className="my-1 space-y-0.5">
+                {mainMenuItems.map((item) => renderMenuItem(item))}
+              </div>
+              <div className="px-2 py-1.5 mb-1 mt-4">
+                <span className="text-xs text-gray-500 dark:text-gray-400">{t('nav.team')}</span>
+              </div>
+              <div className="my-1 space-y-0.5">
+                {teamMenuItems.map((item) => renderMenuItem(item))}
+              </div>
+              <div className="px-2 py-1.5 mb-1 mt-4">
+                <span className="text-xs text-gray-500 dark:text-gray-400">{t('common.actions.settings')}</span>
+              </div>
+              <div className="my-1 space-y-0.5">
+                {settingsMenuItems.map((item) => renderMenuItem(item))}
+              </div>
+            </>
+          )}
         </div>
       </nav>
     </aside>

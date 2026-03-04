@@ -144,6 +144,37 @@ export const enUS = {
     },
   },
 
+  // Sidebar
+  sidebar: {
+    appSwitcher: {
+      switchApp: 'Switch App',
+    },
+    expand: 'Expand',
+    collapse: 'Collapse',
+  },
+
+  // Common UI
+  ui: {
+    notifications: 'Notifications',
+    markAllAsRead: 'Mark all as read',
+    noNotifications: 'No notifications',
+    noNotificationsDesc: 'You have not received any notifications yet',
+    viewAllNotifications: 'View all notifications',
+    chinese: 'Chinese',
+    english: 'English',
+    lightMode: 'Light mode',
+    darkMode: 'Dark mode',
+    adminAccount: 'Account',
+    quickAccess: 'Quick access',
+    profile: 'Profile',
+    accountSecurity: 'Security',
+    notificationSettings: 'Messages',
+    userTokens: 'API Tokens',
+    logout: 'Logout',
+    copyIdSuccess: 'ID copied to clipboard',
+    copyFailed: 'Copy failed',
+  },
+
   // Navigation
   nav: {
     dashboard: 'Dashboard',

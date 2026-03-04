@@ -1,4 +1,5 @@
 import { Sidebar } from '@/components/Sidebar.tsx';
+import { SidebarToggle } from '@/components/SidebarToggle.tsx';
 import { Header } from '@/components/Header.tsx';
 import { RecentApplications, WelcomeBanner, StatsCards, UsageDetails } from '@/pages/dashboard';
 import { CreateApplication, MyApplications } from '@/pages/applications';
@@ -19,7 +20,7 @@ import { ThemeProvider } from '@/components/ui/ThemeProvider';
 import { LanguageProvider } from '@/components/ui/LanguageProvider';
 import { Toaster } from '@/components/ui/sonner';
 import { MyContext } from '@/components/ui/utils';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
 
 export default function App() {
@@ -27,6 +28,24 @@ export default function App() {
     toast.error(msg);
   });
   const [activePage, setActivePage] = useState('home');
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem('ai_sidebar_collapsed') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('ai_sidebar_collapsed', String(sidebarCollapsed));
+    } catch { /* ignore */ }
+  }, [sidebarCollapsed]);
+
+  const toggleSidebar = useCallback(() => {
+    setSidebarCollapsed((prev) => !prev);
+  }, []);
+
   const appUserInfo = appContext.getUser();
   const [chatContent, setChatContent] = useState<string>('');
   const [userInfo, setUserInfo] = useState(
@@ -53,8 +72,20 @@ export default function App() {
         <MyContext.Provider value={{ userInfo }}>
           <div className='flex h-screen bg-gray-50 dark:bg-gray-900'>
             <Toaster richColors position='top-right' />
-            {activePage !== 'chat' && <Sidebar activePage={activePage} onPageChange={(page) => {setActivePage(page); setChatContent('')}} />}
-            <div className='flex-1 flex flex-col overflow-hidden'>
+            {activePage !== 'chat' && (
+              <Sidebar
+                activePage={activePage}
+                onPageChange={(page) => {
+                  setActivePage(page);
+                  setChatContent('');
+                }}
+                collapsed={sidebarCollapsed}
+              />
+            )}
+            <div className='flex-1 flex flex-col min-w-0 relative overflow-hidden'>
+              {activePage !== 'chat' && (
+                <SidebarToggle collapsed={sidebarCollapsed} onToggle={toggleSidebar} />
+              )}
               {activePage !== 'chat' && <Header />}
 
               <main className='flex-1 overflow-y-auto hide-scrollbar'>
