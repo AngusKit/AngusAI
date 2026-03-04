@@ -2,8 +2,7 @@ package cloud.xcan.angus.core.ai.infra.job;
 
 import static cloud.xcan.angus.spec.utils.ObjectUtils.isNotEmpty;
 
-import cloud.xcan.angus.api.manager.SettingManager;
-import cloud.xcan.angus.core.ai.domain.team.activity.ActivityRepo;
+import cloud.xcan.angus.core.ai.domain.activity.ActivityRepo;
 import cloud.xcan.angus.core.job.JobTemplate;
 import jakarta.annotation.Resource;
 import java.util.List;

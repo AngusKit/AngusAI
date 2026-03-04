@@ -1,2 +1,2 @@
-export { TeamMembers } from './TeamMembers';
-export { ResourceSharing } from './ResourceSharing';
+export { TeamMembers } from '../member/TeamMembers.tsx';
+export { ResourceSharing } from '../sharding/ResourceSharing.tsx';

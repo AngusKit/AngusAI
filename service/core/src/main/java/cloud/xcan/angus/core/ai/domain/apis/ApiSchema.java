@@ -9,7 +9,7 @@ import cloud.xcan.angus.core.ai.domain.apis.converter.InfoConverter;
 import cloud.xcan.angus.core.ai.domain.apis.converter.SecurityRequirementConverter;
 import cloud.xcan.angus.core.ai.domain.apis.converter.ServersConverter;
 import cloud.xcan.angus.core.ai.domain.apis.converter.TagsConverter;
-import cloud.xcan.angus.core.ai.domain.team.activity.ActivityResource;
+import cloud.xcan.angus.core.ai.domain.activity.ActivityResource;
 import cloud.xcan.angus.core.jpa.multitenancy.TenantEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;

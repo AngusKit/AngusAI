@@ -10,7 +10,8 @@ import { APICollection } from '@/pages/apis/APICollection';
 import { PluginMarket } from '@/pages/plugins';
 import { ModelManagement } from '@/pages/models';
 import { VectorStore } from '@/pages/vector/VectorStore';
-import { TeamMembers, ResourceSharing } from '@/pages/team';
+import { TeamMembers } from '@/pages/member/TeamMembers';
+import { ResourceSharing } from '@/pages/sharding/ResourceSharing';
 import { AppSettingsPage, UsageAnalytics, APIKeys, BillingSubscription } from '@/pages/settings';
 import { PromptLibraryPage } from '@/pages/prompt/PromptLibraryPage';
 import { Chat } from '@/pages/chat';
@@ -124,7 +125,7 @@ export default function App() {
                     {activePage === 'prompts' && <PromptLibraryPage goChat={(promptContent) => {
                       setChatContent(promptContent);
                       setActivePage('chat');
-                      
+
                     }} />}
                     {activePage === 'notifications' && <NotificationsPage />}
                     {activePage === 'team-members' && <TeamMembers />}
