@@ -1,5 +1,5 @@
 import { Card, CardContent } from '@/components/ui/card';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 import {
   Select,
   SelectContent,

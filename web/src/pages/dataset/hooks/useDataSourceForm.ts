@@ -4,7 +4,7 @@ import { DatasourceConnectionTestDto, DataSourceUpdateDto, DatasourceConfigVo } 
 import Datasets from '@/services/Datasets';
 import { DATABASE_CONFIGS } from '../constants';
 import { generateJdbcUrl } from '../utils';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { DatasourceTypeEnum, DatasourceConnectionStatusEnum } from '@/enums/enums';
 
 /** 数据源表单状态 */

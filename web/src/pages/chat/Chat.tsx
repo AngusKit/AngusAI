@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Send, Paperclip, Mic, StopCircle, MoreVertical, Sparkles, BookmarkPlus, Settings, Maximize2, ArrowLeft, Download, Share2, Palette, Check, } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { toast } from 'sonner';
 import { ChatSidebar } from './ChatSidebar';
 import { ChatMessage } from './ChatMessage';

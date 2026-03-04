@@ -1,13 +1,13 @@
 import { appContext, eventQueue } from '@xcan-angus/infra';
-import { ThemeProvider } from '@/components/ui/ThemeProvider';
-import { LanguageProvider } from '@/components/ui/LanguageProvider';
+import { ThemeProvider } from '@/components/ThemeProvider.tsx';
+import { LanguageProvider } from '@/components/LanguageProvider.tsx';
 import { MyContext } from '@/components/ui/utils';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { Toaster } from '@/components/ui/sonner';
 import { Outlet } from 'react-router-dom';
 
-export function ChatLayout() { 
+export function ChatLayout() {
     eventQueue.register('http_error', (msg: string) => {
     toast.error(msg);
     });

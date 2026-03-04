@@ -57,7 +57,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import {Switch} from '@/components/ui/switch';
 import {useEffect, useRef, useState} from 'react';
-import {useLanguage} from '@/components/ui/LanguageProvider';
+import {useLanguage} from '@/components/LanguageProvider.tsx';
 import {toast} from 'sonner';
 import KnowledgeBases from '@/services/KnowledgeBases';
 import Documents from '@/services/Documents';

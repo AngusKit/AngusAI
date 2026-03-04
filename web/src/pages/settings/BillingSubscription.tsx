@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { CreditCard, Download, Calendar, TrendingUp, Check, Zap, Crown, Rocket, ChevronRight, AlertCircle, FileText, DollarSign, Clock, Package, RefreshCw, Settings, Building2, Users, Plus, Smartphone, X, CheckCircle2, Loader2, QrCode, XCircle, } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';

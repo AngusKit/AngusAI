@@ -24,7 +24,7 @@ import DatasetsData from '@/services/DatasetsData';
 import { DatasetDetailVo, DatasetListVo, DatasetStatisticsVo, DatasourceTableDataPreviewVo, GetDatasetListOrderByEnum, } from '@/services/DatasetsTypes';
 import { DatasetDataListVo } from '@/services/DatasetsDataTypes';
 import { DatasetDataTypeEnum, DatasetTypeEnum, VisibilityEnum, DatasetDataStatusEnum, DatasourceTypeEnum, EnabledStatusEnum } from '@/enums/enums';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { getEnumDescription } from '@/enums/utils';
 import { ENABLED_STATUS_COLOR } from '@/utils/PagesUtils';
 import { FILE_MAX_SIZE_BYTES, FILE_MAX_SIZE_MB } from '@/Constants';

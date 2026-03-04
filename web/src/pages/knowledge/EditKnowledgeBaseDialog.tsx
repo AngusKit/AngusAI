@@ -10,7 +10,7 @@ import { ICON_OPTIONS } from '@/utils';
 import { useKnowledgeBaseForm } from './hooks/useKnowledgeBaseForm';
 import { BasicInfoStep, ConfigurationStep } from './components/KnowledgeBaseFormSteps';
 import { KnowledgeBaseDetailResult } from '@/types/api-types';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { validateBasicInfo, validateConfiguration } from './utils';
 
 interface EditKnowledgeBaseDialogProps {

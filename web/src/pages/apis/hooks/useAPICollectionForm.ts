@@ -4,7 +4,7 @@
 
 import { useState, useCallback } from 'react';
 import { toast } from 'sonner';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 import ApiCollectionsService from '@/services/ApiCollections';
 import { DEFAULT_COLLECTION_FORM_DATA } from '../constants';
 import type { CollectionFormData } from '../types';

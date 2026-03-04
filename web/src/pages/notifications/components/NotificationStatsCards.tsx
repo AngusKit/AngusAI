@@ -1,6 +1,6 @@
 import { Bell, Star, Circle, TrendingUp, Loader2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { NotificationStatisticsVo } from '@/services/NotificationTypes';
 import { safeParseInt } from '@/utils/FormatUtils';
 

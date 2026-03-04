@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { Activity, Search, User, FileText, Database, Workflow, Brain, Settings, Trash2, Edit, Plus, Eye, Share2, Upload, Download, Clock, ChevronRight, AlertCircle, CheckCircle, XCircle, Info, } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';

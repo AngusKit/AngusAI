@@ -8,7 +8,7 @@ import { GetDatasetListOrderByEnum } from '@/services/DatasetsTypes';
 import { convertDatasetVoToItem, convertDataListVoToFile, convertDataListVoToTable } from '../utils';
 import { DatasetItem, DataFileItem, DatabaseTable } from '../utils';
 import { PAGINATION } from '../constants';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 
 /**
  * 数据集列表管理 Hook

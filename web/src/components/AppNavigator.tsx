@@ -5,7 +5,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu.tsx';
-import { useLanguage } from '@/components/ui/LanguageProvider.tsx';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { appContext, ApplicationDetail, WebTagValue2 } from '@xcan-angus/infra';
 import { useState } from 'react';
 

@@ -11,7 +11,7 @@ import Datasets from '@/services/Datasets';
 import { DatasetUpdateDto } from '@/services/DatasetsTypes';
 import { VisibilityEnum, DatasetTypeEnum } from '@/enums/enums';
 import { getTagColor, ICON_OPTIONS } from '@/utils';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { getEnumDescription } from '@/enums/utils';
 import { validateTag } from './utils';
 
@@ -51,7 +51,7 @@ export function EditDatasetDialog({ open, onOpenChange, dataset, onSuccess }: Ed
       setTags(dataset.tags || []);
 
       // 根据数据集类型设置数据类型（编辑时不允许修改）
-      if (dataset.type === DatasetTypeEnum.DATASOURCE) { 
+      if (dataset.type === DatasetTypeEnum.DATASOURCE) {
         setDataType(DatasetTypeEnum.DATASOURCE);
       } else {
         // '文件' 都对应 table 类型

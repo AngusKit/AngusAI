@@ -1,7 +1,7 @@
 import { Star, Archive, Trash2, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { NotificationDetailVo } from '@/services/NotificationTypes';
 import {
   getTypeIcon,

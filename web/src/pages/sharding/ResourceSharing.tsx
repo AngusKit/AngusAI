@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useLanguage } from '@/components/ui/LanguageProvider.tsx';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { Share2, Search, Filter, Workflow, Database, Zap, FileText, Users, Lock, Unlock, Eye, Edit, Trash2, MoreHorizontal, TrendingUp, Clock, Shield, CheckCircle, Globe, UserCheck, Plus, } from 'lucide-react';
 import { Button } from '@/components/ui/button.tsx';
 import { Card } from '@/components/ui/card.tsx';

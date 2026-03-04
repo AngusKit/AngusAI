@@ -37,6 +37,11 @@ export const enUS = {
     success: 'Success',
     refresh: 'Refresh',
     loading: 'Loading...',
+    notFound: {
+      title: 'Page Not Found',
+      description: 'Sorry, the page you are looking for does not exist or has been removed',
+      backHome: 'Back to Home',
+    },
     messages: {
       copyEmptyError: 'Content is empty, cannot copy',
       copySuccess: 'Copied to clipboard',

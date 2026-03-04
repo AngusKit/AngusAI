@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { Settings, Info, Zap, Database, MessageSquare, Puzzle, Shield, Key, Rocket, Save, Upload, Image as ImageIcon, Globe, Languages, Thermometer, Hash, BarChart, MessageCircle, FileText, Mic, Paperclip, Code, Lock, Eye, Copy, RefreshCw, CheckCircle, XCircle, AlertCircle, ChevronRight, Trash2, Plus, X, Search, MoreVertical, Clock, Users, GitBranch, ArrowLeft, } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';

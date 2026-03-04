@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, type ElementType } from 'react';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { Database, Search, Filter, TrendingUp, Activity, Grid3x3, List, Eye, Edit, Trash2, MoreHorizontal, Play, Pause, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';

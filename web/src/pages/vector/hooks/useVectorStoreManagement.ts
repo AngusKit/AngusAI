@@ -19,7 +19,7 @@ import {
 } from '../utils';
 import type { VectorStoreItem, VectorStoreStatus } from '../types';
 import { Database, CheckCircle2, Activity, Zap } from 'lucide-react';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 
 interface UseVectorStoreManagementReturn {
   // State
@@ -31,17 +31,17 @@ interface UseVectorStoreManagementReturn {
   currentPage: number;
   searchQuery: string;
   viewMode: 'grid' | 'list';
-  
+
   // Actions
   setCurrentPage: (page: number) => void;
   setSearchQuery: (query: string) => void;
   setViewMode: (mode: 'grid' | 'list') => void;
-  
+
   // Methods
   loadVectorStores: () => Promise<void>;
   loadStatistics: () => Promise<void>;
   ensureVectorStoreDetail: (store: VectorStoreItem) => Promise<VectorStoreItem>;
-  
+
   // Computed
   statsCards: Array<{
     key: string;

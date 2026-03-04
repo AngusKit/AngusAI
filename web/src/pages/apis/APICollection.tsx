@@ -13,7 +13,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Switch } from '@/components/ui/switch';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { cn } from '@/components/ui/utils';
 import { copyToClipboard } from '@/lib/clipboard';
 import ApiSettingService from '@/services/ApiSetting';
@@ -116,7 +116,7 @@ export function APICollection() {
 
     const securitySchemes: any = {};
     const security: any[] = [];
-    
+
     // 处理所有安全配置
     securityConfigs.forEach((config, configIndex) => {
       if (config.type === 'apiKey') {
@@ -187,7 +187,7 @@ export function APICollection() {
         description: selectedCol?.description || '',
         version: '1.0.0',
       },
-      servers: servers.length > 0 
+      servers: servers.length > 0
         ? servers.map(s => ({ url: s.url, description: s.description }))
         : [{ url: 'https://api.example.com', description: 'Default server' }],
       security,
@@ -279,7 +279,7 @@ export function APICollection() {
       setServerFormData({ url: '', description: '' });
       toast.success(t('apis.messages.serverAdded'));
     } catch {}
-    
+
   };
 
   const handleUpdateServer = async () => {
@@ -290,8 +290,8 @@ export function APICollection() {
       return;
     }
 
-    const newServers = servers.map(s => 
-      s.id === editingServer.id 
+    const newServers = servers.map(s =>
+      s.id === editingServer.id
         ? { ...s, url: serverFormData.url, description: serverFormData.description }
         : s
     )
@@ -432,7 +432,7 @@ export function APICollection() {
         };
       }
       if (security.type === 'bearer') {
-        acc[security.name] = {          
+        acc[security.name] = {
           type: 'http',
           scheme: 'bearer',
           [API_EXTENSION_KEYS.valueKey]: security.bearerToken,
@@ -638,8 +638,8 @@ export function APICollection() {
       return;
     }
 
-    const newSecurityConfigs = securityConfigs.map(s => 
-      s.id === editingSecurity.id 
+    const newSecurityConfigs = securityConfigs.map(s =>
+      s.id === editingSecurity.id
         ? {
             ...s,
             name: securityFormData.name,
@@ -655,7 +655,7 @@ export function APICollection() {
       resetSecurityForm();
       toast.success(t('apis.messages.securityUpdated'));
     } catch {}
-  
+
   };
 
   const handleEditSecurity = (security: SecurityConfigItem) => {
@@ -696,7 +696,7 @@ export function APICollection() {
       setSecurityConfigs(newSecurityConfigs);
       toast.success(t('apis.messages.securityDeleted'));
     } catch {}
-    
+
   };
 
   const resetSecurityForm = () => {
@@ -1151,8 +1151,8 @@ export function APICollection() {
                               </Button>
                             </>
                           ) : (
-                            <Button 
-                              onClick={handleAddServer} 
+                            <Button
+                              onClick={handleAddServer}
                               className="w-full"
                               disabled={servers.length >= 10}
                             >
@@ -1277,8 +1277,8 @@ export function APICollection() {
 
                         <div>
                           <Label>{t('apis.security.authType')}</Label>
-                          <Select 
-                            value={securityFormData.type} 
+                          <Select
+                            value={securityFormData.type}
                             onValueChange={(value: any) => setSecurityFormData(prev => ({ ...prev, type: value }))}
                           >
                             <SelectTrigger className="dark:bg-gray-750 dark:border-gray-600 mt-2">
@@ -1321,8 +1321,8 @@ export function APICollection() {
 
                             <div>
                               <Label>{t('apis.security.apiKeyLocation')}</Label>
-                              <Select 
-                                value={securityFormData.apiKeyIn} 
+                              <Select
+                                value={securityFormData.apiKeyIn}
                                 onValueChange={(value: any) => setSecurityFormData(prev => ({ ...prev, apiKeyIn: value }))}
                               >
                                 <SelectTrigger className="dark:bg-gray-750 dark:border-gray-600 mt-2">
@@ -1582,8 +1582,8 @@ export function APICollection() {
                               </Button>
                             </>
                           ) : (
-                            <Button 
-                              onClick={handleAddSecurity} 
+                            <Button
+                              onClick={handleAddSecurity}
                               className="w-full"
                               disabled={securityConfigs.length >= 10}
                             >

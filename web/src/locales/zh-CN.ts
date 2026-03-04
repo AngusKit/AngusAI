@@ -56,6 +56,11 @@ export const zhCN = {
     success: '成功',
     refresh: '刷新',
     loading: '加载中...',
+    notFound: {
+      title: '页面未找到',
+      description: '抱歉，您访问的页面不存在或已被移除',
+      backHome: '返回首页',
+    },
     pagination: {
       previous: '上一页',
       next: '下一页',

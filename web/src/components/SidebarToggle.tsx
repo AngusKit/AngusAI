@@ -1,6 +1,6 @@
 import { ChevronRight, ChevronLeft } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip.tsx';
-import { useLanguage } from '@/components/ui/LanguageProvider.tsx';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 
 interface SidebarToggleProps {
   collapsed: boolean;

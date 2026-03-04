@@ -6,7 +6,7 @@ import {
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { NotificationDetailVo } from '@/services/NotificationTypes';
 import { LoadingState } from './LoadingState';
 import { EmptyState } from './EmptyState';

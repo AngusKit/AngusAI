@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import Datasets from '@/services/Datasets';
 import { useDataSourceForm } from './hooks/useDataSourceForm';
 import { DataSourceFormContent } from './components/DataSourceFormContent';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { DatasourceConnectionStatusEnum } from '@/enums/enums';
 
 interface AddDataSourceDialogProps {

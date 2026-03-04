@@ -9,7 +9,7 @@ import { VectorStoreTypeEnum } from '@/enums/enums';
 import type { VectorStoreCreateDto, VectorStoreUpdateDto } from '@/services/VectorStoresTypes';
 import { DEFAULT_FORM_DATA, CONNECTION_TEST_TIMEOUT } from '../constants';
 import { parseDimension } from '../utils';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 import type { VectorStoreFormData, VectorStoreItem } from '../types';
 
 interface UseVectorStoreFormReturn {

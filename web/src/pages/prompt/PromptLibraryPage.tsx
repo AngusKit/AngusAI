@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
 import { cn } from '@/components/ui/utils';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { copyToClipboard } from '../../lib/clipboard';
 import Prompts from '../../services/Prompts';
 import PromptCategories from '../../services/PromptCategories';

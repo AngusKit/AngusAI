@@ -1,5 +1,5 @@
 import { Bell } from 'lucide-react';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { useNotificationsData } from './hooks/useNotificationsData';
 import { NotificationStatsCards } from './components/NotificationStatsCards';
 import { NotificationCategorySidebar } from './components/NotificationCategorySidebar';

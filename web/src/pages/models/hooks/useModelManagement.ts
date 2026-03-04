@@ -22,7 +22,7 @@ import {
 } from '../utils';
 import { ModelListItem } from '../types.ts';
 import { getEnumDescription } from '@/enums/utils';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 
 export type SortOption = 'default' | 'name' | 'provider' | 'status' | 'createdDate';
 
@@ -38,7 +38,7 @@ interface UseModelManagementReturn {
   statusFilter: 'all' | ModelStatusEnum;
   sortBy: SortOption;
   viewMode: 'grid' | 'list';
-  
+
   // Actions
   setCurrentPage: (page: number) => void;
   setSearchQuery: (query: string) => void;
@@ -46,13 +46,13 @@ interface UseModelManagementReturn {
   setStatusFilter: (filter: 'all' | ModelStatusEnum) => void;
   setSortBy: (sort: SortOption) => void;
   setViewMode: (mode: 'grid' | 'list') => void;
-  
+
   // Methods
   loadModels: () => Promise<void>;
   loadStatistics: () => Promise<void>;
   handleToggleStatus: (model: ModelListItem) => Promise<void>;
   fetchModelDetail: (modelId: string) => Promise<ModelDetailVo | undefined>;
-  
+
   // Computed
   statsCards: Array<{
     key: string;

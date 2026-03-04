@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ModelTypeEnum } from '@/enums/enums';
 import { MODEL_TYPE_CONFIG } from '../constants';
 import { enumToMessages } from '@/enums/utils';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 import type { ModelFormData } from '../types';
 
 interface ModelFormFieldsProps {

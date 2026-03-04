@@ -4,7 +4,7 @@
 
 import { useState, useRef, useCallback, ChangeEvent } from 'react';
 import { toast } from 'sonner';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 import ApiCollectionsService from '@/services/ApiCollections';
 import { ApiCollectionImportTypeEnum, ConflictStrategyEnum } from '@/enums/enums';
 import { FILE_UPLOAD_CONFIG } from '../constants';

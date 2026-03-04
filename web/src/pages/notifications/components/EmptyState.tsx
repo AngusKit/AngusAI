@@ -1,5 +1,5 @@
 import { Bell } from 'lucide-react';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 
 /**
  * 空状态组件

@@ -1,6 +1,6 @@
 import { MessageSquare, FileText, HelpCircle, User } from 'lucide-react';
 import { Card } from '@/components/ui/card';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 
 export function RecommendedTools() {
   const { t } = useLanguage();

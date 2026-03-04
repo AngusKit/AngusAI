@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Key, Plus, Copy, Eye, EyeOff, Trash2, MoreVertical, CheckCircle, XCircle, AlertCircle, Clock, Shield, Code, RefreshCw, Settings, Zap, GitBranch, Database, BookOpen, Package, Bot, } from 'lucide-react';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';

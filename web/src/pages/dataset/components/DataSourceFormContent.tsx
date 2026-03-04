@@ -5,7 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { DataSourceFormState } from '../hooks/useDataSourceForm';
 import { DATABASE_CONFIGS, DATABASES_REQUIRING_SCHEMA } from '../constants';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { DatasourceConnectionStatusEnum, DatasourceTypeEnum } from '@/enums/enums';
 
 interface DataSourceFormContentProps {

@@ -9,7 +9,7 @@ import { ModelCreateDto, ModelUpdateDto } from '@/services/ModelsTypes';
 import { ModelProviderEnum } from '@/enums/enums';
 import { DEFAULT_FORM_DATA } from '../constants';
 import { parseNumber } from '../utils';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 import type { ModelFormData } from '../types';
 
 interface UseModelFormReturn {

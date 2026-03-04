@@ -7,7 +7,7 @@ import { Card } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { XcanPagination } from '@/components/ui/pagination';
 import VectorStoresService from '@/services/VectorStores';
 import { VectorStoreTypeEnum } from '@/enums/enums';

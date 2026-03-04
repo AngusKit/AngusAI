@@ -8,7 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { VECTOR_STORES, CONFIG_CONSTANTS } from '../constants';
 import { getTagColor, ICON_OPTIONS } from '@/utils';
 import type { KnowledgeBaseFormData } from '../hooks/useKnowledgeBaseForm';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { VisibilityEnum } from '@/enums/enums';
 
 interface BasicInfoStepProps {

@@ -1,6 +1,6 @@
 import { Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 
 export function WelcomeBanner() {
   const { t } = useLanguage();

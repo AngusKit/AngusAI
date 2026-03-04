@@ -5,8 +5,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover.tsx';
 import { Separator } from '@/components/ui/separator.tsx';
 import { useContext, useState } from 'react';
-import { useTheme } from '@/components/ui/ThemeProvider.tsx';
-import { useLanguage } from '@/components/ui/LanguageProvider.tsx';
+import { useTheme } from '@/components/ThemeProvider.tsx';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { languages, Language } from '@/lib/i18n.ts';
 import { toast } from 'sonner';
 import { copyToClipboard } from '@/lib/clipboard.ts';

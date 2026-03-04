@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { BarChart3, TrendingUp, TrendingDown, Activity, Users, MessageSquare, Zap, Clock, Calendar, Filter, ChevronDown, } from 'lucide-react';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';

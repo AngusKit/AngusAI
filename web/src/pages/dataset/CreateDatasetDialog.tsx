@@ -11,7 +11,7 @@ import Datasets from '@/services/Datasets';
 import { DatasetCreateDto } from '@/services/DatasetsTypes';
 import { DatasetTypeEnum, VisibilityEnum } from '@/enums/enums';
 import { getTagColor, ICON_OPTIONS } from '@/utils';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { getEnumDescription } from '@/enums/utils';
 import { MAX_TAGS, MAX_TAG_LENGTH } from './constants';
 import { validateTag } from './utils';

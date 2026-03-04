@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { useDebounce } from '@/hooks/useDebounce';
 import { safeParseInt } from '@/utils/FormatUtils';
 import NotificationService from '@/services/Notification';

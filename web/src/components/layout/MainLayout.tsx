@@ -1,14 +1,15 @@
 import { appContext, eventQueue } from '@xcan-angus/infra';
-import { ThemeProvider } from '@/components/ui/ThemeProvider';
-import { LanguageProvider } from '@/components/ui/LanguageProvider';
-import { Sidebar, Header, RecentApplications, WelcomeBanner, StatsCards, UsageDetails, CreateApplication, MyApplications, Workflow, WorkflowDesignPage, KnowledgeBase, Dataset, APICollection, PluginMarket, ModelManagement, VectorStore, TeamMembers, ResourceSharing, AppSettingsPage, UsageAnalytics, APIKeys, BillingSubscription, PromptLibraryPage, Chat, ActivityLog, } from '@/pages';
+import { ThemeProvider } from '@/components/ThemeProvider.tsx';
+import { LanguageProvider } from '@/components/LanguageProvider.tsx';
+import { Sidebar } from '@/components/Sidebar';
+import { Header } from '@/components/Header';
 import { MyContext } from '@/components/ui/utils';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { Toaster } from '@/components/ui/sonner';
 import { Outlet } from 'react-router-dom';
 
-export function MainLayout() { 
+export function MainLayout() {
     eventQueue.register('http_error', (msg: string) => {
     toast.error(msg);
     });

@@ -4,7 +4,7 @@
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { toast } from 'sonner';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { useDebounce } from '@/hooks/useDebounce';
 import ApiCollectionsService from '@/services/ApiCollections';
 import { ApiCollectionDetailVo, ApiCollectionStatisticsVo, ApiEndpointListParamsOrderByEnum } from '@/services/ApiCollectionsTypes';

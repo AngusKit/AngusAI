@@ -3,7 +3,7 @@ import { toast } from 'sonner';
 import { VisibilityEnum, DatasetTypeEnum } from '@/enums/enums';
 import { FORM_VALIDATION } from '../constants';
 import { ICON_OPTIONS } from '@/utils';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { validateTag } from '../utils'
 
 /** 数据集表单数据类型 */
@@ -13,7 +13,7 @@ export type DatasetFormDataType = DatasetTypeEnum.FILE | DatasetTypeEnum.DATASOU
 export interface DatasetFormState {
   datasetName: string;
   description: string;
-  dataType: DatasetFormDataType; 
+  dataType: DatasetFormDataType;
   visibility: VisibilityEnum;
   selectedIcon: number;
   tags: string[];

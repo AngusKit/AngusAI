@@ -6,7 +6,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Input } from '@/components/ui/input';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, } from '@/components/ui/pagination';
 import { useState, useEffect } from 'react';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { toast } from 'sonner';
 import { EditApplicationDialog } from './EditApplicationDialog';
 import { ShareApplicationDialog } from './ShareApplicationDialog';
@@ -15,7 +15,7 @@ import { ApplicationDetailVo } from '@/services/ApplicationsTypes';
 import { ApplicationStatusEnum, ApplicationCategoryEnum } from '@/enums/enums';
 import { useDebounce } from '@/hooks/useDebounce';
 import { getEnumDescription } from '@/enums/utils';
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
 
 type ViewMode = 'grid' | 'list';
 
@@ -208,10 +208,10 @@ export function MyApplications() {
     try {
       const statusEnum = newStatus;
       await Applications.modifyApplicationStatus(appId, { status: statusEnum });
-      
+
       // 更新本地状态
       setApplications(prev => prev.map(app => (app.id === appId ? { ...app, status: newStatus } : app)));
-      
+
       const app = applications.find(a => a.id === appId);
       let message = '';
       if (newStatus === ApplicationStatusEnum.PUBLISHED) {
@@ -220,7 +220,7 @@ export function MyApplications() {
         message = `${app?.name} 已暂停`;
       }
       toast.success(message);
-      
+
       // 重新加载列表以获取最新数据
       await loadApplications();
     } catch (error: any) {
@@ -246,7 +246,7 @@ export function MyApplications() {
 
   const handleSaveEdit = async (updatedData: Partial<Application>) => {
     if (!selectedApp) return;
-    
+
     try {
       // 构建更新数据
       const updateDto: any = {};
@@ -257,13 +257,13 @@ export function MyApplications() {
       }
 
       await Applications.updateApplication(selectedApp.id, updateDto);
-      
+
       // 更新本地状态
       setApplications(prev => prev.map(app => (app.id === selectedApp.id ? { ...app, ...updatedData } : app)));
-      
+
       toast.success('应用已更新');
       setEditDialogOpen(false);
-      
+
       // 重新加载列表
       await loadApplications();
     } catch (error: any) {

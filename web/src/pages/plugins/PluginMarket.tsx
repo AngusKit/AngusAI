@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { Package, Search, Filter, Download, Star, TrendingUp, Clock, Grid3x3, List, Eye, CheckCircle, ChevronRight, Zap, Shield, Code, Palette, MessageSquare, FileText, BarChart3, Image as ImageIcon, Music, Video, Upload, Edit, X, User, Calendar, ThumbsUp, ThumbsDown, Plus, Minus, Activity, AlertCircle, AlertTriangle, FileCode2, Archive, } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
