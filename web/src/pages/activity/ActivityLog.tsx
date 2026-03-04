@@ -268,8 +268,11 @@ export function ActivityLog() {
     const overview = statistics?.overview;
     const todayActivities = overview?.todayActivities ?? 0;
     const activeUsers = overview?.activeUsers ?? 0;
+    const rawRate = overview?.successRate;
     const successRate =
-      overview?.successRate != null ? `${overview.successRate.toFixed(1)}%` : '--';
+      rawRate != null && !Number.isNaN(Number(rawRate))
+        ? `${Number(rawRate).toFixed(1)}%`
+        : '--';
     const totalActivities = overview?.totalActivities ?? 0;
 
     const isLoading = statisticsLoading;
