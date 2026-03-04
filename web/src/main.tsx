@@ -1,5 +1,5 @@
 import { app, AppOrServiceRoute } from '@xcan-angus/infra';
-import { initAfterAuthentication } from '@/lib/initAuth.ts';
+import { initAfterAuthentication } from '@/lib/initAuth';
 import { BrowserRouter } from 'react-router-dom';
 
 import { createRoot } from 'react-dom/client';
