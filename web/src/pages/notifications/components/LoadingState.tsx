@@ -1,6 +1,9 @@
 import { Loader2 } from 'lucide-react';
-import { useLanguage } from '@/components/ui/LanguageProvider.tsx';
+import { useLanguage } from '@/components/ui/LanguageProvider';
 
+/**
+ * 加载状态组件
+ */
 export function LoadingState () {
   const { t } = useLanguage();
   return (

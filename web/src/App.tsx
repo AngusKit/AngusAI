@@ -83,7 +83,7 @@ export default function App() {
                 {activePage === 'chat' ? (
                   <Chat content={chatContent} onBack={() => setActivePage('home')} />
                 ) : (
-                  <div className='px-7 py-6 space-y-6'>
+                  <div className='flex min-h-full flex-col px-7 py-6 space-y-6'>
                     {activePage === 'home' && (
                       <>
                         <WelcomeBanner />

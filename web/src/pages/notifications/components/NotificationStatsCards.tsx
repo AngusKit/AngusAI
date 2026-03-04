@@ -1,14 +1,20 @@
 import { Bell, Star, Circle, TrendingUp, Loader2 } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card.tsx';
-import { useLanguage } from '@/components/ui/LanguageProvider.tsx';
-import { NotificationStatisticsVo } from '@/services/NotificationTypes.ts';
-import { safeParseInt } from '@/utils/FormatUtils.ts';
+import { Card, CardContent } from '@/components/ui/card';
+import { useLanguage } from '@/components/ui/LanguageProvider';
+import { NotificationStatisticsVo } from '@/services/NotificationTypes';
+import { safeParseInt } from '@/utils/FormatUtils';
 
 interface NotificationStatsCardsProps {
+  /** 统计数据 */
   stats: NotificationStatisticsVo;
+  /** 是否正在加载统计数据 */
   statsLoading: boolean;
 }
 
+/**
+ * 通知统计卡片组件
+ * 显示总消息、未读消息、星标消息、今日新增等统计信息
+ */
 export function NotificationStatsCards ({
   stats,
   statsLoading
@@ -22,7 +28,13 @@ export function NotificationStatsCards ({
             <div>
               <p className='text-sm text-gray-600 dark:text-gray-400'>{t('notifications.totalMessages')}</p>
               <p className='text-3xl mt-1 text-gray-900 dark:text-white'>
-                {statsLoading ? <Loader2 className='size-6 animate-spin'/> : safeParseInt(stats.total, 0)}
+                {statsLoading
+                  ? (
+                    <Loader2 className='size-6 animate-spin'/>
+                    )
+                  : (
+                      safeParseInt(stats.total, 0)
+                    )}
               </p>
               <p className='text-sm text-gray-500 dark:text-gray-400 mt-1'>{t('notifications.allMessagesDesc')}</p>
             </div>
@@ -37,9 +49,17 @@ export function NotificationStatsCards ({
         <CardContent className='pt-6'>
           <div className='flex items-center justify-between'>
             <div>
-              <p className='text-sm text-gray-600 dark:text-gray-400'>{t('notifications.unreadMessages')}</p>
+              <p className='text-sm text-gray-600 dark:text-gray-400'>
+                {t('notifications.unreadMessages')}
+              </p>
               <p className='text-3xl mt-1 text-gray-900 dark:text-white'>
-                {statsLoading ? <Loader2 className='size-6 animate-spin'/> : safeParseInt(stats.unread, 0)}
+                {statsLoading
+                  ? (
+                    <Loader2 className='size-6 animate-spin'/>
+                    )
+                  : (
+                      safeParseInt(stats.unread, 0)
+                    )}
               </p>
               <p className='text-sm text-gray-500 dark:text-gray-400 mt-1'>{t('notifications.unreadMessagesDesc')}</p>
             </div>
@@ -54,9 +74,17 @@ export function NotificationStatsCards ({
         <CardContent className='pt-6'>
           <div className='flex items-center justify-between'>
             <div>
-              <p className='text-sm text-gray-600 dark:text-gray-400'>{t('notifications.starredMessages')}</p>
+              <p className='text-sm text-gray-600 dark:text-gray-400'>
+                {t('notifications.starredMessages')}
+              </p>
               <p className='text-3xl mt-1 text-gray-900 dark:text-white'>
-                {statsLoading ? <Loader2 className='size-6 animate-spin'/> : safeParseInt(stats.starred, 0)}
+                {statsLoading
+                  ? (
+                    <Loader2 className='size-6 animate-spin'/>
+                    )
+                  : (
+                      safeParseInt(stats.starred, 0)
+                    )}
               </p>
               <p className='text-sm text-gray-500 dark:text-gray-400 mt-1'>{t('notifications.starredMessagesDesc')}</p>
             </div>
@@ -71,9 +99,17 @@ export function NotificationStatsCards ({
         <CardContent className='pt-6'>
           <div className='flex items-center justify-between'>
             <div>
-              <p className='text-sm text-gray-600 dark:text-gray-400'>{t('notifications.todayNew')}</p>
+              <p className='text-sm text-gray-600 dark:text-gray-400'>
+                {t('notifications.todayNew')}
+              </p>
               <p className='text-3xl mt-1 text-gray-900 dark:text-white'>
-                {statsLoading ? <Loader2 className='size-6 animate-spin'/> : safeParseInt(stats.todayNew, 0)}
+                {statsLoading
+                  ? (
+                    <Loader2 className='size-6 animate-spin'/>
+                    )
+                  : (
+                      safeParseInt(stats.todayNew, 0)
+                    )}
               </p>
               <p className='text-sm text-green-600 mt-1 flex items-center gap-1'>
                 <TrendingUp className='size-3'/>+

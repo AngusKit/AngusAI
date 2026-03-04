@@ -1,8 +1,8 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button.tsx';
-import { useLanguage } from '@/components/ui/LanguageProvider.tsx';
+import { Button } from '@/components/ui/button';
+import { useLanguage } from '@/components/ui/LanguageProvider';
 
-interface NotificationPaginationProps {
+interface PaginationProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
@@ -10,13 +10,7 @@ interface NotificationPaginationProps {
   pageSize: number;
 }
 
-export function NotificationPagination ({
-  currentPage,
-  totalPages,
-  onPageChange,
-  totalItems,
-  pageSize
-}: NotificationPaginationProps) {
+export function Pagination ({ currentPage, totalPages, onPageChange, totalItems, pageSize }: PaginationProps) {
   const { t } = useLanguage();
   const startItem = (currentPage - 1) * pageSize + 1;
   const endItem = Math.min(currentPage * pageSize, totalItems);
@@ -32,13 +26,13 @@ export function NotificationPagination ({
       </div>
       <div className="flex items-center gap-2">
         <Button
-          variant='outline'
-          size='sm'
+          variant="outline"
+          size="sm"
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className='dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300 disabled:opacity-50'
+          className="dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300 disabled:opacity-50"
         >
-          <ChevronLeft className='w-4 h-4'/>
+          <ChevronLeft className="w-4 h-4"/>
         </Button>
         <div className="text-sm text-gray-600 dark:text-gray-400">
           {t('common.pagination.pageInfo', {
@@ -47,13 +41,13 @@ export function NotificationPagination ({
           } as Record<string, string>)}
         </div>
         <Button
-          variant='outline'
-          size='sm'
+          variant="outline"
+          size="sm"
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className='dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300 disabled:opacity-50'
+          className="dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300 disabled:opacity-50"
         >
-          <ChevronRight className='w-4 h-4'/>
+          <ChevronRight className="w-4 h-4"/>
         </Button>
       </div>
     </div>

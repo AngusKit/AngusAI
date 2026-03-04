@@ -1,25 +1,35 @@
 import { Star, Archive, Trash2, Check } from 'lucide-react';
-import { Button } from '@/components/ui/button.tsx';
-import { Badge } from '@/components/ui/badge.tsx';
-import { useLanguage } from '@/components/ui/LanguageProvider.tsx';
-import { NotificationDetailVo } from '@/services/NotificationTypes.ts';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { useLanguage } from '@/components/ui/LanguageProvider';
+import { NotificationDetailVo } from '@/services/NotificationTypes';
 import {
   getTypeIcon,
   getTypeColor,
   getStatusBadge,
   formatTimestamp,
   getPriorityText
-} from '../notificationUtils.tsx';
+} from '../notificationUtils';
 
 interface NotificationItemProps {
+  /** 通知对象 */
   notification: NotificationDetailVo;
+  /** 是否正在加载 */
   loading: boolean;
+  /** 标记已读/未读回调 */
   onToggleRead: (id: string) => void;
+  /** 切换星标回调 */
   onToggleStar: (id: string) => void;
+  /** 归档回调 */
   onArchive: (id: string) => void;
+  /** 删除回调 */
   onDelete: (id: string) => void;
 }
 
+/**
+ * 单个通知项组件
+ * 显示通知的详细信息并提供操作按钮
+ */
 export function NotificationItem ({
   notification,
   loading,
@@ -38,12 +48,14 @@ export function NotificationItem ({
       }`}
     >
       <div className='flex items-start gap-3'>
+        {/* 类型图标 */}
         <div
           className={`size-10 rounded-lg flex items-center justify-center flex-shrink-0 ${getTypeColor(notification.type)}`}
         >
           {getTypeIcon(notification.type)}
         </div>
 
+        {/* 内容 */}
         <div className='flex-1 min-w-0'>
           <div className='flex items-start justify-between gap-4 mb-2'>
             <div className='flex-1'>
@@ -66,7 +78,7 @@ export function NotificationItem ({
                 </span>
               )}
               <span className='text-gray-500 dark:text-gray-400'>
-                {notification.category || t('notifications.untagged')}
+                {notification.category || t('interfaceManagement.untagged')}
               </span>
               {notification.priority && (
                 <Badge variant='outline' className='text-xs'>

@@ -1,16 +1,23 @@
 import { Bell, Circle, Star, Archive } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card.tsx';
-import { useLanguage } from '@/components/ui/LanguageProvider.tsx';
-import { NotificationCategoryEnum } from '@/enums/enums.ts';
-import { NotificationStatisticsVo } from '@/services/NotificationTypes.ts';
-import { safeParseInt } from '@/utils/FormatUtils.ts';
+import { Card, CardContent } from '@/components/ui/card';
+import { useLanguage } from '@/components/ui/LanguageProvider';
+import { NotificationCategoryEnum } from '@/enums/enums';
+import { NotificationStatisticsVo } from '@/services/NotificationTypes';
+import { safeParseInt } from '@/utils/FormatUtils';
 
 interface NotificationCategorySidebarProps {
+  /** 当前选中的分类 */
   selectedCategory: NotificationCategoryEnum | 'all';
+  /** 统计数据 */
   stats: NotificationStatisticsVo;
+  /** 分类切换回调 */
   onCategoryChange: (category: NotificationCategoryEnum | 'all') => void;
 }
 
+/**
+ * 通知分类侧边栏组件
+ * 显示全部、未读、星标、已归档等分类选项
+ */
 export function NotificationCategorySidebar ({
   selectedCategory,
   stats,

@@ -1,14 +1,19 @@
 import { Bell } from 'lucide-react';
-import { useLanguage } from '@/components/ui/LanguageProvider.tsx';
-import { useNotificationsData } from './hooks/useNotificationsData.ts';
-import { NotificationStatsCards } from './components/NotificationStatsCards.tsx';
-import { NotificationCategorySidebar } from './components/NotificationCategorySidebar.tsx';
-import { NotificationFilters } from './components/NotificationFilters.tsx';
-import { NotificationList } from './components/NotificationList.tsx';
+import { useLanguage } from '@/components/ui/LanguageProvider';
+import { useNotificationsData } from './hooks/useNotificationsData';
+import { NotificationStatsCards } from './components/NotificationStatsCards';
+import { NotificationCategorySidebar } from './components/NotificationCategorySidebar';
+import { NotificationFilters } from './components/NotificationFilters';
+import { NotificationList } from './components/NotificationList';
 
+/**
+ * 通知页面主组件
+ * 提供通知消息的查看、筛选、管理等功能
+ */
 export function NotificationsPage () {
   const { t } = useLanguage();
   const {
+    // 状态
     searchTerm,
     setSearchTerm,
     selectedCategory,
@@ -24,6 +29,8 @@ export function NotificationsPage () {
     statsLoading,
     total,
     totalPages,
+
+    // 操作方法
     handleToggleRead,
     handleToggleStar,
     handleArchive,
@@ -35,6 +42,7 @@ export function NotificationsPage () {
 
   return (
     <div className='space-y-6'>
+      {/* 页面标题 */}
       <div>
         <h1 className='text-gray-900 dark:text-white flex items-center gap-2'>
           <Bell className='size-6 text-blue-600'/>
@@ -45,10 +53,13 @@ export function NotificationsPage () {
         </p>
       </div>
 
+      {/* 统计卡片 */}
       <NotificationStatsCards stats={stats} statsLoading={statsLoading}/>
 
-      <div className='grid grid-cols-1 lg:grid-cols-4 gap-6'>
-        <div className='space-y-6'>
+      {/* 主要内容区域：左侧分类+筛选一列，右侧列表占满剩余空间，两侧最小高度一致 */}
+      <div className='flex flex-col sm:flex-row sm:items-stretch gap-6'>
+        {/* 左侧边栏 - 消息分类和筛选条件同一列 */}
+        <div className='flex shrink-0 flex-col gap-6' style={{ minWidth: 288 }}>
           <NotificationCategorySidebar
             selectedCategory={selectedCategory}
             stats={stats}
@@ -62,7 +73,8 @@ export function NotificationsPage () {
           />
         </div>
 
-        <div className='lg:col-span-3'>
+        {/* 右侧内容 - 通知列表占满剩余空间，与左侧同高 */}
+        <div className='min-w-0 flex-1 flex flex-col min-h-0'>
           <NotificationList
             searchTerm={searchTerm}
             onSearchChange={setSearchTerm}
