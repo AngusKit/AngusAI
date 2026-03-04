@@ -1,9 +1,9 @@
 import { Home, FileText, Workflow, BookOpen, Package, Database, Settings, Users, Share2, BarChart3, Key, CreditCard, ChevronDown, Check, MessageSquare, Sparkles, Code2, Server, Activity, SlidersVertical, } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { AngusAILogo } from './AngusAILogo';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from '@/components/ui/dropdown-menu';
-import { useLanguage } from '@/components/ui/LanguageProvider';
+import { Button } from '@/components/ui/button.tsx';
+import { Badge } from '@/components/ui/badge.tsx';
+import { AngusAILogo } from './AngusAILogo.tsx';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from '@/components/ui/dropdown-menu.tsx';
+import { useLanguage } from '@/components/ui/LanguageProvider.tsx';
 import { appContext, WebTagValue, AppInfo } from '@xcan-angus/infra';
 
 interface SidebarProps {

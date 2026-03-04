@@ -1,19 +1,19 @@
 import { Search, Bell, HelpCircle, Languages, Sun, Moon, User, Shield, Key, MessageSquare, Copy, Check, LogOut, FileText, Sparkles, AlertCircle, CheckCircle, Info, ExternalLink, BookOpen, Video, FileQuestion, Clock, TrendingUp, Zap, Database, GitBranch, X, } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from '@/components/ui/dropdown-menu';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Separator } from '@/components/ui/separator';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button.tsx';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.tsx';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from '@/components/ui/dropdown-menu.tsx';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover.tsx';
+import { Separator } from '@/components/ui/separator.tsx';
+import { Badge } from '@/components/ui/badge.tsx';
 import { useContext, useState } from 'react';
-import { useTheme } from '@/components/ui/ThemeProvider';
-import { useLanguage } from '@/components/ui/LanguageProvider';
-import { languages, Language } from '@/lib/i18n';
+import { useTheme } from '@/components/ui/ThemeProvider.tsx';
+import { useLanguage } from '@/components/ui/LanguageProvider.tsx';
+import { languages, Language } from '@/lib/i18n.ts';
 import { toast } from 'sonner';
-import { copyToClipboard } from '@/lib/clipboard';
-import { MyContext } from '@/components/ui/utils';
+import { copyToClipboard } from '@/lib/clipboard.ts';
+import { MyContext } from '@/components/ui/utils.ts';
 import { app } from '@xcan-angus/infra';
-import { getGreeting, getFormattedDate } from '@/utils/FormatUtils';
+import { getGreeting, getFormattedDate } from '@/utils/FormatUtils.ts';
 
 export function Header() {
   const { language, setLanguage, t } = useLanguage();
