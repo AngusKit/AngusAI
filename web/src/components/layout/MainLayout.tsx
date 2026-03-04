@@ -51,7 +51,7 @@ export function MainLayout() {
                             </main>
                         </div>
                     </div>
-                </div>
+                 </div>
                 </MyContext.Provider>
             </LanguageProvider>
         </ThemeProvider>
