@@ -229,6 +229,7 @@ export const zhCN = {
     unreadMessages: '未读消息',
     starredMessages: '星标消息',
     filterTitle: '筛选条件',
+    allTypes: '全部类型',
     type: '类型',
     priority: '优先级',
     info: '信息',

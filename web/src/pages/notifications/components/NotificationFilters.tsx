@@ -34,11 +34,11 @@ export function NotificationFilters ({
   return (
     <Card className='dark:bg-gray-800 dark:border-gray-700'>
       <CardContent className='pt-6 space-y-4'>
-        <h3 className='text-sm text-gray-900 dark:text-white mb-3'>{t('notifications.filterTitle')}</h3>
+        <h3 className='text-sm text-gray-900 dark:text-white mb-3 whitespace-nowrap'>{t('notifications.filterTitle')}</h3>
 
         <div>
-          <label className='text-xs text-gray-600 dark:text-gray-400 mb-1 block'>
-            {t('common.fields.type')}
+          <label className='text-xs text-gray-600 dark:text-gray-400 mb-1 block whitespace-nowrap'>
+            {t('common.labels.type')}
           </label>
           <Select
             value={selectedType}
@@ -46,20 +46,20 @@ export function NotificationFilters ({
               onTypeChange(value as NotificationTypeEnum | 'all')
             }
           >
-            <SelectTrigger className='dark:bg-gray-900 dark:border-gray-700'>
+            <SelectTrigger className='dark:bg-gray-900 dark:border-gray-700 whitespace-nowrap'>
               <SelectValue/>
             </SelectTrigger>
             <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
-              <SelectItem value='all'>{t('tenants.allTypes')}</SelectItem>
+              <SelectItem value='all'>{t('notifications.allTypes')}</SelectItem>
               <SelectItem value={NotificationTypeEnum.SUCCESS}>{t('common.success')}</SelectItem>
-              <SelectItem value={NotificationTypeEnum.WARNING}>{t('systemMonitoring.warning')}</SelectItem>
+              <SelectItem value={NotificationTypeEnum.WARNING}>{t('notifications.warning')}</SelectItem>
               <SelectItem value={NotificationTypeEnum.INFO}>{t('notifications.info')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div>
-          <label className='text-xs text-gray-600 dark:text-gray-400 mb-1 block'>
+          <label className='text-xs text-gray-600 dark:text-gray-400 mb-1 block whitespace-nowrap'>
             {t('notifications.priority')}
           </label>
           <Select
@@ -68,7 +68,7 @@ export function NotificationFilters ({
               onPriorityChange(value as NotificationPriorityEnum | 'all')
             }
           >
-            <SelectTrigger className='dark:bg-gray-900 dark:border-gray-700'>
+            <SelectTrigger className='dark:bg-gray-900 dark:border-gray-700 whitespace-nowrap'>
               <SelectValue/>
             </SelectTrigger>
             <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
