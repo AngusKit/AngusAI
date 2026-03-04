@@ -2,7 +2,7 @@ import { MainLayout } from '@/components/layout/mainLayout';
 import { ChatLayout } from '@/components/layout/chatLayout';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import  { Home } from '@/pages/home';
-import {  CreateApplication, MyApplications, Workflow, WorkflowDesignPage, KnowledgeBase, Dataset, APICollection, PluginMarket, ModelManagement, VectorStore, TeamMembers, ResourceSharing, TeamSettings, AppSettingsPage, UsageAnalytics, APIKeys, BillingSubscription, PromptLibraryPage, Chat, ActivityLog, } from '@/pages';
+import {  CreateApplication, MyApplications, Workflow, WorkflowDesignPage, KnowledgeBase, Dataset, APICollection, PluginMarket, ModelManagement, VectorStore, TeamMembers, ResourceSharing, AppSettingsPage, UsageAnalytics, APIKeys, BillingSubscription, PromptLibraryPage, Chat, ActivityLog, } from '@/pages';
 
 export function AppRoute() {
   return (
@@ -24,7 +24,6 @@ export function AppRoute() {
         <Route path='team-members' element={<TeamMembers />} />
         <Route path='activity-log' element={<ActivityLog />} />
         <Route path='resource-sharing' element={<ResourceSharing />} />
-        <Route path='team-settings' element={<TeamSettings />} />
         <Route path='individual-app-settings' element={<AppSettingsPage  />} />
         <Route path='usage-analytics' element={<UsageAnalytics />} />
         <Route path='api-keys' element={<APIKeys />} />

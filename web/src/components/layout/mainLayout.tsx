@@ -1,7 +1,7 @@
 import { appContext, eventQueue } from '@xcan-angus/infra';
 import { ThemeProvider } from '@/components/ui/ThemeProvider';
 import { LanguageProvider } from '@/components/ui/LanguageProvider';
-import { Sidebar, Header, RecentApplications, WelcomeBanner, StatsCards, UsageDetails, CreateApplication, MyApplications, Workflow, WorkflowDesignPage, KnowledgeBase, Dataset, APICollection, PluginMarket, ModelManagement, VectorStore, TeamMembers, ResourceSharing, TeamSettings, AppSettingsPage, UsageAnalytics, APIKeys, BillingSubscription, PromptLibraryPage, Chat, ActivityLog, } from '@/pages';
+import { Sidebar, Header, RecentApplications, WelcomeBanner, StatsCards, UsageDetails, CreateApplication, MyApplications, Workflow, WorkflowDesignPage, KnowledgeBase, Dataset, APICollection, PluginMarket, ModelManagement, VectorStore, TeamMembers, ResourceSharing, AppSettingsPage, UsageAnalytics, APIKeys, BillingSubscription, PromptLibraryPage, Chat, ActivityLog, } from '@/pages';
 import { MyContext } from '@/components/ui/utils';
 import { useState } from 'react';
 import { toast } from 'sonner';

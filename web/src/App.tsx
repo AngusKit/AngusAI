@@ -10,7 +10,7 @@ import { APICollection } from '@/pages/apis/APICollection';
 import { PluginMarket } from '@/pages/plugins';
 import { ModelManagement } from '@/pages/models';
 import { VectorStore } from '@/pages/vector/VectorStore';
-import { TeamMembers, ResourceSharing, TeamSettings } from '@/pages/team';
+import { TeamMembers, ResourceSharing } from '@/pages/team';
 import { AppSettingsPage, UsageAnalytics, APIKeys, BillingSubscription } from '@/pages/settings';
 import { PromptLibraryPage } from '@/pages/prompt/PromptLibraryPage';
 import { Chat } from '@/pages/chat';
@@ -130,7 +130,6 @@ export default function App() {
                     {activePage === 'team-members' && <TeamMembers />}
                     {activePage === 'activity-log' && <ActivityLog />}
                     {activePage === 'resource-sharing' && <ResourceSharing />}
-                    {activePage === 'team-settings' && <TeamSettings />}
                     {activePage === 'individual-app-settings' && (
                       <AppSettingsPage onBack={() => setActivePage('apps')} />
                     )}
@@ -152,7 +151,6 @@ export default function App() {
                       activePage !== 'notifications' &&
                       activePage !== 'team-members' &&
                       activePage !== 'resource-sharing' &&
-                      activePage !== 'team-settings' &&
                       activePage !== 'individual-app-settings' &&
                       activePage !== 'usage-analytics' &&
                       activePage !== 'api-keys' &&

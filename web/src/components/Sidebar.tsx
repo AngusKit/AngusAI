@@ -35,7 +35,6 @@ export function Sidebar({ activePage, onPageChange, collapsed = false }: Sidebar
     { id: 'team-members', icon: Users, label: t('nav.members') },
     { id: 'activity-log', icon: Activity, label: t('nav.activityLog') },
     { id: 'resource-sharing', icon: Share2, label: t('nav.sharing') },
-    { id: 'team-settings', icon: Settings, label: t('nav.teamSettings') },
   ];
 
   const settingsMenuItems = [
