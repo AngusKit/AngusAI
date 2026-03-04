@@ -21,7 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
  * 插件实体
  */
 @Entity
-@Table(name = "plugin")
+@Table(name = "ai_plugin")
 @Setter
 @Getter
 @Accessors(chain = true)

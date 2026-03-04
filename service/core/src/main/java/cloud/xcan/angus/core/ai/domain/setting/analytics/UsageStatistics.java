@@ -16,7 +16,7 @@ import lombok.experimental.Accessors;
  * 使用统计聚合实体(按天/周聚合)
  */
 @Entity
-@Table(name = "usage_statistics")
+@Table(name = "ai_usage_statistics")
 @Setter
 @Getter
 @Accessors(chain = true)

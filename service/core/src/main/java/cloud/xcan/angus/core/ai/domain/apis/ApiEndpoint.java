@@ -32,7 +32,7 @@ import org.hibernate.annotations.Type;
  * 接口端点实体
  */
 @Entity
-@Table(name = "api_endpoint")
+@Table(name = "ai_api_endpoint")
 @Setter
 @Getter
 @Accessors(chain = true)

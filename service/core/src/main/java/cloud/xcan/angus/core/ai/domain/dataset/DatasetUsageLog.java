@@ -16,7 +16,7 @@ import lombok.experimental.Accessors;
  * 数据集查询使用记录实体 用于记录数据集的查询访问记录，包括查询时间、响应时间、状态等信息
  */
 @Entity
-@Table(name = "dataset_usage_log")
+@Table(name = "ai_dataset_usage_log")
 @EntityListeners({TenantListener.class})
 @Setter
 @Getter

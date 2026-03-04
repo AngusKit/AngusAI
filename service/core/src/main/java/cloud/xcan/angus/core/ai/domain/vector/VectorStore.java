@@ -21,7 +21,7 @@ import org.hibernate.annotations.Type;
  * 向量存储源实体
  */
 @Entity
-@Table(name = "vector_store")
+@Table(name = "ai_vector_store")
 @Setter
 @Getter
 @Accessors(chain = true)

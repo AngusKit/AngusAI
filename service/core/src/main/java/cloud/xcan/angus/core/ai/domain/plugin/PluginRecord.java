@@ -24,7 +24,7 @@ import org.springframework.format.annotation.DateTimeFormat;
  * 插件事件记录（安装/下载/访问）
  */
 @Entity
-@Table(name = "plugin_record")
+@Table(name = "ai_plugin_record")
 @EntityListeners(AuditingEntityListener.class)
 @Setter
 @Getter

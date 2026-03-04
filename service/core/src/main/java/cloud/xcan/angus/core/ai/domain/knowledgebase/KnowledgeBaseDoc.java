@@ -17,7 +17,7 @@ import lombok.experimental.Accessors;
  * 文档实体
  */
 @Entity
-@Table(name = "knowledge_base_document")
+@Table(name = "ai_knowledge_base_document")
 @Setter
 @Getter
 @Accessors(chain = true)

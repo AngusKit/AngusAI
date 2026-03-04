@@ -22,7 +22,7 @@ import org.springframework.format.annotation.DateTimeFormat;
  * 模型调用事件记录：一条记录对应一次模型调用，用于统计ModelStats。
  */
 @Entity
-@Table(name = "model_call_record")
+@Table(name = "ai_model_call_record")
 @EntityListeners(AuditingEntityListener.class)
 @Setter
 @Getter

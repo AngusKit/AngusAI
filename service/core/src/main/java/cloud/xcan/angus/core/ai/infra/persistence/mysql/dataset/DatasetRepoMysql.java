@@ -11,7 +11,7 @@ public interface DatasetRepoMysql extends DatasetRepo {
    * 统计活跃（被引用）数据集数（在应用中被使用的数据集）
    */
   @Override
-  @Query(value = "SELECT COUNT(DISTINCT d.id) FROM dataset d " +
-      "JOIN application app ON JSON_CONTAINS(app.dataset_ids, CAST(d.id AS CHAR))", nativeQuery = true)
+  @Query(value = "SELECT COUNT(DISTINCT d.id) FROM ai_dataset d " +
+      "JOIN ai_application app ON JSON_CONTAINS(app.dataset_ids, CAST(d.id AS CHAR))", nativeQuery = true)
   Long countActiveDatasets();
 }

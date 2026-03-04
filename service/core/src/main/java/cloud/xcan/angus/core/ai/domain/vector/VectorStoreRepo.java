@@ -14,13 +14,13 @@ public interface VectorStoreRepo extends BaseRepository<VectorStore, Long> {
 
   boolean existsByNameAndIdNot(String name, Long id);
 
-  @Query(value = "SELECT COUNT(*) FROM vector_store WHERE status = ?1", nativeQuery = true)
+  @Query(value = "SELECT COUNT(*) FROM ai_vector_store WHERE status = ?1", nativeQuery = true)
   Long countByStatus(String status);
 
   /**
    * 按类型分组统计存储源数量
    */
-  @Query(value = "SELECT type, COUNT(1) cnt FROM vector_store GROUP BY type", nativeQuery = true)
+  @Query(value = "SELECT type, COUNT(1) cnt FROM ai_vector_store GROUP BY type", nativeQuery = true)
   List<Object[]> countGroupByType();
 }
 

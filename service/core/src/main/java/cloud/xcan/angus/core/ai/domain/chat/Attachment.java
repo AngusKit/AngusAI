@@ -22,7 +22,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Getter
 @Setter
 @Entity
-@Table(name = "chat_attachment")
+@Table(name = "ai_chat_attachment")
 @EntityListeners(AuditingEntityListener.class)
 public class Attachment extends EntitySupport<Attachment, Long> {
 

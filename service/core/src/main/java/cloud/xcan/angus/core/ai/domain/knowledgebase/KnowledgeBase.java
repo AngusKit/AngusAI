@@ -21,7 +21,7 @@ import org.hibernate.annotations.Type;
  * 知识库实体
  */
 @Entity
-@Table(name = "knowledge_base")
+@Table(name = "ai_knowledge_base")
 @Setter
 @Getter
 @Accessors(chain = true)

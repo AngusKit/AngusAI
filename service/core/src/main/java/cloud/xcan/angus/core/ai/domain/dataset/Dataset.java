@@ -24,7 +24,7 @@ import org.hibernate.annotations.Type;
  * 数据集实体
  */
 @Entity
-@Table(name = "dataset")
+@Table(name = "ai_dataset")
 @Setter
 @Getter
 @Accessors(chain = true)

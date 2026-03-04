@@ -25,7 +25,7 @@ import org.springframework.format.annotation.DateTimeFormat;
  * 共享成员实体
  */
 @Entity
-@Table(name = "resource_sharing_member")
+@Table(name = "ai_resource_sharing_member")
 @EntityListeners(AuditingEntityListener.class)
 @Setter
 @Getter

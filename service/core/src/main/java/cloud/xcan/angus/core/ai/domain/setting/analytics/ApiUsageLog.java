@@ -14,7 +14,7 @@ import lombok.experimental.Accessors;
  * API使用日志实体
  */
 @Entity
-@Table(name = "api_usage_log")
+@Table(name = "ai_api_usage_log")
 @Setter
 @Getter
 @Accessors(chain = true)

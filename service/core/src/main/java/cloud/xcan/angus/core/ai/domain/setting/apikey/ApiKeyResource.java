@@ -16,7 +16,7 @@ import lombok.experimental.Accessors;
  * API密钥授权资源实体
  */
 @Entity
-@Table(name = "api_key_resource")
+@Table(name = "ai_api_key_resource")
 @Setter
 @Getter
 @Accessors(chain = true)

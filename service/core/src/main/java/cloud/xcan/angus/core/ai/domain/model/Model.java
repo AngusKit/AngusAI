@@ -23,7 +23,7 @@ import org.hibernate.annotations.Type;
  * 模型实体
  */
 @Entity
-@Table(name = "model")
+@Table(name = "ai_model")
 @EntityListeners(TenantListener.class)
 @Setter
 @Getter

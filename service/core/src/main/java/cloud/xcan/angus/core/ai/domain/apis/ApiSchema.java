@@ -44,7 +44,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @Entity
-@Table(name = "api_schema")
+@Table(name = "ai_api_schema")
 @EntityListeners({AuditingEntityListener.class})
 @DynamicInsert
 @Setter

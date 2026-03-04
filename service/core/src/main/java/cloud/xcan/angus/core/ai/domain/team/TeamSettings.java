@@ -15,7 +15,7 @@ import lombok.experimental.Accessors;
  * 团队设置实体
  */
 @Entity
-@Table(name = "team_settings")
+@Table(name = "ai_team_settings")
 @Setter
 @Getter
 @Accessors(chain = true)

@@ -13,7 +13,7 @@ import lombok.experimental.Accessors;
  * 文档分段实体
  */
 @Entity
-@Table(name = "knowledge_base_document_chunk")
+@Table(name = "ai_knowledge_base_document_chunk")
 @Setter
 @Getter
 @Accessors(chain = true)

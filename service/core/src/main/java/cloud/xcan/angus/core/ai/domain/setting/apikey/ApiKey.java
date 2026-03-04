@@ -23,7 +23,7 @@ import lombok.experimental.Accessors;
  * API密钥实体
  */
 @Entity
-@Table(name = "api_key")
+@Table(name = "ai_api_key")
 @Setter
 @Getter
 @Accessors(chain = true)

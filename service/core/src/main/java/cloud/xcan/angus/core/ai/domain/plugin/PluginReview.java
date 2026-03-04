@@ -21,7 +21,7 @@ import org.springframework.format.annotation.DateTimeFormat;
  * 插件评价记录
  */
 @Entity
-@Table(name = "plugin_review")
+@Table(name = "ai_plugin_review")
 @EntityListeners(AuditingEntityListener.class)
 @Setter
 @Getter

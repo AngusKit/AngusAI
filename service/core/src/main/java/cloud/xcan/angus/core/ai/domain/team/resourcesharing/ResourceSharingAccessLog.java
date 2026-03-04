@@ -19,7 +19,7 @@ import org.hibernate.annotations.Type;
  * 共享访问日志实体
  */
 @Entity
-@Table(name = "resource_sharing_access_log")
+@Table(name = "ai_resource_sharing_access_log")
 @Setter
 @Getter
 @Accessors(chain = true)

@@ -27,7 +27,7 @@ public interface KnowledgeBaseDocUsageLogRepo extends
    * [2]=avgResponseTime (Double)
    */
   @Query(value = "SELECT knowledge_base_id, COUNT(1) cnt, AVG(response_time_ms) avg_time " +
-      "FROM knowledge_base_doc_usage_log WHERE query_date >= :start AND query_date <= :end " +
+      "FROM ai_knowledge_base_doc_usage_log WHERE query_date >= :start AND query_date <= :end " +
       "GROUP BY knowledge_base_id ORDER BY cnt DESC LIMIT :limit", nativeQuery = true)
   List<Object[]> getTopKnowledgeBasesByQueryCount(@Param("start") LocalDateTime start,
       @Param("end") LocalDateTime end, @Param("limit") Integer limit);
@@ -38,7 +38,7 @@ public interface KnowledgeBaseDocUsageLogRepo extends
    */
   @Query(value = "SELECT DATE(query_date) d, COUNT(1) cnt, AVG(response_time_ms) avg_time, " +
       "SUM(CASE WHEN status='FAILED' THEN 1 ELSE 0 END) error_cnt " +
-      "FROM knowledge_base_doc_usage_log WHERE query_date >= :start AND query_date <= :end " +
+      "FROM ai_knowledge_base_doc_usage_log WHERE query_date >= :start AND query_date <= :end " +
       "GROUP BY DATE(query_date) ORDER BY d ASC", nativeQuery = true)
   List<Object[]> getQueryTrendByDay(@Param("start") LocalDateTime start,
       @Param("end") LocalDateTime end);

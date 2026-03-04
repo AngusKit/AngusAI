@@ -19,7 +19,7 @@ import org.hibernate.annotations.Type;
 @Getter
 @Setter
 @Entity
-@Table(name = "chat_session")
+@Table(name = "ai_chat_session")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Session extends TenantAuditingEntity<Session, Long> {
 

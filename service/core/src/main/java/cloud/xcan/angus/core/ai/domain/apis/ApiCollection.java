@@ -21,7 +21,7 @@ import lombok.experimental.Accessors;
  * 接口集实体
  */
 @Entity
-@Table(name = "api_collection")
+@Table(name = "ai_api_collection")
 @Setter
 @Getter
 @Accessors(chain = true)

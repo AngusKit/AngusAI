@@ -16,7 +16,7 @@ import lombok.experimental.Accessors;
  * 知识库文档使用记录实体 用于记录知识库文档的查询访问记录，包括查询时间、响应时间、状态等信息
  */
 @Entity
-@Table(name = "knowledge_base_doc_usage_log")
+@Table(name = "ai_knowledge_base_doc_usage_log")
 @EntityListeners({TenantListener.class})
 @Setter
 @Getter

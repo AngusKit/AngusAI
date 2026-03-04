@@ -20,7 +20,7 @@ import org.hibernate.annotations.Type;
  * 资源共享实体
  */
 @Entity
-@Table(name = "resource_sharing")
+@Table(name = "ai_resource_sharing")
 @Setter
 @Getter
 @Accessors(chain = true)

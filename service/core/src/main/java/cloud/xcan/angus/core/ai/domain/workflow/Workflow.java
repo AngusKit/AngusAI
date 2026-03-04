@@ -17,7 +17,7 @@ import org.hibernate.annotations.Type;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "workflow")
+@Table(name = "ai_workflow")
 public class Workflow extends TenantAuditingEntity<Workflow, Long> {
 
   @Id

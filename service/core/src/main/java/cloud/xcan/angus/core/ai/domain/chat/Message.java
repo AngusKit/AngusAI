@@ -19,7 +19,7 @@ import org.hibernate.annotations.Type;
 @Getter
 @Setter
 @Entity
-@Table(name = "chat_message")
+@Table(name = "ai_chat_message")
 public class Message extends TenantAuditingEntity<Message, Long> {
 
   @Id

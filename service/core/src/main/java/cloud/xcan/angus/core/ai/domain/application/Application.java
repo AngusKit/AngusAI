@@ -22,7 +22,7 @@ import org.hibernate.annotations.Type;
  * 应用实体
  */
 @Entity
-@Table(name = "application")
+@Table(name = "ai_application")
 @Setter
 @Getter
 @Accessors(chain = true)

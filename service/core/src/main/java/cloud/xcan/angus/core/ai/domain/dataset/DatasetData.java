@@ -16,7 +16,7 @@ import lombok.experimental.Accessors;
  * 数据集实体
  */
 @Entity
-@Table(name = "dataset_data")
+@Table(name = "ai_dataset_data")
 @Setter
 @Getter
 @Accessors(chain = true)
