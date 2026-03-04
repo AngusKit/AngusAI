@@ -13,6 +13,5 @@ export * from '../services/PluginsTypes.ts';
 export * from '../services/Prompts.ts';
 export * from '../services/SettingsTypes.ts';
 export * from '../services/SharingTypes.ts';
-export * from '../services/TeamTypes.ts';
 export * from '../services/VectorStoresTypes.ts';
 export * from '../services/WorkflowsTypes.ts';
