@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
-import { Users, Search, UserPlus, Mail, MoreHorizontal, Shield, Eye, Trash2, Crown, User, Clock, CheckCircle, XCircle, AlertCircle, Send, PauseCircle, PlayCircle, UserX, Loader2 } from 'lucide-react';
+import { appContext } from '@xcan-angus/infra';
+import { Users, Search, UserPlus, Mail, MoreHorizontal, Trash2, Clock, CheckCircle, XCircle, AlertCircle, Send, PauseCircle, PlayCircle, UserX, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button.tsx';
 import { Card } from '@/components/ui/card.tsx';
 import { Badge } from '@/components/ui/badge.tsx';
@@ -15,16 +16,16 @@ import { XcanPagination } from '@/components/ui/pagination.tsx';
 import { toast } from 'sonner';
 import MemberService from '@/services/Member';
 import MemberInvitationService from '@/services/MemberInvitation';
+import RoleService from '@/services/Role';
 import type { MemberListVo, UserStatsVo } from '@/services/MemberTypes';
+import type { RoleListVo } from '@/services/RoleTypes';
 import type { UserInviteVo } from '@/services/MemberInvitationTypes';
 import { UserStatusEnum } from '@/enums/enums';
 import { EnabledStatusEnum } from '@/enums/enums';
 import { InviteTypeEnum } from '@/enums/enums';
 import { InviteStatusEnum } from '@/enums/enums';
 import { useDebounce } from '@/hooks/useDebounce';
-
-/** 页面展示用的成员角色：owner-所有者, admin-管理员, member-成员, viewer-访客 */
-type DisplayRole = 'owner' | 'admin' | 'member' | 'viewer';
+import { RemoveMemberDialog } from './components/RemoveMemberDialog';
 
 /** 页面展示用的成员状态：active-活跃, inactive-不活跃, pending-待确认 */
 type DisplayStatus = 'active' | 'inactive' | 'pending';
@@ -34,7 +35,10 @@ interface TeamMember {
   name: string;
   email: string;
   avatar: string;
-  role: DisplayRole;
+  /** 角色名称列表（来自 RoleInfo[].name） */
+  roleNames: string;
+  /** 是否租户管理员/所有者，不可移除 */
+  sysAdmin?: boolean;
   status: DisplayStatus;
   joinedDate: string;
   lastActive: string;
@@ -45,7 +49,8 @@ interface TeamMember {
 interface PendingInvitation {
   id: string;
   email: string;
-  role: DisplayRole;
+  /** 角色名称（来自 roleName） */
+  roleName: string;
   invitedBy: string;
   invitedDate: string;
   expiresDate: string;
@@ -53,16 +58,10 @@ interface PendingInvitation {
 
 const ITEMS_PER_PAGE = 6;
 
-/** 从 MemberListVo 映射到页面展示角色（后端 roles 结构可能不同，需根据实际角色编码调整） */
-function mapVoToDisplayRole(vo: MemberListVo): DisplayRole {
-  if (vo.sysAdmin) return 'owner';
-  const firstRole = vo.roles?.[0];
-  const n = firstRole?.name ?? '';
-  const c = firstRole?.code ?? '';
-  const nameOrCode = (n + c).toLowerCase();
-  if (nameOrCode.includes('admin') || nameOrCode.includes('管理员')) return 'admin';
-  if (nameOrCode.includes('viewer') || nameOrCode.includes('访客')) return 'viewer';
-  return 'member';
+/** 从 MemberListVo.roles 提取角色名称列表 */
+function getRoleNames(vo: MemberListVo): string {
+  const names = (vo.roles ?? []).map(r => r.name).filter(Boolean);
+  return names.join('、') || '-';
 }
 
 /** 从 UserStatusEnum 映射到页面展示状态 */
@@ -71,15 +70,6 @@ function mapStatusToDisplay(status?: string): DisplayStatus {
   if (status === UserStatusEnum.DISABLED) return 'inactive';
   if (status === UserStatusEnum.PENDING) return 'pending';
   return 'active';
-}
-
-/** 从 UserInviteVo.roleName 映射到页面展示角色 */
-function mapInviteRoleToDisplay(roleName?: string): DisplayRole {
-  if (!roleName) return 'member';
-  const lower = roleName.toLowerCase();
-  if (lower.includes('admin') || lower.includes('管理员')) return 'admin';
-  if (lower.includes('viewer') || lower.includes('访客')) return 'viewer';
-  return 'member';
 }
 
 /** 格式化相对时间，如 "2分钟前" */
@@ -125,9 +115,14 @@ export function TeamMembers() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
-  const [inviteRole, setInviteRole] = useState('member');
+  const [inviteRoleId, setInviteRoleId] = useState<string>('__none__');
+  const [inviteRoles, setInviteRoles] = useState<RoleListVo[]>([]);
   const [inviteMessage, setInviteMessage] = useState('');
   const [inviteSending, setInviteSending] = useState(false);
+
+  const [removeDialogOpen, setRemoveDialogOpen] = useState(false);
+  const [removeMemberId, setRemoveMemberId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [currentInvitePage, setCurrentInvitePage] = useState(1);
@@ -155,8 +150,8 @@ export function TeamMembers() {
       const response = await MemberService.list({
         page: currentPage,
         size: ITEMS_PER_PAGE,
-        name: debouncedSearch || undefined,
-        email: debouncedSearch?.includes('@') ? debouncedSearch : undefined,
+        keyword: debouncedSearch?.trim() || undefined,
+        fullTextSearch: true,
         status: statusParam,
       });
       const data = (response as { data?: { total?: number; list?: MemberListVo[] } })?.data;
@@ -167,7 +162,8 @@ export function TeamMembers() {
             name: vo.name ?? vo.username ?? '',
             email: vo.email ?? '',
             avatar: getInitials(vo.name, vo.email),
-            role: mapVoToDisplayRole(vo),
+            roleNames: getRoleNames(vo),
+            sysAdmin: vo.sysAdmin,
             status: mapStatusToDisplay(vo.status),
             joinedDate: formatDate(vo.createdDate),
             lastActive: formatRelativeTime(vo.lastLogin),
@@ -201,7 +197,7 @@ export function TeamMembers() {
           data.list.map((vo: UserInviteVo): PendingInvitation => ({
             id: String(vo.id ?? ''),
             email: vo.email ?? '',
-            role: mapInviteRoleToDisplay(vo.roleName),
+            roleName: vo.roleName ?? '-',
             invitedBy: vo.inviterName ?? '',
             invitedDate: formatDate(vo.inviteDate),
             expiresDate: formatDate(vo.expiryDate),
@@ -217,6 +213,25 @@ export function TeamMembers() {
       setInvitationsLoading(false);
     }
   }, [currentInvitePage]);
+
+  /** 打开邀请弹窗时加载当前应用的角色列表 */
+  useEffect(() => {
+    if (!inviteDialogOpen) return;
+    const accessApp = appContext.getContext?.()?.accessApp as { id?: number | string } | undefined;
+    const appId = accessApp?.id != null ? Number(accessApp.id) : undefined;
+    if (appId == null) {
+      setInviteRoles([]);
+      setInviteRoleId('__none__');
+      return;
+    }
+    RoleService.getRoleList({ appId, status: EnabledStatusEnum.ENABLED })
+      .then(res => {
+        const list = (res as { data?: { list?: RoleListVo[] } })?.data?.list ?? [];
+        setInviteRoles(list);
+        setInviteRoleId('__none__');
+      })
+      .catch(() => setInviteRoles([]));
+  }, [inviteDialogOpen]);
 
   /** 加载统计数据 */
   const loadStats = useCallback(async () => {
@@ -244,15 +259,6 @@ export function TeamMembers() {
     loadStats();
   }, [loadStats]);
 
-  const roleBadges: Record<string, { label: string; color: string; icon: typeof Crown }> = {
-    owner: { label: '所有者', color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400', icon: Crown },
-    admin: { label: '管理员', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400', icon: Shield },
-    member: { label: '成员', color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400', icon: User },
-    viewer: { label: '访客', color: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400', icon: Eye },
-  };
-  const getRoleBadge = (role: string) =>
-    (roleBadges[role] ?? roleBadges.member) as { label: string; color: string; icon: typeof Crown };
-
   const statusBadges: Record<string, { label: string; color: string; icon: typeof CheckCircle }> = {
     active: { label: '活跃', color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400', icon: CheckCircle },
     inactive: { label: '不活跃', color: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400', icon: Clock },
@@ -267,19 +273,23 @@ export function TeamMembers() {
       return;
     }
     const email = inviteEmail.trim();
+    const accessApp = appContext.getContext?.()?.accessApp as { id?: number | string } | undefined;
+    const appId = accessApp?.id != null ? String(accessApp.id) : undefined;
     setInviteSending(true);
     try {
-      const response = await MemberInvitationService.inviteUser({
+      const response =       await MemberInvitationService.inviteUser({
         emails: [email],
         inviteType: InviteTypeEnum.EMAIL,
+        appId,
+        roleId: inviteRoleId && inviteRoleId !== '__none__' ? inviteRoleId : undefined,
         message: inviteMessage || undefined,
         expireDays: 7,
-        // roleId 可选，需根据角色列表接口获取；当前无角色 API 时由后端分配默认角色
       });
       if ((response as { code?: string }).code === 'S') {
         toast.success(`邀请已发送至 ${email}`);
         setInviteDialogOpen(false);
         setInviteEmail('');
+        setInviteRoleId('__none__');
         setInviteMessage('');
         loadInvitations();
         loadStats();
@@ -293,23 +303,35 @@ export function TeamMembers() {
     }
   };
 
-  const handleRemoveMember = async (member: TeamMember) => {
-    if (member.role === 'owner') {
+  const handleOpenRemoveDialog = (member: TeamMember) => {
+    if (member.sysAdmin) {
       toast.error('无法移除所有者');
       return;
     }
+    setRemoveMemberId(member.id);
+    setRemoveDialogOpen(true);
+  };
+
+  const handleConfirmRemove = async () => {
+    if (!removeMemberId) return;
+    const member = members.find(m => m.id === removeMemberId);
+    setDeleting(true);
     try {
-      await MemberService.deleteUser(member.id);
-      toast.success(`已移除成员: ${member.name}`);
+      await MemberService.deleteUser(removeMemberId);
+      toast.success(`已移除成员: ${member?.name ?? ''}`);
+      setRemoveDialogOpen(false);
+      setRemoveMemberId(null);
       loadMembers();
       loadStats();
     } catch (err) {
       toast.error((err as Error)?.message ?? '移除成员失败');
+    } finally {
+      setDeleting(false);
     }
   };
 
   const handlePauseMember = async (member: TeamMember) => {
-    if (member.role === 'owner') {
+    if (member.sysAdmin) {
       toast.error('无法暂停所有者');
       return;
     }
@@ -453,9 +475,7 @@ export function TeamMembers() {
                     </thead>
                     <tbody className='divide-y divide-gray-200 dark:divide-gray-700'>
                       {members.map(member => {
-                        const roleBadge = getRoleBadge(member.role);
                         const statusBadge = getStatusBadge(member.status);
-                        const RoleIcon = roleBadge.icon;
                         const StatusIcon = statusBadge.icon;
                         return (
                           <tr key={member.id} className='hover:bg-gray-50 dark:hover:bg-gray-900'>
@@ -472,11 +492,8 @@ export function TeamMembers() {
                                 </div>
                               </div>
                             </td>
-                            <td className='px-6 py-4'>
-                              <Badge className={`text-xs ${roleBadge.color} border-0 gap-1`}>
-                                <RoleIcon className='w-3 h-3' />
-                                {roleBadge.label}
-                              </Badge>
+                            <td className='px-6 py-4 text-sm dark:text-gray-300'>
+                              {member.roleNames}
                             </td>
                             <td className='px-6 py-4'>
                               <Badge className={`text-xs ${statusBadge.color} border-0 gap-1`}>
@@ -500,7 +517,7 @@ export function TeamMembers() {
                                   </button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align='end' className='dark:bg-gray-800 dark:border-gray-700'>
-                                  {member.role !== 'owner' && (
+                                  {!member.sysAdmin && (
                                     <>
                                       {member.status === 'active' ? (
                                         <DropdownMenuItem onClick={() => handlePauseMember(member)} className='dark:text-gray-300'>
@@ -513,13 +530,13 @@ export function TeamMembers() {
                                           恢复成员
                                         </DropdownMenuItem>
                                       )}
-                                      <DropdownMenuItem onClick={() => handleRemoveMember(member)} className='text-red-600 dark:text-red-400'>
+                                      <DropdownMenuItem onClick={() => handleOpenRemoveDialog(member)} className='text-red-600 dark:text-red-400'>
                                         <Trash2 className='w-4 h-4 mr-2' />
                                         移除成员
                                       </DropdownMenuItem>
                                     </>
                                   )}
-                                  {member.role === 'owner' && (
+                                  {member.sysAdmin && (
                                     <DropdownMenuItem disabled className='dark:text-gray-500'>
                                       所有者无法编辑
                                     </DropdownMenuItem>
@@ -575,17 +592,11 @@ export function TeamMembers() {
                       </tr>
                     </thead>
                     <tbody className='divide-y divide-gray-200 dark:divide-gray-700'>
-                      {pendingInvitations.map(invitation => {
-                        const roleBadge = getRoleBadge(invitation.role);
-                        const RoleIcon = roleBadge.icon;
-                        return (
+                      {pendingInvitations.map(invitation => (
                           <tr key={invitation.id} className='hover:bg-gray-50 dark:hover:bg-gray-900'>
                             <td className='px-6 py-4 text-sm dark:text-white'>{invitation.email}</td>
-                            <td className='px-6 py-4'>
-                              <Badge className={`text-xs ${roleBadge.color} border-0 gap-1`}>
-                                <RoleIcon className='w-3 h-3' />
-                                {roleBadge.label}
-                              </Badge>
+                            <td className='px-6 py-4 text-sm dark:text-gray-300'>
+                              {invitation.roleName}
                             </td>
                             <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{invitation.invitedBy}</td>
                             <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{invitation.invitedDate}</td>
@@ -609,8 +620,7 @@ export function TeamMembers() {
                               </div>
                             </td>
                           </tr>
-                        );
-                      })}
+                      ))}
                     </tbody>
                   </table>
                 </div>
@@ -649,20 +659,20 @@ export function TeamMembers() {
               />
             </div>
             <div className='space-y-2'>
-              <Label htmlFor='invite-role' className='dark:text-gray-300'>分配角色 *</Label>
-              <Select value={inviteRole} onValueChange={setInviteRole}>
+              <Label htmlFor='invite-role' className='dark:text-gray-300'>分配角色（可选）</Label>
+              <Select value={inviteRoleId} onValueChange={setInviteRoleId}>
                 <SelectTrigger className='dark:bg-gray-700 dark:border-gray-600'>
-                  <SelectValue />
+                  <SelectValue placeholder='不指定角色' />
                 </SelectTrigger>
                 <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
-                  <SelectItem value='admin'>管理员 - 完整管理权限</SelectItem>
-                  <SelectItem value='member'>成员 - 创建和编辑权限</SelectItem>
-                  <SelectItem value='viewer'>访客 - 仅查看权限</SelectItem>
+                  <SelectItem value='__none__'>不指定角色</SelectItem>
+                  {inviteRoles.filter(r => r?.id).map(r => (
+                    <SelectItem key={r.id!} value={r.id!}>
+                      {r.name ?? r.code ?? '-'}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
-              <p className='text-xs text-gray-500'>
-                当前邀请使用默认角色，角色由后端分配。如需指定 roleId 请配置角色接口。
-              </p>
             </div>
             <div className='space-y-2'>
               <Label htmlFor='invite-message' className='dark:text-gray-300'>邀请消息（可选）</Label>
@@ -694,6 +704,15 @@ export function TeamMembers() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <RemoveMemberDialog
+        open={removeDialogOpen}
+        onOpenChange={setRemoveDialogOpen}
+        memberId={removeMemberId}
+        memberName={members.find(m => m.id === removeMemberId)?.name ?? ''}
+        deleting={deleting}
+        onConfirm={handleConfirmRemove}
+      />
     </div>
   );
 }

@@ -423,6 +423,19 @@ export enum EnabledStatusEnum {
   DISABLED = 'DISABLED',
 }
 
+/** 角色效果：ALLOW-允许, DENY-拒绝 */
+export enum RoleEffectEnum {
+  ALLOW = 'ALLOW',
+  DENY = 'DENY',
+}
+
+/** 应用菜单类型：MENU-菜单, BUTTON-按钮, PANEL-面板 */
+export enum ApplicationMenuTypeEnum {
+  MENU = 'MENU',
+  BUTTON = 'BUTTON',
+  PANEL = 'PANEL',
+}
+
 export enum DatasourceConnectionStatusEnum {
   IDLE = 'idle',
   SUCCESS = 'success',

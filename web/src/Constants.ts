@@ -1,3 +1,8 @@
+/**
+ * 当前应用编码
+ */
+export const ANGUS_AI_APP_CODE = 'AngusAI';
+
 /** HTTP 请求头前缀 */
 export const HEADER_PREFIX = 'X-';
 
