@@ -13,6 +13,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
 import { useDebounce } from '@/hooks/useDebounce';
+import { getEnumDescription } from '@/enums/utils';
+import { ActivityTargetTypeEnum, ActivityActionTypeEnum } from '@/enums/enums';
 import ActivityService from '@/services/Activity';
 import {
   ActivityDetailVo,
@@ -36,51 +38,40 @@ interface ActivityRecord {
   status: 'success' | 'failed' | 'warning';
 }
 
-// 目标类型映射
-type TargetTypeKey =
-  | 'APPLICATION'
-  | 'WORKFLOW'
-  | 'KNOWLEDGE_BASE'
-  | 'DATASET'
-  | 'MODEL'
-  | 'TEAM_MEMBER'
-  | 'API_KEY'
-  | 'PROMPT';
-
-const targetTypeMap: Record<TargetTypeKey, { labelZh: string; labelEn: string; icon: any; color: string }> = {
-  APPLICATION: { labelZh: '应用', labelEn: 'Application', icon: Brain, color: 'text-blue-500' },
-  WORKFLOW: { labelZh: '工作流', labelEn: 'Workflow', icon: Workflow, color: 'text-purple-500' },
-  KNOWLEDGE_BASE: { labelZh: '知识库', labelEn: 'Knowledge Base', icon: Database, color: 'text-green-500' },
-  DATASET: { labelZh: '数据集', labelEn: 'Dataset', icon: FileText, color: 'text-orange-500' },
-  MODEL: { labelZh: '模型', labelEn: 'Model', icon: Settings, color: 'text-indigo-500' },
-  TEAM_MEMBER: { labelZh: '团队成员', labelEn: 'Team Member', icon: User, color: 'text-pink-500' },
-  API_KEY: { labelZh: 'API密钥', labelEn: 'API Key', icon: Settings, color: 'text-red-500' },
-  PROMPT: { labelZh: '提示词', labelEn: 'Prompt', icon: FileText, color: 'text-cyan-500' },
+/** 目标类型 icon/color 配置（文案走枚举国际化） */
+const targetTypeMeta: Partial<Record<ActivityTargetTypeEnum, { icon: any; color: string }>> = {
+  [ActivityTargetTypeEnum.APPLICATION]: { icon: Brain, color: 'text-blue-500' },
+  [ActivityTargetTypeEnum.WORKFLOW]: { icon: Workflow, color: 'text-purple-500' },
+  [ActivityTargetTypeEnum.KNOWLEDGE_BASE]: { icon: Database, color: 'text-green-500' },
+  [ActivityTargetTypeEnum.DATASET]: { icon: FileText, color: 'text-orange-500' },
+  [ActivityTargetTypeEnum.MODEL]: { icon: Settings, color: 'text-indigo-500' },
+  [ActivityTargetTypeEnum.TEAM_MEMBER]: { icon: User, color: 'text-pink-500' },
+  [ActivityTargetTypeEnum.API_KEY]: { icon: Settings, color: 'text-red-500' },
+  [ActivityTargetTypeEnum.PROMPT]: { icon: FileText, color: 'text-cyan-500' },
 };
 
-type ActionTypeKey = 'CREATE' | 'UPDATE' | 'DELETE' | 'VIEW' | 'SHARE' | 'EXPORT' | 'IMPORT' | 'EXECUTE' | 'UNKNOWN';
-
-const actionTypeMap: Record<ActionTypeKey, { labelZh: string; labelEn: string; icon: any; color: string }> = {
-  CREATE: { labelZh: '创建', labelEn: 'Create', icon: Plus, color: 'text-green-500' },
-  UPDATE: { labelZh: '更新', labelEn: 'Update', icon: Edit, color: 'text-blue-500' },
-  DELETE: { labelZh: '删除', labelEn: 'Delete', icon: Trash2, color: 'text-red-500' },
-  VIEW: { labelZh: '查看', labelEn: 'View', icon: Eye, color: 'text-gray-500' },
-  SHARE: { labelZh: '分享', labelEn: 'Share', icon: Share2, color: 'text-purple-500' },
-  EXPORT: { labelZh: '导出', labelEn: 'Export', icon: Download, color: 'text-indigo-500' },
-  IMPORT: { labelZh: '导入', labelEn: 'Import', icon: Upload, color: 'text-orange-500' },
-  EXECUTE: { labelZh: '执行', labelEn: 'Execute', icon: Activity, color: 'text-cyan-500' },
-  UNKNOWN: { labelZh: '其他', labelEn: 'Other', icon: Info, color: 'text-gray-500' },
+/** 操作类型 icon/color 配置（文案走枚举国际化） */
+const actionTypeMeta: Partial<Record<ActivityActionTypeEnum, { icon: any; color: string }>> = {
+  [ActivityActionTypeEnum.CREATE]: { icon: Plus, color: 'text-green-500' },
+  [ActivityActionTypeEnum.UPDATE]: { icon: Edit, color: 'text-blue-500' },
+  [ActivityActionTypeEnum.DELETE]: { icon: Trash2, color: 'text-red-500' },
+  [ActivityActionTypeEnum.VIEW]: { icon: Eye, color: 'text-gray-500' },
+  [ActivityActionTypeEnum.SHARE]: { icon: Share2, color: 'text-purple-500' },
+  [ActivityActionTypeEnum.EXPORT]: { icon: Download, color: 'text-indigo-500' },
+  [ActivityActionTypeEnum.IMPORT]: { icon: Upload, color: 'text-orange-500' },
+  [ActivityActionTypeEnum.EXECUTE]: { icon: Activity, color: 'text-cyan-500' },
+  [ActivityActionTypeEnum.UNKNOWN]: { icon: Info, color: 'text-gray-500' },
 };
 
-const orderedActionTypes: ActionTypeKey[] = [
-  'CREATE',
-  'UPDATE',
-  'DELETE',
-  'VIEW',
-  'SHARE',
-  'EXPORT',
-  'IMPORT',
-  'EXECUTE',
+const orderedActionTypes: ActivityActionTypeEnum[] = [
+  ActivityActionTypeEnum.CREATE,
+  ActivityActionTypeEnum.UPDATE,
+  ActivityActionTypeEnum.DELETE,
+  ActivityActionTypeEnum.VIEW,
+  ActivityActionTypeEnum.SHARE,
+  ActivityActionTypeEnum.EXPORT,
+  ActivityActionTypeEnum.IMPORT,
+  ActivityActionTypeEnum.EXECUTE,
 ];
 
 const generateActivityId = () =>
@@ -315,39 +306,31 @@ export function ActivityLog() {
   };
 
   const getActionIcon = (actionType: string) => {
-    const action = actionTypeMap[actionType as ActionTypeKey];
-    if (!action) return Activity;
-    return action.icon;
+    const meta = actionTypeMeta[actionType as ActivityActionTypeEnum];
+    if (!meta) return Activity;
+    return meta.icon;
   };
 
   const getActionLabel = (actionType: string) => {
-    const action = actionTypeMap[actionType as ActionTypeKey];
-    if (!action) {
-      return actionType;
-    }
-    return language === 'zh-CN' ? action.labelZh : action.labelEn;
+    return getEnumDescription(ActivityActionTypeEnum, actionType as ActivityActionTypeEnum) || actionType;
   };
 
   const getActionColor = (actionType: string) => {
-    return actionTypeMap[actionType as ActionTypeKey]?.color || 'text-gray-500';
+    return actionTypeMeta[actionType as ActivityActionTypeEnum]?.color || 'text-gray-500';
   };
 
   const getTargetIcon = (targetType: string) => {
-    const target = targetTypeMap[targetType as TargetTypeKey];
-    if (!target) return FileText;
-    return target.icon;
+    const meta = targetTypeMeta[targetType as ActivityTargetTypeEnum];
+    if (!meta) return FileText;
+    return meta.icon;
   };
 
   const getTargetLabel = (targetType: string) => {
-    const target = targetTypeMap[targetType as TargetTypeKey];
-    if (!target) {
-      return targetType;
-    }
-    return language === 'zh-CN' ? target.labelZh : target.labelEn;
+    return getEnumDescription(ActivityTargetTypeEnum, targetType as ActivityTargetTypeEnum) || targetType;
   };
 
   const getTargetColor = (targetType: string) => {
-    return targetTypeMap[targetType as TargetTypeKey]?.color || 'text-gray-500';
+    return targetTypeMeta[targetType as ActivityTargetTypeEnum]?.color || 'text-gray-500';
   };
 
   const getStatusBadge = (status?: string) => {
@@ -466,9 +449,9 @@ export function ActivityLog() {
                 <SelectItem value='all' className='dark:text-white'>
                   {language === 'zh-CN' ? '所有类型' : 'All Types'}
                 </SelectItem>
-                {Object.entries(targetTypeMap).map(([key, meta]) => (
+                {Object.values(ActivityTargetTypeEnum).map(key => (
                   <SelectItem key={key} value={key} className='dark:text-white'>
-                    {language === 'zh-CN' ? meta.labelZh : meta.labelEn}
+                    {getEnumDescription(ActivityTargetTypeEnum, key)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -485,39 +468,17 @@ export function ActivityLog() {
                 <SelectItem value='all' className='dark:text-white'>
                   {language === 'zh-CN' ? '所有操作' : 'All Actions'}
                 </SelectItem>
-                <SelectItem value='UNKNOWN' className='dark:text-white'>
-                  {language === 'zh-CN' ? actionTypeMap.UNKNOWN.labelZh : actionTypeMap.UNKNOWN.labelEn}
+                <SelectItem value={ActivityActionTypeEnum.UNKNOWN} className='dark:text-white'>
+                  {getEnumDescription(ActivityActionTypeEnum, ActivityActionTypeEnum.UNKNOWN)}
                 </SelectItem>
                 {orderedActionTypes.map(key => (
                   <SelectItem key={key} value={key} className='dark:text-white'>
-                    {language === 'zh-CN' ? actionTypeMap[key].labelZh : actionTypeMap[key].labelEn}
+                    {getEnumDescription(ActivityActionTypeEnum, key)}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
-        </div>
-
-        <div className='flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700'>
-          <p className='text-sm text-gray-600 dark:text-gray-400'>
-            {language === 'zh-CN' ? '找到 ' : 'Found '}
-            <span className='dark:text-white'>
-              {selectedActionType === 'all' ? totalRecords : filteredActivities.length}
-            </span>
-            {language === 'zh-CN' ? ' 条记录' : ' records'}
-          </p>
-          <Button
-            variant='ghost'
-            size='sm'
-            onClick={() => {
-              setSearchQuery('');
-              setSelectedTargetType('all');
-              setSelectedActionType('all');
-            }}
-            className='dark:text-gray-400 dark:hover:text-white'
-          >
-            {language === 'zh-CN' ? '清除筛选' : 'Clear Filters'}
-          </Button>
         </div>
       </Card>
 

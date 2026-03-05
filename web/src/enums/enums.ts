@@ -423,6 +423,31 @@ export enum EnabledStatusEnum {
   DISABLED = 'DISABLED',
 }
 
+/** 活动记录目标类型 */
+export enum ActivityTargetTypeEnum {
+  APPLICATION = 'APPLICATION',
+  WORKFLOW = 'WORKFLOW',
+  KNOWLEDGE_BASE = 'KNOWLEDGE_BASE',
+  DATASET = 'DATASET',
+  MODEL = 'MODEL',
+  TEAM_MEMBER = 'TEAM_MEMBER',
+  API_KEY = 'API_KEY',
+  PROMPT = 'PROMPT',
+}
+
+/** 活动记录操作类型 */
+export enum ActivityActionTypeEnum {
+  CREATE = 'CREATE',
+  UPDATE = 'UPDATE',
+  DELETE = 'DELETE',
+  VIEW = 'VIEW',
+  SHARE = 'SHARE',
+  EXPORT = 'EXPORT',
+  IMPORT = 'IMPORT',
+  EXECUTE = 'EXECUTE',
+  UNKNOWN = 'UNKNOWN',
+}
+
 /** 角色效果：ALLOW-允许, DENY-拒绝 */
 export enum RoleEffectEnum {
   ALLOW = 'ALLOW',
@@ -490,4 +515,6 @@ export const enumNamespaceMap = new Map<any, string>([
   [ConnectionStatusEnum, 'enum.ConnectionStatusEnum'],
   [VectorStoreTypeEnum, 'enum.VectorStoreTypeEnum'],
   [EnabledStatusEnum, 'enum.EnabledStatusEnum'],
+  [ActivityTargetTypeEnum, 'enum.ActivityTargetTypeEnum'],
+  [ActivityActionTypeEnum, 'enum.ActivityActionTypeEnum'],
 ]);
