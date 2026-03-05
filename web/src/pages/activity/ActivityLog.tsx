@@ -524,7 +524,7 @@ export function ActivityLog() {
       {/* Activity List */}
       <Card className='dark:bg-gray-900 dark:border-gray-800'>
         {(loading || paginatedActivities.length === 0) ? (
-          <div className='h-[600px] flex flex-col items-center justify-center px-6'>
+          <div className='h-[400px] flex flex-col items-center justify-center px-6'>
             {loading && paginatedActivities.length === 0 ? (
               <>
                 <div className='w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4'>
