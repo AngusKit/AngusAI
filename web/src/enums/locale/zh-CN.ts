@@ -49,6 +49,33 @@ export const enumTranslations = {
     AGRICULTURE: '农业',
     OTHER: '其他',
   },
+  GenderEnum: {
+    MALE: '男',
+    FEMALE: '女',
+    UNKNOWN: '未知',
+  },
+  UserStatusEnum: {
+    ACTIVE: '已激活',
+    DISABLED: '已禁用',
+    PENDING: '待审核',
+  },
+  UserSourceEnum: {
+    REGISTER: '注册',
+    INVITE: '邀请',
+    LDAP: 'LDAP',
+    ADMIN_CREATE: '管理员创建',
+  },
+  InviteTypeEnum: {
+    LINK: '链接邀请',
+    EMAIL: '邮件邀请',
+  },
+  InviteStatusEnum: {
+    PENDING: '待接受',
+    EXPIRED: '已过期',
+    ACCEPTED: '已接受',
+    CANCELLED: '已取消',
+    REJECTED: '已拒绝',
+  },
   MemberPermissionEnum: {
     VIEW: '查看',
     EDIT: '编辑',

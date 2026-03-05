@@ -62,6 +62,43 @@ export enum IndustryEnum {
   OTHER = 'OTHER',
 }
 
+/** 性别：MALE-男, FEMALE-女, UNKNOWN-未知 */
+export enum GenderEnum {
+  MALE = 'MALE',
+  FEMALE = 'FEMALE',
+  UNKNOWN = 'UNKNOWN',
+}
+
+/** 用户状态：ACTIVE-已激活, DISABLED-已禁用, PENDING-待审核 */
+export enum UserStatusEnum {
+  ACTIVE = 'ACTIVE',
+  DISABLED = 'DISABLED',
+  PENDING = 'PENDING',
+}
+
+/** 用户来源：REGISTER-注册, INVITE-邀请, LDAP-LDAP, ADMIN_CREATE-管理员创建 */
+export enum UserSourceEnum {
+  REGISTER = 'REGISTER',
+  INVITE = 'INVITE',
+  LDAP = 'LDAP',
+  ADMIN_CREATE = 'ADMIN_CREATE',
+}
+
+/** 邀请方式：LINK-链接邀请, EMAIL-邮件邀请 */
+export enum InviteTypeEnum {
+  LINK = 'LINK',
+  EMAIL = 'EMAIL',
+}
+
+/** GM 邀请状态：PENDING-待接受, EXPIRED-已过期, ACCEPTED-已接受, CANCELLED-已取消, REJECTED-已拒绝 */
+export enum InviteStatusEnum {
+  PENDING = 'PENDING',
+  EXPIRED = 'EXPIRED',
+  ACCEPTED = 'ACCEPTED',
+  CANCELLED = 'CANCELLED',
+  REJECTED = 'REJECTED',
+}
+
 /** 权限 */
 export enum MemberPermissionEnum {
   VIEW = 'VIEW',
@@ -400,6 +437,11 @@ export const enumNamespaceMap = new Map<any, string>([
   [WorkflowStatusEnum, 'enum.WorkflowStatusEnum'],
   [TeamScaleEnum, 'enum.TeamScaleEnum'],
   [IndustryEnum, 'enum.IndustryEnum'],
+  [GenderEnum, 'enum.GenderEnum'],
+  [UserStatusEnum, 'enum.UserStatusEnum'],
+  [UserSourceEnum, 'enum.UserSourceEnum'],
+  [InviteTypeEnum, 'enum.InviteTypeEnum'],
+  [InviteStatusEnum, 'enum.InviteStatusEnum'],
   [MemberPermissionEnum, 'enum.MemberPermissionEnum'],
   [ResourceTypeEnum, 'enum.ResourceTypeEnum'],
   [SharedWithEnum, 'enum.SharedWithEnum'],

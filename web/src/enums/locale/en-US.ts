@@ -49,6 +49,33 @@ export const enumTranslations = {
     AGRICULTURE: 'Agriculture',
     OTHER: 'Other',
   },
+  GenderEnum: {
+    MALE: 'Male',
+    FEMALE: 'Female',
+    UNKNOWN: 'Unknown',
+  },
+  UserStatusEnum: {
+    ACTIVE: 'Active',
+    DISABLED: 'Disabled',
+    PENDING: 'Pending',
+  },
+  UserSourceEnum: {
+    REGISTER: 'Register',
+    INVITE: 'Invite',
+    LDAP: 'LDAP',
+    ADMIN_CREATE: 'Admin Create',
+  },
+  InviteTypeEnum: {
+    LINK: 'Link Invitation',
+    EMAIL: 'Email Invitation',
+  },
+  InviteStatusEnum: {
+    PENDING: 'Pending',
+    EXPIRED: 'Expired',
+    ACCEPTED: 'Accepted',
+    CANCELLED: 'Cancelled',
+    REJECTED: 'Rejected',
+  },
   MemberPermissionEnum: {
     VIEW: 'View',
     EDIT: 'Edit',
