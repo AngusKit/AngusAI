@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
-import { Users, Search, UserPlus, Mail, MoreHorizontal, Shield, Eye, Edit, Trash2, Crown, User, Clock, CheckCircle, XCircle, AlertCircle, Copy, Send, } from 'lucide-react';
+import { Users, Search, UserPlus, Mail, MoreHorizontal, Shield, Eye, Trash2, Crown, User, Clock, CheckCircle, XCircle, AlertCircle, Send, PauseCircle, PlayCircle, UserX } from 'lucide-react';
 import { Button } from '@/components/ui/button.tsx';
 import { Card } from '@/components/ui/card.tsx';
 import { Badge } from '@/components/ui/badge.tsx';
@@ -39,11 +39,8 @@ interface PendingInvitation {
 export function TeamMembers() {
   const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
-  const [roleFilter, setRoleFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
-  const [memberDetailsOpen, setMemberDetailsOpen] = useState(false);
-  const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState('member');
   const [inviteMessage, setInviteMessage] = useState('');
@@ -284,13 +281,11 @@ export function TeamMembers() {
     const matchesSearch =
       member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       member.email.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesRole = roleFilter === 'all' || member.role === roleFilter;
     const matchesStatus = statusFilter === 'all' || member.status === statusFilter;
-    return matchesSearch && matchesRole && matchesStatus;
+    return matchesSearch && matchesStatus;
   });
 
   // 分页逻辑 - 成员列表
-  const totalPages = Math.ceil(filteredMembers.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentMembers = filteredMembers.slice(startIndex, endIndex);
@@ -309,6 +304,8 @@ export function TeamMembers() {
       return;
     }
     toast.success(`邀请已发送至 ${inviteEmail}`);
+    const now = new Date();
+    const expires = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
     setPendingInvitations([
       ...pendingInvitations,
       {
@@ -316,8 +313,8 @@ export function TeamMembers() {
         email: inviteEmail,
         role: inviteRole as 'admin' | 'member' | 'viewer',
         invitedBy: '张伟',
-        invitedDate: new Date().toISOString().split('T')[0],
-        expiresDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        invitedDate: now.toISOString().split('T')[0] ?? '',
+        expiresDate: expires.toISOString().split('T')[0] ?? '',
       },
     ]);
     setInviteDialogOpen(false);
@@ -334,13 +331,18 @@ export function TeamMembers() {
     toast.success(`已移除成员: ${member.name}`);
   };
 
-  const handleChangeRole = (member: TeamMember, newRole: string) => {
+  const handlePauseMember = (member: TeamMember) => {
     if (member.role === 'owner') {
-      toast.error('无法更改所有者角色');
+      toast.error('无法暂停所有者');
       return;
     }
-    setMembers(members.map(m => (m.id === member.id ? { ...m, role: newRole as any } : m)));
-    toast.success(`已将 ${member.name} 的角色更改为 ${getRoleBadge(newRole).label}`);
+    setMembers(members.map(m => (m.id === member.id ? { ...m, status: 'inactive' as const } : m)));
+    toast.success(`已暂停成员: ${member.name}`);
+  };
+
+  const handleResumeMember = (member: TeamMember) => {
+    setMembers(members.map(m => (m.id === member.id ? { ...m, status: 'active' as const } : m)));
+    toast.success(`已恢复成员: ${member.name}`);
   };
 
   const handleCancelInvitation = (id: number) => {
@@ -368,11 +370,11 @@ export function TeamMembers() {
       color: 'text-orange-600',
     },
     {
-      label: '管理员',
-      value: members.filter(m => m.role === 'admin' || m.role === 'owner').length,
-      subtext: '拥有管理权限',
-      icon: Shield,
-      color: 'text-purple-600',
+      label: '禁用',
+      value: members.filter(m => m.status === 'inactive').length,
+      subtext: '已暂停成员',
+      icon: UserX,
+      color: 'text-gray-600',
     },
     {
       label: '活跃率',
@@ -431,19 +433,6 @@ export function TeamMembers() {
             </div>
 
             <div className='flex items-center gap-3'>
-              <Select value={roleFilter} onValueChange={setRoleFilter}>
-                <SelectTrigger className='w-[140px] dark:bg-gray-800 dark:border-gray-700'>
-                  <SelectValue placeholder='角色筛选' />
-                </SelectTrigger>
-                <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
-                  <SelectItem value='all'>全部角色</SelectItem>
-                  <SelectItem value='owner'>所有者</SelectItem>
-                  <SelectItem value='admin'>管理员</SelectItem>
-                  <SelectItem value='member'>成员</SelectItem>
-                  <SelectItem value='viewer'>访客</SelectItem>
-                </SelectContent>
-              </Select>
-
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className='w-[140px] dark:bg-gray-800 dark:border-gray-700'>
                   <SelectValue placeholder='状态筛选' />
@@ -527,63 +516,48 @@ export function TeamMembers() {
                           <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{member.lastActive}</td>
                           <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{member.joinedDate}</td>
                           <td className='px-6 py-4'>
-                            <div className='flex items-center gap-2'>
-                              <button
-                                onClick={() => {
-                                  setSelectedMember(member);
-                                  setMemberDetailsOpen(true);
-                                }}
-                                className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
-                              >
-                                <Eye className='w-4 h-4 text-blue-500' />
-                              </button>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <button className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'>
-                                    <MoreHorizontal className='w-4 h-4 text-gray-600 dark:text-gray-400' />
-                                  </button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align='end' className='dark:bg-gray-800 dark:border-gray-700'>
-                                  {member.role !== 'owner' && (
-                                    <>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <button className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'>
+                                  <MoreHorizontal className='w-4 h-4 text-gray-600 dark:text-gray-400' />
+                                </button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align='end' className='dark:bg-gray-800 dark:border-gray-700'>
+                                {member.role !== 'owner' && (
+                                  <>
+                                    {member.status === 'active' ? (
                                       <DropdownMenuItem
-                                        onClick={() => handleChangeRole(member, 'admin')}
+                                        onClick={() => handlePauseMember(member)}
                                         className='dark:text-gray-300'
                                       >
-                                        <Shield className='w-4 h-4 mr-2' />
-                                        设为管理员
+                                        <PauseCircle className='w-4 h-4 mr-2' />
+                                        暂停成员
                                       </DropdownMenuItem>
+                                    ) : (
                                       <DropdownMenuItem
-                                        onClick={() => handleChangeRole(member, 'member')}
+                                        onClick={() => handleResumeMember(member)}
                                         className='dark:text-gray-300'
                                       >
-                                        <User className='w-4 h-4 mr-2' />
-                                        设为成员
+                                        <PlayCircle className='w-4 h-4 mr-2' />
+                                        恢复成员
                                       </DropdownMenuItem>
-                                      <DropdownMenuItem
-                                        onClick={() => handleChangeRole(member, 'viewer')}
-                                        className='dark:text-gray-300'
-                                      >
-                                        <Eye className='w-4 h-4 mr-2' />
-                                        设为访客
-                                      </DropdownMenuItem>
-                                      <DropdownMenuItem
-                                        onClick={() => handleRemoveMember(member)}
-                                        className='text-red-600 dark:text-red-400'
-                                      >
-                                        <Trash2 className='w-4 h-4 mr-2' />
-                                        移除成员
-                                      </DropdownMenuItem>
-                                    </>
-                                  )}
-                                  {member.role === 'owner' && (
-                                    <DropdownMenuItem disabled className='dark:text-gray-500'>
-                                      所有者无法编辑
+                                    )}
+                                    <DropdownMenuItem
+                                      onClick={() => handleRemoveMember(member)}
+                                      className='text-red-600 dark:text-red-400'
+                                    >
+                                      <Trash2 className='w-4 h-4 mr-2' />
+                                      移除成员
                                     </DropdownMenuItem>
-                                  )}
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </div>
+                                  </>
+                                )}
+                                {member.role === 'owner' && (
+                                  <DropdownMenuItem disabled className='dark:text-gray-500'>
+                                    所有者无法编辑
+                                  </DropdownMenuItem>
+                                )}
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           </td>
                         </tr>
                       );
@@ -795,74 +769,6 @@ export function TeamMembers() {
         </DialogContent>
       </Dialog>
 
-      {/* Member Details Dialog */}
-      <Dialog open={memberDetailsOpen} onOpenChange={setMemberDetailsOpen}>
-        <DialogContent className='dark:bg-gray-800 dark:border-gray-700 sm:max-w-[600px]'>
-          <DialogHeader>
-            <DialogTitle className='dark:text-white'>成员详情</DialogTitle>
-          </DialogHeader>
-
-          {selectedMember && (
-            <div className='space-y-6'>
-              <div className='flex items-center gap-4'>
-                <Avatar className='w-16 h-16'>
-                  <AvatarFallback className='bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 text-xl'>
-                    {selectedMember.avatar}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <h3 className='text-lg dark:text-white'>{selectedMember.name}</h3>
-                  <p className='text-sm text-gray-600 dark:text-gray-400'>{selectedMember.email}</p>
-                </div>
-              </div>
-
-              <div className='grid grid-cols-2 gap-4'>
-                <div className='space-y-1'>
-                  <div className='text-xs text-gray-500 dark:text-gray-400'>角色</div>
-                  <Badge className={`text-xs ${getRoleBadge(selectedMember.role).color} border-0`}>
-                    {getRoleBadge(selectedMember.role).label}
-                  </Badge>
-                </div>
-                <div className='space-y-1'>
-                  <div className='text-xs text-gray-500 dark:text-gray-400'>状态</div>
-                  <Badge className={`text-xs ${getStatusBadge(selectedMember.status).color} border-0`}>
-                    {getStatusBadge(selectedMember.status).label}
-                  </Badge>
-                </div>
-                <div className='space-y-1'>
-                  <div className='text-xs text-gray-500 dark:text-gray-400'>加入时间</div>
-                  <div className='text-sm dark:text-white'>{selectedMember.joinedDate}</div>
-                </div>
-                <div className='space-y-1'>
-                  <div className='text-xs text-gray-500 dark:text-gray-400'>最后活跃</div>
-                  <div className='text-sm dark:text-white'>{selectedMember.lastActive}</div>
-                </div>
-              </div>
-
-              <div className='grid grid-cols-2 gap-4'>
-                <Card className='p-4 dark:bg-gray-900 dark:border-gray-700'>
-                  <div className='text-xs text-gray-500 dark:text-gray-400 mb-1'>共享资源</div>
-                  <div className='text-2xl dark:text-white'>{selectedMember.resourcesShared}</div>
-                </Card>
-                <Card className='p-4 dark:bg-gray-900 dark:border-gray-700'>
-                  <div className='text-xs text-gray-500 dark:text-gray-400 mb-1'>访问资源</div>
-                  <div className='text-2xl dark:text-white'>{selectedMember.resourcesAccessed}</div>
-                </Card>
-              </div>
-            </div>
-          )}
-
-          <DialogFooter>
-            <Button
-              variant='outline'
-              onClick={() => setMemberDetailsOpen(false)}
-              className='dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300'
-            >
-              关闭
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
