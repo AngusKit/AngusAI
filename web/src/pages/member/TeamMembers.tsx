@@ -399,13 +399,13 @@ export function TeamMembers() {
           const Icon = stat.icon;
           return (
             <Card key={index} className='p-5 dark:bg-gray-800 dark:border-gray-700'>
-              <div className='flex items-start justify-between mb-3'>
+              <div className='flex items-start justify-between'>
                 <div className={`p-2 rounded-lg bg-gray-100 dark:bg-gray-700 ${stat.color}`}>
                   <Icon className='w-5 h-5' />
                 </div>
               </div>
-              <div className='text-base text-gray-600 dark:text-gray-400 mb-0.5'>{stat.label}</div>
-              <div className='text-3xl dark:text-white mb-0.5'>{stat.value}</div>
+              <div className='text-base text-gray-600 dark:text-gray-400'>{stat.label}</div>
+              <div className='text-3xl dark:text-white'>{stat.value}</div>
               <div className='text-xs text-gray-500 dark:text-gray-400'>{stat.subtext}</div>
             </Card>
           );
