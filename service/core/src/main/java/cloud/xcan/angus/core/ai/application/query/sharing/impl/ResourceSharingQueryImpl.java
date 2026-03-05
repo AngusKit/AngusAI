@@ -15,6 +15,7 @@ import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import jakarta.annotation.Resource;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,6 +85,24 @@ public class ResourceSharingQueryImpl implements ResourceSharingQuery {
         return resourcePermissions;
       }
     }.execute();
+  }
+
+  @Override
+  public Map<Long, Integer> getShareCountMap(Collection<Long> userIds) {
+    if (userIds == null || userIds.isEmpty()) {
+      return new HashMap<>();
+    }
+    List<Object[]> results = resourceSharingRepo.countByOwnerIdIn(userIds);
+    Map<Long, Integer> map = new HashMap<>();
+    for (Long userId : userIds) {
+      map.put(userId, 0);
+    }
+    for (Object[] row : results) {
+      Long ownerId = ((Number) row[0]).longValue();
+      int count = ((Number) row[1]).intValue();
+      map.put(ownerId, count);
+    }
+    return map;
   }
 
   @Override

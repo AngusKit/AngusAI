@@ -2,6 +2,8 @@ package cloud.xcan.angus.core.ai.domain.sharing;
 
 import cloud.xcan.angus.core.ai.domain.ResourceType;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.NoRepositoryBean;
@@ -21,6 +23,12 @@ public interface ResourceSharingRepo extends BaseRepository<ResourceSharing, Lon
    */
   @Query("SELECT COUNT(s) FROM ResourceSharing s WHERE s.ownerId = :ownerId")
   Long countByOwnerId(@Param("ownerId") Long ownerId);
+
+  /**
+   * 批量统计用户创建的共享数量，返回 [ownerId, count] 列表
+   */
+  @Query("SELECT s.ownerId, COUNT(s) FROM ResourceSharing s WHERE s.ownerId IN :ownerIds GROUP BY s.ownerId")
+  List<Object[]> countByOwnerIdIn(@Param("ownerIds") Collection<Long> ownerIds);
 
   /**
    * 根据资源类型统计共享数量

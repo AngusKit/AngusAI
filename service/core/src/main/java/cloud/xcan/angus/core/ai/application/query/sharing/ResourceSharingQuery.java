@@ -6,6 +6,7 @@ import cloud.xcan.angus.core.ai.domain.sharing.ResourceSharing;
 import cloud.xcan.angus.core.ai.domain.sharing.ResourceSharingMember;
 import cloud.xcan.angus.core.ai.domain.sharing.SharePermission;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import org.springframework.data.domain.Page;
@@ -25,6 +26,11 @@ public interface ResourceSharingQuery {
    * 分页查询共享列表
    */
   Page<ResourceSharing> find(GenericSpecification<ResourceSharing> spec, PageRequest pageable);
+
+  /**
+   * 按用户ID批量统计共享数量，key 为用户ID，value 为该用户创建的共享数
+   */
+  Map<Long, Integer> getShareCountMap(Collection<Long> userIds);
 
   /**
    * 根据资源ID和资源类型查找共享
