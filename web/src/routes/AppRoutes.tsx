@@ -20,7 +20,7 @@ import { APIKeys } from '@/pages/settings/APIKeys';
 import { BillingSubscription } from '@/pages/settings/BillingSubscription';
 import { PromptLibraryPage } from '@/pages/prompt/PromptLibraryPage';
 import { Chat } from '@/pages/chat/Chat';
-import { ActivityLog } from '@/pages/activity/ActivityLog';
+import { ActivityLogPage } from '@/pages/activity/ActivityLogPage';
 import { NotificationsPage } from '@/pages/notifications/NotificationsPage';
 import { NotFoundPage } from '@/components/NotFoundPage';
 
@@ -43,7 +43,7 @@ export function AppRoutes() {
         <Route path='prompts' element={<PromptLibraryPage />} />
         <Route path='notifications' element={<NotificationsPage />} />
         <Route path='team-members' element={<TeamMembers />} />
-        <Route path='activity-log' element={<ActivityLog />} />
+        <Route path='activity-log' element={<ActivityLogPage />} />
         <Route path='resource-sharing' element={<ResourceSharing />} />
         <Route path='individual-app-settings' element={<AppSettingsPage />} />
         <Route path='usage-analytics' element={<UsageAnalytics />} />
