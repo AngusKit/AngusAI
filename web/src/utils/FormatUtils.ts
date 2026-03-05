@@ -49,6 +49,63 @@ export const formatRelativeTime = (
 };
 
 /**
+ * 简化版相对时间（中文，无语言参数）
+ * @param dateStr 日期字符串
+ * @returns 如 "刚刚"、"2分钟前"、"3小时前"、"5天前"，空返回 '-'
+ */
+export const formatRelativeTimeShort = (dateStr?: string): string => {
+  if (!dateStr) return '-';
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return '-';
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+  if (diffMins < 1) return '刚刚';
+  if (diffMins < 60) return `${diffMins}分钟前`;
+  if (diffHours < 24) return `${diffHours}小时前`;
+  if (diffDays < 7) return `${diffDays}天前`;
+  return date.toLocaleDateString();
+};
+
+/**
+ * 格式化日期为 YYYY-MM-DD
+ * @param dateStr 日期字符串
+ * @returns 日期字符串或 '-'
+ */
+export const formatDateShort = (dateStr?: string): string => {
+  if (!dateStr) return '-';
+  try {
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return '-';
+    return date.toISOString().split('T')[0] ?? '-';
+  } catch {
+    return '-';
+  }
+};
+
+/**
+ * 获取名字首字母作为头像 fallback
+ * @param name 姓名
+ * @param email 邮箱（name 为空时使用）
+ * @returns 1-2 个字符
+ */
+export const getInitials = (name?: string, email?: string): string => {
+  if (name?.trim()) {
+    const parts = name.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      const a = parts[0]?.[0] ?? '';
+      const b = parts[parts.length - 1]?.[0] ?? '';
+      return (a + b).toUpperCase() || '?';
+    }
+    return name.slice(0, 2).toUpperCase();
+  }
+  if (email?.[0]) return email[0].toUpperCase();
+  return '?';
+};
+
+/**
  * 格式化数值（添加千位分隔符）
  * @param value 数值
  * @returns 格式化后的字符串

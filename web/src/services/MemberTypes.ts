@@ -75,11 +75,8 @@ export interface UserLockDto {
   reason?: string;
 }
 
-/** 用户查询参数 - 与 AngusGM UserFindDto 保持一致 */
+/** 用户查询参数 - 与 AngusGM UserFindDto 保持一致，继承 PageQuery 使用 pageNo/pageSize */
 export interface UserFindDto {
-  page?: number;
-  size?: number;
-  orderBy?: string;
   id?: string;
   name?: string;
   email?: string;

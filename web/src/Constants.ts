@@ -32,15 +32,15 @@ export const COOKIE_ACCESS_TOKEN = 'access_token';
 
 /** 需要添加操作租户请求头的路径白名单 */
 export const TENANT_HEADER_WHITELIST_PATTERNS = [
-  '/api/v1/users', // 用户管理接口
-  '/api/v1/user/invites', // 用户邀请管理接口
-  '/api/v1/departments', // 部门管理接口
-  '/api/v1/groups', // 组管理接口
-  '/api/v1/roles', // 角色管理接口
-  '/api/v1/authorizations', // 授权管理接口
-  '/api/v1/sms', // 短信管理接口
-  '/api/v1/email', // 邮件管理接口
-  '/api/v1/logs' // 操作日志接口
+  // '/api/v1/users', // 用户管理接口
+  // '/api/v1/user/invites', // 用户邀请管理接口
+  // '/api/v1/departments', // 部门管理接口
+  // '/api/v1/groups', // 组管理接口
+  // '/api/v1/roles', // 角色管理接口
+  // '/api/v1/authorizations', // 授权管理接口
+  // '/api/v1/sms', // 短信管理接口
+  // '/api/v1/email', // 邮件管理接口
+  // '/api/v1/logs' // 操作日志接口
 ];
 
 /** 搜索防抖延迟（毫秒） */
@@ -54,9 +54,29 @@ export const FILE_MAX_SIZE_MB = 50;
 
 /** 不需要添加操作租户请求头的路径白名单（命中时不添加，优先级高于需添加白名单） */
 export const TENANT_HEADER_EXCLUDED_PATTERNS = [
-  '/api/v1/users/current', // 查询当前租户统计
-  '/api/v1/sms/providers', // 查询短信提供商列表
-  '/api/v1/sms/templates', // 查询短信模板列表
-  '/api/v1/email/smtp', // 查询邮件 SMTP 列表
-  '/api/v1/email/templates' // 查询邮件模板列表
+  // '/api/v1/users/current', // 查询当前租户统计
+  // '/api/v1/sms/providers', // 查询短信提供商列表
+  // '/api/v1/sms/templates', // 查询短信模板列表
+  // '/api/v1/email/smtp', // 查询邮件 SMTP 列表
+  // '/api/v1/email/templates' // 查询邮件模板列表
 ];
+
+/**
+ * 分页相关常量
+ */
+
+/** 默认分页数量 */
+export const DEFAULT_PAGE_SIZE = 10;
+
+/** 最大分页数量（一次加载上限） */
+export const MAX_PAGE_SIZE = 2000;
+
+/**
+ * 防抖相关常量
+ */
+
+/** 通用搜索防抖延迟（毫秒） */
+export const DEBOUNCE_DELAY_SEARCH = 500;
+
+/** 选择器/下拉搜索防抖延迟（毫秒），响应更快 */
+export const DEBOUNCE_DELAY_SELECTOR = 300;

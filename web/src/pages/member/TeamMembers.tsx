@@ -25,7 +25,9 @@ import { EnabledStatusEnum } from '@/enums/enums';
 import { InviteTypeEnum } from '@/enums/enums';
 import { InviteStatusEnum } from '@/enums/enums';
 import { useDebounce } from '@/hooks/useDebounce';
+import { formatRelativeTimeShort, formatDateShort, getInitials } from '@/utils/FormatUtils';
 import { RemoveMemberDialog } from './components/RemoveMemberDialog';
+import { DEFAULT_PAGE_SIZE } from '@/Constants';
 
 /** 页面展示用的成员状态：active-活跃, inactive-不活跃, pending-待确认 */
 type DisplayStatus = 'active' | 'inactive' | 'pending';
@@ -56,8 +58,6 @@ interface PendingInvitation {
   expiresDate: string;
 }
 
-const ITEMS_PER_PAGE = 6;
-
 /** 从 MemberListVo.roles 提取角色名称列表 */
 function getRoleNames(vo: MemberListVo): string {
   const names = (vo.roles ?? []).map(r => r.name).filter(Boolean);
@@ -70,43 +70,6 @@ function mapStatusToDisplay(status?: string): DisplayStatus {
   if (status === UserStatusEnum.DISABLED) return 'inactive';
   if (status === UserStatusEnum.PENDING) return 'pending';
   return 'active';
-}
-
-/** 格式化相对时间，如 "2分钟前" */
-function formatRelativeTime(dateStr?: string): string {
-  if (!dateStr) return '-';
-  const date = new Date(dateStr);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMs / 3600000);
-  const diffDays = Math.floor(diffMs / 86400000);
-  if (diffMins < 1) return '刚刚';
-  if (diffMins < 60) return `${diffMins}分钟前`;
-  if (diffHours < 24) return `${diffHours}小时前`;
-  if (diffDays < 7) return `${diffDays}天前`;
-  return date.toLocaleDateString();
-}
-
-/** 格式化日期为 YYYY-MM-DD */
-function formatDate(dateStr?: string): string {
-  if (!dateStr) return '-';
-  return new Date(dateStr).toISOString().split('T')[0] ?? '-';
-}
-
-/** 获取名字首字母作为头像 */
-function getInitials(name?: string, email?: string): string {
-  if (name?.trim()) {
-    const parts = name.trim().split(/\s+/);
-    if (parts.length >= 2) {
-      const a = parts[0]?.[0] ?? '';
-      const b = parts[parts.length - 1]?.[0] ?? '';
-      return (a + b).toUpperCase() || '?';
-    }
-    return name.slice(0, 2).toUpperCase();
-  }
-  if (email?.[0]) return email[0].toUpperCase();
-  return '?';
 }
 
 export function TeamMembers() {
@@ -148,8 +111,8 @@ export function TeamMembers() {
         statusFilter === 'active' ? UserStatusEnum.ACTIVE :
         statusFilter === 'inactive' ? UserStatusEnum.DISABLED : undefined;
       const response = await MemberService.list({
-        page: currentPage,
-        size: ITEMS_PER_PAGE,
+        pageNo: currentPage,
+        pageSize: DEFAULT_PAGE_SIZE,
         keyword: debouncedSearch?.trim() || undefined,
         fullTextSearch: true,
         status: statusParam,
@@ -165,8 +128,8 @@ export function TeamMembers() {
             roleNames: getRoleNames(vo),
             sysAdmin: vo.sysAdmin,
             status: mapStatusToDisplay(vo.status),
-            joinedDate: formatDate(vo.createdDate),
-            lastActive: formatRelativeTime(vo.lastLogin),
+            joinedDate: formatDateShort(vo.createdDate),
+            lastActive: formatRelativeTimeShort(vo.lastLogin),
             resourcesShared: vo.shareCount ?? 0,
             resourcesAccessed: vo.shareAccessCount ?? 0,
           }))
@@ -187,8 +150,8 @@ export function TeamMembers() {
     setInvitationsLoading(true);
     try {
       const response = await MemberInvitationService.listInvites({
-        page: currentInvitePage,
-        size: ITEMS_PER_PAGE,
+        pageNo: currentInvitePage,
+        pageSize: DEFAULT_PAGE_SIZE,
         status: InviteStatusEnum.PENDING,
       });
       const data = (response as { data?: { total?: number; list?: UserInviteVo[] } })?.data;
@@ -199,8 +162,8 @@ export function TeamMembers() {
             email: vo.email ?? '',
             roleName: vo.roleName ?? '-',
             invitedBy: vo.inviterName ?? '',
-            invitedDate: formatDate(vo.inviteDate),
-            expiresDate: formatDate(vo.expiryDate),
+            invitedDate: formatDateShort(vo.inviteDate),
+            expiresDate: formatDateShort(vo.expiryDate),
           }))
         );
         setInvitationsTotal(data.total ?? 0);
@@ -550,10 +513,10 @@ export function TeamMembers() {
                     </tbody>
                   </table>
                 </div>
-                {membersTotal > ITEMS_PER_PAGE && (
+                {membersTotal > DEFAULT_PAGE_SIZE && (
                   <div className='flex items-center justify-center px-6 py-4 border-t border-gray-200 dark:border-gray-700'>
                     <XcanPagination
-                      pageSize={ITEMS_PER_PAGE}
+                      pageSize={DEFAULT_PAGE_SIZE}
                       pageNo={currentPage}
                       total={membersTotal}
                       onChange={({ pageNo }) => setCurrentPage(pageNo)}
@@ -624,10 +587,10 @@ export function TeamMembers() {
                     </tbody>
                   </table>
                 </div>
-                {invitationsTotal > ITEMS_PER_PAGE && (
+                {invitationsTotal > DEFAULT_PAGE_SIZE && (
                   <div className='flex items-center justify-center px-6 py-4 border-t border-gray-200 dark:border-gray-700'>
                     <XcanPagination
-                      pageSize={ITEMS_PER_PAGE}
+                      pageSize={DEFAULT_PAGE_SIZE}
                       pageNo={currentInvitePage}
                       total={invitationsTotal}
                       onChange={({ pageNo }) => setCurrentInvitePage(pageNo)}

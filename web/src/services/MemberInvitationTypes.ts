@@ -21,9 +21,6 @@ export interface UserInviteDto {
 
 /** 查询邀请列表请求参数 - 与 AngusGM UserInviteFindDto 保持一致 */
 export interface UserInviteFindDto {
-  page?: number;
-  size?: number;
-  orderBy?: string;
   /** 邀请应用ID */
   appId?: string;
   /** 邀请邮箱 */
