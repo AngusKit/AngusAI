@@ -25,9 +25,6 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
     { id: 'knowledge', icon: BookOpen, label: t('nav.knowledge') },
     { id: 'dataset', icon: Database, label: t('nav.dataset') },
     { id: 'api-collection', icon: Code2, label: t('nav.apiCollection') },
-    { id: 'plugins', icon: Package, label: t('nav.plugins') },
-    { id: 'models', icon: Settings, label: t('nav.models') },
-    { id: 'vector-store', icon: Server, label: t('nav.vectorStore') },
     { id: 'prompts', icon: Sparkles, label: t('nav.prompts') },
   ];
 
@@ -38,8 +35,11 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
     { id: 'activity-log', icon: Activity, label: t('nav.activityLog') },
   ];
 
-  const settingsMenuItems = [
+  const systemMenuItems = [
     { id: 'usage-analytics', icon: BarChart3, label: t('analytics.title') },
+    { id: 'plugins', icon: Package, label: t('nav.plugins') },
+    { id: 'models', icon: Settings, label: t('nav.models') },
+    { id: 'vector-store', icon: Server, label: t('nav.vectorStore') },
     { id: 'api-keys', icon: Key, label: t('nav.apiKeys') },
     { id: 'billing', icon: CreditCard, label: t('nav.billing') },
   ];
@@ -92,7 +92,7 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
     );
   };
 
-  const allMenuItems = [...mainMenuItems, ...teamMenuItems, ...settingsMenuItems];
+  const allMenuItems = [...mainMenuItems, ...teamMenuItems, ...systemMenuItems];
 
   return (
     <aside
@@ -139,10 +139,10 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
                 {teamMenuItems.map((item) => renderMenuItem(item))}
               </div>
               <div className="px-2 py-1.5 mb-1 mt-4">
-                <span className="text-xs text-gray-500 dark:text-gray-400">{t('common.actions.settings')}</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">{t('nav.system')}</span>
               </div>
               <div className="my-1 space-y-0.5">
-                {settingsMenuItems.map((item) => renderMenuItem(item))}
+                {systemMenuItems.map((item) => renderMenuItem(item))}
               </div>
             </>
           )}

@@ -203,6 +203,7 @@ export const zhCN = {
     prompts: '提示词',
     team: '团队',
     members: '成员',
+    system: '系统',
     sharing: '共享',
     appSettings: '应用设置',
     apiKeys: 'API密钥',

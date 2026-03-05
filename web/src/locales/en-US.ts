@@ -204,6 +204,7 @@ export const enUS = {
     prompts: 'Prompt',
     team: 'Team',
     members: 'Member',
+    system: 'System',
     sharing: 'Sharing',
     appSettings: 'Settings',
     apiKeys: 'API Keys',
