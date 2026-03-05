@@ -23,8 +23,8 @@ interface RemoveMemberDialogProps {
 }
 
 /**
- * 移除成员对话框 - 确认删除用户账号
- * 参考 AngusGit RemoveMemberDialog，需输入成员姓名以确认
+ * 移除成员确认弹窗
+ * 需输入成员姓名以确认，避免误删
  */
 export function RemoveMemberDialog({
   open,

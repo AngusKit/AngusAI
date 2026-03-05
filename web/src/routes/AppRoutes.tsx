@@ -12,7 +12,7 @@ import { APICollection } from '@/pages/apis/APICollection';
 import { PluginMarket } from '@/pages/plugins/PluginMarket';
 import { ModelManagement } from '@/pages/models/ModelManagement';
 import { VectorStore } from '@/pages/vector/VectorStore';
-import { TeamMembers } from '@/pages/member/TeamMembers';
+import { TeamMembersPage } from '@/pages/member/TeamMembersPage';
 import { ResourceSharing } from '@/pages/sharding/ResourceSharing';
 import { AppSettingsPage } from '@/pages/settings/AppSettingsPage';
 import { UsageAnalytics } from '@/pages/settings/UsageAnalytics';
@@ -42,7 +42,7 @@ export function AppRoutes() {
         <Route path='vector-store' element={<VectorStore />} />
         <Route path='prompts' element={<PromptLibraryPage />} />
         <Route path='notifications' element={<NotificationsPage />} />
-        <Route path='team-members' element={<TeamMembers />} />
+        <Route path='team-members' element={<TeamMembersPage />} />
         <Route path='activity-log' element={<ActivityLogPage />} />
         <Route path='resource-sharing' element={<ResourceSharing />} />
         <Route path='individual-app-settings' element={<AppSettingsPage />} />
