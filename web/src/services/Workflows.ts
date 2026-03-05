@@ -213,7 +213,7 @@ export class Workflows<SecurityDataType = unknown> {
    * @tags Workflow
    * @name GetWorkflowStatistics
    * @summary 获取工作流统计
-   * @request GET:/api/v1/workflows/statistics
+   * @request GET:/api/v1/workflows/stats
    * @secure
    */
   getWorkflowStatistics = (
@@ -224,7 +224,7 @@ export class Workflows<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<WorkflowStatisticsResult>({
-      path: `${AI}/workflows/statistics`,
+      path: `${AI}/workflows/stats`,
       method: 'GET',
       query: query,
       secure: true,

@@ -156,7 +156,7 @@ public class ApplicationRest {
       @ApiResponse(responseCode = "200", description = "统计数据获取成功"),
       @ApiResponse(responseCode = "404", description = "应用不存在")
   })
-  @GetMapping("/{id}/statistics")
+  @GetMapping("/{id}/stats")
   public ApiLocaleResult<ApplicationStatisticsVo> getStatistics(
       @Parameter(description = "应用ID") @PathVariable Long id,
       @Parameter(description = "开始日期") @RequestParam(required = false) String startDate,

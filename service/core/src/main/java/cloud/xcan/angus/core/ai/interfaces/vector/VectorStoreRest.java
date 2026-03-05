@@ -120,7 +120,7 @@ public class VectorStoreRest {
   }
 
   @Operation(operationId = "getVectorStoreStatistics", summary = "获取统计信息", description = "获取向量存储源的统计数据，包括总体统计、类型分布、使用率排行、性能趋势等")
-  @GetMapping("/statistics")
+  @GetMapping("/stats")
   public ApiLocaleResult<VectorStoreStatisticsVo> getStatistics(
       @ParameterObject SimpleStatisticsDto dto) {
     return ApiLocaleResult.success(vectorStoreFacade.getStatistics(dto));

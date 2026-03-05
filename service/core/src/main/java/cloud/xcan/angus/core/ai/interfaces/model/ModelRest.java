@@ -164,7 +164,7 @@ public class ModelRest {
       @ApiResponse(responseCode = "200", description = "统计数据获取成功"),
       @ApiResponse(responseCode = "404", description = "模型不存在")
   })
-  @GetMapping("/statistics")
+  @GetMapping("/stats")
   public ApiLocaleResult<ModelStatisticsVo> getStatistics(
       @ParameterObject SimpleStatisticsDto dto) {
     return ApiLocaleResult.success(modelFacade.getStatistics(dto));

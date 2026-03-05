@@ -174,7 +174,7 @@ export class VectorStores<SecurityDataType = unknown> {
    * @tags VectorStore
    * @name VectorStoreGetStatistics
    * @summary 获取统计信息
-   * @request GET:/api/v1/vector-stores/statistics
+   * @request GET:/api/v1/vector-stores/stats
    * @secure
    */
   vectorStoreGetStatistics = (
@@ -193,7 +193,7 @@ export class VectorStores<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<VectorStoreStatisticsResult>({
-      path: `${AI}/vector-stores/statistics`,
+      path: `${AI}/vector-stores/stats`,
       method: 'GET',
       query: query,
       secure: true,

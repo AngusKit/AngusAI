@@ -331,7 +331,7 @@ export class ApiCollections<SecurityDataType = unknown> {
    * @tags 接口集
    * @name ApiCollectionGetStatistics
    * @summary 获取统计信息
-   * @request GET:/api/v1/api-collections/statistics
+   * @request GET:/api/v1/api-collections/stats
    * @secure
    */
   apiCollectionGetStatistics = (
@@ -350,7 +350,7 @@ export class ApiCollections<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<ApiCollectionStatisticsResult>({
-      path: `${AI}/api-collections/statistics`,
+      path: `${AI}/api-collections/stats`,
       method: 'GET',
       query: query,
       secure: true,

@@ -432,7 +432,7 @@ export class Chat<SecurityDataType = unknown> {
    * @tags 对话消息
    * @name GetChatStatistics
    * @summary 获取对话统计
-   * @request GET:/api/v1/chat/sessions/statistics
+   * @request GET:/api/v1/chat/sessions/stats
    * @secure
    */
   getChatStatistics = (
@@ -446,7 +446,7 @@ export class Chat<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<ChatStatisticsResult>({
-      path: `${AI}/chat/sessions/statistics`,
+      path: `${AI}/chat/sessions/stats`,
       method: 'GET',
       query: query,
       secure: true,

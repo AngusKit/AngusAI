@@ -295,7 +295,7 @@ export class Plugins<SecurityDataType = unknown> {
    * @tags Plugin
    * @name GetPluginStatistics
    * @summary 获取插件统计
-   * @request GET:/api/v1/plugins/statistics
+   * @request GET:/api/v1/plugins/stats
    * @secure
    */
   getPluginStatistics = (
@@ -306,7 +306,7 @@ export class Plugins<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<PluginStatisticsResult>({
-      path: `${AI}/plugins/statistics`,
+      path: `${AI}/plugins/stats`,
       method: 'GET',
       query: query,
       secure: true,

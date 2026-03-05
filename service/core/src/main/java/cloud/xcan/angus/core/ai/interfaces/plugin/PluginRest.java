@@ -175,7 +175,7 @@ public class PluginRest {
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "统计数据获取成功")
   })
-  @GetMapping("/statistics")
+  @GetMapping("/stats")
   public ApiLocaleResult<PluginStatisticsVo> getStatistics(
       @Parameter(description = "统计周期") @RequestParam(required = false) StatisticsPeriod period) {
     return ApiLocaleResult.success(pluginFacade.getStatistics(period));

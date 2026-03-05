@@ -178,7 +178,7 @@ export class KnowledgeBases<SecurityDataType = unknown> {
    * @tags KnowledgeBase
    * @name GetKnowledgeBaseStatistics
    * @summary 获取统计信息
-   * @request GET:/api/v1/knowledge-bases/statistics
+   * @request GET:/api/v1/knowledge-bases/stats
    * @secure
    */
   getKnowledgeBaseStatistics = (
@@ -197,7 +197,7 @@ export class KnowledgeBases<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<KnowledgeBaseStatisticsResult>({
-      path: `${AI}/knowledge-bases/statistics`,
+      path: `${AI}/knowledge-bases/stats`,
       method: 'GET',
       query: query,
       secure: true,

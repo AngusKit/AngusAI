@@ -218,7 +218,7 @@ export class Models<SecurityDataType = unknown> {
    * @tags Model
    * @name GetModelStatistics
    * @summary 获取模型调用统计
-   * @request GET:/api/v1/models/statistics
+   * @request GET:/api/v1/models/stats
    * @secure
    */
   getModelStatistics = (
@@ -237,7 +237,7 @@ export class Models<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<ModelStatisticsResult>({
-      path: `${AI}/models/statistics`,
+      path: `${AI}/models/stats`,
       method: 'GET',
       query: query,
       secure: true,

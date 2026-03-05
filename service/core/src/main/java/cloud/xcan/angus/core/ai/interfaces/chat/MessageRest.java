@@ -135,7 +135,7 @@ public class MessageRest {
   }
 
   @Operation(operationId = "getChatStatistics", summary = "获取对话统计", description = "获取对话模块统计数据")
-  @GetMapping("/statistics")
+  @GetMapping("/stats")
   public ApiLocaleResult<ChatStatisticsVo> getStatistics(
       @Parameter(description = "统计周期") @RequestParam(required = false, defaultValue = "month") String period) {
     return ApiLocaleResult.success(messageFacade.getChatStatistics(period));

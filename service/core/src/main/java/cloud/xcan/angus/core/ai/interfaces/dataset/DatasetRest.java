@@ -166,7 +166,7 @@ public class DatasetRest {
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "统计数据获取成功")
   })
-  @GetMapping("/statistics")
+  @GetMapping("/stats")
   public ApiLocaleResult<DatasetStatisticsVo> getStatistics(
       @ParameterObject SimpleStatisticsDto dto) {
     return ApiLocaleResult.success(datasetFacade.getStatistics(dto));

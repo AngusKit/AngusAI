@@ -68,7 +68,7 @@ export class Activity<SecurityDataType = unknown> {
    * @description 获取活动模块统计数据
    * @tags Activity
    * @summary 获取活动统计
-   * @request GET:/api/v1/activity/statistics
+   * @request GET:/api/v1/activity/stats
    * @secure
    */
   getActivityStatistics = (
@@ -76,7 +76,7 @@ export class Activity<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<ActivityStatisticsResult>({
-      path: `${AI}/activity/statistics`,
+      path: `${AI}/activity/stats`,
       method: 'GET',
       query: query as unknown as QueryParamsType,
       secure: true,

@@ -254,7 +254,7 @@ export class Datasets<SecurityDataType = unknown> {
    * @tags Dataset
    * @name GetDatasetStatistics
    * @summary 获取数据集统计
-   * @request GET:/api/v1/datasets/statistics
+   * @request GET:/api/v1/datasets/stats
    * @secure
    */
   getDatasetStatistics = (
@@ -273,7 +273,7 @@ export class Datasets<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<DatasetStatisticsResult>({
-      path: `${AI}/datasets/statistics`,
+      path: `${AI}/datasets/stats`,
       method: 'GET',
       query: query,
       secure: true,

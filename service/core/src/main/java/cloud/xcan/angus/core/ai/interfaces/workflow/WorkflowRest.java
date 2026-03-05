@@ -165,7 +165,7 @@ public class WorkflowRest {
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "统计数据获取成功")
   })
-  @GetMapping("/statistics")
+  @GetMapping("/stats")
   public ApiLocaleResult<WorkflowStatisticsVo> getStatistics(
       @Parameter(description = "统计周期") @RequestParam(required = false) String period) {
     return ApiLocaleResult.success(workflowFacade.getStatistics(period));

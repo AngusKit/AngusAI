@@ -136,7 +136,7 @@ export class Sharing<SecurityDataType = unknown> {
    * @tags Resource Sharing
    * @name GetResourceSharingStatistics
    * @summary 获取共享访问统计
-   * @request GET:/api/v1/sharing/resources/{id}/statistics
+   * @request GET:/api/v1/sharing/resources/{id}/stats
    * @secure
    */
   getResourceSharingStatistics = (
@@ -148,7 +148,7 @@ export class Sharing<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<ResourceSharingStatisticsResult>({
-      path: `${AI}/sharing/resources/${id}/statistics`,
+      path: `${AI}/sharing/resources/${id}/stats`,
       method: 'GET',
       query: query,
       secure: true,

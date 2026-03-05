@@ -41,7 +41,7 @@ public class ActivityRest {
   }
 
   @Operation(operationId = "getActivityStatistics", summary = "获取活动统计", description = "获取活动模块统计数据")
-  @GetMapping("/statistics")
+  @GetMapping("/stats")
   public ApiLocaleResult<ActivityStatisticsVo> getStatistics(
       @ParameterObject SimpleStatisticsDto dto) {
     return ApiLocaleResult.success(activityFacade.getStatistics(dto));

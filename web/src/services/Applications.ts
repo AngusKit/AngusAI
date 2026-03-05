@@ -200,7 +200,7 @@ export class Applications<SecurityDataType = unknown> {
    * @tags Application
    * @name GetApplicationStatistics
    * @summary 获取应用统计
-   * @request GET:/api/v1/applications/{id}/statistics
+   * @request GET:/api/v1/applications/{id}/stats
    * @secure
    */
   getApplicationStatistics = (
@@ -216,7 +216,7 @@ export class Applications<SecurityDataType = unknown> {
     params: RequestParams = {}
   ) =>
     this.http.request<ApplicationStatisticsResult>({
-      path: `${AI}/applications/${id}/statistics`,
+      path: `${AI}/applications/${id}/stats`,
       method: 'GET',
       query: query,
       secure: true,

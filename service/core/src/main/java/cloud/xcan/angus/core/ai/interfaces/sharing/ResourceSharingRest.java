@@ -141,7 +141,7 @@ public class ResourceSharingRest {
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "统计数据获取成功")
   })
-  @GetMapping("/resources/{id}/statistics")
+  @GetMapping("/resources/{id}/stats")
   public ApiLocaleResult<ResourceSharingStatisticsVo> getStatistics(
       @Parameter(description = "共享ID") @PathVariable Long id,
       @Parameter(description = "统计周期") @RequestParam(required = false) StatisticsPeriod period) {
