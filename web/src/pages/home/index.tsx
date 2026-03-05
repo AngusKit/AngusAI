@@ -1,4 +1,7 @@
-import { RecentApplications, WelcomeBanner, StatsCards, UsageDetails } from '@/pages/dashboard';
+import { RecentApplications } from '@/pages/dashboard/RecentApplications';
+import { WelcomeBanner } from '@/pages/dashboard/WelcomeBanner';
+import { StatsCards } from '@/pages/dashboard/StatsCards';
+import { UsageDetails } from '@/pages/dashboard/UsageDetails';
 import { useNavigate } from 'react-router-dom';
 
 
