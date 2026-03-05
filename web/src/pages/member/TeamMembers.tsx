@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog.tsx';
 import { Label } from '@/components/ui/label.tsx';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu.tsx';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar.tsx';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.tsx';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx';
 import { XcanPagination } from '@/components/ui/pagination.tsx';
 import { toast } from 'sonner';
@@ -23,11 +23,10 @@ import type { UserInviteVo } from '@/services/MemberInvitationTypes';
 import { UserStatusEnum } from '@/enums/enums';
 import { EnabledStatusEnum } from '@/enums/enums';
 import { InviteTypeEnum } from '@/enums/enums';
-import { InviteStatusEnum } from '@/enums/enums';
 import { useDebounce } from '@/hooks/useDebounce';
 import { formatRelativeTimeShort, formatDateShort, getInitials } from '@/utils/FormatUtils';
 import { RemoveMemberDialog } from './components/RemoveMemberDialog';
-import { DEFAULT_PAGE_SIZE } from '@/Constants';
+import { DEFAULT_PAGE_SIZE, ANGUS_AI_APP_CODE } from '@/Constants';
 
 /** 页面展示用的成员状态：active-活跃, inactive-不活跃, pending-待确认 */
 type DisplayStatus = 'active' | 'inactive' | 'pending';
@@ -36,7 +35,10 @@ interface TeamMember {
   id: string;
   name: string;
   email: string;
-  avatar: string;
+  /** 头像 URL，为空时用 avatarFallback */
+  avatarUrl?: string;
+  /** 头像加载失败或无 URL 时展示的首字母 */
+  avatarFallback: string;
   /** 角色名称列表（来自 RoleInfo[].name） */
   roleNames: string;
   /** 是否租户管理员/所有者，不可移除 */
@@ -64,6 +66,22 @@ function getRoleNames(vo: MemberListVo): string {
   return names.join('、') || '-';
 }
 
+/** 角色名称展示：多个角色用 Badge 标签展示 */
+function RoleNamesDisplay({ names }: { names: string }) {
+  if (!names || names === '-') return <span className='text-sm text-gray-500 dark:text-gray-400'>-</span>;
+  const list = names.split(/[、,，]/).map(s => s.trim()).filter(Boolean);
+  if (list.length === 0) return <span className='text-sm text-gray-500 dark:text-gray-400'>-</span>;
+  return (
+    <div className='flex flex-wrap gap-1'>
+      {list.map((name, i) => (
+        <Badge key={i} variant='secondary' className='text-xs font-normal dark:bg-gray-700 dark:text-gray-300'>
+          {name}
+        </Badge>
+      ))}
+    </div>
+  );
+}
+
 /** 从 UserStatusEnum 映射到页面展示状态 */
 function mapStatusToDisplay(status?: string): DisplayStatus {
   if (status === UserStatusEnum.ACTIVE) return 'active';
@@ -80,7 +98,6 @@ export function TeamMembers() {
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRoleId, setInviteRoleId] = useState<string>('__none__');
   const [inviteRoles, setInviteRoles] = useState<RoleListVo[]>([]);
-  const [inviteMessage, setInviteMessage] = useState('');
   const [inviteSending, setInviteSending] = useState(false);
 
   const [removeDialogOpen, setRemoveDialogOpen] = useState(false);
@@ -113,29 +130,30 @@ export function TeamMembers() {
       const response = await MemberService.list({
         pageNo: currentPage,
         pageSize: DEFAULT_PAGE_SIZE,
+        appCode: ANGUS_AI_APP_CODE,
         keyword: debouncedSearch?.trim() || undefined,
         fullTextSearch: true,
         status: statusParam,
       });
       const data = (response as { data?: { total?: number; list?: MemberListVo[] } })?.data;
-      if (data?.list) {
-        setMembers(
-          data.list.map((vo: MemberListVo): TeamMember => ({
-            id: String(vo.id ?? ''),
-            name: vo.name ?? vo.username ?? '',
-            email: vo.email ?? '',
-            avatar: getInitials(vo.name, vo.email),
-            roleNames: getRoleNames(vo),
-            sysAdmin: vo.sysAdmin,
-            status: mapStatusToDisplay(vo.status),
-            joinedDate: formatDateShort(vo.createdDate),
-            lastActive: formatRelativeTimeShort(vo.lastLogin),
-            resourcesShared: vo.shareCount ?? 0,
-            resourcesAccessed: vo.shareAccessCount ?? 0,
-          }))
-        );
-        setMembersTotal(data.total ?? 0);
-      }
+      const list = data?.list ?? [];
+      setMembers(
+        list.map((vo: MemberListVo): TeamMember => ({
+          id: String(vo.id ?? ''),
+          name: vo.name ?? vo.username ?? '',
+          email: vo.email ?? '',
+          avatarUrl: vo.avatar?.trim() || undefined,
+          avatarFallback: getInitials(vo.name, vo.email),
+          roleNames: getRoleNames(vo),
+          sysAdmin: vo.sysAdmin,
+          status: mapStatusToDisplay(vo.status),
+          joinedDate: formatDateShort(vo.createdDate),
+          lastActive: formatRelativeTimeShort(vo.lastLogin),
+          resourcesShared: vo.shareCount ?? 0,
+          resourcesAccessed: vo.shareAccessCount ?? 0,
+        }))
+      );
+      setMembersTotal(data?.total ?? 0);
     } catch (err) {
       toast.error((err as Error)?.message ?? '加载成员列表失败');
       setMembers([]);
@@ -145,29 +163,30 @@ export function TeamMembers() {
     }
   }, [currentPage, debouncedSearch, statusFilter]);
 
-  /** 加载待处理邀请 */
+  /** 加载邀请列表 */
   const loadInvitations = useCallback(async () => {
     setInvitationsLoading(true);
     try {
+      const accessApp = appContext.getContext?.()?.accessApp as { id?: number | string } | undefined;
+      const appId = accessApp?.id != null ? String(accessApp.id) : undefined;
       const response = await MemberInvitationService.listInvites({
         pageNo: currentInvitePage,
         pageSize: DEFAULT_PAGE_SIZE,
-        status: InviteStatusEnum.PENDING,
+        appId,
       });
       const data = (response as { data?: { total?: number; list?: UserInviteVo[] } })?.data;
-      if (data?.list) {
-        setPendingInvitations(
-          data.list.map((vo: UserInviteVo): PendingInvitation => ({
-            id: String(vo.id ?? ''),
-            email: vo.email ?? '',
-            roleName: vo.roleName ?? '-',
-            invitedBy: vo.inviterName ?? '',
-            invitedDate: formatDateShort(vo.inviteDate),
-            expiresDate: formatDateShort(vo.expiryDate),
-          }))
-        );
-        setInvitationsTotal(data.total ?? 0);
-      }
+      const list = data?.list ?? [];
+      setPendingInvitations(
+        list.map((vo: UserInviteVo): PendingInvitation => ({
+          id: String(vo.id ?? ''),
+          email: vo.email ?? '',
+          roleName: vo.roleName ?? '-',
+          invitedBy: vo.inviterName ?? '',
+          invitedDate: formatDateShort(vo.inviteDate),
+          expiresDate: formatDateShort(vo.expiryDate),
+        }))
+      );
+      setInvitationsTotal(data?.total ?? 0);
     } catch (err) {
       toast.error((err as Error)?.message ?? '加载邀请列表失败');
       setPendingInvitations([]);
@@ -200,7 +219,7 @@ export function TeamMembers() {
   const loadStats = useCallback(async () => {
     setStatsLoading(true);
     try {
-      const response = await MemberService.getStats();
+      const response = await MemberService.getStats({ appCode: ANGUS_AI_APP_CODE });
       const data = (response as { data?: UserStatsVo })?.data;
       if (data) setStats(data);
     } catch {
@@ -240,12 +259,11 @@ export function TeamMembers() {
     const appId = accessApp?.id != null ? String(accessApp.id) : undefined;
     setInviteSending(true);
     try {
-      const response =       await MemberInvitationService.inviteUser({
+      const response = await MemberInvitationService.inviteUser({
         emails: [email],
         inviteType: InviteTypeEnum.EMAIL,
         appId,
         roleId: inviteRoleId && inviteRoleId !== '__none__' ? inviteRoleId : undefined,
-        message: inviteMessage || undefined,
         expireDays: 7,
       });
       if ((response as { code?: string }).code === 'S') {
@@ -253,7 +271,6 @@ export function TeamMembers() {
         setInviteDialogOpen(false);
         setInviteEmail('');
         setInviteRoleId('__none__');
-        setInviteMessage('');
         loadInvitations();
         loadStats();
       } else {
@@ -378,7 +395,7 @@ export function TeamMembers() {
       <Tabs defaultValue='members' className='w-full'>
         <TabsList className='dark:bg-gray-800'>
           <TabsTrigger value='members'>全部成员</TabsTrigger>
-          <TabsTrigger value='pending'>待处理邀请 ({invitationsTotal})</TabsTrigger>
+          <TabsTrigger value='pending'>邀请记录</TabsTrigger>
         </TabsList>
 
         <TabsContent value='members' className='space-y-4 mt-0'>
@@ -445,8 +462,11 @@ export function TeamMembers() {
                             <td className='px-6 py-4'>
                               <div className='flex items-center gap-3'>
                                 <Avatar>
+                                  {member.avatarUrl && (
+                                    <AvatarImage src={member.avatarUrl} alt={member.name} />
+                                  )}
                                   <AvatarFallback className='bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'>
-                                    {member.avatar}
+                                    {member.avatarFallback}
                                   </AvatarFallback>
                                 </Avatar>
                                 <div>
@@ -455,8 +475,8 @@ export function TeamMembers() {
                                 </div>
                               </div>
                             </td>
-                            <td className='px-6 py-4 text-sm dark:text-gray-300'>
-                              {member.roleNames}
+                            <td className='px-6 py-4'>
+                              <RoleNamesDisplay names={member.roleNames} />
                             </td>
                             <td className='px-6 py-4'>
                               <Badge className={`text-xs ${statusBadge.color} border-0 gap-1`}>
@@ -636,16 +656,6 @@ export function TeamMembers() {
                   ))}
                 </SelectContent>
               </Select>
-            </div>
-            <div className='space-y-2'>
-              <Label htmlFor='invite-message' className='dark:text-gray-300'>邀请消息（可选）</Label>
-              <Input
-                id='invite-message'
-                placeholder='欢迎加入我们的团队...'
-                value={inviteMessage}
-                onChange={e => setInviteMessage(e.target.value)}
-                className='dark:bg-gray-700 dark:border-gray-600'
-              />
             </div>
             <div className='p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800'>
               <div className='flex gap-2'>
