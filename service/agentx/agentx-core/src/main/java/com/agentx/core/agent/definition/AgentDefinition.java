@@ -79,6 +79,11 @@ public class AgentDefinition {
   private List<String> suggestedQuestions;
 
   /**
+   * 绑定的工作流 ID
+   */
+  private Long workflowId;
+
+  /**
    * 绑定的工具 ID 列表
    */
   private List<String> toolIds;
@@ -92,6 +97,16 @@ public class AgentDefinition {
    * 绑定的知识库 ID 列表
    */
   private List<String> knowledgeBaseIds;
+
+  /**
+   * 绑定的数据集 ID 列表
+   */
+  private List<String> datasetIds;
+
+  /**
+   * 绑定的数据集 ID 列表
+   */
+  private List<String> openApiIds;
 
   /**
    * 记忆策略配置
