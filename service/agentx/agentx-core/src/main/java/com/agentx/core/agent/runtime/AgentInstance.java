@@ -17,6 +17,7 @@ public class AgentInstance {
   private final AgentDefinition definition;
   private AgentStatus status;
   private Object aiServiceProxy;
+  private Object streamingServiceProxy;
   private final Instant createdAt;
   private Instant lastInvokedAt;
   private final Map<String, Object> runtimeContext = new ConcurrentHashMap<>();

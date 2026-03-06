@@ -3,6 +3,7 @@ package com.agentx.core.agent;
 import com.agentx.core.agent.definition.AgentDefinition;
 import com.agentx.core.agent.runtime.AgentChatService;
 import com.agentx.core.agent.runtime.AgentInstance;
+import com.agentx.core.agent.runtime.AgentStreamingChatService;
 import com.agentx.core.memory.MemoryFactory;
 import com.agentx.core.model.ModelRegistry;
 import com.agentx.core.skill.SkillRegistry;
@@ -12,6 +13,7 @@ import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.StreamingChatModel;
 import dev.langchain4j.agent.tool.ToolSpecification;
 import dev.langchain4j.service.AiServices;
+import dev.langchain4j.service.TokenStream;
 import dev.langchain4j.service.tool.ToolExecutor;
 import dev.langchain4j.service.tool.ToolProvider;
 import java.util.ArrayList;
@@ -125,6 +127,30 @@ public class AgentRegistry {
     }
 
     instance.setAiServiceProxy(syncBuilder.build());
+
+    // 构建流式服务（当有 StreamingChatModel 时）
+    if (streamingModel != null) {
+      var streamBuilder = AiServices.builder(AgentStreamingChatService.class)
+          .streamingChatModel(streamingModel);
+
+      if (!toolObjects.isEmpty()) {
+        streamBuilder.tools(toolObjects);
+      }
+      if (!toolMap.isEmpty()) {
+        streamBuilder.tools(toolMap);
+      }
+      if (definition.getSkillIds() != null && !definition.getSkillIds().isEmpty()) {
+        skillRegistry.resolveSkillsToolProvider(definition.getSkillIds())
+            .ifPresent(streamBuilder::toolProvider);
+      }
+      streamBuilder.chatMemoryProvider(memoryProvider);
+      if (systemPrompt != null && !systemPrompt.isBlank()) {
+        final String finalPrompt = systemPrompt;
+        streamBuilder.systemMessageProvider(memoryId -> finalPrompt);
+      }
+      instance.setStreamingServiceProxy(streamBuilder.build());
+    }
+
     instance.activate();
 
     agents.put(definition.getId(), instance);
@@ -142,8 +168,27 @@ public class AgentRegistry {
       throw new IllegalArgumentException("Agent not found: " + agentId);
     }
     instance.recordInvocation();
+    Object memoryId = sessionId != null && !sessionId.isBlank() ? sessionId : "default";
     AgentChatService service = (AgentChatService) instance.getAiServiceProxy();
-    return service.chat(message);
+    return service.chat(memoryId, message);
+  }
+
+  /**
+   * 流式对话 — 返回 TokenStream，无流式模型时抛异常
+   */
+  public TokenStream chatStream(String agentId, String sessionId, String message) {
+    AgentInstance instance = agents.get(agentId);
+    if (instance == null) {
+      throw new IllegalArgumentException("Agent not found: " + agentId);
+    }
+    if (instance.getStreamingServiceProxy() == null) {
+      throw new IllegalStateException("Streaming not supported for agent: " + agentId
+          + " (no StreamingChatModel configured)");
+    }
+    instance.recordInvocation();
+    Object memoryId = sessionId != null && !sessionId.isBlank() ? sessionId : "default";
+    AgentStreamingChatService service = (AgentStreamingChatService) instance.getStreamingServiceProxy();
+    return service.chatStream(memoryId, message);
   }
 
   public void unregister(String agentId) {
