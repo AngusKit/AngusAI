@@ -42,6 +42,8 @@ import com.agentx.core.workflow.validation.WorkflowSpecRegistry;
 import com.agentx.core.workflow.validation.WorkflowValidator;
 import dev.langchain4j.model.chat.ChatModel;
 import java.util.List;
+import java.util.Optional;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -86,8 +88,9 @@ public class AgentXCoreBeansConfiguration {
 
   // ===== Memory =====
   @Bean
-  public MemoryFactory memoryFactory() {
-    return new MemoryFactory();
+  public MemoryFactory memoryFactory(ObjectProvider<ChatModel> chatModelProvider) {
+    Optional<ChatModel> chatModel = Optional.ofNullable(chatModelProvider.getIfAvailable());
+    return new MemoryFactory(chatModel);
   }
 
   // ===== Agent =====

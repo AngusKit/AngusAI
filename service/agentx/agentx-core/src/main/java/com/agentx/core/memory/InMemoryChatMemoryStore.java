@@ -22,7 +22,7 @@ public class InMemoryChatMemoryStore implements ChatMemoryStore {
 
   @Override
   public void updateMessages(Object memoryId, List<ChatMessage> messages) {
-    store.put(memoryId, messages);
+    store.put(memoryId, List.copyOf(messages));
   }
 
   @Override

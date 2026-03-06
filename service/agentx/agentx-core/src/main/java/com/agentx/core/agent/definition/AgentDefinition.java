@@ -140,14 +140,19 @@ public class AgentDefinition {
   public static class MemoryConfig {
 
     /**
-     * 策略: NONE / SLIDING_WINDOW / TOKEN_WINDOW / SUMMARY / PERSISTENT
+     * 策略: NONE / MESSAGE_WINDOW / TOKEN_WINDOW / SUMMARY
+     * 兼容历史配置: SLIDING_WINDOW → MESSAGE_WINDOW，PERSISTENT → MESSAGE_WINDOW
      */
     @Builder.Default
-    private String strategy = "SLIDING_WINDOW";
+    private String strategy = "MESSAGE_WINDOW";
+    /** 消息窗口大小（条数），用于 MESSAGE_WINDOW / SUMMARY */
     @Builder.Default
     private Integer windowSize = 20;
+    /** Token 上限，用于 TOKEN_WINDOW */
     @Builder.Default
     private Integer maxTokens = 8000;
+    /** SUMMARY 策略的摘要提示词，可用 {{messages}} 占位符，不配置则用默认模板 */
+    private String summaryPrompt;
   }
 
   @Data
