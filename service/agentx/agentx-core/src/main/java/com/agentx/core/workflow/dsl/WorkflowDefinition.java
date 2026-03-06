@@ -2,14 +2,18 @@ package com.agentx.core.workflow.dsl;
 
 import java.util.List;
 import java.util.Map;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 工作流 DSL 顶层结构
  */
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class WorkflowDefinition {
 
   private String id;
@@ -23,6 +27,8 @@ public class WorkflowDefinition {
 
   @Data
   @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
   public static class TriggerConfig {
 
     /**
@@ -34,6 +40,8 @@ public class WorkflowDefinition {
 
   @Data
   @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
   public static class WorkflowSettings {
 
     @Builder.Default
@@ -48,6 +56,8 @@ public class WorkflowDefinition {
 
   @Data
   @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
   public static class RetryPolicy {
 
     @Builder.Default

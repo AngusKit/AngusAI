@@ -5,13 +5,17 @@ import com.agentx.core.agent.enums.InteractionMode;
 import com.agentx.core.agent.enums.ReasoningStrategy;
 import java.util.List;
 import java.util.Map;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Agent 声明式定义 — 对应 YAML/JSON 配置文件
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class AgentDefinition {
 
@@ -115,6 +119,8 @@ public class AgentDefinition {
 
   @Data
   @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
   public static class ModelConfig {
 
     private String provider;
@@ -129,6 +135,8 @@ public class AgentDefinition {
 
   @Data
   @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
   public static class MemoryConfig {
 
     /**
@@ -144,6 +152,8 @@ public class AgentDefinition {
 
   @Data
   @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
   public static class GuardrailConfig {
 
     private List<String> inputGuardrailIds;
