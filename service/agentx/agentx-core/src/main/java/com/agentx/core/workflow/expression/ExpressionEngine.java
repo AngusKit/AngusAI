@@ -9,13 +9,11 @@ import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
-import org.springframework.stereotype.Component;
 
 /**
  * SpEL 表达式引擎 — 解析 ${...} 表达式
  */
 @Slf4j
-@Component
 public class ExpressionEngine {
 
   private static final Pattern EXPR_PATTERN = Pattern.compile("\\$\\{(.+?)}");

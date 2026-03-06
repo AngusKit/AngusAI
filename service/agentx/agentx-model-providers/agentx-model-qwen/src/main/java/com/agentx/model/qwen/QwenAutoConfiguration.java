@@ -9,19 +9,15 @@ import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.model.openai.OpenAiEmbeddingModel;
 import dev.langchain4j.model.openai.OpenAiStreamingChatModel;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 
 /**
  * 通义千问 (Qwen) 模块自动配置 — 通过 DashScope OpenAI 兼容接口实现。
  */
-@Configuration
 public class QwenAutoConfiguration {
 
   private static final String DEFAULT_BASE_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1";
 
   @Slf4j
-  @Component
   public static class QwenModelFactory implements ModelFactory {
 
     @Override

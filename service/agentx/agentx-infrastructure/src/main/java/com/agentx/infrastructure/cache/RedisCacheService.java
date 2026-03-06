@@ -1,11 +1,10 @@
 package com.agentx.infrastructure.cache;
 
+import java.time.Duration;
+import java.util.Optional;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-
-import java.time.Duration;
-import java.util.Optional;
 
 /**
  * Redis 缓存服务 —— 为 Agent 定义、会话等提供缓存支持

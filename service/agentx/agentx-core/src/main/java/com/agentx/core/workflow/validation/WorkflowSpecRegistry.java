@@ -4,12 +4,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.springframework.stereotype.Component;
 
 /**
  * 工作流 DSL 规范注册中心 — 提供所有节点类型的规范描述， 用于生成文档、前端联想以及运行时校验。
  */
-@Component
 public class WorkflowSpecRegistry {
 
   private final Map<String, NodeTypeSpec> specs = new LinkedHashMap<>();

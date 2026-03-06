@@ -7,13 +7,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
-import org.springframework.stereotype.Component;
 
 /**
  * WHILE 节点 — 条件循环
  */
 @Slf4j
-@Component
 public class WhileNodeExecutor implements NodeExecutor {
 
   private final ExpressionParser parser = new SpelExpressionParser();

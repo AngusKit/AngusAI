@@ -18,7 +18,6 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 /**
  * Agent 注册中心 — 管理所有 Agent 实例的生命周期。
@@ -27,7 +26,6 @@ import org.springframework.stereotype.Component;
  * </p>
  */
 @Slf4j
-@Component
 @RequiredArgsConstructor
 public class AgentRegistry {
 

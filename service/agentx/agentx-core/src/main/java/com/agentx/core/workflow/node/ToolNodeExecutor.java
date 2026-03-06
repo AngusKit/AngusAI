@@ -7,13 +7,11 @@ import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 /**
  * TOOL 节点 — 调用已注册工具
  */
 @Slf4j
-@Component
 @RequiredArgsConstructor
 public class ToolNodeExecutor implements NodeExecutor {
 

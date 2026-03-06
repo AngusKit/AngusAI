@@ -1,17 +1,20 @@
 package com.agentx.core.guardrail;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.agentx.core.guardrail.builtin.LengthLimitGuardrail;
 import com.agentx.core.guardrail.builtin.PiiSanitizationGuardrail;
 import com.agentx.core.guardrail.builtin.PromptInjectionGuardrail;
 import com.agentx.core.guardrail.builtin.SensitiveWordFilterGuardrail;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * GuardrailChain + 全部内置护栏 单元测试

@@ -1,19 +1,14 @@
 package com.agentx.core.guardrail;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 护栏链执行器 — 双向护栏链管理
  */
 @Slf4j
-@Component
 public class GuardrailChain {
 
   private final Map<String, InputGuardrail> inputGuardrails = new ConcurrentHashMap<>();

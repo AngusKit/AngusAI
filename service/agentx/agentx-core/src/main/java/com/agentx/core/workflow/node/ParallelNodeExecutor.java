@@ -6,13 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 /**
  * PARALLEL 节点 — 并行执行多个分支
  */
 @Slf4j
-@Component
 public class ParallelNodeExecutor implements NodeExecutor {
 
   @Override

@@ -7,19 +7,15 @@ import dev.langchain4j.model.chat.StreamingChatModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.model.openai.OpenAiStreamingChatModel;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 
 /**
  * DeepSeek 模块自动配置 — 通过 OpenAI 兼容接口实现。
  */
-@Configuration
 public class DeepSeekAutoConfiguration {
 
   private static final String DEFAULT_BASE_URL = "https://api.deepseek.com";
 
   @Slf4j
-  @Component
   public static class DeepSeekModelFactory implements ModelFactory {
 
     @Override

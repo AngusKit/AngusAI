@@ -1,8 +1,5 @@
 package com.agentx.core.knowledge.splitter;
 
-import lombok.Builder;
-import lombok.Data;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,9 +18,9 @@ public class DocumentSplitter {
       int end = Math.min(start + chunkSize, text.length());
       chunks.add(text.substring(start, end));
       start = end - overlap;
-        if (start >= text.length()) {
-            break;
-        }
+      if (start >= text.length()) {
+        break;
+      }
     }
     return chunks;
   }

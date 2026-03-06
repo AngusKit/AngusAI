@@ -6,8 +6,6 @@ import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.pgvector.PgVectorEmbeddingStore;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 
 /**
  * PgVector 模块自动配置 — 提供 PgVectorStoreFactory 组件。
@@ -16,11 +14,9 @@ import org.springframework.stereotype.Component;
  * application.yml 读取。
  * </p>
  */
-@Configuration
 public class PgVectorAutoConfiguration {
 
   @Slf4j
-  @Component
   public static class PgVectorStoreFactory implements VectorStoreFactory {
 
     @Override

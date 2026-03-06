@@ -8,7 +8,6 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 /**
  * 技能注册中心 — 统一管理所有技能定义与编程式技能实例。
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Component;
  * </p>
  */
 @Slf4j
-@Component
 public class SkillRegistry {
 
   private final Map<String, SkillDefinition> definitions = new ConcurrentHashMap<>();

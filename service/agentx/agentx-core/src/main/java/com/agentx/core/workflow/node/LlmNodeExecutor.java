@@ -7,13 +7,11 @@ import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 /**
  * LLM 节点 — 直接调用大语言模型
  */
 @Slf4j
-@Component
 @RequiredArgsConstructor
 public class LlmNodeExecutor implements NodeExecutor {
 

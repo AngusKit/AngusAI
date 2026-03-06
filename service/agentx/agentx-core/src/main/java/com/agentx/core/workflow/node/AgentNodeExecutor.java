@@ -6,13 +6,11 @@ import com.agentx.core.workflow.engine.NodeExecutor;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 /**
  * AGENT 节点 — 调用一个完整智能体（含工具/记忆/RAG）
  */
 @Slf4j
-@Component
 @RequiredArgsConstructor
 public class AgentNodeExecutor implements NodeExecutor {
 

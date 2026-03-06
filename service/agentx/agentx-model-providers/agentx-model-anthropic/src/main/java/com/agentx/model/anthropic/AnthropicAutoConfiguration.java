@@ -8,8 +8,6 @@ import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.StreamingChatModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 
 /**
  * Anthropic 模块自动配置 — 提供 AnthropicModelFactory 组件。
@@ -17,11 +15,9 @@ import org.springframework.stereotype.Component;
  * 模型配置由 {@link com.agentx.core.model.ModelConfigProvider} 从数据库等外部源加载。
  * </p>
  */
-@Configuration
 public class AnthropicAutoConfiguration {
 
   @Slf4j
-  @Component
   public static class AnthropicModelFactory implements ModelFactory {
 
     @Override

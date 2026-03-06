@@ -2,14 +2,12 @@ package com.agentx.core.vectorstore;
 
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.EmbeddingStore;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 向量存储注册中心 — 统一管理所有 EmbeddingStore 实例。
@@ -18,7 +16,6 @@ import java.util.stream.Collectors;
  * </p>
  */
 @Slf4j
-@Component
 public class VectorStoreRegistry {
 
   private final Map<String, VectorStoreFactory> factories;

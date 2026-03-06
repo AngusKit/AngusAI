@@ -1,15 +1,19 @@
 package com.agentx.core.tool;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 /**
  * ToolRegistry 单元测试 — 覆盖工具注册、注销、执行、租户过滤
@@ -192,7 +196,7 @@ class ToolRegistryTest {
 
       List<ToolDescriptor> result = registry.listByTenant("tenant-A");
       assertEquals(1, result.size());
-      assertEquals("global", result.getFirst().getId());
+      assertEquals("global", result.get(0).getId());
     }
 
     @Test
@@ -205,7 +209,7 @@ class ToolRegistryTest {
 
       List<ToolDescriptor> result = registry.listByTenant("tenant-A");
       assertEquals(1, result.size());
-      assertEquals("t-a", result.getFirst().getId());
+      assertEquals("t-a", result.get(0).getId());
     }
 
     @Test

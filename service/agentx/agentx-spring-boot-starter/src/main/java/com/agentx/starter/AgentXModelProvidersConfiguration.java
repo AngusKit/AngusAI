@@ -5,7 +5,7 @@ import com.agentx.model.anthropic.AnthropicAutoConfiguration.AnthropicModelFacto
 import com.agentx.model.deepseek.DeepSeekAutoConfiguration;
 import com.agentx.model.gemini.GeminiAutoConfiguration;
 import com.agentx.model.ollama.OllamaAutoConfiguration.OllamaModelFactory;
-import com.agentx.model.openai.OpenAiModelFactory;
+import com.agentx.model.openai.OpenAiAutoConfiguration.OpenAiModelFactory;
 import com.agentx.model.qwen.QwenAutoConfiguration;
 import com.agentx.model.zhipu.ZhipuAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;

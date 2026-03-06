@@ -7,12 +7,20 @@ import dev.langchain4j.store.embedding.EmbeddingMatch;
 import dev.langchain4j.store.embedding.EmbeddingSearchRequest;
 import dev.langchain4j.store.embedding.EmbeddingSearchResult;
 import dev.langchain4j.store.embedding.EmbeddingStore;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import javax.sql.DataSource;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
-
-import javax.sql.DataSource;
-import java.sql.*;
-import java.util.*;
 
 /**
  * MariaDB 向量存储实现 — 基于 MariaDB 11.7+ VECTOR 类型。

@@ -4,13 +4,11 @@ import com.agentx.core.workflow.engine.NodeExecutionContext;
 import com.agentx.core.workflow.engine.NodeExecutor;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 /**
  * CODE 节点 — 在沙盒中执行代码片段（简化实现：仅支持 Groovy/JS 脚本引擎）
  */
 @Slf4j
-@Component
 public class CodeNodeExecutor implements NodeExecutor {
 
   @Override

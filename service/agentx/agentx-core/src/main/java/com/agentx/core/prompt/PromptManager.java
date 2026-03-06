@@ -9,13 +9,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 /**
  * 提示词管理器 — 模板库、版本管理、变量渲染
  */
 @Slf4j
-@Component
 public class PromptManager {
 
   private static final Pattern VARIABLE_PATTERN = Pattern.compile("\\{\\{(\\w+)}}");

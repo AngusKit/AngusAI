@@ -6,13 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 /**
  * SET_VARIABLE 节点 — 设置/修改流程变量
  */
 @Slf4j
-@Component
 public class SetVariableNodeExecutor implements NodeExecutor {
 
   @Override

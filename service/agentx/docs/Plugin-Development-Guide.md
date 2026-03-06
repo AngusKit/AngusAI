@@ -93,40 +93,40 @@ import java.util.Map;
 @Slf4j
 public class MyFirstPlugin implements AgentXPlugin {
 
-    @Override
-    public PluginDescriptor getDescriptor() {
-        return PluginDescriptor.builder()
-                .id("my-first-plugin")           // 唯一标识
-                .name("我的第一个插件")             // 显示名称
-                .version("1.0.0")                 // 版本号
-                .description("一个简单的示例插件")   // 描述
-                .author("Your Name")              // 作者
-                .extensionPoints(List.of("tool"))  // 声明扩展点类型
-                .config(Map.of(                    // 默认配置
-                        "greeting", "Hello"
-                ))
-                .build();
-    }
+  @Override
+  public PluginDescriptor getDescriptor() {
+    return PluginDescriptor.builder()
+        .id("my-first-plugin")           // 唯一标识
+        .name("我的第一个插件")             // 显示名称
+        .version("1.0.0")                 // 版本号
+        .description("一个简单的示例插件")   // 描述
+        .author("Your Name")              // 作者
+        .extensionPoints(List.of("tool"))  // 声明扩展点类型
+        .config(Map.of(                    // 默认配置
+            "greeting", "Hello"
+        ))
+        .build();
+  }
 
-    @Override
-    public void init(PluginContext context) {
-        // 在这里注册你的扩展组件
-        String greeting = context.getConfig("greeting", String.class);
+  @Override
+  public void init(PluginContext context) {
+    // 在这里注册你的扩展组件
+    String greeting = context.getConfig("greeting", String.class);
 
-        context.registerTool(ToolDescriptor.builder()
-                .id("greeting-tool")
-                .name("问候工具")
-                .description("向用户发送问候")
-                .category("utility")
-                .source(ToolDescriptor.ToolSource.SPI)
-                .executor(params -> {
-                    String name = (String) params.getOrDefault("name", "World");
-                    return greeting + ", " + name + "!";
-                })
-                .build());
+    context.registerTool(ToolDescriptor.builder()
+        .id("greeting-tool")
+        .name("问候工具")
+        .description("向用户发送问候")
+        .category("utility")
+        .source(ToolDescriptor.ToolSource.SPI)
+        .executor(params -> {
+          String name = (String) params.getOrDefault("name", "World");
+          return greeting + ", " + name + "!";
+        })
+        .build());
 
-        log.info("MyFirstPlugin initialized");
-    }
+    log.info("MyFirstPlugin initialized");
+  }
 }
 ```
 
@@ -137,24 +137,26 @@ public class MyFirstPlugin implements AgentXPlugin {
 **方式一：Spring Bean 自动发现（推荐）**
 
 ```java
+
 @Configuration
 public class PluginConfig {
 
-    @Bean
-    public MyFirstPlugin myFirstPlugin() {
-        return new MyFirstPlugin();
-    }
+  @Bean
+  public MyFirstPlugin myFirstPlugin() {
+    return new MyFirstPlugin();
+  }
 }
 ```
 
 **方式二：手动安装**
 
 ```java
+
 @Autowired
 private PluginManager pluginManager;
 
 public void loadPlugin() {
-    pluginManager.install(new MyFirstPlugin());
+  pluginManager.install(new MyFirstPlugin());
 }
 ```
 
@@ -198,20 +200,21 @@ LOADED → INITIALIZED → STARTED → STOPPED
 工具是 Agent 与外部世界交互的能力单元。
 
 ```java
+
 @Override
 public void init(PluginContext context) {
-    context.registerTool(ToolDescriptor.builder()
-            .id("my-tool")                       // 唯一 ID
-            .name("我的工具")                      // 显示名称
-            .description("工具功能描述")            // LLM 会读取此描述来决定是否调用
-            .category("utility")                  // 分类
-            .source(ToolDescriptor.ToolSource.SPI) // 来源标记
-            .executor(params -> {                  // 执行逻辑
-                // params 是 Map<String, Object>
-                String input = (String) params.get("input");
-                return "处理结果: " + input;
-            })
-            .build());
+  context.registerTool(ToolDescriptor.builder()
+      .id("my-tool")                       // 唯一 ID
+      .name("我的工具")                      // 显示名称
+      .description("工具功能描述")            // LLM 会读取此描述来决定是否调用
+      .category("utility")                  // 分类
+      .source(ToolDescriptor.ToolSource.SPI) // 来源标记
+      .executor(params -> {                  // 执行逻辑
+        // params 是 Map<String, Object>
+        String input = (String) params.get("input");
+        return "处理结果: " + input;
+      })
+      .build());
 }
 ```
 
@@ -228,31 +231,37 @@ public void init(PluginContext context) {
 ```java
 // 输入护栏
 context.registerInputGuardrail(new InputGuardrail() {
-    @Override
-    public String getId() { return "my-input-guard"; }
+  @Override
+  public String getId () {
+    return "my-input-guard";
+  }
 
-    @Override
-    public GuardrailResult check(String input) {
-        if (input.contains("危险词汇")) {
-            return GuardrailResult.builder()
-                    .passed(false)
-                    .message("输入包含不允许的内容")
-                    .build();
-        }
-        return GuardrailResult.builder().passed(true).build();
+  @Override
+  public GuardrailResult check (String input){
+    if (input.contains("危险词汇")) {
+      return GuardrailResult.builder()
+          .passed(false)
+          .message("输入包含不允许的内容")
+          .build();
     }
+    return GuardrailResult.builder().passed(true).build();
+  }
 });
 
 // 输出护栏
-context.registerOutputGuardrail(new OutputGuardrail() {
-    @Override
-    public String getId() { return "my-output-guard"; }
+    context.
 
-    @Override
-    public GuardrailResult check(String output) {
-        // 检查输出中是否有敏感信息泄露
-        return GuardrailResult.builder().passed(true).build();
-    }
+registerOutputGuardrail(new OutputGuardrail() {
+  @Override
+  public String getId () {
+    return "my-output-guard";
+  }
+
+  @Override
+  public GuardrailResult check (String output){
+    // 检查输出中是否有敏感信息泄露
+    return GuardrailResult.builder().passed(true).build();
+  }
 });
 ```
 
@@ -262,15 +271,17 @@ context.registerOutputGuardrail(new OutputGuardrail() {
 
 ```java
 context.registerNodeExecutor(new NodeExecutor() {
-    @Override
-    public String getNodeType() { return "custom-transform"; }
+  @Override
+  public String getNodeType () {
+    return "custom-transform";
+  }
 
-    @Override
-    public Map<String, Object> execute(NodeDefinition node, Map<String, Object> inputs) {
-        // 自定义节点执行逻辑
-        String data = (String) inputs.get("data");
-        return Map.of("result", data.toUpperCase());
-    }
+  @Override
+  public Map<String, Object> execute (NodeDefinition node, Map < String, Object > inputs){
+    // 自定义节点执行逻辑
+    String data = (String) inputs.get("data");
+    return Map.of("result", data.toUpperCase());
+  }
 });
 ```
 
@@ -280,19 +291,21 @@ context.registerNodeExecutor(new NodeExecutor() {
 
 ```java
 context.registerModelFactory(new ModelFactory() {
-    @Override
-    public String getProvider() { return "my-llm-provider"; }
+  @Override
+  public String getProvider () {
+    return "my-llm-provider";
+  }
 
-    @Override
-    public ChatModel createChatModel(ModelConfigDefinition config) {
-        // 创建你的 ChatModel 实现
-        return null;
-    }
+  @Override
+  public ChatModel createChatModel (ModelConfigDefinition config){
+    // 创建你的 ChatModel 实现
+    return null;
+  }
 
-    @Override
-    public StreamingChatModel createStreamingChatModel(ModelConfigDefinition config) {
-        return null;
-    }
+  @Override
+  public StreamingChatModel createStreamingChatModel (ModelConfigDefinition config){
+    return null;
+  }
 });
 ```
 
@@ -302,14 +315,16 @@ context.registerModelFactory(new ModelFactory() {
 
 ```java
 context.registerVectorStoreFactory(new VectorStoreFactory() {
-    @Override
-    public String getType() { return "my-vectordb"; }
+  @Override
+  public String getType () {
+    return "my-vectordb";
+  }
 
-    @Override
-    public EmbeddingStore<TextSegment> createEmbeddingStore(VectorStoreConfigDefinition config) {
-        // 创建 EmbeddingStore 实例
-        return null;
-    }
+  @Override
+  public EmbeddingStore<TextSegment> createEmbeddingStore (VectorStoreConfigDefinition config){
+    // 创建 EmbeddingStore 实例
+    return null;
+  }
 });
 ```
 
@@ -325,19 +340,43 @@ context.registerVectorStoreFactory(new VectorStoreFactory() {
 
 ```java
 context.registerSkill(SkillDefinition.builder()
-        .id("my-skill")
-        .name("我的技能")
-        .description("技能描述")
-        .category("tool_use")            // 分类
-        .toolIds(List.of("tool-a", "tool-b"))  // 依赖的工具
-        .promptFragment(                  // 提示词片段（追加到 Agent 系统提示词）
+        .
+
+id("my-skill")
+        .
+
+name("我的技能")
+        .
+
+description("技能描述")
+        .
+
+category("tool_use")            // 分类
+        .
+
+toolIds(List.of("tool-a", "tool-b"))  // 依赖的工具
+    .
+
+promptFragment(                  // 提示词片段（追加到 Agent 系统提示词）
                 "你具备 XX 能力，可以：\n1. ...\n2. ...")
-        .knowledgeBaseIds(List.of("kb-1")) // 关联知识库
-        .guardrails(SkillDefinition.SkillGuardrails.builder()
-                .inputGuardrailIds(List.of("guard-1"))
-                .outputGuardrailIds(List.of("guard-2"))
-                .build())
-        .build());
+        .
+
+knowledgeBaseIds(List.of("kb-1")) // 关联知识库
+    .
+
+guardrails(SkillDefinition.SkillGuardrails.builder()
+                .
+
+inputGuardrailIds(List.of("guard-1"))
+    .
+
+outputGuardrailIds(List.of("guard-2"))
+    .
+
+build())
+    .
+
+build());
 ```
 
 ### 6.2 编程式技能
@@ -345,26 +384,27 @@ context.registerSkill(SkillDefinition.builder()
 实现 `Skill` 接口创建可执行技能：
 
 ```java
+
 @Component
 public class TranslationSkill implements Skill {
 
-    @Override
-    public SkillDefinition getDefinition() {
-        return SkillDefinition.builder()
-                .id("translation-skill")
-                .name("翻译技能")
-                .description("多语言翻译")
-                .category("communication")
-                .build();
-    }
+  @Override
+  public SkillDefinition getDefinition() {
+    return SkillDefinition.builder()
+        .id("translation-skill")
+        .name("翻译技能")
+        .description("多语言翻译")
+        .category("communication")
+        .build();
+  }
 
-    @Override
-    public String execute(Map<String, Object> input) {
-        String text = (String) input.get("text");
-        String targetLang = (String) input.getOrDefault("targetLang", "en");
-        // 执行翻译逻辑
-        return "翻译结果...";
-    }
+  @Override
+  public String execute(Map<String, Object> input) {
+    String text = (String) input.get("text");
+    String targetLang = (String) input.getOrDefault("targetLang", "en");
+    // 执行翻译逻辑
+    return "翻译结果...";
+  }
 }
 ```
 
@@ -376,9 +416,18 @@ public class TranslationSkill implements Skill {
 {
   "id": "my-agent",
   "name": "多技能助手",
-  "skillIds": ["web-search-skill", "code-analysis-skill", "translation-skill"],
-  "toolIds": ["http-request-tool"],
-  "model": { "provider": "openai", "modelName": "gpt-4o" }
+  "skillIds": [
+    "web-search-skill",
+    "code-analysis-skill",
+    "translation-skill"
+  ],
+  "toolIds": [
+    "http-request-tool"
+  ],
+  "model": {
+    "provider": "openai",
+    "modelName": "gpt-4o"
+  }
 }
 ```
 
@@ -408,18 +457,19 @@ public class TranslationSkill implements Skill {
 在 `getDescriptor()` 中定义插件的默认配置：
 
 ```java
+
 @Override
 public PluginDescriptor getDescriptor() {
-    return PluginDescriptor.builder()
-            .id("my-plugin")
-            .name("My Plugin")
-            .version("1.0.0")
-            .config(Map.of(
-                    "apiKey", "default-key",
-                    "timeout", 30,
-                    "retryCount", 3
-            ))
-            .build();
+  return PluginDescriptor.builder()
+      .id("my-plugin")
+      .name("My Plugin")
+      .version("1.0.0")
+      .config(Map.of(
+          "apiKey", "default-key",
+          "timeout", 30,
+          "retryCount", 3
+      ))
+      .build();
 }
 ```
 
@@ -428,11 +478,12 @@ public PluginDescriptor getDescriptor() {
 在 `init()` 中通过 PluginContext 读取配置值：
 
 ```java
+
 @Override
 public void init(PluginContext context) {
-    String apiKey = context.getConfig("apiKey", String.class);
-    Integer timeout = context.getConfig("timeout", Integer.class);
-    // ...
+  String apiKey = context.getConfig("apiKey", String.class);
+  Integer timeout = context.getConfig("timeout", Integer.class);
+  // ...
 }
 ```
 
@@ -447,97 +498,100 @@ public void init(PluginContext context) {
 以下是一个完整的**数据库查询插件**实现，展示了工具 + 技能 + 护栏的组合使用：
 
 ```java
+
 @Slf4j
 public class DatabaseQueryPlugin implements AgentXPlugin {
 
-    @Override
-    public PluginDescriptor getDescriptor() {
-        return PluginDescriptor.builder()
-                .id("database-query-plugin")
-                .name("数据库查询插件")
-                .version("1.0.0")
-                .description("安全的自然语言数据库查询")
-                .author("Your Name")
-                .extensionPoints(List.of("tool", "skill", "guardrail"))
-                .config(Map.of(
-                        "jdbcUrl", "jdbc:postgresql://localhost/demo",
-                        "maxRows", 100,
-                        "readOnly", true
-                ))
-                .build();
-    }
+  @Override
+  public PluginDescriptor getDescriptor() {
+    return PluginDescriptor.builder()
+        .id("database-query-plugin")
+        .name("数据库查询插件")
+        .version("1.0.0")
+        .description("安全的自然语言数据库查询")
+        .author("Your Name")
+        .extensionPoints(List.of("tool", "skill", "guardrail"))
+        .config(Map.of(
+            "jdbcUrl", "jdbc:postgresql://localhost/demo",
+            "maxRows", 100,
+            "readOnly", true
+        ))
+        .build();
+  }
 
-    @Override
-    public void init(PluginContext context) {
-        String jdbcUrl = context.getConfig("jdbcUrl", String.class);
-        Integer maxRows = context.getConfig("maxRows", Integer.class);
+  @Override
+  public void init(PluginContext context) {
+    String jdbcUrl = context.getConfig("jdbcUrl", String.class);
+    Integer maxRows = context.getConfig("maxRows", Integer.class);
 
-        // 1. 注册查询工具
-        context.registerTool(ToolDescriptor.builder()
-                .id("db-query-tool")
-                .name("数据库查询")
-                .description("执行只读 SQL，仅支持 SELECT")
-                .category("database")
-                .source(ToolDescriptor.ToolSource.SPI)
-                .executor(params -> {
-                    String sql = (String) params.getOrDefault("sql", "");
-                    if (!sql.trim().toUpperCase().startsWith("SELECT")) {
-                        return "{\"error\":\"仅支持 SELECT\"}";
-                    }
-                    // 执行查询...
-                    return "{\"rows\":[]}";
-                })
-                .build());
+    // 1. 注册查询工具
+    context.registerTool(ToolDescriptor.builder()
+        .id("db-query-tool")
+        .name("数据库查询")
+        .description("执行只读 SQL，仅支持 SELECT")
+        .category("database")
+        .source(ToolDescriptor.ToolSource.SPI)
+        .executor(params -> {
+          String sql = (String) params.getOrDefault("sql", "");
+          if (!sql.trim().toUpperCase().startsWith("SELECT")) {
+            return "{\"error\":\"仅支持 SELECT\"}";
+          }
+          // 执行查询...
+          return "{\"rows\":[]}";
+        })
+        .build());
 
-        // 2. 注册 SQL 注入检测护栏
-        context.registerInputGuardrail(new InputGuardrail() {
-            @Override
-            public String getId() { return "sql-injection-guard"; }
+    // 2. 注册 SQL 注入检测护栏
+    context.registerInputGuardrail(new InputGuardrail() {
+      @Override
+      public String getId() {
+        return "sql-injection-guard";
+      }
 
-            @Override
-            public GuardrailResult check(String input) {
-                String upper = input.toUpperCase();
-                if (upper.contains("DROP ") || upper.contains("DELETE ") ||
-                    upper.contains("INSERT ") || upper.contains("UPDATE ")) {
-                    return GuardrailResult.builder()
-                            .passed(false)
-                            .message("检测到危险 SQL 操作")
-                            .build();
-                }
-                return GuardrailResult.builder().passed(true).build();
-            }
-        });
+      @Override
+      public GuardrailResult check(String input) {
+        String upper = input.toUpperCase();
+        if (upper.contains("DROP ") || upper.contains("DELETE ") ||
+            upper.contains("INSERT ") || upper.contains("UPDATE ")) {
+          return GuardrailResult.builder()
+              .passed(false)
+              .message("检测到危险 SQL 操作")
+              .build();
+        }
+        return GuardrailResult.builder().passed(true).build();
+      }
+    });
 
-        // 3. 注册数据库查询技能
-        context.registerSkill(SkillDefinition.builder()
-                .id("db-query-skill")
-                .name("数据库查询技能")
-                .description("自然语言数据库查询")
-                .category("tool_use")
-                .toolIds(List.of("db-query-tool"))
-                .promptFragment("你可以查询数据库。规则：\n" +
-                        "1. 仅生成 SELECT 语句\n" +
-                        "2. 限制返回 " + maxRows + " 行\n" +
-                        "3. 敏感字段需脱敏")
-                .guardrails(SkillDefinition.SkillGuardrails.builder()
-                        .inputGuardrailIds(List.of("sql-injection-guard"))
-                        .build())
-                .build());
+    // 3. 注册数据库查询技能
+    context.registerSkill(SkillDefinition.builder()
+        .id("db-query-skill")
+        .name("数据库查询技能")
+        .description("自然语言数据库查询")
+        .category("tool_use")
+        .toolIds(List.of("db-query-tool"))
+        .promptFragment("你可以查询数据库。规则：\n" +
+            "1. 仅生成 SELECT 语句\n" +
+            "2. 限制返回 " + maxRows + " 行\n" +
+            "3. 敏感字段需脱敏")
+        .guardrails(SkillDefinition.SkillGuardrails.builder()
+            .inputGuardrailIds(List.of("sql-injection-guard"))
+            .build())
+        .build());
 
-        log.info("DatabaseQueryPlugin initialized");
-    }
+    log.info("DatabaseQueryPlugin initialized");
+  }
 
-    @Override
-    public void start() {
-        // 可在此建立数据库连接池
-        log.info("DatabaseQueryPlugin started");
-    }
+  @Override
+  public void start() {
+    // 可在此建立数据库连接池
+    log.info("DatabaseQueryPlugin started");
+  }
 
-    @Override
-    public void stop() {
-        // 释放数据库连接池
-        log.info("DatabaseQueryPlugin stopped");
-    }
+  @Override
+  public void stop() {
+    // 释放数据库连接池
+    log.info("DatabaseQueryPlugin stopped");
+  }
 }
 ```
 
@@ -579,15 +633,20 @@ public class DatabaseQueryPlugin implements AgentXPlugin {
 ### 9.4 错误处理
 
 ```java
-.executor(params -> {
-    try {
-        // 执行逻辑
-        return "{\"result\": \"success\"}";
-    } catch (Exception e) {
-        log.error("Tool execution failed", e);
-        return String.format("{\"error\":\"%s\"}", e.getMessage());
+.executor(params ->{
+    try{
+    // 执行逻辑
+    return"{\"result\": \"success\"}";
+    }catch(
+Exception e){
+    log.
+
+error("Tool execution failed",e);
+        return String.
+
+format("{\"error\":\"%s\"}",e.getMessage());
     }
-})
+    })
 ```
 
 ### 9.5 插件之间的协作
@@ -614,11 +673,13 @@ A: 检查以下几点：
 A: 将插件注册为 `@Component` 即可通过构造函数注入其他 Bean：
 
 ```java
+
 @Component
 @RequiredArgsConstructor
 public class MyPlugin implements AgentXPlugin {
-    private final SomeService someService;
-    // ...
+
+  private final SomeService someService;
+  // ...
 }
 ```
 

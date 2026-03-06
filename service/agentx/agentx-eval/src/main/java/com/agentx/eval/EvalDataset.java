@@ -1,8 +1,7 @@
 package com.agentx.eval;
 
-import lombok.Data;
-
 import java.util.List;
+import lombok.Data;
 
 /**
  * 评估数据集 —— 包含多条测试用例

@@ -1,16 +1,21 @@
 package com.agentx.core.workflow.engine;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.agentx.core.workflow.dsl.NodeDefinition;
 import com.agentx.core.workflow.dsl.WorkflowDefinition;
 import com.agentx.core.workflow.expression.ExpressionEngine;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.util.*;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * WorkflowEngine 单元测试 — 覆盖拓扑排序、顺序执行、失败策略、变量合并、所有节点类型

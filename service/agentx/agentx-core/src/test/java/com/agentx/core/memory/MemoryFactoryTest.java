@@ -1,13 +1,14 @@
 package com.agentx.core.memory;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+
 import com.agentx.core.agent.definition.AgentDefinition;
 import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * MemoryFactory 单元测试 — 覆盖所有记忆策略

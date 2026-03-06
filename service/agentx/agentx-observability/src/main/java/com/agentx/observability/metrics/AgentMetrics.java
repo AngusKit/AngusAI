@@ -3,15 +3,12 @@ package com.agentx.observability.metrics;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
-import org.springframework.stereotype.Component;
-
 import java.time.Duration;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * AgentX 指标收集器 —— 对 Agent 调用、Workflow 执行、Token 使用等进行度量
  */
-@Component
 public class AgentMetrics {
 
   private final MeterRegistry registry;

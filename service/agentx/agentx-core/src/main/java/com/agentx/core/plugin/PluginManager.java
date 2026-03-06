@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 /**
  * 插件管理器 — 管理所有插件的生命周期（加载 → 初始化 → 启动 → 停止）。
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Component;
  * </p>
  */
 @Slf4j
-@Component
 public class PluginManager {
 
   private final ToolRegistry toolRegistry;

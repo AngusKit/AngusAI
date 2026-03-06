@@ -5,13 +5,11 @@ import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 /**
  * 记忆工厂 — 根据配置创建不同策略的 ChatMemory
  */
 @Slf4j
-@Component
 public class MemoryFactory {
 
   /**

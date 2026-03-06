@@ -11,13 +11,11 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 /**
  * HTTP 节点 — 发起 HTTP 请求
  */
 @Slf4j
-@Component
 public class HttpNodeExecutor implements NodeExecutor {
 
   private final HttpClient httpClient = HttpClient.newBuilder()

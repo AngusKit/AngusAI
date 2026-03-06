@@ -8,17 +8,13 @@ import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.googleai.GoogleAiGeminiChatModel;
 import dev.langchain4j.model.googleai.GoogleAiGeminiStreamingChatModel;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 
 /**
  * Google Gemini 模块自动配置 — 提供 GeminiModelFactory 组件。
  */
-@Configuration
 public class GeminiAutoConfiguration {
 
   @Slf4j
-  @Component
   public static class GeminiModelFactory implements ModelFactory {
 
     @Override

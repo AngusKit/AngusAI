@@ -9,7 +9,6 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 /**
  * 模型注册中心 — 统一管理所有模型实例的创建和获取。
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Component;
  * </p>
  */
 @Slf4j
-@Component
 public class ModelRegistry {
 
   private final Map<String, ModelFactory> factories;

@@ -1,10 +1,8 @@
 package com.agentx.core.knowledge;
 
+import java.time.Instant;
 import lombok.Builder;
 import lombok.Data;
-
-import java.time.Instant;
-import java.util.List;
 
 /**
  * 知识库定义

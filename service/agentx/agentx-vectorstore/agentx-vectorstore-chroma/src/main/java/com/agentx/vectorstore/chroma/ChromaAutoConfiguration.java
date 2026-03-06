@@ -6,14 +6,10 @@ import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.chroma.ChromaEmbeddingStore;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 
-@Configuration
 public class ChromaAutoConfiguration {
 
   @Slf4j
-  @Component
   public static class ChromaStoreFactory implements VectorStoreFactory {
 
     @Override

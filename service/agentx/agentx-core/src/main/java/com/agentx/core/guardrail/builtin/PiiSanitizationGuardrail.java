@@ -2,7 +2,6 @@ package com.agentx.core.guardrail.builtin;
 
 import com.agentx.core.guardrail.GuardrailResult;
 import com.agentx.core.guardrail.InputGuardrail;
-
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

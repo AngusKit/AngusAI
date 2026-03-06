@@ -5,13 +5,11 @@ import com.agentx.core.workflow.engine.NodeExecutor;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 /**
  * SWITCH 节点 — 多路分支（switch-case）
  */
 @Slf4j
-@Component
 public class SwitchNodeExecutor implements NodeExecutor {
 
   @Override

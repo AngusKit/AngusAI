@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 /**
  * 工作流脚本验证器 — 在执行前对 WorkflowDefinition 进行全面校验。
@@ -21,7 +20,6 @@ import org.springframework.stereotype.Component;
  * </p>
  */
 @Slf4j
-@Component
 public class WorkflowValidator {
 
   /**

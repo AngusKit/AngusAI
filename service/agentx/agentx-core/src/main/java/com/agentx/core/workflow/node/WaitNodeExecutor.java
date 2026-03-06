@@ -4,13 +4,11 @@ import com.agentx.core.workflow.engine.NodeExecutionContext;
 import com.agentx.core.workflow.engine.NodeExecutor;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 /**
  * WAIT 节点 — 暂停等待人工审批或外部事件
  */
 @Slf4j
-@Component
 public class WaitNodeExecutor implements NodeExecutor {
 
   @Override

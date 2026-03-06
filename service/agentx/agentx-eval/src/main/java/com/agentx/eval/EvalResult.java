@@ -1,8 +1,7 @@
 package com.agentx.eval;
 
-import lombok.Data;
-
 import java.util.Map;
+import lombok.Data;
 
 /**
  * 单条评估结果

@@ -1,8 +1,7 @@
 package com.agentx.infrastructure.security;
 
-import lombok.Data;
-
 import java.util.Set;
+import lombok.Data;
 
 /**
  * API Key 实体

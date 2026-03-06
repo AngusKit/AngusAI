@@ -5,13 +5,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 /**
  * 工具注册中心 — 管理所有工具实例（@Tool、MCP、OpenAPI、SPI）
  */
 @Slf4j
-@Component
 public class ToolRegistry {
 
   private final Map<String, ToolDescriptor> tools = new ConcurrentHashMap<>();

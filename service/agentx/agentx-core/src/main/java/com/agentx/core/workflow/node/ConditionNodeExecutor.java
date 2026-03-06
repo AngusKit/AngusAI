@@ -7,13 +7,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
-import org.springframework.stereotype.Component;
 
 /**
  * CONDITION 节点 — if-else 分支判断
  */
 @Slf4j
-@Component
 public class ConditionNodeExecutor implements NodeExecutor {
 
   private final ExpressionParser parser = new SpelExpressionParser();

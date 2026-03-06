@@ -4,12 +4,9 @@ import com.agentx.core.vectorstore.VectorStoreConfigDefinition;
 import com.agentx.core.vectorstore.VectorStoreFactory;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.EmbeddingStore;
+import java.sql.SQLException;
 import lombok.extern.slf4j.Slf4j;
 import org.mariadb.jdbc.MariaDbPoolDataSource;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
-
-import java.sql.SQLException;
 
 /**
  * MariaDB 向量存储模块自动配置 — 提供 MariaDbVectorStoreFactory 组件。
@@ -17,11 +14,9 @@ import java.sql.SQLException;
  * 需要 MariaDB 11.7+ 以支持原生 VECTOR 数据类型。
  * </p>
  */
-@Configuration
 public class MariaDbAutoConfiguration {
 
   @Slf4j
-  @Component
   public static class MariaDbVectorStoreFactory implements VectorStoreFactory {
 
     @Override

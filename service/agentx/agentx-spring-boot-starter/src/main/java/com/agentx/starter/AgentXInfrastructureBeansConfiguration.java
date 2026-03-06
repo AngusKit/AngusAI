@@ -1,8 +1,8 @@
 package com.agentx.starter;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * AgentX Infrastructure 模块 Bean 集中注册。

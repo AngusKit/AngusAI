@@ -75,18 +75,10 @@
       <artifactId>jakarta.validation-api</artifactId>
     </dependency>
 
-    <!-- Spring Data JPA (optional for persistence) -->
+    <!-- Jakarta Annotation -->
     <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-data-jpa</artifactId>
-      <optional>true</optional>
-    </dependency>
-
-    <!-- Spring Data Redis (optional for memory/cache) -->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-data-redis</artifactId>
-      <optional>true</optional>
+      <groupId>jakarta.annotation</groupId>
+      <artifactId>jakarta.annotation-api</artifactId>
     </dependency>
   </dependencies>
 </project>

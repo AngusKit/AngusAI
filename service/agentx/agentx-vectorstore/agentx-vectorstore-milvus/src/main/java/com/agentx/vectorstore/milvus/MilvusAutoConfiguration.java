@@ -5,17 +5,12 @@ import com.agentx.core.vectorstore.VectorStoreFactory;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.milvus.MilvusEmbeddingStore;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
-
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 
-@Configuration
 public class MilvusAutoConfiguration {
 
   @Slf4j
-  @Component
   public static class MilvusStoreFactory implements VectorStoreFactory {
 
     @Override

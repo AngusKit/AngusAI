@@ -4,13 +4,11 @@ import com.agentx.core.workflow.engine.NodeExecutionContext;
 import com.agentx.core.workflow.engine.NodeExecutor;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 /**
  * SUB_WORKFLOW 节点 — 调用另一个工作流
  */
 @Slf4j
-@Component
 public class SubWorkflowNodeExecutor implements NodeExecutor {
 
   @Override

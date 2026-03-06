@@ -21,12 +21,6 @@
       <artifactId>micrometer-core</artifactId>
     </dependency>
 
-    <!-- Spring Boot -->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter</artifactId>
-    </dependency>
-
     <!-- SLF4J -->
     <dependency>
       <groupId>org.slf4j</groupId>

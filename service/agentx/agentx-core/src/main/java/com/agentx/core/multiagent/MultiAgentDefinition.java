@@ -1,9 +1,8 @@
 package com.agentx.core.multiagent;
 
+import java.util.List;
 import lombok.Builder;
 import lombok.Data;
-
-import java.util.List;
 
 /**
  * 多 Agent 协作定义

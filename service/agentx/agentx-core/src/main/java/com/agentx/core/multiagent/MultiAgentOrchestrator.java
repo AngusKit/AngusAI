@@ -1,19 +1,16 @@
 package com.agentx.core.multiagent;
 
 import com.agentx.core.agent.AgentRegistry;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 多 Agent 编排器 — 实现四种协作模式
  */
 @Slf4j
-@Component
 @RequiredArgsConstructor
 public class MultiAgentOrchestrator {
 

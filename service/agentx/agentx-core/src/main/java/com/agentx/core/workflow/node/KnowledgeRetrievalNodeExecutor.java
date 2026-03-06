@@ -4,13 +4,11 @@ import com.agentx.core.workflow.engine.NodeExecutionContext;
 import com.agentx.core.workflow.engine.NodeExecutor;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 /**
  * KNOWLEDGE_RETRIEVAL 节点 — 检索知识库
  */
 @Slf4j
-@Component
 public class KnowledgeRetrievalNodeExecutor implements NodeExecutor {
 
   @Override

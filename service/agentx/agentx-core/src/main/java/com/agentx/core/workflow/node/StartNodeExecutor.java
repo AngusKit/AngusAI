@@ -4,12 +4,10 @@ import com.agentx.core.workflow.engine.NodeExecutionContext;
 import com.agentx.core.workflow.engine.NodeExecutor;
 import java.util.HashMap;
 import java.util.Map;
-import org.springframework.stereotype.Component;
 
 /**
  * START 节点 — 流程入口
  */
-@Component
 public class StartNodeExecutor implements NodeExecutor {
 
   @Override

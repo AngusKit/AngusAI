@@ -22,16 +22,30 @@ import com.agentx.core.workflow.dsl.WorkflowDslParser;
 import com.agentx.core.workflow.engine.NodeExecutor;
 import com.agentx.core.workflow.engine.WorkflowEngine;
 import com.agentx.core.workflow.expression.ExpressionEngine;
-import com.agentx.core.workflow.node.*;
+import com.agentx.core.workflow.node.AgentNodeExecutor;
+import com.agentx.core.workflow.node.CodeNodeExecutor;
+import com.agentx.core.workflow.node.ConditionNodeExecutor;
+import com.agentx.core.workflow.node.EndNodeExecutor;
+import com.agentx.core.workflow.node.HttpNodeExecutor;
+import com.agentx.core.workflow.node.KnowledgeRetrievalNodeExecutor;
+import com.agentx.core.workflow.node.LlmNodeExecutor;
+import com.agentx.core.workflow.node.LoopNodeExecutor;
+import com.agentx.core.workflow.node.ParallelNodeExecutor;
+import com.agentx.core.workflow.node.SetVariableNodeExecutor;
+import com.agentx.core.workflow.node.StartNodeExecutor;
+import com.agentx.core.workflow.node.SubWorkflowNodeExecutor;
+import com.agentx.core.workflow.node.SwitchNodeExecutor;
+import com.agentx.core.workflow.node.ToolNodeExecutor;
+import com.agentx.core.workflow.node.WaitNodeExecutor;
+import com.agentx.core.workflow.node.WhileNodeExecutor;
 import com.agentx.core.workflow.validation.WorkflowSpecRegistry;
 import com.agentx.core.workflow.validation.WorkflowValidator;
 import dev.langchain4j.model.chat.ChatModel;
+import java.util.List;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.List;
 
 /**
  * AgentX Core 模块 Bean 集中注册

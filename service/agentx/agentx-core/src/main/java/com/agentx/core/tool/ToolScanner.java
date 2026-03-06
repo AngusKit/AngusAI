@@ -6,13 +6,11 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Component;
 
 /**
  * 工具自动扫描器 — 扫描 @AgentTool 注解自动注册
  */
 @Slf4j
-@Component
 @RequiredArgsConstructor
 public class ToolScanner {
 

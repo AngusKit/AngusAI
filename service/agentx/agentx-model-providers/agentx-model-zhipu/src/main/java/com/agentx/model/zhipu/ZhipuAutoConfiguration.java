@@ -9,19 +9,15 @@ import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.model.openai.OpenAiEmbeddingModel;
 import dev.langchain4j.model.openai.OpenAiStreamingChatModel;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 
 /**
  * 智谱 AI (Zhipu) 模块自动配置 — 通过 OpenAI 兼容接口实现。
  */
-@Configuration
 public class ZhipuAutoConfiguration {
 
   private static final String DEFAULT_BASE_URL = "https://open.bigmodel.cn/api/paas/v4";
 
   @Slf4j
-  @Component
   public static class ZhipuModelFactory implements ModelFactory {
 
     @Override

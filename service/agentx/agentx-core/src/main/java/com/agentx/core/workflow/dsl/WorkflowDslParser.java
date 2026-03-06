@@ -8,13 +8,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 /**
  * 工作流 DSL 解析器 — JSON / YAML 双格式支持
  */
 @Slf4j
-@Component
 public class WorkflowDslParser {
 
   private final ObjectMapper jsonMapper;

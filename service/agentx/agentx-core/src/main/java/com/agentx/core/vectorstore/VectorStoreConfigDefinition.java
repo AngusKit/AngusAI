@@ -1,9 +1,8 @@
 package com.agentx.core.vectorstore;
 
+import java.util.Map;
 import lombok.Builder;
 import lombok.Data;
-
-import java.util.Map;
 
 /**
  * 向量存储配置定义 — 从数据库或其他外部源加载

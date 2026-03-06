@@ -7,13 +7,11 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 /**
  * Agent 定义解析器 — 支持 JSON 和 YAML
  */
 @Slf4j
-@Component
 public class AgentDefinitionParser {
 
   private final ObjectMapper jsonMapper;

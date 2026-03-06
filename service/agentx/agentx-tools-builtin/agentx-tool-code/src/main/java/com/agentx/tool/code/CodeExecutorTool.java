@@ -2,11 +2,10 @@ package com.agentx.tool.code;
 
 import dev.langchain4j.agent.tool.P;
 import dev.langchain4j.agent.tool.Tool;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 /**
  * 代码执行工具 — 在沙盒中执行简单脚本
