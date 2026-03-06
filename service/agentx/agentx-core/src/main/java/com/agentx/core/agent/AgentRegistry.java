@@ -8,6 +8,10 @@ import com.agentx.core.guardrail.GuardrailChain;
 import com.agentx.core.guardrail.GuardrailResult;
 import com.agentx.core.knowledge.ContentRetrieverFactory;
 import com.agentx.core.memory.MemoryFactory;
+import com.agentx.core.workflow.WorkflowDefinitionProvider;
+import com.agentx.core.workflow.dsl.WorkflowDefinition;
+import com.agentx.core.workflow.engine.WorkflowEngine;
+import com.agentx.core.workflow.engine.WorkflowExecutionResult;
 import com.agentx.core.model.ModelRegistry;
 import com.agentx.core.prompt.PromptVariableResolver;
 import com.agentx.core.skill.SkillRegistry;
@@ -45,6 +49,8 @@ public class AgentRegistry {
   private final SkillRegistry skillRegistry;
   private final GuardrailChain guardrailChain;
   private final ContentRetrieverFactory contentRetrieverFactory;
+  private final WorkflowEngine workflowEngine;
+  private final WorkflowDefinitionProvider workflowDefinitionProvider;
 
   /**
    * 注册并构建 Agent 实例 — 从 AgentDefinition.model 配置中解析模型
@@ -212,8 +218,31 @@ public class AgentRegistry {
     }
 
     Object memoryId = sessionId != null && !sessionId.isBlank() ? sessionId : "default";
+    String sessionIdStr = sessionId != null && !sessionId.isBlank() ? sessionId : "default";
+    var definition = instance.getDefinition();
+    var trigger = definition.getWorkflowTrigger();
+    String wfMode = trigger != null && trigger.getMode() != null ? trigger.getMode() : "AFTER_CHAT";
+
+    // BEFORE_CHAT：LLM 前执行工作流（输出可合并到上下文，当前仅执行）
+    if (definition.getWorkflowId() != null && "BEFORE_CHAT".equals(wfMode)) {
+      runWorkflowIfConfigured(definition, Map.of("message", inputToUse, "sessionId", sessionIdStr));
+    }
+
+    // INSTEAD_OF_CHAT：直接执行工作流并返回输出，不调用 LLM
+    if (definition.getWorkflowId() != null && "INSTEAD_OF_CHAT".equals(wfMode)) {
+      String wfResponse = runWorkflowIfConfigured(definition,
+          Map.of("message", inputToUse, "sessionId", sessionIdStr));
+      return wfResponse != null ? wfResponse : "";
+    }
+
     AgentChatService service = (AgentChatService) instance.getAiServiceProxy();
     String response = service.chat(memoryId, inputToUse);
+
+    // AFTER_CHAT：LLM 后执行工作流（通知、记录等）
+    if (definition.getWorkflowId() != null && "AFTER_CHAT".equals(wfMode)) {
+      runWorkflowIfConfigured(definition,
+          Map.of("message", inputToUse, "response", response, "sessionId", sessionIdStr));
+    }
 
     // 输出护栏
     if (guardrailChain != null) {
@@ -278,5 +307,47 @@ public class AgentRegistry {
 
   public Map<String, AgentInstance> listAll() {
     return Map.copyOf(agents);
+  }
+
+  /**
+   * 当 Agent 配置了 workflowId 时执行工作流。
+   *
+   * @param definition Agent 定义
+   * @param inputVariables 入参（message、sessionId、response 等）
+   * @return 工作流输出中的 response 或 text，供 INSTEAD_OF_CHAT 使用；其他模式返回 null
+   */
+  private String runWorkflowIfConfigured(AgentDefinition definition,
+      Map<String, Object> inputVariables) {
+    if (workflowEngine == null || workflowDefinitionProvider == null) {
+      return null;
+    }
+    Long workflowId = definition.getWorkflowId();
+    if (workflowId == null) {
+      return null;
+    }
+    WorkflowDefinition wfDef = workflowDefinitionProvider.loadByLongId(workflowId).orElse(null);
+    if (wfDef == null) {
+      log.warn("Workflow not found for workflowId: {}", workflowId);
+      return null;
+    }
+    try {
+      WorkflowExecutionResult result = workflowEngine.execute(wfDef, inputVariables);
+      Map<String, Object> output = result.getOutput();
+      if (output == null) {
+        return null;
+      }
+      Object resp = output.get("response");
+      if (resp instanceof String) {
+        return (String) resp;
+      }
+      Object text = output.get("text");
+      if (text instanceof String) {
+        return (String) text;
+      }
+      return null;
+    } catch (Exception e) {
+      log.error("Workflow execution failed for workflowId {}: {}", workflowId, e.getMessage(), e);
+      return null;
+    }
   }
 }

@@ -2,6 +2,7 @@ package com.agentx.api.controller;
 
 import com.agentx.api.dto.ApiResponse;
 import com.agentx.api.dto.WorkflowRunRequest;
+import com.agentx.core.workflow.WorkflowDefinitionProvider;
 import com.agentx.core.workflow.dsl.WorkflowDefinition;
 import com.agentx.core.workflow.dsl.WorkflowDslParser;
 import com.agentx.core.workflow.engine.WorkflowEngine;
@@ -11,10 +12,10 @@ import com.agentx.core.workflow.validation.ValidationResult;
 import com.agentx.core.workflow.validation.WorkflowSpecRegistry;
 import com.agentx.core.workflow.validation.WorkflowValidator;
 import jakarta.validation.Valid;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,15 +33,16 @@ public class WorkflowController {
   private final WorkflowEngine workflowEngine;
   private final WorkflowValidator workflowValidator;
   private final WorkflowSpecRegistry workflowSpecRegistry;
-  private final Map<String, WorkflowDefinition> workflowStore;
+  private final WorkflowDefinitionProvider workflowDefinitionProvider;
 
   public WorkflowController(WorkflowEngine workflowEngine,
       WorkflowValidator workflowValidator,
-      WorkflowSpecRegistry workflowSpecRegistry) {
+      WorkflowSpecRegistry workflowSpecRegistry,
+      WorkflowDefinitionProvider workflowDefinitionProvider) {
     this.workflowEngine = workflowEngine;
     this.workflowValidator = workflowValidator;
     this.workflowSpecRegistry = workflowSpecRegistry;
-    this.workflowStore = new HashMap<>();
+    this.workflowDefinitionProvider = workflowDefinitionProvider;
   }
 
   /**
@@ -58,7 +60,7 @@ public class WorkflowController {
             "Workflow validation failed: " + validation.getErrors());
       }
 
-      workflowStore.put(definition.getId(), definition);
+      workflowDefinitionProvider.register(definition);
       return ApiResponse.ok(definition.getId());
     } catch (java.io.IOException e) {
       return ApiResponse.error(400, "Invalid workflow definition: " + e.getMessage());
@@ -104,7 +106,8 @@ public class WorkflowController {
   @PostMapping("/run")
   public ApiResponse<WorkflowExecutionResult> runWorkflow(
       @Valid @RequestBody WorkflowRunRequest request) {
-    WorkflowDefinition definition = workflowStore.get(request.getWorkflowId());
+    WorkflowDefinition definition = workflowDefinitionProvider.loadById(request.getWorkflowId())
+        .orElse(null);
     if (definition == null) {
       return ApiResponse.error(404, "Workflow not found: " + request.getWorkflowId());
     }
@@ -119,6 +122,9 @@ public class WorkflowController {
    */
   @GetMapping
   public ApiResponse<Set<String>> listWorkflows() {
-    return ApiResponse.ok(workflowStore.keySet());
+    Set<String> ids = workflowDefinitionProvider.loadAll().stream()
+        .map(WorkflowDefinition::getId)
+        .collect(Collectors.toSet());
+    return ApiResponse.ok(ids);
   }
 }

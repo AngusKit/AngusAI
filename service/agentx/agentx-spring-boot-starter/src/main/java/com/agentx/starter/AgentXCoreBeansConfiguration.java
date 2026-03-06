@@ -18,6 +18,8 @@ import com.agentx.core.tool.ToolScanner;
 import com.agentx.core.vectorstore.VectorStoreConfigProvider;
 import com.agentx.core.vectorstore.VectorStoreFactory;
 import com.agentx.core.vectorstore.VectorStoreRegistry;
+import com.agentx.core.workflow.InMemoryWorkflowDefinitionProvider;
+import com.agentx.core.workflow.WorkflowDefinitionProvider;
 import com.agentx.core.workflow.dsl.WorkflowDslParser;
 import com.agentx.core.workflow.engine.NodeExecutor;
 import com.agentx.core.workflow.engine.WorkflowEngine;
@@ -46,6 +48,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -110,10 +113,12 @@ public class AgentXCoreBeansConfiguration {
   @Bean
   public AgentRegistry agentRegistry(ToolRegistry toolRegistry, MemoryFactory memoryFactory,
       ModelRegistry modelRegistry, SkillRegistry skillRegistry, GuardrailChain guardrailChain,
-      org.springframework.beans.factory.ObjectProvider<ContentRetrieverFactory> contentRetrieverFactoryProvider) {
+      ObjectProvider<ContentRetrieverFactory> contentRetrieverFactoryProvider,
+      @Lazy WorkflowEngine workflowEngine,
+      WorkflowDefinitionProvider workflowDefinitionProvider) {
     ContentRetrieverFactory contentRetrieverFactory = contentRetrieverFactoryProvider.getIfAvailable();
     return new AgentRegistry(toolRegistry, memoryFactory, modelRegistry, skillRegistry,
-        guardrailChain, contentRetrieverFactory);
+        guardrailChain, contentRetrieverFactory, workflowEngine, workflowDefinitionProvider);
   }
 
   // ===== Guardrail =====
@@ -151,6 +156,12 @@ public class AgentXCoreBeansConfiguration {
   @Bean
   public WorkflowDslParser workflowDslParser() {
     return new WorkflowDslParser();
+  }
+
+  // ===== Workflow: Provider =====
+  @Bean
+  public WorkflowDefinitionProvider workflowDefinitionProvider() {
+    return new InMemoryWorkflowDefinitionProvider();
   }
 
   // ===== Workflow: Validation =====
@@ -232,8 +243,11 @@ public class AgentXCoreBeansConfiguration {
   }
 
   @Bean
-  public SubWorkflowNodeExecutor subWorkflowNodeExecutor() {
-    return new SubWorkflowNodeExecutor();
+  public SubWorkflowNodeExecutor subWorkflowNodeExecutor(
+      @Lazy WorkflowEngine workflowEngine,
+      WorkflowDefinitionProvider workflowDefinitionProvider,
+      ExpressionEngine expressionEngine) {
+    return new SubWorkflowNodeExecutor(workflowEngine, workflowDefinitionProvider, expressionEngine);
   }
 
   @Bean

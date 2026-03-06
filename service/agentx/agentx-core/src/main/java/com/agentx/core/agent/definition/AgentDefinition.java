@@ -79,9 +79,14 @@ public class AgentDefinition {
   private List<String> suggestedQuestions;
 
   /**
-   * 绑定的工作流 ID
+   * 绑定的工作流 ID（Long 兼容数据库主键，Provider 内部转 String 查找）
    */
   private Long workflowId;
+
+  /**
+   * 工作流触发策略（仅当 workflowId 非空时生效）
+   */
+  private WorkflowTriggerConfig workflowTrigger;
 
   /**
    * 绑定的工具 ID 列表
@@ -179,5 +184,18 @@ public class AgentDefinition {
 
     private List<String> inputGuardrailIds;
     private List<String> outputGuardrailIds;
+  }
+
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class WorkflowTriggerConfig {
+
+    /**
+     * BEFORE_CHAT=LLM 前执行 | AFTER_CHAT=LLM 后执行 | INSTEAD_OF_CHAT=替代 LLM 直接返回工作流输出
+     */
+    @Builder.Default
+    private String mode = "AFTER_CHAT";
   }
 }

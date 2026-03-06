@@ -5,8 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.agentx.core.workflow.InMemoryWorkflowDefinitionProvider;
+import com.agentx.core.workflow.WorkflowDefinitionProvider;
 import com.agentx.core.workflow.dsl.NodeDefinition;
+import com.agentx.core.workflow.dsl.WorkflowDefinition;
 import com.agentx.core.workflow.engine.NodeExecutionContext;
+import com.agentx.core.workflow.engine.WorkflowEngine;
+import com.agentx.core.workflow.expression.ExpressionEngine;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -676,17 +681,33 @@ class NodeExecutorTest {
   @DisplayName("SubWorkflowNodeExecutor")
   class SubWorkflowNodeTests {
 
-    private final SubWorkflowNodeExecutor executor = new SubWorkflowNodeExecutor();
+    private SubWorkflowNodeExecutor createExecutor() {
+      ExpressionEngine expressionEngine = new ExpressionEngine();
+      WorkflowDefinitionProvider provider = new InMemoryWorkflowDefinitionProvider();
+      WorkflowDefinition subWf = WorkflowDefinition.builder()
+          .id("sub-wf-001")
+          .name("Test Sub Workflow")
+          .nodes(List.of(
+              NodeDefinition.builder().id("s1").type("START").next("e1").build(),
+              NodeDefinition.builder().id("e1").type("END").build()
+          ))
+          .build();
+      provider.register(subWf);
+      WorkflowEngine engine = new WorkflowEngine(expressionEngine,
+          List.of(new StartNodeExecutor(), new EndNodeExecutor()));
+      return new SubWorkflowNodeExecutor(engine, provider, expressionEngine);
+    }
 
     @Test
     @DisplayName("返回节点类型 SUB_WORKFLOW")
     void nodeType() {
-      assertEquals("SUB_WORKFLOW", executor.getNodeType());
+      assertEquals("SUB_WORKFLOW", createExecutor().getNodeType());
     }
 
     @Test
-    @DisplayName("返回子工作流 ID 和委托状态")
-    void delegatesToSubWorkflow() {
+    @DisplayName("真正执行子工作流并返回结果")
+    void executesSubWorkflow() {
+      SubWorkflowNodeExecutor executor = createExecutor();
       NodeDefinition node = NodeDefinition.builder()
           .id("sub").type("SUB_WORKFLOW")
           .config(Map.of("workflowId", "sub-wf-001"))
@@ -696,7 +717,26 @@ class NodeExecutorTest {
       Map<String, Object> outputs = executor.execute(ctx);
 
       assertEquals("sub-wf-001", outputs.get("subWorkflowId"));
-      assertEquals("DELEGATED", outputs.get("status"));
+      assertEquals("COMPLETED", outputs.get("status"));
+      assertTrue(outputs.containsKey("output"));
+      assertTrue(outputs.containsKey("executionId"));
+    }
+
+    @Test
+    @DisplayName("子工作流不存在时抛异常")
+    void throwsWhenSubWorkflowNotFound() {
+      ExpressionEngine expressionEngine = new ExpressionEngine();
+      WorkflowDefinitionProvider provider = new InMemoryWorkflowDefinitionProvider();
+      WorkflowEngine engine = new WorkflowEngine(expressionEngine, List.of());
+      SubWorkflowNodeExecutor executor = new SubWorkflowNodeExecutor(engine, provider, expressionEngine);
+
+      NodeDefinition node = NodeDefinition.builder()
+          .id("sub").type("SUB_WORKFLOW")
+          .config(Map.of("workflowId", "non-existent-wf"))
+          .build();
+      NodeExecutionContext ctx = buildContext(node);
+
+      assertThrows(IllegalArgumentException.class, () -> executor.execute(ctx));
     }
   }
 
