@@ -14,13 +14,11 @@ import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 /**
  * 数据库查询工具 — 支持只读 SQL 查询，防止数据修改操作
  */
 @Slf4j
-@Component
 public class DatabaseQueryTool {
 
   private final DataSource dataSource;

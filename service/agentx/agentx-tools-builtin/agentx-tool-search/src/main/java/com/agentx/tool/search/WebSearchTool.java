@@ -11,13 +11,11 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 /**
  * 网络搜索工具 — 通过 HTTP 请求执行搜索查询
  */
 @Slf4j
-@Component
 public class WebSearchTool {
 
   private final HttpClient httpClient = HttpClient.newBuilder()

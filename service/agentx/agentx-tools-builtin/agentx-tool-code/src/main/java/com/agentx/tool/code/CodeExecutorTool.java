@@ -5,13 +5,11 @@ import dev.langchain4j.agent.tool.Tool;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 /**
  * 代码执行工具 — 在沙盒中执行简单脚本
  */
 @Slf4j
-@Component
 public class CodeExecutorTool {
 
   @Tool("Execute a mathematical expression or simple calculation and return the result")

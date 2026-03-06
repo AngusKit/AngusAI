@@ -6,13 +6,11 @@ import dev.langchain4j.agent.tool.Tool;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.model.chat.ChatModel;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 /**
  * AI 辅助工具 — 利用 LLM 提供摘要、翻译、信息抽取等能力
  */
 @Slf4j
-@Component
 public class AiUtilityTool {
 
   private final ModelRegistry modelRegistry;

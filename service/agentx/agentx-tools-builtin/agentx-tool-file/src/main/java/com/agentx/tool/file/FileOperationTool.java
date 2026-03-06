@@ -11,13 +11,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 /**
  * 文件操作工具 — 限制在安全沙盒目录内的文件读写操作
  */
 @Slf4j
-@Component
 public class FileOperationTool {
 
   private final Path sandboxRoot;
