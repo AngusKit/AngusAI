@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Configuration;
  * AgentX 向量存储 Bean 集中注册 — 基于 classpath 条件按需加载
  */
 @Configuration
-public class AgentXVectorStoreConfiguration {
+public class VectorStoreConfiguration {
 
   @Configuration
   @ConditionalOnClass(name = "com.agentx.vectorstore.pgvector.PgVectorAutoConfiguration")

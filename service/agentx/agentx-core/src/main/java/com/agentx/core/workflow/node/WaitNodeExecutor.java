@@ -1,5 +1,7 @@
 package com.agentx.core.workflow.node;
 
+import com.agentx.core.workflow.enums.NodeType;
+import com.agentx.core.workflow.enums.WaitType;
 import com.agentx.core.workflow.engine.NodeExecutionContext;
 import com.agentx.core.workflow.engine.NodeExecutor;
 import java.util.Map;
@@ -13,7 +15,7 @@ public class WaitNodeExecutor implements NodeExecutor {
 
   @Override
   public String getNodeType() {
-    return "WAIT";
+    return NodeType.WAIT.name();
   }
 
   @Override
@@ -27,6 +29,6 @@ public class WaitNodeExecutor implements NodeExecutor {
         context.getExecutionId());
 
     // 实际实现需要持久化状态等待外部信号恢复
-    return Map.of("waitType", waitType, "status", "WAITING", "timeout", timeout);
+    return Map.of("waitType", waitType, "status", WaitType.WAITING.name(), "timeout", timeout);
   }
 }

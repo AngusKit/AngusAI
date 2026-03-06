@@ -1,5 +1,6 @@
 package com.agentx.core.workflow.node;
 
+import com.agentx.core.workflow.enums.NodeType;
 import com.agentx.core.workflow.engine.NodeExecutionContext;
 import com.agentx.core.workflow.engine.NodeExecutor;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,7 +26,7 @@ public class HttpNodeExecutor implements NodeExecutor {
 
   @Override
   public String getNodeType() {
-    return "HTTP";
+    return NodeType.HTTP.name();
   }
 
   @Override

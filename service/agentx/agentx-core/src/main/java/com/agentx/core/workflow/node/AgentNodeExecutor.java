@@ -1,6 +1,7 @@
 package com.agentx.core.workflow.node;
 
 import com.agentx.core.agent.AgentRegistry;
+import com.agentx.core.workflow.enums.NodeType;
 import com.agentx.core.workflow.engine.NodeExecutionContext;
 import com.agentx.core.workflow.engine.NodeExecutor;
 import java.util.Map;
@@ -18,7 +19,7 @@ public class AgentNodeExecutor implements NodeExecutor {
 
   @Override
   public String getNodeType() {
-    return "AGENT";
+    return NodeType.AGENT.name();
   }
 
   @Override

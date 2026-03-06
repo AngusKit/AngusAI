@@ -1,4 +1,4 @@
-package com.agentx.core.memory;
+package com.agentx.core.memory.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 

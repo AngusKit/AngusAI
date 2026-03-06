@@ -1,5 +1,6 @@
-package com.agentx.core.multiagent;
+package com.agentx.core.agent.multi;
 
+import com.agentx.core.agent.enums.CollaborationPattern;
 import java.util.List;
 import lombok.Builder;
 import lombok.Data;

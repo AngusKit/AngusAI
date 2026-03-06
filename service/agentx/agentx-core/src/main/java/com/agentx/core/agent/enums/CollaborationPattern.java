@@ -1,4 +1,4 @@
-package com.agentx.core.multiagent;
+package com.agentx.core.agent.enums;
 
 /**
  * 多 Agent 协作模式

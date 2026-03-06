@@ -1,4 +1,4 @@
-package com.agentx.core.multiagent;
+package com.agentx.core.agent.multi;
 
 import com.agentx.core.agent.AgentRegistry;
 import java.util.ArrayList;

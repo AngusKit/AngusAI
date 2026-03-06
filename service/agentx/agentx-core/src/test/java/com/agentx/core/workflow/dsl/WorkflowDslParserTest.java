@@ -6,6 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.agentx.core.workflow.enums.FailurePolicy;
+import com.agentx.core.workflow.enums.NodeType;
+import com.agentx.core.workflow.enums.TriggerType;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -58,9 +61,9 @@ class WorkflowDslParserTest {
       assertEquals("1.0.0", def.getVersion());
       assertNotNull(def.getNodes());
       assertEquals(2, def.getNodes().size());
-      assertEquals("START", def.getNodes().get(0).getType());
+      assertEquals(NodeType.START.name(), def.getNodes().get(0).getType());
       assertEquals("end", def.getNodes().get(0).getNext());
-      assertEquals("END", def.getNodes().get(1).getType());
+      assertEquals(NodeType.END.name(), def.getNodes().get(1).getType());
     }
 
     @Test
@@ -129,10 +132,10 @@ class WorkflowDslParserTest {
 
       assertEquals("Full config workflow", def.getDescription());
       assertNotNull(def.getTrigger());
-      assertEquals("WEBHOOK", def.getTrigger().getType());
+      assertEquals(TriggerType.WEBHOOK.name(), def.getTrigger().getType());
       assertNotNull(def.getSettings());
       assertEquals(300, def.getSettings().getMaxExecutionSeconds());
-      assertEquals("CONTINUE", def.getSettings().getOnFailure());
+      assertEquals(FailurePolicy.CONTINUE, def.getSettings().getOnFailure());
       assertNotNull(def.getSettings().getRetryPolicy());
       assertEquals(3, def.getSettings().getRetryPolicy().getMaxRetries());
     }
@@ -162,7 +165,7 @@ class WorkflowDslParserTest {
       WorkflowDefinition def = parser.parseJson(json);
 
       NodeDefinition llmNode = def.getNodes().get(0);
-      assertEquals("LLM", llmNode.getType());
+      assertEquals(NodeType.LLM.name(), llmNode.getType());
       assertNotNull(llmNode.getConfig());
       assertEquals("Hello", llmNode.getConfig().get("systemPrompt"));
       assertEquals("end", llmNode.getNext());
@@ -285,11 +288,11 @@ class WorkflowDslParserTest {
       assertEquals("wf-complex", def.getId());
       assertEquals(6, def.getNodes().size());
       assertNotNull(def.getSettings());
-      assertEquals("CONTINUE", def.getSettings().getOnFailure());
+      assertEquals(FailurePolicy.CONTINUE, def.getSettings().getOnFailure());
 
       // Verify CONDITION node config
       NodeDefinition cond = def.getNodes().get(1);
-      assertEquals("CONDITION", cond.getType());
+      assertEquals(NodeType.CONDITION.name(), cond.getType());
       assertNotNull(cond.getConfig());
       assertEquals("parallel", cond.getConfig().get("ifTrue"));
     }
@@ -403,9 +406,11 @@ class WorkflowDslParserTest {
       assertEquals(16, def.getNodes().size());
 
       List<String> expectedTypes = List.of(
-          "START", "LLM", "AGENT", "TOOL", "HTTP", "CODE",
-          "CONDITION", "SWITCH", "LOOP", "WHILE", "PARALLEL",
-          "WAIT", "SUB_WORKFLOW", "SET_VARIABLE", "KNOWLEDGE_RETRIEVAL", "END"
+          NodeType.START.name(), NodeType.LLM.name(), NodeType.AGENT.name(), NodeType.TOOL.name(),
+          NodeType.HTTP.name(), NodeType.CODE.name(), NodeType.CONDITION.name(), NodeType.SWITCH.name(),
+          NodeType.LOOP.name(), NodeType.WHILE.name(), NodeType.PARALLEL.name(),
+          NodeType.WAIT.name(), NodeType.SUB_WORKFLOW.name(), NodeType.SET_VARIABLE.name(),
+          NodeType.KNOWLEDGE_RETRIEVAL.name(), NodeType.END.name()
       );
 
       for (int i = 0; i < expectedTypes.size(); i++) {
@@ -517,8 +522,8 @@ class WorkflowDslParserTest {
           .name("Round Trip")
           .version("1.0.0")
           .nodes(List.of(
-              NodeDefinition.builder().id("s").type("START").next("e").build(),
-              NodeDefinition.builder().id("e").type("END").build()
+              NodeDefinition.builder().id("s").type(NodeType.START.name()).next("e").build(),
+              NodeDefinition.builder().id("e").type(NodeType.END.name()).build()
           ))
           .build();
 
@@ -538,7 +543,7 @@ class WorkflowDslParserTest {
           .id("rt-yaml")
           .name("YAML Round Trip")
           .nodes(List.of(
-              NodeDefinition.builder().id("s").type("START").build()
+              NodeDefinition.builder().id("s").type(NodeType.START.name()).build()
           ))
           .build();
 
@@ -559,11 +564,11 @@ class WorkflowDslParserTest {
           .variables(Map.of("key", "value"))
           .settings(WorkflowDefinition.WorkflowSettings.builder()
               .maxExecutionSeconds(120)
-              .onFailure("CONTINUE")
+              .onFailure(FailurePolicy.CONTINUE)
               .retryPolicy(WorkflowDefinition.RetryPolicy.builder()
                   .maxRetries(5).backoffSeconds(10).build())
               .build())
-          .nodes(List.of(NodeDefinition.builder().id("s").type("START").build()))
+          .nodes(List.of(NodeDefinition.builder().id("s").type(NodeType.START.name()).build()))
           .build();
 
       String json = parser.toJson(original);
@@ -571,7 +576,7 @@ class WorkflowDslParserTest {
       assertTrue(json.contains("CONTINUE"));
 
       WorkflowDefinition restored = parser.parseJson(json);
-      assertEquals("CONTINUE", restored.getSettings().getOnFailure());
+      assertEquals(FailurePolicy.CONTINUE, restored.getSettings().getOnFailure());
       assertEquals(5, restored.getSettings().getRetryPolicy().getMaxRetries());
     }
   }
@@ -657,7 +662,7 @@ class WorkflowDslParserTest {
 
       WorkflowDefinition def = parser.parseYaml(yaml);
       assertNotNull(def.getTrigger());
-      assertEquals("CRON", def.getTrigger().getType());
+      assertEquals(TriggerType.CRON.name(), def.getTrigger().getType());
       assertEquals("0 0 * * *", def.getTrigger().getConfig().get("schedule"));
     }
 

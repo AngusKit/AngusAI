@@ -14,6 +14,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConditionalOnClass(name = "com.agentx.infrastructure.persistence.AgentDefinitionRepository")
 @ComponentScan(basePackages = "com.agentx.infrastructure")
-public class AgentXInfrastructureBeansConfiguration {
+public class InfrastructureBeansConfiguration {
 
 }

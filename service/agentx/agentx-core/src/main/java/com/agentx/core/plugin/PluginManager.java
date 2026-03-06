@@ -1,5 +1,6 @@
 package com.agentx.core.plugin;
 
+import com.agentx.core.plugin.enums.PluginState;
 import com.agentx.core.skill.SkillRegistry;
 import com.agentx.core.tool.ToolRegistry;
 import java.util.LinkedHashMap;

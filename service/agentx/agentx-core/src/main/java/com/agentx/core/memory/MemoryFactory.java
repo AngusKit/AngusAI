@@ -1,6 +1,7 @@
 package com.agentx.core.memory;
 
 import com.agentx.core.agent.definition.AgentDefinition;
+import com.agentx.core.memory.enums.MemoryStrategy;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;

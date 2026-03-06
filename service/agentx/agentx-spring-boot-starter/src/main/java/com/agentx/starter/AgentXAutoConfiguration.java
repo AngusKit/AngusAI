@@ -13,12 +13,12 @@ import org.springframework.context.annotation.Import;
 @AutoConfiguration
 @EnableConfigurationProperties(AgentXProperties.class)
 @Import({
-    AgentXCoreBeansConfiguration.class,
-    AgentXInfrastructureBeansConfiguration.class,
-    AgentXObservabilityBeansConfiguration.class,
-    AgentXModelProvidersConfiguration.class,
-    AgentXToolsConfiguration.class,
-    AgentXVectorStoreConfiguration.class
+    CoreBeansConfiguration.class,
+    InfrastructureBeansConfiguration.class,
+    ObservabilityBeansConfiguration.class,
+    ModelProvidersConfiguration.class,
+    ToolsConfiguration.class,
+    VectorStoreConfiguration.class
 })
 public class AgentXAutoConfiguration {
 

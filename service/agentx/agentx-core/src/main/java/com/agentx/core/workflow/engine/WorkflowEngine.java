@@ -1,5 +1,7 @@
 package com.agentx.core.workflow.engine;
 
+import com.agentx.core.workflow.enums.FailurePolicy;
+import com.agentx.core.workflow.enums.NodeType;
 import com.agentx.core.workflow.dsl.NodeDefinition;
 import com.agentx.core.workflow.dsl.WorkflowDefinition;
 import com.agentx.core.workflow.expression.ExpressionEngine;
@@ -99,7 +101,7 @@ public class WorkflowEngine {
         nodeOutputs.put(nodeId, outputs != null ? outputs : Map.of());
 
         // END 节点的输出就是工作流的最终输出
-        if ("END".equals(node.getType())) {
+        if (NodeType.END.name().equals(node.getType())) {
           finalOutput = outputs != null ? outputs : Map.of();
         }
 
@@ -107,7 +109,7 @@ public class WorkflowEngine {
         records.add(WorkflowExecutionResult.NodeExecutionRecord.builder()
             .nodeId(nodeId)
             .nodeType(node.getType())
-            .status("SUCCESS")
+            .status(NodeExecutionStatus.SUCCESS)
             .outputs(outputs)
             .startedAt(nodeStart)
             .completedAt(nodeEnd)
@@ -121,7 +123,7 @@ public class WorkflowEngine {
         records.add(WorkflowExecutionResult.NodeExecutionRecord.builder()
             .nodeId(nodeId)
             .nodeType(node.getType())
-            .status("FAILED")
+            .status(NodeExecutionStatus.FAILED)
             .error(e.getMessage())
             .startedAt(nodeStart)
             .completedAt(nodeEnd)
@@ -129,16 +131,16 @@ public class WorkflowEngine {
             .build());
 
         // 检查全局失败策略
-        String failurePolicy = Optional.ofNullable(workflow.getSettings())
+        FailurePolicy failurePolicy = Optional.ofNullable(workflow.getSettings())
             .map(WorkflowDefinition.WorkflowSettings::getOnFailure)
-            .orElse("STOP");
+            .orElse(FailurePolicy.STOP);
 
-        if ("STOP".equals(failurePolicy)) {
+        if (FailurePolicy.STOP == failurePolicy) {
           Instant endedAt = Instant.now();
           return WorkflowExecutionResult.builder()
               .executionId(executionId)
               .workflowId(workflow.getId())
-              .status("FAILED")
+              .status(WorkflowExecutionStatus.FAILED)
               .output(Map.of("error", e.getMessage()))
               .startedAt(startedAt)
               .completedAt(endedAt)
@@ -157,7 +159,7 @@ public class WorkflowEngine {
     return WorkflowExecutionResult.builder()
         .executionId(executionId)
         .workflowId(workflow.getId())
-        .status("COMPLETED")
+        .status(WorkflowExecutionStatus.COMPLETED)
         .output(finalOutput)
         .startedAt(startedAt)
         .completedAt(completedAt)
@@ -178,7 +180,7 @@ public class WorkflowEngine {
 
     // 找 START 节点
     String startId = nodes.stream()
-        .filter(n -> "START".equals(n.getType()))
+        .filter(n -> NodeType.START.name().equals(n.getType()))
         .map(NodeDefinition::getId)
         .findFirst()
         .orElse(nodes.get(0).getId());

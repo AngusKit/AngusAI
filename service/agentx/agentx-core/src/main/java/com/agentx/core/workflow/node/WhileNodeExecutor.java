@@ -1,5 +1,7 @@
 package com.agentx.core.workflow.node;
 
+import com.agentx.core.workflow.enums.NodeType;
+
 import com.agentx.core.workflow.engine.NodeExecutionContext;
 import com.agentx.core.workflow.engine.NodeExecutor;
 import java.util.Map;
@@ -18,7 +20,7 @@ public class WhileNodeExecutor implements NodeExecutor {
 
   @Override
   public String getNodeType() {
-    return "WHILE";
+    return NodeType.WHILE.name();
   }
 
   @Override

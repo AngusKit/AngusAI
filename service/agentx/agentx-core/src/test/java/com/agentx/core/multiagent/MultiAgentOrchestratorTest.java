@@ -10,6 +10,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.agentx.core.agent.AgentRegistry;
+import com.agentx.core.agent.enums.CollaborationPattern;
+import com.agentx.core.agent.multi.MultiAgentDefinition;
+import com.agentx.core.agent.multi.MultiAgentOrchestrator;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

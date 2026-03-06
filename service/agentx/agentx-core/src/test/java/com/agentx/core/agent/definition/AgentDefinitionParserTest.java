@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.agentx.core.agent.enums.AutonomyLevel;
 import com.agentx.core.agent.enums.InteractionMode;
 import com.agentx.core.agent.enums.ReasoningStrategy;
-import com.agentx.core.memory.MemoryStrategy;
+import com.agentx.core.memory.enums.MemoryStrategy;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

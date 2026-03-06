@@ -1,4 +1,4 @@
-package com.agentx.core.plugin;
+package com.agentx.core.plugin.enums;
 
 /**
  * 插件生命周期状态

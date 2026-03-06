@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
  * AgentX Observability 模块 Bean 集中注册
  */
 @Configuration
-public class AgentXObservabilityBeansConfiguration {
+public class ObservabilityBeansConfiguration {
 
   @Bean
   public AgentMetrics agentMetrics(MeterRegistry meterRegistry) {

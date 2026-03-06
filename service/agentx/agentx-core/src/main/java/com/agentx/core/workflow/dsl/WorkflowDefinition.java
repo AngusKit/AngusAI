@@ -1,5 +1,6 @@
 package com.agentx.core.workflow.dsl;
 
+import com.agentx.core.workflow.enums.FailurePolicy;
 import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
@@ -47,11 +48,8 @@ public class WorkflowDefinition {
     @Builder.Default
     private int maxExecutionSeconds = 600;
     private RetryPolicy retryPolicy;
-    /**
-     * STOP | CONTINUE | ROLLBACK
-     */
     @Builder.Default
-    private String onFailure = "STOP";
+    private FailurePolicy onFailure = FailurePolicy.STOP;
   }
 
   @Data

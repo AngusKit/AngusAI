@@ -1,5 +1,6 @@
 package com.agentx.core.workflow.node;
 
+import com.agentx.core.workflow.enums.NodeType;
 import com.agentx.core.workflow.engine.NodeExecutionContext;
 import com.agentx.core.workflow.engine.NodeExecutor;
 import dev.langchain4j.model.chat.ChatModel;
@@ -19,7 +20,7 @@ public class LlmNodeExecutor implements NodeExecutor {
 
   @Override
   public String getNodeType() {
-    return "LLM";
+    return NodeType.LLM.name();
   }
 
   @Override

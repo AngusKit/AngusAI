@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Configuration;
  * AgentX 模型提供商 Bean 集中注册 — 基于 classpath 条件按需加载
  */
 @Configuration
-public class AgentXModelProvidersConfiguration {
+public class ModelProvidersConfiguration {
 
   @Configuration
   @ConditionalOnClass(name = "com.agentx.model.openai.OpenAiAutoConfiguration")

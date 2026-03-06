@@ -8,7 +8,7 @@ import com.agentx.core.memory.MemoryFactory;
 import com.agentx.core.model.ModelConfigProvider;
 import com.agentx.core.model.ModelFactory;
 import com.agentx.core.model.ModelRegistry;
-import com.agentx.core.multiagent.MultiAgentOrchestrator;
+import com.agentx.core.agent.multi.MultiAgentOrchestrator;
 import com.agentx.core.plugin.AgentXPlugin;
 import com.agentx.core.plugin.PluginManager;
 import com.agentx.core.prompt.PromptManager;
@@ -57,7 +57,7 @@ import org.springframework.context.annotation.Configuration;
  * AgentX Core 模块 Bean 集中注册
  */
 @Configuration
-public class AgentXCoreBeansConfiguration {
+public class CoreBeansConfiguration {
 
   // ===== Model =====
   @Bean

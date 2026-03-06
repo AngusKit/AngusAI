@@ -3,7 +3,7 @@ package com.agentx.core.agent.definition;
 import com.agentx.core.agent.enums.AutonomyLevel;
 import com.agentx.core.agent.enums.InteractionMode;
 import com.agentx.core.agent.enums.ReasoningStrategy;
-import com.agentx.core.memory.MemoryStrategy;
+import com.agentx.core.memory.enums.MemoryStrategy;
 import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;

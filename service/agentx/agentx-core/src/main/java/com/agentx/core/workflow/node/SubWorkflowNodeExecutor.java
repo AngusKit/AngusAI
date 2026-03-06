@@ -1,5 +1,6 @@
 package com.agentx.core.workflow.node;
 
+import com.agentx.core.workflow.enums.NodeType;
 import com.agentx.core.workflow.WorkflowDefinitionProvider;
 import com.agentx.core.workflow.dsl.WorkflowDefinition;
 import com.agentx.core.workflow.engine.NodeExecutionContext;
@@ -25,7 +26,7 @@ public class SubWorkflowNodeExecutor implements NodeExecutor {
 
   @Override
   public String getNodeType() {
-    return "SUB_WORKFLOW";
+    return NodeType.SUB_WORKFLOW.name();
   }
 
   @Override
@@ -51,7 +52,7 @@ public class SubWorkflowNodeExecutor implements NodeExecutor {
     Map<String, Object> output = result.getOutput() != null ? result.getOutput() : Map.of();
     return Map.of(
         "subWorkflowId", workflowId,
-        "status", result.getStatus() != null ? result.getStatus() : "UNKNOWN",
+        "status", result.getStatus() != null ? result.getStatus().name() : "UNKNOWN",
         "output", output,
         "executionId", result.getExecutionId() != null ? result.getExecutionId() : ""
     );

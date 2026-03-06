@@ -16,7 +16,7 @@ public class WorkflowExecutionResult {
 
   private String executionId;
   private String workflowId;
-  private String status; // COMPLETED | FAILED | CANCELLED
+  private WorkflowExecutionStatus status;
   private Map<String, Object> output;
   private Instant startedAt;
   private Instant completedAt;
@@ -30,7 +30,7 @@ public class WorkflowExecutionResult {
 
     private String nodeId;
     private String nodeType;
-    private String status; // SUCCESS | FAILED | SKIPPED
+    private NodeExecutionStatus status;
     private Map<String, Object> outputs;
     private Instant startedAt;
     private Instant completedAt;

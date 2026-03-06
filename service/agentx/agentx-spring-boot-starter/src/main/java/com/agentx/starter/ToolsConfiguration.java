@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Configuration;
  * AgentX 内置工具 Bean 集中注册 — 基于 classpath 条件按需加载
  */
 @Configuration
-public class AgentXToolsConfiguration {
+public class ToolsConfiguration {
 
   @Configuration
   @ConditionalOnClass(name = "com.agentx.tool.http.HttpRequestTool")

@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.agentx.core.workflow.enums.NodeType;
+import com.agentx.core.workflow.enums.FailurePolicy;
 import com.agentx.core.workflow.dsl.NodeDefinition;
 import com.agentx.core.workflow.dsl.WorkflowDefinition;
 import com.agentx.core.workflow.expression.ExpressionEngine;
@@ -53,14 +55,14 @@ class WorkflowEngineTest {
           .id("wf-1")
           .name("Simple")
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type("START").next("end").build(),
-              NodeDefinition.builder().id("end").type("END").build()
+              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("end").build(),
+              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
           ))
           .build();
 
       WorkflowExecutionResult result = engine.execute(wf, null);
 
-      assertEquals("COMPLETED", result.getStatus());
+      assertEquals(WorkflowExecutionStatus.COMPLETED, result.getStatus());
       assertNotNull(result.getExecutionId());
       assertNotNull(result.getStartedAt());
       assertNotNull(result.getCompletedAt());
@@ -85,17 +87,17 @@ class WorkflowEngineTest {
           .id("wf-3")
           .name("Three Nodes")
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type("START").next("mid").build(),
-              NodeDefinition.builder().id("mid").type("SET_VARIABLE").next("end").build(),
-              NodeDefinition.builder().id("end").type("END").build()
+              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("mid").build(),
+              NodeDefinition.builder().id("mid").type(NodeType.SET_VARIABLE.name()).next("end").build(),
+              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
           ))
           .build();
 
       WorkflowExecutionResult result = engine.execute(wf, null);
 
-      assertEquals("COMPLETED", result.getStatus());
+      assertEquals(WorkflowExecutionStatus.COMPLETED, result.getStatus());
       assertEquals(3, result.getNodeRecords().size());
-      result.getNodeRecords().forEach(r -> assertEquals("SUCCESS", r.getStatus()));
+      result.getNodeRecords().forEach(r -> assertEquals(NodeExecutionStatus.SUCCESS, r.getStatus()));
     }
   }
 
@@ -120,8 +122,8 @@ class WorkflowEngineTest {
           .name("Vars")
           .variables(Map.of("defaultKey", "defaultValue"))
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type("START").next("end").build(),
-              NodeDefinition.builder().id("end").type("END").build()
+              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("end").build(),
+              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
           ))
           .build();
 
@@ -145,8 +147,8 @@ class WorkflowEngineTest {
           .name("Override")
           .variables(Map.of("key", "default"))
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type("START").next("end").build(),
-              NodeDefinition.builder().id("end").type("END").build()
+              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("end").build(),
+              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
           ))
           .build();
 
@@ -168,13 +170,13 @@ class WorkflowEngineTest {
           .id("wf-null-input")
           .name("Null Input")
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type("START").next("end").build(),
-              NodeDefinition.builder().id("end").type("END").build()
+              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("end").build(),
+              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
           ))
           .build();
 
       WorkflowExecutionResult result = engine.execute(wf, null);
-      assertEquals("COMPLETED", result.getStatus());
+      assertEquals(WorkflowExecutionStatus.COMPLETED, result.getStatus());
     }
   }
 
@@ -198,17 +200,17 @@ class WorkflowEngineTest {
           .id("wf-stop")
           .name("Stop")
           .settings(WorkflowDefinition.WorkflowSettings.builder()
-              .onFailure("STOP").build())
+              .onFailure(FailurePolicy.STOP).build())
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type("START").next("http").build(),
-              NodeDefinition.builder().id("http").type("HTTP").next("end").build(),
-              NodeDefinition.builder().id("end").type("END").build()
+              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("http").build(),
+              NodeDefinition.builder().id("http").type(NodeType.HTTP.name()).next("end").build(),
+              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
           ))
           .build();
 
       WorkflowExecutionResult result = engine.execute(wf, null);
 
-      assertEquals("FAILED", result.getStatus());
+      assertEquals(WorkflowExecutionStatus.FAILED, result.getStatus());
       assertNotNull(result.getOutput().get("error"));
       // Should not have executed END
       assertTrue(result.getNodeRecords().size() < 3);
@@ -228,20 +230,20 @@ class WorkflowEngineTest {
           .id("wf-continue")
           .name("Continue")
           .settings(WorkflowDefinition.WorkflowSettings.builder()
-              .onFailure("CONTINUE").build())
+              .onFailure(FailurePolicy.CONTINUE).build())
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type("START").next("http").build(),
-              NodeDefinition.builder().id("http").type("HTTP").next("end").build(),
-              NodeDefinition.builder().id("end").type("END").build()
+              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("http").build(),
+              NodeDefinition.builder().id("http").type(NodeType.HTTP.name()).next("end").build(),
+              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
           ))
           .build();
 
       WorkflowExecutionResult result = engine.execute(wf, null);
 
-      assertEquals("COMPLETED", result.getStatus());
+      assertEquals(WorkflowExecutionStatus.COMPLETED, result.getStatus());
       assertEquals(3, result.getNodeRecords().size());
-      assertEquals("FAILED", result.getNodeRecords().get(1).getStatus());
-      assertEquals("SUCCESS", result.getNodeRecords().get(2).getStatus());
+      assertEquals(NodeExecutionStatus.FAILED, result.getNodeRecords().get(1).getStatus());
+      assertEquals(NodeExecutionStatus.SUCCESS, result.getNodeRecords().get(2).getStatus());
     }
 
     @Test
@@ -259,14 +261,14 @@ class WorkflowEngineTest {
           .name("Default")
           // No settings → default STOP
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type("START").next("http").build(),
-              NodeDefinition.builder().id("http").type("HTTP").next("end").build(),
-              NodeDefinition.builder().id("end").type("END").build()
+              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("http").build(),
+              NodeDefinition.builder().id("http").type(NodeType.HTTP.name()).next("end").build(),
+              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
           ))
           .build();
 
       WorkflowExecutionResult result = engine.execute(wf, null);
-      assertEquals("FAILED", result.getStatus());
+      assertEquals(WorkflowExecutionStatus.FAILED, result.getStatus());
     }
   }
 
@@ -291,9 +293,9 @@ class WorkflowEngineTest {
           .id("wf-order")
           .name("Order")
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type("START").next("mid").build(),
-              NodeDefinition.builder().id("mid").type("SET_VARIABLE").next("end").build(),
-              NodeDefinition.builder().id("end").type("END").build()
+              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("mid").build(),
+              NodeDefinition.builder().id("mid").type(NodeType.SET_VARIABLE.name()).next("end").build(),
+              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
           ))
           .build();
 
@@ -318,13 +320,13 @@ class WorkflowEngineTest {
           .id("wf-cond-order")
           .name("Cond Order")
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type("START").next("cond").build(),
-              NodeDefinition.builder().id("cond").type("CONDITION")
+              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("cond").build(),
+              NodeDefinition.builder().id("cond").type(NodeType.CONDITION.name())
                   .config(Map.of("expression", "true", "ifTrue", "a", "ifFalse", "b"))
                   .build(),
-              NodeDefinition.builder().id("a").type("SET_VARIABLE").next("end").build(),
-              NodeDefinition.builder().id("b").type("SET_VARIABLE").next("end").build(),
-              NodeDefinition.builder().id("end").type("END").build()
+              NodeDefinition.builder().id("a").type(NodeType.SET_VARIABLE.name()).next("end").build(),
+              NodeDefinition.builder().id("b").type(NodeType.SET_VARIABLE.name()).next("end").build(),
+              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
           ))
           .build();
 
@@ -350,13 +352,13 @@ class WorkflowEngineTest {
           .id("wf-par-order")
           .name("Par Order")
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type("START").next("par").build(),
-              NodeDefinition.builder().id("par").type("PARALLEL")
+              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("par").build(),
+              NodeDefinition.builder().id("par").type(NodeType.PARALLEL.name())
                   .config(Map.of("branches", List.of("b1", "b2")))
                   .next("end").build(),
-              NodeDefinition.builder().id("b1").type("SET_VARIABLE").build(),
-              NodeDefinition.builder().id("b2").type("SET_VARIABLE").build(),
-              NodeDefinition.builder().id("end").type("END").build()
+              NodeDefinition.builder().id("b1").type(NodeType.SET_VARIABLE.name()).build(),
+              NodeDefinition.builder().id("b2").type(NodeType.SET_VARIABLE.name()).build(),
+              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
           ))
           .build();
 
@@ -387,8 +389,8 @@ class WorkflowEngineTest {
           .id("wf-records")
           .name("Records")
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type("START").next("end").build(),
-              NodeDefinition.builder().id("end").type("END").build()
+              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("end").build(),
+              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
           ))
           .build();
 
@@ -398,8 +400,8 @@ class WorkflowEngineTest {
 
       WorkflowExecutionResult.NodeExecutionRecord startRecord = result.getNodeRecords().get(0);
       assertEquals("start", startRecord.getNodeId());
-      assertEquals("START", startRecord.getNodeType());
-      assertEquals("SUCCESS", startRecord.getStatus());
+      assertEquals(NodeType.START.name(), startRecord.getNodeType());
+      assertEquals(NodeExecutionStatus.SUCCESS, startRecord.getStatus());
       assertNotNull(startRecord.getStartedAt());
       assertNotNull(startRecord.getCompletedAt());
       assertTrue(startRecord.getDurationMs() >= 0);
@@ -419,18 +421,18 @@ class WorkflowEngineTest {
           .id("wf-fail-record")
           .name("Fail Record")
           .settings(WorkflowDefinition.WorkflowSettings.builder()
-              .onFailure("CONTINUE").build())
+              .onFailure(FailurePolicy.CONTINUE).build())
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type("START").next("http").build(),
-              NodeDefinition.builder().id("http").type("HTTP").next("end").build(),
-              NodeDefinition.builder().id("end").type("END").build()
+              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("http").build(),
+              NodeDefinition.builder().id("http").type(NodeType.HTTP.name()).next("end").build(),
+              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
           ))
           .build();
 
       WorkflowExecutionResult result = engine.execute(wf, null);
 
       WorkflowExecutionResult.NodeExecutionRecord httpRecord = result.getNodeRecords().get(1);
-      assertEquals("FAILED", httpRecord.getStatus());
+      assertEquals(NodeExecutionStatus.FAILED, httpRecord.getStatus());
       assertNotNull(httpRecord.getError());
     }
   }
@@ -454,14 +456,14 @@ class WorkflowEngineTest {
           .id("wf-skip")
           .name("Skip")
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type("START").next("end").build(),
-              NodeDefinition.builder().id("end").type("END").build()
+              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("end").build(),
+              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
           ))
           .build();
 
       WorkflowExecutionResult result = engine.execute(wf, null);
 
-      assertEquals("COMPLETED", result.getStatus());
+      assertEquals(WorkflowExecutionStatus.COMPLETED, result.getStatus());
       // Only START node should have a record
       assertEquals(1, result.getNodeRecords().size());
     }
@@ -488,19 +490,19 @@ class WorkflowEngineTest {
           .id("wf-multi-branch")
           .name("Multi Branch")
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type("START").next("cond").build(),
-              NodeDefinition.builder().id("cond").type("CONDITION")
+              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("cond").build(),
+              NodeDefinition.builder().id("cond").type(NodeType.CONDITION.name())
                   .config(Map.of("expression", "true", "ifTrue", "a", "ifFalse", "b"))
                   .build(),
-              NodeDefinition.builder().id("a").type("SET_VARIABLE").next("end").build(),
-              NodeDefinition.builder().id("b").type("SET_VARIABLE").next("end").build(),
-              NodeDefinition.builder().id("end").type("END").build()
+              NodeDefinition.builder().id("a").type(NodeType.SET_VARIABLE.name()).next("end").build(),
+              NodeDefinition.builder().id("b").type(NodeType.SET_VARIABLE.name()).next("end").build(),
+              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
           ))
           .build();
 
       WorkflowExecutionResult result = engine.execute(wf, null);
 
-      assertEquals("COMPLETED", result.getStatus());
+      assertEquals(WorkflowExecutionStatus.COMPLETED, result.getStatus());
       assertTrue(result.getNodeRecords().size() >= 3);
     }
 
@@ -516,12 +518,12 @@ class WorkflowEngineTest {
       WorkflowEngine engine = createEngine(executors);
 
       List<NodeDefinition> nodes = new ArrayList<>();
-      nodes.add(NodeDefinition.builder().id("start").type("START").next("n1").build());
+      nodes.add(NodeDefinition.builder().id("start").type(NodeType.START.name()).next("n1").build());
       for (int i = 1; i <= 10; i++) {
         String next = i < 10 ? "n" + (i + 1) : "end";
-        nodes.add(NodeDefinition.builder().id("n" + i).type("SET_VARIABLE").next(next).build());
+        nodes.add(NodeDefinition.builder().id("n" + i).type(NodeType.SET_VARIABLE.name()).next(next).build());
       }
-      nodes.add(NodeDefinition.builder().id("end").type("END").build());
+      nodes.add(NodeDefinition.builder().id("end").type(NodeType.END.name()).build());
 
       WorkflowDefinition wf = WorkflowDefinition.builder()
           .id("wf-long")
@@ -531,7 +533,7 @@ class WorkflowEngineTest {
 
       WorkflowExecutionResult result = engine.execute(wf, null);
 
-      assertEquals("COMPLETED", result.getStatus());
+      assertEquals(WorkflowExecutionStatus.COMPLETED, result.getStatus());
       assertEquals(12, result.getNodeRecords().size());
     }
   }

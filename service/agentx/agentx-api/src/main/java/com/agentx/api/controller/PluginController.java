@@ -3,7 +3,7 @@ package com.agentx.api.controller;
 import com.agentx.api.dto.ApiResponse;
 import com.agentx.core.plugin.PluginDescriptor;
 import com.agentx.core.plugin.PluginManager;
-import com.agentx.core.plugin.PluginState;
+import com.agentx.core.plugin.enums.PluginState;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;

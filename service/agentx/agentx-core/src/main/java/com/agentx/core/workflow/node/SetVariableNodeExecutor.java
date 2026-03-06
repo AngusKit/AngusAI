@@ -1,5 +1,7 @@
 package com.agentx.core.workflow.node;
 
+import com.agentx.core.workflow.enums.NodeType;
+
 import com.agentx.core.workflow.engine.NodeExecutionContext;
 import com.agentx.core.workflow.engine.NodeExecutor;
 import java.util.HashMap;
@@ -15,7 +17,7 @@ public class SetVariableNodeExecutor implements NodeExecutor {
 
   @Override
   public String getNodeType() {
-    return "SET_VARIABLE";
+    return NodeType.SET_VARIABLE.name();
   }
 
   @Override
