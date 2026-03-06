@@ -155,8 +155,8 @@ class SkillRegistryTest {
     @Test
     @DisplayName("列出所有技能")
     void listAll() {
-      registry.register(DefaultSkill.builder().name("l1").description("L1").content("").build());
-      registry.register(DefaultSkill.builder().name("l2").description("L2").content("").build());
+      registry.register(DefaultSkill.builder().name("l1").description("L1").content("Content 1").build());
+      registry.register(DefaultSkill.builder().name("l2").description("L2").content("Content 2").build());
       assertEquals(2, registry.listAll().size());
     }
   }

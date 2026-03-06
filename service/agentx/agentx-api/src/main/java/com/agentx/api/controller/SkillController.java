@@ -85,10 +85,15 @@ public class SkillController {
   }
 
   private Skill fromDto(SkillDto dto) {
+    String content = dto.getContent();
+    if (content == null || content.isBlank()) {
+      content = "No instructions.";
+    }
     DefaultSkill.Builder builder = DefaultSkill.builder()
         .name(dto.getName())
-        .description(dto.getDescription() != null ? dto.getDescription() : "")
-        .content(dto.getContent() != null ? dto.getContent() : "");
+        .description(dto.getDescription() != null && !dto.getDescription().isBlank()
+            ? dto.getDescription() : dto.getName())
+        .content(content);
     if (dto.getResources() != null && !dto.getResources().isEmpty()) {
       builder.resources(dto.getResources().stream()
           .map(r -> DefaultSkillResource.builder()
