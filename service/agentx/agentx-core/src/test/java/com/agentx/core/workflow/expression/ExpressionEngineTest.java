@@ -84,8 +84,11 @@ class ExpressionEngineTest {
     @Test
     @DisplayName("替换多个表达式")
     void resolveMultipleExpressions() {
-      Map<String, Object> context = Map.of(
-          "variables", Map.of("first", "John", "last", "Doe"));
+      Map<String, Object> variables = new HashMap<>();
+      variables.put("first", "John");
+      variables.put("last", "Doe");
+      Map<String, Object> context = new HashMap<>();
+      context.put("variables", variables);
       Object result = engine.resolve(
           "${#variables['first']} ${#variables['last']}", context);
       assertEquals("John Doe", result);
@@ -174,11 +177,11 @@ class ExpressionEngineTest {
     }
 
     @Test
-    @DisplayName("引用不存在的变量返回原表达式")
+    @DisplayName("引用不存在的变量返回 null 或原表达式")
     void missingVariableFallback() {
       Object result = engine.resolve("${#variables['missing']}", Map.of("variables", Map.of()));
-      // Should either return null or the original expression
-      assertNotNull(result);
+      // SpEL 对不存在的 key 返回 null；异常时返回原表达式
+      assertTrue(result == null || "${#variables['missing']}".equals(result));
     }
   }
 

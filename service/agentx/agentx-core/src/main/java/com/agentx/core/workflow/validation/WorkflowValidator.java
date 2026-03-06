@@ -251,10 +251,12 @@ public class WorkflowValidator {
       }
     }
 
-    // 可达性：检查从 START 能否到达 END
+    // 可达性：检查从 START 能否到达 END（先取节点再取 id，避免 getId() 为 null 时 Optional.of 抛 NPE）
     String startId = nodes.stream()
-        .filter(n -> "START".equals(n.getType())).map(NodeDefinition::getId)
-        .findFirst().orElse(null);
+        .filter(n -> "START".equals(n.getType()))
+        .findFirst()
+        .map(NodeDefinition::getId)
+        .orElse(null);
     if (startId != null) {
       Set<String> reachable = new HashSet<>();
       Queue<String> queue = new LinkedList<>();

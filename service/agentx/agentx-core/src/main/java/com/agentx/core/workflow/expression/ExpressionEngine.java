@@ -16,7 +16,7 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 @Slf4j
 public class ExpressionEngine {
 
-  private static final Pattern EXPR_PATTERN = Pattern.compile("\\$\\{(.+?)}");
+  private static final Pattern EXPR_PATTERN = Pattern.compile("\\$\\{([^}]+)}");
   private final ExpressionParser parser = new SpelExpressionParser();
 
   /**
@@ -65,30 +65,18 @@ public class ExpressionEngine {
 
   private Object evaluate(String expression, Map<String, Object> context) {
     try {
-      EvaluationContext evalContext = new StandardEvaluationContext();
-      context.forEach(((StandardEvaluationContext) evalContext)::setVariable);
-
-      // 以 root 对象注册常用变量
-      StandardEvaluationContext stdCtx = (StandardEvaluationContext) evalContext;
-      if (context.containsKey("variables")) {
-        stdCtx.setVariable("variables", context.get("variables"));
-      }
-      if (context.containsKey("nodes")) {
-        stdCtx.setVariable("nodes", context.get("nodes"));
-      }
-      if (context.containsKey("secrets")) {
-        stdCtx.setVariable("secrets", context.get("secrets"));
-      }
-      if (context.containsKey("context")) {
-        stdCtx.setVariable("context", context.get("context"));
+      StandardEvaluationContext evalContext = new StandardEvaluationContext();
+      for (Map.Entry<String, Object> entry : context.entrySet()) {
+        evalContext.setVariable(entry.getKey(), entry.getValue());
       }
 
       // 支持直接引用 variables.xxx 格式 → 转为 #variables['xxx']
+      // 使用 (?<!#) 负向回顾，避免对已带 # 的 #nodes[ 误替换成 ##nodes[
       String spelExpr = expression
-          .replaceAll("variables\\.", "#variables['")
-          .replaceAll("nodes\\[", "#nodes[")
-          .replaceAll("secrets\\.", "#secrets['")
-          .replaceAll("context\\.", "#context['");
+          .replaceAll("(?<!#)variables\\.", "#variables['")
+          .replaceAll("(?<!#)nodes\\[", "#nodes[")
+          .replaceAll("(?<!#)secrets\\.", "#secrets['")
+          .replaceAll("(?<!#)context\\.", "#context['");
 
       // 修复未闭合的引号
       if (spelExpr.contains("['") && !spelExpr.contains("']")) {
@@ -98,7 +86,7 @@ public class ExpressionEngine {
       Expression exp = parser.parseExpression(spelExpr);
       return exp.getValue(evalContext);
     } catch (Exception e) {
-      log.warn("Expression evaluation failed: {} — {}", expression, e.getMessage());
+      log.warn("Expression evaluation failed: {} — {}", expression, e.getMessage(), e);
       return "${" + expression + "}";
     }
   }
