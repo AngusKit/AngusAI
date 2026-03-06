@@ -1,0 +1,41 @@
+package com.agentx.core.workflow.node;
+
+import com.agentx.core.workflow.engine.NodeExecutionContext;
+import com.agentx.core.workflow.engine.NodeExecutor;
+import java.util.List;
+import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
+/**
+ * SWITCH 节点 — 多路分支（switch-case）
+ */
+@Slf4j
+@Component
+public class SwitchNodeExecutor implements NodeExecutor {
+
+  @Override
+  public String getNodeType() {
+    return "SWITCH";
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public Map<String, Object> execute(NodeExecutionContext context) {
+    Map<String, Object> config = context.getNodeDefinition().getConfig();
+    Object expressionValue = config.get("expression");
+    List<Map<String, Object>> cases = (List<Map<String, Object>>) config.getOrDefault("cases",
+        List.of());
+    String defaultNext = (String) config.get("default");
+
+    String matched = defaultNext;
+    for (Map<String, Object> caseItem : cases) {
+      if (String.valueOf(caseItem.get("value")).equals(String.valueOf(expressionValue))) {
+        matched = (String) caseItem.get("next");
+        break;
+      }
+    }
+
+    return Map.of("nextNode", matched != null ? matched : "");
+  }
+}

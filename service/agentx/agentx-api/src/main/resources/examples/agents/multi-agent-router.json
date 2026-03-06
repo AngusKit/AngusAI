@@ -1,0 +1,63 @@
+{
+  "id": "multi-agent-router",
+  "name": "多 Agent 路由编排",
+  "description": "Router 模式多 Agent 协作示例 — 根据用户意图路由到不同的子 Agent 处理",
+  "version": "1.0.0",
+  "pattern": "ROUTER",
+  "routerConfig": {
+    "routerAgentId": "intent-classifier",
+    "description": "意图分类路由器，根据用户输入的内容判断应由哪个子 Agent 处理"
+  },
+  "childAgents": [
+    {
+      "id": "intent-classifier",
+      "name": "意图分类器",
+      "description": "分析用户意图并路由到对应子 Agent",
+      "model": {
+        "provider": "openai",
+        "modelName": "gpt-4o-mini",
+        "temperature": 0.1
+      },
+      "systemPrompt": "你是一个意图分类器。分析用户输入，返回以下类别之一：\n- TECH_SUPPORT：技术支持问题\n- SALES：销售咨询\n- GENERAL：通用问答\n\n只返回类别名称，不要其他内容。"
+    },
+    {
+      "id": "tech-support-agent",
+      "name": "技术支持 Agent",
+      "description": "处理技术支持类问题",
+      "model": {
+        "provider": "openai",
+        "modelName": "gpt-4o",
+        "temperature": 0.3
+      },
+      "systemPrompt": "你是技术支持工程师，专门解答产品使用和技术配置方面的问题。",
+      "knowledgeBaseIds": [
+        "tech-docs-kb"
+      ]
+    },
+    {
+      "id": "sales-agent",
+      "name": "销售顾问 Agent",
+      "description": "处理售前咨询和销售类问题",
+      "model": {
+        "provider": "openai",
+        "modelName": "gpt-4o",
+        "temperature": 0.5
+      },
+      "systemPrompt": "你是销售顾问，帮助用户了解产品功能、定价和购买流程。",
+      "knowledgeBaseIds": [
+        "product-catalog-kb"
+      ]
+    },
+    {
+      "id": "general-agent",
+      "name": "通用问答 Agent",
+      "description": "处理一般性问答",
+      "model": {
+        "provider": "openai",
+        "modelName": "gpt-4o-mini",
+        "temperature": 0.7
+      },
+      "systemPrompt": "你是一个通用问答助手，回答用户的各种问题。"
+    }
+  ]
+}

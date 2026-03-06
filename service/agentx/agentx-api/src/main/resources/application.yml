@@ -1,0 +1,28 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: agentx-api
+
+agentx:
+  default-provider: openai
+  default-model: gpt-4o
+  memory-window-size: 20
+  guardrails-enabled: true
+  observability-enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level [%X{tenantId:-}] [%X{agentId:-}] [%X{executionId:-}] %logger{36} - %msg%n"
+  level:
+    com.agentx: DEBUG

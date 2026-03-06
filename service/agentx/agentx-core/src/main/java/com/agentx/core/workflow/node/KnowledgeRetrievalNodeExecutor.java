@@ -1,0 +1,34 @@
+package com.agentx.core.workflow.node;
+
+import com.agentx.core.workflow.engine.NodeExecutionContext;
+import com.agentx.core.workflow.engine.NodeExecutor;
+import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
+/**
+ * KNOWLEDGE_RETRIEVAL 节点 — 检索知识库
+ */
+@Slf4j
+@Component
+public class KnowledgeRetrievalNodeExecutor implements NodeExecutor {
+
+  @Override
+  public String getNodeType() {
+    return "KNOWLEDGE_RETRIEVAL";
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public Map<String, Object> execute(NodeExecutionContext context) {
+    Map<String, Object> config = context.getNodeDefinition().getConfig();
+    String query = (String) config.get("query");
+    int topK = config.containsKey("topK") ? ((Number) config.get("topK")).intValue() : 5;
+    var knowledgeBaseIds = config.getOrDefault("knowledgeBaseIds", java.util.List.of());
+
+    log.debug("KNOWLEDGE_RETRIEVAL: query='{}', topK={}, kbIds={}", query, topK, knowledgeBaseIds);
+
+    // 实际实现需要通过 KnowledgeService 检索
+    return Map.of("query", query, "topK", topK, "results", java.util.List.of());
+  }
+}

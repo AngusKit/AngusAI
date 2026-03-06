@@ -1,0 +1,51 @@
+{
+  "id": "customer-service-agent",
+  "name": "客服对话 Agent",
+  "description": "面向客户服务场景的 Agent，提供产品咨询、工单创建、常见问题解答等能力",
+  "version": "1.0.0",
+  "interactionMode": "CHATBOT",
+  "reasoningStrategy": "FUNCTION_CALLING",
+  "autonomyLevel": "SUPERVISED",
+  "model": {
+    "provider": "openai",
+    "modelName": "gpt-4o",
+    "temperature": 0.5,
+    "maxTokens": 2048,
+    "fallbackProvider": "anthropic",
+    "fallbackModelName": "claude-sonnet-4-20250514"
+  },
+  "systemPrompt": "你是一名专业的客服代表，为用户提供产品咨询和技术支持。\n\n工作准则：\n1. 使用友好、专业的语气\n2. 优先从知识库查找答案\n3. 无法解决的问题升级到人工客服\n4. 不要透露内部系统信息\n5. 收集必要信息以便创建工单",
+  "welcomeMessage": "您好！欢迎联系客服中心。请问有什么可以帮助您的？",
+  "suggestedQuestions": [
+    "我想查询订单状态",
+    "产品使用有问题需要帮助",
+    "我想了解退换货政策"
+  ],
+  "toolIds": [
+    "http-request-tool"
+  ],
+  "knowledgeBaseIds": [
+    "product-docs-kb",
+    "faq-kb"
+  ],
+  "memory": {
+    "strategy": "PERSISTENT",
+    "windowSize": 50
+  },
+  "guardrails": {
+    "inputGuardrailIds": [
+      "prompt-injection-guard",
+      "sensitive-word-filter"
+    ],
+    "outputGuardrailIds": [
+      "pii-sanitization",
+      "length-limit"
+    ]
+  },
+  "publishChannels": [
+    "web-widget",
+    "wechat-miniapp",
+    "api"
+  ],
+  "tenantId": "tenant-001"
+}

@@ -1,0 +1,32 @@
+{
+  "id": "data-analysis-agent",
+  "name": "数据分析 Agent",
+  "description": "具备代码执行能力的数据分析 Agent，可以编写和执行数据处理代码",
+  "version": "1.0.0",
+  "interactionMode": "CHATBOT",
+  "reasoningStrategy": "REACT",
+  "autonomyLevel": "AUTONOMOUS",
+  "model": {
+    "provider": "openai",
+    "modelName": "gpt-4o",
+    "temperature": 0.2,
+    "maxTokens": 8192
+  },
+  "systemPrompt": "你是一个数据分析专家 Agent。你可以：\n1. 分析用户描述的数据问题\n2. 编写数据处理代码（支持数学表达式计算）\n3. 执行代码并返回结果\n4. 对结果进行解读和可视化建议\n\n请始终先分析问题，再编写代码，最后解读结果。",
+  "toolIds": [
+    "code-executor-tool",
+    "http-request-tool"
+  ],
+  "memory": {
+    "strategy": "TOKEN_WINDOW",
+    "maxTokens": 16000
+  },
+  "guardrails": {
+    "inputGuardrailIds": [
+      "prompt-injection-guard"
+    ],
+    "outputGuardrailIds": [
+      "pii-sanitization"
+    ]
+  }
+}

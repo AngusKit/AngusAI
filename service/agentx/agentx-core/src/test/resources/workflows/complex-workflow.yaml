@@ -1,0 +1,73 @@
+workflow:
+  id: "test-complex-workflow"
+  name: "Complex Test Workflow"
+  version: "2.0.0"
+  description: "A complex workflow with branching, loops, and parallel"
+  trigger:
+    type: "WEBHOOK"
+    config:
+      path: "/api/trigger"
+  variables:
+    threshold: 80
+    items:
+      - "item1"
+      - "item2"
+      - "item3"
+  settings:
+    maxExecutionSeconds: 600
+    onFailure: "CONTINUE"
+    retryPolicy:
+      maxRetries: 3
+      backoffSeconds: 10
+  nodes:
+    - id: "start"
+      type: "START"
+      next: "condition"
+    - id: "condition"
+      type: "CONDITION"
+      config:
+        expression: "#variables['threshold'] > 50"
+        ifTrue: "parallel"
+        ifFalse: "set-var"
+    - id: "parallel"
+      type: "PARALLEL"
+      config:
+        branches:
+          - "branch-a"
+          - "branch-b"
+        waitAll: true
+      next: "loop"
+    - id: "branch-a"
+      type: "SET_VARIABLE"
+      config:
+        assignments:
+          - name: "branchA"
+            value: "done-a"
+    - id: "branch-b"
+      type: "SET_VARIABLE"
+      config:
+        assignments:
+          - name: "branchB"
+            value: "done-b"
+    - id: "set-var"
+      type: "SET_VARIABLE"
+      config:
+        assignments:
+          - name: "fallback"
+            value: "low-threshold"
+      next: "end"
+    - id: "loop"
+      type: "LOOP"
+      config:
+        collection:
+          - "x"
+          - "y"
+          - "z"
+        iterator: "elem"
+        maxIterations: 100
+      next: "end"
+    - id: "end"
+      type: "END"
+      config:
+        output:
+          status: "completed"

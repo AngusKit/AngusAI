@@ -1,0 +1,31 @@
+id: "test-agent-chatbot"
+name: "Test Chatbot Agent"
+description: "A simple chatbot agent for testing"
+version: "1.0.0"
+interactionMode: "CHATBOT"
+reasoningStrategy: "FUNCTION_CALLING"
+autonomyLevel: "ASSISTANT"
+model:
+  provider: "openai"
+  modelName: "gpt-4"
+  temperature: 0.7
+  maxTokens: 4096
+systemPrompt: "You are a helpful assistant."
+welcomeMessage: "Hello! How can I help you?"
+suggestedQuestions:
+  - "What can you do?"
+  - "Tell me about yourself"
+toolIds:
+  - "tool-search"
+  - "tool-calc"
+skillIds:
+  - "skill-reasoning"
+memory:
+  strategy: "SLIDING_WINDOW"
+  windowSize: 20
+guardrails:
+  inputGuardrailIds:
+    - "length-limit"
+    - "prompt-injection-detector"
+  outputGuardrailIds:
+    - "sensitive-word-filter"

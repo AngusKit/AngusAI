@@ -1,0 +1,19 @@
+{
+  "id": "test-agent-json",
+  "name": "JSON Agent",
+  "description": "Agent defined in JSON",
+  "version": "1.0.0",
+  "interactionMode": "COMPLETION",
+  "reasoningStrategy": "SIMPLE_LLM",
+  "autonomyLevel": "TOOL",
+  "model": {
+    "provider": "openai",
+    "modelName": "gpt-3.5-turbo",
+    "temperature": 0.3,
+    "maxTokens": 2048
+  },
+  "systemPrompt": "You are a simple completion agent.",
+  "memory": {
+    "strategy": "NONE"
+  }
+}

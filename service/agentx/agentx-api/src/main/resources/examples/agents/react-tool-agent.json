@@ -1,0 +1,33 @@
+{
+  "id": "react-tool-agent",
+  "name": "ReAct 工具调用 Agent",
+  "description": "具备 Function Calling / ReAct 推理能力的 Agent，可自主决定调用哪些工具完成任务",
+  "version": "1.0.0",
+  "interactionMode": "CHATBOT",
+  "reasoningStrategy": "REACT",
+  "autonomyLevel": "AUTONOMOUS",
+  "model": {
+    "provider": "openai",
+    "modelName": "gpt-4o",
+    "temperature": 0.3,
+    "maxTokens": 8192
+  },
+  "systemPrompt": "你是一个智能助手，拥有以下工具可供调用。根据用户请求，你可以决定调用哪些工具来获取信息或执行操作。\n\n工作步骤：\n1. 分析用户请求\n2. 决定是否需要调用工具\n3. 调用工具获取结果\n4. 根据工具返回结果回答用户\n\n请始终保持专业、准确的回答。",
+  "welcomeMessage": "你好！我可以帮你查询天气、搜索信息、发送 HTTP 请求等。请告诉我你需要什么帮助？",
+  "toolIds": [
+    "http-request-tool",
+    "code-executor-tool"
+  ],
+  "memory": {
+    "strategy": "TOKEN_WINDOW",
+    "maxTokens": 8000
+  },
+  "guardrails": {
+    "inputGuardrailIds": [
+      "prompt-injection-guard"
+    ],
+    "outputGuardrailIds": [
+      "pii-sanitization"
+    ]
+  }
+}

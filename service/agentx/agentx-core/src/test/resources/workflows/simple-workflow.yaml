@@ -1,0 +1,30 @@
+workflow:
+  id: "test-simple-workflow"
+  name: "Simple Test Workflow"
+  version: "1.0.0"
+  description: "A simple workflow for testing"
+  variables:
+    greeting: "Hello"
+    userName: "World"
+  settings:
+    maxExecutionSeconds: 300
+    onFailure: "STOP"
+    retryPolicy:
+      maxRetries: 2
+      backoffSeconds: 5
+  nodes:
+    - id: "start"
+      type: "START"
+      next: "set-var"
+    - id: "set-var"
+      type: "SET_VARIABLE"
+      config:
+        assignments:
+          - name: "result"
+            value: "processed"
+      next: "end"
+    - id: "end"
+      type: "END"
+      config:
+        output:
+          status: "done"

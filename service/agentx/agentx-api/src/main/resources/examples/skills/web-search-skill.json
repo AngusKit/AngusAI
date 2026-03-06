@@ -1,0 +1,18 @@
+{
+  "id": "web-search-skill",
+  "name": "网络搜索技能",
+  "description": "使 Agent 具备搜索互联网信息的能力，可根据用户问题自动搜索并综合回答",
+  "version": "1.0.0",
+  "category": "tool_use",
+  "toolIds": [
+    "http-request-tool"
+  ],
+  "promptFragment": "你具备网络搜索能力。当用户提问需要最新信息时，可使用搜索工具获取相关网页内容，\n然后基于搜索结果综合回答。搜索时请使用简洁关键词。",
+  "outputFormat": "基于搜索结果的综合回答，需标注信息来源",
+  "examples": [
+    "搜索 2024 年诺贝尔物理学奖获得者",
+    "查找 SpringBoot 3.5 新特性",
+    "搜索最近的 AI 大模型发展动态"
+  ],
+  "enabled": true
+}

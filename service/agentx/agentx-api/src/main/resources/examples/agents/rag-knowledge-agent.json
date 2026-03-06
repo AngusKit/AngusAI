@@ -1,0 +1,33 @@
+{
+  "id": "rag-knowledge-agent",
+  "name": "RAG 知识问答 Agent",
+  "description": "基于检索增强生成（RAG）的知识库问答 Agent，先从知识库中检索相关文档片段，再生成答案",
+  "version": "1.0.0",
+  "interactionMode": "CHATBOT",
+  "reasoningStrategy": "FUNCTION_CALLING",
+  "autonomyLevel": "ASSISTANT",
+  "model": {
+    "provider": "openai",
+    "modelName": "gpt-4o",
+    "temperature": 0.3,
+    "maxTokens": 4096
+  },
+  "systemPrompt": "你是一个知识库问答助手。请根据检索到的知识库内容回答用户问题。\n\n规则：\n1. 只基于检索到的文档内容回答问题\n2. 如果检索内容不足以回答问题，请如实说明\n3. 引用信息时标注来源\n4. 保持回答简洁准确",
+  "welcomeMessage": "你好！我可以根据知识库中的内容回答你的问题。请提问吧！",
+  "knowledgeBaseIds": [
+    "product-docs-kb",
+    "faq-kb"
+  ],
+  "memory": {
+    "strategy": "SLIDING_WINDOW",
+    "windowSize": 10
+  },
+  "guardrails": {
+    "inputGuardrailIds": [
+      "prompt-injection-guard"
+    ],
+    "outputGuardrailIds": [
+      "pii-sanitization"
+    ]
+  }
+}

@@ -1,0 +1,124 @@
+{
+  "workflow": {
+    "id": "customer-onboarding-workflow",
+    "name": "客户入驻工作流",
+    "version": "1.0.0",
+    "description": "客户入驻全流程：信息收集 → 资质验证 → Agent 智能分析 → 并行处理（创建账号 + 发送欢迎邮件） → 完成",
+    "trigger": {
+      "type": "MANUAL"
+    },
+    "variables": {
+      "customerName": "",
+      "customerEmail": "",
+      "companyName": "",
+      "industry": ""
+    },
+    "settings": {
+      "maxExecutionSeconds": 600,
+      "onFailure": "CONTINUE"
+    },
+    "nodes": [
+      {
+        "id": "start",
+        "type": "START",
+        "next": "validate-info"
+      },
+      {
+        "id": "validate-info",
+        "type": "CODE",
+        "config": {
+          "language": "javascript",
+          "script": "var valid = customerName && customerEmail && customerEmail.includes('@'); return { isValid: valid };"
+        },
+        "next": "check-valid"
+      },
+      {
+        "id": "check-valid",
+        "type": "CONDITION",
+        "config": {
+          "expression": "#isValid == true",
+          "ifTrue": "ai-analysis",
+          "ifFalse": "invalid-end"
+        }
+      },
+      {
+        "id": "invalid-end",
+        "type": "SET_VARIABLE",
+        "config": {
+          "assignments": {
+            "status": "REJECTED",
+            "reason": "Required fields missing or invalid"
+          }
+        },
+        "next": "end"
+      },
+      {
+        "id": "ai-analysis",
+        "type": "AGENT",
+        "config": {
+          "agentId": "customer-analysis-agent",
+          "message": "请分析以下客户信息并给出风险等级和推荐方案：\n公司：${companyName}\n行业：${industry}\n联系人：${customerName}"
+        },
+        "outputs": {
+          "analysisResult": "result"
+        },
+        "next": "parallel-setup",
+        "timeout": 60
+      },
+      {
+        "id": "parallel-setup",
+        "type": "PARALLEL",
+        "config": {
+          "branches": [
+            "create-account",
+            "send-welcome"
+          ],
+          "joinStrategy": "ALL"
+        },
+        "next": "end"
+      },
+      {
+        "id": "create-account",
+        "type": "HTTP",
+        "config": {
+          "url": "https://api.example.com/accounts",
+          "method": "POST",
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": "{\"name\": \"${customerName}\", \"email\": \"${customerEmail}\", \"company\": \"${companyName}\"}"
+        },
+        "retry": {
+          "maxRetries": 2,
+          "backoffSeconds": 5
+        }
+      },
+      {
+        "id": "send-welcome",
+        "type": "HTTP",
+        "config": {
+          "url": "https://api.example.com/email/send",
+          "method": "POST",
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": "{\"to\": \"${customerEmail}\", \"template\": \"welcome\", \"vars\": {\"name\": \"${customerName}\"}}"
+        },
+        "retry": {
+          "maxRetries": 3,
+          "backoffSeconds": 10
+        }
+      },
+      {
+        "id": "end",
+        "type": "END",
+        "config": {
+          "outputMapping": {
+            "status": "status",
+            "analysisResult": "analysisResult"
+          }
+        }
+      }
+    ]
+  }
+}

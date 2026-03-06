@@ -1,0 +1,40 @@
+{
+  "id": "chatbot-assistant",
+  "name": "通用对话助手",
+  "description": "基础 Chatbot 类型 Agent，具备多轮对话、上下文记忆能力",
+  "version": "1.0.0",
+  "interactionMode": "CHATBOT",
+  "reasoningStrategy": "FUNCTION_CALLING",
+  "autonomyLevel": "ASSISTANT",
+  "model": {
+    "provider": "openai",
+    "modelName": "gpt-4o",
+    "temperature": 0.7,
+    "maxTokens": 4096
+  },
+  "systemPrompt": "你是一个友好的中文 AI 助手。请根据用户需求提供准确、有用的回答。如果不确定，请如实说明。",
+  "welcomeMessage": "你好！我是你的 AI 助手，请问有什么可以帮助你的？",
+  "suggestedQuestions": [
+    "今天天气怎么样？",
+    "帮我写一段自我介绍",
+    "解释一下什么是机器学习"
+  ],
+  "memory": {
+    "strategy": "SLIDING_WINDOW",
+    "windowSize": 20
+  },
+  "guardrails": {
+    "inputGuardrailIds": [
+      "prompt-injection-guard",
+      "sensitive-word-filter"
+    ],
+    "outputGuardrailIds": [
+      "pii-sanitization",
+      "length-limit"
+    ]
+  },
+  "variables": {
+    "language": "zh-CN",
+    "timezone": "Asia/Shanghai"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "workflow": {
+    "id": "test-json-workflow",
+    "name": "JSON Test Workflow",
+    "version": "1.0.0",
+    "description": "A simple workflow in JSON for testing",
+    "variables": {
+      "input": "test-data"
+    },
+    "nodes": [
+      {
+        "id": "start",
+        "type": "START",
+        "next": "end"
+      },
+      {
+        "id": "end",
+        "type": "END",
+        "config": {
+          "output": {
+            "result": "success"
+          }
+        }
+      }
+    ]
+  }
+}

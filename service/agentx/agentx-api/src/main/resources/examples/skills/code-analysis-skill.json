@@ -1,0 +1,33 @@
+{
+  "id": "code-analysis-skill",
+  "name": "代码分析技能",
+  "description": "使 Agent 具备代码分析和执行能力，可解释代码、发现问题、运行简单计算",
+  "version": "1.0.0",
+  "category": "coding",
+  "toolIds": [
+    "code-executor-tool"
+  ],
+  "promptFragment": "你具备代码分析和执行能力。可以：\n1. 分析用户提供的代码片段，解释其功能\n2. 发现代码中的 Bug 和安全问题\n3. 执行简单的数学计算和数据处理\n4. 提供代码优化建议\n\n执行代码时优先使用安全沙箱，避免执行危险操作。",
+  "inputParameters": {
+    "code": {
+      "name": "code",
+      "type": "string",
+      "description": "待分析的代码片段",
+      "required": true
+    },
+    "language": {
+      "name": "language",
+      "type": "string",
+      "description": "编程语言",
+      "required": false,
+      "defaultValue": "java"
+    }
+  },
+  "outputFormat": "代码分析报告，包含：功能说明、问题列表、优化建议",
+  "examples": [
+    "分析这段 Java 代码的功能",
+    "帮我计算斐波那契数列前 20 项",
+    "检查这段 Python 代码是否有安全漏洞"
+  ],
+  "enabled": true
+}

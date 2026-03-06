@@ -1,0 +1,38 @@
+{
+  "id": "multi-skill-agent",
+  "name": "多技能综合助手",
+  "description": "绑定多个技能的综合型 Agent，展示 Skills 组合使用方式",
+  "version": "1.0.0",
+  "interactionMode": "CHATBOT",
+  "reasoningStrategy": "REACT",
+  "autonomyLevel": "COLLABORATOR",
+  "model": {
+    "provider": "openai",
+    "modelName": "gpt-4o",
+    "temperature": 0.5,
+    "maxTokens": 8192
+  },
+  "systemPrompt": "你是一个多技能的智能助手。你拥有多项技能，可以根据用户需求灵活运用不同技能来完成任务。",
+  "welcomeMessage": "你好！我具备多项技能：网络搜索、代码分析、知识问答和数据分析。请告诉我你需要什么帮助？",
+  "skillIds": [
+    "web-search-skill",
+    "code-analysis-skill",
+    "knowledge-qa-skill",
+    "data-analysis-skill"
+  ],
+  "toolIds": [
+    "http-request-tool"
+  ],
+  "memory": {
+    "strategy": "TOKEN_WINDOW",
+    "maxTokens": 16000
+  },
+  "guardrails": {
+    "inputGuardrailIds": [
+      "prompt-injection-guard"
+    ],
+    "outputGuardrailIds": [
+      "pii-sanitization"
+    ]
+  }
+}

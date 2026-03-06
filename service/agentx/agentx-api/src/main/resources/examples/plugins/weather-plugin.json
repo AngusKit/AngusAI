@@ -1,0 +1,16 @@
+{
+  "id": "weather-plugin",
+  "name": "天气查询插件",
+  "version": "1.0.0",
+  "description": "示例插件 — 提供天气查询工具，展示如何开发 AgentX 插件",
+  "author": "AgentX Team",
+  "extensionPoints": [
+    "tool"
+  ],
+  "config": {
+    "apiKey": "your-weather-api-key",
+    "provider": "openweathermap"
+  },
+  "implementation": "参考以下 Java 代码实现 AgentXPlugin 接口",
+  "code_example": "详见 WeatherPlugin.java"
+}

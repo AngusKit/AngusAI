@@ -1,0 +1,19 @@
+{
+  "id": "knowledge-qa-skill",
+  "name": "知识问答技能",
+  "description": "使 Agent 具备基于知识库的检索增强问答能力（RAG）",
+  "version": "1.0.0",
+  "category": "knowledge",
+  "knowledgeBaseIds": [
+    "product-docs-kb",
+    "faq-kb"
+  ],
+  "promptFragment": "你具备知识库检索问答能力。回答用户问题时：\n1. 优先从知识库中检索相关文档\n2. 基于检索到的内容生成回答\n3. 如果知识库内容不足以回答，请如实说明\n4. 引用信息时标注来源文件和段落",
+  "outputFormat": "基于知识库的准确回答，需标注来源引用",
+  "examples": [
+    "产品 X 的使用说明",
+    "如何配置 SSL 证书",
+    "常见问题有哪些"
+  ],
+  "enabled": true
+}

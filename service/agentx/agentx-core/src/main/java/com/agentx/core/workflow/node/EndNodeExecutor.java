@@ -1,0 +1,33 @@
+package com.agentx.core.workflow.node;
+
+import com.agentx.core.workflow.engine.NodeExecutionContext;
+import com.agentx.core.workflow.engine.NodeExecutor;
+import java.util.HashMap;
+import java.util.Map;
+import org.springframework.stereotype.Component;
+
+/**
+ * END 节点 — 流程出口
+ */
+@Component
+public class EndNodeExecutor implements NodeExecutor {
+
+  @Override
+  public String getNodeType() {
+    return "END";
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public Map<String, Object> execute(NodeExecutionContext context) {
+    Map<String, Object> outputs = new HashMap<>();
+    Map<String, Object> config = context.getNodeDefinition().getConfig();
+    if (config != null && config.containsKey("output")) {
+      Object output = config.get("output");
+      if (output instanceof Map) {
+        outputs.putAll((Map<String, Object>) output);
+      }
+    }
+    return outputs;
+  }
+}

@@ -1,0 +1,116 @@
+{
+  "workflow": {
+    "id": "content-review-workflow",
+    "name": "内容审核工作流",
+    "version": "1.0.0",
+    "description": "对用户提交的内容进行多步审核：敏感词检测 → AI 内容分析 → 条件判断 → 人工审批/自动通过",
+    "trigger": {
+      "type": "WEBHOOK",
+      "config": {
+        "path": "/webhook/content-review"
+      }
+    },
+    "variables": {
+      "content": "",
+      "reviewResult": "",
+      "riskLevel": "LOW"
+    },
+    "settings": {
+      "maxExecutionSeconds": 300,
+      "onFailure": "STOP",
+      "retryPolicy": {
+        "maxRetries": 2,
+        "backoffSeconds": 5
+      }
+    },
+    "nodes": [
+      {
+        "id": "start",
+        "type": "START",
+        "next": "sensitive-check"
+      },
+      {
+        "id": "sensitive-check",
+        "type": "CODE",
+        "config": {
+          "language": "javascript",
+          "script": "var banned = ['违禁词1', '违禁词2']; var found = banned.filter(w => content.includes(w)); riskLevel = found.length > 0 ? 'HIGH' : 'LOW'; return { riskLevel: riskLevel, bannedWordsFound: found };"
+        },
+        "outputs": {
+          "riskLevel": "riskLevel"
+        },
+        "next": "ai-analysis"
+      },
+      {
+        "id": "ai-analysis",
+        "type": "LLM",
+        "config": {
+          "prompt": "请分析以下内容是否存在违规风险，返回 JSON 格式 {\"safe\": true/false, \"reason\": \"...\"}：\n\n${content}",
+          "temperature": 0.1
+        },
+        "outputs": {
+          "aiReview": "result"
+        },
+        "next": "risk-decision",
+        "timeout": 30
+      },
+      {
+        "id": "risk-decision",
+        "type": "CONDITION",
+        "config": {
+          "expression": "#riskLevel == 'HIGH'",
+          "ifTrue": "manual-review",
+          "ifFalse": "auto-approve"
+        }
+      },
+      {
+        "id": "manual-review",
+        "type": "WAIT",
+        "config": {
+          "waitType": "APPROVAL",
+          "approvers": [
+            "admin@example.com"
+          ]
+        },
+        "next": "notify-result"
+      },
+      {
+        "id": "auto-approve",
+        "type": "SET_VARIABLE",
+        "config": {
+          "assignments": {
+            "reviewResult": "AUTO_APPROVED"
+          }
+        },
+        "next": "notify-result"
+      },
+      {
+        "id": "notify-result",
+        "type": "HTTP",
+        "config": {
+          "url": "https://api.example.com/notify",
+          "method": "POST",
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": "{\"content_id\": \"${contentId}\", \"result\": \"${reviewResult}\"}"
+        },
+        "next": "end",
+        "retry": {
+          "maxRetries": 3,
+          "backoffSeconds": 10
+        }
+      },
+      {
+        "id": "end",
+        "type": "END",
+        "config": {
+          "outputMapping": {
+            "reviewResult": "reviewResult",
+            "riskLevel": "riskLevel"
+          }
+        }
+      }
+    ]
+  }
+}

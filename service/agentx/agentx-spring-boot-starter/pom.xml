@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.agentx</groupId>
+    <artifactId>agentx-parent</artifactId>
+    <version>1.0.0</version>
+  </parent>
+
+  <artifactId>agentx-spring-boot-starter</artifactId>
+  <name>AgentX :: Spring Boot Starter</name>
+  <description>AgentX 自动装配 Starter，聚合所有核心模块并提供默认配置</description>
+
+  <dependencies>
+    <!-- Core -->
+    <dependency>
+      <groupId>com.agentx</groupId>
+      <artifactId>agentx-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- Infrastructure -->
+    <dependency>
+      <groupId>com.agentx</groupId>
+      <artifactId>agentx-infrastructure</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- Observability -->
+    <dependency>
+      <groupId>com.agentx</groupId>
+      <artifactId>agentx-observability</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- Spring Boot -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-autoconfigure</artifactId>
+    </dependency>
+
+    <!-- LangChain4j -->
+    <dependency>
+      <groupId>dev.langchain4j</groupId>
+      <artifactId>langchain4j</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.opennlp</groupId>
+          <artifactId>opennlp-tools</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>dev.langchain4j</groupId>
+      <artifactId>langchain4j-core</artifactId>
+    </dependency>
+
+    <!-- Lombok -->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <!-- Models -->
+    <dependency>
+      <groupId>com.agentx</groupId>
+      <artifactId>agentx-model-openai</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.agentx</groupId>
+      <artifactId>agentx-model-anthropic</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.agentx</groupId>
+      <artifactId>agentx-model-ollama</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.agentx</groupId>
+      <artifactId>agentx-model-gemini</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.agentx</groupId>
+      <artifactId>agentx-model-qwen</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.agentx</groupId>
+      <artifactId>agentx-model-zhipu</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.agentx</groupId>
+      <artifactId>agentx-model-deepseek</artifactId>
+    </dependency>
+
+    <!-- Tools -->
+    <dependency>
+      <groupId>com.agentx</groupId>
+      <artifactId>agentx-tool-http</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.agentx</groupId>
+      <artifactId>agentx-tool-code</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.agentx</groupId>
+      <artifactId>agentx-tool-database</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.agentx</groupId>
+      <artifactId>agentx-tool-search</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.agentx</groupId>
+      <artifactId>agentx-tool-file</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.agentx</groupId>
+      <artifactId>agentx-tool-notify</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.agentx</groupId>
+      <artifactId>agentx-tool-ai</artifactId>
+    </dependency>
+
+    <!-- Vector Storage -->
+    <dependency>
+      <groupId>com.agentx</groupId>
+      <artifactId>agentx-vectorstore-pgvector</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.agentx</groupId>
+      <artifactId>agentx-vectorstore-milvus</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.agentx</groupId>
+      <artifactId>agentx-vectorstore-qdrant</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.agentx</groupId>
+      <artifactId>agentx-vectorstore-chroma</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.agentx</groupId>
+      <artifactId>agentx-vectorstore-elasticsearch</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.agentx</groupId>
+      <artifactId>agentx-vectorstore-weaviate</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.agentx</groupId>
+      <artifactId>agentx-vectorstore-mariadb</artifactId>
+    </dependency>
+  </dependencies>
+</project>

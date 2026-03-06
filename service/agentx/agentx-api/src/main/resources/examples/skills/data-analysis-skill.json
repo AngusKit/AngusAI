@@ -1,0 +1,28 @@
+{
+  "id": "data-analysis-skill",
+  "name": "数据分析技能",
+  "description": "使 Agent 具备结构化数据分析能力，可处理表格数据、生成统计报告、数据可视化描述",
+  "version": "1.0.0",
+  "category": "analysis",
+  "toolIds": [
+    "code-executor-tool"
+  ],
+  "promptFragment": "你具备数据分析能力。可以：\n1. 分析 CSV/JSON 格式的结构化数据\n2. 计算统计指标（均值、中位数、标准差等）\n3. 发现数据趋势和异常\n4. 提供数据可视化建议（图表类型、维度选择）\n5. 生成数据分析报告\n\n分析数据时确保数值准确，统计方法正确。",
+  "inputParameters": {
+    "data": {
+      "name": "data",
+      "type": "string",
+      "description": "待分析的数据（CSV/JSON格式）",
+      "required": true
+    },
+    "analysisType": {
+      "name": "analysisType",
+      "type": "string",
+      "description": "分析类型：descriptive/correlation/trend/anomaly",
+      "required": false,
+      "defaultValue": "descriptive"
+    }
+  },
+  "outputFormat": "数据分析报告，含关键指标、趋势发现、可视化建议",
+  "enabled": true
+}
