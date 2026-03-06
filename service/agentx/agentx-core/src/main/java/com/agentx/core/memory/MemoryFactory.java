@@ -43,7 +43,7 @@ public class MemoryFactory {
           .build();
     }
 
-    MemoryStrategy strategy = MemoryStrategy.from(config.getStrategy());
+    MemoryStrategy strategy = config.getStrategy() != null ? config.getStrategy() : MemoryStrategy.TOKEN_WINDOW;
 
     return switch (strategy) {
       case NONE -> memoryId -> new EmptyChatMemory(memoryId);

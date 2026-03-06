@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.agentx.core.agent.enums.AutonomyLevel;
 import com.agentx.core.agent.enums.InteractionMode;
 import com.agentx.core.agent.enums.ReasoningStrategy;
+import com.agentx.core.memory.MemoryStrategy;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -107,7 +108,7 @@ class AgentDefinitionParserTest {
       assertEquals(2, def.getToolIds().size());
       assertEquals(1, def.getSkillIds().size());
       assertNotNull(def.getMemory());
-      assertEquals("SLIDING_WINDOW", def.getMemory().getStrategy());
+      assertEquals(MemoryStrategy.MESSAGE_WINDOW, def.getMemory().getStrategy());
       assertNotNull(def.getGuardrails());
       assertEquals(1, def.getGuardrails().getInputGuardrailIds().size());
     }
@@ -296,7 +297,7 @@ class AgentDefinitionParserTest {
 
       AgentDefinition def = parser.parseJson(json);
 
-      assertEquals("TOKEN_WINDOW", def.getMemory().getStrategy());
+      assertEquals(MemoryStrategy.TOKEN_WINDOW, def.getMemory().getStrategy());
       assertEquals(16000, def.getMemory().getMaxTokens());
     }
 
@@ -313,7 +314,7 @@ class AgentDefinitionParserTest {
 
       AgentDefinition def = parser.parseJson(json);
 
-      assertEquals("PERSISTENT", def.getMemory().getStrategy());
+      assertEquals(MemoryStrategy.MESSAGE_WINDOW, def.getMemory().getStrategy());
       assertEquals(50, def.getMemory().getWindowSize());
     }
 
@@ -330,7 +331,23 @@ class AgentDefinitionParserTest {
 
       AgentDefinition def = parser.parseJson(json);
 
-      assertEquals("NONE", def.getMemory().getStrategy());
+      assertEquals(MemoryStrategy.NONE, def.getMemory().getStrategy());
+    }
+
+    @Test
+    @DisplayName("解析未知策略 — 映射为 TOKEN_WINDOW")
+    void parseUnknownMemoryStrategy() throws IOException {
+      String json = """
+          {
+            "id": "mem-unknown",
+            "name": "Unknown",
+            "memory": {"strategy": "UNKNOWN_STRATEGY"}
+          }
+          """;
+
+      AgentDefinition def = parser.parseJson(json);
+
+      assertEquals(MemoryStrategy.TOKEN_WINDOW, def.getMemory().getStrategy());
     }
 
     @Test
@@ -376,7 +393,7 @@ class AgentDefinitionParserTest {
       assertEquals(ReasoningStrategy.REACT, def.getReasoningStrategy());
       assertEquals(AutonomyLevel.COLLABORATOR, def.getAutonomyLevel());
       assertEquals("anthropic", def.getModel().getProvider());
-      assertEquals("SUMMARY", def.getMemory().getStrategy());
+      assertEquals(MemoryStrategy.SUMMARY, def.getMemory().getStrategy());
       assertEquals(2, def.getToolIds().size());
     }
 
@@ -460,7 +477,7 @@ class AgentDefinitionParserTest {
           .systemPrompt("Hello")
           .toolIds(List.of("tool-1"))
           .memory(AgentDefinition.MemoryConfig.builder()
-              .strategy("SLIDING_WINDOW").windowSize(20).build())
+              .strategy(MemoryStrategy.MESSAGE_WINDOW).windowSize(20).build())
           .build();
 
       String json = parser.toJson(original);
@@ -509,7 +526,7 @@ class AgentDefinitionParserTest {
     @DisplayName("MemoryConfig 默认值")
     void memoryConfigDefaults() {
       AgentDefinition.MemoryConfig config = AgentDefinition.MemoryConfig.builder().build();
-      assertEquals("SLIDING_WINDOW", config.getStrategy());
+      assertEquals(MemoryStrategy.TOKEN_WINDOW, config.getStrategy());
       assertEquals(20, config.getWindowSize());
       assertEquals(8000, config.getMaxTokens());
     }

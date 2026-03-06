@@ -43,7 +43,7 @@ class MemoryFactoryTest {
     @DisplayName("MESSAGE_WINDOW 策略 — 基于消息条数")
     void messageWindowStrategy() {
       AgentDefinition.MemoryConfig config = AgentDefinition.MemoryConfig.builder()
-          .strategy("MESSAGE_WINDOW")
+          .strategy(MemoryStrategy.MESSAGE_WINDOW)
           .windowSize(30)
           .build();
 
@@ -56,10 +56,10 @@ class MemoryFactoryTest {
     }
 
     @Test
-    @DisplayName("SLIDING_WINDOW 兼容 — 映射为 MESSAGE_WINDOW")
+    @DisplayName("SLIDING_WINDOW 兼容 — 解析后为 MESSAGE_WINDOW，此处直接测 MESSAGE_WINDOW")
     void slidingWindowCompat() {
       AgentDefinition.MemoryConfig config = AgentDefinition.MemoryConfig.builder()
-          .strategy("SLIDING_WINDOW")
+          .strategy(MemoryStrategy.MESSAGE_WINDOW)
           .windowSize(30)
           .build();
 
@@ -72,7 +72,7 @@ class MemoryFactoryTest {
     @DisplayName("MESSAGE_WINDOW 默认窗口大小")
     void messageWindowDefault() {
       AgentDefinition.MemoryConfig config = AgentDefinition.MemoryConfig.builder()
-          .strategy("MESSAGE_WINDOW")
+          .strategy(MemoryStrategy.MESSAGE_WINDOW)
           .build();
 
       ChatMemoryProvider provider = factory.create(config);
@@ -84,7 +84,7 @@ class MemoryFactoryTest {
     @DisplayName("NONE 策略 — 空记忆，不保留任何消息")
     void noneStrategy() {
       AgentDefinition.MemoryConfig config = AgentDefinition.MemoryConfig.builder()
-          .strategy("NONE")
+          .strategy(MemoryStrategy.NONE)
           .build();
 
       ChatMemoryProvider provider = factory.create(config);
@@ -102,7 +102,7 @@ class MemoryFactoryTest {
     @DisplayName("TOKEN_WINDOW 策略 — 使用 TokenWindowChatMemory")
     void tokenWindowStrategy() {
       AgentDefinition.MemoryConfig config = AgentDefinition.MemoryConfig.builder()
-          .strategy("TOKEN_WINDOW")
+          .strategy(MemoryStrategy.TOKEN_WINDOW)
           .maxTokens(8000)
           .build();
 
@@ -119,7 +119,7 @@ class MemoryFactoryTest {
     @DisplayName("TOKEN_WINDOW 默认 maxTokens")
     void tokenWindowDefaultTokens() {
       AgentDefinition.MemoryConfig config = AgentDefinition.MemoryConfig.builder()
-          .strategy("TOKEN_WINDOW")
+          .strategy(MemoryStrategy.TOKEN_WINDOW)
           .maxTokens(null)
           .build();
 
@@ -131,7 +131,7 @@ class MemoryFactoryTest {
     @DisplayName("SUMMARY 策略")
     void summaryStrategy() {
       AgentDefinition.MemoryConfig config = AgentDefinition.MemoryConfig.builder()
-          .strategy("SUMMARY")
+          .strategy(MemoryStrategy.SUMMARY)
           .windowSize(10)
           .build();
 
@@ -144,7 +144,7 @@ class MemoryFactoryTest {
     @DisplayName("SUMMARY 默认窗口大小")
     void summaryDefaultWindow() {
       AgentDefinition.MemoryConfig config = AgentDefinition.MemoryConfig.builder()
-          .strategy("SUMMARY")
+          .strategy(MemoryStrategy.SUMMARY)
           .windowSize(null)
           .build();
 
@@ -157,7 +157,7 @@ class MemoryFactoryTest {
     @DisplayName("PERSISTENT 兼容 — 映射为 MESSAGE_WINDOW")
     void persistentCompatMapsToMessageWindow() {
       AgentDefinition.MemoryConfig config = AgentDefinition.MemoryConfig.builder()
-          .strategy("PERSISTENT")
+          .strategy(MemoryStrategy.MESSAGE_WINDOW)
           .windowSize(50)
           .build();
 
@@ -170,16 +170,19 @@ class MemoryFactoryTest {
     }
 
     @Test
-    @DisplayName("未知策略使用默认 MESSAGE_WINDOW")
-    void unknownStrategy() {
+    @DisplayName("null 策略使用默认 TOKEN_WINDOW")
+    void nullStrategyUsesDefaultTokenWindow() {
       AgentDefinition.MemoryConfig config = AgentDefinition.MemoryConfig.builder()
-          .strategy("UNKNOWN_STRATEGY")
+          .strategy(null)
           .windowSize(15)
           .build();
 
       ChatMemoryProvider provider = factory.create(config);
       assertNotNull(provider);
-      assertNotNull(provider.get("session-1"));
+      ChatMemory memory = provider.get("session-1");
+      assertNotNull(memory);
+      memory.add(UserMessage.from("test"));
+      assertFalse(memory.messages().isEmpty(), "TOKEN_WINDOW 应保留消息");
     }
   }
 
@@ -191,7 +194,7 @@ class MemoryFactoryTest {
     @DisplayName("不同 memoryId 返回不同实例且消息隔离")
     void differentMemoryIds() {
       AgentDefinition.MemoryConfig config = AgentDefinition.MemoryConfig.builder()
-          .strategy("MESSAGE_WINDOW")
+          .strategy(MemoryStrategy.MESSAGE_WINDOW)
           .build();
       ChatMemoryProvider provider = factory.create(config);
       ChatMemory mem1 = provider.get("session-1");

@@ -3,6 +3,7 @@ package com.agentx.core.agent.definition;
 import com.agentx.core.agent.enums.AutonomyLevel;
 import com.agentx.core.agent.enums.InteractionMode;
 import com.agentx.core.agent.enums.ReasoningStrategy;
+import com.agentx.core.memory.MemoryStrategy;
 import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
@@ -144,7 +145,7 @@ public class AgentDefinition {
      * 兼容历史配置: SLIDING_WINDOW → MESSAGE_WINDOW，PERSISTENT → MESSAGE_WINDOW
      */
     @Builder.Default
-    private String strategy = "MESSAGE_WINDOW";
+    private MemoryStrategy strategy = MemoryStrategy.TOKEN_WINDOW;
     /** 消息窗口大小（条数），用于 MESSAGE_WINDOW / SUMMARY */
     @Builder.Default
     private Integer windowSize = 20;
