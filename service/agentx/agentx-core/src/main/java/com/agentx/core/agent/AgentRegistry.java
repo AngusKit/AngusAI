@@ -4,8 +4,12 @@ import com.agentx.core.agent.definition.AgentDefinition;
 import com.agentx.core.agent.runtime.AgentChatService;
 import com.agentx.core.agent.runtime.AgentInstance;
 import com.agentx.core.agent.runtime.AgentStreamingChatService;
+import com.agentx.core.guardrail.GuardrailChain;
+import com.agentx.core.guardrail.GuardrailResult;
+import com.agentx.core.knowledge.ContentRetrieverFactory;
 import com.agentx.core.memory.MemoryFactory;
 import com.agentx.core.model.ModelRegistry;
+import com.agentx.core.prompt.PromptVariableResolver;
 import com.agentx.core.skill.SkillRegistry;
 import com.agentx.core.tool.ToolRegistry;
 import dev.langchain4j.memory.chat.ChatMemoryProvider;
@@ -39,6 +43,8 @@ public class AgentRegistry {
   private final MemoryFactory memoryFactory;
   private final ModelRegistry modelRegistry;
   private final SkillRegistry skillRegistry;
+  private final GuardrailChain guardrailChain;
+  private final ContentRetrieverFactory contentRetrieverFactory;
 
   /**
    * 注册并构建 Agent 实例 — 从 AgentDefinition.model 配置中解析模型
@@ -76,17 +82,16 @@ public class AgentRegistry {
    * 注册并构建 Agent 实例（显式传入模型实例）
    */
   public AgentInstance register(AgentDefinition definition,
-      ChatModel chatModel,
-      StreamingChatModel streamingModel) {
+      ChatModel chatModel, StreamingChatModel streamingModel) {
     log.info("Registering agent: {} ({})", definition.getName(), definition.getId());
 
     AgentInstance instance = new AgentInstance(definition);
 
-    // Build sync chat service
+    // 构建同步对话服务
     var syncBuilder = AiServices.builder(AgentChatService.class)
         .chatModel(chatModel);
 
-    // Bind tools: @Tool beans -> tools(objects), executor-only plugins -> tools(Map)
+    // 绑定工具：@Tool beans 作为 tools(objects)，仅执行器插件作为 tools(Map)
     List<String> allToolIds = definition.getToolIds() != null
         ? new ArrayList<>(definition.getToolIds()) : new ArrayList<>();
 
@@ -100,18 +105,30 @@ public class AgentRegistry {
       syncBuilder.tools(toolMap);
     }
 
-    // Bind LangChain4j Skills (activate_skill, read_skill_resource)
+    // 绑定 LangChain4j 技能（activate_skill、read_skill_resource）
     // skillIds 即技能名称（Skill.name()）
     if (definition.getSkillIds() != null && !definition.getSkillIds().isEmpty()) {
       skillRegistry.resolveSkillsToolProvider(definition.getSkillIds())
           .ifPresent(syncBuilder::toolProvider);
     }
 
-    // Bind memory
+    // 绑定记忆
     ChatMemoryProvider memoryProvider = memoryFactory.create(definition.getMemory());
     syncBuilder.chatMemoryProvider(memoryProvider);
 
-    // System message — include skills hint when skills are present
+    // RAG：当存在 knowledgeBaseIds 时绑定 contentRetriever
+    AgentDefinition.ModelConfig defModel = definition.getModel();
+    if (contentRetrieverFactory != null && definition.getKnowledgeBaseIds() != null
+        && !definition.getKnowledgeBaseIds().isEmpty()) {
+      String embeddingProvider = defModel != null && defModel.getProvider() != null
+          ? defModel.getProvider() : "openai";
+      int topK = 5;
+      contentRetrieverFactory.createContentRetriever(
+          definition.getKnowledgeBaseIds(), embeddingProvider, topK)
+          .ifPresent(syncBuilder::contentRetriever);
+    }
+
+    // 系统消息：当有技能时追加技能提示
     String systemPrompt = definition.getSystemPrompt();
     if (definition.getSkillIds() != null && !definition.getSkillIds().isEmpty()) {
       String skillsHint = skillRegistry.formatAvailableSkills(definition.getSkillIds());
@@ -121,6 +138,7 @@ public class AgentRegistry {
         systemPrompt = (systemPrompt != null ? systemPrompt : "") + skillsInstruction;
       }
     }
+    systemPrompt = PromptVariableResolver.resolve(systemPrompt, definition.getVariables());
     if (systemPrompt != null && !systemPrompt.isBlank()) {
       final String finalPrompt = systemPrompt;
       syncBuilder.systemMessageProvider(memoryId -> finalPrompt);
@@ -133,6 +151,14 @@ public class AgentRegistry {
       var streamBuilder = AiServices.builder(AgentStreamingChatService.class)
           .streamingChatModel(streamingModel);
 
+      if (contentRetrieverFactory != null && definition.getKnowledgeBaseIds() != null
+          && !definition.getKnowledgeBaseIds().isEmpty()) {
+        String embProvider = defModel != null && defModel.getProvider() != null
+            ? defModel.getProvider() : "openai";
+        contentRetrieverFactory.createContentRetriever(
+            definition.getKnowledgeBaseIds(), embProvider, 5)
+            .ifPresent(streamBuilder::contentRetriever);
+      }
       if (!toolObjects.isEmpty()) {
         streamBuilder.tools(toolObjects);
       }
@@ -168,13 +194,47 @@ public class AgentRegistry {
       throw new IllegalArgumentException("Agent not found: " + agentId);
     }
     instance.recordInvocation();
+
+    // 输入护栏
+    String inputToUse = message;
+    if (guardrailChain != null) {
+      var guardrails = instance.getDefinition().getGuardrails();
+      if (guardrails != null && guardrails.getInputGuardrailIds() != null
+          && !guardrails.getInputGuardrailIds().isEmpty()) {
+        GuardrailResult inputResult = guardrailChain.checkInput(message, guardrails.getInputGuardrailIds());
+        if (!inputResult.isPassed()) {
+          return "[Guardrail] " + (inputResult.getReason() != null ? inputResult.getReason() : "Input blocked");
+        }
+        if (inputResult.getSanitizedContent() != null) {
+          inputToUse = inputResult.getSanitizedContent();
+        }
+      }
+    }
+
     Object memoryId = sessionId != null && !sessionId.isBlank() ? sessionId : "default";
     AgentChatService service = (AgentChatService) instance.getAiServiceProxy();
-    return service.chat(memoryId, message);
+    String response = service.chat(memoryId, inputToUse);
+
+    // 输出护栏
+    if (guardrailChain != null) {
+      var guardrails = instance.getDefinition().getGuardrails();
+      if (guardrails != null && guardrails.getOutputGuardrailIds() != null
+          && !guardrails.getOutputGuardrailIds().isEmpty()) {
+        GuardrailResult outputResult = guardrailChain.checkOutput(response, guardrails.getOutputGuardrailIds());
+        if (!outputResult.isPassed()) {
+          return "[Guardrail] " + (outputResult.getReason() != null ? outputResult.getReason() : "Output blocked");
+        }
+        if (outputResult.getSanitizedContent() != null) {
+          response = outputResult.getSanitizedContent();
+        }
+      }
+    }
+    return response;
   }
 
   /**
-   * 流式对话 — 返回 TokenStream，无流式模型时抛异常
+   * 流式对话 — 返回 TokenStream，无流式模型时抛异常。
+   * 注意：输出护栏在流式场景下暂不执行（需先缓冲完整响应），仅执行输入护栏。
    */
   public TokenStream chatStream(String agentId, String sessionId, String message) {
     AgentInstance instance = agents.get(agentId);
@@ -186,9 +246,26 @@ public class AgentRegistry {
           + " (no StreamingChatModel configured)");
     }
     instance.recordInvocation();
+
+    // 输入护栏（输出护栏需先缓冲完整响应，流式场景下不执行）
+    String inputToUse = message;
+    if (guardrailChain != null) {
+      var guardrails = instance.getDefinition().getGuardrails();
+      if (guardrails != null && guardrails.getInputGuardrailIds() != null
+          && !guardrails.getInputGuardrailIds().isEmpty()) {
+        GuardrailResult inputResult = guardrailChain.checkInput(message, guardrails.getInputGuardrailIds());
+        if (!inputResult.isPassed()) {
+          throw new IllegalStateException("[Guardrail] " + (inputResult.getReason() != null ? inputResult.getReason() : "Input blocked"));
+        }
+        if (inputResult.getSanitizedContent() != null) {
+          inputToUse = inputResult.getSanitizedContent();
+        }
+      }
+    }
+
     Object memoryId = sessionId != null && !sessionId.isBlank() ? sessionId : "default";
     AgentStreamingChatService service = (AgentStreamingChatService) instance.getStreamingServiceProxy();
-    return service.chatStream(memoryId, message);
+    return service.chatStream(memoryId, inputToUse);
   }
 
   public void unregister(String agentId) {

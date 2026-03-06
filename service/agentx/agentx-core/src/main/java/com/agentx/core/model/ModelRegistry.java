@@ -86,6 +86,25 @@ public class ModelRegistry {
   }
 
   /**
+   * 获取指定 provider 的默认 EmbeddingModel
+   */
+  public Optional<EmbeddingModel> getDefaultEmbeddingModel(String provider) {
+    return configProvider.loadDefault(provider)
+        .flatMap(config -> {
+          EmbeddingModel cached = embeddingModelCache.get(config.getId());
+          if (cached != null) {
+            return Optional.of(cached);
+          }
+          EmbeddingModel model = getFactory(config.getProvider()).createEmbeddingModel(config);
+          if (model == null) {
+            return Optional.empty();
+          }
+          embeddingModelCache.put(config.getId(), model);
+          return Optional.of(model);
+        });
+  }
+
+  /**
    * 清除缓存并强制从数据库重新加载
    */
   public void refresh() {

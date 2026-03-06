@@ -3,6 +3,7 @@ package com.agentx.starter;
 import com.agentx.core.agent.AgentRegistry;
 import com.agentx.core.agent.definition.AgentDefinitionParser;
 import com.agentx.core.guardrail.GuardrailChain;
+import com.agentx.core.knowledge.ContentRetrieverFactory;
 import com.agentx.core.memory.MemoryFactory;
 import com.agentx.core.model.ModelConfigProvider;
 import com.agentx.core.model.ModelFactory;
@@ -69,6 +70,13 @@ public class AgentXCoreBeansConfiguration {
     return new VectorStoreRegistry(factories, configProvider);
   }
 
+  @Bean
+  @ConditionalOnBean(VectorStoreRegistry.class)
+  public ContentRetrieverFactory contentRetrieverFactory(VectorStoreRegistry vectorStoreRegistry,
+      ModelRegistry modelRegistry) {
+    return new ContentRetrieverFactory(vectorStoreRegistry, modelRegistry);
+  }
+
   // ===== Tool =====
   @Bean
   public ToolRegistry toolRegistry() {
@@ -101,8 +109,11 @@ public class AgentXCoreBeansConfiguration {
 
   @Bean
   public AgentRegistry agentRegistry(ToolRegistry toolRegistry, MemoryFactory memoryFactory,
-      ModelRegistry modelRegistry, SkillRegistry skillRegistry) {
-    return new AgentRegistry(toolRegistry, memoryFactory, modelRegistry, skillRegistry);
+      ModelRegistry modelRegistry, SkillRegistry skillRegistry, GuardrailChain guardrailChain,
+      org.springframework.beans.factory.ObjectProvider<ContentRetrieverFactory> contentRetrieverFactoryProvider) {
+    ContentRetrieverFactory contentRetrieverFactory = contentRetrieverFactoryProvider.getIfAvailable();
+    return new AgentRegistry(toolRegistry, memoryFactory, modelRegistry, skillRegistry,
+        guardrailChain, contentRetrieverFactory);
   }
 
   // ===== Guardrail =====
