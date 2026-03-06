@@ -26,7 +26,7 @@ public interface ApiEndpointCallLogRepo extends BaseRepository<ApiEndpointCallLo
    * [2]=avgResponseTime (Double)
    */
   @Query(value = "SELECT endpoint_id, COUNT(1) cnt, AVG(response_time_ms) avg_time " +
-      "FROM api_endpoint_call_log WHERE call_date >= :start AND call_date <= :end " +
+      "FROM ai_api_endpoint_call_log WHERE call_date >= :start AND call_date <= :end " +
       "GROUP BY endpoint_id ORDER BY cnt DESC LIMIT :limit", nativeQuery = true)
   List<Object[]> getTopEndpointsByCallCount(@Param("start") LocalDateTime start,
       @Param("end") LocalDateTime end, @Param("limit") Integer limit);
@@ -46,7 +46,7 @@ public interface ApiEndpointCallLogRepo extends BaseRepository<ApiEndpointCallLo
    */
   @Query(value = "SELECT DATE(call_date) d, COUNT(1) cnt, AVG(response_time_ms) avg_time, " +
       "SUM(CASE WHEN status='FAILED' THEN 1 ELSE 0 END) error_cnt " +
-      "FROM api_endpoint_call_log WHERE call_date >= :start AND call_date <= :end " +
+      "FROM ai_api_endpoint_call_log WHERE call_date >= :start AND call_date <= :end " +
       "GROUP BY DATE(call_date) ORDER BY d ASC", nativeQuery = true)
   List<Object[]> getPerformanceTrendByDay(@Param("start") LocalDateTime start,
       @Param("end") LocalDateTime end);

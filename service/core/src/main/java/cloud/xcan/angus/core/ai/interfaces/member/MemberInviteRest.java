@@ -1,4 +1,4 @@
-package cloud.xcan.angus.core.git.interfaces.member;
+package cloud.xcan.angus.core.ai.interfaces.member;
 
 import cloud.xcan.angus.api.gm.user.UserInviteRemote;
 import cloud.xcan.angus.api.gm.user.dto.UserInviteDto;
@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 接口、参数与 AngusGM 邀请接口保持一致
  * </p>
  */
-@Tag(name = "UserInvite", description = "用户邀请管理 - 委托 GM 实现")
+@Tag(name = "UserInvite", description = "用户邀请管理 - 委托 AngusGM 实现")
 @Validated
 @RestController
 @RequestMapping("/api/v1/member/invites")
