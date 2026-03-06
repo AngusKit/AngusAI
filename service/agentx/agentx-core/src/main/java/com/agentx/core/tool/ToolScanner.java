@@ -1,14 +1,21 @@
 package com.agentx.core.tool;
 
+import dev.langchain4j.agent.tool.Tool;
 import jakarta.annotation.PostConstruct;
 import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 
 /**
- * 工具自动扫描器 — 扫描 @AgentTool 注解自动注册
+ * 工具自动扫描器 — 扫描 LangChain4j {@link Tool} 注解的 Bean 并注册到 ToolRegistry。
+ * <p>
+ * 使用 Spring Bean 名称作为工具 ID，Agent 的 toolIds 配置需与 Bean 名称对应（如 webSearchTool、httpRequestTool）。
+ * 一个 Bean 可包含多个 @Tool 方法，LangChain4j 会自动提取。
+ * </p>
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -20,35 +27,38 @@ public class ToolScanner {
   @PostConstruct
   public void scan() {
     Map<String, Object> beans = applicationContext.getBeansOfType(Object.class);
+    Set<Object> registered = new HashSet<>();
+
     for (Map.Entry<String, Object> entry : beans.entrySet()) {
+      String beanName = entry.getKey();
       Object bean = entry.getValue();
-      for (Method method : bean.getClass().getMethods()) {
-        AgentTool annotation = method.getAnnotation(AgentTool.class);
-        if (annotation != null) {
-          String toolId = annotation.id();
-          String toolName = annotation.name().isEmpty() ? method.getName() : annotation.name();
 
-          ToolDescriptor descriptor = ToolDescriptor.builder()
-              .id(toolId)
-              .name(toolName)
-              .description(annotation.description())
-              .category(annotation.category())
-              .source(ToolDescriptor.ToolSource.BUILTIN)
-              .instance(bean)
-              .executor(params -> {
-                try {
-                  Object result = method.invoke(bean, params);
-                  return result != null ? result.toString() : "";
-                } catch (Exception e) {
-                  throw new RuntimeException("Tool execution failed: " + toolId, e);
-                }
-              })
-              .build();
+      if (registered.contains(bean)) {
+        continue;
+      }
 
-          toolRegistry.register(descriptor);
-          log.debug("Auto-registered tool from @AgentTool: {}", toolId);
-        }
+      if (hasToolMethods(bean.getClass())) {
+        ToolDescriptor descriptor = ToolDescriptor.builder()
+            .id(beanName)
+            .name(beanName)
+            .description("LangChain4j @Tool bean: " + bean.getClass().getSimpleName())
+            .source(ToolDescriptor.ToolSource.BUILTIN)
+            .instance(bean)
+            .build();
+
+        toolRegistry.register(descriptor);
+        registered.add(bean);
+        log.debug("Auto-registered @Tool bean: {} ({})", beanName, bean.getClass().getSimpleName());
       }
     }
+  }
+
+  private static boolean hasToolMethods(Class<?> clazz) {
+    for (Method method : clazz.getDeclaredMethods()) {
+      if (method.isAnnotationPresent(Tool.class)) {
+        return true;
+      }
+    }
+    return false;
   }
 }

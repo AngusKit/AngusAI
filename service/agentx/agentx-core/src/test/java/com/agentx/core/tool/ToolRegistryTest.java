@@ -227,6 +227,85 @@ class ToolRegistryTest {
     }
   }
 
+  // ==================== LangChain4j 绑定 ====================
+
+  @Nested
+  @DisplayName("LangChain4j Tool Binding")
+  class LangChain4jBinding {
+
+    @Test
+    @DisplayName("getToolObjectsForIds 返回 @Tool Bean 实例")
+    void getToolObjectsForIds() {
+      Object webSearch = new Object();
+      Object httpTool = new Object();
+      registry.register(ToolDescriptor.builder()
+          .id("webSearchTool").name("Web Search").instance(webSearch).build());
+      registry.register(ToolDescriptor.builder()
+          .id("httpRequestTool").name("HTTP").instance(httpTool).build());
+
+      List<Object> result = registry.getToolObjectsForIds(List.of("webSearchTool", "httpRequestTool"));
+      assertEquals(2, result.size());
+      assertSame(webSearch, result.get(0));
+      assertSame(httpTool, result.get(1));
+    }
+
+    @Test
+    @DisplayName("getToolObjectsForIds 忽略 executor-only 工具")
+    void getToolObjectsForIdsSkipsExecutorOnly() {
+      registry.register(ToolDescriptor.builder()
+          .id("plugin-tool").name("Plugin").executor(m -> "ok").build());
+
+      List<Object> result = registry.getToolObjectsForIds(List.of("plugin-tool"));
+      assertTrue(result.isEmpty());
+    }
+
+    @Test
+    @DisplayName("getToolMapForIds 返回 executor-only 工具的 LangChain4j 绑定")
+    void getToolMapForIds() {
+      registry.register(ToolDescriptor.builder()
+          .id("create-ticket")
+          .name("创建工单")
+          .description("创建客服工单")
+          .executor(params -> "ticket-" + params.get("title"))
+          .build());
+
+      var map = registry.getToolMapForIds(List.of("create-ticket"));
+      assertEquals(1, map.size());
+      var spec = map.keySet().iterator().next();
+      assertEquals("create-ticket", spec.name());
+      assertEquals("创建客服工单", spec.description());
+
+      var exec = map.get(spec);
+      String result = exec.execute(
+          dev.langchain4j.agent.tool.ToolExecutionRequest.builder()
+              .name("create-ticket")
+              .arguments("{\"title\":\"test\"}")
+              .build(),
+          null);
+      assertEquals("ticket-test", result);
+    }
+
+    @Test
+    @DisplayName("getToolMapForIds 忽略有 instance 的工具")
+    void getToolMapForIdsSkipsInstanceTools() {
+      Object bean = new Object();
+      registry.register(ToolDescriptor.builder()
+          .id("beanTool").name("Bean").instance(bean).build());
+
+      var map = registry.getToolMapForIds(List.of("beanTool"));
+      assertTrue(map.isEmpty());
+    }
+
+    @Test
+    @DisplayName("空 toolIds 返回空集合")
+    void emptyToolIds() {
+      assertTrue(registry.getToolObjectsForIds(List.of()).isEmpty());
+      assertTrue(registry.getToolMapForIds(List.of()).isEmpty());
+      assertTrue(registry.getToolObjectsForIds(null).isEmpty());
+      assertTrue(registry.getToolMapForIds(null).isEmpty());
+    }
+  }
+
   // ==================== ToolDescriptor ====================
 
   @Nested

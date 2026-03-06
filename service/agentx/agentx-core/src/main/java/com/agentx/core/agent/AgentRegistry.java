@@ -10,7 +10,9 @@ import com.agentx.core.tool.ToolRegistry;
 import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.StreamingChatModel;
+import dev.langchain4j.agent.tool.ToolSpecification;
 import dev.langchain4j.service.AiServices;
+import dev.langchain4j.service.tool.ToolExecutor;
 import dev.langchain4j.service.tool.ToolProvider;
 import java.util.ArrayList;
 import java.util.List;
@@ -82,12 +84,18 @@ public class AgentRegistry {
     var syncBuilder = AiServices.builder(AgentChatService.class)
         .chatModel(chatModel);
 
-    // Bind direct tools (skillIds 仅用于 LangChain4j Skills，不再关联额外 toolIds)
+    // Bind tools: @Tool beans -> tools(objects), executor-only plugins -> tools(Map)
     List<String> allToolIds = definition.getToolIds() != null
         ? new ArrayList<>(definition.getToolIds()) : new ArrayList<>();
 
-    for (String toolId : allToolIds) {
-      toolRegistry.getTool(toolId).ifPresent(syncBuilder::tools);
+    List<Object> toolObjects = toolRegistry.getToolObjectsForIds(allToolIds);
+    Map<ToolSpecification, ToolExecutor> toolMap = toolRegistry.getToolMapForIds(allToolIds);
+
+    if (!toolObjects.isEmpty()) {
+      syncBuilder.tools(toolObjects);
+    }
+    if (!toolMap.isEmpty()) {
+      syncBuilder.tools(toolMap);
     }
 
     // Bind LangChain4j Skills (activate_skill, read_skill_resource)
