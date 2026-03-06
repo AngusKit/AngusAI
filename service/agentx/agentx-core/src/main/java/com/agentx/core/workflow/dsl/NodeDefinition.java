@@ -2,14 +2,18 @@ package com.agentx.core.workflow.dsl;
 
 import java.util.List;
 import java.util.Map;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 工作流节点定义
  */
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class NodeDefinition {
 
   private String id;
@@ -57,6 +61,8 @@ public class NodeDefinition {
 
   @Data
   @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
   public static class RetryConfig {
 
     @Builder.Default
@@ -68,6 +74,8 @@ public class NodeDefinition {
 
   @Data
   @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
   public static class FailureHandler {
 
     /**

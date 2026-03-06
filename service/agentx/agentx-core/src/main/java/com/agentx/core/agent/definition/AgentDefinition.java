@@ -14,9 +14,9 @@ import lombok.NoArgsConstructor;
  * Agent 声明式定义 — 对应 YAML/JSON 配置文件
  */
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class AgentDefinition {
 
   /**
