@@ -4,7 +4,7 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.agentx</groupId>
+  <groupId>cloud.xcan.agentx</groupId>
   <artifactId>agentx-parent</artifactId>
   <version>1.0.0</version>
   <packaging>pom</packaging>
@@ -87,7 +87,7 @@
 
       <!-- AgentX BOM -->
       <dependency>
-        <groupId>com.agentx</groupId>
+        <groupId>cloud.xcan.agentx</groupId>
         <artifactId>agentx-bom</artifactId>
         <version>${project.version}</version>
         <type>pom</type>

@@ -4,7 +4,7 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.agentx</groupId>
+  <groupId>cloud.xcan.agentx</groupId>
   <artifactId>agentx-bom</artifactId>
   <version>1.0.0</version>
   <packaging>pom</packaging>
@@ -16,153 +16,153 @@
     <dependencies>
       <!-- ===== AgentX Core Modules ===== -->
       <dependency>
-        <groupId>com.agentx</groupId>
+        <groupId>cloud.xcan.agentx</groupId>
         <artifactId>agentx-core</artifactId>
         <version>${project.version}</version>
       </dependency>
 
       <!-- ===== Model Providers ===== -->
       <dependency>
-        <groupId>com.agentx</groupId>
+        <groupId>cloud.xcan.agentx</groupId>
         <artifactId>agentx-model-openai</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.agentx</groupId>
+        <groupId>cloud.xcan.agentx</groupId>
         <artifactId>agentx-model-anthropic</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.agentx</groupId>
+        <groupId>cloud.xcan.agentx</groupId>
         <artifactId>agentx-model-ollama</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.agentx</groupId>
+        <groupId>cloud.xcan.agentx</groupId>
         <artifactId>agentx-model-gemini</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.agentx</groupId>
+        <groupId>cloud.xcan.agentx</groupId>
         <artifactId>agentx-model-qwen</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.agentx</groupId>
+        <groupId>cloud.xcan.agentx</groupId>
         <artifactId>agentx-model-zhipu</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.agentx</groupId>
+        <groupId>cloud.xcan.agentx</groupId>
         <artifactId>agentx-model-deepseek</artifactId>
         <version>${project.version}</version>
       </dependency>
 
       <!-- ===== Built-in Tools ===== -->
       <dependency>
-        <groupId>com.agentx</groupId>
+        <groupId>cloud.xcan.agentx</groupId>
         <artifactId>agentx-tool-search</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.agentx</groupId>
+        <groupId>cloud.xcan.agentx</groupId>
         <artifactId>agentx-tool-http</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.agentx</groupId>
+        <groupId>cloud.xcan.agentx</groupId>
         <artifactId>agentx-tool-code</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.agentx</groupId>
+        <groupId>cloud.xcan.agentx</groupId>
         <artifactId>agentx-tool-database</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.agentx</groupId>
+        <groupId>cloud.xcan.agentx</groupId>
         <artifactId>agentx-tool-file</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.agentx</groupId>
+        <groupId>cloud.xcan.agentx</groupId>
         <artifactId>agentx-tool-notify</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.agentx</groupId>
+        <groupId>cloud.xcan.agentx</groupId>
         <artifactId>agentx-tool-ai</artifactId>
         <version>${project.version}</version>
       </dependency>
 
       <!-- ===== Vector Stores ===== -->
       <dependency>
-        <groupId>com.agentx</groupId>
+        <groupId>cloud.xcan.agentx</groupId>
         <artifactId>agentx-vectorstore-pgvector</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.agentx</groupId>
+        <groupId>cloud.xcan.agentx</groupId>
         <artifactId>agentx-vectorstore-milvus</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.agentx</groupId>
+        <groupId>cloud.xcan.agentx</groupId>
         <artifactId>agentx-vectorstore-qdrant</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.agentx</groupId>
+        <groupId>cloud.xcan.agentx</groupId>
         <artifactId>agentx-vectorstore-chroma</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.agentx</groupId>
+        <groupId>cloud.xcan.agentx</groupId>
         <artifactId>agentx-vectorstore-elasticsearch</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.agentx</groupId>
+        <groupId>cloud.xcan.agentx</groupId>
         <artifactId>agentx-vectorstore-weaviate</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.agentx</groupId>
+        <groupId>cloud.xcan.agentx</groupId>
         <artifactId>agentx-vectorstore-mariadb</artifactId>
         <version>${project.version}</version>
       </dependency>
 
       <!-- ===== Infrastructure ===== -->
       <dependency>
-        <groupId>com.agentx</groupId>
+        <groupId>cloud.xcan.agentx</groupId>
         <artifactId>agentx-infrastructure</artifactId>
         <version>${project.version}</version>
       </dependency>
 
       <!-- ===== Observability ===== -->
       <dependency>
-        <groupId>com.agentx</groupId>
+        <groupId>cloud.xcan.agentx</groupId>
         <artifactId>agentx-observability</artifactId>
         <version>${project.version}</version>
       </dependency>
 
       <!-- ===== Starter ===== -->
       <dependency>
-        <groupId>com.agentx</groupId>
+        <groupId>cloud.xcan.agentx</groupId>
         <artifactId>agentx-spring-boot-starter</artifactId>
         <version>${project.version}</version>
       </dependency>
 
       <!-- ===== API ===== -->
       <dependency>
-        <groupId>com.agentx</groupId>
+        <groupId>cloud.xcan.agentx</groupId>
         <artifactId>agentx-api</artifactId>
         <version>${project.version}</version>
       </dependency>
 
       <!-- ===== Eval ===== -->
       <dependency>
-        <groupId>com.agentx</groupId>
+        <groupId>cloud.xcan.agentx</groupId>
         <artifactId>agentx-eval</artifactId>
         <version>${project.version}</version>
       </dependency>

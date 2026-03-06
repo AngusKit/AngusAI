@@ -81,10 +81,10 @@ AgentX 插件系统允许开发者以**插拔式**方式扩展框架能力，无
 ```java
 package com.example.plugins;
 
-import com.agentx.core.plugin.AgentXPlugin;
-import com.agentx.core.plugin.PluginContext;
-import com.agentx.core.plugin.PluginDescriptor;
-import com.agentx.core.tool.ToolDescriptor;
+import cloud.xcan.agentx.core.plugin.AgentXPlugin;
+import cloud.xcan.agentx.core.plugin.PluginContext;
+import cloud.xcan.agentx.core.plugin.PluginDescriptor;
+import cloud.xcan.agentx.core.tool.ToolDescriptor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;

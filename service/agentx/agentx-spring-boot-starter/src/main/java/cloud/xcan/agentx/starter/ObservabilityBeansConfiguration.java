@@ -1,0 +1,19 @@
+package cloud.xcan.agentx.starter;
+
+import cloud.xcan.agentx.observability.metrics.AgentMetrics;
+import io.micrometer.core.instrument.MeterRegistry;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+/**
+ * AgentX Observability 模块 Bean 集中注册
+ */
+@Configuration
+public class ObservabilityBeansConfiguration {
+
+  @Bean
+  public AgentMetrics agentMetrics(MeterRegistry meterRegistry) {
+    return new AgentMetrics(meterRegistry);
+  }
+
+}
