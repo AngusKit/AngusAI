@@ -6,11 +6,11 @@
 
   <parent>
     <groupId>cloud.xcan.agentx</groupId>
-    <artifactId>agentx-parent</artifactId>
+    <artifactId>xcan-angusai.agentx-parent</artifactId>
     <version>1.0.0</version>
   </parent>
 
-  <artifactId>agentx-vectorstore</artifactId>
+  <artifactId>xcan-angusai.agentx-vectorstore</artifactId>
   <packaging>pom</packaging>
   <name>AgentX :: Vector Store Adapters</name>
 

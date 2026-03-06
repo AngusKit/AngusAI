@@ -6,11 +6,11 @@
 
   <parent>
     <groupId>cloud.xcan.agentx</groupId>
-    <artifactId>agentx-parent</artifactId>
+    <artifactId>xcan-angusai.agentx-parent</artifactId>
     <version>1.0.0</version>
   </parent>
 
-  <artifactId>agentx-observability</artifactId>
+  <artifactId>xcan-angusai.agentx-observability</artifactId>
   <name>AgentX :: Observability</name>
   <description>可观测性 —— Micrometer Metrics + 结构化日志</description>
 

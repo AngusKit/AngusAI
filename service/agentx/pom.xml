@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>cloud.xcan.agentx</groupId>
-  <artifactId>agentx-parent</artifactId>
+  <artifactId>xcan-angusai.agentx-parent</artifactId>
   <version>1.0.0</version>
   <packaging>pom</packaging>
 
@@ -102,7 +102,7 @@
       <!-- AgentX BOM -->
       <dependency>
         <groupId>cloud.xcan.agentx</groupId>
-        <artifactId>agentx-bom</artifactId>
+        <artifactId>xcan-angusai.agentx-bom</artifactId>
         <version>${project.version}</version>
         <type>pom</type>
         <scope>import</scope>

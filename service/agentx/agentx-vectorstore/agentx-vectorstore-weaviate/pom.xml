@@ -6,17 +6,17 @@
 
   <parent>
     <groupId>cloud.xcan.agentx</groupId>
-    <artifactId>agentx-vectorstore</artifactId>
+    <artifactId>xcan-angusai.agentx-vectorstore</artifactId>
     <version>1.0.0</version>
   </parent>
 
-  <artifactId>agentx-vectorstore-weaviate</artifactId>
+  <artifactId>xcan-angusai.agentx-vectorstore-weaviate</artifactId>
   <name>AgentX :: Vector Store :: Weaviate</name>
 
   <dependencies>
     <dependency>
       <groupId>cloud.xcan.agentx</groupId>
-      <artifactId>agentx-core</artifactId>
+      <artifactId>xcan-angusai.agentx-core</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

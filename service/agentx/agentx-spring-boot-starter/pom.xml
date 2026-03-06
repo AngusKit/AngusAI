@@ -6,11 +6,11 @@
 
   <parent>
     <groupId>cloud.xcan.agentx</groupId>
-    <artifactId>agentx-parent</artifactId>
+    <artifactId>xcan-angusai.agentx-parent</artifactId>
     <version>1.0.0</version>
   </parent>
 
-  <artifactId>agentx-spring-boot-starter</artifactId>
+  <artifactId>xcan-angusai.agentx-spring-boot-starter</artifactId>
   <name>AgentX :: Spring Boot Starter</name>
   <description>AgentX 自动装配 Starter，聚合所有核心模块并提供默认配置</description>
 
@@ -18,21 +18,21 @@
     <!-- Core -->
     <dependency>
       <groupId>cloud.xcan.agentx</groupId>
-      <artifactId>agentx-core</artifactId>
+      <artifactId>xcan-angusai.agentx-core</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <!-- Infrastructure -->
     <dependency>
       <groupId>cloud.xcan.agentx</groupId>
-      <artifactId>agentx-infrastructure</artifactId>
+      <artifactId>xcan-angusai.agentx-infrastructure</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <!-- Observability -->
     <dependency>
       <groupId>cloud.xcan.agentx</groupId>
-      <artifactId>agentx-observability</artifactId>
+      <artifactId>xcan-angusai.agentx-observability</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -72,91 +72,91 @@
     <!-- Models -->
     <dependency>
       <groupId>cloud.xcan.agentx</groupId>
-      <artifactId>agentx-model-openai</artifactId>
+      <artifactId>xcan-angusai.agentx-model-openai</artifactId>
     </dependency>
     <dependency>
       <groupId>cloud.xcan.agentx</groupId>
-      <artifactId>agentx-model-anthropic</artifactId>
+      <artifactId>xcan-angusai.agentx-model-anthropic</artifactId>
     </dependency>
     <dependency>
       <groupId>cloud.xcan.agentx</groupId>
-      <artifactId>agentx-model-ollama</artifactId>
+      <artifactId>xcan-angusai.agentx-model-ollama</artifactId>
     </dependency>
     <dependency>
       <groupId>cloud.xcan.agentx</groupId>
-      <artifactId>agentx-model-gemini</artifactId>
+      <artifactId>xcan-angusai.agentx-model-gemini</artifactId>
     </dependency>
     <dependency>
       <groupId>cloud.xcan.agentx</groupId>
-      <artifactId>agentx-model-qwen</artifactId>
+      <artifactId>xcan-angusai.agentx-model-qwen</artifactId>
     </dependency>
     <dependency>
       <groupId>cloud.xcan.agentx</groupId>
-      <artifactId>agentx-model-zhipu</artifactId>
+      <artifactId>xcan-angusai.agentx-model-zhipu</artifactId>
     </dependency>
     <dependency>
       <groupId>cloud.xcan.agentx</groupId>
-      <artifactId>agentx-model-deepseek</artifactId>
+      <artifactId>xcan-angusai.agentx-model-deepseek</artifactId>
     </dependency>
 
     <!-- Tools -->
     <dependency>
       <groupId>cloud.xcan.agentx</groupId>
-      <artifactId>agentx-tool-http</artifactId>
+      <artifactId>xcan-angusai.agentx-tool-http</artifactId>
     </dependency>
     <dependency>
       <groupId>cloud.xcan.agentx</groupId>
-      <artifactId>agentx-tool-code</artifactId>
+      <artifactId>xcan-angusai.agentx-tool-code</artifactId>
     </dependency>
     <dependency>
       <groupId>cloud.xcan.agentx</groupId>
-      <artifactId>agentx-tool-database</artifactId>
+      <artifactId>xcan-angusai.agentx-tool-database</artifactId>
     </dependency>
     <dependency>
       <groupId>cloud.xcan.agentx</groupId>
-      <artifactId>agentx-tool-search</artifactId>
+      <artifactId>xcan-angusai.agentx-tool-search</artifactId>
     </dependency>
     <dependency>
       <groupId>cloud.xcan.agentx</groupId>
-      <artifactId>agentx-tool-file</artifactId>
+      <artifactId>xcan-angusai.agentx-tool-file</artifactId>
     </dependency>
     <dependency>
       <groupId>cloud.xcan.agentx</groupId>
-      <artifactId>agentx-tool-notify</artifactId>
+      <artifactId>xcan-angusai.agentx-tool-notify</artifactId>
     </dependency>
     <dependency>
       <groupId>cloud.xcan.agentx</groupId>
-      <artifactId>agentx-tool-ai</artifactId>
+      <artifactId>xcan-angusai.agentx-tool-ai</artifactId>
     </dependency>
 
     <!-- Vector Storage -->
     <dependency>
       <groupId>cloud.xcan.agentx</groupId>
-      <artifactId>agentx-vectorstore-pgvector</artifactId>
+      <artifactId>xcan-angusai.agentx-vectorstore-pgvector</artifactId>
     </dependency>
     <dependency>
       <groupId>cloud.xcan.agentx</groupId>
-      <artifactId>agentx-vectorstore-milvus</artifactId>
+      <artifactId>xcan-angusai.agentx-vectorstore-milvus</artifactId>
     </dependency>
     <dependency>
       <groupId>cloud.xcan.agentx</groupId>
-      <artifactId>agentx-vectorstore-qdrant</artifactId>
+      <artifactId>xcan-angusai.agentx-vectorstore-qdrant</artifactId>
     </dependency>
     <dependency>
       <groupId>cloud.xcan.agentx</groupId>
-      <artifactId>agentx-vectorstore-chroma</artifactId>
+      <artifactId>xcan-angusai.agentx-vectorstore-chroma</artifactId>
     </dependency>
     <dependency>
       <groupId>cloud.xcan.agentx</groupId>
-      <artifactId>agentx-vectorstore-elasticsearch</artifactId>
+      <artifactId>xcan-angusai.agentx-vectorstore-elasticsearch</artifactId>
     </dependency>
     <dependency>
       <groupId>cloud.xcan.agentx</groupId>
-      <artifactId>agentx-vectorstore-weaviate</artifactId>
+      <artifactId>xcan-angusai.agentx-vectorstore-weaviate</artifactId>
     </dependency>
     <dependency>
       <groupId>cloud.xcan.agentx</groupId>
-      <artifactId>agentx-vectorstore-mariadb</artifactId>
+      <artifactId>xcan-angusai.agentx-vectorstore-mariadb</artifactId>
     </dependency>
   </dependencies>
 </project>

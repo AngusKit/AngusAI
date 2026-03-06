@@ -6,17 +6,17 @@
 
   <parent>
     <groupId>cloud.xcan.agentx</groupId>
-    <artifactId>agentx-model-providers</artifactId>
+    <artifactId>xcan-angusai.agentx-model-providers</artifactId>
     <version>1.0.0</version>
   </parent>
 
-  <artifactId>agentx-model-qwen</artifactId>
+  <artifactId>xcan-angusai.agentx-model-qwen</artifactId>
   <name>AgentX :: Model Provider :: Qwen (通义千问)</name>
 
   <dependencies>
     <dependency>
       <groupId>cloud.xcan.agentx</groupId>
-      <artifactId>agentx-core</artifactId>
+      <artifactId>xcan-angusai.agentx-core</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

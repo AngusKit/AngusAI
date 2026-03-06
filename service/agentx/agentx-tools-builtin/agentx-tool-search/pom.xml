@@ -6,17 +6,17 @@
 
   <parent>
     <groupId>cloud.xcan.agentx</groupId>
-    <artifactId>agentx-tools-builtin</artifactId>
+    <artifactId>xcan-angusai.agentx-tools-builtin</artifactId>
     <version>1.0.0</version>
   </parent>
 
-  <artifactId>agentx-tool-search</artifactId>
+  <artifactId>xcan-angusai.agentx-tool-search</artifactId>
   <name>AgentX :: Tool :: Web Search</name>
 
   <dependencies>
     <dependency>
       <groupId>cloud.xcan.agentx</groupId>
-      <artifactId>agentx-core</artifactId>
+      <artifactId>xcan-angusai.agentx-core</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

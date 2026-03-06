@@ -6,11 +6,11 @@
 
   <parent>
     <groupId>cloud.xcan.agentx</groupId>
-    <artifactId>agentx-parent</artifactId>
+    <artifactId>xcan-angusai.agentx-parent</artifactId>
     <version>1.0.0</version>
   </parent>
 
-  <artifactId>agentx-api</artifactId>
+  <artifactId>xcan-angusai.agentx-api</artifactId>
   <name>AgentX :: REST API</name>
   <description>RESTful API 层 —— 对外暴露 Agent / Workflow / Knowledge 管理和执行接口</description>
 
@@ -18,7 +18,7 @@
     <!-- AgentX Starter -->
     <dependency>
       <groupId>cloud.xcan.agentx</groupId>
-      <artifactId>agentx-spring-boot-starter</artifactId>
+      <artifactId>xcan-angusai.agentx-spring-boot-starter</artifactId>
       <version>${project.version}</version>
     </dependency>
 

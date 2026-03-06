@@ -6,11 +6,11 @@
 
   <parent>
     <groupId>cloud.xcan.agentx</groupId>
-    <artifactId>agentx-parent</artifactId>
+    <artifactId>xcan-angusai.agentx-parent</artifactId>
     <version>1.0.0</version>
   </parent>
 
-  <artifactId>agentx-core</artifactId>
+  <artifactId>xcan-angusai.agentx-core</artifactId>
   <name>AgentX :: Core</name>
   <description>AgentX 核心模块 —
     Agent定义、工作流引擎、知识库RAG、工具插件、记忆、护栏、多Agent协作、提示词管理

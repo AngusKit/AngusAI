@@ -6,18 +6,18 @@
 
   <parent>
     <groupId>cloud.xcan.agentx</groupId>
-    <artifactId>agentx-parent</artifactId>
+    <artifactId>xcan-angusai.agentx-parent</artifactId>
     <version>1.0.0</version>
   </parent>
 
-  <artifactId>agentx-eval</artifactId>
+  <artifactId>xcan-angusai.agentx-eval</artifactId>
   <name>AgentX :: Eval</name>
   <description>Agent 评估框架 —— 支持回归测试、质量评估和基准测试</description>
 
   <dependencies>
     <dependency>
       <groupId>cloud.xcan.agentx</groupId>
-      <artifactId>agentx-core</artifactId>
+      <artifactId>xcan-angusai.agentx-core</artifactId>
       <version>${project.version}</version>
     </dependency>
 
