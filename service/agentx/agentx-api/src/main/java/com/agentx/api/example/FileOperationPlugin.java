@@ -3,7 +3,7 @@ package com.agentx.api.example;
 import com.agentx.core.plugin.AgentXPlugin;
 import com.agentx.core.plugin.PluginContext;
 import com.agentx.core.plugin.PluginDescriptor;
-import com.agentx.core.skill.SkillDefinition;
+import dev.langchain4j.skills.DefaultSkill;
 import com.agentx.core.tool.ToolDescriptor;
 import java.util.List;
 import java.util.Map;
@@ -88,14 +88,11 @@ public class FileOperationPlugin implements AgentXPlugin {
         })
         .build());
 
-    // 注册文件操作技能
-    context.registerSkill(SkillDefinition.builder()
-        .id("file-operation-skill")
-        .name("文件操作技能")
+    // 注册文件操作技能（LangChain4j Skill）
+    context.registerSkill(DefaultSkill.builder()
+        .name("file-operation-skill")
         .description("读取和分析文件内容")
-        .category("tool_use")
-        .toolIds(List.of("file-read-tool", "file-list-tool"))
-        .promptFragment("你具备文件读取和分析能力。可以列出文件目录和读取文件内容。\n" +
+        .content("你具备文件读取和分析能力。使用 file-read-tool、file-list-tool 可列出目录和读取文件。\n" +
             "注意：仅支持只读操作，文件路径不允许包含 '..'。")
         .build());
 

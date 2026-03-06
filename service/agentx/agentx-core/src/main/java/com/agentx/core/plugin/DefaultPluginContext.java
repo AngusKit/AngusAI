@@ -3,11 +3,12 @@ package com.agentx.core.plugin;
 import com.agentx.core.guardrail.InputGuardrail;
 import com.agentx.core.guardrail.OutputGuardrail;
 import com.agentx.core.model.ModelFactory;
-import com.agentx.core.skill.SkillDefinition;
+import com.agentx.core.skill.SkillRegistry;
 import com.agentx.core.tool.ToolDescriptor;
 import com.agentx.core.tool.ToolRegistry;
 import com.agentx.core.vectorstore.VectorStoreFactory;
 import com.agentx.core.workflow.engine.NodeExecutor;
+import dev.langchain4j.skills.Skill;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 public class DefaultPluginContext implements PluginContext {
 
   private final ToolRegistry toolRegistry;
+  private final SkillRegistry skillRegistry;
   private final Map<String, Object> pluginConfig;
 
   private final List<InputGuardrail> inputGuardrails = new ArrayList<>();
@@ -27,10 +29,11 @@ public class DefaultPluginContext implements PluginContext {
   private final List<NodeExecutor> nodeExecutors = new ArrayList<>();
   private final List<ModelFactory> modelFactories = new ArrayList<>();
   private final List<VectorStoreFactory> vectorStoreFactories = new ArrayList<>();
-  private final List<SkillDefinition> skillDefinitions = new ArrayList<>();
 
-  public DefaultPluginContext(ToolRegistry toolRegistry, Map<String, Object> pluginConfig) {
+  public DefaultPluginContext(ToolRegistry toolRegistry, SkillRegistry skillRegistry,
+      Map<String, Object> pluginConfig) {
     this.toolRegistry = toolRegistry;
+    this.skillRegistry = skillRegistry;
     this.pluginConfig = pluginConfig != null ? pluginConfig : Map.of();
   }
 
@@ -71,9 +74,9 @@ public class DefaultPluginContext implements PluginContext {
   }
 
   @Override
-  public void registerSkill(SkillDefinition skill) {
-    skillDefinitions.add(skill);
-    log.info("Plugin registered skill: {}", skill.getId());
+  public void registerSkill(Skill skill) {
+    skillRegistry.register(skill);
+    log.info("Plugin registered skill: {}", skill.name());
   }
 
   @Override
@@ -106,9 +109,5 @@ public class DefaultPluginContext implements PluginContext {
 
   public List<VectorStoreFactory> getVectorStoreFactories() {
     return vectorStoreFactories;
-  }
-
-  public List<SkillDefinition> getSkillDefinitions() {
-    return skillDefinitions;
   }
 }

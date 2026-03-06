@@ -83,7 +83,7 @@ public class AgentDefinition {
   private List<String> toolIds;
 
   /**
-   * 绑定的技能 ID 列表
+   * 绑定的技能名称列表（对应 LangChain4j Skill.name()）
    */
   private List<String> skillIds;
 

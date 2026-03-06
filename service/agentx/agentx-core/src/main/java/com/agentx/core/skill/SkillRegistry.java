@@ -1,160 +1,102 @@
 package com.agentx.core.skill;
 
-import java.util.Collection;
+import dev.langchain4j.service.tool.ToolProvider;
+import dev.langchain4j.skills.Skill;
+import dev.langchain4j.skills.Skills;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 技能注册中心 — 统一管理所有技能定义与编程式技能实例。
+ * 技能注册中心 — 基于 LangChain4j {@link Skill} 管理技能。
  * <p>
- * 技能可通过以下方式注册：
- * <ul>
- *   <li>声明式：通过 {@link #register(SkillDefinition)} 注册 JSON/YAML 定义</li>
- *   <li>编程式：通过 {@link #registerSkill(Skill)} 注册实现了 {@link Skill} 接口的 Bean</li>
- *   <li>自动发现：Spring Bean 自动注入实现 {@link Skill} 接口的组件</li>
- * </ul>
+ * 技能通过 Spring Bean 自动注入或 {@link #register(Skill)} 注册。
+ * Agent 通过 skillIds（技能名称）绑定技能，LLM 通过 activate_skill 工具按需加载。
  * </p>
  */
 @Slf4j
 public class SkillRegistry {
 
-  private final Map<String, SkillDefinition> definitions = new ConcurrentHashMap<>();
-  private final Map<String, Skill> executableSkills = new ConcurrentHashMap<>();
+  private final java.util.Map<String, Skill> skillsByName = new ConcurrentHashMap<>();
 
   public SkillRegistry(List<Skill> autoDiscoveredSkills) {
     if (autoDiscoveredSkills != null) {
       for (Skill skill : autoDiscoveredSkills) {
-        registerSkill(skill);
+        register(skill);
       }
     }
-    log.info("SkillRegistry initialized with {} skills", definitions.size());
+    log.info("SkillRegistry initialized with {} skills", skillsByName.size());
   }
 
   /**
-   * 注册声明式技能定义
+   * 注册技能
    */
-  public void register(SkillDefinition definition) {
-    definitions.put(definition.getId(), definition);
-    log.info("Skill registered: {} ({})", definition.getName(), definition.getId());
+  public void register(Skill skill) {
+    Objects.requireNonNull(skill, "skill");
+    String name = skill.name();
+    if (name == null || name.isBlank()) {
+      throw new IllegalArgumentException("Skill name must not be blank");
+    }
+    skillsByName.put(name, skill);
+    log.info("Skill registered: {} ({})", skill.description(), name);
   }
 
   /**
-   * 注册编程式技能
+   * 获取技能
    */
-  public void registerSkill(Skill skill) {
-    SkillDefinition def = skill.getDefinition();
-    definitions.put(def.getId(), def);
-    executableSkills.put(def.getId(), skill);
-    log.info("Executable skill registered: {} ({})", def.getName(), def.getId());
+  public Optional<Skill> get(String skillName) {
+    return Optional.ofNullable(skillsByName.get(skillName));
   }
 
   /**
-   * 获取技能定义
+   * 解析技能列表（按名称过滤已注册的技能）
    */
-  public Optional<SkillDefinition> get(String skillId) {
-    return Optional.ofNullable(definitions.get(skillId));
-  }
-
-  /**
-   * 获取编程式技能实例
-   */
-  public Optional<Skill> getExecutableSkill(String skillId) {
-    return Optional.ofNullable(executableSkills.get(skillId));
-  }
-
-  /**
-   * 获取多个技能的聚合工具 ID 列表
-   */
-  public List<String> resolveToolIds(List<String> skillIds) {
-    if (skillIds == null) {
+  public List<Skill> resolveSkills(List<String> skillNames) {
+    if (skillNames == null) {
       return List.of();
     }
-    return skillIds.stream()
-        .map(definitions::get)
+    return skillNames.stream()
+        .map(skillsByName::get)
         .filter(Objects::nonNull)
-        .filter(SkillDefinition::isEnabled)
-        .map(SkillDefinition::getToolIds)
-        .filter(Objects::nonNull)
-        .flatMap(Collection::stream)
-        .distinct()
         .toList();
   }
 
   /**
-   * 构建多个技能的聚合提示词片段
+   * 返回技能的 ToolProvider（activate_skill, read_skill_resource）
    */
-  public String resolvePromptFragments(List<String> skillIds) {
-    if (skillIds == null) {
+  public Optional<ToolProvider> resolveSkillsToolProvider(List<String> skillNames) {
+    List<Skill> skills = resolveSkills(skillNames);
+    if (skills.isEmpty()) {
+      return Optional.empty();
+    }
+    return Optional.of(Skills.from(skills).toolProvider());
+  }
+
+  /**
+   * 格式化为系统提示中可用的技能列表（XML）
+   */
+  public String formatAvailableSkills(List<String> skillNames) {
+    List<Skill> skills = resolveSkills(skillNames);
+    if (skills.isEmpty()) {
       return "";
     }
-    return skillIds.stream()
-        .map(definitions::get)
-        .filter(Objects::nonNull)
-        .filter(SkillDefinition::isEnabled)
-        .map(SkillDefinition::getPromptFragment)
-        .filter(Objects::nonNull)
-        .collect(Collectors.joining("\n\n"));
-  }
-
-  /**
-   * 获取多个技能的聚合知识库 ID 列表
-   */
-  public List<String> resolveKnowledgeBaseIds(List<String> skillIds) {
-    if (skillIds == null) {
-      return List.of();
-    }
-    return skillIds.stream()
-        .map(definitions::get)
-        .filter(Objects::nonNull)
-        .filter(SkillDefinition::isEnabled)
-        .map(SkillDefinition::getKnowledgeBaseIds)
-        .filter(Objects::nonNull)
-        .flatMap(Collection::stream)
-        .distinct()
-        .toList();
+    return Skills.from(skills).formatAvailableSkills();
   }
 
   /**
    * 注销技能
    */
-  public void unregister(String skillId) {
-    definitions.remove(skillId);
-    executableSkills.remove(skillId);
-    log.info("Skill unregistered: {}", skillId);
+  public void unregister(String skillName) {
+    skillsByName.remove(skillName);
+    log.info("Skill unregistered: {}", skillName);
   }
 
   /**
    * 列出所有技能
    */
-  public List<SkillDefinition> listAll() {
-    return List.copyOf(definitions.values());
-  }
-
-  /**
-   * 按分类列出技能
-   */
-  public List<SkillDefinition> listByCategory(String category) {
-    return definitions.values().stream()
-        .filter(d -> category.equals(d.getCategory()))
-        .toList();
-  }
-
-  /**
-   * 执行编程式技能
-   */
-  public String executeSkill(String skillId, Map<String, Object> input) {
-    Skill skill = executableSkills.get(skillId);
-    if (skill == null) {
-      throw new IllegalArgumentException("Executable skill not found: " + skillId);
-    }
-    if (!skill.isAvailable()) {
-      throw new IllegalStateException("Skill is not available: " + skillId);
-    }
-    return skill.execute(input);
+  public List<Skill> listAll() {
+    return List.copyOf(skillsByName.values());
   }
 }

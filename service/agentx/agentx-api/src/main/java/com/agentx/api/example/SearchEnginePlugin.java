@@ -3,7 +3,7 @@ package com.agentx.api.example;
 import com.agentx.core.plugin.AgentXPlugin;
 import com.agentx.core.plugin.PluginContext;
 import com.agentx.core.plugin.PluginDescriptor;
-import com.agentx.core.skill.SkillDefinition;
+import dev.langchain4j.skills.DefaultSkill;
 import com.agentx.core.tool.ToolDescriptor;
 import java.util.List;
 import java.util.Map;
@@ -75,14 +75,11 @@ public class SearchEnginePlugin implements AgentXPlugin {
         })
         .build());
 
-    // 搜索技能
-    context.registerSkill(SkillDefinition.builder()
-        .id("search-engine-skill")
-        .name("搜索引擎技能")
+    // 搜索技能（LangChain4j Skill）
+    context.registerSkill(DefaultSkill.builder()
+        .name("search-engine-skill")
         .description("多来源搜索：网页、新闻")
-        .category("tool_use")
-        .toolIds(List.of("web-search-tool", "news-search-tool"))
-        .promptFragment("你具备多来源搜索能力：\n" +
+        .content("你具备多来源搜索能力。使用 web-search-tool、news-search-tool：\n" +
             "1. 网页搜索 — 搜索互联网上的网页内容\n" +
             "2. 新闻搜索 — 搜索最近的新闻报道\n" +
             "根据用户问题选择合适的搜索来源。搜索后综合多个结果给出回答，并标注信息来源。")

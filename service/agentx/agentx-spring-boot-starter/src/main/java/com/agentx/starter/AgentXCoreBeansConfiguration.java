@@ -11,7 +11,6 @@ import com.agentx.core.multiagent.MultiAgentOrchestrator;
 import com.agentx.core.plugin.AgentXPlugin;
 import com.agentx.core.plugin.PluginManager;
 import com.agentx.core.prompt.PromptManager;
-import com.agentx.core.skill.Skill;
 import com.agentx.core.skill.SkillRegistry;
 import com.agentx.core.tool.ToolRegistry;
 import com.agentx.core.tool.ToolScanner;
@@ -41,6 +40,7 @@ import com.agentx.core.workflow.node.WhileNodeExecutor;
 import com.agentx.core.workflow.validation.WorkflowSpecRegistry;
 import com.agentx.core.workflow.validation.WorkflowValidator;
 import dev.langchain4j.model.chat.ChatModel;
+import dev.langchain4j.skills.Skill;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.ObjectProvider;
@@ -83,7 +83,7 @@ public class AgentXCoreBeansConfiguration {
   // ===== Skill =====
   @Bean
   public SkillRegistry skillRegistry(List<Skill> skills) {
-    return new SkillRegistry(skills);
+    return new SkillRegistry(skills != null ? skills : List.of());
   }
 
   // ===== Memory =====
@@ -125,8 +125,9 @@ public class AgentXCoreBeansConfiguration {
 
   // ===== Plugin =====
   @Bean
-  public PluginManager pluginManager(ToolRegistry toolRegistry, List<AgentXPlugin> plugins) {
-    return new PluginManager(toolRegistry, plugins);
+  public PluginManager pluginManager(ToolRegistry toolRegistry, SkillRegistry skillRegistry,
+      List<AgentXPlugin> plugins) {
+    return new PluginManager(toolRegistry, skillRegistry, plugins);
   }
 
   // ===== Workflow: Expression =====

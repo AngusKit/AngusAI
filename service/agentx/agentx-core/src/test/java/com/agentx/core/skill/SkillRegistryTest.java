@@ -3,12 +3,12 @@ package com.agentx.core.skill;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import dev.langchain4j.skills.DefaultSkill;
+import dev.langchain4j.skills.Skill;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 /**
- * SkillRegistry 单元测试 — 覆盖声明式/编程式注册、聚合解析、执行
+ * SkillRegistry 单元测试 — 基于 LangChain4j Skill
  */
 @DisplayName("SkillRegistry Tests")
 class SkillRegistryTest {
@@ -28,30 +28,25 @@ class SkillRegistryTest {
     registry = new SkillRegistry(Collections.emptyList());
   }
 
-  // ==================== 声明式注册 ====================
-
   @Nested
-  @DisplayName("Declarative Registration")
-  class DeclarativeRegistration {
+  @DisplayName("Registration")
+  class Registration {
 
     @Test
-    @DisplayName("注册并获取声明式技能定义")
+    @DisplayName("注册并获取技能")
     void registerAndGet() {
-      SkillDefinition def = SkillDefinition.builder()
-          .id("skill-1")
-          .name("Test Skill")
+      Skill skill = DefaultSkill.builder()
+          .name("test-skill")
           .description("A test skill")
-          .category("tool_use")
-          .toolIds(List.of("tool-a", "tool-b"))
-          .promptFragment("You have tool_use capability.")
+          .content("Test content")
           .build();
 
-      registry.register(def);
+      registry.register(skill);
 
-      Optional<SkillDefinition> result = registry.get("skill-1");
+      Optional<Skill> result = registry.get("test-skill");
       assertTrue(result.isPresent());
-      assertEquals("Test Skill", result.get().getName());
-      assertEquals("tool_use", result.get().getCategory());
+      assertEquals("A test skill", result.get().description());
+      assertEquals("Test content", result.get().content());
     }
 
     @Test
@@ -59,41 +54,7 @@ class SkillRegistryTest {
     void getNotExists() {
       assertTrue(registry.get("nonexistent").isEmpty());
     }
-
-    @Test
-    @DisplayName("声明式技能不可执行")
-    void declarativeNotExecutable() {
-      registry.register(SkillDefinition.builder()
-          .id("decl-1").name("Declarative").build());
-
-      assertTrue(registry.getExecutableSkill("decl-1").isEmpty());
-    }
   }
-
-  // ==================== 编程式注册 ====================
-
-  @Nested
-  @DisplayName("Programmatic Registration")
-  class ProgrammaticRegistration {
-
-    @Test
-    @DisplayName("注册编程式技能")
-    void registerExecutableSkill() {
-      Skill skill = new TestSkill("prog-1", "Programmatic Skill");
-      registry.registerSkill(skill);
-
-      assertTrue(registry.get("prog-1").isPresent());
-      assertTrue(registry.getExecutableSkill("prog-1").isPresent());
-    }
-
-    @Test
-    @DisplayName("获取不存在的编程式技能返回空")
-    void getNotExists() {
-      assertTrue(registry.getExecutableSkill("nope").isEmpty());
-    }
-  }
-
-  // ==================== 自动发现 ====================
 
   @Nested
   @DisplayName("Auto Discovery")
@@ -102,14 +63,14 @@ class SkillRegistryTest {
     @Test
     @DisplayName("构造函数自动发现技能")
     void autoDiscoversSkills() {
-      Skill s1 = new TestSkill("auto-1", "Auto 1");
-      Skill s2 = new TestSkill("auto-2", "Auto 2");
+      Skill s1 = DefaultSkill.builder().name("auto-1").description("Auto 1").content("C1").build();
+      Skill s2 = DefaultSkill.builder().name("auto-2").description("Auto 2").content("C2").build();
 
       SkillRegistry autoRegistry = new SkillRegistry(List.of(s1, s2));
 
       assertEquals(2, autoRegistry.listAll().size());
-      assertTrue(autoRegistry.getExecutableSkill("auto-1").isPresent());
-      assertTrue(autoRegistry.getExecutableSkill("auto-2").isPresent());
+      assertTrue(autoRegistry.get("auto-1").isPresent());
+      assertTrue(autoRegistry.get("auto-2").isPresent());
     }
 
     @Test
@@ -119,129 +80,73 @@ class SkillRegistryTest {
     }
   }
 
-  // ==================== 聚合解析 ====================
-
   @Nested
-  @DisplayName("Aggregate Resolution")
-  class AggregateResolution {
+  @DisplayName("Resolution")
+  class Resolution {
 
     @BeforeEach
     void setUpSkills() {
-      registry.register(SkillDefinition.builder()
-          .id("s1").name("S1")
-          .toolIds(List.of("tool-a", "tool-b"))
-          .promptFragment("Fragment 1")
-          .knowledgeBaseIds(List.of("kb-1"))
-          .enabled(true)
-          .build());
-      registry.register(SkillDefinition.builder()
-          .id("s2").name("S2")
-          .toolIds(List.of("tool-b", "tool-c"))
-          .promptFragment("Fragment 2")
-          .knowledgeBaseIds(List.of("kb-1", "kb-2"))
-          .enabled(true)
-          .build());
-      registry.register(SkillDefinition.builder()
-          .id("s3").name("S3 Disabled")
-          .toolIds(List.of("tool-d"))
-          .promptFragment("Disabled")
-          .enabled(false)
-          .build());
+      registry.register(DefaultSkill.builder()
+          .name("s1").description("S1").content("Content 1").build());
+      registry.register(DefaultSkill.builder()
+          .name("s2").description("S2").content("Content 2").build());
     }
 
     @Test
-    @DisplayName("resolveToolIds — 去重合并")
-    void resolveToolIds() {
-      List<String> toolIds = registry.resolveToolIds(List.of("s1", "s2"));
-      assertTrue(toolIds.contains("tool-a"));
-      assertTrue(toolIds.contains("tool-b"));
-      assertTrue(toolIds.contains("tool-c"));
-      // tool-b 不重复
-      assertEquals(3, toolIds.size());
+    @DisplayName("resolveSkills — 按名称解析")
+    void resolveSkills() {
+      List<Skill> skills = registry.resolveSkills(List.of("s1", "s2"));
+      assertEquals(2, skills.size());
     }
 
     @Test
-    @DisplayName("resolveToolIds — 排除禁用技能")
-    void resolveToolIdsExcludesDisabled() {
-      List<String> toolIds = registry.resolveToolIds(List.of("s1", "s3"));
-      assertFalse(toolIds.contains("tool-d"));
+    @DisplayName("resolveSkills — null 输入返回空列表")
+    void resolveSkillsNull() {
+      assertEquals(List.of(), registry.resolveSkills(null));
     }
 
     @Test
-    @DisplayName("resolveToolIds — null 输入返回空列表")
-    void resolveToolIdsNull() {
-      assertEquals(List.of(), registry.resolveToolIds(null));
+    @DisplayName("resolveSkills — 包含不存在的名称会过滤")
+    void resolveSkillsWithMissing() {
+      List<Skill> skills = registry.resolveSkills(List.of("s1", "nonexistent"));
+      assertEquals(1, skills.size());
     }
 
     @Test
-    @DisplayName("resolveToolIds — 包含不存在的技能 ID 不抛异常")
-    void resolveToolIdsWithMissing() {
-      List<String> toolIds = registry.resolveToolIds(List.of("s1", "nonexistent"));
-      assertEquals(2, toolIds.size());
+    @DisplayName("resolveSkillsToolProvider — 有技能时返回 provider")
+    void resolveSkillsToolProvider() {
+      assertTrue(registry.resolveSkillsToolProvider(List.of("s1")).isPresent());
     }
 
     @Test
-    @DisplayName("resolvePromptFragments — 合并提示词片段")
-    void resolvePromptFragments() {
-      String fragments = registry.resolvePromptFragments(List.of("s1", "s2"));
-      assertTrue(fragments.contains("Fragment 1"));
-      assertTrue(fragments.contains("Fragment 2"));
+    @DisplayName("resolveSkillsToolProvider — 无技能时返回空")
+    void resolveSkillsToolProviderEmpty() {
+      assertFalse(registry.resolveSkillsToolProvider(List.of()).isPresent());
+      assertFalse(registry.resolveSkillsToolProvider(List.of("nonexistent")).isPresent());
     }
 
     @Test
-    @DisplayName("resolvePromptFragments — 排除禁用技能")
-    void resolvePromptFragmentsExcludesDisabled() {
-      String fragments = registry.resolvePromptFragments(List.of("s1", "s3"));
-      assertFalse(fragments.contains("Disabled"));
-    }
-
-    @Test
-    @DisplayName("resolvePromptFragments — null 输入返回空字符串")
-    void resolvePromptFragmentsNull() {
-      assertEquals("", registry.resolvePromptFragments(null));
-    }
-
-    @Test
-    @DisplayName("resolveKnowledgeBaseIds — 去重合并")
-    void resolveKnowledgeBaseIds() {
-      List<String> kbIds = registry.resolveKnowledgeBaseIds(List.of("s1", "s2"));
-      assertTrue(kbIds.contains("kb-1"));
-      assertTrue(kbIds.contains("kb-2"));
-      assertEquals(2, kbIds.size());
-    }
-
-    @Test
-    @DisplayName("resolveKnowledgeBaseIds — null 输入返回空列表")
-    void resolveKnowledgeBaseIdsNull() {
-      assertEquals(List.of(), registry.resolveKnowledgeBaseIds(null));
+    @DisplayName("formatAvailableSkills — 返回非空 XML")
+    void formatAvailableSkills() {
+      String xml = registry.formatAvailableSkills(List.of("s1", "s2"));
+      assertTrue(xml.contains("<available_skills>"));
+      assertTrue(xml.contains("s1"));
+      assertTrue(xml.contains("s2"));
     }
   }
-
-  // ==================== 注销 ====================
 
   @Nested
   @DisplayName("Unregister")
   class Unregister {
 
     @Test
-    @DisplayName("注销声明式技能")
-    void unregisterDeclarative() {
-      registry.register(SkillDefinition.builder().id("del-1").name("Del").build());
+    @DisplayName("注销技能")
+    void unregister() {
+      registry.register(DefaultSkill.builder().name("del-1").description("Del").content("x").build());
       registry.unregister("del-1");
       assertTrue(registry.get("del-1").isEmpty());
     }
-
-    @Test
-    @DisplayName("注销编程式技能同时移除执行器")
-    void unregisterExecutable() {
-      registry.registerSkill(new TestSkill("del-2", "Del Exec"));
-      registry.unregister("del-2");
-      assertTrue(registry.get("del-2").isEmpty());
-      assertTrue(registry.getExecutableSkill("del-2").isEmpty());
-    }
   }
-
-  // ==================== 列表 ====================
 
   @Nested
   @DisplayName("List Skills")
@@ -250,110 +155,9 @@ class SkillRegistryTest {
     @Test
     @DisplayName("列出所有技能")
     void listAll() {
-      registry.register(SkillDefinition.builder().id("l1").name("L1").build());
-      registry.register(SkillDefinition.builder().id("l2").name("L2").build());
+      registry.register(DefaultSkill.builder().name("l1").description("L1").content("").build());
+      registry.register(DefaultSkill.builder().name("l2").description("L2").content("").build());
       assertEquals(2, registry.listAll().size());
-    }
-
-    @Test
-    @DisplayName("按分类列出")
-    void listByCategory() {
-      registry.register(SkillDefinition.builder()
-          .id("coding-1").name("Coding").category("coding").build());
-      registry.register(SkillDefinition.builder()
-          .id("analysis-1").name("Analysis").category("analysis").build());
-      registry.register(SkillDefinition.builder()
-          .id("coding-2").name("Coding 2").category("coding").build());
-
-      List<SkillDefinition> codingSkills = registry.listByCategory("coding");
-      assertEquals(2, codingSkills.size());
-    }
-  }
-
-  // ==================== 执行 ====================
-
-  @Nested
-  @DisplayName("Execute Skill")
-  class ExecuteSkill {
-
-    @Test
-    @DisplayName("执行可用的编程式技能")
-    void executeAvailable() {
-      registry.registerSkill(new TestSkill("exec-1", "Executable"));
-      String result = registry.executeSkill("exec-1", Map.of("input", "test"));
-      assertEquals("executed: {input=test}", result);
-    }
-
-    @Test
-    @DisplayName("执行不存在的技能抛出异常")
-    void executeNotFound() {
-      assertThrows(IllegalArgumentException.class,
-          () -> registry.executeSkill("missing", Map.of()));
-    }
-
-    @Test
-    @DisplayName("执行不可用的技能抛出异常")
-    void executeUnavailable() {
-      registry.registerSkill(new UnavailableSkill());
-      assertThrows(IllegalStateException.class,
-          () -> registry.executeSkill("unavailable-skill", Map.of()));
-    }
-  }
-
-  // ==================== SkillDefinition ====================
-
-  @Nested
-  @DisplayName("SkillDefinition Defaults")
-  class SkillDefinitionDefaults {
-
-    @Test
-    @DisplayName("默认值验证")
-    void defaults() {
-      SkillDefinition def = SkillDefinition.builder()
-          .id("def-1").name("Default Skill").build();
-      assertEquals("1.0.0", def.getVersion());
-      assertTrue(def.isEnabled());
-    }
-  }
-
-  // ==================== 辅助类 ====================
-
-  static class TestSkill implements Skill {
-
-    private final SkillDefinition definition;
-
-    TestSkill(String id, String name) {
-      this.definition = SkillDefinition.builder()
-          .id(id).name(name).enabled(true).build();
-    }
-
-    @Override
-    public SkillDefinition getDefinition() {
-      return definition;
-    }
-
-    @Override
-    public String execute(Map<String, Object> input) {
-      return "executed: " + input;
-    }
-  }
-
-  static class UnavailableSkill implements Skill {
-
-    @Override
-    public SkillDefinition getDefinition() {
-      return SkillDefinition.builder()
-          .id("unavailable-skill").name("Unavailable").enabled(false).build();
-    }
-
-    @Override
-    public String execute(Map<String, Object> input) {
-      return "should not reach here";
-    }
-
-    @Override
-    public boolean isAvailable() {
-      return false;
     }
   }
 }

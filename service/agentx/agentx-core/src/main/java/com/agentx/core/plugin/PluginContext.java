@@ -3,10 +3,10 @@ package com.agentx.core.plugin;
 import com.agentx.core.guardrail.InputGuardrail;
 import com.agentx.core.guardrail.OutputGuardrail;
 import com.agentx.core.model.ModelFactory;
-import com.agentx.core.skill.SkillDefinition;
 import com.agentx.core.tool.ToolDescriptor;
 import com.agentx.core.vectorstore.VectorStoreFactory;
 import com.agentx.core.workflow.engine.NodeExecutor;
+import dev.langchain4j.skills.Skill;
 
 /**
  * 插件上下文 — 提供给插件在 init 阶段注册扩展组件的 API
@@ -44,9 +44,9 @@ public interface PluginContext {
   void registerVectorStoreFactory(VectorStoreFactory factory);
 
   /**
-   * 注册技能定义
+   * 注册技能（LangChain4j Skill）
    */
-  void registerSkill(SkillDefinition skill);
+  void registerSkill(Skill skill);
 
   /**
    * 获取插件配置值

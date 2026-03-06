@@ -11,6 +11,7 @@ import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.StreamingChatModel;
 import dev.langchain4j.service.AiServices;
+import dev.langchain4j.service.tool.ToolProvider;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -81,33 +82,36 @@ public class AgentRegistry {
     var syncBuilder = AiServices.builder(AgentChatService.class)
         .chatModel(chatModel);
 
-    // Resolve skill tool IDs and merge with direct tool IDs
-    List<String> allToolIds = new ArrayList<>();
-    if (definition.getToolIds() != null) {
-      allToolIds.addAll(definition.getToolIds());
-    }
-    if (definition.getSkillIds() != null) {
-      allToolIds.addAll(skillRegistry.resolveToolIds(definition.getSkillIds()));
-    }
+    // Bind direct tools (skillIds 仅用于 LangChain4j Skills，不再关联额外 toolIds)
+    List<String> allToolIds = definition.getToolIds() != null
+        ? new ArrayList<>(definition.getToolIds()) : new ArrayList<>();
 
-    // Bind tools
     for (String toolId : allToolIds) {
       toolRegistry.getTool(toolId).ifPresent(syncBuilder::tools);
+    }
+
+    // Bind LangChain4j Skills (activate_skill, read_skill_resource)
+    // skillIds 即技能名称（Skill.name()）
+    if (definition.getSkillIds() != null && !definition.getSkillIds().isEmpty()) {
+      skillRegistry.resolveSkillsToolProvider(definition.getSkillIds())
+          .ifPresent(syncBuilder::toolProvider);
     }
 
     // Bind memory
     ChatMemoryProvider memoryProvider = memoryFactory.create(definition.getMemory());
     syncBuilder.chatMemoryProvider(memoryProvider);
 
-    // System message — append skill prompt fragments
+    // System message — include skills hint when skills are present
     String systemPrompt = definition.getSystemPrompt();
     if (definition.getSkillIds() != null && !definition.getSkillIds().isEmpty()) {
-      String skillPrompts = skillRegistry.resolvePromptFragments(definition.getSkillIds());
-      if (!skillPrompts.isEmpty()) {
-        systemPrompt = (systemPrompt != null ? systemPrompt + "\n\n" : "") + skillPrompts;
+      String skillsHint = skillRegistry.formatAvailableSkills(definition.getSkillIds());
+      if (!skillsHint.isEmpty()) {
+        String skillsInstruction = "\n\nYou have access to the following skills:\n" + skillsHint
+            + "\nWhen the user's request relates to one of these skills, activate it first using the `activate_skill` tool before proceeding.";
+        systemPrompt = (systemPrompt != null ? systemPrompt : "") + skillsInstruction;
       }
     }
-    if (systemPrompt != null) {
+    if (systemPrompt != null && !systemPrompt.isBlank()) {
       final String finalPrompt = systemPrompt;
       syncBuilder.systemMessageProvider(memoryId -> finalPrompt);
     }

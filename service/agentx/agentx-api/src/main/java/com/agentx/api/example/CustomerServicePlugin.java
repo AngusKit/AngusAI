@@ -5,7 +5,7 @@ import com.agentx.core.guardrail.OutputGuardrail;
 import com.agentx.core.plugin.AgentXPlugin;
 import com.agentx.core.plugin.PluginContext;
 import com.agentx.core.plugin.PluginDescriptor;
-import com.agentx.core.skill.SkillDefinition;
+import dev.langchain4j.skills.DefaultSkill;
 import com.agentx.core.tool.ToolDescriptor;
 import java.util.List;
 import java.util.Map;
@@ -94,22 +94,16 @@ public class CustomerServicePlugin implements AgentXPlugin {
       }
     });
 
-    // 客服技能
-    context.registerSkill(SkillDefinition.builder()
-        .id("customer-service-skill")
-        .name("智能客服技能")
+    // 客服技能（LangChain4j Skill）
+    context.registerSkill(DefaultSkill.builder()
+        .name("customer-service-skill")
         .description("处理客户咨询、创建工单、查询工单状态")
-        .category("communication")
-        .toolIds(List.of("create-ticket-tool", "query-ticket-tool"))
-        .promptFragment("你是一名专业客服助手。工作流程：\n" +
+        .content("你是一名专业客服助手。使用 create-ticket-tool、query-ticket-tool 等工具。工作流程：\n" +
             "1. 理解客户问题，尝试直接回答\n" +
             "2. 无法回答时查询知识库\n" +
             "3. 需要跟进时创建工单\n" +
             "4. 客户情绪激动时安抚并建议转人工\n" +
             "始终保持礼貌、专业、有同理心。")
-        .guardrails(SkillDefinition.SkillGuardrails.builder()
-            .outputGuardrailIds(List.of("sentiment-escalation"))
-            .build())
         .build());
 
     log.info("CustomerServicePlugin initialized — ticketApi={}", ticketApiUrl);

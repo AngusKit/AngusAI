@@ -39,7 +39,7 @@ public final class ExtensionPoints {
   public static final String MEMORY_STORE = "memory_store";
 
   /**
-   * 技能扩展 — 插件可注册新的 SkillDefinition
+   * 技能扩展 — 插件可注册新的 LangChain4j Skill
    */
   public static final String SKILL = "skill";
 }

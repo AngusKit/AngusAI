@@ -1,5 +1,6 @@
 package com.agentx.core.plugin;
 
+import com.agentx.core.skill.SkillRegistry;
 import com.agentx.core.tool.ToolRegistry;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -22,13 +23,16 @@ import lombok.extern.slf4j.Slf4j;
 public class PluginManager {
 
   private final ToolRegistry toolRegistry;
+  private final SkillRegistry skillRegistry;
   private final Map<String, PluginEntry> plugins = new ConcurrentHashMap<>();
 
   /**
    * 初始化通过 Spring 自动发现的所有插件
    */
-  public PluginManager(ToolRegistry toolRegistry, List<AgentXPlugin> autoDiscoveredPlugins) {
+  public PluginManager(ToolRegistry toolRegistry, SkillRegistry skillRegistry,
+      List<AgentXPlugin> autoDiscoveredPlugins) {
     this.toolRegistry = toolRegistry;
+    this.skillRegistry = skillRegistry;
     if (autoDiscoveredPlugins != null) {
       for (AgentXPlugin plugin : autoDiscoveredPlugins) {
         install(plugin);
@@ -54,7 +58,8 @@ public class PluginManager {
 
     try {
       // 初始化
-      DefaultPluginContext context = new DefaultPluginContext(toolRegistry, descriptor.getConfig());
+      DefaultPluginContext context = new DefaultPluginContext(toolRegistry, skillRegistry,
+          descriptor.getConfig());
       plugin.init(context);
       entry.setState(PluginState.INITIALIZED);
       entry.setContext(context);

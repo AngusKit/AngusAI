@@ -3,8 +3,8 @@ package com.agentx.api.example;
 import com.agentx.core.plugin.AgentXPlugin;
 import com.agentx.core.plugin.PluginContext;
 import com.agentx.core.plugin.PluginDescriptor;
-import com.agentx.core.skill.SkillDefinition;
 import com.agentx.core.tool.ToolDescriptor;
+import dev.langchain4j.skills.DefaultSkill;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -58,14 +58,11 @@ public class EmailNotificationPlugin implements AgentXPlugin {
         })
         .build());
 
-    // 注册邮件通知技能
-    context.registerSkill(SkillDefinition.builder()
-        .id("email-notification-skill")
-        .name("邮件通知技能")
+    // 注册邮件通知技能（LangChain4j Skill）
+    context.registerSkill(DefaultSkill.builder()
+        .name("email-notification-skill")
         .description("发送邮件通知给指定用户")
-        .category("communication")
-        .toolIds(List.of("send-email-tool"))
-        .promptFragment("你具备发送邮件的能力。当需要通知用户时，可以发送邮件。\n" +
+        .content("你具备发送邮件的能力。使用 send-email-tool 工具可发送邮件。\n" +
             "发送前请确认收件人、主题和正文内容。注意不要发送垃圾邮件。")
         .build());
 

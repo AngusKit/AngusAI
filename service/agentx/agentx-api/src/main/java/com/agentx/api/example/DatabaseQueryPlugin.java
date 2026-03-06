@@ -3,8 +3,8 @@ package com.agentx.api.example;
 import com.agentx.core.plugin.AgentXPlugin;
 import com.agentx.core.plugin.PluginContext;
 import com.agentx.core.plugin.PluginDescriptor;
-import com.agentx.core.skill.SkillDefinition;
 import com.agentx.core.tool.ToolDescriptor;
+import dev.langchain4j.skills.DefaultSkill;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -71,14 +71,11 @@ public class DatabaseQueryPlugin implements AgentXPlugin {
         })
         .build());
 
-    // 注册数据库查询技能
-    context.registerSkill(SkillDefinition.builder()
-        .id("db-query-skill")
-        .name("数据库查询技能")
+    // 注册数据库查询技能（LangChain4j Skill）
+    context.registerSkill(DefaultSkill.builder()
+        .name("db-query-skill")
         .description("基于自然语言生成 SQL 并查询数据库")
-        .category("tool_use")
-        .toolIds(List.of("db-query-tool"))
-        .promptFragment("你具备数据库查询能力。可以将用户的自然语言问题转换为 SQL 查询。\n" +
+        .content("你具备数据库查询能力。使用 db-query-tool 工具可将用户的自然语言问题转换为 SQL 查询。\n" +
             "规则：1) 仅生成 SELECT 语句 2) 查询结果限制 " + limit + " 条 3) 敏感字段需脱敏")
         .build());
 

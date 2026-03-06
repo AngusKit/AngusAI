@@ -3,7 +3,7 @@ package com.agentx.api.example;
 import com.agentx.core.plugin.AgentXPlugin;
 import com.agentx.core.plugin.PluginContext;
 import com.agentx.core.plugin.PluginDescriptor;
-import com.agentx.core.skill.SkillDefinition;
+import dev.langchain4j.skills.DefaultSkill;
 import com.agentx.core.tool.ToolDescriptor;
 import java.util.List;
 import java.util.Map;
@@ -66,14 +66,11 @@ public class ContentGenerationPlugin implements AgentXPlugin {
         })
         .build());
 
-    // 内容创作技能
-    context.registerSkill(SkillDefinition.builder()
-        .id("content-creation-skill")
-        .name("内容创作技能")
+    // 内容创作技能（LangChain4j Skill）
+    context.registerSkill(DefaultSkill.builder()
+        .name("content-creation-skill")
         .description("多种内容创作能力：文章、摘要、翻译")
-        .category("communication")
-        .toolIds(List.of("text-summarize-tool", "text-translate-tool"))
-        .promptFragment("你具备内容创作能力：\n" +
+        .content("你具备内容创作能力。使用 text-summarize-tool、text-translate-tool 等工具：\n" +
             "1. 文章写作 — 根据主题写作结构化文章\n" +
             "2. 文本摘要 — 长文本自动摘要\n" +
             "3. 翻译 — 多语言翻译\n" +
