@@ -483,7 +483,7 @@ export function ModelManagement() {
           return;
         }
       }
-      const providerValue = detail?.provider ?? model.providerEnum ?? ModelProviderEnum.CUSTOM;
+      const providerValue = detail?.provider ?? model.providerEnum ?? ModelProviderEnum.OTHER;
 
       setEditFormData({
         name: detail?.name ?? model.name ?? '',

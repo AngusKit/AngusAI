@@ -64,18 +64,6 @@ public class ModelFacadeImpl implements ModelFacade {
 
   private static final int DEFAULT_MONTHS = 1; // 默认统计近一月
 
-  @Override
-  public List<ModelProvider> getSupportedProviders() {
-    if (modelFactories == null || modelFactories.isEmpty()) {
-      return List.of();
-    }
-    return modelFactories.stream()
-        .map(ModelFactory::getProvider)
-        .distinct()
-        .sorted()
-        .collect(Collectors.toList());
-  }
-
   @NameJoin
   @Override
   public ModelDetailVo create(ModelCreateDto dto) {
@@ -132,6 +120,18 @@ public class ModelFacadeImpl implements ModelFacade {
     Page<Model> page = modelQuery.find(spec, dto.tranPage(), dto.fullTextSearch,
         getMatchSearchFields(dto.getClass()));
     return buildVoPageResult(page, ModelAssembler::toListVo);
+  }
+
+  @Override
+  public List<ModelProvider> getSupportedProviders() {
+    if (modelFactories == null || modelFactories.isEmpty()) {
+      return List.of();
+    }
+    return modelFactories.stream()
+        .map(ModelFactory::getProvider)
+        .distinct()
+        .sorted()
+        .collect(Collectors.toList());
   }
 
   /**

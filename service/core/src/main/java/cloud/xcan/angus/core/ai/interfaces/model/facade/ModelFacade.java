@@ -17,11 +17,6 @@ import java.util.List;
 public interface ModelFacade {
 
   /**
-   * 获取当前运行时支持的模型提供者列表（基于 ModelProvidersConfiguration 中已注册的 ModelFactory）
-   */
-  List<ModelProvider> getSupportedProviders();
-
-  /**
    * 创建模型
    */
   ModelDetailVo create(ModelCreateDto dto);
@@ -60,6 +55,11 @@ public interface ModelFacade {
    * 获取模型列表
    */
   PageResult<ModelListVo> list(ModelFindDto dto);
+
+  /**
+   * 获取当前运行时支持的模型提供者列表（基于 ModelProvidersConfiguration 中已注册的 ModelFactory）
+   */
+  List<ModelProvider> getSupportedProviders();
 
   /**
    * 获取模型调用统计

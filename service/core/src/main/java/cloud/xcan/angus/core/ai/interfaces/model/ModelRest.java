@@ -1,5 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.model;
 
+import cloud.xcan.agentx.core.model.ModelProvider;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.ModelFacade;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelFindDto;
@@ -20,6 +21,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import java.util.List;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -142,7 +144,7 @@ public class ModelRest {
   })
   @ResponseStatus(HttpStatus.OK)
   @GetMapping("/providers")
-  public ApiLocaleResult<java.util.List<cloud.xcan.agentx.core.model.ModelProvider>> getSupportedProviders() {
+  public ApiLocaleResult<List<ModelProvider>> getSupportedProviders() {
     return ApiLocaleResult.success(modelFacade.getSupportedProviders());
   }
 
