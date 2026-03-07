@@ -159,9 +159,8 @@ export const enumTranslations = {
     OPENAI_API_COMPATIBLE: 'OpenAI API兼容',
   },
   ModelStatusEnum: {
-    STOPPED: '已停止',
-    RUNNING: '运行中',
-    ERROR: '错误',
+    ACTIVE: '激活',
+    DISABLED: '禁用',
   },
   VisibilityEnum: {
     PRIVATE: '私有',

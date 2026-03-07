@@ -30,4 +30,9 @@ public interface ModelCmd {
    */
   void delete(Long id);
 
+  /**
+   * 修改模型状态
+   */
+  Model updateStatus(Long id, cloud.xcan.angus.core.ai.domain.model.ModelStatus status);
+
 }

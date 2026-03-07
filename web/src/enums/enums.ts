@@ -200,9 +200,8 @@ export enum ModelFeaturesEnum {
 
 /** 模型状态 */
 export enum ModelStatusEnum {
-  STOPPED = 'STOPPED',
-  RUNNING = 'RUNNING',
-  ERROR = 'ERROR',
+  ACTIVE = 'ACTIVE',
+  DISABLED = 'DISABLED',
 }
 
 /**

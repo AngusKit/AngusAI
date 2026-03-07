@@ -20,6 +20,7 @@ import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelFindDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelTestDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelUpdateDto;
+import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelUpdateStatusDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.internal.assembler.ModelAssembler;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelListVo;
@@ -92,6 +93,13 @@ public class ModelFacadeImpl implements ModelFacade {
 
   @NameJoin
   @Override
+  public ModelDetailVo updateStatus(Long id, ModelUpdateStatusDto dto) {
+    Model saved = modelCmd.updateStatus(id, dto.getStatus());
+    return ModelAssembler.toDetailVo(saved);
+  }
+
+  @NameJoin
+  @Override
   public ModelDetailVo getDetail(Long id) {
     Model model = modelQuery.findAndCheck(id);
     return ModelAssembler.toDetailVo(model);
@@ -159,11 +167,11 @@ public class ModelFacadeImpl implements ModelFacade {
     long totalModels = modelRepo.countAllByFilters(SearchCriteria.criteria());
     vo.setTotalModels(totalModels);
 
-    // 运行中的模型数（不按时间过滤）
-    Set<SearchCriteria> runningFilters = SearchCriteria.merge(SearchCriteria.criteria(),
-        SearchCriteria.equal("status", ModelStatus.RUNNING.getValue()));
-    long runningModels = modelRepo.countAllByFilters(runningFilters);
-    vo.setRunningModels(runningModels);
+    // 激活的模型数（不按时间过滤）
+    Set<SearchCriteria> activeFilters = SearchCriteria.merge(SearchCriteria.criteria(),
+        SearchCriteria.equal("status", ModelStatus.ACTIVE.getValue()));
+    long activeModels = modelRepo.countAllByFilters(activeFilters);
+    vo.setActiveModels(activeModels);
 
     // 总调用次数（时间范围内）
     long totalCalls = modelCallRecordQuery.countAllByFilters(callFilters);

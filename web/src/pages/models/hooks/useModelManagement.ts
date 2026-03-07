@@ -233,13 +233,9 @@ export const useModelManagement = (): UseModelManagementReturn => {
       }
 
       try {
-        if (model.statusEnum === ModelStatusEnum.RUNNING) {
-          await ModelsService.stopModel(model.id, { graceful: true });
-          toast.success(t('models.messages.modelStopped', { name: model.name }));
-        } else {
-          await ModelsService.startModel(model.id);
-          toast.success(t('models.messages.modelStarted', { name: model.name }));
-        }
+        const newStatus = model.statusEnum === ModelStatusEnum.ACTIVE ? ModelStatusEnum.DISABLED : ModelStatusEnum.ACTIVE;
+        await ModelsService.updateModelStatus(model.id, { status: newStatus });
+        toast.success(newStatus === ModelStatusEnum.ACTIVE ? t('models.messages.modelActivated', { name: model.name }) : t('models.messages.modelDisabled', { name: model.name }));
         await loadModels();
         await loadStatistics();
       } catch (error: any) {

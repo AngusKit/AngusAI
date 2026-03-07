@@ -159,9 +159,8 @@ export const enumTranslations = {
     OPENAI_API_COMPATIBLE: 'OpenAI API Compatible',
   },
   ModelStatusEnum: {
-    STOPPED: 'Stopped',
-    RUNNING: 'Running',
-    ERROR: 'Error',
+    ACTIVE: 'Active',
+    DISABLED: 'Disabled',
   },
   VisibilityEnum: {
     PRIVATE: 'Private',

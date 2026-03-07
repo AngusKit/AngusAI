@@ -25,7 +25,7 @@ public class ModelAssembler {
     model.setType(dto.getType());
     model.setProvider(dto.getProvider());
     // 设置默认状态
-    model.setStatus(ModelStatus.STOPPED);
+    model.setStatus(ModelStatus.DISABLED);
 
     // 创建配置对象
     ModelConfigDefinition config = new ModelConfigDefinition();

@@ -5,6 +5,7 @@ import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelFindDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelTestDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelUpdateDto;
+import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelUpdateStatusDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelListVo;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelStatisticsVo;
@@ -75,6 +76,18 @@ public class ModelRest {
       @Parameter(description = "模型ID") @PathVariable Long id,
       @Valid @RequestBody ModelConfigDefinition dto) {
     return ApiLocaleResult.success(modelFacade.updateConfig(id, dto));
+  }
+
+  @Operation(operationId = "updateModelStatus", summary = "修改模型状态", description = "修改模型状态（激活/禁用）")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "状态修改成功")
+  })
+  @ResponseStatus(HttpStatus.OK)
+  @PutMapping("/{id}/status")
+  public ApiLocaleResult<ModelDetailVo> updateStatus(
+      @Parameter(description = "模型ID") @PathVariable Long id,
+      @Valid @RequestBody ModelUpdateStatusDto dto) {
+    return ApiLocaleResult.success(modelFacade.updateStatus(id, dto));
   }
 
   @Operation(operationId = "testModel", summary = "测试模型连接", description = "测试模型连接和配置")

@@ -132,12 +132,10 @@ const mapTypeToConfig = (type?: ModelTypeEnum | string) => {
 
 const mapStatusToConfig = (status?: ModelStatusEnum | string) => {
   switch (status) {
-    case ModelStatusEnum.RUNNING:
-      return MODEL_STATUS_CONFIG[ModelStatusEnum.RUNNING];
-    case ModelStatusEnum.STOPPED:
-      return MODEL_STATUS_CONFIG[ModelStatusEnum.STOPPED];
-    case ModelStatusEnum.ERROR:
-      return MODEL_STATUS_CONFIG[ModelStatusEnum.ERROR];
+    case ModelStatusEnum.ACTIVE:
+      return MODEL_STATUS_CONFIG[ModelStatusEnum.ACTIVE];
+    case ModelStatusEnum.DISABLED:
+      return MODEL_STATUS_CONFIG[ModelStatusEnum.DISABLED];
     default:
       return DEFAULT_MODEL_STATUS_CONFIG;
   }
@@ -433,13 +431,9 @@ export function ModelManagement() {
       }
 
       try {
-        if (model.statusEnum === ModelStatusEnum.RUNNING) {
-          await ModelsService.stopModel(model.id, { graceful: true });
-          toast.success(t('models.messages.modelStopped', { name: model.name }));
-        } else {
-          await ModelsService.startModel(model.id);
-          toast.success(t('models.messages.modelStarted', { name: model.name }));
-        }
+        const newStatus = model.statusEnum === ModelStatusEnum.ACTIVE ? ModelStatusEnum.DISABLED : ModelStatusEnum.ACTIVE;
+        await ModelsService.updateModelStatus(model.id, { status: newStatus });
+        toast.success(newStatus === ModelStatusEnum.ACTIVE ? t('models.messages.modelActivated', { name: model.name }) : t('models.messages.modelDisabled', { name: model.name }));
         await loadModels();
         await loadStatistics();
       } catch (error: any) {
@@ -737,14 +731,11 @@ export function ModelManagement() {
                   <SelectItem value='all' className='dark:text-gray-300'>
                     {t('models.filters.allStatuses')}
                   </SelectItem>
-                  <SelectItem value={ModelStatusEnum.RUNNING} className='dark:text-gray-300'>
-                    {t('models.filters.running')}
+                  <SelectItem value={ModelStatusEnum.ACTIVE} className='dark:text-gray-300'>
+                    {t('models.filters.active')}
                   </SelectItem>
-                  <SelectItem value={ModelStatusEnum.STOPPED} className='dark:text-gray-300'>
-                    {t('models.filters.stopped')}
-                  </SelectItem>
-                  <SelectItem value={ModelStatusEnum.ERROR} className='dark:text-gray-300'>
-                    {t('models.filters.error')}
+                  <SelectItem value={ModelStatusEnum.DISABLED} className='dark:text-gray-300'>
+                    {t('models.filters.disabled')}
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -834,7 +825,7 @@ export function ModelManagement() {
                   <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
                     {models.map(model => {
                       const Icon = model.icon;
-                      const toggleDisabled = !model.statusEnum || model.statusEnum === ModelStatusEnum.ERROR;
+                      const toggleDisabled = !model.statusEnum;
                       return (
                         <Card
                           key={model.id}
@@ -846,7 +837,7 @@ export function ModelManagement() {
                               className='p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors'
                               disabled={toggleDisabled || modelsLoading}
                             >
-                              {model.statusEnum === ModelStatusEnum.RUNNING ? (
+                              {model.statusEnum === ModelStatusEnum.ACTIVE ? (
                                 <Pause className='w-4 h-4 text-orange-600 dark:text-orange-400' />
                               ) : (
                                 <Play className='w-4 h-4 text-green-600 dark:text-green-400' />
@@ -998,10 +989,10 @@ export function ModelManagement() {
                                   onClick={() => handleToggleStatus(model)}
                                   className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
                                   disabled={
-                                    !model.statusEnum || model.statusEnum === ModelStatusEnum.ERROR || modelsLoading
+                                    !model.statusEnum || modelsLoading
                                   }
                                 >
-                                  {model.statusEnum === ModelStatusEnum.RUNNING ? (
+                                  {model.statusEnum === ModelStatusEnum.ACTIVE ? (
                                     <Pause className='w-4 h-4 text-orange-500' />
                                   ) : (
                                     <Play className='w-4 h-4 text-green-500' />

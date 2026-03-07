@@ -1,5 +1,5 @@
 import { AI, ApiLocaleResult, PageQuery } from '@xcan-angus/infra';
-import { GetModelListParamsOrderByEnum, ModelConfig, ModelCreateDto, ModelDetailResult, ModelStatisticsResult, ModelTestDto, ModelUpdateDto, PageResultModelListResult, } from './ModelsTypes.ts';
+import { GetModelListParamsOrderByEnum, ModelConfig, ModelCreateDto, ModelDetailResult, ModelStatisticsResult, ModelTestDto, ModelUpdateDto, ModelUpdateStatusDto, PageResultModelListResult, } from './ModelsTypes.ts';
 import http, { ContentType, HttpClient, QueryParamsType, RequestParams } from './HttpClient.ts';
 import { ModelProviderEnum, ModelStatusEnum, ModelTypeEnum } from '@/enums/enums.ts';
 
@@ -22,6 +22,24 @@ export class Models<SecurityDataType = unknown> {
   updateModelConfig = (id: string, data: ModelConfig, params: RequestParams = {}) =>
     this.http.request<ModelDetailResult>({
       path: `${AI}/models/${id}/config`,
+      method: 'PUT',
+      body: data,
+      secure: true,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * @description 修改模型状态（激活/禁用）
+   *
+   * @tags Model
+   * @name UpdateModelStatus
+   * @summary 修改模型状态
+   * @request PUT:/api/v1/models/{id}/status
+   * @secure
+   */
+  updateModelStatus = (id: string, data: ModelUpdateStatusDto, params: RequestParams = {}) =>
+    this.http.request<ModelDetailResult>({
+      path: `${AI}/models/${id}/status`,
       method: 'PUT',
       body: data,
       secure: true,
@@ -101,65 +119,6 @@ export class Models<SecurityDataType = unknown> {
       body: data,
       secure: true,
       type: ContentType.Json,
-      ...params,
-    });
-  /**
-   * @description 停止模型
-   *
-   * @tags Model
-   * @name StopModel
-   * @summary 停止模型
-   * @request POST:/api/v1/models/{id}/stop
-   * @secure
-   */
-  stopModel = (
-    id: string,
-    query?: {
-      /**
-       * 优雅停止
-       * @default true
-       */
-      graceful?: boolean;
-    },
-    params: RequestParams = {}
-  ) =>
-    this.http.request<ModelDetailResult>({
-      path: `${AI}/models/${id}/stop`,
-      method: 'POST',
-      query: query,
-      secure: true,
-      ...params,
-    });
-  /**
-   * @description 启动模型
-   *
-   * @tags Model
-   * @name StartModel
-   * @summary 启动模型
-   * @request POST:/api/v1/models/{id}/start
-   * @secure
-   */
-  startModel = (id: string, params: RequestParams = {}) =>
-    this.http.request<ModelDetailResult>({
-      path: `${AI}/models/${id}/start`,
-      method: 'POST',
-      secure: true,
-      ...params,
-    });
-  /**
-   * @description 重启模型（先停止再启动）
-   *
-   * @tags Model
-   * @name RestartModel
-   * @summary 重启模型
-   * @request POST:/api/v1/models/{id}/restart
-   * @secure
-   */
-  restartModel = (id: string, params: RequestParams = {}) =>
-    this.http.request<ModelDetailResult>({
-      path: `${AI}/models/${id}/restart`,
-      method: 'POST',
-      secure: true,
       ...params,
     });
   /**

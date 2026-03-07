@@ -6,6 +6,7 @@ import cloud.xcan.angus.core.ai.application.cmd.model.ModelCmd;
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.domain.model.Model;
 import cloud.xcan.angus.core.ai.domain.model.ModelRepo;
+import cloud.xcan.angus.core.ai.domain.model.ModelStatus;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
@@ -133,6 +134,25 @@ public class ModelCmdImpl extends CommCmd<Model, Long> implements ModelCmd {
       protected Void process() {
         modelRepo.deleteById(id);
         return null;
+      }
+    }.execute();
+  }
+
+  @Override
+  @Transactional
+  public Model updateStatus(Long id, ModelStatus status) {
+    return new BizTemplate<Model>() {
+      Model modelDb;
+
+      @Override
+      protected void checkParams() {
+        modelDb = modelQuery.findAndCheck(id);
+      }
+
+      @Override
+      protected Model process() {
+        modelDb.setStatus(status);
+        return modelRepo.save(modelDb);
       }
     }.execute();
   }

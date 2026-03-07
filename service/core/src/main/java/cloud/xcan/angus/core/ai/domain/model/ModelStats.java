@@ -10,8 +10,8 @@ public class ModelStats {
   @Schema(description = "总模型数")
   private Long totalModels;
 
-  @Schema(description = "运行中的模型数")
-  private Long runningModels;
+  @Schema(description = "激活的模型数")
+  private Long activeModels;
 
   @Schema(description = "总调用次数")
   private Long totalCalls = 0L;

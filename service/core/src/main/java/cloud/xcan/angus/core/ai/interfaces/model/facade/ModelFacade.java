@@ -4,6 +4,7 @@ import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelFindDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelTestDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelUpdateDto;
+import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelUpdateStatusDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelListVo;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelStatisticsVo;
@@ -52,5 +53,10 @@ public interface ModelFacade {
    * 获取模型调用统计
    */
   ModelStatisticsVo getStatistics(SimpleStatisticsDto dto);
+
+  /**
+   * 修改模型状态
+   */
+  ModelDetailVo updateStatus(Long id, ModelUpdateStatusDto dto);
 
 }

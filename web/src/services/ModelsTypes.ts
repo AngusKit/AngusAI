@@ -123,10 +123,10 @@ export interface ModelStats {
    */
   totalModels?: number;
   /**
-   * 运行中的模型数
+   * 激活的模型数
    * @format int64
    */
-  runningModels?: number;
+  activeModels?: number;
   /**
    * 总调用次数
    * @format int64
@@ -285,6 +285,12 @@ export interface ModelUpdateDto {
   maxTokens?: number;
 }
 
+/** 修改模型状态请求参数 */
+export interface ModelUpdateStatusDto {
+  /** 模型状态：ACTIVE-激活，DISABLED-禁用 */
+  status: ModelStatusEnum;
+}
+
 /** 模型列表项响应 */
 export interface ModelListVo extends TenantAuditingVo {
   /**
@@ -329,10 +335,10 @@ export interface ModelStatisticsVo {
    */
   totalModels?: number;
   /**
-   * 运行中的模型数
+   * 激活的模型数
    * @format int64
    */
-  runningModels?: number;
+  activeModels?: number;
   /**
    * 总调用次数
    * @format int64
