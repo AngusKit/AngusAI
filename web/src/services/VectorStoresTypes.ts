@@ -321,6 +321,12 @@ export type VectorStoreStatisticsResult = ApiLocaleResult & {
   data?: VectorStoreStatisticsVo;
 };
 
+/** 支持的向量存储类型列表响应 — 返回当前运行时已注册的 VectorStoreType 枚举值 */
+export type VectorStoreSupportedTypesResult = ApiLocaleResult & {
+  /** 支持的向量存储类型枚举值列表，如 PGVECTOR、MILVUS、QDRANT、CHROMA 等 */
+  data?: VectorStoreTypeEnum[];
+};
+
 /** 排序字段 */
 export enum VectorStoreListParamsOrderByEnum {
   Id = 'id',

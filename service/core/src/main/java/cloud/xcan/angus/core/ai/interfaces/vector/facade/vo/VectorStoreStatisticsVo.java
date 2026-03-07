@@ -1,6 +1,8 @@
 package cloud.xcan.angus.core.ai.interfaces.vector.facade.vo;
 
 import cloud.xcan.agentx.core.vectorstore.VectorStoreType;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.Data;
@@ -45,7 +47,8 @@ public class VectorStoreStatisticsVo {
   @Schema(description = "类型分布")
   public static class TypeDistribution {
 
-    @Schema(description = "类型")
+    @Schema(description = "类型（如 PGVECTOR、MILVUS）")
+    @JsonSerialize(using = ToStringSerializer.class)
     private VectorStoreType type;
 
     @Schema(description = "数量")
@@ -65,7 +68,8 @@ public class VectorStoreStatisticsVo {
     @Schema(description = "名称")
     private String name;
 
-    @Schema(description = "类型")
+    @Schema(description = "类型（如 PGVECTOR、MILVUS）")
+    @JsonSerialize(using = ToStringSerializer.class)
     private VectorStoreType type;
 
     @Schema(description = "查询次数")

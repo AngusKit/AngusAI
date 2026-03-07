@@ -7,8 +7,10 @@ import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.VectorStoreUpdateDt
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.vo.ConnectionTestVo;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.vo.VectorStoreStatisticsVo;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.vo.VectorStoreVo;
+import cloud.xcan.agentx.core.vectorstore.VectorStoreType;
 import cloud.xcan.angus.remote.PageResult;
 import cloud.xcan.angus.remote.dto.SimpleStatisticsDto;
+import java.util.List;
 
 /**
  * 向量存储源门面服务接口
@@ -51,7 +53,16 @@ public interface VectorStoreFacade {
   PageResult<VectorStoreVo> list(VectorStoreFindDto dto);
 
   /**
+   * 获取支持的向量存储类型
+   * <p>
+   * 基于当前运行时已注册的 VectorStoreFactory 返回支持的类型列表。
+   * </p>
+   */
+  List<VectorStoreType> getSupportedTypes();
+
+  /**
    * 获取统计信息
    */
   VectorStoreStatisticsVo getStatistics(SimpleStatisticsDto dto);
+
 }

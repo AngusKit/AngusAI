@@ -1,5 +1,5 @@
 import { ApiLocaleResult, PageQuery, AI } from '@xcan-angus/infra';
-import { ConnectionTestDto, ConnectionTestResult, PageResultVectorStoreResult, VectorStoreCreateDto, VectorStoreListParamsOrderByEnum, VectorStoreResult, VectorStoreStatisticsResult, VectorStoreUpdateDto, } from './VectorStoresTypes.ts';
+import { ConnectionTestDto, ConnectionTestResult, PageResultVectorStoreResult, VectorStoreCreateDto, VectorStoreListParamsOrderByEnum, VectorStoreResult, VectorStoreStatisticsResult, VectorStoreSupportedTypesResult, VectorStoreUpdateDto, } from './VectorStoresTypes.ts';
 import http, { ContentType, HttpClient, QueryParamsType, RequestParams } from './HttpClient.ts';
 import { ConnectionStatusEnum, VectorStoreTypeEnum } from '@/enums/enums.ts';
 
@@ -165,6 +165,22 @@ export class VectorStores<SecurityDataType = unknown> {
       path: `${AI}/vector-stores/${id}/toggle`,
       method: 'PATCH',
       query: query,
+      secure: true,
+      ...params,
+    });
+  /**
+   * @description 获取当前运行时支持的向量存储类型列表（基于已注册的 VectorStoreFactory）
+   *
+   * @tags VectorStore
+   * @name VectorStoreGetSupportedTypes
+   * @summary 查询支持的向量存储类型
+   * @request GET:/api/v1/vector-stores/types
+   * @secure
+   */
+  vectorStoreGetSupportedTypes = (params: RequestParams = {}) =>
+    this.http.request<VectorStoreSupportedTypesResult>({
+      path: `${AI}/vector-stores/types`,
+      method: 'GET',
       secure: true,
       ...params,
     });

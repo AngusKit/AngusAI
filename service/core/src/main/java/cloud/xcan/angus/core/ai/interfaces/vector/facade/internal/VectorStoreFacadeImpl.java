@@ -11,6 +11,7 @@ import cloud.xcan.angus.core.ai.application.query.vector.VectorStoreQuery;
 import cloud.xcan.angus.core.ai.application.query.vector.impl.VectorStoreQueryImpl;
 import cloud.xcan.angus.core.ai.domain.vector.VectorStore;
 import cloud.xcan.angus.core.ai.domain.vector.VectorStoreRepo;
+import cloud.xcan.agentx.core.vectorstore.VectorStoreFactory;
 import cloud.xcan.agentx.core.vectorstore.VectorStoreType;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.VectorStoreFacade;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.VectorStoreConnectionTestDto;
@@ -35,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
@@ -55,6 +57,9 @@ public class VectorStoreFacadeImpl implements VectorStoreFacade {
 
   @Resource
   private VectorStoreRepo vectorStoreRepo;
+
+  @Resource
+  private List<VectorStoreFactory> vectorStoreFactories;
 
   private static final int TOP_N = 10;
   private static final int DEFAULT_MONTHS = 1; // 默认统计近一月
@@ -107,6 +112,18 @@ public class VectorStoreFacadeImpl implements VectorStoreFacade {
     Page<VectorStore> page = vectorStoreQuery.find(spec, dto.tranPage(),
         dto.fullTextSearch, getMatchSearchFields(dto.getClass()));
     return buildVoPageResult(page, VectorStoreAssembler::toVo);
+  }
+
+  @Override
+  public List<VectorStoreType> getSupportedTypes() {
+    if (vectorStoreFactories == null || vectorStoreFactories.isEmpty()) {
+      return List.of();
+    }
+    return vectorStoreFactories.stream()
+        .map(VectorStoreFactory::getType)
+        .distinct()
+        .sorted()
+        .collect(Collectors.toList());
   }
 
   /**
@@ -181,11 +198,14 @@ public class VectorStoreFacadeImpl implements VectorStoreFacade {
     for (Object[] r : rows) {
       VectorStoreStatisticsVo.TypeDistribution d = new VectorStoreStatisticsVo.TypeDistribution();
       String typeStr = Objects.toString(r[0], null);
-      try {
-        d.setType(VectorStoreType.valueOf(typeStr));
-      } catch (Exception e) {
-        continue; // 跳过无效类型
+      if (typeStr == null || typeStr.isBlank()) {
+        continue;
       }
+      VectorStoreType vectorStoreType = VectorStoreType.fromKey(typeStr);
+      if (vectorStoreType == null) {
+        continue;
+      }
+      d.setType(vectorStoreType);
       d.setCount(r[1] == null ? 0L : ((Number) r[1]).longValue());
       d.setPercentage(total == 0 ? 0.0 : (d.getCount() * 100.0 / total));
       list.add(d);

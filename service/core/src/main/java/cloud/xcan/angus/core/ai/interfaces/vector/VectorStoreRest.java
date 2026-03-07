@@ -8,9 +8,11 @@ import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.VectorStoreUpdateDt
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.vo.ConnectionTestVo;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.vo.VectorStoreStatisticsVo;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.vo.VectorStoreVo;
+import cloud.xcan.agentx.core.vectorstore.VectorStoreType;
 import cloud.xcan.angus.remote.ApiLocaleResult;
 import cloud.xcan.angus.remote.PageResult;
 import cloud.xcan.angus.remote.dto.SimpleStatisticsDto;
+import java.util.List;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -116,7 +118,14 @@ public class VectorStoreRest {
     return ApiLocaleResult.success(vectorStoreFacade.list(dto));
   }
 
-  // TODO 查询支持的向量存储
+  @Operation(operationId = "getSupportedVectorStoreTypes", summary = "查询支持的向量存储类型", description = "获取当前运行时支持的向量存储类型列表（基于已注册的 VectorStoreFactory）")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "获取成功")
+  })
+  @GetMapping("/types")
+  public ApiLocaleResult<List<VectorStoreType>> getSupportedTypes() {
+    return ApiLocaleResult.success(vectorStoreFacade.getSupportedTypes());
+  }
 
   @Operation(operationId = "getVectorStoreStatistics", summary = "获取统计信息", description = "获取向量存储源的统计数据，包括总体统计、类型分布、使用率排行、性能趋势等")
   @GetMapping("/stats")
