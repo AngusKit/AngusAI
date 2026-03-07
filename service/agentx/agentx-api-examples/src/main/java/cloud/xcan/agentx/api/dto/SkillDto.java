@@ -25,6 +25,7 @@ public class SkillDto {
   @NoArgsConstructor
   @AllArgsConstructor
   public static class ResourceDto {
+
     private String relativePath;
     private String content;
   }

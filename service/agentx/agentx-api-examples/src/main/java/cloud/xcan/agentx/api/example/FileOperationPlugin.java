@@ -3,8 +3,8 @@ package cloud.xcan.agentx.api.example;
 import cloud.xcan.core.plugin.AgentXPlugin;
 import cloud.xcan.core.plugin.PluginContext;
 import cloud.xcan.core.plugin.PluginDescriptor;
-import dev.langchain4j.skills.DefaultSkill;
 import cloud.xcan.core.tool.ToolDescriptor;
+import dev.langchain4j.skills.DefaultSkill;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -92,8 +92,9 @@ public class FileOperationPlugin implements AgentXPlugin {
     context.registerSkill(DefaultSkill.builder()
         .name("file-operation-skill")
         .description("读取和分析文件内容")
-        .content("你具备文件读取和分析能力。使用 file-read-tool、file-list-tool 可列出目录和读取文件。\n" +
-            "注意：仅支持只读操作，文件路径不允许包含 '..'。")
+        .content(
+            "你具备文件读取和分析能力。使用 file-read-tool、file-list-tool 可列出目录和读取文件。\n" +
+                "注意：仅支持只读操作，文件路径不允许包含 '..'。")
         .build());
 
     log.info("FileOperationPlugin initialized — basePath={}", allowedBase);

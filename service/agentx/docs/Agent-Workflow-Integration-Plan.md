@@ -8,21 +8,21 @@
 
 ### 1.1 已有能力
 
-| 能力 | 实现位置 | 说明 |
-|------|----------|------|
-| **工作流 → Agent** | `AgentNodeExecutor` | AGENT 节点通过 `agentRegistry.chat(agentId, executionId, input)` 调用 Agent |
-| **工作流引擎** | `WorkflowEngine.execute()` | 拓扑排序 + 顺序执行，支持 LLM、TOOL、HTTP、AGENT 等节点 |
-| **变量与表达式** | `ExpressionEngine` | 支持 `${variables.xxx}`、`${nodes['nodeId'].outputs.xxx}` 等 |
-| **上下文传递** | `NodeExecutionContext` | `variables`、`nodeOutputs` 在节点间传递 |
+| 能力              | 实现位置                       | 说明                                                                    |
+|-----------------|----------------------------|-----------------------------------------------------------------------|
+| **工作流 → Agent** | `AgentNodeExecutor`        | AGENT 节点通过 `agentRegistry.chat(agentId, executionId, input)` 调用 Agent |
+| **工作流引擎**       | `WorkflowEngine.execute()` | 拓扑排序 + 顺序执行，支持 LLM、TOOL、HTTP、AGENT 等节点                                |
+| **变量与表达式**      | `ExpressionEngine`         | 支持 `${variables.xxx}`、`${nodes['nodeId'].outputs.xxx}` 等              |
+| **上下文传递**       | `NodeExecutionContext`     | `variables`、`nodeOutputs` 在节点间传递                                      |
 
 ### 1.2 缺口
 
-| 缺口 | 描述 |
-|------|------|
-| **Agent.workflowId 未使用** | `AgentDefinition.workflowId` 存在但未在 `AgentRegistry.chat()` 中接入 |
-| **工作流加载** | 无统一 `WorkflowDefinitionProvider`，WorkflowController 用内存 Map 存储 |
-| **ID 类型不一致** | `AgentDefinition.workflowId` 为 Long，`WorkflowDefinition.id` 为 String |
-| **SubWorkflow 未真正执行** | `SubWorkflowNodeExecutor` 仅返回 `DELEGATED`，未调用 WorkflowEngine |
+| 缺口                       | 描述                                                                   |
+|--------------------------|----------------------------------------------------------------------|
+| **Agent.workflowId 未使用** | `AgentDefinition.workflowId` 存在但未在 `AgentRegistry.chat()` 中接入        |
+| **工作流加载**                | 无统一 `WorkflowDefinitionProvider`，WorkflowController 用内存 Map 存储       |
+| **ID 类型不一致**             | `AgentDefinition.workflowId` 为 Long，`WorkflowDefinition.id` 为 String |
+| **SubWorkflow 未真正执行**    | `SubWorkflowNodeExecutor` 仅返回 `DELEGATED`，未调用 WorkflowEngine         |
 
 ---
 
@@ -35,18 +35,19 @@
 ```
 
 - **实现**：`AgentNodeExecutor` 读取 `config.agentId`、`config.input`，调用 `agentRegistry.chat()`
-- **待增强**：`input` 可支持 `${variables.message}` 等表达式，需在 WorkflowEngine 中对 config 做 `expressionEngine.resolveMap()` 后再传给 NodeExecutor
+- **待增强**：`input` 可支持 `${variables.message}` 等表达式，需在 WorkflowEngine 中对 config
+  做 `expressionEngine.resolveMap()` 后再传给 NodeExecutor
 
 ### 2.2 场景 B：Agent 对话触发工作流（待实现）
 
 用户与 Agent 对话时，根据 `workflowId` 执行工作流：
 
-| 模式 | 执行时机 | 用途 |
-|------|----------|------|
-| **前置** | LLM 前 | 知识检索、数据准备、意图路由 |
-| **后置** | LLM 后 | 通知、记录、多步骤任务、多渠道发布 |
+| 模式     | 执行时机   | 用途                |
+|--------|--------|-------------------|
+| **前置** | LLM 前  | 知识检索、数据准备、意图路由    |
+| **后置** | LLM 后  | 通知、记录、多步骤任务、多渠道发布 |
 | **替代** | 替代 LLM | 纯工作流驱动（如表单填写、审批流） |
-| **条件** | 按意图 | 特定关键词或意图时触发工作流 |
+| **条件** | 按意图    | 特定关键词或意图时触发工作流    |
 
 ### 2.3 场景 C：子工作流真正执行（待实现）
 
@@ -104,11 +105,11 @@ workflowTrigger:
 
 **入参约定**：
 
-| 阶段 | inputVariables |
-|------|----------------|
-| BEFORE_CHAT | `{ "message": message, "sessionId": sessionId }` |
-| AFTER_CHAT | `{ "message": message, "response": response, "sessionId": sessionId }` |
-| INSTEAD_OF_CHAT | `{ "message": message, "sessionId": sessionId }` |
+| 阶段              | inputVariables                                                         |
+|-----------------|------------------------------------------------------------------------|
+| BEFORE_CHAT     | `{ "message": message, "sessionId": sessionId }`                       |
+| AFTER_CHAT      | `{ "message": message, "response": response, "sessionId": sessionId }` |
+| INSTEAD_OF_CHAT | `{ "message": message, "sessionId": sessionId }`                       |
 
 工作流输出中的 `response` 或 `text` 可作为最终返回（INSTEAD_OF_CHAT 模式）。
 
@@ -155,7 +156,9 @@ return Map.of(
 
 **当前**：`input` 仅支持字面量或简单引用。
 
-**建议**：在 WorkflowEngine 执行节点前，对 `node.config` 执行 `expressionEngine.resolveMap(config, buildContext(variables, nodeOutputs))`，使 `input: "${variables.userQuery}"` 等生效。
+**建议**：在 WorkflowEngine 执行节点前，对 `node.config`
+执行 `expressionEngine.resolveMap(config, buildContext(variables, nodeOutputs))`
+，使 `input: "${variables.userQuery}"` 等生效。
 
 ---
 

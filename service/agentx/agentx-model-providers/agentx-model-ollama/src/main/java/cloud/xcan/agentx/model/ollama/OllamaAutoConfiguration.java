@@ -1,6 +1,7 @@
 package cloud.xcan.agentx.model.ollama;
 
 import cloud.xcan.core.model.ModelConfigDefinition;
+import cloud.xcan.core.model.ModelConfigProvider;
 import cloud.xcan.core.model.ModelFactory;
 import cloud.xcan.core.model.ModelProvider;
 import dev.langchain4j.model.chat.ChatModel;
@@ -10,7 +11,6 @@ import dev.langchain4j.model.ollama.OllamaChatModel;
 import dev.langchain4j.model.ollama.OllamaEmbeddingModel;
 import dev.langchain4j.model.ollama.OllamaStreamingChatModel;
 import lombok.extern.slf4j.Slf4j;
-import cloud.xcan.core.model.ModelConfigProvider;
 
 /**
  * Ollama 模块自动配置 — 提供 OllamaModelFactory 组件。

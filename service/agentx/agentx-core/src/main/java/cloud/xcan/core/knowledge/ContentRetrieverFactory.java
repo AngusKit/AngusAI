@@ -18,8 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * ContentRetriever 工厂 — 根据 knowledgeBaseIds 创建 RAG 检索器。
  * <p>
- * 约定：knowledgeBaseId 与 VectorStoreConfigProvider 中的配置 ID 对应，
- * 即知识库 ID 作为向量存储配置 ID 使用。
+ * 约定：knowledgeBaseId 与 VectorStoreConfigProvider 中的配置 ID 对应， 即知识库 ID 作为向量存储配置 ID 使用。
  * </p>
  */
 @Slf4j
@@ -32,9 +31,9 @@ public class ContentRetrieverFactory {
   /**
    * 根据知识库 ID 列表创建 ContentRetriever。
    *
-   * @param knowledgeBaseIds 知识库 ID 列表（对应向量存储配置 ID）
+   * @param knowledgeBaseIds  知识库 ID 列表（对应向量存储配置 ID）
    * @param embeddingProvider 用于检索的 Embedding 模型 provider（如 "openai"）
-   * @param topK 每个知识库检索数量
+   * @param topK              每个知识库检索数量
    * @return ContentRetriever，若无法创建则返回 empty
    */
   public Optional<ContentRetriever> createContentRetriever(

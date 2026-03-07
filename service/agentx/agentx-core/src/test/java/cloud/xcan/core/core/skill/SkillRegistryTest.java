@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import cloud.xcan.core.skill.SkillRegistry;
 import dev.langchain4j.skills.DefaultSkill;
 import dev.langchain4j.skills.Skill;
 import java.util.Collections;
@@ -14,7 +15,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import cloud.xcan.core.skill.SkillRegistry;
 
 /**
  * SkillRegistry 单元测试 — 基于 LangChain4j Skill
@@ -143,7 +143,8 @@ class SkillRegistryTest {
     @Test
     @DisplayName("注销技能")
     void unregister() {
-      registry.register(DefaultSkill.builder().name("del-1").description("Del").content("x").build());
+      registry.register(
+          DefaultSkill.builder().name("del-1").description("Del").content("x").build());
       registry.unregister("del-1");
       assertTrue(registry.get("del-1").isEmpty());
     }
@@ -156,8 +157,10 @@ class SkillRegistryTest {
     @Test
     @DisplayName("列出所有技能")
     void listAll() {
-      registry.register(DefaultSkill.builder().name("l1").description("L1").content("Content 1").build());
-      registry.register(DefaultSkill.builder().name("l2").description("L2").content("Content 2").build());
+      registry.register(
+          DefaultSkill.builder().name("l1").description("L1").content("Content 1").build());
+      registry.register(
+          DefaultSkill.builder().name("l2").description("L2").content("Content 2").build());
       assertEquals(2, registry.listAll().size());
     }
   }

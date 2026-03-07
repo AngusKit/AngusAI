@@ -5,13 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import cloud.xcan.core.workflow.expression.ExpressionEngine;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import cloud.xcan.core.workflow.expression.ExpressionEngine;
 
 /**
  * ExpressionEngine 单元测试 — 覆盖 SpEL 表达式解析、变量替换、Map 解析、错误处理

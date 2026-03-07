@@ -4,17 +4,17 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import cloud.xcan.core.workflow.enums.NodeType;
 import cloud.xcan.core.workflow.dsl.NodeDefinition;
 import cloud.xcan.core.workflow.dsl.WorkflowDefinition;
+import cloud.xcan.core.workflow.enums.NodeType;
+import cloud.xcan.core.workflow.validation.ValidationResult;
+import cloud.xcan.core.workflow.validation.WorkflowValidator;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import cloud.xcan.core.workflow.validation.ValidationResult;
-import cloud.xcan.core.workflow.validation.WorkflowValidator;
 
 /**
  * WorkflowValidator 单元测试 — 覆盖结构验证、节点类型、DAG环检测、必填字段、引用一致性
@@ -42,8 +42,8 @@ class WorkflowValidatorTest {
           .id("wf-1")
           .name("Simple")
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("end").build(),
-              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
+              NodeDefinition.builder().id("start").type(NodeType.START).next("end").build(),
+              NodeDefinition.builder().id("end").type(NodeType.END).build()
           ))
           .build();
 
@@ -59,11 +59,11 @@ class WorkflowValidatorTest {
           .id("wf-multi")
           .name("Multi")
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("set").build(),
-              NodeDefinition.builder().id("set").type(NodeType.SET_VARIABLE.name())
+              NodeDefinition.builder().id("start").type(NodeType.START).next("set").build(),
+              NodeDefinition.builder().id("set").type(NodeType.SET_VARIABLE)
                   .config(Map.of("assignments", List.of(Map.of("name", "x", "value", "y"))))
                   .next("end").build(),
-              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
+              NodeDefinition.builder().id("end").type(NodeType.END).build()
           ))
           .build();
 
@@ -78,17 +78,17 @@ class WorkflowValidatorTest {
           .id("wf-cond")
           .name("Condition")
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("cond").build(),
-              NodeDefinition.builder().id("cond").type(NodeType.CONDITION.name())
+              NodeDefinition.builder().id("start").type(NodeType.START).next("cond").build(),
+              NodeDefinition.builder().id("cond").type(NodeType.CONDITION)
                   .config(Map.of("expression", "true", "ifTrue", "a", "ifFalse", "b"))
                   .build(),
-              NodeDefinition.builder().id("a").type(NodeType.SET_VARIABLE.name())
+              NodeDefinition.builder().id("a").type(NodeType.SET_VARIABLE)
                   .config(Map.of("assignments", List.of()))
                   .next("end").build(),
-              NodeDefinition.builder().id("b").type(NodeType.SET_VARIABLE.name())
+              NodeDefinition.builder().id("b").type(NodeType.SET_VARIABLE)
                   .config(Map.of("assignments", List.of()))
                   .next("end").build(),
-              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
+              NodeDefinition.builder().id("end").type(NodeType.END).build()
           ))
           .build();
 
@@ -109,8 +109,8 @@ class WorkflowValidatorTest {
       WorkflowDefinition wf = WorkflowDefinition.builder()
           .name("No ID")
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("end").build(),
-              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
+              NodeDefinition.builder().id("start").type(NodeType.START).next("end").build(),
+              NodeDefinition.builder().id("end").type(NodeType.END).build()
           ))
           .build();
 
@@ -125,8 +125,8 @@ class WorkflowValidatorTest {
       WorkflowDefinition wf = WorkflowDefinition.builder()
           .id("wf-noname")
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("end").build(),
-              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
+              NodeDefinition.builder().id("start").type(NodeType.START).next("end").build(),
+              NodeDefinition.builder().id("end").type(NodeType.END).build()
           ))
           .build();
 
@@ -176,7 +176,7 @@ class WorkflowValidatorTest {
           .id("wf-no-start")
           .name("No Start")
           .nodes(List.of(
-              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
+              NodeDefinition.builder().id("end").type(NodeType.END).build()
           ))
           .build();
 
@@ -192,9 +192,9 @@ class WorkflowValidatorTest {
           .id("wf-multi-start")
           .name("Multi Start")
           .nodes(List.of(
-              NodeDefinition.builder().id("s1").type(NodeType.START.name()).build(),
-              NodeDefinition.builder().id("s2").type(NodeType.START.name()).build(),
-              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
+              NodeDefinition.builder().id("s1").type(NodeType.START).build(),
+              NodeDefinition.builder().id("s2").type(NodeType.START).build(),
+              NodeDefinition.builder().id("end").type(NodeType.END).build()
           ))
           .build();
 
@@ -210,7 +210,7 @@ class WorkflowValidatorTest {
           .id("wf-no-end")
           .name("No End")
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type(NodeType.START.name()).build()
+              NodeDefinition.builder().id("start").type(NodeType.START).build()
           ))
           .build();
 
@@ -226,33 +226,15 @@ class WorkflowValidatorTest {
   class NodeTypeValidation {
 
     @Test
-    @DisplayName("未知节点类型报错")
-    void unknownNodeType() {
-      WorkflowDefinition wf = WorkflowDefinition.builder()
-          .id("wf-unknown")
-          .name("Unknown Type")
-          .nodes(List.of(
-              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("bad").build(),
-              NodeDefinition.builder().id("bad").type("UNKNOWN_TYPE").next("end").build(),
-              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
-          ))
-          .build();
-
-      ValidationResult result = validator.validate(wf);
-      assertFalse(result.isValid());
-      assertTrue(result.getErrors().stream().anyMatch(i -> "N004".equals(i.getCode())));
-    }
-
-    @Test
     @DisplayName("节点缺少 type 报错")
     void missingNodeType() {
       WorkflowDefinition wf = WorkflowDefinition.builder()
           .id("wf-no-type")
           .name("No Type")
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("n1").build(),
+              NodeDefinition.builder().id("start").type(NodeType.START).next("n1").build(),
               NodeDefinition.builder().id("n1").build(), // no type
-              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
+              NodeDefinition.builder().id("end").type(NodeType.END).build()
           ))
           .build();
 
@@ -268,8 +250,8 @@ class WorkflowValidatorTest {
           .id("wf-no-id")
           .name("No ID")
           .nodes(List.of(
-              NodeDefinition.builder().type(NodeType.START.name()).build(), // no id
-              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
+              NodeDefinition.builder().type(NodeType.START).build(), // no id
+              NodeDefinition.builder().id("end").type(NodeType.END).build()
           ))
           .build();
 
@@ -285,11 +267,11 @@ class WorkflowValidatorTest {
           .id("wf-dup")
           .name("Duplicate")
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("end").build(),
-              NodeDefinition.builder().id("start").type(NodeType.SET_VARIABLE.name())
+              NodeDefinition.builder().id("start").type(NodeType.START).next("end").build(),
+              NodeDefinition.builder().id("start").type(NodeType.SET_VARIABLE)
                   .config(Map.of("assignments", List.of()))
                   .next("end").build(),
-              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
+              NodeDefinition.builder().id("end").type(NodeType.END).build()
           ))
           .build();
 
@@ -302,7 +284,7 @@ class WorkflowValidatorTest {
     @DisplayName("所有16种合法节点类型不报错")
     void allValidNodeTypes() {
       for (NodeType type : NodeType.values()) {
-        NodeDefinition node = NodeDefinition.builder().id("n-" + type.name()).type(type.name()).build();
+        NodeDefinition node = NodeDefinition.builder().id("n-" + type.name()).type(type).build();
         // Just verify no NPE during type check — full validation has config requirements
         assertNotNull(node.getType());
       }
@@ -403,9 +385,10 @@ class WorkflowValidatorTest {
           .id("wf-test")
           .name("Test")
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type(NodeType.START.name()).next(nodeId).build(),
-              NodeDefinition.builder().id(nodeId).type(nodeType).config(config).next("end").build(),
-              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
+              NodeDefinition.builder().id("start").type(NodeType.START).next(nodeId).build(),
+              NodeDefinition.builder().id(nodeId).type(NodeType.valueOf(nodeType)).config(config)
+                  .next("end").build(),
+              NodeDefinition.builder().id("end").type(NodeType.END).build()
           ))
           .build();
     }
@@ -424,8 +407,9 @@ class WorkflowValidatorTest {
           .id("wf-badref")
           .name("Bad Ref")
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("does-not-exist").build(),
-              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
+              NodeDefinition.builder().id("start").type(NodeType.START).next("does-not-exist")
+                  .build(),
+              NodeDefinition.builder().id("end").type(NodeType.END).build()
           ))
           .build();
 
@@ -441,11 +425,11 @@ class WorkflowValidatorTest {
           .id("wf-cond-ref")
           .name("Cond Ref")
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("cond").build(),
-              NodeDefinition.builder().id("cond").type(NodeType.CONDITION.name())
+              NodeDefinition.builder().id("start").type(NodeType.START).next("cond").build(),
+              NodeDefinition.builder().id("cond").type(NodeType.CONDITION)
                   .config(Map.of("expression", "true", "ifTrue", "nonexistent", "ifFalse", "end"))
                   .build(),
-              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
+              NodeDefinition.builder().id("end").type(NodeType.END).build()
           ))
           .build();
 
@@ -461,11 +445,11 @@ class WorkflowValidatorTest {
           .id("wf-par-ref")
           .name("Par Ref")
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("par").build(),
-              NodeDefinition.builder().id("par").type(NodeType.PARALLEL.name())
+              NodeDefinition.builder().id("start").type(NodeType.START).next("par").build(),
+              NodeDefinition.builder().id("par").type(NodeType.PARALLEL)
                   .config(Map.of("branches", List.of("nonexistent")))
                   .next("end").build(),
-              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
+              NodeDefinition.builder().id("end").type(NodeType.END).build()
           ))
           .build();
 
@@ -488,14 +472,14 @@ class WorkflowValidatorTest {
           .id("wf-cycle")
           .name("Cycle")
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("a").build(),
-              NodeDefinition.builder().id("a").type(NodeType.SET_VARIABLE.name())
+              NodeDefinition.builder().id("start").type(NodeType.START).next("a").build(),
+              NodeDefinition.builder().id("a").type(NodeType.SET_VARIABLE)
                   .config(Map.of("assignments", List.of()))
                   .next("b").build(),
-              NodeDefinition.builder().id("b").type(NodeType.SET_VARIABLE.name())
+              NodeDefinition.builder().id("b").type(NodeType.SET_VARIABLE)
                   .config(Map.of("assignments", List.of()))
                   .next("a").build(), // cycle: a → b → a
-              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
+              NodeDefinition.builder().id("end").type(NodeType.END).build()
           ))
           .build();
 
@@ -511,11 +495,11 @@ class WorkflowValidatorTest {
           .id("wf-self-loop")
           .name("Self Loop")
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("loop").build(),
-              NodeDefinition.builder().id("loop").type(NodeType.SET_VARIABLE.name())
+              NodeDefinition.builder().id("start").type(NodeType.START).next("loop").build(),
+              NodeDefinition.builder().id("loop").type(NodeType.SET_VARIABLE)
                   .config(Map.of("assignments", List.of()))
                   .next("loop").build(), // self-loop
-              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
+              NodeDefinition.builder().id("end").type(NodeType.END).build()
           ))
           .build();
 
@@ -531,14 +515,14 @@ class WorkflowValidatorTest {
           .id("wf-no-cycle")
           .name("No Cycle")
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("a").build(),
-              NodeDefinition.builder().id("a").type(NodeType.SET_VARIABLE.name())
+              NodeDefinition.builder().id("start").type(NodeType.START).next("a").build(),
+              NodeDefinition.builder().id("a").type(NodeType.SET_VARIABLE)
                   .config(Map.of("assignments", List.of()))
                   .next("b").build(),
-              NodeDefinition.builder().id("b").type(NodeType.SET_VARIABLE.name())
+              NodeDefinition.builder().id("b").type(NodeType.SET_VARIABLE)
                   .config(Map.of("assignments", List.of()))
                   .next("end").build(),
-              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
+              NodeDefinition.builder().id("end").type(NodeType.END).build()
           ))
           .build();
 
@@ -561,11 +545,11 @@ class WorkflowValidatorTest {
           .id("wf-unreachable")
           .name("Unreachable")
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("end").build(),
-              NodeDefinition.builder().id("orphan").type(NodeType.SET_VARIABLE.name())
+              NodeDefinition.builder().id("start").type(NodeType.START).next("end").build(),
+              NodeDefinition.builder().id("orphan").type(NodeType.SET_VARIABLE)
                   .config(Map.of("assignments", List.of()))
                   .build(), // unreachable
-              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
+              NodeDefinition.builder().id("end").type(NodeType.END).build()
           ))
           .build();
 
@@ -587,11 +571,11 @@ class WorkflowValidatorTest {
           .id("wf-timeout")
           .name("Timeout")
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("n1").build(),
-              NodeDefinition.builder().id("n1").type(NodeType.SET_VARIABLE.name())
+              NodeDefinition.builder().id("start").type(NodeType.START).next("n1").build(),
+              NodeDefinition.builder().id("n1").type(NodeType.SET_VARIABLE)
                   .config(Map.of("assignments", List.of()))
                   .timeout(-1).next("end").build(),
-              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
+              NodeDefinition.builder().id("end").type(NodeType.END).build()
           ))
           .build();
 

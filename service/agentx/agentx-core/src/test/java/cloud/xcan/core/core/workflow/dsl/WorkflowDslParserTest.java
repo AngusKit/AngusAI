@@ -10,6 +10,7 @@ import cloud.xcan.core.workflow.dsl.NodeDefinition;
 import cloud.xcan.core.workflow.dsl.WorkflowDefinition;
 import cloud.xcan.core.workflow.dsl.WorkflowDslParser;
 import cloud.xcan.core.workflow.enums.FailurePolicy;
+import cloud.xcan.core.workflow.enums.FailureStrategy;
 import cloud.xcan.core.workflow.enums.NodeType;
 import cloud.xcan.core.workflow.enums.TriggerType;
 import java.io.IOException;
@@ -64,9 +65,9 @@ class WorkflowDslParserTest {
       assertEquals("1.0.0", def.getVersion());
       assertNotNull(def.getNodes());
       assertEquals(2, def.getNodes().size());
-      assertEquals(NodeType.START.name(), def.getNodes().get(0).getType());
+      assertEquals(NodeType.START, def.getNodes().get(0).getType());
       assertEquals("end", def.getNodes().get(0).getNext());
-      assertEquals(NodeType.END.name(), def.getNodes().get(1).getType());
+      assertEquals(NodeType.END, def.getNodes().get(1).getType());
     }
 
     @Test
@@ -135,7 +136,7 @@ class WorkflowDslParserTest {
 
       assertEquals("Full config workflow", def.getDescription());
       assertNotNull(def.getTrigger());
-      assertEquals(TriggerType.WEBHOOK.name(), def.getTrigger().getType());
+      assertEquals(TriggerType.WEBHOOK, def.getTrigger().getType());
       assertNotNull(def.getSettings());
       assertEquals(300, def.getSettings().getMaxExecutionSeconds());
       assertEquals(FailurePolicy.CONTINUE, def.getSettings().getOnFailure());
@@ -168,7 +169,7 @@ class WorkflowDslParserTest {
       WorkflowDefinition def = parser.parseJson(json);
 
       NodeDefinition llmNode = def.getNodes().get(0);
-      assertEquals(NodeType.LLM.name(), llmNode.getType());
+      assertEquals(NodeType.LLM, llmNode.getType());
       assertNotNull(llmNode.getConfig());
       assertEquals("Hello", llmNode.getConfig().get("systemPrompt"));
       assertEquals("end", llmNode.getNext());
@@ -295,7 +296,7 @@ class WorkflowDslParserTest {
 
       // Verify CONDITION node config
       NodeDefinition cond = def.getNodes().get(1);
-      assertEquals(NodeType.CONDITION.name(), cond.getType());
+      assertEquals(NodeType.CONDITION, cond.getType());
       assertNotNull(cond.getConfig());
       assertEquals("parallel", cond.getConfig().get("ifTrue"));
     }
@@ -410,14 +411,15 @@ class WorkflowDslParserTest {
 
       List<String> expectedTypes = List.of(
           NodeType.START.name(), NodeType.LLM.name(), NodeType.AGENT.name(), NodeType.TOOL.name(),
-          NodeType.HTTP.name(), NodeType.CODE.name(), NodeType.CONDITION.name(), NodeType.SWITCH.name(),
+          NodeType.HTTP.name(), NodeType.CODE.name(), NodeType.CONDITION.name(),
+          NodeType.SWITCH.name(),
           NodeType.LOOP.name(), NodeType.WHILE.name(), NodeType.PARALLEL.name(),
           NodeType.WAIT.name(), NodeType.SUB_WORKFLOW.name(), NodeType.SET_VARIABLE.name(),
           NodeType.KNOWLEDGE_RETRIEVAL.name(), NodeType.END.name()
       );
 
       for (int i = 0; i < expectedTypes.size(); i++) {
-        assertEquals(expectedTypes.get(i), def.getNodes().get(i).getType(),
+        assertEquals(expectedTypes.get(i), def.getNodes().get(i).getType().name(),
             "Mismatch at node index " + i);
       }
     }
@@ -525,8 +527,8 @@ class WorkflowDslParserTest {
           .name("Round Trip")
           .version("1.0.0")
           .nodes(List.of(
-              NodeDefinition.builder().id("s").type(NodeType.START.name()).next("e").build(),
-              NodeDefinition.builder().id("e").type(NodeType.END.name()).build()
+              NodeDefinition.builder().id("s").type(NodeType.START).next("e").build(),
+              NodeDefinition.builder().id("e").type(NodeType.END).build()
           ))
           .build();
 
@@ -546,7 +548,7 @@ class WorkflowDslParserTest {
           .id("rt-yaml")
           .name("YAML Round Trip")
           .nodes(List.of(
-              NodeDefinition.builder().id("s").type(NodeType.START.name()).build()
+              NodeDefinition.builder().id("s").type(NodeType.START).build()
           ))
           .build();
 
@@ -571,7 +573,7 @@ class WorkflowDslParserTest {
               .retryPolicy(WorkflowDefinition.RetryPolicy.builder()
                   .maxRetries(5).backoffSeconds(10).build())
               .build())
-          .nodes(List.of(NodeDefinition.builder().id("s").type(NodeType.START.name()).build()))
+          .nodes(List.of(NodeDefinition.builder().id("s").type(NodeType.START).build()))
           .build();
 
       String json = parser.toJson(original);
@@ -612,10 +614,10 @@ class WorkflowDslParserTest {
       NodeDefinition node = def.getNodes().get(0);
 
       assertNotNull(node.getOnFailure());
-      assertEquals("GOTO", node.getOnFailure().getStrategy());
+      assertEquals(FailureStrategy.GOTO, node.getOnFailure().getStrategy());
       assertEquals("fallback", node.getOnFailure().getGotoNode());
       assertNotNull(node.getOnTimeout());
-      assertEquals("SKIP", node.getOnTimeout().getStrategy());
+      assertEquals(FailureStrategy.SKIP, node.getOnTimeout().getStrategy());
     }
 
     @Test
@@ -665,7 +667,7 @@ class WorkflowDslParserTest {
 
       WorkflowDefinition def = parser.parseYaml(yaml);
       assertNotNull(def.getTrigger());
-      assertEquals(TriggerType.CRON.name(), def.getTrigger().getType());
+      assertEquals(TriggerType.CRON, def.getTrigger().getType());
       assertEquals("0 0 * * *", def.getTrigger().getConfig().get("schedule"));
     }
 

@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import cloud.xcan.core.prompt.PromptManager;
+import cloud.xcan.core.prompt.PromptTemplate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -11,8 +13,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import cloud.xcan.core.prompt.PromptManager;
-import cloud.xcan.core.prompt.PromptTemplate;
 
 /**
  * PromptManager 单元测试 — 覆盖模板保存、版本管理、渲染、列表

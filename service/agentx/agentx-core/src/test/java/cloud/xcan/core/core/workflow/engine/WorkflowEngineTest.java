@@ -4,16 +4,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import cloud.xcan.core.workflow.dsl.NodeDefinition;
+import cloud.xcan.core.workflow.dsl.WorkflowDefinition;
 import cloud.xcan.core.workflow.engine.NodeExecutionContext;
 import cloud.xcan.core.workflow.engine.NodeExecutionStatus;
 import cloud.xcan.core.workflow.engine.NodeExecutor;
 import cloud.xcan.core.workflow.engine.WorkflowEngine;
 import cloud.xcan.core.workflow.engine.WorkflowExecutionResult;
 import cloud.xcan.core.workflow.engine.WorkflowExecutionStatus;
-import cloud.xcan.core.workflow.enums.NodeType;
 import cloud.xcan.core.workflow.enums.FailurePolicy;
-import cloud.xcan.core.workflow.dsl.NodeDefinition;
-import cloud.xcan.core.workflow.dsl.WorkflowDefinition;
+import cloud.xcan.core.workflow.enums.NodeType;
 import cloud.xcan.core.workflow.expression.ExpressionEngine;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -61,8 +61,8 @@ class WorkflowEngineTest {
           .id("wf-1")
           .name("Simple")
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("end").build(),
-              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
+              NodeDefinition.builder().id("start").type(NodeType.START).next("end").build(),
+              NodeDefinition.builder().id("end").type(NodeType.END).build()
           ))
           .build();
 
@@ -93,9 +93,9 @@ class WorkflowEngineTest {
           .id("wf-3")
           .name("Three Nodes")
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("mid").build(),
-              NodeDefinition.builder().id("mid").type(NodeType.SET_VARIABLE.name()).next("end").build(),
-              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
+              NodeDefinition.builder().id("start").type(NodeType.START).next("mid").build(),
+              NodeDefinition.builder().id("mid").type(NodeType.SET_VARIABLE).next("end").build(),
+              NodeDefinition.builder().id("end").type(NodeType.END).build()
           ))
           .build();
 
@@ -103,7 +103,8 @@ class WorkflowEngineTest {
 
       assertEquals(WorkflowExecutionStatus.COMPLETED, result.getStatus());
       assertEquals(3, result.getNodeRecords().size());
-      result.getNodeRecords().forEach(r -> assertEquals(NodeExecutionStatus.SUCCESS, r.getStatus()));
+      result.getNodeRecords()
+          .forEach(r -> assertEquals(NodeExecutionStatus.SUCCESS, r.getStatus()));
     }
   }
 
@@ -128,8 +129,8 @@ class WorkflowEngineTest {
           .name("Vars")
           .variables(Map.of("defaultKey", "defaultValue"))
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("end").build(),
-              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
+              NodeDefinition.builder().id("start").type(NodeType.START).next("end").build(),
+              NodeDefinition.builder().id("end").type(NodeType.END).build()
           ))
           .build();
 
@@ -153,8 +154,8 @@ class WorkflowEngineTest {
           .name("Override")
           .variables(Map.of("key", "default"))
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("end").build(),
-              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
+              NodeDefinition.builder().id("start").type(NodeType.START).next("end").build(),
+              NodeDefinition.builder().id("end").type(NodeType.END).build()
           ))
           .build();
 
@@ -176,8 +177,8 @@ class WorkflowEngineTest {
           .id("wf-null-input")
           .name("Null Input")
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("end").build(),
-              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
+              NodeDefinition.builder().id("start").type(NodeType.START).next("end").build(),
+              NodeDefinition.builder().id("end").type(NodeType.END).build()
           ))
           .build();
 
@@ -208,9 +209,9 @@ class WorkflowEngineTest {
           .settings(WorkflowDefinition.WorkflowSettings.builder()
               .onFailure(FailurePolicy.STOP).build())
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("http").build(),
-              NodeDefinition.builder().id("http").type(NodeType.HTTP.name()).next("end").build(),
-              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
+              NodeDefinition.builder().id("start").type(NodeType.START).next("http").build(),
+              NodeDefinition.builder().id("http").type(NodeType.HTTP).next("end").build(),
+              NodeDefinition.builder().id("end").type(NodeType.END).build()
           ))
           .build();
 
@@ -238,9 +239,9 @@ class WorkflowEngineTest {
           .settings(WorkflowDefinition.WorkflowSettings.builder()
               .onFailure(FailurePolicy.CONTINUE).build())
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("http").build(),
-              NodeDefinition.builder().id("http").type(NodeType.HTTP.name()).next("end").build(),
-              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
+              NodeDefinition.builder().id("start").type(NodeType.START).next("http").build(),
+              NodeDefinition.builder().id("http").type(NodeType.HTTP).next("end").build(),
+              NodeDefinition.builder().id("end").type(NodeType.END).build()
           ))
           .build();
 
@@ -267,9 +268,9 @@ class WorkflowEngineTest {
           .name("Default")
           // No settings → default STOP
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("http").build(),
-              NodeDefinition.builder().id("http").type(NodeType.HTTP.name()).next("end").build(),
-              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
+              NodeDefinition.builder().id("start").type(NodeType.START).next("http").build(),
+              NodeDefinition.builder().id("http").type(NodeType.HTTP).next("end").build(),
+              NodeDefinition.builder().id("end").type(NodeType.END).build()
           ))
           .build();
 
@@ -299,9 +300,9 @@ class WorkflowEngineTest {
           .id("wf-order")
           .name("Order")
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("mid").build(),
-              NodeDefinition.builder().id("mid").type(NodeType.SET_VARIABLE.name()).next("end").build(),
-              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
+              NodeDefinition.builder().id("start").type(NodeType.START).next("mid").build(),
+              NodeDefinition.builder().id("mid").type(NodeType.SET_VARIABLE).next("end").build(),
+              NodeDefinition.builder().id("end").type(NodeType.END).build()
           ))
           .build();
 
@@ -326,13 +327,13 @@ class WorkflowEngineTest {
           .id("wf-cond-order")
           .name("Cond Order")
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("cond").build(),
-              NodeDefinition.builder().id("cond").type(NodeType.CONDITION.name())
+              NodeDefinition.builder().id("start").type(NodeType.START).next("cond").build(),
+              NodeDefinition.builder().id("cond").type(NodeType.CONDITION)
                   .config(Map.of("expression", "true", "ifTrue", "a", "ifFalse", "b"))
                   .build(),
-              NodeDefinition.builder().id("a").type(NodeType.SET_VARIABLE.name()).next("end").build(),
-              NodeDefinition.builder().id("b").type(NodeType.SET_VARIABLE.name()).next("end").build(),
-              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
+              NodeDefinition.builder().id("a").type(NodeType.SET_VARIABLE).next("end").build(),
+              NodeDefinition.builder().id("b").type(NodeType.SET_VARIABLE).next("end").build(),
+              NodeDefinition.builder().id("end").type(NodeType.END).build()
           ))
           .build();
 
@@ -358,13 +359,13 @@ class WorkflowEngineTest {
           .id("wf-par-order")
           .name("Par Order")
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("par").build(),
-              NodeDefinition.builder().id("par").type(NodeType.PARALLEL.name())
+              NodeDefinition.builder().id("start").type(NodeType.START).next("par").build(),
+              NodeDefinition.builder().id("par").type(NodeType.PARALLEL)
                   .config(Map.of("branches", List.of("b1", "b2")))
                   .next("end").build(),
-              NodeDefinition.builder().id("b1").type(NodeType.SET_VARIABLE.name()).build(),
-              NodeDefinition.builder().id("b2").type(NodeType.SET_VARIABLE.name()).build(),
-              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
+              NodeDefinition.builder().id("b1").type(NodeType.SET_VARIABLE).build(),
+              NodeDefinition.builder().id("b2").type(NodeType.SET_VARIABLE).build(),
+              NodeDefinition.builder().id("end").type(NodeType.END).build()
           ))
           .build();
 
@@ -395,8 +396,8 @@ class WorkflowEngineTest {
           .id("wf-records")
           .name("Records")
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("end").build(),
-              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
+              NodeDefinition.builder().id("start").type(NodeType.START).next("end").build(),
+              NodeDefinition.builder().id("end").type(NodeType.END).build()
           ))
           .build();
 
@@ -429,9 +430,9 @@ class WorkflowEngineTest {
           .settings(WorkflowDefinition.WorkflowSettings.builder()
               .onFailure(FailurePolicy.CONTINUE).build())
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("http").build(),
-              NodeDefinition.builder().id("http").type(NodeType.HTTP.name()).next("end").build(),
-              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
+              NodeDefinition.builder().id("start").type(NodeType.START).next("http").build(),
+              NodeDefinition.builder().id("http").type(NodeType.HTTP).next("end").build(),
+              NodeDefinition.builder().id("end").type(NodeType.END).build()
           ))
           .build();
 
@@ -462,8 +463,8 @@ class WorkflowEngineTest {
           .id("wf-skip")
           .name("Skip")
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("end").build(),
-              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
+              NodeDefinition.builder().id("start").type(NodeType.START).next("end").build(),
+              NodeDefinition.builder().id("end").type(NodeType.END).build()
           ))
           .build();
 
@@ -496,13 +497,13 @@ class WorkflowEngineTest {
           .id("wf-multi-branch")
           .name("Multi Branch")
           .nodes(List.of(
-              NodeDefinition.builder().id("start").type(NodeType.START.name()).next("cond").build(),
-              NodeDefinition.builder().id("cond").type(NodeType.CONDITION.name())
+              NodeDefinition.builder().id("start").type(NodeType.START).next("cond").build(),
+              NodeDefinition.builder().id("cond").type(NodeType.CONDITION)
                   .config(Map.of("expression", "true", "ifTrue", "a", "ifFalse", "b"))
                   .build(),
-              NodeDefinition.builder().id("a").type(NodeType.SET_VARIABLE.name()).next("end").build(),
-              NodeDefinition.builder().id("b").type(NodeType.SET_VARIABLE.name()).next("end").build(),
-              NodeDefinition.builder().id("end").type(NodeType.END.name()).build()
+              NodeDefinition.builder().id("a").type(NodeType.SET_VARIABLE).next("end").build(),
+              NodeDefinition.builder().id("b").type(NodeType.SET_VARIABLE).next("end").build(),
+              NodeDefinition.builder().id("end").type(NodeType.END).build()
           ))
           .build();
 
@@ -524,12 +525,13 @@ class WorkflowEngineTest {
       WorkflowEngine engine = createEngine(executors);
 
       List<NodeDefinition> nodes = new ArrayList<>();
-      nodes.add(NodeDefinition.builder().id("start").type(NodeType.START.name()).next("n1").build());
+      nodes.add(NodeDefinition.builder().id("start").type(NodeType.START).next("n1").build());
       for (int i = 1; i <= 10; i++) {
         String next = i < 10 ? "n" + (i + 1) : "end";
-        nodes.add(NodeDefinition.builder().id("n" + i).type(NodeType.SET_VARIABLE.name()).next(next).build());
+        nodes.add(
+            NodeDefinition.builder().id("n" + i).type(NodeType.SET_VARIABLE).next(next).build());
       }
-      nodes.add(NodeDefinition.builder().id("end").type(NodeType.END.name()).build());
+      nodes.add(NodeDefinition.builder().id("end").type(NodeType.END).build());
 
       WorkflowDefinition wf = WorkflowDefinition.builder()
           .id("wf-long")

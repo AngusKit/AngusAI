@@ -1,8 +1,10 @@
 package cloud.xcan.agentx.model.openai;
 
 import cloud.xcan.core.model.ModelConfigDefinition;
+import cloud.xcan.core.model.ModelConfigProvider;
 import cloud.xcan.core.model.ModelFactory;
 import cloud.xcan.core.model.ModelProvider;
+import cloud.xcan.core.model.ModelRegistry;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.StreamingChatModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
@@ -10,14 +12,12 @@ import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.model.openai.OpenAiEmbeddingModel;
 import dev.langchain4j.model.openai.OpenAiStreamingChatModel;
 import lombok.extern.slf4j.Slf4j;
-import cloud.xcan.core.model.ModelConfigProvider;
-import cloud.xcan.core.model.ModelRegistry;
 
 /**
  * OpenAI 模块自动配置 — 注册 OpenAiModelFactory 组件。
  * <p>
- * 模型配置不再从 application.yml 读取，而是由 {@link ModelConfigProvider} 从数据库等外部源加载，通过
- * {@link ModelRegistry} 统一管理。
+ * 模型配置不再从 application.yml 读取，而是由 {@link ModelConfigProvider} 从数据库等外部源加载，通过 {@link ModelRegistry}
+ * 统一管理。
  * </p>
  */
 public class OpenAiAutoConfiguration {

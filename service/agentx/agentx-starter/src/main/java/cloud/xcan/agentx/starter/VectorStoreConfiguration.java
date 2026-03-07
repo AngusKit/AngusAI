@@ -1,6 +1,5 @@
 package cloud.xcan.agentx.starter;
 
-import cloud.xcan.core.vectorstore.VectorStoreFactory;
 import cloud.xcan.agentx.vectorstore.chroma.ChromaAutoConfiguration;
 import cloud.xcan.agentx.vectorstore.elasticsearch.ElasticsearchAutoConfiguration;
 import cloud.xcan.agentx.vectorstore.mariadb.MariaDbAutoConfiguration;
@@ -8,6 +7,7 @@ import cloud.xcan.agentx.vectorstore.milvus.MilvusAutoConfiguration;
 import cloud.xcan.agentx.vectorstore.pgvector.PgVectorAutoConfiguration;
 import cloud.xcan.agentx.vectorstore.qdrant.QdrantAutoConfiguration;
 import cloud.xcan.agentx.vectorstore.weaviate.WeaviateAutoConfiguration;
+import cloud.xcan.core.vectorstore.VectorStoreFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

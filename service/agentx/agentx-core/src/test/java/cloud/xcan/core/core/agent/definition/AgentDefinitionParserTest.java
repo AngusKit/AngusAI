@@ -7,11 +7,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import cloud.xcan.core.agent.definition.AgentDefinition;
 import cloud.xcan.core.agent.definition.AgentDefinitionParser;
-import cloud.xcan.core.model.ModelProvider;
 import cloud.xcan.core.agent.enums.AutonomyLevel;
 import cloud.xcan.core.agent.enums.InteractionMode;
 import cloud.xcan.core.agent.enums.ReasoningStrategy;
 import cloud.xcan.core.memory.enums.MemoryStrategy;
+import cloud.xcan.core.model.ModelProvider;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

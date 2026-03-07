@@ -13,8 +13,8 @@ import org.springframework.context.ApplicationContext;
 /**
  * 工具自动扫描器 — 扫描 LangChain4j {@link Tool} 注解的 Bean 并注册到 ToolRegistry。
  * <p>
- * 使用 Spring Bean 名称作为工具 ID，Agent 的 toolIds 配置需与 Bean 名称对应（如 webSearchTool、httpRequestTool）。
- * 一个 Bean 可包含多个 @Tool 方法，LangChain4j 会自动提取。
+ * 使用 Spring Bean 名称作为工具 ID，Agent 的 toolIds 配置需与 Bean 名称对应（如 webSearchTool、httpRequestTool）。 一个 Bean
+ * 可包含多个 @Tool 方法，LangChain4j 会自动提取。
  * </p>
  */
 @Slf4j

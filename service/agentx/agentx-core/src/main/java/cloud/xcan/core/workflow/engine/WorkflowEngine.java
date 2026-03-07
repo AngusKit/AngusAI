@@ -1,10 +1,10 @@
 package cloud.xcan.core.workflow.engine;
 
+import cloud.xcan.core.workflow.dsl.NodeDefinition;
+import cloud.xcan.core.workflow.dsl.WorkflowDefinition;
 import cloud.xcan.core.workflow.enums.FailurePolicy;
 import cloud.xcan.core.workflow.enums.NodeType;
 import cloud.xcan.core.workflow.expression.ExpressionEngine;
-import cloud.xcan.core.workflow.dsl.NodeDefinition;
-import cloud.xcan.core.workflow.dsl.WorkflowDefinition;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -82,9 +82,10 @@ public class WorkflowEngine {
       log.debug("Executing node: {} ({})", nodeId, node.getType());
 
       try {
-        NodeExecutor executor = executors.get(node.getType());
+        String nodeTypeStr = node.getType() != null ? node.getType().name() : null;
+        NodeExecutor executor = nodeTypeStr != null ? executors.get(nodeTypeStr) : null;
         if (executor == null) {
-          log.warn("No executor for node type: {}", node.getType());
+          log.warn("No executor for node type: {}", nodeTypeStr);
           continue;
         }
 
@@ -101,14 +102,14 @@ public class WorkflowEngine {
         nodeOutputs.put(nodeId, outputs != null ? outputs : Map.of());
 
         // END 节点的输出就是工作流的最终输出
-        if (NodeType.END.name().equals(node.getType())) {
+        if (node.getType() == NodeType.END) {
           finalOutput = outputs != null ? outputs : Map.of();
         }
 
         Instant nodeEnd = Instant.now();
         records.add(WorkflowExecutionResult.NodeExecutionRecord.builder()
             .nodeId(nodeId)
-            .nodeType(node.getType())
+            .nodeType(node.getType() != null ? node.getType().name() : null)
             .status(NodeExecutionStatus.SUCCESS)
             .outputs(outputs)
             .startedAt(nodeStart)
@@ -122,7 +123,7 @@ public class WorkflowEngine {
 
         records.add(WorkflowExecutionResult.NodeExecutionRecord.builder()
             .nodeId(nodeId)
-            .nodeType(node.getType())
+            .nodeType(node.getType() != null ? node.getType().name() : null)
             .status(NodeExecutionStatus.FAILED)
             .error(e.getMessage())
             .startedAt(nodeStart)
@@ -180,7 +181,7 @@ public class WorkflowEngine {
 
     // 找 START 节点
     String startId = nodes.stream()
-        .filter(n -> NodeType.START.name().equals(n.getType()))
+        .filter(n -> n.getType() == NodeType.START)
         .map(NodeDefinition::getId)
         .findFirst()
         .orElse(nodes.get(0).getId());

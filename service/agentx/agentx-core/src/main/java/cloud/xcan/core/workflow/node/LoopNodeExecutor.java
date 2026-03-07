@@ -3,7 +3,6 @@ package cloud.xcan.core.workflow.node;
 import cloud.xcan.core.workflow.engine.NodeExecutionContext;
 import cloud.xcan.core.workflow.engine.NodeExecutor;
 import cloud.xcan.core.workflow.enums.NodeType;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

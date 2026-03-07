@@ -1,7 +1,7 @@
 package cloud.xcan.core.agent.runtime;
 
-import cloud.xcan.core.agent.enums.AgentStatus;
 import cloud.xcan.core.agent.definition.AgentDefinition;
+import cloud.xcan.core.agent.enums.AgentStatus;
 import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

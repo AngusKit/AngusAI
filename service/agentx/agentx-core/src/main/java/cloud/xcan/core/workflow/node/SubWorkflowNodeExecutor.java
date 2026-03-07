@@ -1,13 +1,13 @@
 package cloud.xcan.core.workflow.node;
 
 import cloud.xcan.core.workflow.WorkflowDefinitionProvider;
+import cloud.xcan.core.workflow.dsl.WorkflowDefinition;
 import cloud.xcan.core.workflow.engine.NodeExecutionContext;
 import cloud.xcan.core.workflow.engine.NodeExecutor;
 import cloud.xcan.core.workflow.engine.WorkflowEngine;
 import cloud.xcan.core.workflow.engine.WorkflowExecutionResult;
 import cloud.xcan.core.workflow.enums.NodeType;
 import cloud.xcan.core.workflow.expression.ExpressionEngine;
-import cloud.xcan.core.workflow.dsl.WorkflowDefinition;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -61,7 +61,8 @@ public class SubWorkflowNodeExecutor implements NodeExecutor {
   /**
    * 构建子工作流入参：优先使用 config.inputVariables（支持表达式），否则透传父工作流 variables
    */
-  private Map<String, Object> buildSubInputs(NodeExecutionContext context, Map<String, Object> config) {
+  private Map<String, Object> buildSubInputs(NodeExecutionContext context,
+      Map<String, Object> config) {
     Object inputVars = config.get("inputVariables");
     if (inputVars instanceof Map) {
       Map<String, Object> copy = new HashMap<>((Map<String, Object>) inputVars);

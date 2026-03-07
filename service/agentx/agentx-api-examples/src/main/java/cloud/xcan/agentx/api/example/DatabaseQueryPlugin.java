@@ -75,8 +75,9 @@ public class DatabaseQueryPlugin implements AgentXPlugin {
     context.registerSkill(DefaultSkill.builder()
         .name("db-query-skill")
         .description("基于自然语言生成 SQL 并查询数据库")
-        .content("你具备数据库查询能力。使用 db-query-tool 工具可将用户的自然语言问题转换为 SQL 查询。\n" +
-            "规则：1) 仅生成 SELECT 语句 2) 查询结果限制 " + limit + " 条 3) 敏感字段需脱敏")
+        .content(
+            "你具备数据库查询能力。使用 db-query-tool 工具可将用户的自然语言问题转换为 SQL 查询。\n" +
+                "规则：1) 仅生成 SELECT 语句 2) 查询结果限制 " + limit + " 条 3) 敏感字段需脱敏")
         .build());
 
     log.info("DatabaseQueryPlugin initialized — db-query-tool registered, jdbcUrl={}", jdbcUrl);

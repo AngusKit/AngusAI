@@ -1,18 +1,17 @@
 package cloud.xcan.agentx.vectorstore.pgvector;
 
 import cloud.xcan.core.vectorstore.VectorStoreConfigDefinition;
+import cloud.xcan.core.vectorstore.VectorStoreConfigProvider;
 import cloud.xcan.core.vectorstore.VectorStoreFactory;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.pgvector.PgVectorEmbeddingStore;
 import lombok.extern.slf4j.Slf4j;
-import cloud.xcan.core.vectorstore.VectorStoreConfigProvider;
 
 /**
  * PgVector 模块自动配置 — 提供 PgVectorStoreFactory 组件。
  * <p>
- * 向量存储配置由 {@link VectorStoreConfigProvider} 从数据库等外部源加载，不再从
- * application.yml 读取。
+ * 向量存储配置由 {@link VectorStoreConfigProvider} 从数据库等外部源加载，不再从 application.yml 读取。
  * </p>
  */
 public class PgVectorAutoConfiguration {

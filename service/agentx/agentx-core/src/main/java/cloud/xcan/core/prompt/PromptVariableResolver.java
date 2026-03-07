@@ -9,7 +9,8 @@ import java.util.regex.Pattern;
  */
 public final class PromptVariableResolver {
 
-  private static final Pattern PLACEHOLDER = Pattern.compile("\\{\\{([^}]+)\\}\\}|\\$\\{([^}]+)\\}");
+  private static final Pattern PLACEHOLDER = Pattern.compile(
+      "\\{\\{([^}]+)\\}\\}|\\$\\{([^}]+)\\}");
 
   private PromptVariableResolver() {
   }
@@ -17,7 +18,7 @@ public final class PromptVariableResolver {
   /**
    * 解析模板，将 {{key}} 或 ${key} 替换为 variables.get(key)。
    *
-   * @param template 原始模板
+   * @param template  原始模板
    * @param variables 变量映射，可为 null
    * @return 替换后的字符串，variables 为 null 或空时返回原模板
    */

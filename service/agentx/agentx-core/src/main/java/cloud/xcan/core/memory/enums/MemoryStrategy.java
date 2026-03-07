@@ -10,16 +10,24 @@ import com.fasterxml.jackson.annotation.JsonCreator;
  */
 public enum MemoryStrategy {
 
-  /** 不保留任何记忆 */
+  /**
+   * 不保留任何记忆
+   */
   NONE,
 
-  /** 基于消息条数的滑动窗口 — MessageWindowChatMemory */
+  /**
+   * 基于消息条数的滑动窗口 — MessageWindowChatMemory
+   */
   MESSAGE_WINDOW,
 
-  /** 基于 Token 的滑动窗口 — TokenWindowChatMemory */
+  /**
+   * 基于 Token 的滑动窗口 — TokenWindowChatMemory
+   */
   TOKEN_WINDOW,
 
-  /** 摘要记忆 — 超出窗口时压缩旧消息为摘要，需 ChatModel */
+  /**
+   * 摘要记忆 — 超出窗口时压缩旧消息为摘要，需 ChatModel
+   */
   SUMMARY;
 
   /**

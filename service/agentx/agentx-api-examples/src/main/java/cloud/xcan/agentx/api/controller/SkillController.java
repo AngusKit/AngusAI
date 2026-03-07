@@ -1,7 +1,7 @@
 package cloud.xcan.agentx.api.controller;
 
-import cloud.xcan.agentx.api.dto.SkillDto;
 import cloud.xcan.agentx.api.dto.ApiResponse;
+import cloud.xcan.agentx.api.dto.SkillDto;
 import cloud.xcan.core.skill.SkillRegistry;
 import dev.langchain4j.skills.DefaultSkill;
 import dev.langchain4j.skills.DefaultSkillResource;
@@ -75,11 +75,11 @@ public class SkillController {
         .content(s.content())
         .resources(s.resources() != null && !s.resources().isEmpty()
             ? s.resources().stream()
-                .map(r -> SkillDto.ResourceDto.builder()
-                    .relativePath(r.relativePath())
-                    .content(r.content())
-                    .build())
-                .collect(Collectors.toList())
+            .map(r -> SkillDto.ResourceDto.builder()
+                .relativePath(r.relativePath())
+                .content(r.content())
+                .build())
+            .collect(Collectors.toList())
             : null)
         .build();
   }

@@ -2,6 +2,7 @@ package cloud.xcan.core.workflow.validation;
 
 import cloud.xcan.core.workflow.dsl.NodeDefinition;
 import cloud.xcan.core.workflow.dsl.WorkflowDefinition;
+import cloud.xcan.core.workflow.enums.NodeType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,31 +24,29 @@ import lombok.extern.slf4j.Slf4j;
 public class WorkflowValidator {
 
   /**
-   * 所有合法节点类型
+   * 所有合法节点类型（从 NodeType 枚举派生）
    */
-  private static final Set<String> VALID_NODE_TYPES = Set.of(
-      "START", "END", "LLM", "AGENT", "TOOL", "HTTP", "CODE",
-      "CONDITION", "SWITCH", "LOOP", "WHILE", "PARALLEL",
-      "WAIT", "SUB_WORKFLOW", "SET_VARIABLE", "KNOWLEDGE_RETRIEVAL"
-  );
+  private static final Set<String> VALID_NODE_TYPES = java.util.Arrays.stream(NodeType.values())
+      .map(NodeType::name)
+      .collect(java.util.stream.Collectors.toSet());
 
   /**
    * 需要 config 字段的节点类型和对应必填 key
    */
-  private static final Map<String, List<String>> REQUIRED_CONFIG_KEYS = Map.ofEntries(
-      Map.entry("LLM", List.of("prompt")),
-      Map.entry("AGENT", List.of("agentId")),
-      Map.entry("TOOL", List.of("toolId")),
-      Map.entry("HTTP", List.of("url")),
-      Map.entry("CODE", List.of("language", "script")),
-      Map.entry("CONDITION", List.of("expression", "ifTrue", "ifFalse")),
-      Map.entry("SWITCH", List.of("expression", "cases")),
-      Map.entry("LOOP", List.of("items", "body")),
-      Map.entry("WHILE", List.of("condition", "body")),
-      Map.entry("PARALLEL", List.of("branches")),
-      Map.entry("SUB_WORKFLOW", List.of("workflowId")),
-      Map.entry("SET_VARIABLE", List.of("assignments")),
-      Map.entry("KNOWLEDGE_RETRIEVAL", List.of("query"))
+  private static final Map<NodeType, List<String>> REQUIRED_CONFIG_KEYS = Map.ofEntries(
+      Map.entry(NodeType.LLM, List.of("prompt")),
+      Map.entry(NodeType.AGENT, List.of("agentId")),
+      Map.entry(NodeType.TOOL, List.of("toolId")),
+      Map.entry(NodeType.HTTP, List.of("url")),
+      Map.entry(NodeType.CODE, List.of("language", "script")),
+      Map.entry(NodeType.CONDITION, List.of("expression", "ifTrue", "ifFalse")),
+      Map.entry(NodeType.SWITCH, List.of("expression", "cases")),
+      Map.entry(NodeType.LOOP, List.of("items", "body")),
+      Map.entry(NodeType.WHILE, List.of("condition", "body")),
+      Map.entry(NodeType.PARALLEL, List.of("branches")),
+      Map.entry(NodeType.SUB_WORKFLOW, List.of("workflowId")),
+      Map.entry(NodeType.SET_VARIABLE, List.of("assignments")),
+      Map.entry(NodeType.KNOWLEDGE_RETRIEVAL, List.of("query"))
   );
 
   /**
@@ -111,8 +110,8 @@ public class WorkflowValidator {
   }
 
   private void validateStartEnd(List<NodeDefinition> nodes, ValidationResult result) {
-    long startCount = nodes.stream().filter(n -> "START".equals(n.getType())).count();
-    long endCount = nodes.stream().filter(n -> "END".equals(n.getType())).count();
+    long startCount = nodes.stream().filter(n -> n.getType() == NodeType.START).count();
+    long endCount = nodes.stream().filter(n -> n.getType() == NodeType.END).count();
 
     if (startCount == 0) {
       result.addError(null, "W004", "Workflow must have exactly one START node");
@@ -129,11 +128,11 @@ public class WorkflowValidator {
   private void validateNode(NodeDefinition node, Map<String, NodeDefinition> nodeMap,
       ValidationResult result) {
     // 类型校验
-    if (node.getType() == null || node.getType().isBlank()) {
+    if (node.getType() == null) {
       result.addError(node.getId(), "N003", "Node is missing required field: type");
       return;
     }
-    if (!VALID_NODE_TYPES.contains(node.getType())) {
+    if (!VALID_NODE_TYPES.contains(node.getType().name())) {
       result.addError(node.getId(), "N004",
           "Unknown node type: " + node.getType() + ". Valid types: " + VALID_NODE_TYPES);
     }
@@ -150,23 +149,24 @@ public class WorkflowValidator {
       Map<String, Object> config = node.getConfig();
       if (config == null || config.isEmpty()) {
         result.addError(node.getId(), "N006",
-            "Node of type " + node.getType() + " requires config with keys: " + requiredKeys);
+            "Node of type " + node.getType().name() + " requires config with keys: "
+                + requiredKeys);
       } else {
         for (String key : requiredKeys) {
           if (!config.containsKey(key)) {
             result.addError(node.getId(), "N007",
-                "Node config missing required key '" + key + "' for type " + node.getType());
+                "Node config missing required key '" + key + "' for type " + node.getType().name());
           }
         }
       }
     }
 
     // CONDITION / SWITCH 分支引用校验
-    if ("CONDITION".equals(node.getType()) && node.getConfig() != null) {
+    if (node.getType() == NodeType.CONDITION && node.getConfig() != null) {
       validateBranchRef(node, "ifTrue", nodeMap, result);
       validateBranchRef(node, "ifFalse", nodeMap, result);
     }
-    if ("SWITCH".equals(node.getType()) && node.getConfig() != null) {
+    if (node.getType() == NodeType.SWITCH && node.getConfig() != null) {
       Object cases = node.getConfig().get("cases");
       if (cases instanceof Map<?, ?> caseMap) {
         for (Object target : caseMap.values()) {
@@ -179,7 +179,7 @@ public class WorkflowValidator {
     }
 
     // PARALLEL 分支引用校验
-    if ("PARALLEL".equals(node.getType()) && node.getConfig() != null) {
+    if (node.getType() == NodeType.PARALLEL && node.getConfig() != null) {
       Object branches = node.getConfig().get("branches");
       if (branches instanceof List<?> list) {
         for (Object b : list) {
@@ -253,7 +253,7 @@ public class WorkflowValidator {
 
     // 可达性：检查从 START 能否到达 END（先取节点再取 id，避免 getId() 为 null 时 Optional.of 抛 NPE）
     String startId = nodes.stream()
-        .filter(n -> "START".equals(n.getType()))
+        .filter(n -> n.getType() == NodeType.START)
         .findFirst()
         .map(NodeDefinition::getId)
         .orElse(null);

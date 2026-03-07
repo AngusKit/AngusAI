@@ -1,6 +1,5 @@
 package cloud.xcan.agentx.starter;
 
-import cloud.xcan.core.model.ModelRegistry;
 import cloud.xcan.agentx.tool.ai.AiUtilityTool;
 import cloud.xcan.agentx.tool.code.CodeExecutorTool;
 import cloud.xcan.agentx.tool.database.DatabaseQueryTool;
@@ -8,6 +7,7 @@ import cloud.xcan.agentx.tool.file.FileOperationTool;
 import cloud.xcan.agentx.tool.http.HttpRequestTool;
 import cloud.xcan.agentx.tool.notify.NotificationTool;
 import cloud.xcan.agentx.tool.search.WebSearchTool;
+import cloud.xcan.core.model.ModelRegistry;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;

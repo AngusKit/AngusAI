@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import cloud.xcan.core.tool.ToolDescriptor;
+import cloud.xcan.core.tool.ToolRegistry;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -14,8 +16,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import cloud.xcan.core.tool.ToolDescriptor;
-import cloud.xcan.core.tool.ToolRegistry;
 
 /**
  * ToolRegistry 单元测试 — 覆盖工具注册、注销、执行、租户过滤
@@ -245,7 +245,8 @@ class ToolRegistryTest {
       registry.register(ToolDescriptor.builder()
           .id("httpRequestTool").name("HTTP").instance(httpTool).build());
 
-      List<Object> result = registry.getToolObjectsForIds(List.of("webSearchTool", "httpRequestTool"));
+      List<Object> result = registry.getToolObjectsForIds(
+          List.of("webSearchTool", "httpRequestTool"));
       assertEquals(2, result.size());
       assertSame(webSearch, result.get(0));
       assertSame(httpTool, result.get(1));

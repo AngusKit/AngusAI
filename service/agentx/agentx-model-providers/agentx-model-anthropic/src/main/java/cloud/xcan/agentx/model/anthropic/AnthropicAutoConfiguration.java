@@ -1,6 +1,7 @@
 package cloud.xcan.agentx.model.anthropic;
 
 import cloud.xcan.core.model.ModelConfigDefinition;
+import cloud.xcan.core.model.ModelConfigProvider;
 import cloud.xcan.core.model.ModelFactory;
 import cloud.xcan.core.model.ModelProvider;
 import dev.langchain4j.model.anthropic.AnthropicChatModel;
@@ -9,7 +10,6 @@ import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.StreamingChatModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import lombok.extern.slf4j.Slf4j;
-import cloud.xcan.core.model.ModelConfigProvider;
 
 /**
  * Anthropic 模块自动配置 — 提供 AnthropicModelFactory 组件。

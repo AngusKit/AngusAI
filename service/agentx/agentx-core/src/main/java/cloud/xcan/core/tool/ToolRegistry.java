@@ -23,7 +23,7 @@ public class ToolRegistry {
   private static final Type MAP_TYPE = new ParameterizedType() {
     @Override
     public Type[] getActualTypeArguments() {
-      return new Type[] {String.class, Object.class};
+      return new Type[]{String.class, Object.class};
     }
 
     @Override
@@ -62,8 +62,7 @@ public class ToolRegistry {
   }
 
   /**
-   * 获取 @Tool Bean 实例列表（用于 AiServices.tools(objects)）
-   * 去重：同一 Bean 只返回一次
+   * 获取 @Tool Bean 实例列表（用于 AiServices.tools(objects)） 去重：同一 Bean 只返回一次
    */
   public List<Object> getToolObjectsForIds(List<String> toolIds) {
     if (toolIds == null || toolIds.isEmpty()) {
@@ -81,8 +80,8 @@ public class ToolRegistry {
   }
 
   /**
-   * 获取 executor-only 工具的 LangChain4j 绑定（用于 AiServices.tools(Map)）
-   * 插件通过 registerTool(descriptor.executor(...)) 注册的工具会出现在此 Map 中
+   * 获取 executor-only 工具的 LangChain4j 绑定（用于 AiServices.tools(Map)） 插件通过
+   * registerTool(descriptor.executor(...)) 注册的工具会出现在此 Map 中
    */
   public Map<ToolSpecification, ToolExecutor> getToolMapForIds(List<String> toolIds) {
     if (toolIds == null || toolIds.isEmpty()) {

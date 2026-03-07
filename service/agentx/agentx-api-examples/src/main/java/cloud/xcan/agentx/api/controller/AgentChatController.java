@@ -5,6 +5,9 @@ import cloud.xcan.agentx.api.dto.ChatRequest;
 import cloud.xcan.agentx.api.dto.ChatResponse;
 import cloud.xcan.core.agent.AgentRegistry;
 import dev.langchain4j.service.TokenStream;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +20,7 @@ import reactor.core.scheduler.Schedulers;
 /**
  * Agent 对话接口
  */
+@Tag(name = "Agent", description = "Agent 对话 - 同步对话、流式对话")
 @RestController
 @RequestMapping("/api/v1/agents")
 public class AgentChatController {
@@ -27,9 +31,11 @@ public class AgentChatController {
     this.agentRegistry = agentRegistry;
   }
 
-  /**
-   * 同步对话
-   */
+  @Operation(operationId = "chat", summary = "同步对话", description = "与指定 Agent 进行同步对话")
+  @ApiResponses(value = {
+      @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "对话成功"),
+      @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "请求参数无效")
+  })
   @PostMapping("/chat")
   public ApiResponse<ChatResponse> chat(@Valid @RequestBody ChatRequest request) {
     long start = System.currentTimeMillis();
@@ -45,9 +51,11 @@ public class AgentChatController {
     return ApiResponse.ok(response);
   }
 
-  /**
-   * 流式对话 (SSE) — 基于 TokenStream 的真实流式输出
-   */
+  @Operation(operationId = "chatStream", summary = "流式对话", description = "与指定 Agent 进行流式对话，返回 SSE 事件流")
+  @ApiResponses(value = {
+      @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "SSE 流式输出"),
+      @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "请求参数无效")
+  })
   @PostMapping(value = "/chat/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
   public Flux<String> chatStream(@Valid @RequestBody ChatRequest request) {
     String sessionId = request.getSessionId() != null ? request.getSessionId() : "default";

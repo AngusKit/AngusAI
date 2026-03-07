@@ -23,7 +23,9 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class SummarizingChatMemory implements ChatMemory {
 
-  /** Default summary prompt, overridable via memory.summaryPrompt config */
+  /**
+   * Default summary prompt, overridable via memory.summaryPrompt config
+   */
   public static final String DEFAULT_SUMMARY_PROMPT = """
       You are a professional dialogue memory compressor. Your task is to distill lengthy AI conversation history into a structured summary so that follow-up conversations can restore context with minimal tokens.
 

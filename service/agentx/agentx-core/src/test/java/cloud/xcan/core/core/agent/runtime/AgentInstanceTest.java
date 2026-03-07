@@ -8,11 +8,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import cloud.xcan.core.agent.definition.AgentDefinition;
 import cloud.xcan.core.agent.enums.AgentStatus;
+import cloud.xcan.core.agent.runtime.AgentInstance;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import cloud.xcan.core.agent.runtime.AgentInstance;
 
 /**
  * AgentInstance 单元测试 — 覆盖生命周期状态转换和运行时上下文管理

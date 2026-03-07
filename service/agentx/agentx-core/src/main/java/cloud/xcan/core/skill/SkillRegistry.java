@@ -12,8 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * 技能注册中心 — 基于 LangChain4j {@link Skill} 管理技能。
  * <p>
- * 技能通过 Spring Bean 自动注入或 {@link #register(Skill)} 注册。
- * Agent 通过 skillIds（技能名称）绑定技能，LLM 通过 activate_skill 工具按需加载。
+ * 技能通过 Spring Bean 自动注入或 {@link #register(Skill)} 注册。 Agent 通过 skillIds（技能名称）绑定技能，LLM 通过
+ * activate_skill 工具按需加载。
  * </p>
  */
 @Slf4j

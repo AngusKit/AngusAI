@@ -5,8 +5,8 @@ import cloud.xcan.core.guardrail.OutputGuardrail;
 import cloud.xcan.core.plugin.AgentXPlugin;
 import cloud.xcan.core.plugin.PluginContext;
 import cloud.xcan.core.plugin.PluginDescriptor;
-import dev.langchain4j.skills.DefaultSkill;
 import cloud.xcan.core.tool.ToolDescriptor;
+import dev.langchain4j.skills.DefaultSkill;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -98,12 +98,13 @@ public class CustomerServicePlugin implements AgentXPlugin {
     context.registerSkill(DefaultSkill.builder()
         .name("customer-service-skill")
         .description("处理客户咨询、创建工单、查询工单状态")
-        .content("你是一名专业客服助手。使用 create-ticket-tool、query-ticket-tool 等工具。工作流程：\n" +
-            "1. 理解客户问题，尝试直接回答\n" +
-            "2. 无法回答时查询知识库\n" +
-            "3. 需要跟进时创建工单\n" +
-            "4. 客户情绪激动时安抚并建议转人工\n" +
-            "始终保持礼貌、专业、有同理心。")
+        .content(
+            "你是一名专业客服助手。使用 create-ticket-tool、query-ticket-tool 等工具。工作流程：\n" +
+                "1. 理解客户问题，尝试直接回答\n" +
+                "2. 无法回答时查询知识库\n" +
+                "3. 需要跟进时创建工单\n" +
+                "4. 客户情绪激动时安抚并建议转人工\n" +
+                "始终保持礼貌、专业、有同理心。")
         .build());
 
     log.info("CustomerServicePlugin initialized — ticketApi={}", ticketApiUrl);

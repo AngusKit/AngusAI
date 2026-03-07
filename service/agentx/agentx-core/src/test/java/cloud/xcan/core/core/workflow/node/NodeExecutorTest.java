@@ -6,22 +6,15 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import cloud.xcan.core.workflow.InMemoryWorkflowDefinitionProvider;
-import cloud.xcan.core.workflow.enums.NodeType;
-import cloud.xcan.core.workflow.enums.WaitType;
-import cloud.xcan.core.workflow.engine.WorkflowExecutionStatus;
 import cloud.xcan.core.workflow.WorkflowDefinitionProvider;
 import cloud.xcan.core.workflow.dsl.NodeDefinition;
 import cloud.xcan.core.workflow.dsl.WorkflowDefinition;
 import cloud.xcan.core.workflow.engine.NodeExecutionContext;
 import cloud.xcan.core.workflow.engine.WorkflowEngine;
+import cloud.xcan.core.workflow.engine.WorkflowExecutionStatus;
+import cloud.xcan.core.workflow.enums.NodeType;
+import cloud.xcan.core.workflow.enums.WaitType;
 import cloud.xcan.core.workflow.expression.ExpressionEngine;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
 import cloud.xcan.core.workflow.node.CodeNodeExecutor;
 import cloud.xcan.core.workflow.node.ConditionNodeExecutor;
 import cloud.xcan.core.workflow.node.EndNodeExecutor;
@@ -34,6 +27,13 @@ import cloud.xcan.core.workflow.node.SubWorkflowNodeExecutor;
 import cloud.xcan.core.workflow.node.SwitchNodeExecutor;
 import cloud.xcan.core.workflow.node.WaitNodeExecutor;
 import cloud.xcan.core.workflow.node.WhileNodeExecutor;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 /**
  * 所有节点执行器单元测试 — 覆盖 START, END, CODE, CONDITION, SWITCH, LOOP, WHILE, PARALLEL, WAIT, SUB_WORKFLOW,
@@ -76,7 +76,7 @@ class NodeExecutorTest {
     @DisplayName("传递全局变量到输出")
     void passesVariablesToOutput() {
       Map<String, Object> vars = new HashMap<>(Map.of("key1", "val1", "key2", 42));
-      NodeDefinition node = NodeDefinition.builder().id("start").type(NodeType.START.name()).build();
+      NodeDefinition node = NodeDefinition.builder().id("start").type(NodeType.START).build();
       NodeExecutionContext ctx = buildContext(node, vars, new ConcurrentHashMap<>());
 
       Map<String, Object> outputs = executor.execute(ctx);
@@ -89,7 +89,7 @@ class NodeExecutorTest {
     @DisplayName("合并输出映射")
     void mergesOutputMappings() {
       NodeDefinition node = NodeDefinition.builder()
-          .id("start").type(NodeType.START.name())
+          .id("start").type(NodeType.START)
           .outputs(Map.of("extra", "value"))
           .build();
       Map<String, Object> vars = new HashMap<>(Map.of("base", "data"));
@@ -104,7 +104,7 @@ class NodeExecutorTest {
     @Test
     @DisplayName("空变量不报错")
     void emptyVariables() {
-      NodeDefinition node = NodeDefinition.builder().id("start").type(NodeType.START.name()).build();
+      NodeDefinition node = NodeDefinition.builder().id("start").type(NodeType.START).build();
       NodeExecutionContext ctx = buildContext(node, new HashMap<>(), new ConcurrentHashMap<>());
 
       Map<String, Object> outputs = executor.execute(ctx);
@@ -116,7 +116,7 @@ class NodeExecutorTest {
     @Test
     @DisplayName("null 变量不报错")
     void nullVariables() {
-      NodeDefinition node = NodeDefinition.builder().id("start").type(NodeType.START.name()).build();
+      NodeDefinition node = NodeDefinition.builder().id("start").type(NodeType.START).build();
       NodeExecutionContext ctx = NodeExecutionContext.builder()
           .nodeDefinition(node)
           .variables(null)
@@ -148,7 +148,7 @@ class NodeExecutorTest {
     @DisplayName("提取 config.output 作为输出")
     void extractsConfigOutput() {
       NodeDefinition node = NodeDefinition.builder()
-          .id("end").type(NodeType.END.name())
+          .id("end").type(NodeType.END)
           .config(Map.of("output", Map.of("status", "done", "code", 200)))
           .build();
       NodeExecutionContext ctx = buildContext(node);
@@ -163,7 +163,7 @@ class NodeExecutorTest {
     @DisplayName("无 output 配置返回空 Map")
     void noOutputConfig() {
       NodeDefinition node = NodeDefinition.builder()
-          .id("end").type(NodeType.END.name())
+          .id("end").type(NodeType.END)
           .config(Map.of())
           .build();
       NodeExecutionContext ctx = buildContext(node);
@@ -177,7 +177,7 @@ class NodeExecutorTest {
     @Test
     @DisplayName("null config 返回空 Map")
     void nullConfig() {
-      NodeDefinition node = NodeDefinition.builder().id("end").type(NodeType.END.name()).build();
+      NodeDefinition node = NodeDefinition.builder().id("end").type(NodeType.END).build();
       NodeExecutionContext ctx = buildContext(node);
 
       Map<String, Object> outputs = executor.execute(ctx);
@@ -190,7 +190,7 @@ class NodeExecutorTest {
     @DisplayName("output 不是 Map 时返回空")
     void outputNotMap() {
       NodeDefinition node = NodeDefinition.builder()
-          .id("end").type(NodeType.END.name())
+          .id("end").type(NodeType.END)
           .config(Map.of("output", "just a string"))
           .build();
       NodeExecutionContext ctx = buildContext(node);
@@ -218,7 +218,7 @@ class NodeExecutorTest {
     @DisplayName("执行代码节点返回语言和代码")
     void executesCodeNode() {
       NodeDefinition node = NodeDefinition.builder()
-          .id("code").type(NodeType.CODE.name())
+          .id("code").type(NodeType.CODE)
           .config(Map.of("language", "javascript", "code", "return 1 + 2;"))
           .build();
       NodeExecutionContext ctx = buildContext(node);
@@ -234,7 +234,7 @@ class NodeExecutorTest {
     @DisplayName("默认语言为 javascript")
     void defaultLanguage() {
       NodeDefinition node = NodeDefinition.builder()
-          .id("code").type(NodeType.CODE.name())
+          .id("code").type(NodeType.CODE)
           .config(Map.of("code", "console.log('hi')"))
           .build();
       NodeExecutionContext ctx = buildContext(node);
@@ -248,7 +248,7 @@ class NodeExecutorTest {
     @DisplayName("null 代码返回空字符串")
     void nullCode() {
       NodeDefinition node = NodeDefinition.builder()
-          .id("code").type(NodeType.CODE.name())
+          .id("code").type(NodeType.CODE)
           .config(new HashMap<>(Map.of("language", "python")))
           .build();
       NodeExecutionContext ctx = buildContext(node);
@@ -277,7 +277,7 @@ class NodeExecutorTest {
     @DisplayName("表达式为真返回 ifTrue 节点")
     void trueCondition() {
       NodeDefinition node = NodeDefinition.builder()
-          .id("cond").type(NodeType.CONDITION.name())
+          .id("cond").type(NodeType.CONDITION)
           .config(Map.of("expression", "1 == 1", "ifTrue", "nodeA", "ifFalse", "nodeB"))
           .build();
       Map<String, Object> vars = new HashMap<>();
@@ -293,7 +293,7 @@ class NodeExecutorTest {
     @DisplayName("表达式为假返回 ifFalse 节点")
     void falseCondition() {
       NodeDefinition node = NodeDefinition.builder()
-          .id("cond").type(NodeType.CONDITION.name())
+          .id("cond").type(NodeType.CONDITION)
           .config(Map.of("expression", "1 == 2", "ifTrue", "nodeA", "ifFalse", "nodeB"))
           .build();
       NodeExecutionContext ctx = buildContext(node, new HashMap<>(), new ConcurrentHashMap<>());
@@ -308,7 +308,7 @@ class NodeExecutorTest {
     @DisplayName("使用变量进行条件判断")
     void conditionWithVariables() {
       NodeDefinition node = NodeDefinition.builder()
-          .id("cond").type(NodeType.CONDITION.name())
+          .id("cond").type(NodeType.CONDITION)
           .config(Map.of("expression", "#variables['score'] > 60",
               "ifTrue", "pass", "ifFalse", "fail"))
           .build();
@@ -325,7 +325,7 @@ class NodeExecutorTest {
     @DisplayName("无效表达式返回 false")
     void invalidExpressionReturnsFalse() {
       NodeDefinition node = NodeDefinition.builder()
-          .id("cond").type(NodeType.CONDITION.name())
+          .id("cond").type(NodeType.CONDITION)
           .config(Map.of("expression", "undefined.method()",
               "ifTrue", "nodeA", "ifFalse", "nodeB"))
           .build();
@@ -341,7 +341,7 @@ class NodeExecutorTest {
     @DisplayName("null config 抛出异常")
     void nullConfigThrowsException() {
       NodeDefinition node = NodeDefinition.builder()
-          .id("cond").type(NodeType.CONDITION.name()).build();
+          .id("cond").type(NodeType.CONDITION).build();
       NodeExecutionContext ctx = buildContext(node);
 
       assertThrows(IllegalArgumentException.class, () -> executor.execute(ctx));
@@ -366,7 +366,7 @@ class NodeExecutorTest {
     @DisplayName("匹配 case 返回对应节点")
     void matchesCase() {
       NodeDefinition node = NodeDefinition.builder()
-          .id("sw").type(NodeType.SWITCH.name())
+          .id("sw").type(NodeType.SWITCH)
           .config(Map.of(
               "expression", "A",
               "cases", List.of(
@@ -387,7 +387,7 @@ class NodeExecutorTest {
     @DisplayName("无匹配 case 返回 default")
     void noMatchReturnsDefault() {
       NodeDefinition node = NodeDefinition.builder()
-          .id("sw").type(NodeType.SWITCH.name())
+          .id("sw").type(NodeType.SWITCH)
           .config(Map.of(
               "expression", "C",
               "cases", List.of(
@@ -408,7 +408,7 @@ class NodeExecutorTest {
     @DisplayName("无 default 且不匹配返回空字符串")
     void noDefaultNoMatch() {
       NodeDefinition node = NodeDefinition.builder()
-          .id("sw").type(NodeType.SWITCH.name())
+          .id("sw").type(NodeType.SWITCH)
           .config(Map.of(
               "expression", "Z",
               "cases", List.of(Map.of("value", "A", "next", "nodeA"))
@@ -440,7 +440,7 @@ class NodeExecutorTest {
     @DisplayName("遍历集合并记录迭代次数")
     void iteratesOverCollection() {
       NodeDefinition node = NodeDefinition.builder()
-          .id("loop").type(NodeType.LOOP.name())
+          .id("loop").type(NodeType.LOOP)
           .config(Map.of("collection", List.of("a", "b", "c"), "iterator", "item"))
           .build();
       Map<String, Object> vars = new HashMap<>();
@@ -456,7 +456,7 @@ class NodeExecutorTest {
     @DisplayName("设置迭代器变量和 loopIndex")
     void setsIteratorVariable() {
       NodeDefinition node = NodeDefinition.builder()
-          .id("loop").type(NodeType.LOOP.name())
+          .id("loop").type(NodeType.LOOP)
           .config(Map.of("collection", List.of("x", "y"), "iterator", "elem"))
           .build();
       Map<String, Object> vars = new HashMap<>();
@@ -474,7 +474,7 @@ class NodeExecutorTest {
     void maxIterationsLimit() {
       List<String> bigList = List.of("1", "2", "3", "4", "5", "6", "7", "8", "9", "10");
       NodeDefinition node = NodeDefinition.builder()
-          .id("loop").type(NodeType.LOOP.name())
+          .id("loop").type(NodeType.LOOP)
           .config(Map.of("collection", bigList, "iterator", "item", "maxIterations", 3))
           .build();
       Map<String, Object> vars = new HashMap<>();
@@ -489,7 +489,7 @@ class NodeExecutorTest {
     @DisplayName("默认迭代器名称为 item")
     void defaultIteratorName() {
       NodeDefinition node = NodeDefinition.builder()
-          .id("loop").type(NodeType.LOOP.name())
+          .id("loop").type(NodeType.LOOP)
           .config(Map.of("collection", List.of("val")))
           .build();
       Map<String, Object> vars = new HashMap<>();
@@ -504,7 +504,7 @@ class NodeExecutorTest {
     @DisplayName("空集合迭代0次")
     void emptyCollection() {
       NodeDefinition node = NodeDefinition.builder()
-          .id("loop").type(NodeType.LOOP.name())
+          .id("loop").type(NodeType.LOOP)
           .config(Map.of("collection", List.of()))
           .build();
       NodeExecutionContext ctx = buildContext(node, new HashMap<>(), new ConcurrentHashMap<>());
@@ -518,7 +518,7 @@ class NodeExecutorTest {
     @DisplayName("非列表 collection 当空列表处理")
     void nonListCollection() {
       NodeDefinition node = NodeDefinition.builder()
-          .id("loop").type(NodeType.LOOP.name())
+          .id("loop").type(NodeType.LOOP)
           .config(Map.of("collection", "not a list"))
           .build();
       NodeExecutionContext ctx = buildContext(node, new HashMap<>(), new ConcurrentHashMap<>());
@@ -547,7 +547,7 @@ class NodeExecutorTest {
     @DisplayName("条件始终为 false 迭代0次")
     void falseConditionNoIterations() {
       NodeDefinition node = NodeDefinition.builder()
-          .id("while").type(NodeType.WHILE.name())
+          .id("while").type(NodeType.WHILE)
           .config(Map.of("condition", "false", "maxIterations", 10))
           .build();
       NodeExecutionContext ctx = buildContext(node, new HashMap<>(), new ConcurrentHashMap<>());
@@ -561,7 +561,7 @@ class NodeExecutorTest {
     @DisplayName("maxIterations 限制循环次数")
     void maxIterationsBreaksLoop() {
       NodeDefinition node = NodeDefinition.builder()
-          .id("while").type(NodeType.WHILE.name())
+          .id("while").type(NodeType.WHILE)
           .config(Map.of("condition", "true", "maxIterations", 5))
           .build();
       NodeExecutionContext ctx = buildContext(node, new HashMap<>(), new ConcurrentHashMap<>());
@@ -575,7 +575,7 @@ class NodeExecutorTest {
     @DisplayName("无效条件表达式不循环")
     void invalidConditionNoLoop() {
       NodeDefinition node = NodeDefinition.builder()
-          .id("while").type(NodeType.WHILE.name())
+          .id("while").type(NodeType.WHILE)
           .config(Map.of("condition", "undefined.broken()", "maxIterations", 10))
           .build();
       NodeExecutionContext ctx = buildContext(node, new HashMap<>(), new ConcurrentHashMap<>());
@@ -604,7 +604,7 @@ class NodeExecutorTest {
     @DisplayName("返回分支列表和 waitAll 标记")
     void returnsBranchesAndWaitAll() {
       NodeDefinition node = NodeDefinition.builder()
-          .id("par").type(NodeType.PARALLEL.name())
+          .id("par").type(NodeType.PARALLEL)
           .config(Map.of("branches", List.of("b1", "b2", "b3"), "waitAll", true))
           .build();
       NodeExecutionContext ctx = buildContext(node);
@@ -619,7 +619,7 @@ class NodeExecutorTest {
     @DisplayName("默认 waitAll 为 true")
     void defaultWaitAllTrue() {
       NodeDefinition node = NodeDefinition.builder()
-          .id("par").type(NodeType.PARALLEL.name())
+          .id("par").type(NodeType.PARALLEL)
           .config(Map.of("branches", List.of("b1")))
           .build();
       NodeExecutionContext ctx = buildContext(node);
@@ -633,7 +633,7 @@ class NodeExecutorTest {
     @DisplayName("空分支列表")
     void emptyBranches() {
       NodeDefinition node = NodeDefinition.builder()
-          .id("par").type(NodeType.PARALLEL.name())
+          .id("par").type(NodeType.PARALLEL)
           .config(Map.of("waitAll", false))
           .build();
       NodeExecutionContext ctx = buildContext(node);
@@ -662,7 +662,7 @@ class NodeExecutorTest {
     @DisplayName("返回等待类型和超时")
     void returnsWaitConfig() {
       NodeDefinition node = NodeDefinition.builder()
-          .id("wait").type(NodeType.WAIT.name())
+          .id("wait").type(NodeType.WAIT)
           .config(Map.of("waitType", WaitType.APPROVAL.name(), "timeout", 300))
           .build();
       NodeExecutionContext ctx = buildContext(node);
@@ -678,7 +678,7 @@ class NodeExecutorTest {
     @DisplayName("默认 waitType 为 APPROVAL，timeout 为 3600")
     void defaults() {
       NodeDefinition node = NodeDefinition.builder()
-          .id("wait").type(NodeType.WAIT.name())
+          .id("wait").type(NodeType.WAIT)
           .config(Map.of())
           .build();
       NodeExecutionContext ctx = buildContext(node);
@@ -703,8 +703,8 @@ class NodeExecutorTest {
           .id("sub-wf-001")
           .name("Test Sub Workflow")
           .nodes(List.of(
-              NodeDefinition.builder().id("s1").type(NodeType.START.name()).next("e1").build(),
-              NodeDefinition.builder().id("e1").type(NodeType.END.name()).build()
+              NodeDefinition.builder().id("s1").type(NodeType.START).next("e1").build(),
+              NodeDefinition.builder().id("e1").type(NodeType.END).build()
           ))
           .build();
       provider.register(subWf);
@@ -724,7 +724,7 @@ class NodeExecutorTest {
     void executesSubWorkflow() {
       SubWorkflowNodeExecutor executor = createExecutor();
       NodeDefinition node = NodeDefinition.builder()
-          .id("sub").type(NodeType.SUB_WORKFLOW.name())
+          .id("sub").type(NodeType.SUB_WORKFLOW)
           .config(Map.of("workflowId", "sub-wf-001"))
           .build();
       NodeExecutionContext ctx = buildContext(node);
@@ -743,10 +743,11 @@ class NodeExecutorTest {
       ExpressionEngine expressionEngine = new ExpressionEngine();
       WorkflowDefinitionProvider provider = new InMemoryWorkflowDefinitionProvider();
       WorkflowEngine engine = new WorkflowEngine(expressionEngine, List.of());
-      SubWorkflowNodeExecutor executor = new SubWorkflowNodeExecutor(engine, provider, expressionEngine);
+      SubWorkflowNodeExecutor executor = new SubWorkflowNodeExecutor(engine, provider,
+          expressionEngine);
 
       NodeDefinition node = NodeDefinition.builder()
-          .id("sub").type(NodeType.SUB_WORKFLOW.name())
+          .id("sub").type(NodeType.SUB_WORKFLOW)
           .config(Map.of("workflowId", "non-existent-wf"))
           .build();
       NodeExecutionContext ctx = buildContext(node);
@@ -773,7 +774,7 @@ class NodeExecutorTest {
     @DisplayName("设置单个变量")
     void setSingleVariable() {
       NodeDefinition node = NodeDefinition.builder()
-          .id("set").type(NodeType.SET_VARIABLE.name())
+          .id("set").type(NodeType.SET_VARIABLE)
           .config(Map.of("assignments", List.of(Map.of("name", "x", "value", "hello"))))
           .build();
       Map<String, Object> vars = new HashMap<>();
@@ -789,7 +790,7 @@ class NodeExecutorTest {
     @DisplayName("设置多个变量")
     void setMultipleVariables() {
       NodeDefinition node = NodeDefinition.builder()
-          .id("set").type(NodeType.SET_VARIABLE.name())
+          .id("set").type(NodeType.SET_VARIABLE)
           .config(Map.of("assignments", List.of(
               Map.of("name", "a", "value", 1),
               Map.of("name", "b", "value", "two"),
@@ -811,7 +812,7 @@ class NodeExecutorTest {
     @DisplayName("覆盖已有变量")
     void overrideExistingVariable() {
       NodeDefinition node = NodeDefinition.builder()
-          .id("set").type(NodeType.SET_VARIABLE.name())
+          .id("set").type(NodeType.SET_VARIABLE)
           .config(Map.of("assignments", List.of(Map.of("name", "x", "value", "new"))))
           .build();
       Map<String, Object> vars = new HashMap<>(Map.of("x", "old"));
@@ -826,7 +827,7 @@ class NodeExecutorTest {
     @DisplayName("空 assignments 不修改变量")
     void emptyAssignments() {
       NodeDefinition node = NodeDefinition.builder()
-          .id("set").type(NodeType.SET_VARIABLE.name())
+          .id("set").type(NodeType.SET_VARIABLE)
           .config(Map.of("assignments", List.of()))
           .build();
       Map<String, Object> vars = new HashMap<>();
@@ -857,7 +858,7 @@ class NodeExecutorTest {
     @DisplayName("返回查询参数")
     void returnsQueryParams() {
       NodeDefinition node = NodeDefinition.builder()
-          .id("kr").type(NodeType.KNOWLEDGE_RETRIEVAL.name())
+          .id("kr").type(NodeType.KNOWLEDGE_RETRIEVAL)
           .config(Map.of("query", "test query", "topK", 3,
               "knowledgeBaseIds", List.of("kb1", "kb2")))
           .build();
@@ -874,7 +875,7 @@ class NodeExecutorTest {
     @DisplayName("默认 topK 为 5")
     void defaultTopK() {
       NodeDefinition node = NodeDefinition.builder()
-          .id("kr").type(NodeType.KNOWLEDGE_RETRIEVAL.name())
+          .id("kr").type(NodeType.KNOWLEDGE_RETRIEVAL)
           .config(Map.of("query", "test"))
           .build();
       NodeExecutionContext ctx = buildContext(node);

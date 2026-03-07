@@ -15,7 +15,9 @@ public enum ModelProvider {
   GEMINI,
   AMAZON_BEDROCK,
   GITHUB_MODELS,
-  /** @deprecated */
+  /**
+   * @deprecated
+   */
   @Deprecated
   AZURE_OPEN_AI,
   GOOGLE_AI_GEMINI,
@@ -27,14 +29,22 @@ public enum ModelProvider {
   OTHER,
 
   // 针对langchain4j扩展模型提供商
-  /** 通义千问（阿里） */
+  /**
+   * 通义千问（阿里）
+   */
   QWEN,
-  /** 智谱 GLM */
+  /**
+   * 智谱 GLM
+   */
   ZHIPU,
-  /** DeepSeek */
+  /**
+   * DeepSeek
+   */
   DEEPSEEK;
 
-  /** 用于 Map 查找、JSON 序列化 — 返回枚举名 */
+  /**
+   * 用于 Map 查找、JSON 序列化 — 返回枚举名
+   */
   @JsonValue
   public String getKey() {
     return name();
