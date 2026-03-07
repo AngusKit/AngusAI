@@ -5,6 +5,9 @@ import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.parseStartDate;
 import static cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder.getMatchSearchFields;
 import static cloud.xcan.angus.core.utils.CoreUtils.buildVoPageResult;
 
+import cloud.xcan.agentx.core.model.ModelConfigDefinition;
+import cloud.xcan.agentx.core.model.ModelFactory;
+import cloud.xcan.agentx.core.model.ModelProvider;
 import cloud.xcan.angus.core.ai.application.cmd.model.ModelCmd;
 import cloud.xcan.angus.core.ai.application.query.model.ModelCallRecordQuery;
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
@@ -30,12 +33,8 @@ import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.PageResult;
 import cloud.xcan.angus.remote.dto.SimpleStatisticsDto;
 import cloud.xcan.angus.remote.search.SearchCriteria;
-import cloud.xcan.agentx.core.model.ModelConfigDefinition;
-import cloud.xcan.agentx.core.model.ModelFactory;
-import cloud.xcan.agentx.core.model.ModelProvider;
 import jakarta.annotation.Resource;
 import java.time.LocalDate;
-import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -59,7 +58,7 @@ public class ModelFacadeImpl implements ModelFacade {
   @Resource
   private ModelCallRecordQuery modelCallRecordQuery;
 
-  @Autowired(required = false)
+  @Resource
   private List<ModelFactory> modelFactories;
 
   private static final int DEFAULT_MONTHS = 1; // 默认统计近一月

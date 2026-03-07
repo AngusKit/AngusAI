@@ -32,9 +32,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * 向量存储源管理 REST 控制器
- */
 @Tag(name = "VectorStore", description = "向量存储源管理")
 @Validated
 @RestController

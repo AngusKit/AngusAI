@@ -25,9 +25,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * API密钥管理REST接口
- */
 @Tag(name = "APIKeys", description = "API密钥管理 - 密钥的创建、管理、吊销、刷新等功能")
 @Validated
 @RestController
