@@ -992,7 +992,7 @@ agentx/
 │   ├── logging/                      #   结构化日志
 │   └── dashboard/                    #   Grafana 模板
 │
-├── agentx-spring-boot-starter/       # Spring Boot 自动装配
+├── agentx-starter/       # Spring Boot 自动装配
 │
 ├── agentx-api/                       # REST API / WebSocket 接入层
 │

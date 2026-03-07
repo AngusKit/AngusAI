@@ -10,7 +10,7 @@
     <version>1.0.0</version>
   </parent>
 
-  <artifactId>xcan-angusai.agentx-spring-boot-starter</artifactId>
+  <artifactId>xcan-angusai.agentx-starter</artifactId>
   <name>AgentX :: Spring Boot Starter</name>
   <description>AgentX 自动装配 Starter，聚合所有核心模块并提供默认配置</description>
 
@@ -53,13 +53,6 @@
     <dependency>
       <groupId>dev.langchain4j</groupId>
       <artifactId>langchain4j-core</artifactId>
-    </dependency>
-
-    <!-- Lombok -->
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <optional>true</optional>
     </dependency>
 
     <!-- Models -->

@@ -148,7 +148,7 @@
       <!-- ===== Starter ===== -->
       <dependency>
         <groupId>cloud.xcan.agentx</groupId>
-        <artifactId>xcan-angusai.agentx-spring-boot-starter</artifactId>
+        <artifactId>xcan-angusai.agentx-starter</artifactId>
         <version>${project.version}</version>
       </dependency>
 

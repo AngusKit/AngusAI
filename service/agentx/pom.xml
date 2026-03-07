@@ -25,7 +25,7 @@
     <module>agentx-tools-builtin</module>
     <module>agentx-vectorstore</module>
     <module>agentx-observability</module>
-    <module>agentx-spring-boot-starter</module>
+    <module>agentx-starter</module>
     <module>agentx-api</module>
     <module>agentx-eval</module>
   </modules>
@@ -36,60 +36,10 @@
     <maven.compiler.target>${java.version}</maven.compiler.target>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-    <!-- Core Dependencies -->
-    <langchain4j.version>1.12.1</langchain4j.version>
-    <spring-boot.version>3.4.0</spring-boot.version>
-
-    <!-- Infrastructure -->
-    <postgresql.version>42.7.4</postgresql.version>
-    <milvus-sdk.version>2.4.3</milvus-sdk.version>
-    <redisson.version>3.36.0</redisson.version>
-
-    <!-- Observability -->
-    <micrometer.version>1.14.2</micrometer.version>
-
-    <!-- Utilities -->
-    <jackson.version>2.18.2</jackson.version>
-    <snakeyaml.version>2.3</snakeyaml.version>
-    <json-schema-validator.version>1.5.4</json-schema-validator.version>
-    <lombok.version>1.18.38</lombok.version>
-    <mapstruct.version>1.6.3</mapstruct.version>
-    <guava.version>33.4.0-jre</guava.version>
-
-    <!-- Testing -->
-    <junit.version>5.11.4</junit.version>
-    <mockito.version>5.14.2</mockito.version>
-    <testcontainers.version>1.20.4</testcontainers.version>
-
-    <!-- Maven Plugins -->
-    <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
-    <maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
-    <spring-boot-maven-plugin.version>3.4.1</spring-boot-maven-plugin.version>
   </properties>
 
   <dependencyManagement>
     <dependencies>
-      <!-- Spring Boot Dependencies -->
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>${spring-boot.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-tomcat</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-undertow</artifactId>
-        <version>${spring-boot.version}</version>
-      </dependency>
-
       <!-- AgentX BOM -->
       <dependency>
         <groupId>cloud.xcan.agentx</groupId>
@@ -106,27 +56,6 @@
         <version>${langchain4j.version}</version>
         <type>pom</type>
         <scope>import</scope>
-      </dependency>
-
-      <!-- Guava -->
-      <dependency>
-        <groupId>com.google.guava</groupId>
-        <artifactId>guava</artifactId>
-        <version>${guava.version}</version>
-      </dependency>
-
-      <!-- JSON Schema Validator -->
-      <dependency>
-        <groupId>com.networknt</groupId>
-        <artifactId>json-schema-validator</artifactId>
-        <version>${json-schema-validator.version}</version>
-      </dependency>
-
-      <!-- Mockito JUnit Jupiter -->
-      <dependency>
-        <groupId>org.mockito</groupId>
-        <artifactId>mockito-junit-jupiter</artifactId>
-        <version>${mockito.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

@@ -18,7 +18,7 @@
     <!-- AgentX Starter -->
     <dependency>
       <groupId>cloud.xcan.agentx</groupId>
-      <artifactId>xcan-angusai.agentx-spring-boot-starter</artifactId>
+      <artifactId>xcan-angusai.agentx-starter</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -50,13 +50,6 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-    </dependency>
-
-    <!-- Lombok -->
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <optional>true</optional>
     </dependency>
 
     <!-- Test -->
