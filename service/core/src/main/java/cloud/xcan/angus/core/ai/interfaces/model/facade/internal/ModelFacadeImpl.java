@@ -30,7 +30,7 @@ import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.PageResult;
 import cloud.xcan.angus.remote.dto.SimpleStatisticsDto;
 import cloud.xcan.angus.remote.search.SearchCriteria;
-import cloud.xcan.core.model.ModelConfigDefinition;
+import cloud.xcan.agentx.core.model.ModelConfigDefinition;
 import jakarta.annotation.Resource;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -81,6 +81,13 @@ public class ModelFacadeImpl implements ModelFacade {
 
   @NameJoin
   @Override
+  public ModelDetailVo updateStatus(Long id, ModelUpdateStatusDto dto) {
+    Model saved = modelCmd.updateStatus(id, dto.getStatus());
+    return ModelAssembler.toDetailVo(saved);
+  }
+
+  @NameJoin
+  @Override
   public ModelDetailVo test(Long id, ModelTestDto dto) {
     Model saved = modelCmd.test(id, dto.getTestPrompt());
     return ModelAssembler.toDetailVo(saved);
@@ -89,13 +96,6 @@ public class ModelFacadeImpl implements ModelFacade {
   @Override
   public void delete(Long id) {
     modelCmd.delete(id);
-  }
-
-  @NameJoin
-  @Override
-  public ModelDetailVo updateStatus(Long id, ModelUpdateStatusDto dto) {
-    Model saved = modelCmd.updateStatus(id, dto.getStatus());
-    return ModelAssembler.toDetailVo(saved);
   }
 
   @NameJoin

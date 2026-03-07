@@ -272,93 +272,49 @@ export interface SecurityConfig {
   enableAnonymization?: boolean;
 }
 
-/** 模型配置 */
-export interface ModelConfig {
-  /** 模型名称，例如 gpt-4o-mini */
-  modelName: string;
-  /** 模型类型，如：CHAT, EMBEDDING, VISION 等 */
-  modelType: ModelTypeEnum;
-  /** 模型提供商，如：OPENAI、ANTHROPIC、OLLAMA 等 */
-  provider: ModelProviderEnum;
-  /** 模型版本标识 */
-  version: string;
-  /** 模型用途或能力描述 */
-  description?: string;
-  /** 访问模型所需的API密钥 */
-  apiKey: string;
-  /** 模型服务的基础URL */
-  apiEndpoint: string;
+/** 模型配置定义 — 与后端 ModelConfigDefinition 一致 */
+export interface ModelConfigDefinition {
+  /** 配置唯一标识 */
+  id?: string;
+  /** 模型提供商：OPEN_AI/ANTHROPIC/OLLAMA/GEMINI/QWEN/ZHIPU/DEEPSEEK 等 */
+  provider?: ModelProviderEnum;
+  /** 模型类型：chat/image/audio/embedding/moderation */
+  type?: ModelTypeEnum;
+  /** 模型名称，例如 gpt-4 */
+  modelName?: string;
+  /** API Key（加密存储，敏感字段） */
+  apiKey?: string;
+  /** API Base URL（用于自托管或代理） */
+  baseUrl?: string;
   /**
-   * 温度，控制创造性，通常0.0-2.0
+   * 温度参数，0-2
    * @format double
    */
   temperature?: number;
   /**
-   * 最大生成token数
+   * 最大 Token 数
    * @format int32
    */
   maxTokens?: number;
+  /** Embedding 模型名称（用于 RAG 等场景） */
+  embeddingModelName?: string;
+  /** 是否为默认配置 — 多个模型时优先选择默认模型 */
+  defaultConfig?: boolean;
   /**
-   * 上下文窗口大小，模型最大可处理的上下文长度
-   * @format int32
-   */
-  contextWindow?: number;
-  /**
-   * 请求超时时间（毫秒）
-   * @format int64
-   */
-  timeout?: number;
-  /**
-   * 失败重试次数
-   * @format int32
-   */
-  retryCount?: number;
-  /** 是否启用流式响应 */
-  streaming?: boolean;
-  /**
-   * 优先级（越小越高）
+   * 优先级 — 数值越大优先级越高；无默认模型时选择优先级最高的
    * @format int32
    */
   priority?: number;
-  /** 是否启用该模型配置 */
-  enabled?: boolean;
-  /** 是否本地部署模型 */
-  isLocal?: boolean;
-  /** 是否兼容OpenAI API接口 */
-  openaiCompatible?: boolean;
-  /**
-   * 成本等级（1-5）
-   * @format int32
-   */
-  costLevel?: number;
-  /**
-   * 性能等级（1-5）
-   * @format int32
-   */
-  performanceLevel?: number;
-  /**
-   * 模型支持的特性枚举集合
-   * @uniqueItems true
-   */
-  features?: string[];
-  /**
-   * 支持的多模态类型，例如：image, audio
-   * @uniqueItems true
-   */
-  multimodalityTypes?: string[];
-  /** 默认请求参数键值对 */
-  defaultParams?: Record<string, object>;
-  /**
-   * 支持的输入格式集合
-   * @uniqueItems true
-   */
-  inputFormats?: string[];
+  /** 租户 ID（null 为全局） */
+  tenantId?: string;
+  /** 扩展参数 */
+  extraProperties?: Record<string, object>;
 }
 
 /** 应用配置更新请求参数 */
 export interface ApplicationConfig {
   /** 模型配置 */
-  model: ModelConfig;
+  model: ModelConfigDefinition;
   /** 关联资源 */
   resources?: ResourcesConfig;
   /** 提示词配置 */

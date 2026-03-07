@@ -2,6 +2,7 @@ package cloud.xcan.angus.core.ai.application.cmd.model.impl;
 
 import static cloud.xcan.angus.spec.utils.ObjectUtils.nullSafe;
 
+import cloud.xcan.agentx.core.model.ModelConfigDefinition;
 import cloud.xcan.angus.core.ai.application.cmd.model.ModelCmd;
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.domain.model.Model;
@@ -13,7 +14,6 @@ import cloud.xcan.angus.core.jpa.repository.BaseRepository;
 import cloud.xcan.angus.remote.message.http.ResourceExisted;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import cloud.xcan.angus.spec.utils.ObjectUtils;
-import cloud.xcan.core.model.ModelConfigDefinition;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -103,6 +103,24 @@ public class ModelCmdImpl extends CommCmd<Model, Long> implements ModelCmd {
     }.execute();
   }
 
+  @Override
+  @Transactional
+  public Model updateStatus(Long id, ModelStatus status) {
+    return new BizTemplate<Model>() {
+      Model modelDb;
+
+      @Override
+      protected void checkParams() {
+        modelDb = modelQuery.findAndCheck(id);
+      }
+
+      @Override
+      protected Model process() {
+        modelDb.setStatus(status);
+        return modelRepo.save(modelDb);
+      }
+    }.execute();
+  }
 
   @Override
   public Model test(Long id, String testPrompt) {
@@ -134,25 +152,6 @@ public class ModelCmdImpl extends CommCmd<Model, Long> implements ModelCmd {
       protected Void process() {
         modelRepo.deleteById(id);
         return null;
-      }
-    }.execute();
-  }
-
-  @Override
-  @Transactional
-  public Model updateStatus(Long id, ModelStatus status) {
-    return new BizTemplate<Model>() {
-      Model modelDb;
-
-      @Override
-      protected void checkParams() {
-        modelDb = modelQuery.findAndCheck(id);
-      }
-
-      @Override
-      protected Model process() {
-        modelDb.setStatus(status);
-        return modelRepo.save(modelDb);
       }
     }.execute();
   }

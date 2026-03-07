@@ -1118,7 +1118,7 @@ export const zhCN = {
       version: '版本',
       versionPlaceholder: '例如: gpt-4-turbo-2024-04',
       apiConfiguration: 'API配置',
-      apiEndpoint: 'API端点',
+      baseUrl: 'API 基础地址',
       apiKey: 'API密钥',
       leaveBlankToKeepUnchanged: '留空则不修改',
       modelParameters: '模型参数',

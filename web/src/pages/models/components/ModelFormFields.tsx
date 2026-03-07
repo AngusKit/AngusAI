@@ -137,7 +137,7 @@ export function ModelFormFields({
 
         <div className='space-y-2'>
           <Label htmlFor={isEdit ? 'edit-model-endpoint' : 'model-endpoint'} className='dark:text-gray-300'>
-            {t('models.formFields.apiEndpoint')}
+            {t('models.formFields.baseUrl')}
           </Label>
           <Input
             id={isEdit ? 'edit-model-endpoint' : 'model-endpoint'}

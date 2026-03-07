@@ -13,7 +13,7 @@ import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelListVo;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder;
 import cloud.xcan.angus.remote.search.SearchCriteria;
-import cloud.xcan.core.model.ModelConfigDefinition;
+import cloud.xcan.agentx.core.model.ModelConfigDefinition;
 import java.util.Set;
 
 public class ModelAssembler {
@@ -28,19 +28,20 @@ public class ModelAssembler {
     model.setStatus(ModelStatus.DISABLED);
 
     // 创建配置对象
-    ModelConfigDefinition config = new ModelConfigDefinition();
-    config.setModelName(dto.getName());
-    config.setType(dto.getType());
-    config.setProvider(dto.getProvider());
-    config.setBaseUrl(dto.getApiEndpoint());
-    config.setApiKey(dto.getApiKey());
-    config.setTemperature(dto.getTemperature());
-    config.setMaxTokens(dto.getMaxTokens());
-    config.setEmbeddingModelName(dto.getEmbeddingModelName());
-    config.setDefaultConfig(dto.isDefaultConfig());
-    config.setPriority(nullSafe(dto.getPriority(), 0));
-    config.setTenantId(String.valueOf(getOptTenantId()));
-    config.setExtraProperties(dto.getExtraProperties());
+    ModelConfigDefinition config = ModelConfigDefinition.builder()
+        .modelName(dto.getName())
+        .type(dto.getType())
+        .provider(dto.getProvider())
+        .baseUrl(dto.getBaseUrl())
+        .apiKey(dto.getApiKey())
+        .temperature(dto.getTemperature())
+        .maxTokens(dto.getMaxTokens())
+        .embeddingModelName(dto.getEmbeddingModelName())
+        .defaultConfig(dto.isDefaultConfig())
+        .priority(nullSafe(dto.getPriority(), 0))
+        .tenantId(String.valueOf(getOptTenantId()))
+        .extraProperties(dto.getExtraProperties())
+        .build();
     model.setConfig(config);
     return model;
   }
@@ -53,19 +54,20 @@ public class ModelAssembler {
     model.setType(dto.getType());
     model.setProvider(dto.getProvider());
     // 创建配置对象
-    ModelConfigDefinition config = new ModelConfigDefinition();
-    config.setModelName(dto.getName());
-    config.setType(dto.getType());
-    config.setProvider(dto.getProvider());
-    config.setBaseUrl(dto.getApiEndpoint());
-    config.setApiKey(dto.getApiKey());
-    config.setTemperature(dto.getTemperature());
-    config.setMaxTokens(dto.getMaxTokens());
-    config.setEmbeddingModelName(dto.getEmbeddingModelName());
-    config.setDefaultConfig(dto.isDefaultConfig());
-    config.setPriority(nullSafe(dto.getPriority(), 0));
-    config.setTenantId(String.valueOf(getOptTenantId()));
-    config.setExtraProperties(dto.getExtraProperties());
+    ModelConfigDefinition config = ModelConfigDefinition.builder()
+        .modelName(dto.getName())
+        .type(dto.getType())
+        .provider(dto.getProvider())
+        .baseUrl(dto.getBaseUrl())
+        .apiKey(dto.getApiKey())
+        .temperature(dto.getTemperature())
+        .maxTokens(dto.getMaxTokens())
+        .embeddingModelName(dto.getEmbeddingModelName())
+        .defaultConfig(dto.isDefaultConfig())
+        .priority(nullSafe(dto.getPriority(), 0))
+        .tenantId(String.valueOf(getOptTenantId()))
+        .extraProperties(dto.getExtraProperties())
+        .build();
     model.setConfig(config);
     return model;
   }

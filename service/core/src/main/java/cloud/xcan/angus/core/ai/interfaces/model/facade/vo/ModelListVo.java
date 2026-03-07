@@ -1,7 +1,7 @@
 package cloud.xcan.angus.core.ai.interfaces.model.facade.vo;
 
 import cloud.xcan.angus.core.ai.domain.model.ModelStatus;
-import cloud.xcan.core.model.ModelProvider;
+import cloud.xcan.agentx.core.model.ModelProvider;
 import dev.langchain4j.model.catalog.ModelType;
 import cloud.xcan.angus.remote.vo.TenantAuditingVo;
 import io.swagger.v3.oas.annotations.media.Schema;

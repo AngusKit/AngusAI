@@ -1,11 +1,10 @@
 package cloud.xcan.angus.core.ai.interfaces.model.facade.dto;
 
 import cloud.xcan.angus.core.ai.domain.model.ModelStatus;
-import cloud.xcan.core.model.ModelProvider;
+import cloud.xcan.agentx.core.model.ModelProvider;
 import dev.langchain4j.model.catalog.ModelType;
 import cloud.xcan.angus.remote.PageQuery;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.validator.constraints.Length;

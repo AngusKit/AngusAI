@@ -1,6 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.model.facade.dto;
 
-import cloud.xcan.core.model.ModelProvider;
+import cloud.xcan.agentx.core.model.ModelProvider;
 import dev.langchain4j.model.catalog.ModelType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Map;
@@ -26,9 +26,9 @@ public class ModelUpdateDto {
   @Schema(description = "模型提供商")
   private ModelProvider provider;
 
-  @Schema(description = "API端点", example = "https://api.openai.com/v1/chat/completions")
+  @Schema(description = "API Base URL（用于自托管或代理）", example = "https://api.openai.com/v1")
   @Length(max = 400)
-  private String apiEndpoint;
+  private String baseUrl;
 
   @Length(max = 4096)
   @Schema(description = "API密钥")

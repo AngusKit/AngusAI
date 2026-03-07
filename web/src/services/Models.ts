@@ -1,5 +1,5 @@
 import { AI, ApiLocaleResult, PageQuery } from '@xcan-angus/infra';
-import { GetModelListParamsOrderByEnum, ModelConfig, ModelCreateDto, ModelDetailResult, ModelStatisticsResult, ModelTestDto, ModelUpdateDto, ModelUpdateStatusDto, PageResultModelListResult, } from './ModelsTypes.ts';
+import { GetModelListParamsOrderByEnum, ModelConfigDefinition, ModelCreateDto, ModelDetailResult, ModelStatisticsResult, ModelTestDto, ModelUpdateDto, ModelUpdateStatusDto, PageResultModelListResult, } from './ModelsTypes.ts';
 import http, { ContentType, HttpClient, QueryParamsType, RequestParams } from './HttpClient.ts';
 import { ModelProviderEnum, ModelStatusEnum, ModelTypeEnum } from '@/enums/enums.ts';
 
@@ -19,7 +19,7 @@ export class Models<SecurityDataType = unknown> {
    * @request PUT:/api/v1/models/{id}/config
    * @secure
    */
-  updateModelConfig = (id: string, data: ModelConfig, params: RequestParams = {}) =>
+  updateModelConfig = (id: string, data: ModelConfigDefinition, params: RequestParams = {}) =>
     this.http.request<ModelDetailResult>({
       path: `${AI}/models/${id}/config`,
       method: 'PUT',

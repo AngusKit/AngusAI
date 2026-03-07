@@ -805,7 +805,7 @@ export const enUS = {
       version: 'Version',
       versionPlaceholder: 'e.g., gpt-4-turbo-2024-04',
       apiConfiguration: 'API Configuration',
-      apiEndpoint: 'API Endpoint',
+      baseUrl: 'API Base URL',
       apiKey: 'API Key',
       leaveBlankToKeepUnchanged: 'Leave blank to keep unchanged',
       modelParameters: 'Model Parameters',

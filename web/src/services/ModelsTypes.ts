@@ -1,8 +1,8 @@
 import { ApiLocaleResult, TenantAuditingVo } from '@xcan-angus/infra';
 import { ModelProviderEnum, ModelStatusEnum, ModelTypeEnum } from '@/enums/enums.ts';
-import type { ModelConfig } from './ApplicationsTypes.ts';
+import type { ModelConfigDefinition } from './ApplicationsTypes.ts';
 
-export type { ModelConfig } from './ApplicationsTypes.ts';
+export type { ModelConfigDefinition } from './ApplicationsTypes.ts';
 
 /** 近一月增长趋势 */
 export interface LastMonthGrowthTrend {
@@ -191,7 +191,7 @@ export interface ModelDetailVo extends TenantAuditingVo {
   /** 模型状态 */
   status?: ModelStatusEnum;
   /** 配置信息 */
-  config?: ModelConfig;
+  config?: ModelConfigDefinition;
   /** 模型访问限制 */
   accessLimit?: ModelAccessLimit;
   /** 统计数据 */
@@ -223,10 +223,10 @@ export interface ModelCreateDto {
   /** 模型提供商 */
   provider: ModelProviderEnum;
   /**
-   * API端点
-   * @example "https://api.openai.com/v1/chat/completions"
+   * API Base URL（用于自托管或代理）
+   * @example "https://api.openai.com/v1"
    */
-  apiEndpoint?: string;
+  baseUrl?: string;
   /** API密钥 */
   apiKey?: string;
   /**
@@ -267,10 +267,10 @@ export interface ModelUpdateDto {
   /** 模型提供商 */
   provider?: ModelProviderEnum;
   /**
-   * API端点
-   * @example "https://api.openai.com/v1/chat/completions"
+   * API Base URL（用于自托管或代理）
+   * @example "https://api.openai.com/v1"
    */
-  apiEndpoint?: string;
+  baseUrl?: string;
   /** API密钥 */
   apiKey?: string;
   /**

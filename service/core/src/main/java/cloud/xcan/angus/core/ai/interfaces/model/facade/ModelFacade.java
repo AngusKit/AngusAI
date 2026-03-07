@@ -10,7 +10,7 @@ import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelListVo;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelStatisticsVo;
 import cloud.xcan.angus.remote.PageResult;
 import cloud.xcan.angus.remote.dto.SimpleStatisticsDto;
-import cloud.xcan.core.model.ModelConfigDefinition;
+import cloud.xcan.agentx.core.model.ModelConfigDefinition;
 
 public interface ModelFacade {
 
@@ -28,6 +28,11 @@ public interface ModelFacade {
    * 更新模型配置
    */
   ModelDetailVo updateConfig(Long id, ModelConfigDefinition config);
+
+  /**
+   * 修改模型状态
+   */
+  ModelDetailVo updateStatus(Long id, ModelUpdateStatusDto dto);
 
   /**
    * 测试模型连接
@@ -53,10 +58,5 @@ public interface ModelFacade {
    * 获取模型调用统计
    */
   ModelStatisticsVo getStatistics(SimpleStatisticsDto dto);
-
-  /**
-   * 修改模型状态
-   */
-  ModelDetailVo updateStatus(Long id, ModelUpdateStatusDto dto);
 
 }
