@@ -4,6 +4,7 @@ import cloud.xcan.core.agent.enums.AutonomyLevel;
 import cloud.xcan.core.agent.enums.InteractionMode;
 import cloud.xcan.core.agent.enums.ReasoningStrategy;
 import cloud.xcan.core.memory.enums.MemoryStrategy;
+import cloud.xcan.core.model.ModelProvider;
 import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
@@ -144,13 +145,13 @@ public class AgentDefinition {
   @AllArgsConstructor
   public static class ModelConfig {
 
-    private String provider;
+    private ModelProvider provider;
     private String modelName;
     @Builder.Default
     private Double temperature = 0.7;
     @Builder.Default
     private Integer maxTokens = 4096;
-    private String fallbackProvider;
+    private ModelProvider fallbackProvider;
     private String fallbackModelName;
   }
 

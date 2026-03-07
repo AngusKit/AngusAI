@@ -1,6 +1,7 @@
 package cloud.xcan.core.knowledge;
 
 import cloud.xcan.core.knowledge.retriever.CompositeContentRetriever;
+import cloud.xcan.core.model.ModelProvider;
 import cloud.xcan.core.model.ModelRegistry;
 import cloud.xcan.core.vectorstore.VectorStoreRegistry;
 import dev.langchain4j.data.segment.TextSegment;
@@ -37,9 +38,7 @@ public class ContentRetrieverFactory {
    * @return ContentRetriever，若无法创建则返回 empty
    */
   public Optional<ContentRetriever> createContentRetriever(
-      List<String> knowledgeBaseIds,
-      String embeddingProvider,
-      int topK) {
+      List<String> knowledgeBaseIds, ModelProvider embeddingProvider, int topK) {
     if (knowledgeBaseIds == null || knowledgeBaseIds.isEmpty()) {
       return Optional.empty();
     }
@@ -74,7 +73,7 @@ public class ContentRetrieverFactory {
     return Optional.of(composite);
   }
 
-  private EmbeddingModel getEmbeddingModel(String provider) {
+  private EmbeddingModel getEmbeddingModel(ModelProvider provider) {
     return modelRegistry.getDefaultEmbeddingModel(provider).orElse(null);
   }
 }

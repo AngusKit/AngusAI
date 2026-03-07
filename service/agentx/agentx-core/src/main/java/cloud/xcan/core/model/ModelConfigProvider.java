@@ -1,5 +1,6 @@
 package cloud.xcan.core.model;
 
+import dev.langchain4j.model.catalog.ModelType;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -29,7 +30,7 @@ public interface ModelConfigProvider {
    * 加载默认/首选模型配置
    * <p>
    * 选取规则：若有 defaultConfig=true 则返回该配置；否则返回 priority 最高的配置。
-   * 实现类可自行实现，或调用 {@link #selectPreferred(List, String)} 使用框架提供的选取逻辑。
+   * 实现类可自行实现，或调用 {@link #selectPreferred(List, ModelProvider)} 使用框架提供的选取逻辑。
    * </p>
    */
   Optional<ModelConfigDefinition> loadDefault();
@@ -38,11 +39,21 @@ public interface ModelConfigProvider {
    * 加载指定提供商的默认/首选模型配置。
    * <p>
    * 选取规则：若有 defaultConfig=true 则返回该配置；否则返回 priority 最高的配置。
-   * 实现类可自行实现，或调用 {@link #selectPreferred(List, String)} 使用框架提供的选取逻辑。
+   * 实现类可自行实现，或调用 {@link #selectPreferred(List, ModelProvider)} 使用框架提供的选取逻辑。
    * </p>
    */
-  Optional<ModelConfigDefinition> loadDefault(String provider);
+  Optional<ModelConfigDefinition> loadDefault(ModelProvider provider);
 
+  /**
+   * 加载指定提供商、指定类型的默认/首选模型配置。
+   * <p>
+   * 按 type 过滤：仅返回 type 匹配或为 null 的配置（null 表示兼容未设置 type 的旧数据）。
+   * 实现类可调用 {@link #selectPreferred(List, ModelProvider, ModelType)}。
+   * </p>
+   */
+  default Optional<ModelConfigDefinition> loadDefault(ModelProvider provider, ModelType type) {
+    return selectPreferred(loadAll(), provider, type);
+  }
 
   /**
    * 加载指定租户的模型配置
@@ -53,16 +64,16 @@ public interface ModelConfigProvider {
    * 从配置列表中选取指定提供商的首选模型：优先默认，其次按优先级降序。
    *
    * @param configs 候选配置列表
-   * @param provider 提供商标识
+   * @param provider 提供商
    * @return 首选配置，若无匹配则 empty
    */
   static Optional<ModelConfigDefinition> selectPreferred(List<ModelConfigDefinition> configs,
-      String provider) {
-    if (configs == null || configs.isEmpty()) {
+      ModelProvider provider) {
+    if (configs == null || configs.isEmpty() || provider == null) {
       return Optional.empty();
     }
     List<ModelConfigDefinition> filtered = configs.stream()
-        .filter(c -> provider != null && provider.equals(c.getProvider()))
+        .filter(c -> provider.equals(c.getProvider()))
         .toList();
     if (filtered.isEmpty()) {
       return Optional.empty();
@@ -78,5 +89,28 @@ public interface ModelConfigProvider {
     return filtered.stream()
         .max(Comparator.comparing(ModelConfigDefinition::getPriority,
             Comparator.nullsFirst(Comparator.naturalOrder())));
+  }
+
+  /**
+   * 从配置列表中选取指定提供商、指定类型的首选模型。
+   *
+   * @param configs 候选配置列表
+   * @param provider 提供商
+   * @param type 模型类型（null 表示不过滤）
+   * @return 首选配置，若无匹配则 empty
+   */
+  static Optional<ModelConfigDefinition> selectPreferred(List<ModelConfigDefinition> configs,
+      ModelProvider provider, ModelType type) {
+    if (configs == null || configs.isEmpty() || provider == null) {
+      return Optional.empty();
+    }
+    List<ModelConfigDefinition> byProvider = configs.stream()
+        .filter(c -> provider.equals(c.getProvider()))
+        .toList();
+    List<ModelConfigDefinition> filtered = type == null ? byProvider
+        : byProvider.stream()
+            .filter(c -> c.getType() == null || type.equals(c.getType()))
+            .toList();
+    return selectPreferred(filtered, provider);
   }
 }

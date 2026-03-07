@@ -1,5 +1,6 @@
 package cloud.xcan.core.model;
 
+import dev.langchain4j.model.catalog.ModelType;
 import java.util.Map;
 import lombok.Builder;
 import lombok.Data;
@@ -17,9 +18,14 @@ public class ModelConfigDefinition {
   private String id;
 
   /**
-   * 模型提供商: openai / anthropic / ollama 等
+   * 模型提供商
    */
-  private String provider;
+  private ModelProvider provider;
+
+  /**
+   * 模型类型: chat / image / audio / embedding / moderation
+   */
+  private ModelType type;
 
   /**
    * 模型名称

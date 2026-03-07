@@ -2,6 +2,7 @@ package cloud.xcan.agentx.model.openai;
 
 import cloud.xcan.core.model.ModelConfigDefinition;
 import cloud.xcan.core.model.ModelFactory;
+import cloud.xcan.core.model.ModelProvider;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.StreamingChatModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
@@ -28,8 +29,8 @@ public class OpenAiAutoConfiguration {
   public static class OpenAiModelFactory implements ModelFactory {
 
     @Override
-    public String getProvider() {
-      return "openai";
+    public ModelProvider getProvider() {
+      return ModelProvider.OPEN_AI;
     }
 
     @Override

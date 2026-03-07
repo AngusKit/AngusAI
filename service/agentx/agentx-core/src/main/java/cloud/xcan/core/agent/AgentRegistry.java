@@ -1,25 +1,26 @@
 package cloud.xcan.core.agent;
 
-import cloud.xcan.core.knowledge.ContentRetrieverFactory;
-import cloud.xcan.core.prompt.PromptVariableResolver;
-import cloud.xcan.core.workflow.WorkflowDefinitionProvider;
 import cloud.xcan.core.agent.definition.AgentDefinition;
 import cloud.xcan.core.agent.runtime.AgentChatService;
 import cloud.xcan.core.agent.runtime.AgentInstance;
 import cloud.xcan.core.agent.runtime.AgentStreamingChatService;
 import cloud.xcan.core.guardrail.GuardrailChain;
 import cloud.xcan.core.guardrail.GuardrailResult;
+import cloud.xcan.core.knowledge.ContentRetrieverFactory;
 import cloud.xcan.core.memory.MemoryFactory;
+import cloud.xcan.core.model.ModelProvider;
+import cloud.xcan.core.model.ModelRegistry;
+import cloud.xcan.core.prompt.PromptVariableResolver;
+import cloud.xcan.core.skill.SkillRegistry;
+import cloud.xcan.core.tool.ToolRegistry;
+import cloud.xcan.core.workflow.WorkflowDefinitionProvider;
 import cloud.xcan.core.workflow.dsl.WorkflowDefinition;
 import cloud.xcan.core.workflow.engine.WorkflowEngine;
 import cloud.xcan.core.workflow.engine.WorkflowExecutionResult;
-import cloud.xcan.core.model.ModelRegistry;
-import cloud.xcan.core.skill.SkillRegistry;
-import cloud.xcan.core.tool.ToolRegistry;
+import dev.langchain4j.agent.tool.ToolSpecification;
 import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.StreamingChatModel;
-import dev.langchain4j.agent.tool.ToolSpecification;
 import dev.langchain4j.service.AiServices;
 import dev.langchain4j.service.TokenStream;
 import dev.langchain4j.service.tool.ToolExecutor;
@@ -59,8 +60,8 @@ public class AgentRegistry {
 
     // 从 ModelRegistry 获取模型
     AgentDefinition.ModelConfig modelConfig = definition.getModel();
-    String provider = modelConfig != null && modelConfig.getProvider() != null
-        ? modelConfig.getProvider() : "openai";
+    ModelProvider provider = modelConfig != null && modelConfig.getProvider() != null
+        ? modelConfig.getProvider() : ModelProvider.OPEN_AI;
 
     ChatModel chatModel;
     StreamingChatModel streamingModel = null;
@@ -125,11 +126,11 @@ public class AgentRegistry {
     AgentDefinition.ModelConfig defModel = definition.getModel();
     if (contentRetrieverFactory != null && definition.getKnowledgeBaseIds() != null
         && !definition.getKnowledgeBaseIds().isEmpty()) {
-      String embeddingProvider = defModel != null && defModel.getProvider() != null
-          ? defModel.getProvider() : "openai";
+      ModelProvider embeddingProvider = defModel != null && defModel.getProvider() != null
+          ? defModel.getProvider() : ModelProvider.DEEPSEEK;
       int topK = 5;
       contentRetrieverFactory.createContentRetriever(
-          definition.getKnowledgeBaseIds(), embeddingProvider, topK)
+              definition.getKnowledgeBaseIds(), embeddingProvider, topK)
           .ifPresent(syncBuilder::contentRetriever);
     }
 
@@ -158,10 +159,10 @@ public class AgentRegistry {
 
       if (contentRetrieverFactory != null && definition.getKnowledgeBaseIds() != null
           && !definition.getKnowledgeBaseIds().isEmpty()) {
-        String embProvider = defModel != null && defModel.getProvider() != null
-            ? defModel.getProvider() : "openai";
+        ModelProvider embProvider = defModel != null && defModel.getProvider() != null
+            ? defModel.getProvider() : ModelProvider.DEEPSEEK;
         contentRetrieverFactory.createContentRetriever(
-            definition.getKnowledgeBaseIds(), embProvider, 5)
+                definition.getKnowledgeBaseIds(), embProvider, 5)
             .ifPresent(streamBuilder::contentRetriever);
       }
       if (!toolObjects.isEmpty()) {
@@ -206,9 +207,11 @@ public class AgentRegistry {
       var guardrails = instance.getDefinition().getGuardrails();
       if (guardrails != null && guardrails.getInputGuardrailIds() != null
           && !guardrails.getInputGuardrailIds().isEmpty()) {
-        GuardrailResult inputResult = guardrailChain.checkInput(message, guardrails.getInputGuardrailIds());
+        GuardrailResult inputResult = guardrailChain.checkInput(message,
+            guardrails.getInputGuardrailIds());
         if (!inputResult.isPassed()) {
-          return "[Guardrail] " + (inputResult.getReason() != null ? inputResult.getReason() : "Input blocked");
+          return "[Guardrail] " + (inputResult.getReason() != null ? inputResult.getReason()
+              : "Input blocked");
         }
         if (inputResult.getSanitizedContent() != null) {
           inputToUse = inputResult.getSanitizedContent();
@@ -248,9 +251,11 @@ public class AgentRegistry {
       var guardrails = instance.getDefinition().getGuardrails();
       if (guardrails != null && guardrails.getOutputGuardrailIds() != null
           && !guardrails.getOutputGuardrailIds().isEmpty()) {
-        GuardrailResult outputResult = guardrailChain.checkOutput(response, guardrails.getOutputGuardrailIds());
+        GuardrailResult outputResult = guardrailChain.checkOutput(response,
+            guardrails.getOutputGuardrailIds());
         if (!outputResult.isPassed()) {
-          return "[Guardrail] " + (outputResult.getReason() != null ? outputResult.getReason() : "Output blocked");
+          return "[Guardrail] " + (outputResult.getReason() != null ? outputResult.getReason()
+              : "Output blocked");
         }
         if (outputResult.getSanitizedContent() != null) {
           response = outputResult.getSanitizedContent();
@@ -261,8 +266,7 @@ public class AgentRegistry {
   }
 
   /**
-   * 流式对话 — 返回 TokenStream，无流式模型时抛异常。
-   * 注意：输出护栏在流式场景下暂不执行（需先缓冲完整响应），仅执行输入护栏。
+   * 流式对话 — 返回 TokenStream，无流式模型时抛异常。 注意：输出护栏在流式场景下暂不执行（需先缓冲完整响应），仅执行输入护栏。
    */
   public TokenStream chatStream(String agentId, String sessionId, String message) {
     AgentInstance instance = agents.get(agentId);
@@ -281,9 +285,12 @@ public class AgentRegistry {
       var guardrails = instance.getDefinition().getGuardrails();
       if (guardrails != null && guardrails.getInputGuardrailIds() != null
           && !guardrails.getInputGuardrailIds().isEmpty()) {
-        GuardrailResult inputResult = guardrailChain.checkInput(message, guardrails.getInputGuardrailIds());
+        GuardrailResult inputResult = guardrailChain.checkInput(message,
+            guardrails.getInputGuardrailIds());
         if (!inputResult.isPassed()) {
-          throw new IllegalStateException("[Guardrail] " + (inputResult.getReason() != null ? inputResult.getReason() : "Input blocked"));
+          throw new IllegalStateException(
+              "[Guardrail] " + (inputResult.getReason() != null ? inputResult.getReason()
+                  : "Input blocked"));
         }
         if (inputResult.getSanitizedContent() != null) {
           inputToUse = inputResult.getSanitizedContent();
@@ -311,7 +318,7 @@ public class AgentRegistry {
   /**
    * 当 Agent 配置了 workflowId 时执行工作流。
    *
-   * @param definition Agent 定义
+   * @param definition     Agent 定义
    * @param inputVariables 入参（message、sessionId、response 等）
    * @return 工作流输出中的 response 或 text，供 INSTEAD_OF_CHAT 使用；其他模式返回 null
    */

@@ -2,6 +2,7 @@ package cloud.xcan.agentx.model.zhipu;
 
 import cloud.xcan.core.model.ModelConfigDefinition;
 import cloud.xcan.core.model.ModelFactory;
+import cloud.xcan.core.model.ModelProvider;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.StreamingChatModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
@@ -21,8 +22,8 @@ public class ZhipuAutoConfiguration {
   public static class ZhipuModelFactory implements ModelFactory {
 
     @Override
-    public String getProvider() {
-      return "zhipu";
+    public ModelProvider getProvider() {
+      return ModelProvider.ZHIPU;
     }
 
     @Override

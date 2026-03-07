@@ -1,5 +1,6 @@
 package cloud.xcan.agentx.tool.ai;
 
+import cloud.xcan.core.model.ModelProvider;
 import cloud.xcan.core.model.ModelRegistry;
 import dev.langchain4j.agent.tool.P;
 import dev.langchain4j.agent.tool.Tool;
@@ -62,14 +63,15 @@ public class AiUtilityTool {
   private String callLlm(String prompt) {
     try {
       // Try all common providers in order
-      for (String provider : new String[]{"openai", "anthropic", "gemini", "qwen", "zhipu",
-          "deepseek", "ollama"}) {
-        var modelOpt = modelRegistry.getDefaultChatModel(provider);
+
+      for (ModelProvider value : ModelProvider.values()) {
+        var modelOpt = modelRegistry.getDefaultChatModel(value);
         if (modelOpt.isPresent()) {
           ChatModel model = modelOpt.get();
           return model.chat(UserMessage.from(prompt)).aiMessage().text();
         }
       }
+
       return "Error: No model provider available. Please configure at least one model.";
     } catch (Exception e) {
       log.error("AI utility call failed: {}", e.getMessage());

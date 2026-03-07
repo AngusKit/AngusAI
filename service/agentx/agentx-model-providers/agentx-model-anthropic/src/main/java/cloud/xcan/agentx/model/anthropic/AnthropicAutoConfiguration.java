@@ -2,6 +2,7 @@ package cloud.xcan.agentx.model.anthropic;
 
 import cloud.xcan.core.model.ModelConfigDefinition;
 import cloud.xcan.core.model.ModelFactory;
+import cloud.xcan.core.model.ModelProvider;
 import dev.langchain4j.model.anthropic.AnthropicChatModel;
 import dev.langchain4j.model.anthropic.AnthropicStreamingChatModel;
 import dev.langchain4j.model.chat.ChatModel;
@@ -22,8 +23,8 @@ public class AnthropicAutoConfiguration {
   public static class AnthropicModelFactory implements ModelFactory {
 
     @Override
-    public String getProvider() {
-      return "anthropic";
+    public ModelProvider getProvider() {
+      return ModelProvider.ANTHROPIC;
     }
 
     @Override

@@ -2,6 +2,7 @@ package cloud.xcan.agentx.model.deepseek;
 
 import cloud.xcan.core.model.ModelConfigDefinition;
 import cloud.xcan.core.model.ModelFactory;
+import cloud.xcan.core.model.ModelProvider;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.StreamingChatModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
@@ -19,8 +20,8 @@ public class DeepSeekAutoConfiguration {
   public static class DeepSeekModelFactory implements ModelFactory {
 
     @Override
-    public String getProvider() {
-      return "deepseek";
+    public ModelProvider getProvider() {
+      return ModelProvider.DEEPSEEK;
     }
 
     @Override

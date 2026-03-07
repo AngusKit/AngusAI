@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import cloud.xcan.core.agent.definition.AgentDefinition;
 import cloud.xcan.core.agent.definition.AgentDefinitionParser;
+import cloud.xcan.core.model.ModelProvider;
 import cloud.xcan.core.agent.enums.AutonomyLevel;
 import cloud.xcan.core.agent.enums.InteractionMode;
 import cloud.xcan.core.agent.enums.ReasoningStrategy;
@@ -101,7 +102,7 @@ class AgentDefinitionParserTest {
       assertEquals(ReasoningStrategy.FUNCTION_CALLING, def.getReasoningStrategy());
       assertEquals(AutonomyLevel.ASSISTANT, def.getAutonomyLevel());
       assertNotNull(def.getModel());
-      assertEquals("openai", def.getModel().getProvider());
+      assertEquals(ModelProvider.OPEN_AI, def.getModel().getProvider());
       assertEquals("gpt-4", def.getModel().getModelName());
       assertEquals(0.7, def.getModel().getTemperature());
       assertEquals("You are helpful.", def.getSystemPrompt());
@@ -242,7 +243,7 @@ class AgentDefinitionParserTest {
 
       AgentDefinition def = parser.parseJson(json);
 
-      assertEquals("anthropic", def.getModel().getFallbackProvider());
+      assertEquals(ModelProvider.ANTHROPIC, def.getModel().getFallbackProvider());
       assertEquals("claude-3", def.getModel().getFallbackModelName());
     }
 
@@ -394,7 +395,7 @@ class AgentDefinitionParserTest {
       assertEquals(InteractionMode.CHATBOT, def.getInteractionMode());
       assertEquals(ReasoningStrategy.REACT, def.getReasoningStrategy());
       assertEquals(AutonomyLevel.COLLABORATOR, def.getAutonomyLevel());
-      assertEquals("anthropic", def.getModel().getProvider());
+      assertEquals(ModelProvider.ANTHROPIC, def.getModel().getProvider());
       assertEquals(MemoryStrategy.SUMMARY, def.getMemory().getStrategy());
       assertEquals(2, def.getToolIds().size());
     }
@@ -475,7 +476,7 @@ class AgentDefinitionParserTest {
           .reasoningStrategy(ReasoningStrategy.FUNCTION_CALLING)
           .autonomyLevel(AutonomyLevel.ASSISTANT)
           .model(AgentDefinition.ModelConfig.builder()
-              .provider("openai").modelName("gpt-4").build())
+              .provider(ModelProvider.OPEN_AI).modelName("gpt-4").build())
           .systemPrompt("Hello")
           .toolIds(List.of("tool-1"))
           .memory(AgentDefinition.MemoryConfig.builder()
@@ -489,7 +490,7 @@ class AgentDefinitionParserTest {
       AgentDefinition restored = parser.parseJson(json);
       assertEquals("rt-1", restored.getId());
       assertEquals(InteractionMode.CHATBOT, restored.getInteractionMode());
-      assertEquals("openai", restored.getModel().getProvider());
+      assertEquals(ModelProvider.OPEN_AI, restored.getModel().getProvider());
     }
 
     @Test

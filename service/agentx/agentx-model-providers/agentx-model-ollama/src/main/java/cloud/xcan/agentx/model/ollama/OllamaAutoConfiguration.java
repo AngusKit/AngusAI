@@ -2,6 +2,7 @@ package cloud.xcan.agentx.model.ollama;
 
 import cloud.xcan.core.model.ModelConfigDefinition;
 import cloud.xcan.core.model.ModelFactory;
+import cloud.xcan.core.model.ModelProvider;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.StreamingChatModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
@@ -23,8 +24,8 @@ public class OllamaAutoConfiguration {
   public static class OllamaModelFactory implements ModelFactory {
 
     @Override
-    public String getProvider() {
-      return "ollama";
+    public ModelProvider getProvider() {
+      return ModelProvider.OLLAMA;
     }
 
     @Override

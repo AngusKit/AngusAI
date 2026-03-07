@@ -2,6 +2,7 @@ package cloud.xcan.agentx.model.gemini;
 
 import cloud.xcan.core.model.ModelConfigDefinition;
 import cloud.xcan.core.model.ModelFactory;
+import cloud.xcan.core.model.ModelProvider;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.StreamingChatModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
@@ -18,8 +19,8 @@ public class GeminiAutoConfiguration {
   public static class GeminiModelFactory implements ModelFactory {
 
     @Override
-    public String getProvider() {
-      return "gemini";
+    public ModelProvider getProvider() {
+      return ModelProvider.GEMINI;
     }
 
     @Override

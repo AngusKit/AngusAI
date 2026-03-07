@@ -13,9 +13,9 @@ import dev.langchain4j.model.embedding.EmbeddingModel;
 public interface ModelFactory {
 
   /**
-   * 该工厂支持的 provider 名称（如 "openai"、"anthropic"、"ollama"）
+   * 该工厂支持的 provider
    */
-  String getProvider();
+  ModelProvider getProvider();
 
   /**
    * 根据配置创建 ChatModel

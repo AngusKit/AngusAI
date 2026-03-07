@@ -1,5 +1,6 @@
 package cloud.xcan.core.model;
 
+import dev.langchain4j.model.catalog.ModelType;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.StreamingChatModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
@@ -19,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ModelRegistry {
 
-  private final Map<String, ModelFactory> factories;
+  private final Map<ModelProvider, ModelFactory> factories;
   private final ModelConfigProvider configProvider;
   private final Map<String, ChatModel> chatModelCache = new ConcurrentHashMap<>();
   private final Map<String, StreamingChatModel> streamingModelCache = new ConcurrentHashMap<>();
@@ -69,7 +70,7 @@ public class ModelRegistry {
   /**
    * 获取指定 provider 的默认 ChatModel
    */
-  public Optional<ChatModel> getDefaultChatModel(String provider) {
+  public Optional<ChatModel> getDefaultChatModel(ModelProvider provider) {
     return configProvider.loadDefault(provider)
         .map(config -> chatModelCache.computeIfAbsent(config.getId(),
             id -> getFactory(config.getProvider()).createChatModel(config)));
@@ -78,17 +79,25 @@ public class ModelRegistry {
   /**
    * 获取指定 provider 的默认 StreamingChatModel
    */
-  public Optional<StreamingChatModel> getDefaultStreamingChatModel(String provider) {
+  public Optional<StreamingChatModel> getDefaultStreamingChatModel(ModelProvider provider) {
     return configProvider.loadDefault(provider)
         .map(config -> streamingModelCache.computeIfAbsent(config.getId(),
             id -> getFactory(config.getProvider()).createStreamingChatModel(config)));
   }
 
   /**
-   * 获取指定 provider 的默认 EmbeddingModel
+   * 获取指定 provider（字符串 key）的默认 EmbeddingModel，用于 ContentRetrieverFactory 等兼容场景
    */
-  public Optional<EmbeddingModel> getDefaultEmbeddingModel(String provider) {
-    return configProvider.loadDefault(provider)
+  public Optional<EmbeddingModel> getDefaultEmbeddingModel(String providerKey) {
+    ModelProvider p = ModelProvider.fromKey(providerKey);
+    return p != null ? getDefaultEmbeddingModel(p) : Optional.empty();
+  }
+
+  /**
+   * 获取指定 provider 的默认 EmbeddingModel（优先 type=EMBEDDING 的配置）
+   */
+  public Optional<EmbeddingModel> getDefaultEmbeddingModel(ModelProvider provider) {
+    return configProvider.loadDefault(provider, ModelType.EMBEDDING)
         .flatMap(config -> {
           EmbeddingModel cached = embeddingModelCache.get(config.getId());
           if (cached != null) {
@@ -157,7 +166,7 @@ public class ModelRegistry {
     return configProvider.loadAll();
   }
 
-  private ModelFactory getFactory(String provider) {
+  private ModelFactory getFactory(ModelProvider provider) {
     ModelFactory factory = factories.get(provider);
     if (factory == null) {
       throw new IllegalArgumentException("Unsupported model provider: " + provider
