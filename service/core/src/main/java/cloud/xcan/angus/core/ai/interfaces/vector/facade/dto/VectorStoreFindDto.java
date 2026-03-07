@@ -1,7 +1,8 @@
 package cloud.xcan.angus.core.ai.interfaces.vector.facade.dto;
 
+
 import cloud.xcan.angus.core.ai.domain.ConnectionStatus;
-import cloud.xcan.angus.core.ai.infra.ai.vector.VectorStoreType;
+import cloud.xcan.agentx.core.vectorstore.VectorStoreType;
 import cloud.xcan.angus.remote.PageQuery;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

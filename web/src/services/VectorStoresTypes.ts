@@ -1,8 +1,8 @@
 import { ApiLocaleResult, TenantAuditingVo } from '@xcan-angus/infra';
 import { ConnectionStatusEnum, VectorStoreTypeEnum } from '@/enums/enums.ts';
 
-/** 向量存储源配置 */
-export interface VectorStoreConfig {
+/** 向量存储配置定义（与后端 VectorStoreConfigDefinition 对应） */
+export interface VectorStoreConfigDefinition {
   /** 向量存储源类型 */
   type: VectorStoreTypeEnum;
   /**
@@ -94,7 +94,7 @@ export interface VectorStoreCreateDto {
   /** 描述 */
   description?: string;
   /** 配置信息 */
-  config: VectorStoreConfig;
+  config: VectorStoreConfigDefinition;
 }
 
 /** 向量存储源详情 */
@@ -120,7 +120,7 @@ export interface VectorStoreVo extends TenantAuditingVo {
    */
   indexCount?: number;
   /** 配置信息 */
-  config?: VectorStoreConfig;
+  config?: VectorStoreConfigDefinition;
 }
 
 /** The API response result of supporting international message. */
@@ -138,7 +138,7 @@ export interface ConnectionTestDto {
    */
   timeout?: number;
   /** 向量存储配置 */
-  config?: VectorStoreConfig;
+  config?: VectorStoreConfigDefinition;
 }
 
 /** 测试详情 */
@@ -187,7 +187,7 @@ export interface VectorStoreUpdateDto {
   /** 描述 */
   description?: string;
   /** 配置信息 */
-  config: VectorStoreConfig;
+  config: VectorStoreConfigDefinition;
 }
 
 export interface PageResultVectorStoreVo {

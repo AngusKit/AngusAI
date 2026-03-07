@@ -1,6 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.vector.facade;
 
-import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.ConnectionTestDto;
+import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.VectorStoreConnectionTestDto;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.VectorStoreCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.VectorStoreFindDto;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.VectorStoreUpdateDto;
@@ -38,7 +38,7 @@ public interface VectorStoreFacade {
   /**
    * 连接测试
    */
-  ConnectionTestVo testConnection(Long id, ConnectionTestDto dto);
+  ConnectionTestVo testConnection(Long id, VectorStoreConnectionTestDto dto);
 
   /**
    * 获取存储源详情

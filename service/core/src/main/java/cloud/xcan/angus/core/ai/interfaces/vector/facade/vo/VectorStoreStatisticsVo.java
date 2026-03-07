@@ -1,6 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.vector.facade.vo;
 
-import cloud.xcan.angus.core.ai.infra.ai.vector.VectorStoreType;
+import cloud.xcan.agentx.core.vectorstore.VectorStoreType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.Data;

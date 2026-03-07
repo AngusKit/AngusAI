@@ -1,7 +1,7 @@
 package cloud.xcan.angus.core.ai.interfaces.vector;
 
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.VectorStoreFacade;
-import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.ConnectionTestDto;
+import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.VectorStoreConnectionTestDto;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.VectorStoreCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.VectorStoreFindDto;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.VectorStoreUpdateDto;
@@ -81,7 +81,7 @@ public class VectorStoreRest {
   @PostMapping("/test")
   public ApiLocaleResult<ConnectionTestVo> testConnection(
       @Parameter(description = "存储源ID", required = true) @RequestParam(required = false) Long id,
-      @Valid @RequestBody(required = false) ConnectionTestDto dto) {
+      @Valid @RequestBody(required = false) VectorStoreConnectionTestDto dto) {
     return ApiLocaleResult.success(vectorStoreFacade.testConnection(id, dto));
   }
 

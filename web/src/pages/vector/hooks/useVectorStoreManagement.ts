@@ -73,7 +73,7 @@ export const useVectorStoreManagement = (): UseVectorStoreManagementReturn => {
       if (!store?.id) {
         return null;
       }
-      const type = store.type ?? VectorStoreTypeEnum.PINECONE;
+      const type = store.type ?? VectorStoreTypeEnum.PGVECTOR;
       const config = store.config;
       const endpoint = buildEndpointFromConfig(config);
       const dimension = config?.dimension;

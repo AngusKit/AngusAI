@@ -1,7 +1,7 @@
 package cloud.xcan.angus.core.ai.application.cmd.vector;
 
 import cloud.xcan.angus.core.ai.domain.vector.VectorStore;
-import cloud.xcan.angus.core.ai.domain.vector.VectorStoreConfig;
+import cloud.xcan.agentx.core.vectorstore.VectorStoreConfigDefinition;
 
 /**
  * 向量存储源命令服务
@@ -26,7 +26,7 @@ public interface VectorStoreCmd {
   /**
    * 连接测试
    */
-  VectorStore testConnection(Long id, Integer timeout, VectorStoreConfig config);
+  VectorStore testConnection(Long id, Integer timeout, VectorStoreConfigDefinition config);
 
   /**
    * 删除向量存储源

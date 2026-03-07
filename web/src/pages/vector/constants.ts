@@ -8,46 +8,20 @@ import { getEnumDescription, enumToMessages } from '@/enums/utils';
 
 const getEnumIcon = (value: VectorStoreTypeEnum) => {
   switch (value) {
-    case VectorStoreTypeEnum.AZURE_AI_SERVICE:
-      return '☁️';
-    case VectorStoreTypeEnum.AZURE_COSMOS_DB:
-      return '🌐';
-    case VectorStoreTypeEnum.APACHE_CASSANDRA:
-      return '📊';
-    case VectorStoreTypeEnum.CHROMA:
-      return '🎨';
-    case VectorStoreTypeEnum.COUCHBASE:
-      return '🛋️';
-    case VectorStoreTypeEnum.ELASTICSEARCH:
-      return '🔍';
-    case VectorStoreTypeEnum.GEMFIRE:
-      return '💎';
-    case VectorStoreTypeEnum.MARIADB:
-      return '🗄️';
-    case VectorStoreTypeEnum.MILVUS:
-      return '🦅';
-    case VectorStoreTypeEnum.MONGODB_ATLAS:
-      return '🍃';
-    case VectorStoreTypeEnum.NEO4J:
-      return '🔗';
-    case VectorStoreTypeEnum.OPENSEARCH:
-      return '🔎';
-    case VectorStoreTypeEnum.ORACLE:
-      return '🏛️';
     case VectorStoreTypeEnum.PGVECTOR:
       return '🐘';
-    case VectorStoreTypeEnum.PINECONE:
-      return '🌲';
+    case VectorStoreTypeEnum.MILVUS:
+      return '🦅';
     case VectorStoreTypeEnum.QDRANT:
       return '⚡';
-    case VectorStoreTypeEnum.REDIS:
-      return '🔴';
-    case VectorStoreTypeEnum.SAP_HANA:
-      return '💼';
-    case VectorStoreTypeEnum.TYPESENSE:
-      return '⚙️';
+    case VectorStoreTypeEnum.CHROMA:
+      return '🎨';
+    case VectorStoreTypeEnum.ELASTICSEARCH:
+      return '🔍';
     case VectorStoreTypeEnum.WEAVIATE:
       return '🕸️';
+    case VectorStoreTypeEnum.MARIADB:
+      return '🗄️';
   }
 };
 

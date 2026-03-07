@@ -11,9 +11,9 @@ import cloud.xcan.angus.core.ai.application.query.vector.VectorStoreQuery;
 import cloud.xcan.angus.core.ai.application.query.vector.impl.VectorStoreQueryImpl;
 import cloud.xcan.angus.core.ai.domain.vector.VectorStore;
 import cloud.xcan.angus.core.ai.domain.vector.VectorStoreRepo;
-import cloud.xcan.angus.core.ai.infra.ai.vector.VectorStoreType;
+import cloud.xcan.agentx.core.vectorstore.VectorStoreType;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.VectorStoreFacade;
-import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.ConnectionTestDto;
+import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.VectorStoreConnectionTestDto;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.VectorStoreCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.VectorStoreFindDto;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.VectorStoreUpdateDto;
@@ -83,7 +83,7 @@ public class VectorStoreFacadeImpl implements VectorStoreFacade {
   }
 
   @Override
-  public ConnectionTestVo testConnection(Long id, ConnectionTestDto dto) {
+  public ConnectionTestVo testConnection(Long id, VectorStoreConnectionTestDto dto) {
     VectorStore vectorStore = vectorStoreCmd.testConnection(id, dto.getTimeout(), dto.getConfig());
     return VectorStoreAssembler.toConnectionTestVo(vectorStore);
   }

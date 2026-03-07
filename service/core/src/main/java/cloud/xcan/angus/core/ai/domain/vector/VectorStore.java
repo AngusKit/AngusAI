@@ -1,7 +1,8 @@
 package cloud.xcan.angus.core.ai.domain.vector;
 
+import cloud.xcan.agentx.core.vectorstore.VectorStoreConfigDefinition;
 import cloud.xcan.angus.core.ai.domain.ConnectionStatus;
-import cloud.xcan.angus.core.ai.infra.ai.vector.VectorStoreType;
+import cloud.xcan.agentx.core.vectorstore.VectorStoreType;
 import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.Column;
@@ -42,7 +43,7 @@ public class VectorStore extends TenantAuditingEntity<VectorStore, Long> {
 
   @Type(JsonType.class)
   @Column(columnDefinition = "json", name = "config")
-  private VectorStoreConfig config;
+  private VectorStoreConfigDefinition config;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "status", nullable = false, length = 20)

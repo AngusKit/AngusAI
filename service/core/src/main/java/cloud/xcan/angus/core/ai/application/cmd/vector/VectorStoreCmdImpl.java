@@ -7,7 +7,7 @@ import static java.util.Objects.nonNull;
 import cloud.xcan.angus.core.ai.application.query.vector.VectorStoreQuery;
 import cloud.xcan.angus.core.ai.domain.ConnectionStatus;
 import cloud.xcan.angus.core.ai.domain.vector.VectorStore;
-import cloud.xcan.angus.core.ai.domain.vector.VectorStoreConfig;
+import cloud.xcan.agentx.core.vectorstore.VectorStoreConfigDefinition;
 import cloud.xcan.angus.core.ai.domain.vector.VectorStoreRepo;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;
@@ -112,7 +112,7 @@ public class VectorStoreCmdImpl extends CommCmd<VectorStore, Long> implements Ve
 
   @Override
   public VectorStore testConnection(@Nullable Long id, Integer timeout,
-      @Nullable VectorStoreConfig config) {
+      @Nullable VectorStoreConfigDefinition config) {
     return new BizTemplate<VectorStore>() {
       VectorStore vectorStoreDb;
 
@@ -132,7 +132,7 @@ public class VectorStoreCmdImpl extends CommCmd<VectorStore, Long> implements Ve
       @Override
       protected VectorStore process() {
         try {
-          VectorStoreConfig testConfig = nonNull(config) ? config : vectorStoreDb.getConfig();
+          VectorStoreConfigDefinition testConfig = nonNull(config) ? config : vectorStoreDb.getConfig();
 
           // TODO: 实际调用VectorStoreFactory进行连接测试
           // VectorStoreFactory factory = ...;

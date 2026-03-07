@@ -1,6 +1,9 @@
 package cloud.xcan.angus.core.ai.interfaces.vector.facade.dto;
 
-import cloud.xcan.angus.core.ai.domain.vector.VectorStoreConfig;
+import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_DESC_LENGTH;
+import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_NAME_LENGTH;
+
+import cloud.xcan.agentx.core.vectorstore.VectorStoreConfigDefinition;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import jakarta.validation.Valid;
@@ -14,18 +17,18 @@ import org.hibernate.validator.constraints.Length;
 public class VectorStoreUpdateDto {
 
   @NotBlank
-  @Length(max = 100)
+  @Length(max = MAX_NAME_LENGTH)
   @Schema(description = "存储源名称", requiredMode = RequiredMode.REQUIRED)
   private String name;
 
-  @Length(max = 500)
+  @Length(max = MAX_DESC_LENGTH)
   @Schema(description = "描述")
   private String description;
 
   @NotNull
   @Valid
   @Schema(description = "配置信息", requiredMode = RequiredMode.REQUIRED)
-  private VectorStoreConfig config;
+  private VectorStoreConfigDefinition config;
 
 }
 
