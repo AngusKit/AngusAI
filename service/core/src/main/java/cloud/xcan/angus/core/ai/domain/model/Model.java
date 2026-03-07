@@ -33,10 +33,10 @@ public class Model extends TenantAuditingEntity<Model, Long> {
   @Id
   private Long id;
 
-  @Column(name = "name", nullable = false, length = 50)
+  @Column(name = "name", nullable = false, length = 40)
   private String name;
 
-  @Column(name = "description", nullable = false, length = 500)
+  @Column(name = "description", nullable = false, length = 400)
   private String description;
 
   @Enumerated(EnumType.STRING)

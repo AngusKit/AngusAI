@@ -1,5 +1,10 @@
 package cloud.xcan.angus.core.ai.interfaces.model.facade.dto;
 
+import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_DESC_LENGTH;
+import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_KEY_LENGTH;
+import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_PARAM_VALUE_LENGTH;
+import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_URL_LENGTH_X2;
+
 import cloud.xcan.agentx.core.model.ModelProvider;
 import dev.langchain4j.model.catalog.ModelType;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -12,11 +17,11 @@ import org.hibernate.validator.constraints.Range;
 @Schema(description = "更新模型请求参数")
 public class ModelUpdateDto {
 
-  @Length(max = 50)
+  @Length(max = MAX_KEY_LENGTH)
   @Schema(description = "模型名称", example = "GPT-4")
   private String name;
 
-  @Length(max = 500)
+  @Length(max = MAX_DESC_LENGTH)
   @Schema(description = "模型描述", example = "OpenAI GPT-4 语言模型")
   private String description;
 
@@ -27,10 +32,10 @@ public class ModelUpdateDto {
   private ModelProvider provider;
 
   @Schema(description = "API Base URL（用于自托管或代理）", example = "https://api.openai.com/v1")
-  @Length(max = 400)
+  @Length(max = MAX_URL_LENGTH_X2)
   private String baseUrl;
 
-  @Length(max = 4096)
+  @Length(max = MAX_PARAM_VALUE_LENGTH)
   @Schema(description = "API密钥")
   private String apiKey;
 
@@ -41,6 +46,7 @@ public class ModelUpdateDto {
   @Schema(description = "最大token数", example = "128000")
   private Integer maxTokens;
 
+  @Length(max = MAX_KEY_LENGTH)
   @Schema(description = "Embedding 模型名称（用于 RAG 等场景）")
   private String embeddingModelName;
 
@@ -49,9 +55,6 @@ public class ModelUpdateDto {
 
   @Schema(description = "优先级 — 数值越大优先级越高；无默认模型时选择优先级最高的", example = "0")
   private Integer priority = 0;
-
-  @Schema(description = "租户 ID（null 为全局）")
-  private String tenantId;
 
   @Schema(description = "扩展参数")
   private Map<String, Object> extraProperties;
