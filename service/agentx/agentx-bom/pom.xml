@@ -132,13 +132,6 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- ===== Infrastructure ===== -->
-      <dependency>
-        <groupId>cloud.xcan.agentx</groupId>
-        <artifactId>xcan-angusai.agentx-infrastructure</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
       <!-- ===== Observability ===== -->
       <dependency>
         <groupId>cloud.xcan.agentx</groupId>

@@ -6,6 +6,7 @@ import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.model.chat.ChatModel;
+import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -99,7 +100,7 @@ public class SummarizingChatMemory implements ChatMemory {
   private final int maxMessages;
   private final String summaryPrompt;
   private final ChatModel chatModel;
-  private final dev.langchain4j.store.memory.chat.ChatMemoryStore store;
+  private final ChatMemoryStore store;
 
   @Override
   public Object id() {

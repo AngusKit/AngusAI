@@ -2,13 +2,14 @@ package cloud.xcan.agentx.starter;
 
 import cloud.xcan.core.agent.AgentRegistry;
 import cloud.xcan.core.agent.definition.AgentDefinitionParser;
+import cloud.xcan.core.agent.multi.MultiAgentOrchestrator;
 import cloud.xcan.core.guardrail.GuardrailChain;
 import cloud.xcan.core.knowledge.ContentRetrieverFactory;
+import cloud.xcan.core.memory.InMemoryChatMemoryStore;
 import cloud.xcan.core.memory.MemoryFactory;
 import cloud.xcan.core.model.ModelConfigProvider;
 import cloud.xcan.core.model.ModelFactory;
 import cloud.xcan.core.model.ModelRegistry;
-import cloud.xcan.core.agent.multi.MultiAgentOrchestrator;
 import cloud.xcan.core.plugin.AgentXPlugin;
 import cloud.xcan.core.plugin.PluginManager;
 import cloud.xcan.core.prompt.PromptManager;
@@ -44,14 +45,16 @@ import cloud.xcan.core.workflow.validation.WorkflowSpecRegistry;
 import cloud.xcan.core.workflow.validation.WorkflowValidator;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.skills.Skill;
+import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.context.annotation.Lazy;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * AgentX Core 模块 Bean 集中注册
@@ -99,9 +102,16 @@ public class CoreBeansConfiguration {
 
   // ===== Memory =====
   @Bean
-  public MemoryFactory memoryFactory(ObjectProvider<ChatModel> chatModelProvider) {
-    Optional<ChatModel> chatModel = Optional.ofNullable(chatModelProvider.getIfAvailable());
-    return new MemoryFactory(chatModel);
+  @ConditionalOnMissingBean
+  public ChatMemoryStore chatMemoryStore() {
+    return new InMemoryChatMemoryStore();
+  }
+
+  @Bean
+  public MemoryFactory memoryFactory(ChatMemoryStore chatMemoryStore,
+      ObjectProvider<ChatModel> chatModelProvider) {
+    Optional<ChatModel> chatModel = Optional.of(chatModelProvider.getIfAvailable());
+    return new MemoryFactory(chatMemoryStore, chatModel.get());
   }
 
   // ===== Agent =====
@@ -247,7 +257,8 @@ public class CoreBeansConfiguration {
       @Lazy WorkflowEngine workflowEngine,
       WorkflowDefinitionProvider workflowDefinitionProvider,
       ExpressionEngine expressionEngine) {
-    return new SubWorkflowNodeExecutor(workflowEngine, workflowDefinitionProvider, expressionEngine);
+    return new SubWorkflowNodeExecutor(workflowEngine, workflowDefinitionProvider,
+        expressionEngine);
   }
 
   @Bean

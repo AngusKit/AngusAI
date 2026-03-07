@@ -25,8 +25,7 @@ public class ModelRegistry {
   private final Map<String, StreamingChatModel> streamingModelCache = new ConcurrentHashMap<>();
   private final Map<String, EmbeddingModel> embeddingModelCache = new ConcurrentHashMap<>();
 
-  public ModelRegistry(List<ModelFactory> factoryList,
-      ModelConfigProvider configProvider) {
+  public ModelRegistry(List<ModelFactory> factoryList, ModelConfigProvider configProvider) {
     this.factories = factoryList.stream()
         .collect(Collectors.toMap(ModelFactory::getProvider, f -> f));
     this.configProvider = configProvider;

@@ -14,7 +14,6 @@ import org.springframework.context.annotation.Import;
 @EnableConfigurationProperties(AgentXProperties.class)
 @Import({
     CoreBeansConfiguration.class,
-    InfrastructureBeansConfiguration.class,
     ObservabilityBeansConfiguration.class,
     ModelProvidersConfiguration.class,
     ToolsConfiguration.class,

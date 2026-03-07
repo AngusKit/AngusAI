@@ -32,7 +32,6 @@
     <module>agentx-model-providers</module>
     <module>agentx-tools-builtin</module>
     <module>agentx-vectorstore</module>
-    <module>agentx-infrastructure</module>
     <module>agentx-observability</module>
     <module>agentx-spring-boot-starter</module>
     <module>agentx-api</module>
