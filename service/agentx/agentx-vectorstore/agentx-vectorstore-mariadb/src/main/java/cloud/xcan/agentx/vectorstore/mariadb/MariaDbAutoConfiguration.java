@@ -2,6 +2,7 @@ package cloud.xcan.agentx.vectorstore.mariadb;
 
 import cloud.xcan.agentx.core.vectorstore.VectorStoreConfigDefinition;
 import cloud.xcan.agentx.core.vectorstore.VectorStoreFactory;
+import cloud.xcan.agentx.core.vectorstore.VectorStoreType;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import java.sql.SQLException;
@@ -20,8 +21,8 @@ public class MariaDbAutoConfiguration {
   public static class MariaDbVectorStoreFactory implements VectorStoreFactory {
 
     @Override
-    public String getType() {
-      return "mariadb";
+    public VectorStoreType getType() {
+      return VectorStoreType.MARIADB;
     }
 
     @Override

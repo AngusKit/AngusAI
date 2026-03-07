@@ -27,6 +27,13 @@ public interface VectorStoreConfigProvider {
   Optional<VectorStoreConfigDefinition> loadDefault(String type);
 
   /**
+   * 加载指定类型的默认配置（枚举重载）
+   */
+  default Optional<VectorStoreConfigDefinition> loadDefault(VectorStoreType type) {
+    return type != null ? loadDefault(type.getKey()) : Optional.empty();
+  }
+
+  /**
    * 加载指定租户的向量存储配置
    */
   List<VectorStoreConfigDefinition> loadByTenant(String tenantId);

@@ -12,9 +12,9 @@ import dev.langchain4j.store.embedding.EmbeddingStore;
 public interface VectorStoreFactory {
 
   /**
-   * 该工厂支持的向量存储类型（如 "pgvector"、"milvus"）
+   * 该工厂支持的向量存储类型（见 {@link VectorStoreType}）
    */
-  String getType();
+  VectorStoreType getType();
 
   /**
    * 根据配置创建 EmbeddingStore

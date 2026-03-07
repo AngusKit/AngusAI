@@ -2,6 +2,7 @@ package cloud.xcan.agentx.vectorstore.chroma;
 
 import cloud.xcan.agentx.core.vectorstore.VectorStoreConfigDefinition;
 import cloud.xcan.agentx.core.vectorstore.VectorStoreFactory;
+import cloud.xcan.agentx.core.vectorstore.VectorStoreType;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.chroma.ChromaEmbeddingStore;
@@ -13,8 +14,8 @@ public class ChromaAutoConfiguration {
   public static class ChromaStoreFactory implements VectorStoreFactory {
 
     @Override
-    public String getType() {
-      return "chroma";
+    public VectorStoreType getType() {
+      return VectorStoreType.CHROMA;
     }
 
     @Override

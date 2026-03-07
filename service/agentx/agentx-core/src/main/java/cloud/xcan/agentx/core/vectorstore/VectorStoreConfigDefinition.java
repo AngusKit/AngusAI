@@ -17,9 +17,9 @@ public class VectorStoreConfigDefinition {
   private String id;
 
   /**
-   * 向量存储类型: pgvector / milvus / qdrant / chroma 等
+   * 向量存储类型（见 {@link VectorStoreType}）
    */
-  private String type;
+  private VectorStoreType type;
 
   /**
    * 数据库连接 URL

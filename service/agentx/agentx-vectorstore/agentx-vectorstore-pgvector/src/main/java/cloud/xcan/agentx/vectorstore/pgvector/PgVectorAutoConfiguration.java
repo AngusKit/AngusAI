@@ -3,6 +3,7 @@ package cloud.xcan.agentx.vectorstore.pgvector;
 import cloud.xcan.agentx.core.vectorstore.VectorStoreConfigDefinition;
 import cloud.xcan.agentx.core.vectorstore.VectorStoreConfigProvider;
 import cloud.xcan.agentx.core.vectorstore.VectorStoreFactory;
+import cloud.xcan.agentx.core.vectorstore.VectorStoreType;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.pgvector.PgVectorEmbeddingStore;
@@ -20,8 +21,8 @@ public class PgVectorAutoConfiguration {
   public static class PgVectorStoreFactory implements VectorStoreFactory {
 
     @Override
-    public String getType() {
-      return "pgvector";
+    public VectorStoreType getType() {
+      return VectorStoreType.PGVECTOR;
     }
 
     @Override

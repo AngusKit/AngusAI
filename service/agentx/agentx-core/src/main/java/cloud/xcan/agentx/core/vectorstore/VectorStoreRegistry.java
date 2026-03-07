@@ -25,7 +25,7 @@ public class VectorStoreRegistry {
   public VectorStoreRegistry(List<VectorStoreFactory> factoryList,
       VectorStoreConfigProvider configProvider) {
     this.factories = factoryList.stream()
-        .collect(Collectors.toMap(VectorStoreFactory::getType, f -> f));
+        .collect(Collectors.toMap(f -> f.getType().getKey(), f -> f));
     this.configProvider = configProvider;
     log.info("VectorStoreRegistry initialized with types: {}", factories.keySet());
   }
@@ -37,7 +37,11 @@ public class VectorStoreRegistry {
     return storeCache.computeIfAbsent(configId, id -> {
       VectorStoreConfigDefinition config = configProvider.loadById(id)
           .orElseThrow(() -> new IllegalArgumentException("VectorStore config not found: " + id));
-      return getFactory(config.getType()).createEmbeddingStore(config);
+      String typeKey = config.getType() != null ? config.getType().getKey() : null;
+      if (typeKey == null) {
+        throw new IllegalArgumentException("VectorStore config type is required: " + config.getId());
+      }
+      return getFactory(typeKey).createEmbeddingStore(config);
     });
   }
 
@@ -47,7 +51,20 @@ public class VectorStoreRegistry {
   public Optional<EmbeddingStore<TextSegment>> getDefaultStore(String type) {
     return configProvider.loadDefault(type)
         .map(config -> storeCache.computeIfAbsent(config.getId(),
-            id -> getFactory(config.getType()).createEmbeddingStore(config)));
+            id -> {
+              String tk = config.getType() != null ? config.getType().getKey() : null;
+              if (tk == null) {
+                throw new IllegalArgumentException("VectorStore config type is required: " + config.getId());
+              }
+              return getFactory(tk).createEmbeddingStore(config);
+            }));
+  }
+
+  /**
+   * 获取指定类型的默认 EmbeddingStore（枚举重载）
+   */
+  public Optional<EmbeddingStore<TextSegment>> getDefaultStore(VectorStoreType type) {
+    return type != null ? getDefaultStore(type.getKey()) : Optional.empty();
   }
 
   /**

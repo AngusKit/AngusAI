@@ -2,6 +2,7 @@ package cloud.xcan.agentx.vectorstore.weaviate;
 
 import cloud.xcan.agentx.core.vectorstore.VectorStoreConfigDefinition;
 import cloud.xcan.agentx.core.vectorstore.VectorStoreFactory;
+import cloud.xcan.agentx.core.vectorstore.VectorStoreType;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.weaviate.WeaviateEmbeddingStore;
@@ -14,8 +15,8 @@ public class WeaviateAutoConfiguration {
   public static class WeaviateStoreFactory implements VectorStoreFactory {
 
     @Override
-    public String getType() {
-      return "weaviate";
+    public VectorStoreType getType() {
+      return VectorStoreType.WEAVIATE;
     }
 
     @Override

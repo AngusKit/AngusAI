@@ -2,6 +2,7 @@ package cloud.xcan.agentx.vectorstore.elasticsearch;
 
 import cloud.xcan.agentx.core.vectorstore.VectorStoreConfigDefinition;
 import cloud.xcan.agentx.core.vectorstore.VectorStoreFactory;
+import cloud.xcan.agentx.core.vectorstore.VectorStoreType;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.elasticsearch.ElasticsearchEmbeddingStore;
@@ -14,8 +15,8 @@ public class ElasticsearchAutoConfiguration {
   public static class ElasticsearchStoreFactory implements VectorStoreFactory {
 
     @Override
-    public String getType() {
-      return "elasticsearch";
+    public VectorStoreType getType() {
+      return VectorStoreType.ELASTICSEARCH;
     }
 
     @Override
