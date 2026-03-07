@@ -26,7 +26,7 @@
     <module>agentx-vectorstore</module>
     <module>agentx-observability</module>
     <module>agentx-starter</module>
-    <module>agentx-api</module>
+    <module>agentx-api-examples</module>
     <module>agentx-eval</module>
   </modules>
 

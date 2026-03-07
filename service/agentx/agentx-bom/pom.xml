@@ -148,14 +148,7 @@
       <!-- ===== Starter ===== -->
       <dependency>
         <groupId>cloud.xcan.agentx</groupId>
-        <artifactId>agentx-starter</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- ===== API ===== -->
-      <dependency>
-        <groupId>cloud.xcan.agentx</groupId>
-        <artifactId>xcan-angusai.agentx-api</artifactId>
+        <artifactId>xcan-angusai.agentx-starter</artifactId>
         <version>${project.version}</version>
       </dependency>
 

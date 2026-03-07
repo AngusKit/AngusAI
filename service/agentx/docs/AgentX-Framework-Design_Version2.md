@@ -994,7 +994,7 @@ agentx/
 │
 ├── agentx-starter/       # Spring Boot 自动装配
 │
-├── agentx-api/                       # REST API / WebSocket 接入层
+├── agentx-api-examples/                       # REST API / WebSocket 接入层
 │
 ├── agentx-cli/                       # 命令行工具
 │

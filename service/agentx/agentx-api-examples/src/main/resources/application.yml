@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: agentx-api
+    name: agentx-api-examples
 
 agentx:
   default-provider: openai

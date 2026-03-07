@@ -10,15 +10,15 @@
     <version>1.0.0</version>
   </parent>
 
-  <artifactId>xcan-angusai.agentx-api</artifactId>
-  <name>AgentX :: REST API</name>
+  <artifactId>xcan-angusai.agentx-api-examples</artifactId>
+  <name>AgentX :: REST API Examples</name>
   <description>RESTful API 层 —— 对外暴露 Agent / Workflow / Knowledge 管理和执行接口</description>
 
   <dependencies>
     <!-- AgentX Starter -->
     <dependency>
       <groupId>cloud.xcan.agentx</groupId>
-      <artifactId>agentx-starter</artifactId>
+      <artifactId>xcan-angusai.agentx-starter</artifactId>
       <version>${project.version}</version>
     </dependency>
 
