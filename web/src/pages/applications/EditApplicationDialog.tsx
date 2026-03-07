@@ -7,8 +7,9 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ApplicationStatusEnum, ApplicationCategoryEnum } from '@/enums/enums';
+import Agents from '@/services/Agents';
 import { getEnumDescription, enumToMessages } from '@/enums/utils';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { MessageSquare, Sparkles, Database, Bot, Code, Zap, Heart, Star, Users, FileText, Calendar, Settings, Bell, Globe, Lock, Mail, Phone, Camera, Image, Music, Video, BookOpen, Briefcase, Coffee, ShoppingCart, CreditCard, Gift, Trophy, Target, Rocket, Lightbulb, Brain, Cpu, Cloud, Server, Terminal, Package, Wrench, Shield, ChevronLeft, ChevronRight, } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -23,6 +24,7 @@ interface Application {
   tags: { label: string; color: string }[];
   visits: string;
   category: ApplicationCategoryEnum;
+  agentId?: string;
 }
 
 interface EditApplicationDialogProps {
@@ -105,14 +107,29 @@ export function EditApplicationDialog({ open, onOpenChange, application, onSave 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState<ApplicationCategoryEnum>(ApplicationCategoryEnum.CHATBOT);
+  const [agentId, setAgentId] = useState<string | undefined>(undefined);
+  const [agentsList, setAgentsList] = useState<{ id: string; name: string }[]>([]);
   const [selectedIconId, setSelectedIconId] = useState('message');
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (open) {
+      Agents.getAgentList({ bindable: true, status: 'ACTIVE', pageNo: 1, pageSize: 100 })
+        .then((res: any) => {
+          const data = res?.data;
+          const list = (data?.list ?? []).map((a: any) => ({ id: a.id != null ? String(a.id) : '', name: a.name ?? '--' }));
+          setAgentsList(list);
+        })
+        .catch(() => setAgentsList([]));
+    }
+  }, [open]);
 
   useEffect(() => {
     if (application) {
       setName(application.name);
       setDescription(application.description);
       setCategory(application.category);
+      setAgentId(application.agentId);
       // 找到对应的图标ID
       const iconOption = iconOptions.find(opt => opt.bgColor === application.iconBgColor);
       if (iconOption) {
@@ -138,6 +155,7 @@ export function EditApplicationDialog({ open, onOpenChange, application, onSave 
       category,
       icon: selectedIcon?.icon,
       iconBgColor: selectedIcon?.bgColor,
+      agentId,
     });
     toast.success('应用已更新');
     onOpenChange(false);
@@ -196,6 +214,28 @@ export function EditApplicationDialog({ open, onOpenChange, application, onSave 
               rows={4}
               className='dark:bg-gray-900 dark:border-gray-700 dark:text-white resize-none'
             />
+          </div>
+
+          {/* 绑定智能体 */}
+          <div className='space-y-2'>
+            <Label htmlFor='agentId' className='dark:text-gray-300'>
+              绑定智能体
+            </Label>
+            <Select
+              value={agentId ?? ''}
+              onValueChange={(v) => setAgentId(v || undefined)}
+            >
+              <SelectTrigger className='dark:bg-gray-900 dark:border-gray-700 dark:text-white'>
+                <SelectValue placeholder='选择智能体' />
+              </SelectTrigger>
+              <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
+                {agentsList.map((a) => (
+                  <SelectItem key={a.id} value={String(a.id)} className='dark:text-gray-300'>
+                    {a.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* 应用分类 */}

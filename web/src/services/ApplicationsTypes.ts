@@ -8,6 +8,10 @@ export interface ApplicationDetailVo extends TenantAuditingVo {
    * @format int64
    */
   id?: string;
+  /**
+   * 绑定的智能体ID
+   */
+  agentId?: string;
   /** 应用名称 */
   name?: string;
   /** 应用图标 */
@@ -41,6 +45,10 @@ export type ApplicationDetailResult = ApiLocaleResult & {
 
 /** 应用配置 */
 export interface ApplicationConfigVo {
+  /**
+   * 绑定的智能体ID
+   */
+  agentId?: string;
   /** 模型配置 */
   model?: ModelConfigVo;
   /** 关联资源 */
@@ -313,6 +321,10 @@ export interface ModelConfigDefinition {
 
 /** 应用配置更新请求参数 */
 export interface ApplicationConfig {
+  /**
+   * 绑定的智能体ID
+   */
+  agentId?: string;
   /** 模型配置 */
   model: ModelConfigDefinition;
   /** 关联资源 */
@@ -331,6 +343,10 @@ export interface ApplicationConfig {
 
 /** 创建应用请求参数 */
 export interface ApplicationCreateDto {
+  /**
+   * 绑定的智能体ID（必填）
+   */
+  agentId: string;
   /**
    * 应用名称
    * @example "我的智能助手"
@@ -382,6 +398,10 @@ export interface ApplicationDuplicateDto {
 
 /** 更新应用基本信息请求参数 */
 export interface ApplicationUpdateDto {
+  /**
+   * 绑定的智能体ID
+   */
+  agentId?: string;
   /**
    * 应用名称
    * @example "我的智能助手"

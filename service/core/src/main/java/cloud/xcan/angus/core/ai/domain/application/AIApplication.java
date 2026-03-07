@@ -72,24 +72,11 @@ public class AIApplication extends TenantAuditingEntity<AIApplication, Long> {
   @Column(columnDefinition = "json", name = "config")
   private ApplicationConfig config;
 
-  // 关联资源（冗余字段）
-  @Column(name = "model_id")
-  private Long modelId;
-
-  @Type(JsonType.class)
-  @Column(columnDefinition = "json", name = "knowledge_base_ids")
-  private List<Long> knowledgeBaseIds;
-
-  @Type(JsonType.class)
-  @Column(columnDefinition = "json", name = "dataset_ids")
-  private List<Long> datasetIds;
-
-  @Type(JsonType.class)
-  @Column(columnDefinition = "json", name = "api_collection_ids")
-  private List<Long> apiCollectionIds;
-
-  @Column( name = "workflow_id")
-  private Long workflowId;
+  /**
+   * 绑定的智能体ID（必填，每个应用至少绑定一个Agent）
+   */
+  @Column(name = "agent_id", nullable = false)
+  private Long agentId;
 
   // 发布设置
   @Column(name = "public_access")

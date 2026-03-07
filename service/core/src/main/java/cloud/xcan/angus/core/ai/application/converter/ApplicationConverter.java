@@ -24,22 +24,14 @@ public class ApplicationConverter {
     newApplication.setCategory(sourceApplication.getCategory());
     newApplication.setLanguage(sourceApplication.getLanguage());
     newApplication.setConfig(sourceApplication.getConfig());
-
-    // 设置关联资源ID（冗余字段）
-    newApplication.setModelId(sourceApplication.getModelId());
-    newApplication.setKnowledgeBaseIds(sourceApplication.getKnowledgeBaseIds());
-    newApplication.setDatasetIds(sourceApplication.getDatasetIds());
-    newApplication.setApiCollectionIds(sourceApplication.getApiCollectionIds());
-    newApplication.setWorkflowId(sourceApplication.getWorkflowId());
+    newApplication.setAgentId(sourceApplication.getAgentId());
     return newApplication;
   }
 
   public static void updateAssociatedIds(ApplicationConfig config, AIApplication applicationDb) {
-    applicationDb.setModelId(config.getModel().getId());
-    applicationDb.setKnowledgeBaseIds(config.getResources().getKnowledgeBaseIds());
-    applicationDb.setDatasetIds(config.getResources().getDatasetIds());
-    applicationDb.setApiCollectionIds(config.getResources().getApiCollectionIds());
-    applicationDb.setWorkflowId(config.getResources().getWorkflowId());
+    if (config != null && config.getAgentId() != null) {
+      applicationDb.setAgentId(config.getAgentId());
+    }
   }
 
   public static void toApplicationShare(AIApplication application, AIApplication applicationDb) {

@@ -51,17 +51,11 @@ public class ApplicationDetailVo extends TenantAuditingVo {
   private ApplicationStatsVo stats;
 
   @Data
-  @Schema(description = "应用配置")
+  @Schema(description = "应用配置（模型/资源/提示词由绑定的智能体提供）")
   public static class ApplicationConfigVo {
 
-    @Schema(description = "模型配置")
-    private ModelConfigVo model;
-
-    @Schema(description = "关联资源")
-    private ResourcesConfigVo resources;
-
-    @Schema(description = "提示词配置")
-    private PromptsConfigVo prompts;
+    @Schema(description = "绑定的智能体ID")
+    private Long agentId;
 
     @Schema(description = "对话设置")
     private ConversationConfigVo conversation;
@@ -74,32 +68,9 @@ public class ApplicationDetailVo extends TenantAuditingVo {
 
     @Schema(description = "发布设置")
     private PublishConfigVo publish;
-  }
 
-  @Data
-  @Schema(description = "模型配置")
-  public static class ModelConfigVo {
-
-    @Schema(description = "模型提供商")
-    private String provider;
-
-    @Schema(description = "模型名称")
-    private String modelName;
-
-    @Schema(description = "温度")
-    private Double temperature;
-
-    @Schema(description = "最大token数")
-    private Integer maxTokens;
-
-    @Schema(description = "top_p")
-    private Double topP;
-
-    @Schema(description = "频率惩罚")
-    private Double frequencyPenalty;
-
-    @Schema(description = "存在惩罚")
-    private Double presencePenalty;
+    @Schema(description = "关联资源（来自绑定的智能体）")
+    private ResourcesConfigVo resources;
   }
 
   @Data
@@ -130,31 +101,6 @@ public class ApplicationDetailVo extends TenantAuditingVo {
 
     @Schema(description = "资源名称")
     private String name;
-  }
-
-  @Data
-  @Schema(description = "工作流信息")
-  public static class WorkflowInfoVo {
-
-    @Schema(description = "工作流ID")
-    private Long id;
-
-    @Schema(description = "工作流名称")
-    private String name;
-
-    @Schema(description = "是否启用")
-    private Boolean enabled;
-  }
-
-  @Data
-  @Schema(description = "提示词配置")
-  public static class PromptsConfigVo {
-
-    @Schema(description = "系统提示词")
-    private String system;
-
-    @Schema(description = "上下文提示词")
-    private String context;
   }
 
   @Data

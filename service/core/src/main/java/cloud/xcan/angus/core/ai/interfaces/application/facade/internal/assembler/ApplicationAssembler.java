@@ -1,6 +1,7 @@
 package cloud.xcan.angus.core.ai.interfaces.application.facade.internal.assembler;
 
 import cloud.xcan.angus.core.ai.domain.application.AIApplication;
+import cloud.xcan.angus.core.ai.domain.application.ApplicationConfig;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.dto.ApplicationCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.dto.ApplicationFindDto;
@@ -27,7 +28,13 @@ public class ApplicationAssembler {
         .setIcon(dto.getIcon())
         .setDescription(dto.getDescription())
         .setCategory(dto.getCategory())
-        .setLanguage(dto.getLanguage());
+        .setLanguage(dto.getLanguage())
+        .setAgentId(dto.getAgentId());
+
+    // 设置默认配置（agentId 必填，模型/资源/提示词由 Agent 提供）
+    ApplicationConfig config = new ApplicationConfig();
+    config.setAgentId(dto.getAgentId());
+    application.setConfig(config);
 
     // 设置默认值
     application.setStatus(ApplicationStatus.DRAFT)
@@ -49,6 +56,11 @@ public class ApplicationAssembler {
     application.setDescription(dto.getDescription());
     application.setCategory(dto.getCategory());
     application.setLanguage(dto.getLanguage());
+    if (dto.getAgentId() != null) {
+      ApplicationConfig config = new ApplicationConfig();
+      config.setAgentId(dto.getAgentId());
+      application.setConfig(config);
+    }
     return application;
   }
 
@@ -84,9 +96,12 @@ public class ApplicationAssembler {
     vo.setModifiedBy(application.getModifiedBy());
     vo.setModifiedDate(application.getModifiedDate());
 
-    // 设置配置信息
+    // 设置配置信息（agentId、conversation、features、security、publish）
     ApplicationConfigVo configVo = new ApplicationConfigVo();
-    CoreUtils.copyProperties(application.getConfig(), configVo);
+    if (application.getConfig() != null) {
+      configVo.setAgentId(application.getAgentId());
+      CoreUtils.copyProperties(application.getConfig(), configVo);
+    }
     configVo.setResources(resourcesConfigVo);
     vo.setConfig(configVo);
 

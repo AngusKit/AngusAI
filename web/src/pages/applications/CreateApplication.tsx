@@ -1,4 +1,7 @@
-import { MessageSquare, Sparkles, HelpCircle, Bot, ChevronLeft, ChevronRight, Check, Code, Code2, Search, Zap, Database, FileText, Users, Send, Palette, Image, Smile, Star, Heart, Briefcase, Coffee, Globe, Bookmark, Cloud, Cpu, Music, Video, Camera, Mail, Phone, Map, Calendar, Bell, Settings, Folder, Archive, Download, Upload, Share2, Lock, Unlock, Eye, EyeOff, Edit, Trash2, Copy, Link, Hash, Percent, TrendingUp, BarChart, PieChart, Activity, Target, Flag, Award, Gift, Rocket, Layers, Command, BookOpen, } from 'lucide-react';
+import { MessageSquare, Sparkles, HelpCircle, Bot, ChevronLeft, ChevronRight, Check, Code2, Search, Zap, Database, FileText, Users, Send, Palette, Image, Smile, Star, Heart, Briefcase, Coffee, Globe, Bookmark, Cloud, Cpu, Music, Video, Camera, Mail, Phone, Map, Calendar, Bell, Settings, Folder, Archive, Download, Upload, Share2, Lock, Unlock, Eye, EyeOff, Edit, Trash2, Copy, Link, Hash, Percent, TrendingUp, BarChart, PieChart, Activity, Target, Flag, Award, Gift, Rocket, Layers, Command, BookOpen, } from 'lucide-react';
+import Agents from '@/services/Agents';
+import Applications from '@/services/Applications';
+import { ApplicationCategoryEnum } from '@/enums/enums';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -9,7 +12,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
@@ -153,8 +156,10 @@ export function CreateApplication() {
   const { t } = useLanguage();
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedType, setSelectedType] = useState<AppType | null>(null);
-  const [selectedModel, setSelectedModel] = useState<ModelType | null>(null);
-  const [modelSearchQuery, setModelSearchQuery] = useState('');
+  const [selectedAgent, setSelectedAgent] = useState<{ id: string; name: string } | null>(null);
+  const [agentSearchQuery, setAgentSearchQuery] = useState('');
+  const [agentsList, setAgentsList] = useState<{ id: string; name: string; description?: string }[]>([]);
+  const [agentsLoading, setAgentsLoading] = useState(false);
   const [appName, setAppName] = useState('');
   const [appDescription, setAppDescription] = useState('');
   const [welcomeMessage, setWelcomeMessage] = useState('');
@@ -173,6 +178,35 @@ export function CreateApplication() {
   const onBack = () => {
     navigate('/apps');
   };
+
+  useEffect(() => {
+    if (currentStep === 2) {
+      setAgentsLoading(true);
+      Agents.getAgentList({
+        status: 'ACTIVE',
+        bindable: true,
+        pageNo: 1,
+        pageSize: 100,
+        keyword: agentSearchQuery.trim() || undefined,
+      })
+        .then((res: any) => {
+          const data = res?.data;
+          const list = data?.list ?? [];
+          setAgentsList(
+            list.map((a: any) => ({
+              id: a.id != null ? String(a.id) : '',
+              name: a.name ?? '--',
+              description: a.description,
+            }))
+          );
+        })
+        .catch((e) => {
+          console.error('Failed to load agents:', e);
+          setAgentsList([]);
+        })
+        .finally(() => setAgentsLoading(false));
+    }
+  }, [currentStep, agentSearchQuery]);
 
   const steps = [
     {
@@ -230,109 +264,6 @@ export function CreateApplication() {
       description: '智能任务执行代理，支持多步推理和任务处理',
       icon: Bot,
       iconBg: 'bg-gradient-to-br from-orange-500 to-orange-600',
-    },
-  ];
-
-  const models = [
-    {
-      id: 'gpt-4-turbo' as ModelType,
-      name: 'GPT-4 Turbo',
-      provider: 'OpenAI',
-      description: '最新旗舰模型，卓越的性能和速度',
-      contextTokens: '128K',
-      cost: '$0.01 / 1K',
-      category: 'premium',
-      recommended: true,
-    },
-    {
-      id: 'gpt-4' as ModelType,
-      name: 'GPT-4',
-      provider: 'OpenAI',
-      description: '强大的理解和生成能力',
-      contextTokens: '8K',
-      cost: '$0.03 / 1K',
-      category: 'premium',
-      recommended: false,
-    },
-    {
-      id: 'gpt-3.5-turbo' as ModelType,
-      name: 'GPT-3.5 Turbo',
-      provider: 'OpenAI',
-      description: '高性价比选择，快速响应',
-      contextTokens: '16K',
-      cost: '$0.001 / 1K',
-      category: 'standard',
-      recommended: false,
-    },
-    {
-      id: 'claude-3-opus' as ModelType,
-      name: 'Claude-3 Opus',
-      provider: 'Anthropic',
-      description: '最强大的Claude模型',
-      contextTokens: '200K',
-      cost: '$0.015 / 1K',
-      category: 'premium',
-      recommended: true,
-    },
-    {
-      id: 'claude-3-sonnet' as ModelType,
-      name: 'Claude-3 Sonnet',
-      provider: 'Anthropic',
-      description: '平衡性能和成本',
-      contextTokens: '200K',
-      cost: '$0.003 / 1K',
-      category: 'standard',
-      recommended: false,
-    },
-    {
-      id: 'claude-3-haiku' as ModelType,
-      name: 'Claude-3 Haiku',
-      provider: 'Anthropic',
-      description: '最快的Claude模型',
-      contextTokens: '200K',
-      cost: '$0.00025 / 1K',
-      category: 'economy',
-      recommended: false,
-    },
-    {
-      id: 'gemini-pro' as ModelType,
-      name: 'Gemini Pro',
-      provider: 'Google',
-      description: 'Google最新多模态模型',
-      contextTokens: '32K',
-      cost: '$0.0005 / 1K',
-      category: 'standard',
-      recommended: false,
-    },
-    {
-      id: 'llama-3-70b' as ModelType,
-      name: 'Llama-3 70B',
-      provider: 'Meta',
-      description: '开源大模型，强大性能',
-      contextTokens: '8K',
-      cost: '$0.0009 / 1K',
-      category: 'economy',
-      recommended: false,
-    },
-    {
-      id: 'llama-3-8b' as ModelType,
-      name: 'Llama-3 8B',
-      provider: 'Meta',
-      description: '开源模型，超高性价比',
-      contextTokens: '8K',
-      cost: '$0.0002 / 1K',
-      category: 'economy',
-      recommended: false,
-    },
-    {
-      id: 'mistral-large' as ModelType,
-      name: 'Mistral Large',
-      provider: 'Mistral AI',
-      description: '欧洲领先的AI模型',
-      contextTokens: '32K',
-      cost: '$0.008 / 1K',
-      category: 'standard',
-      recommended: false,
     },
   ];
 
@@ -428,20 +359,102 @@ export function CreateApplication() {
     { id: 'command' as IconType, icon: Command, label: '命令' },
   ];
 
-  const filteredModels = models.filter(
-    model =>
-      model.name.toLowerCase().includes(modelSearchQuery.toLowerCase()) ||
-      model.provider.toLowerCase().includes(modelSearchQuery.toLowerCase()) ||
-      model.description.toLowerCase().includes(modelSearchQuery.toLowerCase())
+  const filteredAgents = agentsList.filter(
+    a =>
+      a.name.toLowerCase().includes(agentSearchQuery.toLowerCase()) ||
+      (a.description ?? '').toLowerCase().includes(agentSearchQuery.toLowerCase())
   );
 
-  const handleNext = () => {
+  useEffect(() => {
+    if (currentStep === 2) {
+      setAgentsLoading(true);
+      Agents.getAgentList({ bindable: true, pageNo: 1, pageSize: 100 })
+        .then((res: any) => {
+          const data = res?.data;
+          const list = (data?.list ?? []).map((item: any) => ({
+            id: item.id ?? 0,
+            name: item.name ?? '--',
+            description: item.description,
+          }));
+          setAgentsList(list);
+        })
+        .catch(() => setAgentsList([]))
+        .finally(() => setAgentsLoading(false));
+    }
+  }, [currentStep]);
+
+  const mapAppTypeToCategory = (type: AppType | null): ApplicationCategoryEnum => {
+    if (type === 'chatbot') return ApplicationCategoryEnum.CHATBOT;
+    if (type === 'text-generation') return ApplicationCategoryEnum.CONTENT_CREATION;
+    if (type === 'knowledge') return ApplicationCategoryEnum.KNOWLEDGE_QA;
+    if (type === 'agent') return ApplicationCategoryEnum.AGENT_PROXY;
+    return ApplicationCategoryEnum.CHATBOT;
+  };
+
+  const iconToEmoji: Record<IconType, string> = {
+    message: '💬',
+    sparkles: '✨',
+    help: '❓',
+    bot: '🤖',
+    zap: '⚡',
+    database: '🗄️',
+    file: '📄',
+    users: '👥',
+    palette: '🎨',
+    image: '🖼️',
+    smile: '😊',
+    star: '⭐',
+    heart: '❤️',
+    briefcase: '💼',
+    coffee: '☕',
+    globe: '🌐',
+    bookmark: '🔖',
+    cloud: '☁️',
+    cpu: '💻',
+    music: '🎵',
+    video: '🎬',
+    camera: '📷',
+    mail: '📧',
+    phone: '📱',
+    map: '🗺️',
+    calendar: '📅',
+    bell: '🔔',
+    settings: '⚙️',
+    folder: '📁',
+    archive: '📦',
+    download: '⬇️',
+    upload: '⬆️',
+    share: '🔗',
+    lock: '🔒',
+    unlock: '🔓',
+    eye: '👁️',
+    eyeoff: '🙈',
+    edit: '✏️',
+    trash: '🗑️',
+    copy: '📋',
+    link: '🔗',
+    hash: '#',
+    percent: '%',
+    trending: '📈',
+    barchart: '📊',
+    piechart: '🥧',
+    activity: '📌',
+    target: '🎯',
+    flag: '🚩',
+    award: '🏆',
+    gift: '🎁',
+    rocket: '🚀',
+    layers: '📚',
+    command: '⌘',
+  };
+
+  const handleNext = async () => {
     if (currentStep === 1 && !selectedType) {
       toast.error('请选择一个应用类型');
       return;
     }
-    if (currentStep === 2 && !selectedModel) {
-      toast.error('请选择一个AI模型');
+    if (currentStep === 2 && !selectedAgent) {
+      toast.error('请选择一个智能体');
       return;
     }
     if (currentStep === 3) {
@@ -458,8 +471,24 @@ export function CreateApplication() {
     if (currentStep < 5) {
       setCurrentStep(currentStep + 1);
     } else {
-      toast.success('应用创建成功！');
-      onBack();
+      if (!selectedAgent) {
+        toast.error('请选择智能体');
+        return;
+      }
+      try {
+        await Applications.createApplication({
+          name: appName.trim(),
+          icon: iconToEmoji[selectedIcon] || '🤖',
+          description: appDescription.trim() || undefined,
+          category: mapAppTypeToCategory(selectedType),
+          agentId: selectedAgent.id,
+          language: 'zh-CN',
+        });
+        toast.success('应用创建成功！');
+        onBack();
+      } catch (error: any) {
+        toast.error(error?.message || error?.data?.message || '创建失败');
+      }
     }
   };
 
@@ -495,7 +524,7 @@ export function CreateApplication() {
         '我可以帮您处理这个任务。让我们一步步来完成。',
         welcomeMessage || '感谢您的提问！我会尽力为您提供帮助。',
       ];
-      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+      const randomResponse = responses[Math.floor(Math.random() * responses.length)] ?? '';
       setTestMessages(prev => [...prev, { role: 'assistant', content: randomResponse }]);
     }, 1000);
   };
@@ -535,19 +564,6 @@ export function CreateApplication() {
           descriptionTemplate: '',
           welcomeTemplate: '',
         };
-    }
-  };
-
-  const getCategoryBadge = (category: string) => {
-    switch (category) {
-      case 'premium':
-        return <Badge className='bg-purple-500 hover:bg-purple-600 text-white'>旗舰</Badge>;
-      case 'standard':
-        return <Badge className='bg-blue-500 hover:bg-blue-600 text-white'>标准</Badge>;
-      case 'economy':
-        return <Badge className='bg-green-500 hover:bg-green-600 text-white'>经济</Badge>;
-      default:
-        return null;
     }
   };
 
@@ -599,9 +615,9 @@ export function CreateApplication() {
   const renderStep2 = () => (
     <div className='animate-in fade-in duration-500'>
       <div className='text-center mb-8'>
-        <h2 className='text-2xl mb-2 dark:text-white'>配置 AI 模型</h2>
+        <h2 className='text-2xl mb-2 dark:text-white'>选择智能体</h2>
         <p className='text-sm text-gray-600 dark:text-gray-400'>
-          选择适合您应用的 AI 模型，不同模型在性能和成本上有所差异
+          选择要绑定到应用的智能体，应用将使用该智能体的能力进行对话
         </p>
       </div>
 
@@ -610,54 +626,52 @@ export function CreateApplication() {
         <div className='relative max-w-2xl mx-auto'>
           <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400' />
           <Input
-            placeholder='搜索模型名称、提供商...'
-            value={modelSearchQuery}
-            onChange={e => setModelSearchQuery(e.target.value)}
+            placeholder='搜索智能体名称、描述...'
+            value={agentSearchQuery}
+            onChange={e => setAgentSearchQuery(e.target.value)}
             className='pl-10 dark:bg-gray-800 dark:border-gray-700 dark:text-white'
           />
         </div>
       </div>
 
-      {/* 模型列表 */}
+      {/* 智能体列表 */}
       <div>
         <ScrollArea className='h-[500px] pr-4'>
           <div className='space-y-3'>
-            {filteredModels.map(model => (
-              <Card
-                key={model.id}
-                onClick={() => setSelectedModel(model.id)}
-                className={`p-5 cursor-pointer transition-all duration-300 hover:shadow-lg relative ${
-                  selectedModel === model.id
-                    ? 'border-2 border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-lg'
-                    : 'border-2 border-transparent hover:border-blue-200 dark:hover:border-blue-800'
-                }`}
-              >
-                <div className='flex items-start gap-4'>
-                  <div className='bg-gradient-to-br from-gray-700 to-gray-800 w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0'>
-                    <Code className='w-6 h-6 text-white' />
-                  </div>
-                  <div className='flex-1 min-w-0'>
-                    <div className='flex items-center justify-between gap-2 mb-1'>
-                      <div className='flex items-center gap-2 min-w-0'>
-                        <h3 className='dark:text-white'>{model.name}</h3>
-                        {getCategoryBadge(model.category)}
-                        {model.recommended && (
-                          <Badge className='bg-green-500 hover:bg-green-600 text-white'>推荐</Badge>
-                        )}
-                      </div>
-                      <div className='flex items-center gap-3 text-sm flex-shrink-0'>
-                        <span className='text-gray-500 dark:text-gray-400'>{model.contextTokens}</span>
-                        <span className='text-gray-900 dark:text-white'>{model.cost}</span>
-                        {selectedModel === model.id && <Check className='w-5 h-5 text-blue-500' />}
-                      </div>
+            {agentsLoading ? (
+              <div className='py-12 text-center text-gray-500 dark:text-gray-400'>加载中...</div>
+            ) : filteredAgents.length === 0 ? (
+              <div className='py-12 text-center text-gray-500 dark:text-gray-400'>
+                暂无可用智能体，请先在智能体管理中创建
+              </div>
+            ) : (
+              filteredAgents.map(agent => (
+                <Card
+                  key={agent.id}
+                  onClick={() => setSelectedAgent({ id: agent.id, name: agent.name })}
+                  className={`p-5 cursor-pointer transition-all duration-300 hover:shadow-lg relative ${
+                    selectedAgent?.id === agent.id
+                      ? 'border-2 border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-lg'
+                      : 'border-2 border-transparent hover:border-blue-200 dark:hover:border-blue-800'
+                  }`}
+                >
+                  <div className='flex items-start gap-4'>
+                    <div className='bg-gradient-to-br from-orange-500 to-orange-600 w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0'>
+                      <Bot className='w-6 h-6 text-white' />
                     </div>
-                    <p className='text-sm text-gray-600 dark:text-gray-400'>
-                      {model.provider} · {model.description}
-                    </p>
+                    <div className='flex-1 min-w-0'>
+                      <div className='flex items-center justify-between gap-2 mb-1'>
+                        <h3 className='dark:text-white'>{agent.name}</h3>
+                        {selectedAgent?.id === agent.id && <Check className='w-5 h-5 text-blue-500' />}
+                      </div>
+                      <p className='text-sm text-gray-600 dark:text-gray-400'>
+                        {agent.description || '暂无描述'}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </Card>
-            ))}
+                </Card>
+              ))
+            )}
           </div>
         </ScrollArea>
       </div>
@@ -1356,7 +1370,6 @@ export function CreateApplication() {
 
   const renderStep5 = () => {
     const selectedTypeObj = appTypes.find(t => t.id === selectedType);
-    const selectedModelObj = models.find(m => m.id === selectedModel);
     const selectedTemplateObj = templates.find(t => t.id === selectedTemplate);
     const SelectedIcon = getSelectedIcon();
 
@@ -1393,8 +1406,8 @@ export function CreateApplication() {
                       <div className='text-sm dark:text-white'>{selectedTypeObj?.name}</div>
                     </div>
                     <div className='p-3 bg-gray-50 dark:bg-gray-900 rounded-lg'>
-                      <div className='text-xs text-gray-500 dark:text-gray-400 mb-1'>AI 模型</div>
-                      <div className='text-sm dark:text-white'>{selectedModelObj?.name}</div>
+                      <div className='text-xs text-gray-500 dark:text-gray-400 mb-1'>绑定智能体</div>
+                      <div className='text-sm dark:text-white'>{selectedAgent?.name ?? '--'}</div>
                     </div>
                     <div className='p-3 bg-gray-50 dark:bg-gray-900 rounded-lg'>
                       <div className='text-xs text-gray-500 dark:text-gray-400 mb-1'>外观模板</div>
@@ -1478,15 +1491,11 @@ export function CreateApplication() {
                 )}
 
                 <div>
-                  <h4 className='text-sm mb-3 dark:text-white'>成本预估</h4>
+                  <h4 className='text-sm mb-3 dark:text-white'>智能体</h4>
                   <div className='p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800'>
-                    <div className='flex items-center justify-between mb-1'>
-                      <span className='text-sm text-gray-600 dark:text-gray-400'>预计每1K tokens</span>
-                      <span className='text-sm dark:text-white'>{selectedModelObj?.cost}</span>
-                    </div>
                     <div className='flex items-center justify-between'>
-                      <span className='text-sm text-gray-600 dark:text-gray-400'>上下文窗口</span>
-                      <span className='text-sm dark:text-white'>{selectedModelObj?.contextTokens}</span>
+                      <span className='text-sm text-gray-600 dark:text-gray-400'>已选智能体</span>
+                      <span className='text-sm dark:text-white'>{selectedAgent?.name ?? '--'}</span>
                     </div>
                   </div>
                 </div>

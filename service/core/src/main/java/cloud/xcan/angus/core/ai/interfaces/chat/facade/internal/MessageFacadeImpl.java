@@ -2,12 +2,15 @@ package cloud.xcan.angus.core.ai.interfaces.chat.facade.internal;
 
 import cloud.xcan.angus.core.ai.application.cmd.chat.MessageCmd;
 import cloud.xcan.angus.core.ai.application.cmd.chat.SessionCmd;
+import cloud.xcan.angus.core.ai.application.query.application.ApplicationQuery;
 import cloud.xcan.angus.core.ai.application.query.chat.MessageQuery;
 import cloud.xcan.angus.core.ai.application.query.chat.SessionQuery;
+import cloud.xcan.angus.core.ai.domain.application.AIApplication;
 import cloud.xcan.angus.core.ai.domain.chat.Message;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRole;
-import cloud.xcan.angus.core.ai.infra.ai.model.ChatService;
+import cloud.xcan.angus.core.ai.domain.chat.Session;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.MessageFacade;
+import cloud.xcan.angus.remote.message.ProtocolException;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.MessageFeedbackDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.MessageFindDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.MessageSendDto;
@@ -45,7 +48,10 @@ public class MessageFacadeImpl implements MessageFacade {
   private SessionQuery sessionQuery;
 
   @Resource
-  private ChatService aiService;
+  private ApplicationQuery applicationQuery;
+
+  @Resource
+  private cloud.xcan.agentx.core.agent.AgentRegistry agentRegistry;
 
   @Override
   public MessageSendVo sendMessage(Long sessionId, MessageSendDto dto) {
@@ -57,8 +63,15 @@ public class MessageFacadeImpl implements MessageFacade {
         dto.getAttachments()
     );
 
-    // 2. 调用AI服务获取响应
-    String aiResponse = aiService.sendMessage(sessionId, dto.getContent(), dto.getOverrideConfig());
+    // 2. Session → Application → agentId → AgentRegistry.chat
+    Session session = sessionQuery.findAndCheck(sessionId);
+    AIApplication application = applicationQuery.findAndCheck(session.getAppId());
+    if (application.getAgentId() == null) {
+      throw ProtocolException.of("应用未绑定智能体，无法进行对话");
+    }
+    String agentIdStr = String.valueOf(application.getAgentId());
+    String sessionIdStr = String.valueOf(sessionId);
+    String aiResponse = agentRegistry.chat(agentIdStr, sessionIdStr, dto.getContent());
 
     // 3. 创建助手消息
     Long assistantMessageId = messageCmd.create(sessionId, MessageRole.ASSISTANT, aiResponse);
@@ -82,13 +95,51 @@ public class MessageFacadeImpl implements MessageFacade {
         dto.getAttachments()
     );
 
-    // 2. 创建空的助手消息用于流式更新
+    // 2. Session → Application → agentId → AgentRegistry.chatStream
+    Session session = sessionQuery.findAndCheck(sessionId);
+    AIApplication application = applicationQuery.findAndCheck(session.getAppId());
+    if (application.getAgentId() == null) {
+      throw ProtocolException.of("应用未绑定智能体，无法进行对话");
+    }
+    String agentIdStr = String.valueOf(application.getAgentId());
+    String sessionIdStr = String.valueOf(sessionId);
+
+    // 3. 创建空的助手消息用于流式更新
     Long assistantMessageId = messageCmd.create(sessionId, MessageRole.ASSISTANT, "");
     messageCmd.setStreaming(assistantMessageId, true);
 
-    // 3. 调用AI服务进行流式响应
-    // aiService.sendMessageStream(sessionId, dto.getContent(), dto.getOverrideConfig(), assistantMessageId);
-    return null;
+    // 4. 流式调用 AgentRegistry.chatStream
+    SseEmitter emitter = new SseEmitter(120_000L);
+    new Thread(() -> {
+      try {
+        dev.langchain4j.service.TokenStream stream = agentRegistry.chatStream(
+            agentIdStr, sessionIdStr, dto.getContent());
+        StringBuilder fullContent = new StringBuilder();
+        stream.onPartialResponse(token -> {
+          fullContent.append(token);
+          try {
+            emitter.send(SseEmitter.event().data(token));
+          } catch (Exception e) {
+            emitter.completeWithError(e);
+          }
+        })
+            .onCompleteResponse(r -> {
+              messageQuery.updateContent(assistantMessageId, fullContent.toString());
+              messageCmd.setStreaming(assistantMessageId, false);
+              emitter.complete();
+            })
+            .onError(e -> {
+              messageCmd.setStreaming(assistantMessageId, false);
+              emitter.completeWithError(e);
+            });
+        stream.start();
+      } catch (Exception e) {
+        messageCmd.setStreaming(assistantMessageId, false);
+        emitter.completeWithError(e);
+      }
+    }).start();
+
+    return emitter;
   }
 
   @Override

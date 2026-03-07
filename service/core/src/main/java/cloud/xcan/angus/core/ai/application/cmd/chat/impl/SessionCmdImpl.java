@@ -5,10 +5,11 @@ import static cloud.xcan.angus.spec.utils.ObjectUtils.nullSafe;
 import static java.util.Objects.nonNull;
 
 import cloud.xcan.angus.core.ai.application.cmd.chat.SessionCmd;
+import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
 import cloud.xcan.angus.core.ai.application.query.application.ApplicationQuery;
 import cloud.xcan.angus.core.ai.application.query.chat.SessionQuery;
+import cloud.xcan.angus.core.ai.domain.agent.Agent;
 import cloud.xcan.angus.core.ai.domain.application.AIApplication;
-import cloud.xcan.angus.core.ai.domain.application.ApplicationConfig;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRepo;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRole;
 import cloud.xcan.angus.core.ai.domain.chat.Session;
@@ -42,44 +43,48 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
   @Resource
   private ApplicationQuery applicationQuery;
 
+  @Resource
+  private AgentQuery agentQuery;
+
   @Override
   @Transactional
   public Session create(Session session) {
     return new BizTemplate<Session>() {
       AIApplication application;
       Model currentModel;
+      Agent agent;
 
       @Override
       protected void checkParams() {
-        // 检查应用和模型是否存在
-        application = applicationQuery.findAndCheck(session.getId(), session.getModelId());
-
+        // 检查应用和模型是否存在（appId 必填，modelId 可选，默认从 Agent 获取）
+        application = applicationQuery.findAndCheck(session.getAppId(), session.getModelId());
+        currentModel = application.getCurrentUseMode();
+        agent = agentQuery.findAndCheck(application.getAgentId());
         // TODO 检查会话配额，默认每个用户应用会话数不超过500，应用总会话不超过10000
       }
 
       @Override
       protected Session process() {
-
         session.setTitle(nullSafe(session.getTitle(), "新对话"));
+        // 会话默认使用应用绑定的 Agent 的模型
+        if (session.getModelId() == null) {
+          session.setModelId(currentModel.getId());
+        }
 
-        ApplicationConfig appConfig = application.getConfig();
         SessionConfig sessionConfig = session.getConfig();
-        sessionConfig.setTemperature(nullSafe(sessionConfig.getTemperature(),
-            currentModel.getConfig().getTemperature()));
-        sessionConfig.setMaxTokens(nullSafe(sessionConfig.getMaxTokens(),
-            currentModel.getConfig().getMaxTokens()));
-        sessionConfig.setTopP(nullSafe(sessionConfig.getTopP(),
-            appConfig.getModel().getTopP()));
-        sessionConfig.setFrequencyPenalty(nullSafe(sessionConfig.getFrequencyPenalty(),
-            appConfig.getModel().getFrequencyPenalty()));
-        sessionConfig.setPresencePenalty(nullSafe(sessionConfig.getPresencePenalty(),
-            appConfig.getModel().getPresencePenalty()));
-        sessionConfig.setSystemPrompt(nullSafe(sessionConfig.getSystemPrompt(),
-            appConfig.getPrompts().getSystem()));
-
-        currentModel = application.getCurrentUseMode();
-        sessionConfig.setTemperature(nullSafe(sessionConfig.getTemperature(),
-            currentModel.getConfig().getTemperature()));
+        if (currentModel != null && currentModel.getConfig() != null) {
+          var modelConfig = currentModel.getConfig();
+          sessionConfig.setTemperature(nullSafe(sessionConfig.getTemperature(),
+              modelConfig.getTemperature()));
+          sessionConfig.setMaxTokens(nullSafe(sessionConfig.getMaxTokens(),
+              modelConfig.getMaxTokens()));
+          // topP/frequencyPenalty/presencePenalty 不在 ModelConfigDefinition 中，使用默认值
+          sessionConfig.setTopP(nullSafe(sessionConfig.getTopP(), 0.9));
+          sessionConfig.setFrequencyPenalty(nullSafe(sessionConfig.getFrequencyPenalty(), 0.0));
+          sessionConfig.setPresencePenalty(nullSafe(sessionConfig.getPresencePenalty(), 0.0));
+        }
+        sessionConfig.setSystemPrompt(nullSafe(nullSafe(sessionConfig.getSystemPrompt(),
+            agent != null ? agent.getSystemPrompt() : null), ""));
 
         insert0(session);
         return session;
@@ -127,14 +132,15 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
         // 查找并检查会话是否存在
         session = sessionQuery.findAndCheck(id);
 
-        // 检查应用是否存在
-        applicationQuery.findAndCheck(appId);
+        // 检查应用是否存在，并获取默认模型（来自绑定的 Agent）
+        application = applicationQuery.findAndCheck(appId, null);
       }
 
       @Override
       protected Void process() {
         session.setAppId(appId);
-        session.setModelId(application.getModelId());
+        Model defaultModel = application.getCurrentUseMode();
+        session.setModelId(defaultModel != null ? defaultModel.getId() : null);
         sessionRepo.save(session);
         return null;
       }

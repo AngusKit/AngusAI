@@ -209,6 +209,7 @@ export const zhCN = {
     apiKeys: 'API密钥',
     billing: '订阅',
     plugins: '插件',
+    agents: '智能体',
     activityLog: '活动',
     notifications: '通知',
   },

@@ -210,6 +210,7 @@ export const enUS = {
     apiKeys: 'API Keys',
     billing: 'Subscription',
     plugins: 'Plugin',
+    agents: 'Agents',
     activityLog: 'Activities',
     notifications: 'Notifications',
   },

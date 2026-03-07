@@ -24,6 +24,9 @@ public class ApplicationUpdateDto {
   @Schema(description = "应用分类")
   private ApplicationCategory category;
 
+  @Schema(description = "绑定的智能体ID")
+  private Long agentId;
+
   @Length(max = Constants.APPLICATION_LANGUAGE_MAX_LENGTH)
   @Schema(description = "默认语言", example = "zh-CN")
   private String language;

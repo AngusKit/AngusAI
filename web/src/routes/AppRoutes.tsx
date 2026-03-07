@@ -11,6 +11,7 @@ import { Dataset } from '@/pages/dataset/Dataset';
 import { APICollection } from '@/pages/apis/APICollection';
 import { PluginMarket } from '@/pages/plugins/PluginMarket';
 import { ModelManagement } from '@/pages/models/ModelManagement';
+import { AgentManagement } from '@/pages/agents/AgentManagement';
 import { VectorStore } from '@/pages/vector/VectorStore';
 import { TeamMembersPage } from '@/pages/member/TeamMembersPage';
 import { ResourceSharing } from '@/pages/sharding/ResourceSharing';
@@ -39,6 +40,7 @@ export function AppRoutes() {
         <Route path='api-collection' element={<APICollection />} />
         <Route path='plugins' element={<PluginMarket />} />
         <Route path='models' element={<ModelManagement />} />
+        <Route path='agents' element={<AgentManagement />} />
         <Route path='vector-store' element={<VectorStore />} />
         <Route path='prompts' element={<PromptLibraryPage />} />
         <Route path='notifications' element={<NotificationsPage />} />

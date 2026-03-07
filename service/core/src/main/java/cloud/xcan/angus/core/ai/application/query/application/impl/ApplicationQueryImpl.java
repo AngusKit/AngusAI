@@ -3,7 +3,9 @@ package cloud.xcan.angus.core.ai.application.query.application.impl;
 import static cloud.xcan.angus.spec.utils.ObjectUtils.nullSafe;
 import static java.util.Objects.nonNull;
 
+import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
 import cloud.xcan.angus.core.ai.application.query.application.ApplicationQuery;
+import cloud.xcan.angus.core.ai.domain.agent.Agent;
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.domain.application.AIApplication;
 import cloud.xcan.angus.core.ai.domain.application.AIApplicationRepo;
@@ -35,6 +37,9 @@ public class ApplicationQueryImpl implements ApplicationQuery {
   @Resource
   private ModelQuery modelQuery;
 
+  @Resource
+  private AgentQuery agentQuery;
+
   @Override
   public AIApplication findAndCheck(Long id) {
     return new BizTemplate<AIApplication>() {
@@ -50,6 +55,7 @@ public class ApplicationQueryImpl implements ApplicationQuery {
   public AIApplication findAndCheck(Long id, @Nullable Long currentUseModelId) {
     return new BizTemplate<AIApplication>() {
       AIApplication application;
+      Agent agent;
       Model currentUseMode;
       Model appDefaultModel;
 
@@ -57,24 +63,25 @@ public class ApplicationQueryImpl implements ApplicationQuery {
       protected void checkParams() {
         // 检查应用是否存在
         application = findAndCheck(id);
-
-        // 检查应用模型是否存在
-        if (nonNull(application.getModelId())) {
-          appDefaultModel = modelQuery.findAndCheck(application.getModelId());
+        if (application.getAgentId() == null) {
+          throw ProtocolException.of("应用未绑定智能体，请先配置应用");
         }
-
+        // 从绑定的智能体获取模型
+        agent = agentQuery.findAndCheck(application.getAgentId());
+        if (nonNull(agent.getModelId())) {
+          appDefaultModel = modelQuery.findAndCheck(agent.getModelId());
+        }
         // 检查当前使用模型是否存在
         if (nonNull(currentUseModelId)) {
           currentUseMode = modelQuery.findAndCheck(currentUseModelId);
         }
-
         // 切换应用模型时，检查模型类型是否一致
-        if (nonNull(currentUseModelId) && nonNull(application.getModelId())
-            && !Objects.equals(currentUseModelId, application.getModelId())
-            && !Objects.equals(currentUseMode.getType(),
-            application.getAppDefaultModel().getType())) {
-          throw ProtocolException.of("当前选择模型类型[{0}]与应用默认模型类型[{1}]不一致",
-              new Object[]{currentUseMode.getType(), application.getAppDefaultModel().getType()});
+        if (nonNull(currentUseModelId) && nonNull(agent.getModelId())
+            && !Objects.equals(currentUseModelId, agent.getModelId())
+            && nonNull(appDefaultModel)
+            && !Objects.equals(currentUseMode.getType(), appDefaultModel.getType())) {
+          throw ProtocolException.of("当前选择模型类型[{0}]与智能体默认模型类型[{1}]不一致",
+              new Object[]{currentUseMode.getType(), appDefaultModel.getType()});
         }
       }
 

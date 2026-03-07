@@ -267,6 +267,18 @@ export enum ApplicationStatusEnum {
   PAUSED = 'PAUSED',
 }
 
+/** 智能体状态：ACTIVE-已发布, INACTIVE-已下线 */
+export enum AgentStatusEnum {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+}
+
+/** 智能体状态：ACTIVE-已发布, INACTIVE-已下线 */
+export enum AgentStatusEnum {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+}
+
 export enum ApiKeyPermissionsEnum {
   READ = 'READ',
   WRITE = 'WRITE',

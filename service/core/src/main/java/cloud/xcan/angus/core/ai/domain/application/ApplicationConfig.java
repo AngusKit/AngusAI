@@ -11,22 +11,12 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-@Schema(description = "应用配置更新请求参数")
+@Schema(description = "应用配置更新请求参数（强制绑定智能体，模型/资源/提示词由 Agent 提供）")
 public class ApplicationConfig {
 
-  @Valid
   @NotNull
-  @Schema(description = "模型配置", requiredMode = RequiredMode.REQUIRED)
-  private ModelConfig model;
-
-  @Valid
-  @Schema(description = "关联资源")
-  private ResourcesConfig resources;
-
-  @Valid
-  @NotNull
-  @Schema(description = "提示词配置", requiredMode = RequiredMode.REQUIRED)
-  private PromptsConfig prompts;
+  @Schema(description = "绑定的智能体ID", requiredMode = RequiredMode.REQUIRED)
+  private Long agentId;
 
   @Schema(description = "对话设置")
   private ConversationConfig conversation;
@@ -39,76 +29,6 @@ public class ApplicationConfig {
 
   @Schema(description = "发布设置")
   private PublishConfig publish;
-
-  @Data
-  @Schema(description = "默认模型配置")
-  public static class ModelConfig {
-
-    @Schema(description = "模型Id", requiredMode = RequiredMode.REQUIRED)
-    @NotNull
-    private Long id;
-
-    @Schema(description = "模型提供商", example = "openai")
-    private String provider;
-
-    @Schema(description = "模型名称", example = "gpt-3.5-turbo")
-    private String modelName;
-
-    @Min(value = 0, message = "温度值不能小于0")
-    @Max(value = 2, message = "温度值不能大于2")
-    @Schema(description = "温度", example = "0.5")
-    private Double temperature;
-
-    @Min(value = 1, message = "最大token数不能小于1")
-    @Schema(description = "最大token数", example = "2048")
-    private Integer maxTokens;
-
-    @Min(value = 0, message = "top_p值不能小于0")
-    @Max(value = 1, message = "top_p值不能大于1")
-    @Schema(description = "top_p", example = "0.9")
-    private Double topP;
-
-    @Min(value = -2, message = "频率惩罚不能小于-2")
-    @Max(value = 2, message = "频率惩罚不能大于2")
-    @Schema(description = "频率惩罚", example = "0.0")
-    private Double frequencyPenalty;
-
-    @Min(value = -2, message = "存在惩罚不能小于-2")
-    @Max(value = 2, message = "存在惩罚不能大于2")
-    @Schema(description = "存在惩罚", example = "0.0")
-    private Double presencePenalty;
-  }
-
-  @Data
-  @Schema(description = "关联资源配置")
-  public static class ResourcesConfig {
-
-    @Size(max = 5)
-    @Schema(description = "关联的知识库ID，最多5个")
-    private List<Long> knowledgeBaseIds;
-
-    @Size(max = 5)
-    @Schema(description = "关联的数据集ID列表，最多5个")
-    private List<Long> datasetIds;
-
-    @Size(max = 10)
-    @Schema(description = "关联的接口集ID列表，最多10个")
-    private List<Long> apiCollectionIds;
-
-    @Schema(description = "关联的工作流ID")
-    private Long workflowId;
-  }
-
-  @Data
-  @Schema(description = "提示词配置")
-  public static class PromptsConfig {
-
-    @Schema(description = "系统提示词")
-    private String system;
-
-    @Schema(description = "上下文提示词")
-    private String context;
-  }
 
   @Data
   @Schema(description = "对话设置")

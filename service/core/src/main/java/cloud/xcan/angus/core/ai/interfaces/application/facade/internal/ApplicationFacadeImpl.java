@@ -6,12 +6,14 @@ import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 
 import cloud.xcan.angus.core.ai.application.cmd.application.ApplicationCmd;
+import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
 import cloud.xcan.angus.core.ai.application.query.apis.ApiCollectionQuery;
 import cloud.xcan.angus.core.ai.application.query.application.ApplicationQuery;
 import cloud.xcan.angus.core.ai.application.query.dataset.DatasetQuery;
 import cloud.xcan.angus.core.ai.application.query.knowledgebase.KnowledgeBaseQuery;
 import cloud.xcan.angus.core.ai.application.query.workflow.WorkflowQuery;
 import cloud.xcan.angus.core.ai.domain.apis.ApiCollection;
+import cloud.xcan.angus.core.ai.domain.agent.Agent;
 import cloud.xcan.angus.core.ai.domain.application.AIApplication;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationConfig;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
@@ -60,11 +62,14 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
   @Resource
   private ApiCollectionQuery apiCollectionQuery;
 
+  @Resource
+  private AgentQuery agentQuery;
+
   @Override
   public ApplicationDetailVo create(ApplicationCreateDto dto) {
     AIApplication application = ApplicationAssembler.toCreateDomain(dto);
     AIApplication saved = applicationCmd.create(application);
-    return ApplicationAssembler.toDetailVo(saved, null);
+    return ApplicationAssembler.toDetailVo(saved, getResourcesConfigVo(saved));
   }
 
   @Override
@@ -132,25 +137,29 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
 
   private ResourcesConfigVo getResourcesConfigVo(AIApplication saved) {
     ResourcesConfigVo vo = new ResourcesConfigVo();
-    if (isNotEmpty(saved.getWorkflowId())) {
-      Workflow workflow = workflowQuery.findById(saved.getWorkflowId());
+    if (saved.getAgentId() == null) {
+      return vo;
+    }
+    Agent agent = agentQuery.findAndCheck(saved.getAgentId());
+    if (nonNull(agent.getWorkflowId())) {
+      Workflow workflow = workflowQuery.findById(agent.getWorkflowId());
       if (nonNull(workflow)) {
         vo.setWorkflow(new ResourceInfoVo(workflow.getId(), workflow.getName()));
       }
     }
-    if (isNotEmpty(saved.getDatasetIds())) {
-      List<Dataset> datasets = datasetQuery.findById(saved.getDatasetIds());
+    if (isNotEmpty(agent.getDatasetIds())) {
+      List<Dataset> datasets = datasetQuery.findById(agent.getDatasetIds());
       vo.setDatasets(datasets.stream().map(x -> new ResourceInfoVo(x.getId(), x.getName()))
           .collect(Collectors.toList()));
     }
-    if (isNotEmpty(saved.getKnowledgeBaseIds())) {
-      List<KnowledgeBase> knowledgeBases = knowledgeBaseQuery.findById(saved.getKnowledgeBaseIds());
+    if (isNotEmpty(agent.getKnowledgeBaseIds())) {
+      List<KnowledgeBase> knowledgeBases = knowledgeBaseQuery.findById(agent.getKnowledgeBaseIds());
       vo.setKnowledgeBases(
           knowledgeBases.stream().map(x -> new ResourceInfoVo(x.getId(), x.getName()))
               .collect(Collectors.toList()));
     }
-    if (isNotEmpty(saved.getApiCollectionIds())) {
-      List<ApiCollection> apiCollections = apiCollectionQuery.findById(saved.getApiCollectionIds());
+    if (isNotEmpty(agent.getApiCollectionIds())) {
+      List<ApiCollection> apiCollections = apiCollectionQuery.findById(agent.getApiCollectionIds());
       vo.setApiCollections(
           apiCollections.stream().map(x -> new ResourceInfoVo(x.getId(), x.getName()))
               .collect(Collectors.toList()));

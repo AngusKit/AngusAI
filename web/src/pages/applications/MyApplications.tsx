@@ -35,6 +35,7 @@ interface Application {
   tags: Tag[];
   visits: string;
   category: ApplicationCategoryEnum;
+  agentId?: string;
 }
 
 export function MyApplications() {
@@ -131,6 +132,7 @@ export function MyApplications() {
           tags: [], // API中没有标签字段，需要从其他地方获取或留空
           visits: `${app.apiCalls || 0} 次调用`, // API中没有调用次数字段，需要从统计接口获取
           category: app.category,
+          agentId: app.agentId != null ? String(app.agentId) : undefined,
         }));
 
         setApplications(mappedList);
@@ -252,9 +254,8 @@ export function MyApplications() {
       const updateDto: any = {};
       if (updatedData.name !== undefined) updateDto.name = updatedData.name;
       if (updatedData.description !== undefined) updateDto.description = updatedData.description;
-      if (updatedData.category !== undefined) {
-        updateDto.category = updatedData.category;
-      }
+      if (updatedData.category !== undefined) updateDto.category = updatedData.category;
+      if (updatedData.agentId !== undefined) updateDto.agentId = updatedData.agentId;
 
       await Applications.updateApplication(selectedApp.id, updateDto);
 

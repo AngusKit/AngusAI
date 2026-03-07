@@ -6,6 +6,7 @@ import static cloud.xcan.angus.core.ai.application.converter.ApplicationConverte
 import static cloud.xcan.angus.spec.utils.ObjectUtils.isNull;
 
 import cloud.xcan.angus.core.ai.application.cmd.application.ApplicationCmd;
+import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
 import cloud.xcan.angus.core.ai.application.query.application.ApplicationQuery;
 import cloud.xcan.angus.core.ai.domain.application.AIApplication;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationConfig;
@@ -34,6 +35,9 @@ public class ApplicationCmdImpl extends CommCmd<AIApplication, Long> implements 
   @Resource
   private ApplicationQuery applicationQuery;
 
+  @Resource
+  private AgentQuery agentQuery;
+
   @Override
   @Transactional
   public AIApplication create(AIApplication application) {
@@ -43,6 +47,12 @@ public class ApplicationCmdImpl extends CommCmd<AIApplication, Long> implements 
         // 检查名称是否已存在
         if (applicationQuery.existsByName(application.getName())) {
           throw ResourceExisted.of("应用名称「{0}」已存在", new Object[]{application.getName()});
+        }
+        // 检查绑定的智能体是否存在
+        if (application.getAgentId() != null) {
+          agentQuery.findAndCheck(application.getAgentId());
+        } else {
+          throw ProtocolException.of("应用必须绑定至少一个智能体");
         }
       }
 

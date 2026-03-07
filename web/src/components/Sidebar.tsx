@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, FileText, Workflow, BookOpen, Package, Database, Settings, Users, Share2, BarChart3, Key, CreditCard, MessageSquare, Sparkles, Code2, Server, Activity, Bell } from 'lucide-react';
+import { Home, FileText, Workflow, BookOpen, Package, Database, Settings, Users, Share2, BarChart3, Key, CreditCard, MessageSquare, Sparkles, Code2, Server, Activity, Bell, Bot } from 'lucide-react';
 import { Button } from '@/components/ui/button.tsx';
 import { Badge } from '@/components/ui/badge.tsx';
 import { AppNavigator } from './AppNavigator.tsx';
@@ -38,6 +38,7 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
   const systemMenuItems = [
     { id: 'usage-analytics', icon: BarChart3, label: t('analytics.title') },
     { id: 'plugins', icon: Package, label: t('nav.plugins') },
+    { id: 'agents', icon: Bot, label: t('nav.agents') },
     { id: 'models', icon: Settings, label: t('nav.models') },
     { id: 'vector-store', icon: Server, label: t('nav.vectorStore') },
     { id: 'api-keys', icon: Key, label: t('nav.apiKeys') },
