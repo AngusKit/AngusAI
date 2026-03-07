@@ -206,6 +206,12 @@ export type ModelDetailResult = ApiLocaleResult & {
   data?: ModelDetailVo;
 };
 
+/** 支持的模型提供者列表响应 — 返回当前运行时已注册的 ModelProvider 枚举值 */
+export type ModelSupportedProvidersResult = ApiLocaleResult & {
+  /** 支持的模型提供者枚举值列表，如 OPEN_AI、ANTHROPIC、OLLAMA、GEMINI、QWEN、ZHIPU、DEEPSEEK 等 */
+  data?: ModelProviderEnum[];
+};
+
 /** 创建模型请求参数 */
 export interface ModelCreateDto {
   /**

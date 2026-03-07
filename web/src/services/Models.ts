@@ -1,5 +1,5 @@
 import { AI, ApiLocaleResult, PageQuery } from '@xcan-angus/infra';
-import { GetModelListParamsOrderByEnum, ModelConfigDefinition, ModelCreateDto, ModelDetailResult, ModelStatisticsResult, ModelTestDto, ModelUpdateDto, ModelUpdateStatusDto, PageResultModelListResult, } from './ModelsTypes.ts';
+import { GetModelListParamsOrderByEnum, ModelConfigDefinition, ModelCreateDto, ModelDetailResult, ModelStatisticsResult, ModelSupportedProvidersResult, ModelTestDto, ModelUpdateDto, ModelUpdateStatusDto, PageResultModelListResult, } from './ModelsTypes.ts';
 import http, { ContentType, HttpClient, QueryParamsType, RequestParams } from './HttpClient.ts';
 import { ModelProviderEnum, ModelStatusEnum, ModelTypeEnum } from '@/enums/enums.ts';
 
@@ -169,6 +169,22 @@ export class Models<SecurityDataType = unknown> {
       body: data,
       secure: true,
       type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * @description 获取当前运行时支持的模型提供者列表（基于 ModelProvidersConfiguration 中已注册的 ModelFactory）
+   *
+   * @tags Model
+   * @name GetSupportedProviders
+   * @summary 查询支持的模型提供者
+   * @request GET:/api/v1/models/providers
+   * @secure
+   */
+  getSupportedProviders = (params: RequestParams = {}) =>
+    this.http.request<ModelSupportedProvidersResult>({
+      path: `${AI}/models/providers`,
+      method: 'GET',
+      secure: true,
       ...params,
     });
   /**

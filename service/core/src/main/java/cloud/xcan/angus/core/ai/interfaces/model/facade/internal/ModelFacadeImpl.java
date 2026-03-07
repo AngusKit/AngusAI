@@ -31,10 +31,15 @@ import cloud.xcan.angus.remote.PageResult;
 import cloud.xcan.angus.remote.dto.SimpleStatisticsDto;
 import cloud.xcan.angus.remote.search.SearchCriteria;
 import cloud.xcan.agentx.core.model.ModelConfigDefinition;
+import cloud.xcan.agentx.core.model.ModelFactory;
+import cloud.xcan.agentx.core.model.ModelProvider;
 import jakarta.annotation.Resource;
 import java.time.LocalDate;
+import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
@@ -54,7 +59,22 @@ public class ModelFacadeImpl implements ModelFacade {
   @Resource
   private ModelCallRecordQuery modelCallRecordQuery;
 
+  @Autowired(required = false)
+  private List<ModelFactory> modelFactories;
+
   private static final int DEFAULT_MONTHS = 1; // 默认统计近一月
+
+  @Override
+  public List<ModelProvider> getSupportedProviders() {
+    if (modelFactories == null || modelFactories.isEmpty()) {
+      return List.of();
+    }
+    return modelFactories.stream()
+        .map(ModelFactory::getProvider)
+        .distinct()
+        .sorted()
+        .collect(Collectors.toList());
+  }
 
   @NameJoin
   @Override

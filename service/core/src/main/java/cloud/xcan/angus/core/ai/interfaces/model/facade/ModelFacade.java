@@ -11,8 +11,15 @@ import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelStatisticsVo;
 import cloud.xcan.angus.remote.PageResult;
 import cloud.xcan.angus.remote.dto.SimpleStatisticsDto;
 import cloud.xcan.agentx.core.model.ModelConfigDefinition;
+import cloud.xcan.agentx.core.model.ModelProvider;
+import java.util.List;
 
 public interface ModelFacade {
+
+  /**
+   * 获取当前运行时支持的模型提供者列表（基于 ModelProvidersConfiguration 中已注册的 ModelFactory）
+   */
+  List<ModelProvider> getSupportedProviders();
 
   /**
    * 创建模型

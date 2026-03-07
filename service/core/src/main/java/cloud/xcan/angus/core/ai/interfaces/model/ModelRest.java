@@ -136,7 +136,15 @@ public class ModelRest {
     return ApiLocaleResult.success(modelFacade.list(dto));
   }
 
-  // TODO 查询支持的模型
+  @Operation(operationId = "getSupportedProviders", summary = "查询支持的模型提供者", description = "获取当前运行时支持的模型提供者列表（基于 ModelProvidersConfiguration 中已注册的 ModelFactory）")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "获取成功")
+  })
+  @ResponseStatus(HttpStatus.OK)
+  @GetMapping("/providers")
+  public ApiLocaleResult<java.util.List<cloud.xcan.agentx.core.model.ModelProvider>> getSupportedProviders() {
+    return ApiLocaleResult.success(modelFacade.getSupportedProviders());
+  }
 
   @Operation(operationId = "getModelStatistics", summary = "获取模型调用统计", description = "获取模型调用统计数据")
   @ApiResponses(value = {
