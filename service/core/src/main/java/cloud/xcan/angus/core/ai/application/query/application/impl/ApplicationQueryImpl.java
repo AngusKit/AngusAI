@@ -63,11 +63,11 @@ public class ApplicationQueryImpl implements ApplicationQuery {
       protected void checkParams() {
         // 检查应用是否存在
         application = findAndCheck(id);
-        if (application.getAgentId() == null) {
+        if (application.getDefaultAgentId() == null) {
           throw ProtocolException.of("应用未绑定智能体，请先配置应用");
         }
         // 从绑定的智能体获取模型
-        agent = agentQuery.findAndCheck(application.getAgentId());
+        agent = agentQuery.findAndCheck(application.getDefaultAgentId());
         if (nonNull(agent.getModelId())) {
           appDefaultModel = modelQuery.findAndCheck(agent.getModelId());
         }

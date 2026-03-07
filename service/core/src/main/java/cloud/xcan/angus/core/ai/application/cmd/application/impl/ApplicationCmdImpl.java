@@ -48,11 +48,12 @@ public class ApplicationCmdImpl extends CommCmd<AIApplication, Long> implements 
         if (applicationQuery.existsByName(application.getName())) {
           throw ResourceExisted.of("应用名称「{0}」已存在", new Object[]{application.getName()});
         }
-        // 检查绑定的智能体是否存在
-        if (application.getAgentId() != null) {
-          agentQuery.findAndCheck(application.getAgentId());
-        } else {
+        // 检查绑定的智能体是否存在（至少一个，且全部有效）
+        if (application.getAgentIds() == null || application.getAgentIds().isEmpty()) {
           throw ProtocolException.of("应用必须绑定至少一个智能体");
+        }
+        for (Long agentId : application.getAgentIds()) {
+          agentQuery.findAndCheck(agentId);
         }
       }
 

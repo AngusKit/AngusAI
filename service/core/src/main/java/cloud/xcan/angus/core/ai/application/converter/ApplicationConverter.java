@@ -1,6 +1,7 @@
 package cloud.xcan.angus.core.ai.application.converter;
 
 import cloud.xcan.angus.core.ai.domain.application.AIApplication;
+import cloud.xcan.angus.core.ai.domain.application.ApplicationAgentBinding;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationConfig;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationShare;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
@@ -24,13 +25,34 @@ public class ApplicationConverter {
     newApplication.setCategory(sourceApplication.getCategory());
     newApplication.setLanguage(sourceApplication.getLanguage());
     newApplication.setConfig(sourceApplication.getConfig());
-    newApplication.setAgentId(sourceApplication.getAgentId());
+    // 复制智能体绑定关系
+    if (sourceApplication.getAgentBindings() != null && !sourceApplication.getAgentBindings().isEmpty()) {
+      for (ApplicationAgentBinding src : sourceApplication.getAgentBindings()) {
+        ApplicationAgentBinding binding = new ApplicationAgentBinding()
+            .setAgentId(src.getAgentId())
+            .setIsDefault(src.getIsDefault())
+            .setSortOrder(src.getSortOrder());
+        binding.setApplication(newApplication);
+        newApplication.getAgentBindings().add(binding);
+      }
+    }
     return newApplication;
   }
 
   public static void updateAssociatedIds(ApplicationConfig config, AIApplication applicationDb) {
-    if (config != null && config.getAgentId() != null) {
-      applicationDb.setAgentId(config.getAgentId());
+    if (config != null && config.getAgentIds() != null && !config.getAgentIds().isEmpty()) {
+      Long defaultId = config.getDefaultAgentId() != null && config.getAgentIds().contains(config.getDefaultAgentId())
+          ? config.getDefaultAgentId() : config.getAgentIds().get(0);
+      applicationDb.getAgentBindings().clear();
+      int sortOrder = 0;
+      for (Long agentId : config.getAgentIds()) {
+        ApplicationAgentBinding binding = new ApplicationAgentBinding()
+            .setAgentId(agentId)
+            .setIsDefault(agentId.equals(defaultId))
+            .setSortOrder(sortOrder++);
+        binding.setApplication(applicationDb);
+        applicationDb.getAgentBindings().add(binding);
+      }
     }
   }
 

@@ -54,8 +54,11 @@ public class ApplicationDetailVo extends TenantAuditingVo {
   @Schema(description = "应用配置（模型/资源/提示词由绑定的智能体提供）")
   public static class ApplicationConfigVo {
 
-    @Schema(description = "绑定的智能体ID")
-    private Long agentId;
+    @Schema(description = "绑定的智能体ID列表")
+    private List<Long> agentIds;
+
+    @Schema(description = "默认智能体ID（用于对话）")
+    private Long defaultAgentId;
 
     @Schema(description = "对话设置")
     private ConversationConfigVo conversation;

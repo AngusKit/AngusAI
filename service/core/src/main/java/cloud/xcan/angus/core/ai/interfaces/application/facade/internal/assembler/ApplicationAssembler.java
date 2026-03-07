@@ -1,6 +1,7 @@
 package cloud.xcan.angus.core.ai.interfaces.application.facade.internal.assembler;
 
 import cloud.xcan.angus.core.ai.domain.application.AIApplication;
+import cloud.xcan.angus.core.ai.domain.application.ApplicationAgentBinding;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationConfig;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.dto.ApplicationCreateDto;
@@ -28,12 +29,25 @@ public class ApplicationAssembler {
         .setIcon(dto.getIcon())
         .setDescription(dto.getDescription())
         .setCategory(dto.getCategory())
-        .setLanguage(dto.getLanguage())
-        .setAgentId(dto.getAgentId());
+        .setLanguage(dto.getLanguage());
 
-    // 设置默认配置（agentId 必填，模型/资源/提示词由 Agent 提供）
+    // 创建智能体绑定（agentIds 必填，模型/资源/提示词由 Agent 提供）
+    Long defaultId = dto.getDefaultAgentId() != null && dto.getAgentIds().contains(dto.getDefaultAgentId())
+        ? dto.getDefaultAgentId() : dto.getAgentIds().get(0);
+    int sortOrder = 0;
+    for (Long agentId : dto.getAgentIds()) {
+      ApplicationAgentBinding binding = new ApplicationAgentBinding()
+          .setAgentId(agentId)
+          .setIsDefault(agentId.equals(defaultId))
+          .setSortOrder(sortOrder++);
+      binding.setApplication(application);
+      application.getAgentBindings().add(binding);
+    }
+
+    // 设置默认配置
     ApplicationConfig config = new ApplicationConfig();
-    config.setAgentId(dto.getAgentId());
+    config.setAgentIds(dto.getAgentIds());
+    config.setDefaultAgentId(defaultId);
     application.setConfig(config);
 
     // 设置默认值
@@ -56,9 +70,11 @@ public class ApplicationAssembler {
     application.setDescription(dto.getDescription());
     application.setCategory(dto.getCategory());
     application.setLanguage(dto.getLanguage());
-    if (dto.getAgentId() != null) {
+    // agentBindings 由 updateAssociatedIds 根据 config.agentIds 在 applicationDb 上更新
+    if (dto.getAgentIds() != null && !dto.getAgentIds().isEmpty()) {
       ApplicationConfig config = new ApplicationConfig();
-      config.setAgentId(dto.getAgentId());
+      config.setAgentIds(dto.getAgentIds());
+      config.setDefaultAgentId(dto.getDefaultAgentId());
       application.setConfig(config);
     }
     return application;
@@ -96,10 +112,11 @@ public class ApplicationAssembler {
     vo.setModifiedBy(application.getModifiedBy());
     vo.setModifiedDate(application.getModifiedDate());
 
-    // 设置配置信息（agentId、conversation、features、security、publish）
+    // 设置配置信息（agentIds、defaultAgentId、conversation、features、security、publish）
     ApplicationConfigVo configVo = new ApplicationConfigVo();
     if (application.getConfig() != null) {
-      configVo.setAgentId(application.getAgentId());
+      configVo.setAgentIds(application.getAgentIds());
+      configVo.setDefaultAgentId(application.getDefaultAgentId());
       CoreUtils.copyProperties(application.getConfig(), configVo);
     }
     configVo.setResources(resourcesConfigVo);
@@ -126,6 +143,8 @@ public class ApplicationAssembler {
     vo.setDescription(application.getDescription());
     vo.setCategory(application.getCategory());
     vo.setStatus(application.getStatus());
+    vo.setAgentIds(application.getAgentIds());
+    vo.setDefaultAgentId(application.getDefaultAgentId());
     vo.setApiCalls(application.getApiCalls());
     vo.setPublicAccess(application.getPublicAccess());
     vo.setEmbedEnabled(application.getEmbedEnabled());

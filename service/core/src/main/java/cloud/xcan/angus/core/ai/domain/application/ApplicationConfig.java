@@ -15,8 +15,12 @@ import lombok.Data;
 public class ApplicationConfig {
 
   @NotNull
-  @Schema(description = "绑定的智能体ID", requiredMode = RequiredMode.REQUIRED)
-  private Long agentId;
+  @Size(min = 1)
+  @Schema(description = "绑定的智能体ID列表（至少一个）", requiredMode = RequiredMode.REQUIRED)
+  private List<Long> agentIds;
+
+  @Schema(description = "默认智能体ID（用于对话，不传则取 agentIds 第一个）")
+  private Long defaultAgentId;
 
   @Schema(description = "对话设置")
   private ConversationConfig conversation;

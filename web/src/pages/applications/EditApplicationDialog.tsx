@@ -24,7 +24,8 @@ interface Application {
   tags: { label: string; color: string }[];
   visits: string;
   category: ApplicationCategoryEnum;
-  agentId?: string;
+  agentIds?: string[];
+  defaultAgentId?: string;
 }
 
 interface EditApplicationDialogProps {
@@ -107,7 +108,7 @@ export function EditApplicationDialog({ open, onOpenChange, application, onSave 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState<ApplicationCategoryEnum>(ApplicationCategoryEnum.CHATBOT);
-  const [agentId, setAgentId] = useState<string | undefined>(undefined);
+  const [defaultAgentId, setDefaultAgentId] = useState<string | undefined>(undefined);
   const [agentsList, setAgentsList] = useState<{ id: string; name: string }[]>([]);
   const [selectedIconId, setSelectedIconId] = useState('message');
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -129,7 +130,7 @@ export function EditApplicationDialog({ open, onOpenChange, application, onSave 
       setName(application.name);
       setDescription(application.description);
       setCategory(application.category);
-      setAgentId(application.agentId);
+      setDefaultAgentId(application.defaultAgentId ?? application.agentIds?.[0]);
       // 找到对应的图标ID
       const iconOption = iconOptions.find(opt => opt.bgColor === application.iconBgColor);
       if (iconOption) {
@@ -155,7 +156,8 @@ export function EditApplicationDialog({ open, onOpenChange, application, onSave 
       category,
       icon: selectedIcon?.icon,
       iconBgColor: selectedIcon?.bgColor,
-      agentId,
+      agentIds: defaultAgentId ? [defaultAgentId] : undefined,
+      defaultAgentId,
     });
     toast.success('应用已更新');
     onOpenChange(false);
@@ -218,12 +220,12 @@ export function EditApplicationDialog({ open, onOpenChange, application, onSave 
 
           {/* 绑定智能体 */}
           <div className='space-y-2'>
-            <Label htmlFor='agentId' className='dark:text-gray-300'>
+            <Label htmlFor='defaultAgentId' className='dark:text-gray-300'>
               绑定智能体
             </Label>
             <Select
-              value={agentId ?? ''}
-              onValueChange={(v) => setAgentId(v || undefined)}
+              value={defaultAgentId ?? ''}
+              onValueChange={(v) => setDefaultAgentId(v || undefined)}
             >
               <SelectTrigger className='dark:bg-gray-900 dark:border-gray-700 dark:text-white'>
                 <SelectValue placeholder='选择智能体' />

@@ -4,7 +4,7 @@ import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
 import cloud.xcan.angus.core.ai.domain.agent.Agent;
 import cloud.xcan.angus.core.ai.domain.agent.AgentRepo;
 import cloud.xcan.angus.core.ai.domain.agent.AgentStatus;
-import cloud.xcan.angus.core.ai.domain.application.AIApplicationRepo;
+import cloud.xcan.angus.core.ai.domain.application.ApplicationAgentBindingRepo;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import cloud.xcan.agentx.core.agent.enums.InteractionMode;
@@ -22,7 +22,7 @@ public class AgentQueryImpl implements AgentQuery {
   private AgentRepo agentRepo;
 
   @Resource
-  private AIApplicationRepo applicationRepo;
+  private ApplicationAgentBindingRepo applicationAgentBindingRepo;
 
   @Override
   public Agent findAndCheck(Long id) {
@@ -58,7 +58,7 @@ public class AgentQueryImpl implements AgentQuery {
 
   @Override
   public boolean isReferencedByApplications(Long agentId) {
-    return agentId != null && applicationRepo.existsByAgentId(agentId);
+    return agentId != null && applicationAgentBindingRepo.existsByAgentId(agentId);
   }
 
 }

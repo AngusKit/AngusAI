@@ -4,11 +4,15 @@ import cloud.xcan.angus.core.ai.domain.Constants;
 import cloud.xcan.angus.core.ai.domain.model.Model;
 import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import java.time.LocalDateTime;
@@ -73,10 +77,38 @@ public class AIApplication extends TenantAuditingEntity<AIApplication, Long> {
   private ApplicationConfig config;
 
   /**
-   * 绑定的智能体ID（必填，每个应用至少绑定一个Agent）
+   * 应用与智能体的一对多绑定关系（每个应用可绑定多个智能体）
    */
-  @Column(name = "agent_id", nullable = false)
-  private Long agentId;
+  @OneToMany(mappedBy = "application", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+  @OrderBy("sortOrder ASC")
+  private List<ApplicationAgentBinding> agentBindings = new java.util.ArrayList<>();
+
+  /**
+   * 获取默认智能体ID（用于对话时选用）
+   * 优先返回 isDefault=true 的绑定，否则按 sortOrder 取第一个
+   */
+  public Long getDefaultAgentId() {
+    if (agentBindings == null || agentBindings.isEmpty()) {
+      return null;
+    }
+    return agentBindings.stream()
+        .filter(b -> Boolean.TRUE.equals(b.getIsDefault()))
+        .findFirst()
+        .map(ApplicationAgentBinding::getAgentId)
+        .orElseGet(() -> agentBindings.get(0).getAgentId());
+  }
+
+  /**
+   * 获取所有绑定的智能体ID列表（按 sortOrder 排序）
+   */
+  public List<Long> getAgentIds() {
+    if (agentBindings == null || agentBindings.isEmpty()) {
+      return List.of();
+    }
+    return agentBindings.stream()
+        .map(ApplicationAgentBinding::getAgentId)
+        .toList();
+  }
 
   // 发布设置
   @Column(name = "public_access")

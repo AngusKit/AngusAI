@@ -69,7 +69,7 @@ public class AgentDefinitionAssembler {
         .memory(memoryConfig)
         .guardrails(guardrailConfig)
         .variables(nullSafe(agent.getVariables()))
-        .tenantId(agent.getTenantId())
+        .tenantId(String.valueOf(agent.getTenantId()))
         .build();
   }
 

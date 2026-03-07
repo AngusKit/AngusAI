@@ -137,10 +137,11 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
 
   private ResourcesConfigVo getResourcesConfigVo(AIApplication saved) {
     ResourcesConfigVo vo = new ResourcesConfigVo();
-    if (saved.getAgentId() == null) {
+    Long defaultAgentId = saved.getDefaultAgentId();
+    if (defaultAgentId == null) {
       return vo;
     }
-    Agent agent = agentQuery.findAndCheck(saved.getAgentId());
+    Agent agent = agentQuery.findAndCheck(defaultAgentId);
     if (nonNull(agent.getWorkflowId())) {
       Workflow workflow = workflowQuery.findById(agent.getWorkflowId());
       if (nonNull(workflow)) {

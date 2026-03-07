@@ -35,7 +35,8 @@ interface Application {
   tags: Tag[];
   visits: string;
   category: ApplicationCategoryEnum;
-  agentId?: string;
+  agentIds?: string[];
+  defaultAgentId?: string;
 }
 
 export function MyApplications() {
@@ -132,7 +133,8 @@ export function MyApplications() {
           tags: [], // API中没有标签字段，需要从其他地方获取或留空
           visits: `${app.apiCalls || 0} 次调用`, // API中没有调用次数字段，需要从统计接口获取
           category: app.category,
-          agentId: app.agentId != null ? String(app.agentId) : undefined,
+          agentIds: (app as any).agentIds?.map((id: number) => String(id)) ?? (app as any).config?.agentIds ?? [],
+          defaultAgentId: (app as any).defaultAgentId != null ? String((app as any).defaultAgentId) : (app as any).config?.defaultAgentId,
         }));
 
         setApplications(mappedList);
@@ -255,7 +257,8 @@ export function MyApplications() {
       if (updatedData.name !== undefined) updateDto.name = updatedData.name;
       if (updatedData.description !== undefined) updateDto.description = updatedData.description;
       if (updatedData.category !== undefined) updateDto.category = updatedData.category;
-      if (updatedData.agentId !== undefined) updateDto.agentId = updatedData.agentId;
+      if (updatedData.agentIds !== undefined) updateDto.agentIds = updatedData.agentIds?.map(Number);
+      if (updatedData.defaultAgentId !== undefined) updateDto.defaultAgentId = Number(updatedData.defaultAgentId);
 
       await Applications.updateApplication(selectedApp.id, updateDto);
 

@@ -28,11 +28,6 @@ public interface AIApplicationRepo extends BaseRepository<AIApplication, Long> {
   boolean existsByNameAndIdNot(String name, Long id);
 
   /**
-   * 检查是否有应用绑定指定智能体（用于 Agent 删除前校验）
-   */
-  boolean existsByAgentId(Long agentId);
-
-  /**
    * 统计用户的应用程序数量
    */
   long countByCreatedBy(Long createdBy);

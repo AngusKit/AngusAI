@@ -481,7 +481,8 @@ export function CreateApplication() {
           icon: iconToEmoji[selectedIcon] || '🤖',
           description: appDescription.trim() || undefined,
           category: mapAppTypeToCategory(selectedType),
-          agentId: selectedAgent.id,
+          agentIds: [selectedAgent.id],
+          defaultAgentId: selectedAgent.id,
           language: 'zh-CN',
         });
         toast.success('应用创建成功！');

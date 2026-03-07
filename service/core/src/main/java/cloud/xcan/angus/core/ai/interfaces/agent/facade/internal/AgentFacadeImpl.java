@@ -1,6 +1,7 @@
 package cloud.xcan.angus.core.ai.interfaces.agent.facade.internal;
 
-import static cloud.xcan.angus.core.jpa.criteria.CoreUtils.buildVoPageResult;
+
+import static cloud.xcan.angus.core.utils.CoreUtils.buildVoPageResult;
 
 import cloud.xcan.agentx.core.agent.AgentRegistry;
 import cloud.xcan.agentx.core.agent.definition.AgentDefinition;
@@ -111,7 +112,7 @@ public class AgentFacadeImpl implements AgentFacade {
         log.warn("Failed to unregister agent {} before delete: {}", id, e.getMessage());
       }
     }
-    agentCmd.delete(id);
+    agentCmd.delete(id, force);
   }
 
   @NameJoin
