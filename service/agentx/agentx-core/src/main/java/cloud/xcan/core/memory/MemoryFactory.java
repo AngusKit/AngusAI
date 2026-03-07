@@ -21,15 +21,15 @@ public class MemoryFactory {
 
   private static final SimpleTokenCountEstimator TOKEN_ESTIMATOR = new SimpleTokenCountEstimator();
 
-  private ChatMemoryStore memoryStore;
-  private ChatModel chatModel;
+  private final ChatMemoryStore memoryStore;
+  private final ChatModel chatModel;
 
   /**
    * 无依赖构造函数，用于简单场景
    */
   public MemoryFactory() {
     this.chatModel = null;
-    memoryStore = new InMemoryChatMemoryStore();
+    this.memoryStore = new InMemoryChatMemoryStore();
   }
 
   /**
@@ -37,7 +37,7 @@ public class MemoryFactory {
    */
   public MemoryFactory(ChatModel chatModel) {
     this.chatModel = chatModel;
-    memoryStore = new InMemoryChatMemoryStore();
+    this.memoryStore = new InMemoryChatMemoryStore();
   }
 
   /**

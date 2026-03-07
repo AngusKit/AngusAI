@@ -47,7 +47,6 @@ import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.skills.Skill;
 import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -108,10 +107,8 @@ public class CoreBeansConfiguration {
   }
 
   @Bean
-  public MemoryFactory memoryFactory(ChatMemoryStore chatMemoryStore,
-      ObjectProvider<ChatModel> chatModelProvider) {
-    Optional<ChatModel> chatModel = Optional.of(chatModelProvider.getIfAvailable());
-    return new MemoryFactory(chatMemoryStore, chatModel.get());
+  public MemoryFactory memoryFactory(ChatMemoryStore chatMemoryStore, ModelRegistry modelRegistry) {
+    return new MemoryFactory(chatMemoryStore, modelRegistry.getDefaultChatModel().orElse(null));
   }
 
   // ===== Agent =====
@@ -124,8 +121,7 @@ public class CoreBeansConfiguration {
   public AgentRegistry agentRegistry(ToolRegistry toolRegistry, MemoryFactory memoryFactory,
       ModelRegistry modelRegistry, SkillRegistry skillRegistry, GuardrailChain guardrailChain,
       ObjectProvider<ContentRetrieverFactory> contentRetrieverFactoryProvider,
-      @Lazy WorkflowEngine workflowEngine,
-      WorkflowDefinitionProvider workflowDefinitionProvider) {
+      @Lazy WorkflowEngine workflowEngine, WorkflowDefinitionProvider workflowDefinitionProvider) {
     ContentRetrieverFactory contentRetrieverFactory = contentRetrieverFactoryProvider.getIfAvailable();
     return new AgentRegistry(toolRegistry, memoryFactory, modelRegistry, skillRegistry,
         guardrailChain, contentRetrieverFactory, workflowEngine, workflowDefinitionProvider);
@@ -253,10 +249,8 @@ public class CoreBeansConfiguration {
   }
 
   @Bean
-  public SubWorkflowNodeExecutor subWorkflowNodeExecutor(
-      @Lazy WorkflowEngine workflowEngine,
-      WorkflowDefinitionProvider workflowDefinitionProvider,
-      ExpressionEngine expressionEngine) {
+  public SubWorkflowNodeExecutor subWorkflowNodeExecutor(@Lazy WorkflowEngine workflowEngine,
+      WorkflowDefinitionProvider workflowDefinitionProvider, ExpressionEngine expressionEngine) {
     return new SubWorkflowNodeExecutor(workflowEngine, workflowDefinitionProvider,
         expressionEngine);
   }

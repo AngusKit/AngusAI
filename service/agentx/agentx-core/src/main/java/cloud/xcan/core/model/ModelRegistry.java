@@ -104,6 +104,43 @@ public class ModelRegistry {
   }
 
   /**
+   * 获取指定 provider 的默认 ChatModel
+   */
+  public Optional<ChatModel> getDefaultChatModel() {
+    return configProvider.loadDefault()
+        .map(config -> chatModelCache.computeIfAbsent(config.getId(),
+            id -> getFactory(config.getProvider()).createChatModel(config)));
+  }
+
+  /**
+   * 获取指定 provider 的默认 StreamingChatModel
+   */
+  public Optional<StreamingChatModel> getDefaultStreamingChatModel() {
+    return configProvider.loadDefault()
+        .map(config -> streamingModelCache.computeIfAbsent(config.getId(),
+            id -> getFactory(config.getProvider()).createStreamingChatModel(config)));
+  }
+
+  /**
+   * 获取指定 provider 的默认 EmbeddingModel
+   */
+  public Optional<EmbeddingModel> getDefaultEmbeddingModel() {
+    return configProvider.loadDefault()
+        .flatMap(config -> {
+          EmbeddingModel cached = embeddingModelCache.get(config.getId());
+          if (cached != null) {
+            return Optional.of(cached);
+          }
+          EmbeddingModel model = getFactory(config.getProvider()).createEmbeddingModel(config);
+          if (model == null) {
+            return Optional.empty();
+          }
+          embeddingModelCache.put(config.getId(), model);
+          return Optional.of(model);
+        });
+  }
+
+  /**
    * 清除缓存并强制从数据库重新加载
    */
   public void refresh() {

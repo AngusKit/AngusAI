@@ -54,10 +54,16 @@ public class ModelConfigDefinition {
   private String embeddingModelName;
 
   /**
-   * 是否为默认配置
+   * 是否为默认配置 — 多个模型时优先选择默认模型
    */
   @Builder.Default
   private boolean defaultConfig = false;
+
+  /**
+   * 优先级 — 数值越大优先级越高；无默认模型时选择优先级最高的
+   */
+  @Builder.Default
+  private Integer priority = 0;
 
   /**
    * 租户 ID（null 为全局）
