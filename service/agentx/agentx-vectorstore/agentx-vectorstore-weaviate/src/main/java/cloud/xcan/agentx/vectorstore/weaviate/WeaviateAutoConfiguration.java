@@ -1,7 +1,7 @@
 package cloud.xcan.agentx.vectorstore.weaviate;
 
-import cloud.xcan.core.vectorstore.VectorStoreConfigDefinition;
-import cloud.xcan.core.vectorstore.VectorStoreFactory;
+import cloud.xcan.agentx.core.vectorstore.VectorStoreConfigDefinition;
+import cloud.xcan.agentx.core.vectorstore.VectorStoreFactory;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.weaviate.WeaviateEmbeddingStore;

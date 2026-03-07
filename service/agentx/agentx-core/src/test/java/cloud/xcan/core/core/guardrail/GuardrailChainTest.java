@@ -6,12 +6,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import cloud.xcan.core.guardrail.GuardrailChain;
-import cloud.xcan.core.guardrail.GuardrailResult;
-import cloud.xcan.core.guardrail.builtin.LengthLimitGuardrail;
-import cloud.xcan.core.guardrail.builtin.PiiSanitizationGuardrail;
-import cloud.xcan.core.guardrail.builtin.PromptInjectionGuardrail;
-import cloud.xcan.core.guardrail.builtin.SensitiveWordFilterGuardrail;
+import cloud.xcan.agentx.core.guardrail.GuardrailChain;
+import cloud.xcan.agentx.core.guardrail.GuardrailResult;
+import cloud.xcan.agentx.core.guardrail.builtin.LengthLimitGuardrail;
+import cloud.xcan.agentx.core.guardrail.builtin.PiiSanitizationGuardrail;
+import cloud.xcan.agentx.core.guardrail.builtin.PromptInjectionGuardrail;
+import cloud.xcan.agentx.core.guardrail.builtin.SensitiveWordFilterGuardrail;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

@@ -7,8 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import cloud.xcan.core.tool.ToolDescriptor;
-import cloud.xcan.core.tool.ToolRegistry;
+import cloud.xcan.agentx.core.tool.ToolDescriptor;
+import cloud.xcan.agentx.core.tool.ToolRegistry;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;

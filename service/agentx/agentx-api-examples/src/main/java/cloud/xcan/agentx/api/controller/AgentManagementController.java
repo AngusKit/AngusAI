@@ -1,9 +1,9 @@
 package cloud.xcan.agentx.api.controller;
 
 import cloud.xcan.agentx.api.dto.ApiResponse;
-import cloud.xcan.core.agent.AgentRegistry;
-import cloud.xcan.core.agent.definition.AgentDefinition;
-import cloud.xcan.core.agent.definition.AgentDefinitionParser;
+import cloud.xcan.agentx.core.agent.AgentRegistry;
+import cloud.xcan.agentx.core.agent.definition.AgentDefinition;
+import cloud.xcan.agentx.core.agent.definition.AgentDefinitionParser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;

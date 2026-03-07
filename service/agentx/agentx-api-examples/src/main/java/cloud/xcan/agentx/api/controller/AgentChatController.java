@@ -3,7 +3,7 @@ package cloud.xcan.agentx.api.controller;
 import cloud.xcan.agentx.api.dto.ApiResponse;
 import cloud.xcan.agentx.api.dto.ChatRequest;
 import cloud.xcan.agentx.api.dto.ChatResponse;
-import cloud.xcan.core.agent.AgentRegistry;
+import cloud.xcan.agentx.core.agent.AgentRegistry;
 import dev.langchain4j.service.TokenStream;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

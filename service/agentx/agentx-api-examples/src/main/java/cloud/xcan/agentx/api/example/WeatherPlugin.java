@@ -1,9 +1,9 @@
 package cloud.xcan.agentx.api.example;
 
-import cloud.xcan.core.plugin.AgentXPlugin;
-import cloud.xcan.core.plugin.PluginContext;
-import cloud.xcan.core.plugin.PluginDescriptor;
-import cloud.xcan.core.tool.ToolDescriptor;
+import cloud.xcan.agentx.core.plugin.AgentXPlugin;
+import cloud.xcan.agentx.core.plugin.PluginContext;
+import cloud.xcan.agentx.core.plugin.PluginDescriptor;
+import cloud.xcan.agentx.core.tool.ToolDescriptor;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;

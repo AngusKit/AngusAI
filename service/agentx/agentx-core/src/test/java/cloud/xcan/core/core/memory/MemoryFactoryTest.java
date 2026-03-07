@@ -5,9 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import cloud.xcan.core.agent.definition.AgentDefinition;
-import cloud.xcan.core.memory.MemoryFactory;
-import cloud.xcan.core.memory.enums.MemoryStrategy;
+import cloud.xcan.agentx.core.agent.definition.AgentDefinition;
+import cloud.xcan.agentx.core.memory.MemoryFactory;
+import cloud.xcan.agentx.core.memory.enums.MemoryStrategy;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.ChatMemoryProvider;

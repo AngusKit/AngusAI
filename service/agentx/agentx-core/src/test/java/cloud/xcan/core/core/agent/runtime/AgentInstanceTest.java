@@ -6,9 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import cloud.xcan.core.agent.definition.AgentDefinition;
-import cloud.xcan.core.agent.enums.AgentStatus;
-import cloud.xcan.core.agent.runtime.AgentInstance;
+import cloud.xcan.agentx.core.agent.definition.AgentDefinition;
+import cloud.xcan.agentx.core.agent.enums.AgentStatus;
+import cloud.xcan.agentx.core.agent.runtime.AgentInstance;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

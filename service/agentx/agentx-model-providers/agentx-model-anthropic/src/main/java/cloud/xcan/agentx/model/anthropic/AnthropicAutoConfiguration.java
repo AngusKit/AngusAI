@@ -1,9 +1,9 @@
 package cloud.xcan.agentx.model.anthropic;
 
-import cloud.xcan.core.model.ModelConfigDefinition;
-import cloud.xcan.core.model.ModelConfigProvider;
-import cloud.xcan.core.model.ModelFactory;
-import cloud.xcan.core.model.ModelProvider;
+import cloud.xcan.agentx.core.model.ModelConfigDefinition;
+import cloud.xcan.agentx.core.model.ModelConfigProvider;
+import cloud.xcan.agentx.core.model.ModelFactory;
+import cloud.xcan.agentx.core.model.ModelProvider;
 import dev.langchain4j.model.anthropic.AnthropicChatModel;
 import dev.langchain4j.model.anthropic.AnthropicStreamingChatModel;
 import dev.langchain4j.model.chat.ChatModel;

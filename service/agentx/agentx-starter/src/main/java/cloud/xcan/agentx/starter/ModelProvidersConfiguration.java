@@ -7,7 +7,7 @@ import cloud.xcan.agentx.model.ollama.OllamaAutoConfiguration.OllamaModelFactory
 import cloud.xcan.agentx.model.openai.OpenAiAutoConfiguration.OpenAiModelFactory;
 import cloud.xcan.agentx.model.qwen.QwenAutoConfiguration;
 import cloud.xcan.agentx.model.zhipu.ZhipuAutoConfiguration;
-import cloud.xcan.core.model.ModelFactory;
+import cloud.xcan.agentx.core.model.ModelFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

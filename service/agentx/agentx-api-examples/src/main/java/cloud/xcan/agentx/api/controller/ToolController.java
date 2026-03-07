@@ -1,8 +1,8 @@
 package cloud.xcan.agentx.api.controller;
 
 import cloud.xcan.agentx.api.dto.ApiResponse;
-import cloud.xcan.core.tool.ToolDescriptor;
-import cloud.xcan.core.tool.ToolRegistry;
+import cloud.xcan.agentx.core.tool.ToolDescriptor;
+import cloud.xcan.agentx.core.tool.ToolRegistry;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

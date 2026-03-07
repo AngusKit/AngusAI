@@ -2,7 +2,7 @@ package cloud.xcan.agentx.api.controller;
 
 import cloud.xcan.agentx.api.dto.ApiResponse;
 import cloud.xcan.agentx.api.dto.SkillDto;
-import cloud.xcan.core.skill.SkillRegistry;
+import cloud.xcan.agentx.core.skill.SkillRegistry;
 import dev.langchain4j.skills.DefaultSkill;
 import dev.langchain4j.skills.DefaultSkillResource;
 import dev.langchain4j.skills.Skill;

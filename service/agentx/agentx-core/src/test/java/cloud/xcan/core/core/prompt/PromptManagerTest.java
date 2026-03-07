@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import cloud.xcan.core.prompt.PromptManager;
-import cloud.xcan.core.prompt.PromptTemplate;
+import cloud.xcan.agentx.core.prompt.PromptManager;
+import cloud.xcan.agentx.core.prompt.PromptTemplate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;

@@ -1,7 +1,7 @@
 package cloud.xcan.agentx.tool.ai;
 
-import cloud.xcan.core.model.ModelProvider;
-import cloud.xcan.core.model.ModelRegistry;
+import cloud.xcan.agentx.core.model.ModelProvider;
+import cloud.xcan.agentx.core.model.ModelRegistry;
 import dev.langchain4j.agent.tool.P;
 import dev.langchain4j.agent.tool.Tool;
 import dev.langchain4j.data.message.UserMessage;

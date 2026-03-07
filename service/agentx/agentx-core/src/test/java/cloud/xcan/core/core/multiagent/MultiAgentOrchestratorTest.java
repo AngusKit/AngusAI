@@ -9,10 +9,10 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import cloud.xcan.core.agent.AgentRegistry;
-import cloud.xcan.core.agent.enums.CollaborationPattern;
-import cloud.xcan.core.agent.multi.MultiAgentDefinition;
-import cloud.xcan.core.agent.multi.MultiAgentOrchestrator;
+import cloud.xcan.agentx.core.agent.AgentRegistry;
+import cloud.xcan.agentx.core.agent.enums.CollaborationPattern;
+import cloud.xcan.agentx.core.agent.multi.MultiAgentDefinition;
+import cloud.xcan.agentx.core.agent.multi.MultiAgentOrchestrator;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

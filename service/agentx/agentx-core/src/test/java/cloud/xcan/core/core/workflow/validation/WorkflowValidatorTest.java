@@ -4,11 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import cloud.xcan.core.workflow.dsl.NodeDefinition;
-import cloud.xcan.core.workflow.dsl.WorkflowDefinition;
-import cloud.xcan.core.workflow.enums.NodeType;
-import cloud.xcan.core.workflow.validation.ValidationResult;
-import cloud.xcan.core.workflow.validation.WorkflowValidator;
+import cloud.xcan.agentx.core.workflow.dsl.NodeDefinition;
+import cloud.xcan.agentx.core.workflow.dsl.WorkflowDefinition;
+import cloud.xcan.agentx.core.workflow.enums.NodeType;
+import cloud.xcan.agentx.core.workflow.validation.ValidationResult;
+import cloud.xcan.agentx.core.workflow.validation.WorkflowValidator;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;

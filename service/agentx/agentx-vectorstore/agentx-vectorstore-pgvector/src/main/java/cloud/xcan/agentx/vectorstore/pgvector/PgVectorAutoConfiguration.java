@@ -1,8 +1,8 @@
 package cloud.xcan.agentx.vectorstore.pgvector;
 
-import cloud.xcan.core.vectorstore.VectorStoreConfigDefinition;
-import cloud.xcan.core.vectorstore.VectorStoreConfigProvider;
-import cloud.xcan.core.vectorstore.VectorStoreFactory;
+import cloud.xcan.agentx.core.vectorstore.VectorStoreConfigDefinition;
+import cloud.xcan.agentx.core.vectorstore.VectorStoreConfigProvider;
+import cloud.xcan.agentx.core.vectorstore.VectorStoreFactory;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.pgvector.PgVectorEmbeddingStore;

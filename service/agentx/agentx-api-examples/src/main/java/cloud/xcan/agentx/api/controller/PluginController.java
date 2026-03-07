@@ -1,9 +1,9 @@
 package cloud.xcan.agentx.api.controller;
 
 import cloud.xcan.agentx.api.dto.ApiResponse;
-import cloud.xcan.core.plugin.PluginDescriptor;
-import cloud.xcan.core.plugin.PluginManager;
-import cloud.xcan.core.plugin.enums.PluginState;
+import cloud.xcan.agentx.core.plugin.PluginDescriptor;
+import cloud.xcan.agentx.core.plugin.PluginManager;
+import cloud.xcan.agentx.core.plugin.enums.PluginState;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
