@@ -23,9 +23,8 @@ public class ChromaAutoConfiguration {
       log.info("Creating Chroma embedding store: collection={}",
           config.getCollectionName());
 
-      String collection =
-          config.getCollectionName() != null ? config.getCollectionName() : "embeddings";
-      String baseUrl = config.getUrl() != null ? config.getUrl() : "http://localhost:8000";
+      String collection = config.getEffectiveCollectionName();
+      String baseUrl = config.getEffectiveUrl() != null ? config.getEffectiveUrl() : "http://localhost:8000";
 
       return ChromaEmbeddingStore.builder()
           .baseUrl(baseUrl)

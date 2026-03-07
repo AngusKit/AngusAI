@@ -32,7 +32,14 @@ public class MariaDbAutoConfiguration {
 
       try {
         MariaDbPoolDataSource dataSource = new MariaDbPoolDataSource();
-        dataSource.setUrl(config.getUrl());
+        String jdbcUrl = config.getEffectiveUrl();
+        if (jdbcUrl == null || !jdbcUrl.startsWith("jdbc:")) {
+          jdbcUrl = String.format("jdbc:mariadb://%s:%d/%s",
+              config.getEffectiveHost(),
+              config.getEffectivePort(3306),
+              config.getDatabase() != null ? config.getDatabase() : "vector_db");
+        }
+        dataSource.setUrl(jdbcUrl);
         if (config.getUsername() != null) {
           dataSource.setUser(config.getUsername());
         }
@@ -42,9 +49,8 @@ public class MariaDbAutoConfiguration {
 
         return MariaDbEmbeddingStore.builder()
             .dataSource(dataSource)
-            .tableName(config.getCollectionName() != null ? config.getCollectionName()
-                : "agentx_embeddings")
-            .dimension(config.getDimension() != null ? config.getDimension() : 1536)
+            .tableName(config.getEffectiveCollectionName())
+            .dimension(config.getEffectiveDimension())
             .build();
       } catch (SQLException e) {
         throw new RuntimeException("Failed to create MariaDB data source", e);

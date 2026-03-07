@@ -24,13 +24,12 @@ public class MilvusAutoConfiguration {
       log.info("Creating Milvus embedding store: collection={}, dimension={}",
           config.getCollectionName(), config.getDimension());
 
-      String collection =
-          config.getCollectionName() != null ? config.getCollectionName() : "embeddings";
-      int dimension = config.getDimension() != null ? config.getDimension() : 1536;
+      String collection = config.getEffectiveCollectionName();
+      int dimension = config.getEffectiveDimension();
       Map<String, Object> extra = config.getExtraProperties();
 
       var builder = MilvusEmbeddingStore.builder()
-          .uri(config.getUrl())
+          .uri(config.getEffectiveUrl() != null ? config.getEffectiveUrl() : "http://localhost:19530")
           .collectionName(collection)
           .dimension(dimension);
 

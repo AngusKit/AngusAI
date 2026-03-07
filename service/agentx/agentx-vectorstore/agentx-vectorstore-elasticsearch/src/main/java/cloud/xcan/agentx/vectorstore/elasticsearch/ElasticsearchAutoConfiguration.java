@@ -24,9 +24,8 @@ public class ElasticsearchAutoConfiguration {
       log.info("Creating Elasticsearch embedding store: index={}",
           config.getCollectionName());
 
-      String indexName =
-          config.getCollectionName() != null ? config.getCollectionName() : "embeddings";
-      String serverUrl = config.getUrl() != null ? config.getUrl() : "http://localhost:9200";
+      String indexName = config.getEffectiveCollectionName();
+      String serverUrl = config.getEffectiveUrl() != null ? config.getEffectiveUrl() : "http://localhost:9200";
       Map<String, Object> extra = config.getExtraProperties();
 
       var builder = ElasticsearchEmbeddingStore.builder()
@@ -37,8 +36,9 @@ public class ElasticsearchAutoConfiguration {
         builder.userName(config.getUsername());
         builder.password(config.getPassword());
       }
-      if (extra != null && extra.containsKey("apiKey")) {
-        builder.apiKey((String) extra.get("apiKey"));
+      String apiKey = config.getApiKey() != null ? config.getApiKey() : config.getExtra("apiKey", String.class);
+      if (apiKey != null) {
+        builder.apiKey(apiKey);
       }
 
       return builder.build();

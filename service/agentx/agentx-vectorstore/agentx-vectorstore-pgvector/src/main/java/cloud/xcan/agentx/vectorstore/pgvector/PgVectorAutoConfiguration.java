@@ -28,14 +28,18 @@ public class PgVectorAutoConfiguration {
     @Override
     public EmbeddingStore<TextSegment> createEmbeddingStore(VectorStoreConfigDefinition config) {
       log.info("Creating PgVector embedding store: collection={}, dimension={}",
-          config.getCollectionName(), config.getDimension());
+          config.getEffectiveCollectionName(), config.getEffectiveDimension());
 
-      String host = config.getUrl();
-      String table = config.getCollectionName() != null ? config.getCollectionName() : "embeddings";
-      int dimension = config.getDimension() != null ? config.getDimension() : 1536;
+      String host = config.getEffectiveHost();
+      int port = config.getEffectivePort(5432);
+      String database = config.getDatabase() != null ? config.getDatabase() : "postgres";
+      String table = config.getEffectiveCollectionName();
+      int dimension = config.getEffectiveDimension();
 
       return PgVectorEmbeddingStore.builder()
           .host(host)
+          .port(port)
+          .database(database)
           .user(config.getUsername())
           .password(config.getPassword())
           .table(table)

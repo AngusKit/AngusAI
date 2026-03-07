@@ -24,11 +24,10 @@ public class QdrantAutoConfiguration {
       log.info("Creating Qdrant embedding store: collection={}, dimension={}",
           config.getCollectionName(), config.getDimension());
 
-      String collection =
-          config.getCollectionName() != null ? config.getCollectionName() : "embeddings";
+      String collection = config.getEffectiveCollectionName();
       Map<String, Object> extra = config.getExtraProperties();
 
-      String host = config.getUrl() != null ? config.getUrl() : "localhost";
+      String host = config.getEffectiveHost();
       int port = 6334;
       if (extra != null && extra.containsKey("grpcPort")) {
         port = ((Number) extra.get("grpcPort")).intValue();
