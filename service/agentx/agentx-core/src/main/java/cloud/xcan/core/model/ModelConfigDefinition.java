@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Map;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 模型配置定义 — 从数据库或其他外部源加载的模型配置
@@ -12,6 +13,7 @@ import lombok.Data;
 @Schema(description = "模型配置定义 — 从数据库或外部源加载的模型配置")
 @Data
 @Builder
+@NoArgsConstructor
 public class ModelConfigDefinition {
 
   @Schema(description = "配置唯一标识", example = "config-001")

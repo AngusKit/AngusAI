@@ -1,7 +1,7 @@
 package cloud.xcan.angus.core.ai.application.cmd.model;
 
 import cloud.xcan.angus.core.ai.domain.model.Model;
-import cloud.xcan.angus.core.ai.infra.ai.model.ModelConfig;
+import cloud.xcan.core.model.ModelConfigDefinition;
 
 public interface ModelCmd {
 
@@ -18,22 +18,7 @@ public interface ModelCmd {
   /**
    * 更新模型配置
    */
-  Model updateConfig(Long id, ModelConfig config);
-
-  /**
-   * 启动模型
-   */
-  Model start(Long id);
-
-  /**
-   * 停止模型
-   */
-  Model stop(Long id, Boolean graceful);
-
-  /**
-   * 重启模型
-   */
-  Model restart(Long id);
+  Model updateConfig(Long id, ModelConfigDefinition config);
 
   /**
    * 测试模型连接

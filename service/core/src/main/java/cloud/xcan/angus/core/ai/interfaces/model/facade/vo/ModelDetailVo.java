@@ -4,10 +4,10 @@ import cloud.xcan.angus.core.ai.domain.model.ModelAccessLimit;
 import cloud.xcan.angus.core.ai.domain.model.ModelPerformance;
 import cloud.xcan.angus.core.ai.domain.model.ModelStats;
 import cloud.xcan.angus.core.ai.domain.model.ModelStatus;
-import cloud.xcan.angus.core.ai.infra.ai.model.ModelConfig;
-import cloud.xcan.angus.core.ai.infra.ai.model.ModelProvider;
-import cloud.xcan.angus.core.ai.infra.ai.model.ModelType;
 import cloud.xcan.angus.remote.vo.TenantAuditingVo;
+import cloud.xcan.core.model.ModelConfigDefinition;
+import cloud.xcan.core.model.ModelProvider;
+import dev.langchain4j.model.catalog.ModelType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -32,14 +32,11 @@ public class ModelDetailVo extends TenantAuditingVo {
   @Schema(description = "模型提供商")
   private ModelProvider provider;
 
-  @Schema(description = "版本号")
-  private String version;
-
   @Schema(description = "模型状态")
   private ModelStatus status;
 
   @Schema(description = "配置信息")
-  private ModelConfig config;
+  private ModelConfigDefinition config;
 
   @Schema(description = "模型访问限制")
   private ModelAccessLimit accessLimit;

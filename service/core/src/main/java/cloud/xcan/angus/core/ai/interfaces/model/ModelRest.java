@@ -1,6 +1,5 @@
 package cloud.xcan.angus.core.ai.interfaces.model;
 
-import cloud.xcan.angus.core.ai.infra.ai.model.ModelConfig;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.ModelFacade;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelFindDto;
@@ -12,6 +11,7 @@ import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelStatisticsVo;
 import cloud.xcan.angus.remote.ApiLocaleResult;
 import cloud.xcan.angus.remote.PageResult;
 import cloud.xcan.angus.remote.dto.SimpleStatisticsDto;
+import cloud.xcan.core.model.ModelConfigDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -24,13 +24,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -60,7 +58,7 @@ public class ModelRest {
       @ApiResponse(responseCode = "200", description = "更新成功")
   })
   @ResponseStatus(HttpStatus.OK)
-  @PatchMapping("/{id}")
+  @PutMapping("/{id}")
   public ApiLocaleResult<ModelDetailVo> update(
       @Parameter(description = "模型ID") @PathVariable Long id,
       @Valid @RequestBody ModelUpdateDto dto) {
@@ -75,42 +73,8 @@ public class ModelRest {
   @PutMapping("/{id}/config")
   public ApiLocaleResult<ModelDetailVo> updateConfig(
       @Parameter(description = "模型ID") @PathVariable Long id,
-      @Valid @RequestBody ModelConfig dto) {
+      @Valid @RequestBody ModelConfigDefinition dto) {
     return ApiLocaleResult.success(modelFacade.updateConfig(id, dto));
-  }
-
-  @Operation(operationId = "startModel", summary = "启动模型", description = "启动模型")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "启动成功")
-  })
-  @ResponseStatus(HttpStatus.OK)
-  @PostMapping("/{id}/start")
-  public ApiLocaleResult<ModelDetailVo> start(
-      @Parameter(description = "模型ID") @PathVariable Long id) {
-    return ApiLocaleResult.success(modelFacade.start(id));
-  }
-
-  @Operation(operationId = "stopModel", summary = "停止模型", description = "停止模型")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "停止成功")
-  })
-  @ResponseStatus(HttpStatus.OK)
-  @PostMapping("/{id}/stop")
-  public ApiLocaleResult<ModelDetailVo> stop(
-      @Parameter(description = "模型ID") @PathVariable Long id,
-      @Parameter(description = "优雅停止") @RequestParam(required = false, defaultValue = "true") Boolean graceful) {
-    return ApiLocaleResult.success(modelFacade.stop(id, graceful));
-  }
-
-  @Operation(operationId = "restartModel", summary = "重启模型", description = "重启模型")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "重启中")
-  })
-  @ResponseStatus(HttpStatus.OK)
-  @PostMapping("/{id}/restart")
-  public ApiLocaleResult<ModelDetailVo> restart(
-      @Parameter(description = "模型ID") @PathVariable Long id) {
-    return ApiLocaleResult.success(modelFacade.restart(id));
   }
 
   @Operation(operationId = "testModel", summary = "测试模型连接", description = "测试模型连接和配置")
@@ -158,6 +122,8 @@ public class ModelRest {
       @Valid @ParameterObject ModelFindDto dto) {
     return ApiLocaleResult.success(modelFacade.list(dto));
   }
+
+  // TODO 查询支持的模型
 
   @Operation(operationId = "getModelStatistics", summary = "获取模型调用统计", description = "获取模型调用统计数据")
   @ApiResponses(value = {

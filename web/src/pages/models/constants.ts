@@ -99,7 +99,6 @@ export const DEFAULT_FORM_DATA = {
   description: '',
   type: ModelTypeEnum.CHAT,
   provider: '',
-  version: '',
   apiKey: '',
   endpoint: '',
   maxTokens: '',

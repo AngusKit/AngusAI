@@ -30,7 +30,6 @@ interface ModelListItem {
   iconColor: string;
   provider: string;
   providerEnum?: ModelProviderEnum;
-  version: string;
   status: string;
   statusEnum?: ModelStatusEnum;
   statusColor: string;
@@ -169,7 +168,6 @@ export function ModelManagement() {
     description: '',
     type: ModelTypeEnum.CHAT,
     provider: '',
-    version: '',
     apiKey: '',
     endpoint: '',
     maxTokens: '',
@@ -181,7 +179,6 @@ export function ModelManagement() {
     description: '',
     type: ModelTypeEnum.CHAT,
     provider: '',
-    version: '',
     apiKey: '',
     endpoint: '',
     maxTokens: '',
@@ -318,7 +315,6 @@ export function ModelManagement() {
         iconColor: typeConfig.iconColor,
         provider: providerLabel,
         providerEnum: item.provider as ModelProviderEnum | undefined,
-        version: item.version ?? detail?.version ?? '--',
         status: statusConfig.label,
         statusEnum: item.status as ModelStatusEnum | undefined,
         statusColor: statusConfig.color,
@@ -500,7 +496,6 @@ export function ModelManagement() {
         description: detail?.description ?? model.description ?? '',
         type: detail?.type ?? model.typeEnum ?? ModelTypeEnum.CHAT,
         provider: providerValue,
-        version: detail?.version ?? model.version ?? '',
         apiKey: detail?.config?.apiKey ?? '',
         endpoint: detail?.config?.apiEndpoint ?? '',
         maxTokens: detail?.config?.maxTokens !== undefined ? String(detail.config.maxTokens) : '',
@@ -517,7 +512,7 @@ export function ModelManagement() {
       return;
     }
 
-    if (!editFormData.name.trim() || !editFormData.provider || !editFormData.version.trim()) {
+    if (!editFormData.name.trim() || !editFormData.provider) {
       toast.error(t('models.validation.requiredFields'));
       return;
     }
@@ -531,7 +526,6 @@ export function ModelManagement() {
       name: editFormData.name.trim(),
       description: editFormData.description.trim() || undefined,
       provider: editFormData.provider as ModelProviderEnum,
-      version: editFormData.version.trim(),
       type: editFormData.type,
       apiEndpoint: editFormData.endpoint.trim() || undefined,
       apiKey: editFormData.apiKey.trim() || undefined,
@@ -570,7 +564,7 @@ export function ModelManagement() {
   );
 
   const handleAddModel = useCallback(async () => {
-    if (!formData.name.trim() || !formData.provider || !formData.version.trim()) {
+    if (!formData.name.trim() || !formData.provider) {
       toast.error(t('models.validation.requiredFields'));
       return;
     }
@@ -585,7 +579,6 @@ export function ModelManagement() {
       description: formData.description.trim() || formData.name.trim(),
       type: formData.type,
       provider: formData.provider as ModelProviderEnum,
-      version: formData.version.trim(),
       apiEndpoint: formData.endpoint.trim() || undefined,
       apiKey: formData.apiKey.trim() || undefined,
       maxTokens,
@@ -601,7 +594,6 @@ export function ModelManagement() {
         description: '',
         type: ModelTypeEnum.CHAT,
         provider: '',
-        version: '',
         apiKey: '',
         endpoint: '',
         maxTokens: '',
@@ -630,7 +622,6 @@ export function ModelManagement() {
       description: '',
       type: ModelTypeEnum.CHAT,
       provider: '',
-      version: '',
       apiKey: '',
       endpoint: '',
       maxTokens: '',
@@ -644,7 +635,6 @@ export function ModelManagement() {
       description: '',
       type: ModelTypeEnum.CHAT,
       provider: '',
-      version: '',
       apiKey: '',
       endpoint: '',
       maxTokens: '',
@@ -913,10 +903,6 @@ export function ModelManagement() {
                               <span className='dark:text-white'>{model.provider}</span>
                             </div>
                             <div className='flex items-center justify-between'>
-                              <span className='text-gray-500 dark:text-gray-400'>{t('models.table.version')}</span>
-                              <span className='dark:text-white'>{model.version}</span>
-                            </div>
-                            <div className='flex items-center justify-between'>
                               <span className='text-gray-500 dark:text-gray-400'>{t('models.table.latency')}</span>
                               <span className='dark:text-white'>{model.performance.latency}</span>
                             </div>
@@ -989,7 +975,7 @@ export function ModelManagement() {
                                 <div>
                                   <div className='dark:text-white'>{model.name}</div>
                                   <div className='text-xs text-gray-500 dark:text-gray-400'>
-                                    {model.provider} · {model.version}
+                                    {model.provider}
                                   </div>
                                 </div>
                               </div>
@@ -1091,10 +1077,6 @@ export function ModelManagement() {
                 <div className='space-y-1'>
                   <div className='text-xs text-gray-500 dark:text-gray-400'>{t('models.table.provider')}</div>
                   <div className='dark:text-white'>{selectedModel.provider}</div>
-                </div>
-                <div className='space-y-1'>
-                  <div className='text-xs text-gray-500 dark:text-gray-400'>{t('models.table.version')}</div>
-                  <div className='dark:text-white'>{selectedModel.version}</div>
                 </div>
                 <div className='space-y-1'>
                   <div className='text-xs text-gray-500 dark:text-gray-400'>{t('models.table.type')}</div>

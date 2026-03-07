@@ -188,8 +188,6 @@ export interface ModelDetailVo extends TenantAuditingVo {
   type?: ModelTypeEnum;
   /** 模型提供商 */
   provider?: ModelProviderEnum;
-  /** 版本号 */
-  version?: string;
   /** 模型状态 */
   status?: ModelStatusEnum;
   /** 配置信息 */
@@ -224,11 +222,6 @@ export interface ModelCreateDto {
   type: ModelTypeEnum;
   /** 模型提供商 */
   provider: ModelProviderEnum;
-  /**
-   * 版本号
-   * @example "gpt-4-1106-preview"
-   */
-  version?: string;
   /**
    * API端点
    * @example "https://api.openai.com/v1/chat/completions"
@@ -274,11 +267,6 @@ export interface ModelUpdateDto {
   /** 模型提供商 */
   provider?: ModelProviderEnum;
   /**
-   * 版本号
-   * @example "gpt-4-1106-preview"
-   */
-  version?: string;
-  /**
    * API端点
    * @example "https://api.openai.com/v1/chat/completions"
    */
@@ -312,8 +300,6 @@ export interface ModelListVo extends TenantAuditingVo {
   type?: ModelTypeEnum;
   /** 模型提供商 */
   provider?: ModelProviderEnum;
-  /** 版本号 */
-  version?: string;
   /** 模型状态 */
   status?: ModelStatusEnum;
 }

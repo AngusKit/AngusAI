@@ -11,12 +11,10 @@ import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.domain.model.LastMonthGrowthTrend;
 import cloud.xcan.angus.core.ai.domain.model.Model;
 import cloud.xcan.angus.core.ai.domain.model.ModelCallRecord;
-import cloud.xcan.angus.core.ai.domain.model.ModelCallRecordRepo;
 import cloud.xcan.angus.core.ai.domain.model.ModelRepo;
 import cloud.xcan.angus.core.ai.domain.model.ModelStatus;
 import cloud.xcan.angus.core.ai.domain.model.TodayGrowthTrend;
 import cloud.xcan.angus.core.ai.domain.plugin.LongTotalView;
-import cloud.xcan.angus.core.ai.infra.ai.model.ModelConfig;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.ModelFacade;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelFindDto;
@@ -31,10 +29,10 @@ import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.PageResult;
 import cloud.xcan.angus.remote.dto.SimpleStatisticsDto;
 import cloud.xcan.angus.remote.search.SearchCriteria;
+import cloud.xcan.core.model.ModelConfigDefinition;
 import jakarta.annotation.Resource;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Set;
 import lombok.Getter;
 import org.springframework.data.domain.Page;
@@ -75,29 +73,8 @@ public class ModelFacadeImpl implements ModelFacade {
 
   @NameJoin
   @Override
-  public ModelDetailVo updateConfig(Long id, ModelConfig config) {
+  public ModelDetailVo updateConfig(Long id, ModelConfigDefinition config) {
     Model saved = modelCmd.updateConfig(id, config);
-    return ModelAssembler.toDetailVo(saved);
-  }
-
-  @NameJoin
-  @Override
-  public ModelDetailVo start(Long id) {
-    Model saved = modelCmd.start(id);
-    return ModelAssembler.toDetailVo(saved);
-  }
-
-  @NameJoin
-  @Override
-  public ModelDetailVo stop(Long id, Boolean graceful) {
-    Model saved = modelCmd.stop(id, graceful);
-    return ModelAssembler.toDetailVo(saved);
-  }
-
-  @NameJoin
-  @Override
-  public ModelDetailVo restart(Long id) {
-    Model saved = modelCmd.restart(id);
     return ModelAssembler.toDetailVo(saved);
   }
 

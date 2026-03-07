@@ -32,7 +32,7 @@ export const useModelForm = (
   }, []);
 
   const validateForm = useCallback((): boolean => {
-    if (!formData.name.trim() || !formData.provider || !formData.version.trim()) {
+    if (!formData.name.trim() || !formData.provider) {
       toast.error(t('models.validation.requiredFields'));
       return false;
     }
@@ -52,7 +52,6 @@ export const useModelForm = (
       description: formData.description.trim() || formData.name.trim(),
       type: formData.type,
       provider: formData.provider as ModelProviderEnum,
-      version: formData.version.trim(),
       apiEndpoint: formData.endpoint.trim() || undefined,
       apiKey: formData.apiKey.trim() || undefined,
       maxTokens,
@@ -87,7 +86,6 @@ export const useModelForm = (
         name: formData.name.trim(),
         description: formData.description.trim() || undefined,
         provider: formData.provider as ModelProviderEnum,
-        version: formData.version.trim(),
         type: formData.type,
         apiEndpoint: formData.endpoint.trim() || undefined,
         apiKey: formData.apiKey.trim() || undefined,

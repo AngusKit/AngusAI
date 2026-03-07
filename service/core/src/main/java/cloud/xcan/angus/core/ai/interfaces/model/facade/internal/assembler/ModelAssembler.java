@@ -1,18 +1,19 @@
 package cloud.xcan.angus.core.ai.interfaces.model.facade.internal.assembler;
 
+import static cloud.xcan.angus.core.utils.PrincipalContextUtils.getOptTenantId;
+import static cloud.xcan.angus.spec.utils.ObjectUtils.nullSafe;
+
 import cloud.xcan.angus.core.ai.domain.model.Model;
-import cloud.xcan.angus.core.ai.domain.model.ModelStats;
 import cloud.xcan.angus.core.ai.domain.model.ModelStatus;
-import cloud.xcan.angus.core.ai.infra.ai.model.ModelConfig;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelFindDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelListVo;
-import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelStatisticsVo;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder;
 import cloud.xcan.angus.remote.search.SearchCriteria;
+import cloud.xcan.core.model.ModelConfigDefinition;
 import java.util.Set;
 
 public class ModelAssembler {
@@ -23,22 +24,23 @@ public class ModelAssembler {
     model.setDescription(dto.getDescription());
     model.setType(dto.getType());
     model.setProvider(dto.getProvider());
-    model.setVersion(dto.getVersion());
-
     // 设置默认状态
     model.setStatus(ModelStatus.STOPPED);
 
     // 创建配置对象
-    ModelConfig config = new ModelConfig();
+    ModelConfigDefinition config = new ModelConfigDefinition();
     config.setModelName(dto.getName());
-    config.setModelType(dto.getType());
+    config.setType(dto.getType());
     config.setProvider(dto.getProvider());
-    config.setVersion(dto.getVersion());
-    config.setDescription(dto.getDescription());
-    config.setApiEndpoint(dto.getApiEndpoint());
+    config.setBaseUrl(dto.getApiEndpoint());
     config.setApiKey(dto.getApiKey());
     config.setTemperature(dto.getTemperature());
     config.setMaxTokens(dto.getMaxTokens());
+    config.setEmbeddingModelName(dto.getEmbeddingModelName());
+    config.setDefaultConfig(dto.isDefaultConfig());
+    config.setPriority(nullSafe(dto.getPriority(), 0));
+    config.setTenantId(String.valueOf(getOptTenantId()));
+    config.setExtraProperties(dto.getExtraProperties());
     model.setConfig(config);
     return model;
   }
@@ -50,19 +52,20 @@ public class ModelAssembler {
     model.setDescription(dto.getDescription());
     model.setType(dto.getType());
     model.setProvider(dto.getProvider());
-    model.setVersion(dto.getVersion());
-
     // 创建配置对象
-    ModelConfig config = new ModelConfig();
+    ModelConfigDefinition config = new ModelConfigDefinition();
     config.setModelName(dto.getName());
-    config.setModelType(dto.getType());
+    config.setType(dto.getType());
     config.setProvider(dto.getProvider());
-    config.setVersion(dto.getVersion());
-    config.setDescription(dto.getDescription());
-    config.setApiEndpoint(dto.getApiEndpoint());
+    config.setBaseUrl(dto.getApiEndpoint());
     config.setApiKey(dto.getApiKey());
     config.setTemperature(dto.getTemperature());
     config.setMaxTokens(dto.getMaxTokens());
+    config.setEmbeddingModelName(dto.getEmbeddingModelName());
+    config.setDefaultConfig(dto.isDefaultConfig());
+    config.setPriority(nullSafe(dto.getPriority(), 0));
+    config.setTenantId(String.valueOf(getOptTenantId()));
+    config.setExtraProperties(dto.getExtraProperties());
     model.setConfig(config);
     return model;
   }
@@ -74,7 +77,6 @@ public class ModelAssembler {
     vo.setDescription(model.getDescription());
     vo.setType(model.getType());
     vo.setProvider(model.getProvider());
-    vo.setVersion(model.getVersion());
     vo.setStatus(model.getStatus());
 
     // 设置模型配置
@@ -103,7 +105,6 @@ public class ModelAssembler {
     vo.setDescription(model.getDescription());
     vo.setType(model.getType());
     vo.setProvider(model.getProvider());
-    vo.setVersion(model.getVersion());
     vo.setStatus(model.getStatus());
 
     // 设置审计信息
@@ -112,22 +113,6 @@ public class ModelAssembler {
     vo.setCreatedDate(model.getCreatedDate());
     vo.setModifiedBy(model.getModifiedBy());
     vo.setModifiedDate(model.getModifiedDate());
-    return vo;
-  }
-
-  public static ModelStatisticsVo ToStatistics(ModelStats stats) {
-    ModelStatisticsVo vo = new ModelStatisticsVo();
-    vo.setTotalModels(stats.getTotalModels());
-    vo.setRunningModels(stats.getRunningModels());
-    vo.setTotalCalls(stats.getTotalCalls());
-    vo.setFailedCalls(stats.getFailedCalls());
-    vo.setTotalCost(stats.getTotalCost());
-    vo.setSuccessRate(stats.getSuccessRate());
-    vo.setTotalTokensConsumed(stats.getTotalTokensConsumed());
-    vo.setAverageLatencyMs(stats.getAverageLatencyMs());
-
-    vo.setTodayGrowthTrend(stats.getTodayGrowthTrend());
-    vo.setLastMonthGrowthTrend(stats.getLastMonthGrowthTrend());
     return vo;
   }
 

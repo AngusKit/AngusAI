@@ -126,7 +126,6 @@ export const useModelManagement = (): UseModelManagementReturn => {
         iconColor: typeConfig.iconColor,
         provider: providerLabel,
         providerEnum: item.provider as ModelProviderEnum | undefined,
-        version: item.version ?? detail?.version ?? '--',
         status: statusConfig.label,
         statusEnum: item.status as ModelStatusEnum | undefined,
         statusColor: statusConfig.color,

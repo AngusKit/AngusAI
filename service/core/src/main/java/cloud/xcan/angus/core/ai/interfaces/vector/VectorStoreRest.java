@@ -119,6 +119,8 @@ public class VectorStoreRest {
     return ApiLocaleResult.success(vectorStoreFacade.list(dto));
   }
 
+  // TODO 查询支持的向量存储
+
   @Operation(operationId = "getVectorStoreStatistics", summary = "获取统计信息", description = "获取向量存储源的统计数据，包括总体统计、类型分布、使用率排行、性能趋势等")
   @GetMapping("/stats")
   public ApiLocaleResult<VectorStoreStatisticsVo> getStatistics(

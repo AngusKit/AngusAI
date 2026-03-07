@@ -7,11 +7,11 @@ public interface ModelRepo extends BaseRepository<Model, Long> {
   /**
    * 检查模型名称是否存在
    */
-  boolean existsByNameAndVersion(String name, String version);
+  boolean existsByName(String name);
 
   /**
    * 检查模型名称是否存在（排除指定ID）
    */
-  boolean existsByNameAndVersionAndIdNot(String name, String version, Long id);
+  boolean existsByNameAndIdNot(String name, Long id);
 
 }

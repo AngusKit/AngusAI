@@ -126,19 +126,6 @@ export function ModelFormFields({
             </Select>
           </div>
         </div>
-
-        <div className='space-y-2'>
-          <Label htmlFor={isEdit ? 'edit-model-version' : 'model-version'} className='dark:text-gray-300'>
-            {t('models.formFields.version')} <span className='text-red-500'>*</span>
-          </Label>
-          <Input
-            id={isEdit ? 'edit-model-version' : 'model-version'}
-            placeholder={t('models.formFields.versionPlaceholder')}
-            value={formData.version}
-            onChange={e => updateField('version', e.target.value)}
-            className='dark:bg-gray-700 dark:border-gray-600'
-          />
-        </div>
       </div>
 
       {/* API配置 */}

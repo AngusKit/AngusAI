@@ -17,7 +17,6 @@ export interface ModelListItem {
   iconColor: string;
   provider: string;
   providerEnum?: ModelProviderEnum;
-  version: string;
   status: string;
   statusEnum?: ModelStatusEnum;
   statusColor: string;
@@ -43,7 +42,6 @@ export interface ModelFormData {
   description: string;
   type: ModelTypeEnum;
   provider: string;
-  version: string;
   apiKey: string;
   endpoint: string;
   maxTokens: string;

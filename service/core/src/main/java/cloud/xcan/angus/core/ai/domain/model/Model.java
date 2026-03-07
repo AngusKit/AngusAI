@@ -1,10 +1,10 @@
 package cloud.xcan.angus.core.ai.domain.model;
 
-import cloud.xcan.angus.core.ai.infra.ai.model.ModelConfig;
-import cloud.xcan.angus.core.ai.infra.ai.model.ModelProvider;
-import cloud.xcan.angus.core.ai.infra.ai.model.ModelType;
 import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
 import cloud.xcan.angus.core.jpa.multitenancy.TenantListener;
+import cloud.xcan.core.model.ModelConfigDefinition;
+import cloud.xcan.core.model.ModelProvider;
+import dev.langchain4j.model.catalog.ModelType;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -47,9 +47,6 @@ public class Model extends TenantAuditingEntity<Model, Long> {
   @Column(name = "provider", nullable = false)
   private ModelProvider provider;
 
-  @Column(name = "version", length = 40)
-  private String version;
-
   @Enumerated(EnumType.STRING)
   @Column(name = "status", nullable = false)
   private ModelStatus status;
@@ -57,7 +54,7 @@ public class Model extends TenantAuditingEntity<Model, Long> {
   // 配置信息（JSON格式存储）
   @Type(JsonType.class)
   @Column(columnDefinition = "json", name = "config")
-  private ModelConfig config;
+  private ModelConfigDefinition config;
 
   @Type(JsonType.class)
   @Column(columnDefinition = "json", name = "access_limit")

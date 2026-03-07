@@ -46,13 +46,13 @@ public class ModelQueryImpl implements ModelQuery {
   }
 
   @Override
-  public boolean existsByNameAndVersion(String name, String version) {
-    return modelRepo.existsByNameAndVersion(name, version);
+  public boolean existsByName(String name) {
+    return modelRepo.existsByName(name);
   }
 
   @Override
-  public boolean existsByNameAndVersionAndIdNot(String name, String version, Long id) {
-    return modelRepo.existsByNameAndVersionAndIdNot(name, version, id);
+  public boolean existsByNameAndIdNot(String name, Long id) {
+    return modelRepo.existsByNameAndIdNot(name, id);
   }
 
 }

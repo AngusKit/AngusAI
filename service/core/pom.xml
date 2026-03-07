@@ -35,6 +35,12 @@
       <artifactId>xcan-infra.l2cache-core</artifactId>
     </dependency>
 
+    <!-- AgentX Core Modules -->
+    <dependency>
+      <groupId>cloud.xcan.agentx</groupId>
+      <artifactId>xcan-angusai.agentx-core</artifactId>
+    </dependency>
+
     <!-- Note: Cannot move to the front, which will cause OAS failure in Angus -->
     <dependency>
       <groupId>cloud.xcan.angus</groupId>

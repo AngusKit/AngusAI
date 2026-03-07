@@ -1,6 +1,5 @@
 package cloud.xcan.angus.core.ai.interfaces.model.facade;
 
-import cloud.xcan.angus.core.ai.infra.ai.model.ModelConfig;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelFindDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelTestDto;
@@ -10,6 +9,7 @@ import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelListVo;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelStatisticsVo;
 import cloud.xcan.angus.remote.PageResult;
 import cloud.xcan.angus.remote.dto.SimpleStatisticsDto;
+import cloud.xcan.core.model.ModelConfigDefinition;
 
 public interface ModelFacade {
 
@@ -26,22 +26,7 @@ public interface ModelFacade {
   /**
    * 更新模型配置
    */
-  ModelDetailVo updateConfig(Long id, ModelConfig config);
-
-  /**
-   * 启动模型
-   */
-  ModelDetailVo start(Long id);
-
-  /**
-   * 停止模型
-   */
-  ModelDetailVo stop(Long id, Boolean graceful);
-
-  /**
-   * 重启模型
-   */
-  ModelDetailVo restart(Long id);
+  ModelDetailVo updateConfig(Long id, ModelConfigDefinition config);
 
   /**
    * 测试模型连接
