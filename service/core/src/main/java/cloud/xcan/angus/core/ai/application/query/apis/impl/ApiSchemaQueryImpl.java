@@ -32,7 +32,7 @@ public class ApiSchemaQueryImpl implements ApiSchemaQuery {
   @Override
   public ApiSchema findAndCheckByCollectionId(Long collectionId) {
     return apiSchemaRepo.findByCollectionId(collectionId).orElseThrow(
-        () -> ResourceNotFound.of("API Schema not found for collectionId: {0}",
+        () -> ResourceNotFound.of("API Schema not found for collectionId:「{0}」",
             new Object[]{collectionId}));
   }
 

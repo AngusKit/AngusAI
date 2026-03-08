@@ -22,10 +22,7 @@ public interface AgentCmd {
 
   /**
    * 删除智能体
-   *
-   * @param id    智能体ID
-   * @param force 是否强制删除（解除应用绑定）
    */
-  void delete(Long id, boolean force);
+  void delete(Long id);
 
 }

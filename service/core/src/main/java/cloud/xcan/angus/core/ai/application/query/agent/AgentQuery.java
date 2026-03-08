@@ -2,11 +2,10 @@ package cloud.xcan.angus.core.ai.application.query.agent;
 
 import cloud.xcan.angus.core.ai.domain.agent.Agent;
 import cloud.xcan.angus.core.ai.domain.agent.AgentStatus;
-import cloud.xcan.agentx.core.agent.enums.InteractionMode;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
+import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 public interface AgentQuery {
 
@@ -18,8 +17,8 @@ public interface AgentQuery {
   /**
    * 分页查询智能体列表
    */
-  Page<Agent> find(String keyword, AgentStatus status, InteractionMode interactionMode,
-      Pageable pageable);
+  Page<Agent> find(GenericSpecification<Agent> spec, PageRequest pageable,
+      boolean fullTextSearch, String[] match);
 
   /**
    * 查询 ACTIVE 状态的智能体列表（用于应用绑定选择器、启动时注册）

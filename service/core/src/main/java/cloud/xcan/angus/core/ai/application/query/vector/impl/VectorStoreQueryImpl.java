@@ -54,7 +54,7 @@ public class VectorStoreQueryImpl implements VectorStoreQuery {
       @Override
       protected VectorStore process() {
         return vectorStoreRepo.findById(id)
-            .orElseThrow(() -> ResourceNotFound.of("存储源未找到", new Object[]{}));
+            .orElseThrow(() -> ResourceNotFound.of("存储源「{0}」未找到", new Object[]{id}));
       }
     }.execute();
   }

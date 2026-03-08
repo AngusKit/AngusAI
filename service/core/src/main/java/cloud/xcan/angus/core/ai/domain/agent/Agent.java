@@ -4,6 +4,7 @@ import cloud.xcan.agentx.core.agent.enums.AutonomyLevel;
 import cloud.xcan.agentx.core.agent.enums.InteractionMode;
 import cloud.xcan.agentx.core.agent.enums.ReasoningStrategy;
 import cloud.xcan.agentx.core.memory.enums.MemoryStrategy;
+import cloud.xcan.angus.core.ai.application.converter.AgentDefinitionConverter;
 import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -18,7 +19,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapKeyColumn;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +30,7 @@ import lombok.experimental.Accessors;
 /**
  * 智能体实体 — 用户可创建的智能体，持久化存储
  *
- * @see cloud.xcan.angus.core.ai.interfaces.agent.facade.internal.assembler.AgentDefinitionAssembler
+ * @see AgentDefinitionConverter
  */
 @Entity
 @Table(name = "ai_agent")

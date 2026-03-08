@@ -50,7 +50,7 @@ public class PluginQueryImpl implements PluginQuery {
       @Override
       protected Plugin process() {
         return pluginRepo.findById(id)
-            .orElseThrow(() -> ResourceNotFound.of("插件不存在", new Object[]{}));
+            .orElseThrow(() -> ResourceNotFound.of("插件「{0}」不存在", new Object[]{id}));
       }
     }.execute();
   }

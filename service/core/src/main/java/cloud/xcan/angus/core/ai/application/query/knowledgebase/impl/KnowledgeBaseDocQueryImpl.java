@@ -33,7 +33,7 @@ public class KnowledgeBaseDocQueryImpl implements KnowledgeBaseDocQuery {
       @Override
       protected KnowledgeBaseDoc process() {
         return knowledgeBaseDocRepo.findById(id)
-            .orElseThrow(() -> ResourceNotFound.of("文档不存在", new Object[]{}));
+            .orElseThrow(() -> ResourceNotFound.of("文档「{0}」不存在", new Object[]{id}));
       }
     }.execute();
   }

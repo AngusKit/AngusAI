@@ -49,7 +49,7 @@ public class PromptQueryImpl implements PromptQuery {
       @Override
       protected Prompt process() {
         Prompt prompt = promptRepo.findById(id)
-            .orElseThrow(() -> ResourceNotFound.of("提示词未找到", new Object[]{}));
+            .orElseThrow(() -> ResourceNotFound.of("提示词「{0}」未找到", new Object[]{id}));
 
         // 设置系统标志
         setIsSystemFlag(List.of(prompt));

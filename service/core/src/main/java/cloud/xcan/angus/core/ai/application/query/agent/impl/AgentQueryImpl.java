@@ -3,23 +3,26 @@ package cloud.xcan.angus.core.ai.application.query.agent.impl;
 import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
 import cloud.xcan.angus.core.ai.domain.agent.Agent;
 import cloud.xcan.angus.core.ai.domain.agent.AgentRepo;
+import cloud.xcan.angus.core.ai.domain.agent.AgentSearchRepo;
 import cloud.xcan.angus.core.ai.domain.agent.AgentStatus;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationAgentBindingRepo;
 import cloud.xcan.angus.core.biz.BizTemplate;
+import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
-import cloud.xcan.agentx.core.agent.enums.InteractionMode;
 import jakarta.annotation.Resource;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
 
 @Service
 public class AgentQueryImpl implements AgentQuery {
 
   @Resource
   private AgentRepo agentRepo;
+
+  @Resource
+  private AgentSearchRepo agentSearchRepo;
 
   @Resource
   private ApplicationAgentBindingRepo applicationAgentBindingRepo;
@@ -30,15 +33,22 @@ public class AgentQueryImpl implements AgentQuery {
       @Override
       protected Agent process() {
         return agentRepo.findById(id)
-            .orElseThrow(() -> ResourceNotFound.of("智能体不存在", new Object[]{}));
+            .orElseThrow(() -> ResourceNotFound.of("智能体「{0}」不存在", new Object[]{id}));
       }
     }.execute();
   }
 
   @Override
-  public Page<Agent> find(String keyword, AgentStatus status, InteractionMode interactionMode,
-      Pageable pageable) {
-    return agentRepo.find(keyword, status, interactionMode, pageable);
+  public Page<Agent> find(GenericSpecification<Agent> spec, PageRequest pageable,
+      boolean fullTextSearch, String[] match) {
+    return new BizTemplate<Page<Agent>>() {
+      @Override
+      protected Page<Agent> process() {
+        return fullTextSearch
+            ? agentSearchRepo.find(spec.getCriteria(), pageable, Agent.class, match)
+            : agentRepo.findAll(spec, pageable);
+      }
+    }.execute();
   }
 
   @Override

@@ -33,7 +33,7 @@ public class ApiEndpointQueryImpl implements ApiEndpointQuery {
       @Override
       protected ApiEndpoint process() {
         return apiEndpointRepo.findById(id)
-            .orElseThrow(() -> ResourceNotFound.of("接口端点未找到", new Object[]{}));
+            .orElseThrow(() -> ResourceNotFound.of("接口端点「{0}」未找到", new Object[]{id}));
       }
     }.execute();
   }

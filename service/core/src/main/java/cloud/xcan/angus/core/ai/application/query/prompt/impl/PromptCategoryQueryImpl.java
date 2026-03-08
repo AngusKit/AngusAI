@@ -41,7 +41,7 @@ public class PromptCategoryQueryImpl implements PromptCategoryQuery {
       @Override
       protected PromptCategory process() {
         PromptCategory category = promptCategoryRepo.findById(id)
-            .orElseThrow(() -> ResourceNotFound.of("分类未找到", new Object[]{}));
+            .orElseThrow(() -> ResourceNotFound.of("分类「{0}」未找到", new Object[]{id}));
         setPromptCount(List.of(category));
         return category;
       }

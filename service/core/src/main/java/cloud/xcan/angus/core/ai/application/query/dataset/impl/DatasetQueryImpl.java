@@ -31,7 +31,7 @@ public class DatasetQueryImpl implements DatasetQuery {
       @Override
       protected Dataset process() {
         return datasetRepo.findById(id)
-            .orElseThrow(() -> ResourceNotFound.of("数据集不存在", new Object[]{}));
+            .orElseThrow(() -> ResourceNotFound.of("数据集「{0}」不存在", new Object[]{id}));
       }
     }.execute();
   }

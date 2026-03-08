@@ -31,7 +31,7 @@ public class KnowledgeBaseQueryImpl implements KnowledgeBaseQuery {
       @Override
       protected KnowledgeBase process() {
         return knowledgeBaseRepo.findById(id)
-            .orElseThrow(() -> ResourceNotFound.of("知识库不存在", new Object[]{}));
+            .orElseThrow(() -> ResourceNotFound.of("知识库「{0}」不存在", new Object[]{id}));
       }
     }.execute();
   }

@@ -58,7 +58,7 @@ public class ApiCollectionQueryImpl implements ApiCollectionQuery {
       @Override
       protected ApiCollection process() {
         return apiCollectionRepo.findById(id)
-            .orElseThrow(() -> ResourceNotFound.of("接口集未找到", new Object[]{}));
+            .orElseThrow(() -> ResourceNotFound.of("接口集「{0}」未找到", new Object[]{id}));
       }
     }.execute();
   }

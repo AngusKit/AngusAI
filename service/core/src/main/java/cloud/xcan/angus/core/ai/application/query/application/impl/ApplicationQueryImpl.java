@@ -46,7 +46,7 @@ public class ApplicationQueryImpl implements ApplicationQuery {
       @Override
       protected AIApplication process() {
         return applicationRepo.findById(id)
-            .orElseThrow(() -> ResourceNotFound.of("应用不存在", new Object[]{}));
+            .orElseThrow(() -> ResourceNotFound.of("应用「{0}」不存在", new Object[]{id}));
       }
     }.execute();
   }

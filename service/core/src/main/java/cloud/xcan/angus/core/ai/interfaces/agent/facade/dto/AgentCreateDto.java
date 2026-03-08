@@ -1,5 +1,8 @@
 package cloud.xcan.angus.core.ai.interfaces.agent.facade.dto;
 
+import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_DESC_LENGTH;
+import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_NAME_LENGTH;
+
 import cloud.xcan.agentx.core.agent.enums.AutonomyLevel;
 import cloud.xcan.agentx.core.agent.enums.InteractionMode;
 import cloud.xcan.agentx.core.agent.enums.ReasoningStrategy;
@@ -18,11 +21,11 @@ import lombok.Data;
 public class AgentCreateDto {
 
   @NotBlank
-  @Size(max = 100)
+  @Size(max = MAX_NAME_LENGTH)
   @Schema(description = "智能体名称", requiredMode = RequiredMode.REQUIRED)
   private String name;
 
-  @Size(max = 500)
+  @Size(max = MAX_DESC_LENGTH)
   @Schema(description = "描述")
   private String description;
 
@@ -68,18 +71,18 @@ public class AgentCreateDto {
     @Size(max = 5)
     @Schema(description = "知识库ID列表")
     private List<Long> knowledgeBaseIds;
-    @Size(max = 10)
+    @Size(max = 20)
     @Schema(description = "工具ID列表")
     private List<String> toolIds;
     @Schema(description = "工作流ID")
     private Long workflowId;
-    @Size(max = 10)
+    @Size(max = 20)
     @Schema(description = "技能ID列表")
     private List<String> skillIds;
     @Size(max = 5)
     @Schema(description = "数据集ID列表")
     private List<Long> datasetIds;
-    @Size(max = 10)
+    @Size(max = 5)
     @Schema(description = "接口集ID列表")
     private List<Long> apiCollectionIds;
   }

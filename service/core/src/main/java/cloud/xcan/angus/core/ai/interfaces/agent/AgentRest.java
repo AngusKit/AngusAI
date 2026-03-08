@@ -21,7 +21,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -48,14 +47,33 @@ public class AgentRest {
     return ApiLocaleResult.success(agentFacade.create(dto));
   }
 
-  @Operation(operationId = "updateAgent", summary = "更新智能体", description = "部分更新，仅传需更新字段")
+  @Operation(operationId = "updateAgent", summary = "更新智能体", description = "全量字段更新智能体")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "更新成功")})
   @ResponseStatus(HttpStatus.OK)
-  @PatchMapping("/{id}")
+  @PutMapping("/{id}")
   public ApiLocaleResult<AgentDetailVo> update(
       @Parameter(description = "智能体ID") @PathVariable Long id,
       @Valid @RequestBody AgentUpdateDto dto) {
     return ApiLocaleResult.success(agentFacade.update(id, dto));
+  }
+
+  @Operation(operationId = "updateAgentStatus", summary = "发布/下线智能体")
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "操作成功")})
+  @ResponseStatus(HttpStatus.OK)
+  @PutMapping("/{id}/status")
+  public ApiLocaleResult<AgentDetailVo> updateStatus(
+      @Parameter(description = "智能体ID") @PathVariable Long id,
+      @Parameter(description = "状态：ACTIVE=发布，INACTIVE=下线") @RequestParam AgentStatus status) {
+    return ApiLocaleResult.success(agentFacade.updateStatus(id, status));
+  }
+
+  @Operation(operationId = "deleteAgent", summary = "删除智能体")
+  @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "删除成功")})
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @DeleteMapping("/{id}")
+  public void delete(
+      @Parameter(description = "智能体ID") @PathVariable Long id) {
+    agentFacade.delete(id);
   }
 
   @Operation(operationId = "getAgentDetail", summary = "获取智能体详情")
@@ -77,25 +95,5 @@ public class AgentRest {
   public ApiLocaleResult<PageResult<AgentListVo>> list(
       @Valid @ParameterObject AgentFindDto dto) {
     return ApiLocaleResult.success(agentFacade.list(dto));
-  }
-
-  @Operation(operationId = "deleteAgent", summary = "删除智能体")
-  @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "删除成功")})
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  @DeleteMapping("/{id}")
-  public void delete(
-      @Parameter(description = "智能体ID") @PathVariable Long id,
-      @Parameter(description = "是否强制删除（被应用引用时）") @RequestParam(defaultValue = "false") boolean force) {
-    agentFacade.delete(id, force);
-  }
-
-  @Operation(operationId = "updateAgentStatus", summary = "发布/下线智能体")
-  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "操作成功")})
-  @ResponseStatus(HttpStatus.OK)
-  @PutMapping("/{id}/status")
-  public ApiLocaleResult<AgentDetailVo> updateStatus(
-      @Parameter(description = "智能体ID") @PathVariable Long id,
-      @Parameter(description = "状态：ACTIVE=发布，INACTIVE=下线") @RequestParam AgentStatus status) {
-    return ApiLocaleResult.success(agentFacade.updateStatus(id, status));
   }
 }

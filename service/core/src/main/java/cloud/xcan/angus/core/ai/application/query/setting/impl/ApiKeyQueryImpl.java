@@ -23,7 +23,7 @@ public class ApiKeyQueryImpl implements ApiKeyQuery {
   @Transactional(readOnly = true)
   public ApiKey findAndCheck(Long id) {
     return apiKeyRepo.findById(id)
-        .orElseThrow(() -> ResourceNotFound.of("API密钥不存在", new Object[]{}));
+        .orElseThrow(() -> ResourceNotFound.of("API密钥「{0}」不存在", new Object[]{id}));
   }
 
   @Override

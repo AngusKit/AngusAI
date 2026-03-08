@@ -44,7 +44,7 @@ public class SessionQueryImpl implements SessionQuery {
       @Override
       protected Session process() {
         return sessionRepo.findById(id)
-            .orElseThrow(() -> ResourceNotFound.of("会话不存在", new Object[]{}));
+            .orElseThrow(() -> ResourceNotFound.of("会话「{0}」不存在", new Object[]{id}));
       }
     }.execute();
   }

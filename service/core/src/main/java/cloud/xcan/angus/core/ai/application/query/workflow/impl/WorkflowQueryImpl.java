@@ -27,7 +27,7 @@ public class WorkflowQueryImpl implements WorkflowQuery {
       @Override
       protected Workflow process() {
         return workflowRepo.findById(id)
-            .orElseThrow(() -> ResourceNotFound.of("工作流不存在", new Object[]{}));
+            .orElseThrow(() -> ResourceNotFound.of("工作流「{0}」不存在", new Object[]{id}));
       }
     }.execute();
   }

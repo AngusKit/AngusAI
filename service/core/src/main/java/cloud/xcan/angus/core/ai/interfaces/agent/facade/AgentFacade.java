@@ -36,7 +36,7 @@ public interface AgentFacade {
   /**
    * 删除智能体
    */
-  void delete(Long id, boolean force);
+  void delete(Long id);
 
   /**
    * 发布/下线智能体

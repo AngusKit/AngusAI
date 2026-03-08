@@ -48,7 +48,7 @@ public class ModelQueryImpl implements ModelQuery {
       @Override
       protected Model process() {
         return modelRepo.findById(id)
-            .orElseThrow(() -> ResourceNotFound.of("模型不存在", new Object[]{}));
+            .orElseThrow(() -> ResourceNotFound.of("模型「{0}」不存在", new Object[]{id}));
       }
     }.execute();
   }

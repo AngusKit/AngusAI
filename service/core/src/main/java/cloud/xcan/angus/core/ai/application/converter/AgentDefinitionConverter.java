@@ -1,13 +1,14 @@
-package cloud.xcan.angus.core.ai.interfaces.agent.facade.internal.assembler;
+package cloud.xcan.angus.core.ai.application.converter;
 
-import cloud.xcan.angus.core.ai.domain.agent.Agent;
-import cloud.xcan.angus.core.ai.domain.model.Model;
+import static cloud.xcan.angus.spec.utils.ObjectUtils.nullSafe;
+
 import cloud.xcan.agentx.core.agent.definition.AgentDefinition;
 import cloud.xcan.agentx.core.memory.enums.MemoryStrategy;
 import cloud.xcan.agentx.core.model.ModelProvider;
+import cloud.xcan.angus.core.ai.domain.agent.Agent;
+import cloud.xcan.angus.core.ai.domain.model.Model;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -17,20 +18,27 @@ import java.util.stream.Collectors;
  * 否则 ModelRegistry.getChatModel 可能失败，需降级到 getDefaultChatModel(provider)
  * </p>
  */
-public class AgentDefinitionAssembler {
+public class AgentDefinitionConverter {
 
   public static AgentDefinition toDefinition(Agent agent, Model model) {
     AgentDefinition.ModelConfig modelConfig = AgentDefinition.ModelConfig.builder()
-        .provider(model != null ? model.getProvider() : ModelProvider.OPEN_AI)
-        .modelName(model != null && model.getConfig() != null ? model.getConfig().getModelName() : null)
-        .temperature(model != null && model.getConfig() != null ? model.getConfig().getTemperature() : 0.7)
-        .maxTokens(model != null && model.getConfig() != null ? model.getConfig().getMaxTokens() : 4096)
+        .provider(model != null
+            ? model.getProvider() : ModelProvider.DEEPSEEK)
+        .modelName(model != null && model.getConfig() != null
+            ? model.getConfig().getModelName() : null)
+        .temperature(model != null && model.getConfig() != null
+            ? model.getConfig().getTemperature() : 0.7)
+        .maxTokens(model != null && model.getConfig() != null
+            ? model.getConfig().getMaxTokens() : 4096)
         .build();
 
     AgentDefinition.MemoryConfig memoryConfig = AgentDefinition.MemoryConfig.builder()
-        .strategy(agent.getMemoryStrategy() != null ? agent.getMemoryStrategy() : MemoryStrategy.TOKEN_WINDOW)
-        .windowSize(agent.getMemoryWindowSize() != null ? agent.getMemoryWindowSize() : 20)
-        .maxTokens(agent.getMemoryMaxTokens() != null ? agent.getMemoryMaxTokens() : 8000)
+        .strategy(agent.getMemoryStrategy() != null
+            ? agent.getMemoryStrategy() : MemoryStrategy.TOKEN_WINDOW)
+        .windowSize(agent.getMemoryWindowSize() != null
+            ? agent.getMemoryWindowSize() : 20)
+        .maxTokens(agent.getMemoryMaxTokens() != null
+            ? agent.getMemoryMaxTokens() : 8000)
         .summaryPrompt(agent.getMemorySummaryPrompt())
         .build();
 
@@ -73,11 +81,4 @@ public class AgentDefinitionAssembler {
         .build();
   }
 
-  private static <T> List<T> nullSafe(List<T> list) {
-    return list != null ? list : Collections.emptyList();
-  }
-
-  private static <K, V> Map<K, V> nullSafe(Map<K, V> map) {
-    return map != null ? map : Collections.emptyMap();
-  }
 }

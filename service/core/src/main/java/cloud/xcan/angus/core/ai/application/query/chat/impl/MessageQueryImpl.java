@@ -39,7 +39,7 @@ public class MessageQueryImpl implements MessageQuery {
       @Override
       protected Message process() {
         return messageRepo.findById(id)
-            .orElseThrow(() -> ResourceNotFound.of("消息不存在", new Object[]{}));
+            .orElseThrow(() -> ResourceNotFound.of("消息「{0}」不存在", new Object[]{id}));
       }
     }.execute();
   }
