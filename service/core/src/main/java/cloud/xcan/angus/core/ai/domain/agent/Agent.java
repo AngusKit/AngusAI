@@ -129,7 +129,7 @@ public class Agent extends TenantAuditingEntity<Agent, Long> {
   private List<String> outputGuardrailIds = new ArrayList<>();
 
   @Type(JsonType.class)
-  @Column(columnDefinition = "json", name = "var_value")
+  @Column(columnDefinition = "json", name = "variables")
   private Map<String, String> variables = new HashMap<>();
 
   @Override

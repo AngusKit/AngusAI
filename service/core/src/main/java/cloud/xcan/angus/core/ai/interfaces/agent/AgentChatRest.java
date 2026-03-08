@@ -21,9 +21,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-/**
- * 智能体对话 API — 同步对话、流式对话
- */
 @Tag(name = "AgentChat", description = "智能体对话 - 与指定智能体进行同步或流式对话")
 @Validated
 @RestController
