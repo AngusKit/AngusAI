@@ -1,5 +1,15 @@
 package cloud.xcan.angus.core.ai.interfaces.agent.facade.dto;
 
+import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_API_COLLECTION_IDS_MAX_SIZE;
+import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_DATASET_IDS_MAX_SIZE;
+import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_KNOWLEDGE_BASE_IDS_MAX_SIZE;
+import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_MEMORY_DEFAULT_MAX_TOKENS;
+import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_MEMORY_DEFAULT_WINDOW_SIZE;
+import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_SKILL_IDS_MAX_SIZE;
+import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_SUGGESTED_QUESTIONS_MAX_SIZE;
+import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_TOOL_IDS_MAX_SIZE;
+import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_SYSTEM_PROMPT_MAX_LENGTH;
+import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_WELCOME_MESSAGE_MAX_LENGTH;
 import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_DESC_LENGTH_X4;
 import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_NAME_LENGTH;
 
@@ -42,14 +52,15 @@ public class AgentCreateDto {
   @Schema(description = "默认模型ID", requiredMode = RequiredMode.REQUIRED)
   private Long defaultModelId;
 
+  @Size(max = AGENT_SYSTEM_PROMPT_MAX_LENGTH)
   @Schema(description = "系统提示词")
   private String systemPrompt;
 
-  @Size(max = 1000)
+  @Size(max = AGENT_WELCOME_MESSAGE_MAX_LENGTH)
   @Schema(description = "欢迎消息")
   private String welcomeMessage;
 
-  @Size(max = 10)
+  @Size(max = AGENT_SUGGESTED_QUESTIONS_MAX_SIZE)
   @Schema(description = "建议问题列表")
   private List<String> suggestedQuestions;
 
@@ -69,21 +80,21 @@ public class AgentCreateDto {
   @Schema(description = "关联资源")
   public static class ResourcesDto {
 
-    @Size(max = 5)
+    @Size(max = AGENT_KNOWLEDGE_BASE_IDS_MAX_SIZE)
     @Schema(description = "知识库ID列表")
     private List<Long> knowledgeBaseIds;
-    @Size(max = 20)
+    @Size(max = AGENT_TOOL_IDS_MAX_SIZE)
     @Schema(description = "工具ID列表")
     private List<String> toolIds;
     @Schema(description = "工作流ID")
     private Long workflowId;
-    @Size(max = 20)
+    @Size(max = AGENT_SKILL_IDS_MAX_SIZE)
     @Schema(description = "技能ID列表")
     private List<String> skillIds;
-    @Size(max = 5)
+    @Size(max = AGENT_DATASET_IDS_MAX_SIZE)
     @Schema(description = "数据集ID列表")
     private List<Long> datasetIds;
-    @Size(max = 5)
+    @Size(max = AGENT_API_COLLECTION_IDS_MAX_SIZE)
     @Schema(description = "接口集ID列表")
     private List<Long> apiCollectionIds;
   }
@@ -95,9 +106,9 @@ public class AgentCreateDto {
     @Schema(description = "策略")
     private MemoryStrategy strategy = MemoryStrategy.TOKEN_WINDOW;
     @Schema(description = "窗口大小")
-    private Integer windowSize = 20;
+    private Integer windowSize = AGENT_MEMORY_DEFAULT_WINDOW_SIZE;
     @Schema(description = "最大Token数")
-    private Integer maxTokens = 8000;
+    private Integer maxTokens = AGENT_MEMORY_DEFAULT_MAX_TOKENS;
     @Schema(description = "摘要提示词")
     private String summaryPrompt;
   }

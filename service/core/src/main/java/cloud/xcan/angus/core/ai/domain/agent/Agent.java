@@ -1,10 +1,14 @@
 package cloud.xcan.angus.core.ai.domain.agent;
 
+import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_DESC_LENGTH_X4;
+import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_NAME_LENGTH;
+
 import cloud.xcan.agentx.core.agent.enums.AutonomyLevel;
 import cloud.xcan.agentx.core.agent.enums.InteractionMode;
 import cloud.xcan.agentx.core.agent.enums.ReasoningStrategy;
 import cloud.xcan.agentx.core.memory.enums.MemoryStrategy;
 import cloud.xcan.angus.core.ai.application.converter.AgentDefinitionConverter;
+import cloud.xcan.angus.core.ai.domain.Constants;
 import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.CollectionTable;
@@ -45,10 +49,10 @@ public class Agent extends TenantAuditingEntity<Agent, Long> {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(name = "name", nullable = false, length = 100)
+  @Column(name = "name", nullable = false, length = MAX_NAME_LENGTH)
   private String name;
 
-  @Column(name = "description", length = 800)
+  @Column(name = "description", length = MAX_DESC_LENGTH_X4)
   private String description;
 
   @Enumerated(EnumType.STRING)
@@ -70,10 +74,10 @@ public class Agent extends TenantAuditingEntity<Agent, Long> {
   @Column(name = "default_model_id", nullable = false)
   private Long defaultModelId;
 
-  @Column(name = "system_prompt", columnDefinition = "TEXT")
+  @Column(name = "system_prompt", length = Constants.AGENT_SYSTEM_PROMPT_MAX_LENGTH)
   private String systemPrompt;
 
-  @Column(name = "welcome_message", length = 1000)
+  @Column(name = "welcome_message", length = Constants.AGENT_WELCOME_MESSAGE_MAX_LENGTH)
   private String welcomeMessage;
 
   @Type(JsonType.class)
@@ -108,10 +112,10 @@ public class Agent extends TenantAuditingEntity<Agent, Long> {
   private MemoryStrategy memoryStrategy = MemoryStrategy.TOKEN_WINDOW;
 
   @Column(name = "memory_window_size")
-  private Integer memoryWindowSize = 20;
+  private Integer memoryWindowSize = Constants.AGENT_MEMORY_DEFAULT_WINDOW_SIZE;
 
   @Column(name = "memory_max_tokens")
-  private Integer memoryMaxTokens = 8000;
+  private Integer memoryMaxTokens = Constants.AGENT_MEMORY_DEFAULT_MAX_TOKENS;
 
   @Column(name = "memory_summary_prompt", columnDefinition = "TEXT")
   private String memorySummaryPrompt;

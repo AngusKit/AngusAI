@@ -1,5 +1,8 @@
 package cloud.xcan.angus.core.ai.interfaces.agent.facade.dto;
 
+import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_SUGGESTED_QUESTIONS_MAX_SIZE;
+import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_SYSTEM_PROMPT_MAX_LENGTH;
+import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_WELCOME_MESSAGE_MAX_LENGTH;
 import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_DESC_LENGTH_X4;
 import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_NAME_LENGTH;
 
@@ -41,14 +44,15 @@ public class AgentUpdateDto {
   @Schema(description = "默认模型ID", requiredMode = RequiredMode.REQUIRED)
   private Long defaultModelId;
 
+  @Size(max = AGENT_SYSTEM_PROMPT_MAX_LENGTH)
   @Schema(description = "系统提示词")
   private String systemPrompt;
 
-  @Size(max = 1000)
+  @Size(max = AGENT_WELCOME_MESSAGE_MAX_LENGTH)
   @Schema(description = "欢迎消息")
   private String welcomeMessage;
 
-  @Size(max = 10)
+  @Size(max = AGENT_SUGGESTED_QUESTIONS_MAX_SIZE)
   @Schema(description = "建议问题列表")
   private List<String> suggestedQuestions;
 

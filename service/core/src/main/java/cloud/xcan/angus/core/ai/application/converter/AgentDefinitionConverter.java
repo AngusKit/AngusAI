@@ -1,5 +1,7 @@
 package cloud.xcan.angus.core.ai.application.converter;
 
+import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_MEMORY_DEFAULT_MAX_TOKENS;
+import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_MEMORY_DEFAULT_WINDOW_SIZE;
 import static cloud.xcan.angus.spec.utils.ObjectUtils.nullSafe;
 
 import cloud.xcan.agentx.core.agent.definition.AgentDefinition;
@@ -36,9 +38,9 @@ public class AgentDefinitionConverter {
         .strategy(agent.getMemoryStrategy() != null
             ? agent.getMemoryStrategy() : MemoryStrategy.TOKEN_WINDOW)
         .windowSize(agent.getMemoryWindowSize() != null
-            ? agent.getMemoryWindowSize() : 20)
+            ? agent.getMemoryWindowSize() : AGENT_MEMORY_DEFAULT_WINDOW_SIZE)
         .maxTokens(agent.getMemoryMaxTokens() != null
-            ? agent.getMemoryMaxTokens() : 8000)
+            ? agent.getMemoryMaxTokens() : AGENT_MEMORY_DEFAULT_MAX_TOKENS)
         .summaryPrompt(agent.getMemorySummaryPrompt())
         .build();
 

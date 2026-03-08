@@ -11,6 +11,57 @@ public interface Constants {
 
   String CHAT_ATTACHMENTS_UPLOAD_BIZ_KEY = "angusAIChatAttachments";
 
+  // ==================== 智能体常量 ====================
+  /**
+   * 智能体系统提示词最大长度（注意：这里允许100k字符，如果对于具体模型太长时在对应模型上手动截取安全长度字符）
+   */
+  int AGENT_SYSTEM_PROMPT_MAX_LENGTH = 100000;
+
+  /**
+   * 智能体欢迎消息最大长度
+   */
+  int AGENT_WELCOME_MESSAGE_MAX_LENGTH = 1000;
+
+  /**
+   * 智能体建议问题最大数量
+   */
+  int AGENT_SUGGESTED_QUESTIONS_MAX_SIZE = 10;
+
+  /**
+   * 智能体关联知识库最大数量
+   */
+  int AGENT_KNOWLEDGE_BASE_IDS_MAX_SIZE = 5;
+
+  /**
+   * 智能体关联工具最大数量
+   */
+  int AGENT_TOOL_IDS_MAX_SIZE = 20;
+
+  /**
+   * 智能体关联技能最大数量
+   */
+  int AGENT_SKILL_IDS_MAX_SIZE = 20;
+
+  /**
+   * 智能体关联数据集最大数量
+   */
+  int AGENT_DATASET_IDS_MAX_SIZE = 5;
+
+  /**
+   * 智能体关联接口集最大数量
+   */
+  int AGENT_API_COLLECTION_IDS_MAX_SIZE = 5;
+
+  /**
+   * 智能体记忆默认窗口大小
+   */
+  int AGENT_MEMORY_DEFAULT_WINDOW_SIZE = 20;
+
+  /**
+   * 智能体记忆默认最大Token数
+   */
+  int AGENT_MEMORY_DEFAULT_MAX_TOKENS = 8000;
+
   // ==================== 知识库常量 ====================
 
   String KNOWLEDGE_DOC_UPLOAD_BIZ_KEY = "angusAIKnowledgeBaseDocs";

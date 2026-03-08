@@ -1,5 +1,7 @@
 package cloud.xcan.angus.core.ai.interfaces.agent.facade.internal.assembler;
 
+import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_MEMORY_DEFAULT_MAX_TOKENS;
+import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_MEMORY_DEFAULT_WINDOW_SIZE;
 import static cloud.xcan.angus.spec.utils.ObjectUtils.nullSafe;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
@@ -43,8 +45,8 @@ public class AgentAssembler {
     }
     if (dto.getMemory() != null) {
       agent.setMemoryStrategy(nullSafe(dto.getMemory().getStrategy(), MemoryStrategy.TOKEN_WINDOW));
-      agent.setMemoryWindowSize(nullSafe(dto.getMemory().getWindowSize(), 20));
-      agent.setMemoryMaxTokens(nullSafe(dto.getMemory().getMaxTokens(), 8000));
+      agent.setMemoryWindowSize(nullSafe(dto.getMemory().getWindowSize(), AGENT_MEMORY_DEFAULT_WINDOW_SIZE));
+      agent.setMemoryMaxTokens(nullSafe(dto.getMemory().getMaxTokens(), AGENT_MEMORY_DEFAULT_MAX_TOKENS));
       agent.setMemorySummaryPrompt(dto.getMemory().getSummaryPrompt());
     }
     if (dto.getGuardrails() != null) {
@@ -84,13 +86,13 @@ public class AgentAssembler {
     }
     if (dto.getMemory() != null) {
       agent.setMemoryStrategy(nullSafe(dto.getMemory().getStrategy(), MemoryStrategy.TOKEN_WINDOW));
-      agent.setMemoryWindowSize(nullSafe(dto.getMemory().getWindowSize(), 20));
-      agent.setMemoryMaxTokens(nullSafe(dto.getMemory().getMaxTokens(), 8000));
+      agent.setMemoryWindowSize(nullSafe(dto.getMemory().getWindowSize(), AGENT_MEMORY_DEFAULT_WINDOW_SIZE));
+      agent.setMemoryMaxTokens(nullSafe(dto.getMemory().getMaxTokens(), AGENT_MEMORY_DEFAULT_MAX_TOKENS));
       agent.setMemorySummaryPrompt(dto.getMemory().getSummaryPrompt());
     } else {
       agent.setMemoryStrategy(MemoryStrategy.TOKEN_WINDOW);
-      agent.setMemoryWindowSize(20);
-      agent.setMemoryMaxTokens(8000);
+      agent.setMemoryWindowSize(AGENT_MEMORY_DEFAULT_WINDOW_SIZE);
+      agent.setMemoryMaxTokens(AGENT_MEMORY_DEFAULT_MAX_TOKENS);
       agent.setMemorySummaryPrompt(null);
     }
     if (dto.getGuardrails() != null) {
