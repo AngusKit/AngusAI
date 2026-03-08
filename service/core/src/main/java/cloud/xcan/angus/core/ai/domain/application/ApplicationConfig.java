@@ -2,8 +2,6 @@ package cloud.xcan.angus.core.ai.domain.application;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -15,7 +13,7 @@ import lombok.Data;
 public class ApplicationConfig {
 
   @NotNull
-  @Size(min = 1)
+  @Size(min = 1, max = 20)
   @Schema(description = "绑定的智能体ID列表（至少一个）", requiredMode = RequiredMode.REQUIRED)
   private List<Long> agentIds;
 
@@ -101,7 +99,4 @@ public class ApplicationConfig {
     private Boolean apiEnabled;
   }
 
-  public void checkValid(){
-    // TODO
-  }
 }

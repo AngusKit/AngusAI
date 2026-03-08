@@ -166,8 +166,6 @@ public class ApplicationCmdImpl extends CommCmd<AIApplication, Long> implements 
         if (isNull(applicationDb.getConfig())){
           throw ProtocolException.of("应用未配置，请先配置应用");
         }
-        // TODO
-        applicationDb.getConfig().checkValid();
       }
 
       @Override

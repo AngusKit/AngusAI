@@ -22,7 +22,7 @@ import lombok.experimental.Accessors;
 @Setter
 @Getter
 @Accessors(chain = true)
-public class ApplicationAgentBinding {
+public class ApplicationAgent {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

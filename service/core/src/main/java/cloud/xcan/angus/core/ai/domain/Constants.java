@@ -8,24 +8,9 @@ import java.io.File;
 public interface Constants {
 
   /**
-   * 应用名称最大长度
-   */
-  int APPLICATION_NAME_MAX_LENGTH = 50;
-
-  /**
-   * 应用描述最大长度
-   */
-  int APPLICATION_DESCRIPTION_MAX_LENGTH = 500;
-
-  /**
    * 应用语言最大长度
    */
   int APPLICATION_LANGUAGE_MAX_LENGTH = 20;
-
-  /**
-   * 数据库描述字段长度
-   */
-  int APPLICATION_DESCRIPTION_DB_LENGTH = 500;
 
   // ==================== 聊天常量 ====================
 

@@ -1,7 +1,7 @@
 package cloud.xcan.angus.core.ai.application.converter;
 
 import cloud.xcan.angus.core.ai.domain.application.AIApplication;
-import cloud.xcan.angus.core.ai.domain.application.ApplicationAgentBinding;
+import cloud.xcan.angus.core.ai.domain.application.ApplicationAgent;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationConfig;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationShare;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
@@ -27,8 +27,8 @@ public class ApplicationConverter {
     newApplication.setConfig(sourceApplication.getConfig());
     // 复制智能体绑定关系
     if (sourceApplication.getAgentBindings() != null && !sourceApplication.getAgentBindings().isEmpty()) {
-      for (ApplicationAgentBinding src : sourceApplication.getAgentBindings()) {
-        ApplicationAgentBinding binding = new ApplicationAgentBinding()
+      for (ApplicationAgent src : sourceApplication.getAgentBindings()) {
+        ApplicationAgent binding = new ApplicationAgent()
             .setAgentId(src.getAgentId())
             .setIsDefault(src.getIsDefault())
             .setSortOrder(src.getSortOrder());
@@ -46,7 +46,7 @@ public class ApplicationConverter {
       applicationDb.getAgentBindings().clear();
       int sortOrder = 0;
       for (Long agentId : config.getAgentIds()) {
-        ApplicationAgentBinding binding = new ApplicationAgentBinding()
+        ApplicationAgent binding = new ApplicationAgent()
             .setAgentId(agentId)
             .setIsDefault(agentId.equals(defaultId))
             .setSortOrder(sortOrder++);

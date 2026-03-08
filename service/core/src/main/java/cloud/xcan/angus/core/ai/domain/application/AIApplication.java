@@ -1,6 +1,5 @@
 package cloud.xcan.angus.core.ai.domain.application;
 
-import cloud.xcan.angus.core.ai.domain.Constants;
 import cloud.xcan.angus.core.ai.domain.model.Model;
 import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
@@ -35,13 +34,13 @@ public class AIApplication extends TenantAuditingEntity<AIApplication, Long> {
   @Id
   private Long id;
 
-  @Column(name = "name", nullable = false, length = Constants.APPLICATION_NAME_MAX_LENGTH)
+  @Column(name = "name", nullable = false, length = 100)
   private String name;
 
   @Column(name = "icon", nullable = false)
   private String icon;
 
-  @Column(name = "description", length = Constants.APPLICATION_DESCRIPTION_DB_LENGTH)
+  @Column(name = "description", length = 800)
   private String description;
 
   @Enumerated(EnumType.STRING)
@@ -52,7 +51,7 @@ public class AIApplication extends TenantAuditingEntity<AIApplication, Long> {
   @Column(name = "status", nullable = false)
   private ApplicationStatus status;
 
-  @Column(name = "language", length = Constants.APPLICATION_LANGUAGE_MAX_LENGTH)
+  @Column(name = "language", length = 20)
   private String language;
 
   @Column(name = "published_date")
@@ -81,7 +80,7 @@ public class AIApplication extends TenantAuditingEntity<AIApplication, Long> {
    */
   @OneToMany(mappedBy = "application", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
   @OrderBy("sortOrder ASC")
-  private List<ApplicationAgentBinding> agentBindings = new java.util.ArrayList<>();
+  private List<ApplicationAgent> agentBindings = new java.util.ArrayList<>();
 
   /**
    * 获取默认智能体ID（用于对话时选用） 优先返回 isDefault=true 的绑定，否则按 sortOrder 取第一个
@@ -93,7 +92,7 @@ public class AIApplication extends TenantAuditingEntity<AIApplication, Long> {
     return agentBindings.stream()
         .filter(b -> Boolean.TRUE.equals(b.getIsDefault()))
         .findFirst()
-        .map(ApplicationAgentBinding::getAgentId)
+        .map(ApplicationAgent::getAgentId)
         .orElseGet(() -> agentBindings.get(0).getAgentId());
   }
 
@@ -105,7 +104,7 @@ public class AIApplication extends TenantAuditingEntity<AIApplication, Long> {
       return List.of();
     }
     return agentBindings.stream()
-        .map(ApplicationAgentBinding::getAgentId)
+        .map(ApplicationAgent::getAgentId)
         .toList();
   }
 

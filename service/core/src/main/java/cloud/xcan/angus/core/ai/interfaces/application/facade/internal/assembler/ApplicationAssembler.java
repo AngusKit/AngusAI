@@ -1,7 +1,7 @@
 package cloud.xcan.angus.core.ai.interfaces.application.facade.internal.assembler;
 
 import cloud.xcan.angus.core.ai.domain.application.AIApplication;
-import cloud.xcan.angus.core.ai.domain.application.ApplicationAgentBinding;
+import cloud.xcan.angus.core.ai.domain.application.ApplicationAgent;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationConfig;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.dto.ApplicationCreateDto;
@@ -36,7 +36,7 @@ public class ApplicationAssembler {
         ? dto.getDefaultAgentId() : dto.getAgentIds().get(0);
     int sortOrder = 0;
     for (Long agentId : dto.getAgentIds()) {
-      ApplicationAgentBinding binding = new ApplicationAgentBinding()
+      ApplicationAgent binding = new ApplicationAgent()
           .setAgentId(agentId)
           .setIsDefault(agentId.equals(defaultId))
           .setSortOrder(sortOrder++);

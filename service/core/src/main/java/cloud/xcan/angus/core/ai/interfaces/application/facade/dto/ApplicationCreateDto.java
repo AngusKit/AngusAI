@@ -1,5 +1,9 @@
 package cloud.xcan.angus.core.ai.interfaces.application.facade.dto;
 
+import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_DESC_LENGTH;
+import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_DESC_LENGTH_X4;
+import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_NAME_LENGTH;
+
 import cloud.xcan.angus.core.ai.domain.Constants;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationCategory;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -15,7 +19,7 @@ import org.hibernate.validator.constraints.Length;
 public class ApplicationCreateDto {
 
   @NotBlank
-  @Length(max = Constants.APPLICATION_NAME_MAX_LENGTH)
+  @Length(max = MAX_NAME_LENGTH)
   @Schema(description = "应用名称", example = "我的智能助手", requiredMode = Schema.RequiredMode.REQUIRED)
   private String name;
 
@@ -23,7 +27,7 @@ public class ApplicationCreateDto {
   @Schema(description = "应用图标（emoji或URL）", example = "🤖", requiredMode = Schema.RequiredMode.REQUIRED)
   private String icon;
 
-  @Length(max = Constants.APPLICATION_DESCRIPTION_MAX_LENGTH)
+  @Length(max = MAX_DESC_LENGTH_X4)
   @Schema(description = "应用描述", example = "这是一个智能助手应用")
   private String description;
 

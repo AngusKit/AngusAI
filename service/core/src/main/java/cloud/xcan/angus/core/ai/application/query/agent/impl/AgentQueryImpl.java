@@ -5,7 +5,7 @@ import cloud.xcan.angus.core.ai.domain.agent.Agent;
 import cloud.xcan.angus.core.ai.domain.agent.AgentRepo;
 import cloud.xcan.angus.core.ai.domain.agent.AgentSearchRepo;
 import cloud.xcan.angus.core.ai.domain.agent.AgentStatus;
-import cloud.xcan.angus.core.ai.domain.application.ApplicationAgentBindingRepo;
+import cloud.xcan.angus.core.ai.domain.application.ApplicationAgentRepo;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
@@ -25,7 +25,7 @@ public class AgentQueryImpl implements AgentQuery {
   private AgentSearchRepo agentSearchRepo;
 
   @Resource
-  private ApplicationAgentBindingRepo applicationAgentBindingRepo;
+  private ApplicationAgentRepo applicationAgentBindingRepo;
 
   @Override
   public Agent findAndCheck(Long id) {
