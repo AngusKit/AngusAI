@@ -44,7 +44,9 @@ export type ApplicationDetailResult = ApiLocaleResult & {
 
 /** 资源信息（id + name） */
 export interface ResourceInfoVo {
-  id?: number;
+  /** 资源ID */
+  id?: string;
+  /** 资源名称 */
   name?: string;
 }
 

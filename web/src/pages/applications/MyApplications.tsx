@@ -123,18 +123,18 @@ export function MyApplications() {
 
       if (Array.isArray(listData)) {
         const mappedList: Application[] = listData.map((app: ApplicationDetailVo) => ({
-          id: app.id || '',
-          name: app.name || '',
-          description: app.description || '',
+          id: app.id ?? '',
+          name: app.name ?? '',
+          description: app.description ?? '',
           icon: getIconForApplication(app.category, app.name),
           iconBgColor: getIconBgColor(app.category),
-          status: app.status,
+          status: (app.status as ApplicationStatusEnum) ?? ApplicationStatusEnum.DRAFT,
           isStarred: false, // API中没有星标字段，默认为false
           tags: [], // API中没有标签字段，需要从其他地方获取或留空
-          visits: `${app.apiCalls || 0} 次调用`, // API中没有调用次数字段，需要从统计接口获取
-          category: app.category,
-          agentIds: (app as any).agents?.map((a: { id?: number }) => String(a.id)) ?? (app as any).agentIds?.map((id: number) => String(id)) ?? (app as any).config?.agents?.map((a: { id?: number }) => String(a.id)) ?? [],
-          defaultAgentId: (app as any).defaultAgent?.id != null ? String((app as any).defaultAgent.id) : (app as any).defaultAgentId != null ? String((app as any).defaultAgentId) : (app as any).config?.defaultAgent?.id != null ? String((app as any).config.defaultAgent.id) : undefined,
+          visits: `${app.apiCalls ?? 0} 次调用`, // API中没有调用次数字段，需要从统计接口获取
+          category: app.category ?? ApplicationCategoryEnum.CHATBOT,
+          agentIds: app.agents?.map(a => a.id).filter((id): id is string => !!id) ?? (app as any).agentIds ?? app.config?.agents?.map(a => a.id).filter((id): id is string => !!id) ?? [],
+          defaultAgentId: app.defaultAgent?.id ?? (app as any).defaultAgentId ?? app.config?.defaultAgent?.id,
         }));
 
         setApplications(mappedList);
@@ -257,8 +257,8 @@ export function MyApplications() {
       if (updatedData.name !== undefined) updateDto.name = updatedData.name;
       if (updatedData.description !== undefined) updateDto.description = updatedData.description;
       if (updatedData.category !== undefined) updateDto.category = updatedData.category;
-      if (updatedData.agentIds !== undefined) updateDto.agentIds = updatedData.agentIds?.map(Number);
-      if (updatedData.defaultAgentId !== undefined) updateDto.defaultAgentId = Number(updatedData.defaultAgentId);
+      if (updatedData.agentIds !== undefined) updateDto.agentIds = updatedData.agentIds;
+      if (updatedData.defaultAgentId !== undefined) updateDto.defaultAgentId = updatedData.defaultAgentId;
 
       await Applications.updateApplication(selectedApp.id, updateDto);
 
