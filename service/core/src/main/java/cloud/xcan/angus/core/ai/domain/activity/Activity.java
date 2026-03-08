@@ -23,7 +23,6 @@ import lombok.experimental.Accessors;
  */
 @Entity
 @Table(name = "ai_activity")
-@EntityListeners({TenantListener.class})
 @Setter
 @Getter
 @Accessors(chain = true)

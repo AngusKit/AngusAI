@@ -84,8 +84,7 @@ public class AIApplication extends TenantAuditingEntity<AIApplication, Long> {
   private List<ApplicationAgentBinding> agentBindings = new java.util.ArrayList<>();
 
   /**
-   * 获取默认智能体ID（用于对话时选用）
-   * 优先返回 isDefault=true 的绑定，否则按 sortOrder 取第一个
+   * 获取默认智能体ID（用于对话时选用） 优先返回 isDefault=true 的绑定，否则按 sortOrder 取第一个
    */
   public Long getDefaultAgentId() {
     if (agentBindings == null || agentBindings.isEmpty()) {

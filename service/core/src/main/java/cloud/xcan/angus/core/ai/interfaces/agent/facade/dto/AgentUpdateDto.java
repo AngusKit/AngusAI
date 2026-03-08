@@ -1,6 +1,7 @@
 package cloud.xcan.angus.core.ai.interfaces.agent.facade.dto;
 
 import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_DESC_LENGTH;
+import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_DESC_LENGTH_X4;
 import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_NAME_LENGTH;
 
 import cloud.xcan.agentx.core.agent.enums.AutonomyLevel;
@@ -24,7 +25,7 @@ public class AgentUpdateDto {
   @Schema(description = "智能体名称", requiredMode = RequiredMode.REQUIRED)
   private String name;
 
-  @Size(max = MAX_DESC_LENGTH)
+  @Size(max = MAX_DESC_LENGTH_X4)
   @Schema(description = "描述")
   private String description;
 
@@ -38,8 +39,8 @@ public class AgentUpdateDto {
   private AutonomyLevel autonomyLevel = AutonomyLevel.ASSISTANT;
 
   @NotNull
-  @Schema(description = "模型ID", requiredMode = RequiredMode.REQUIRED)
-  private Long modelId;
+  @Schema(description = "默认模型ID", requiredMode = RequiredMode.REQUIRED)
+  private Long defaultModelId;
 
   @Schema(description = "系统提示词")
   private String systemPrompt;

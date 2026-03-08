@@ -58,7 +58,7 @@ public class AgentDefinitionConverter {
         : Collections.emptyList();
 
     return AgentDefinition.builder()
-        .id(agent.getAgentId())
+        .id(String.valueOf(agent.getId()))
         .name(agent.getName())
         .description(agent.getDescription())
         .interactionMode(agent.getInteractionMode())

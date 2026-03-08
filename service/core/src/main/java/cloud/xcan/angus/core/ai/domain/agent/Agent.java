@@ -6,6 +6,7 @@ import cloud.xcan.agentx.core.agent.enums.ReasoningStrategy;
 import cloud.xcan.agentx.core.memory.enums.MemoryStrategy;
 import cloud.xcan.angus.core.ai.application.converter.AgentDefinitionConverter;
 import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
+import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -26,6 +27,7 @@ import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.hibernate.annotations.Type;
 
 /**
  * 智能体实体 — 用户可创建的智能体，持久化存储
@@ -46,7 +48,7 @@ public class Agent extends TenantAuditingEntity<Agent, Long> {
   @Column(name = "name", nullable = false, length = 100)
   private String name;
 
-  @Column(name = "description", length = 500)
+  @Column(name = "description", length = 800)
   private String description;
 
   @Enumerated(EnumType.STRING)
@@ -65,8 +67,8 @@ public class Agent extends TenantAuditingEntity<Agent, Long> {
   @Column(name = "autonomy_level", length = 30)
   private AutonomyLevel autonomyLevel = AutonomyLevel.ASSISTANT;
 
-  @Column(name = "model_id", nullable = false)
-  private Long modelId;
+  @Column(name = "default_model_id", nullable = false)
+  private Long defaultModelId;
 
   @Column(name = "system_prompt", columnDefinition = "TEXT")
   private String systemPrompt;
@@ -74,37 +76,31 @@ public class Agent extends TenantAuditingEntity<Agent, Long> {
   @Column(name = "welcome_message", length = 1000)
   private String welcomeMessage;
 
-  @ElementCollection(fetch = FetchType.LAZY)
-  @CollectionTable(name = "ai_agent_suggested_questions", joinColumns = @JoinColumn(name = "agent_id"))
-  @Column(name = "question", length = 500)
+  @Type(JsonType.class)
+  @Column(columnDefinition = "json", name = "question")
   private List<String> suggestedQuestions = new ArrayList<>();
 
-  @ElementCollection(fetch = FetchType.LAZY)
-  @CollectionTable(name = "ai_agent_knowledge_base_ids", joinColumns = @JoinColumn(name = "agent_id"))
-  @Column(name = "knowledge_base_id")
+  @Type(JsonType.class)
+  @Column(columnDefinition = "json", name = "knowledge_base_id")
   private List<Long> knowledgeBaseIds = new ArrayList<>();
 
-  @ElementCollection(fetch = FetchType.LAZY)
-  @CollectionTable(name = "ai_agent_tool_ids", joinColumns = @JoinColumn(name = "agent_id"))
-  @Column(name = "tool_id", length = 100)
+  @Type(JsonType.class)
+  @Column(columnDefinition = "json", name = "tool_id")
   private List<String> toolIds = new ArrayList<>();
 
   @Column(name = "workflow_id")
   private Long workflowId;
 
-  @ElementCollection(fetch = FetchType.LAZY)
-  @CollectionTable(name = "ai_agent_skill_ids", joinColumns = @JoinColumn(name = "agent_id"))
-  @Column(name = "skill_id", length = 100)
+  @Type(JsonType.class)
+  @Column(columnDefinition = "json", name = "skill_id")
   private List<String> skillIds = new ArrayList<>();
 
-  @ElementCollection(fetch = FetchType.LAZY)
-  @CollectionTable(name = "ai_agent_dataset_ids", joinColumns = @JoinColumn(name = "agent_id"))
-  @Column(name = "dataset_id")
+  @Type(JsonType.class)
+  @Column(columnDefinition = "json", name = "dataset_id")
   private List<Long> datasetIds = new ArrayList<>();
 
-  @ElementCollection(fetch = FetchType.LAZY)
-  @CollectionTable(name = "ai_agent_api_collection_ids", joinColumns = @JoinColumn(name = "agent_id"))
-  @Column(name = "api_collection_id")
+  @Type(JsonType.class)
+  @Column(columnDefinition = "json", name = "api_collection_id")
   private List<Long> apiCollectionIds = new ArrayList<>();
 
   @Enumerated(EnumType.STRING)
@@ -120,20 +116,16 @@ public class Agent extends TenantAuditingEntity<Agent, Long> {
   @Column(name = "memory_summary_prompt", columnDefinition = "TEXT")
   private String memorySummaryPrompt;
 
-  @ElementCollection(fetch = FetchType.LAZY)
-  @CollectionTable(name = "ai_agent_input_guardrail_ids", joinColumns = @JoinColumn(name = "agent_id"))
-  @Column(name = "guardrail_id", length = 100)
+  @Type(JsonType.class)
+  @Column(columnDefinition = "json", name = "guardrail_id")
   private List<String> inputGuardrailIds = new ArrayList<>();
 
-  @ElementCollection(fetch = FetchType.LAZY)
-  @CollectionTable(name = "ai_agent_output_guardrail_ids", joinColumns = @JoinColumn(name = "agent_id"))
-  @Column(name = "guardrail_id", length = 100)
+  @Type(JsonType.class)
+  @Column(columnDefinition = "json", name = "guardrail_id")
   private List<String> outputGuardrailIds = new ArrayList<>();
 
-  @ElementCollection(fetch = FetchType.LAZY)
-  @CollectionTable(name = "ai_agent_variables", joinColumns = @JoinColumn(name = "agent_id"))
-  @MapKeyColumn(name = "var_key", length = 100)
-  @Column(name = "var_value", length = 2000)
+  @Type(JsonType.class)
+  @Column(columnDefinition = "json", name = "var_value")
   private Map<String, String> variables = new HashMap<>();
 
   @Override
@@ -141,10 +133,4 @@ public class Agent extends TenantAuditingEntity<Agent, Long> {
     return this.id;
   }
 
-  /**
-   * 获取 AgentRegistry 使用的 agentId（String）
-   */
-  public String getAgentId() {
-    return id != null ? String.valueOf(id) : null;
-  }
 }

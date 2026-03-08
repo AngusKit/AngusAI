@@ -29,7 +29,7 @@ public class AgentAssembler {
     agent.setReasoningStrategy(
         nullSafe(dto.getReasoningStrategy(), ReasoningStrategy.FUNCTION_CALLING));
     agent.setAutonomyLevel(nullSafe(dto.getAutonomyLevel(), AutonomyLevel.ASSISTANT));
-    agent.setModelId(dto.getModelId());
+    agent.setDefaultModelId(dto.getDefaultModelId());
     agent.setSystemPrompt(dto.getSystemPrompt());
     agent.setWelcomeMessage(dto.getWelcomeMessage());
     agent.setSuggestedQuestions(nullSafe(dto.getSuggestedQuestions(), emptyList()));
@@ -63,7 +63,7 @@ public class AgentAssembler {
     agent.setReasoningStrategy(
         nullSafe(dto.getReasoningStrategy(), ReasoningStrategy.FUNCTION_CALLING));
     agent.setAutonomyLevel(nullSafe(dto.getAutonomyLevel(), AutonomyLevel.ASSISTANT));
-    agent.setModelId(dto.getModelId());
+    agent.setDefaultModelId(dto.getDefaultModelId());
     agent.setSystemPrompt(dto.getSystemPrompt());
     agent.setWelcomeMessage(dto.getWelcomeMessage());
     agent.setSuggestedQuestions(nullSafe(dto.getSuggestedQuestions(), emptyList()));
@@ -113,7 +113,7 @@ public class AgentAssembler {
     vo.setInteractionMode(agent.getInteractionMode());
     vo.setReasoningStrategy(agent.getReasoningStrategy());
     vo.setAutonomyLevel(agent.getAutonomyLevel());
-    vo.setModelId(agent.getModelId());
+    vo.setModelId(agent.getDefaultModelId());
     vo.setSystemPrompt(agent.getSystemPrompt());
     vo.setWelcomeMessage(agent.getWelcomeMessage());
     vo.setSuggestedQuestions(agent.getSuggestedQuestions());
@@ -150,7 +150,7 @@ public class AgentAssembler {
     vo.setDescription(agent.getDescription());
     vo.setStatus(agent.getStatus());
     vo.setInteractionMode(agent.getInteractionMode());
-    vo.setModelId(agent.getModelId());
+    vo.setModelId(agent.getDefaultModelId());
 
     // 设置审计字段
     vo.setTenantId(agent.getTenantId());

@@ -68,16 +68,16 @@ public class ApplicationQueryImpl implements ApplicationQuery {
         }
         // 从绑定的智能体获取模型
         agent = agentQuery.findAndCheck(application.getDefaultAgentId());
-        if (nonNull(agent.getModelId())) {
-          appDefaultModel = modelQuery.findAndCheck(agent.getModelId());
+        if (nonNull(agent.getDefaultModelId())) {
+          appDefaultModel = modelQuery.findAndCheck(agent.getDefaultModelId());
         }
         // 检查当前使用模型是否存在
         if (nonNull(currentUseModelId)) {
           currentUseMode = modelQuery.findAndCheck(currentUseModelId);
         }
         // 切换应用模型时，检查模型类型是否一致
-        if (nonNull(currentUseModelId) && nonNull(agent.getModelId())
-            && !Objects.equals(currentUseModelId, agent.getModelId())
+        if (nonNull(currentUseModelId) && nonNull(agent.getDefaultModelId())
+            && !Objects.equals(currentUseModelId, agent.getDefaultModelId())
             && nonNull(appDefaultModel)
             && !Objects.equals(currentUseMode.getType(), appDefaultModel.getType())) {
           throw ProtocolException.of("当前选择模型类型[{0}]与智能体默认模型类型[{1}]不一致",

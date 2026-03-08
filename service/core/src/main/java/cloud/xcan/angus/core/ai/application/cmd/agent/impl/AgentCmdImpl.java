@@ -51,7 +51,7 @@ public class AgentCmdImpl extends CommCmd<Agent, Long> implements AgentCmd {
         if (agentQuery.existsByName(agent.getName())) {
           throw ResourceExisted.of("智能体名称「{0}」已存在", new Object[]{agent.getName()});
         }
-        modelQuery.findAndCheck(agent.getModelId());
+        modelQuery.findAndCheck(agent.getDefaultModelId());
       }
 
       @Override
@@ -71,8 +71,8 @@ public class AgentCmdImpl extends CommCmd<Agent, Long> implements AgentCmd {
         if (agentQuery.existsByNameAndIdNot(agent.getName(), agent.getId())) {
           throw ResourceExisted.of("智能体名称「{0}」已存在", new Object[]{agent.getName()});
         }
-        if (agent.getModelId() != null) {
-          modelQuery.findAndCheck(agent.getModelId());
+        if (agent.getDefaultModelId() != null) {
+          modelQuery.findAndCheck(agent.getDefaultModelId());
         }
       }
 
@@ -142,9 +142,9 @@ public class AgentCmdImpl extends CommCmd<Agent, Long> implements AgentCmd {
    * TODO: 确认 ModelConfigProvider.loadById(String.valueOf(modelId)) 是否支持按模型ID加载
    */
   private void registerToRegistry(Agent agent) {
-    Model model = modelQuery.findAndCheck(agent.getModelId());
+    Model model = modelQuery.findAndCheck(agent.getDefaultModelId());
     AgentDefinition definition = AgentDefinitionConverter.toDefinition(agent, model);
-    String configId = String.valueOf(agent.getModelId());
+    String configId = String.valueOf(agent.getDefaultModelId());
     ChatModel chatModel;
     StreamingChatModel streamingModel = null;
     try {
