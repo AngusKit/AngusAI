@@ -124,7 +124,8 @@ public class ApplicationAssembler {
   }
 
   public static ApplicationListVo toListVo(AIApplication application,
-      java.util.List<Long> agentIds, Long defaultAgentId) {
+      java.util.List<ApplicationDetailVo.ResourceInfoVo> agents,
+      ApplicationDetailVo.ResourceInfoVo defaultAgent) {
     ApplicationListVo vo = new ApplicationListVo();
     vo.setId(application.getId());
     vo.setName(application.getName());
@@ -132,8 +133,8 @@ public class ApplicationAssembler {
     vo.setDescription(application.getDescription());
     vo.setCategory(application.getCategory());
     vo.setStatus(application.getStatus());
-    vo.setAgentIds(agentIds != null ? agentIds : java.util.List.of());
-    vo.setDefaultAgentId(defaultAgentId);
+    vo.setAgents(agents != null ? agents : java.util.List.of());
+    vo.setDefaultAgent(defaultAgent);
     vo.setApiCalls(application.getApiCalls());
     vo.setPublicAccess(application.getPublicAccess());
     vo.setEmbedEnabled(application.getEmbedEnabled());

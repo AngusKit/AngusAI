@@ -2,6 +2,7 @@ package cloud.xcan.angus.core.ai.interfaces.application.facade.vo;
 
 import cloud.xcan.angus.core.ai.domain.application.ApplicationCategory;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
+import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.ResourceInfoVo;
 import cloud.xcan.angus.remote.vo.TenantAuditingVo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
@@ -32,11 +33,11 @@ public class ApplicationListVo extends TenantAuditingVo {
   @Schema(description = "应用状态")
   private ApplicationStatus status;
 
-  @Schema(description = "绑定的智能体ID列表")
-  private List<Long> agentIds;
+  @Schema(description = "绑定的智能体列表")
+  private List<ResourceInfoVo> agents;
 
-  @Schema(description = "默认智能体ID（用于对话）")
-  private Long defaultAgentId;
+  @Schema(description = "默认智能体（用于对话）")
+  private ResourceInfoVo defaultAgent;
 
   @Schema(description = "使用的模型")
   private String model;

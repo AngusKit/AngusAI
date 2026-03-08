@@ -28,10 +28,10 @@ export interface ApplicationDetailVo extends TenantAuditingVo {
   /** 分享信息 */
   shareInfo?: ApplicationShareInfoVo;
 
-  /** 绑定的智能体ID列表（列表接口返回） */
-  agentIds?: (string | number)[];
-  /** 默认智能体ID（列表接口返回） */
-  defaultAgentId?: string | number;
+  /** 绑定的智能体列表（列表接口返回） */
+  agents?: ResourceInfoVo[];
+  /** 默认智能体（列表接口返回） */
+  defaultAgent?: ResourceInfoVo;
 
   apiCalls?: number;
 }

@@ -19,6 +19,11 @@ public interface ApplicationAgentRepo extends BaseRepository<ApplicationAgent, L
   List<ApplicationAgent> findByApplicationIdOrderBySortOrderAsc(Long applicationId);
 
   /**
+   * 批量按应用ID查询绑定（用于列表页性能优化，结果需在内存中按 applicationId 分组排序）
+   */
+  List<ApplicationAgent> findByApplicationIdIn(java.util.List<Long> applicationIds);
+
+  /**
    * 删除指定应用的所有智能体绑定
    */
   @Modifying

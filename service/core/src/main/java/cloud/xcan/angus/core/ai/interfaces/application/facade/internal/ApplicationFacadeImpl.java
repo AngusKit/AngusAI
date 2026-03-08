@@ -12,9 +12,10 @@ import cloud.xcan.angus.core.ai.application.query.application.ApplicationQuery;
 import cloud.xcan.angus.core.ai.application.query.dataset.DatasetQuery;
 import cloud.xcan.angus.core.ai.application.query.knowledgebase.KnowledgeBaseQuery;
 import cloud.xcan.angus.core.ai.application.query.workflow.WorkflowQuery;
-import cloud.xcan.angus.core.ai.domain.apis.ApiCollection;
 import cloud.xcan.angus.core.ai.domain.agent.Agent;
+import cloud.xcan.angus.core.ai.domain.apis.ApiCollection;
 import cloud.xcan.angus.core.ai.domain.application.AIApplication;
+import cloud.xcan.angus.core.ai.domain.application.ApplicationAgent;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationConfig;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
 import cloud.xcan.angus.core.ai.domain.dataset.Dataset;
@@ -36,7 +37,9 @@ import cloud.xcan.angus.core.biz.NameJoin;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.PageResult;
 import jakarta.annotation.Resource;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
@@ -129,8 +132,16 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
     GenericSpecification<AIApplication> spec = ApplicationAssembler.getSpecification(dto);
     Page<AIApplication> page = applicationQuery.find(spec, dto.tranPage(),
         dto.fullTextSearch, getMatchSearchFields(dto.getClass()));
+    List<AIApplication> content = page.getContent();
+    if (content.isEmpty()) {
+      return buildVoPageResult(page, app -> ApplicationAssembler.toListVo(app, List.of(), null));
+    }
+    // 批量加载 agents 和 defaultAgent，避免 N+1 查询
+    List<Long> appIds = content.stream().map(AIApplication::getId).toList();
+    AgentsBatchResult batch = batchLoadAgentsAndDefaultAgents(appIds);
     return buildVoPageResult(page, app -> ApplicationAssembler.toListVo(app,
-        applicationQuery.getAgentIds(app.getId()), applicationQuery.getDefaultAgentId(app.getId())));
+        batch.agentsMap.getOrDefault(app.getId(), List.of()),
+        batch.defaultAgentMap.get(app.getId())));
   }
 
   @Override
@@ -143,6 +154,75 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
     return statistics;
   }
 
+  /**
+   * 批量加载应用的 agents 和 defaultAgent，仅 2 次数据库查询，避免 N+1
+   */
+  private AgentsBatchResult batchLoadAgentsAndDefaultAgents(List<Long> applicationIds) {
+    if (applicationIds == null || applicationIds.isEmpty()) {
+      return new AgentsBatchResult(Map.of(), Map.of());
+    }
+    List<ApplicationAgent> bindings = agentQuery.findAgentByApplicationIdIn(applicationIds);
+    if (bindings.isEmpty()) {
+      return new AgentsBatchResult(
+          applicationIds.stream().collect(Collectors.toMap(id -> id, id -> List.of())), Map.of());
+    }
+    List<Long> agentIds = bindings.stream().map(ApplicationAgent::getAgentId).distinct().toList();
+    List<Agent> agents = agentQuery.findByIds(agentIds);
+    Map<Long, Agent> agentMap = agents.stream().collect(Collectors.toMap(Agent::getId, a -> a));
+
+    Map<Long, List<ResourceInfoVo>> agentsMap = bindings.stream()
+        .collect(Collectors.groupingBy(ApplicationAgent::getApplicationId))
+        .entrySet().stream()
+        .collect(Collectors.toMap(Map.Entry::getKey, e -> {
+          List<ApplicationAgent> list = e.getValue().stream()
+              .sorted(Comparator.comparingInt(ApplicationAgent::getSortOrder))
+              .toList();
+          return list.stream()
+              .map(b -> {
+                Agent agent = agentMap.get(b.getAgentId());
+                return agent != null ? new ResourceInfoVo(agent.getId(), agent.getName())
+                    : new ResourceInfoVo(b.getAgentId(), "Agent");
+              })
+              .toList();
+        }));
+
+    Map<Long, ResourceInfoVo> defaultAgentMap = new java.util.HashMap<>();
+    for (Map.Entry<Long, List<ResourceInfoVo>> e : agentsMap.entrySet()) {
+      Long appId = e.getKey();
+      List<ResourceInfoVo> agentsList = e.getValue();
+      if (!agentsList.isEmpty()) {
+        ApplicationAgent defaultBinding = bindings.stream()
+            .filter(b -> appId.equals(b.getApplicationId()))
+            .filter(b -> Boolean.TRUE.equals(b.getIsDefault()))
+            .findFirst()
+            .orElseGet(() -> bindings.stream()
+                .filter(b -> appId.equals(b.getApplicationId()))
+                .min(Comparator.comparingInt(ApplicationAgent::getSortOrder))
+                .orElse(null));
+        if (defaultBinding != null) {
+          ResourceInfoVo vo = agentsList.stream()
+              .filter(a -> defaultBinding.getAgentId().equals(a.getId()))
+              .findFirst()
+              .orElse(agentsList.get(0));
+          defaultAgentMap.put(appId, vo);
+        }
+      }
+    }
+    return new AgentsBatchResult(agentsMap, defaultAgentMap);
+  }
+
+  private static class AgentsBatchResult {
+
+    final Map<Long, List<ResourceInfoVo>> agentsMap;
+    final Map<Long, ResourceInfoVo> defaultAgentMap;
+
+    AgentsBatchResult(Map<Long, List<ResourceInfoVo>> agentsMap,
+        Map<Long, ResourceInfoVo> defaultAgentMap) {
+      this.agentsMap = agentsMap;
+      this.defaultAgentMap = defaultAgentMap;
+    }
+  }
+
   private ResourceInfoVo getDefaultAgentVo(Long applicationId) {
     Long defaultAgentId = applicationQuery.getDefaultAgentId(applicationId);
     if (defaultAgentId == null) {
@@ -152,7 +232,7 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
       Agent agent = agentQuery.findAndCheck(defaultAgentId);
       return new ResourceInfoVo(agent.getId(), agent.getName());
     } catch (Exception e) {
-      return new ResourceInfoVo(defaultAgentId, "未知");
+      return new ResourceInfoVo(defaultAgentId, "Agent");
     }
   }
 
@@ -161,14 +241,13 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
     if (agentIds == null || agentIds.isEmpty()) {
       return List.of();
     }
+    List<Agent> agents = agentQuery.findByIds(agentIds);
+    Map<Long, Agent> agentMap = agents.stream().collect(Collectors.toMap(Agent::getId, a -> a));
     return agentIds.stream()
         .map(id -> {
-          try {
-            Agent agent = agentQuery.findAndCheck(id);
-            return new ResourceInfoVo(agent.getId(), agent.getName());
-          } catch (Exception e) {
-            return new ResourceInfoVo(id, "未知");
-          }
+          Agent agent = agentMap.get(id);
+          return agent != null ? new ResourceInfoVo(agent.getId(), agent.getName())
+              : new ResourceInfoVo(id, "Agent");
         })
         .collect(Collectors.toList());
   }

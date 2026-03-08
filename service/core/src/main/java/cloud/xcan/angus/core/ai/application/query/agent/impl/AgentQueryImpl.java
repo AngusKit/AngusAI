@@ -5,6 +5,7 @@ import cloud.xcan.angus.core.ai.domain.agent.Agent;
 import cloud.xcan.angus.core.ai.domain.agent.AgentRepo;
 import cloud.xcan.angus.core.ai.domain.agent.AgentSearchRepo;
 import cloud.xcan.angus.core.ai.domain.agent.AgentStatus;
+import cloud.xcan.angus.core.ai.domain.application.ApplicationAgent;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationAgentRepo;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
@@ -49,6 +50,19 @@ public class AgentQueryImpl implements AgentQuery {
             : agentRepo.findAll(spec, pageable);
       }
     }.execute();
+  }
+
+  @Override
+  public List<Agent> findByIds(List<Long> ids) {
+    if (ids == null || ids.isEmpty()) {
+      return List.of();
+    }
+    return agentRepo.findAllById(ids);
+  }
+
+  @Override
+  public List<ApplicationAgent> findAgentByApplicationIdIn(List<Long> applicationIds) {
+    return applicationAgentBindingRepo.findByApplicationIdIn(applicationIds);
   }
 
   @Override

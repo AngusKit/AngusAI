@@ -189,7 +189,8 @@ public class ApplicationQueryImpl implements ApplicationQuery {
 
   @Override
   public Long getDefaultAgentId(Long applicationId) {
-    List<ApplicationAgent> list = applicationAgentRepo.findByApplicationIdOrderBySortOrderAsc(applicationId);
+    List<ApplicationAgent> list =
+        applicationAgentRepo.findByApplicationIdOrderBySortOrderAsc(applicationId);
     if (list.isEmpty()) {
       return null;
     }

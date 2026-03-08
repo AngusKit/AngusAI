@@ -133,8 +133,8 @@ export function MyApplications() {
           tags: [], // API中没有标签字段，需要从其他地方获取或留空
           visits: `${app.apiCalls || 0} 次调用`, // API中没有调用次数字段，需要从统计接口获取
           category: app.category,
-          agentIds: (app as any).agentIds?.map((id: number) => String(id)) ?? (app as any).config?.agents?.map((a: { id?: number }) => String(a.id)) ?? [],
-          defaultAgentId: (app as any).defaultAgentId != null ? String((app as any).defaultAgentId) : (app as any).config?.defaultAgent?.id != null ? String((app as any).config.defaultAgent.id) : undefined,
+          agentIds: (app as any).agents?.map((a: { id?: number }) => String(a.id)) ?? (app as any).agentIds?.map((id: number) => String(id)) ?? (app as any).config?.agents?.map((a: { id?: number }) => String(a.id)) ?? [],
+          defaultAgentId: (app as any).defaultAgent?.id != null ? String((app as any).defaultAgent.id) : (app as any).defaultAgentId != null ? String((app as any).defaultAgentId) : (app as any).config?.defaultAgent?.id != null ? String((app as any).config.defaultAgent.id) : undefined,
         }));
 
         setApplications(mappedList);
