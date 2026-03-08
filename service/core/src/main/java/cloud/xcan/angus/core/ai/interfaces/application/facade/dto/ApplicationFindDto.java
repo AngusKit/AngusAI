@@ -27,9 +27,6 @@ public class ApplicationFindDto extends PageQuery {
   @Schema(description = "是否启用API")
   private Boolean apiEnabled;
 
-  @Schema(description = "是否模板")
-  private Boolean isTemplate;
-
   @Schema(description = "排序字段", example = "modifiedDate", allowableValues = {"createdDate",
       "modifiedDate", "status", "category", "name"})
   private String orderBy = "modifiedDate";

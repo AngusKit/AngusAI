@@ -11,6 +11,7 @@ import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDeta
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.ApplicationConfigVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.ApplicationShareVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.ApplicationStatsVo;
+import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.ResourceInfoVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.ResourcesConfigVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationListVo;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
@@ -18,6 +19,7 @@ import cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder;
 import cloud.xcan.angus.core.utils.CoreUtils;
 import cloud.xcan.angus.remote.search.SearchCriteria;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 public class ApplicationAssembler {
@@ -30,7 +32,8 @@ public class ApplicationAssembler {
         .setCategory(dto.getCategory());
 
     // 智能体绑定由 ApplicationCmdImpl.create 在保存应用后写入 ai_application_agent
-    Long defaultId = dto.getDefaultAgentId() != null && dto.getAgentIds().contains(dto.getDefaultAgentId())
+    Long defaultId = dto.getDefaultAgentId() != null
+        && dto.getAgentIds().contains(dto.getDefaultAgentId())
         ? dto.getDefaultAgentId() : dto.getAgentIds().get(0);
 
     // 设置默认配置
@@ -82,7 +85,7 @@ public class ApplicationAssembler {
   }
 
   public static ApplicationDetailVo toDetailVo(AIApplication application,
-      ResourcesConfigVo resourcesConfigVo, java.util.List<ApplicationDetailVo.ResourceInfoVo> agents,
+      ResourcesConfigVo resourcesConfigVo, List<ApplicationDetailVo.ResourceInfoVo> agents,
       ApplicationDetailVo.ResourceInfoVo defaultAgent) {
     ApplicationDetailVo vo = new ApplicationDetailVo();
     vo.setId(application.getId());
@@ -124,8 +127,7 @@ public class ApplicationAssembler {
   }
 
   public static ApplicationListVo toListVo(AIApplication application,
-      java.util.List<ApplicationDetailVo.ResourceInfoVo> agents,
-      ApplicationDetailVo.ResourceInfoVo defaultAgent) {
+      List<ResourceInfoVo> agents, ApplicationDetailVo.ResourceInfoVo defaultAgent) {
     ApplicationListVo vo = new ApplicationListVo();
     vo.setId(application.getId());
     vo.setName(application.getName());
@@ -133,7 +135,7 @@ public class ApplicationAssembler {
     vo.setDescription(application.getDescription());
     vo.setCategory(application.getCategory());
     vo.setStatus(application.getStatus());
-    vo.setAgents(agents != null ? agents : java.util.List.of());
+    vo.setAgents(agents != null ? agents : List.of());
     vo.setDefaultAgent(defaultAgent);
     vo.setApiCalls(application.getApiCalls());
     vo.setPublicAccess(application.getPublicAccess());

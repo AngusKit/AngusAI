@@ -29,27 +29,6 @@ public class ApplicationConverter {
     return newApplication;
   }
 
-  /**
-   * 根据 config 更新应用绑定的智能体（先删后增）
-   */
-  public static void updateAssociatedIds(ApplicationConfig config, Long applicationId,
-      ApplicationAgentRepo applicationAgentRepo) {
-    if (config != null && config.getAgentIds() != null && !config.getAgentIds().isEmpty()) {
-      Long defaultId = config.getDefaultAgentId() != null && config.getAgentIds().contains(config.getDefaultAgentId())
-          ? config.getDefaultAgentId() : config.getAgentIds().get(0);
-      applicationAgentRepo.deleteByApplicationId(applicationId);
-      int sortOrder = 0;
-      for (Long agentId : config.getAgentIds()) {
-        ApplicationAgent binding = new ApplicationAgent()
-            .setApplicationId(applicationId)
-            .setAgentId(agentId)
-            .setIsDefault(agentId.equals(defaultId))
-            .setSortOrder(sortOrder++);
-        applicationAgentRepo.save(binding);
-      }
-    }
-  }
-
   public static void toApplicationShare(AIApplication application, AIApplication applicationDb) {
     String shareId = UUID.randomUUID().toString();
     applicationDb.setShareId(shareId);

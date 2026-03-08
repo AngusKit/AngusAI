@@ -2,24 +2,22 @@ package cloud.xcan.angus.core.ai.application.cmd.application.impl;
 
 import static cloud.xcan.angus.core.ai.application.converter.ApplicationConverter.toApplicationShare;
 import static cloud.xcan.angus.core.ai.application.converter.ApplicationConverter.toDuplicateApplication;
-import static cloud.xcan.angus.core.ai.application.converter.ApplicationConverter.updateAssociatedIds;
 import static cloud.xcan.angus.spec.utils.ObjectUtils.isNull;
 
 import cloud.xcan.angus.core.ai.application.cmd.application.ApplicationCmd;
 import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
 import cloud.xcan.angus.core.ai.application.query.application.ApplicationQuery;
 import cloud.xcan.angus.core.ai.domain.application.AIApplication;
+import cloud.xcan.angus.core.ai.domain.application.AIApplicationRepo;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationAgent;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationAgentRepo;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationConfig;
-import cloud.xcan.angus.core.ai.domain.application.AIApplicationRepo;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
 import cloud.xcan.angus.remote.message.ProtocolException;
 import cloud.xcan.angus.remote.message.http.ResourceExisted;
-import cloud.xcan.angus.spec.annotations.DoInFuture;
 import cloud.xcan.angus.spec.utils.ObjectUtils;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -27,7 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-@DoInFuture("添加权限校验")
 @Service
 public class ApplicationCmdImpl extends CommCmd<AIApplication, Long> implements ApplicationCmd {
 
@@ -66,13 +63,17 @@ public class ApplicationCmdImpl extends CommCmd<AIApplication, Long> implements 
       @Override
       protected AIApplication process() {
         insert0(application);
+
         // 保存智能体绑定（以 applicationId 关联）
         Long defaultId = application.getConfig().getDefaultAgentId() != null
-            && application.getConfig().getAgentIds().contains(application.getConfig().getDefaultAgentId())
-            ? application.getConfig().getDefaultAgentId() : application.getConfig().getAgentIds().get(0);
+            && application.getConfig().getAgentIds()
+            .contains(application.getConfig().getDefaultAgentId())
+            ? application.getConfig().getDefaultAgentId()
+            : application.getConfig().getAgentIds().get(0);
         int sortOrder = 0;
         for (Long agentId : application.getConfig().getAgentIds()) {
           ApplicationAgent binding = new ApplicationAgent()
+              .setId(uidGenerator.getUID())
               .setApplicationId(application.getId())
               .setAgentId(agentId)
               .setIsDefault(agentId.equals(defaultId))
@@ -108,7 +109,8 @@ public class ApplicationCmdImpl extends CommCmd<AIApplication, Long> implements 
         AIApplication newApplication = toDuplicateApplication(newName, applicationDb);
         AIApplication saved = applicationRepo.save(newApplication);
         // 复制智能体绑定
-        for (ApplicationAgent src : applicationAgentRepo.findByApplicationIdOrderBySortOrderAsc(sourceId)) {
+        for (ApplicationAgent src : applicationAgentRepo.findByApplicationIdOrderBySortOrderAsc(
+            sourceId)) {
           ApplicationAgent binding = new ApplicationAgent()
               .setId(uidGenerator.getUID())
               .setApplicationId(saved.getId())
@@ -134,9 +136,8 @@ public class ApplicationCmdImpl extends CommCmd<AIApplication, Long> implements 
         applicationDb = applicationQuery.findAndCheck(application.getId());
 
         // 检查名称是否已存在（排除当前应用）
-        if (ObjectUtils.isNotEmpty(application.getName())
-            && applicationQuery.existsByNameAndIdNot(application.getName(),
-            applicationDb.getId())) {
+        if (ObjectUtils.isNotEmpty(application.getName()) &&
+            applicationQuery.existsByNameAndIdNot(application.getName(), applicationDb.getId())) {
           throw ResourceExisted.of("应用名称「{0}」已存在", new Object[]{application.getName()});
         }
 
@@ -146,7 +147,7 @@ public class ApplicationCmdImpl extends CommCmd<AIApplication, Long> implements 
       @Override
       protected AIApplication process() {
         // 设置关联资源ID（冗余字段）
-        updateAssociatedIds(application.getConfig(), applicationDb.getId(), applicationAgentRepo);
+        updateAssociatedIds(application.getConfig(), applicationDb.getId());
 
         update(application, applicationDb);
         return applicationDb;
@@ -176,7 +177,7 @@ public class ApplicationCmdImpl extends CommCmd<AIApplication, Long> implements 
         applicationDb.setConfig(config);
 
         // 设置关联资源ID（冗余字段）
-        updateAssociatedIds(config, applicationDb.getId(), applicationAgentRepo);
+        updateAssociatedIds(config, applicationDb.getId());
         return applicationRepo.save(applicationDb);
       }
     }.execute();
@@ -193,7 +194,7 @@ public class ApplicationCmdImpl extends CommCmd<AIApplication, Long> implements 
         applicationDb = applicationQuery.findAndCheck(id);
 
         // 检查是否已经正确配置应用
-        if (isNull(applicationDb.getConfig())){
+        if (isNull(applicationDb.getConfig())) {
           throw ProtocolException.of("应用未配置，请先配置应用");
         }
       }
@@ -237,6 +238,28 @@ public class ApplicationCmdImpl extends CommCmd<AIApplication, Long> implements 
         return null;
       }
     }.execute();
+  }
+
+  /**
+   * 根据 config 更新应用绑定的智能体（先删后增）
+   */
+  public void updateAssociatedIds(ApplicationConfig config, Long applicationId) {
+    if (config != null && config.getAgentIds() != null && !config.getAgentIds().isEmpty()) {
+      Long defaultId = config.getDefaultAgentId() != null
+          && config.getAgentIds().contains(config.getDefaultAgentId())
+          ? config.getDefaultAgentId() : config.getAgentIds().get(0);
+      applicationAgentRepo.deleteByApplicationId(applicationId);
+      int sortOrder = 0;
+      for (Long agentId : config.getAgentIds()) {
+        ApplicationAgent binding = new ApplicationAgent()
+            .setId(uidGenerator.getUID())
+            .setApplicationId(applicationId)
+            .setAgentId(agentId)
+            .setIsDefault(agentId.equals(defaultId))
+            .setSortOrder(sortOrder++);
+        applicationAgentRepo.save(binding);
+      }
+    }
   }
 
   @Override

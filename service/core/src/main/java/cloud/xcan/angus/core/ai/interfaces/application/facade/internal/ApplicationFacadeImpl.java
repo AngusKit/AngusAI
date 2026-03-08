@@ -136,7 +136,6 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
     if (content.isEmpty()) {
       return buildVoPageResult(page, app -> ApplicationAssembler.toListVo(app, List.of(), null));
     }
-    // 批量加载 agents 和 defaultAgent，避免 N+1 查询
     List<Long> appIds = content.stream().map(AIApplication::getId).toList();
     AgentsBatchResult batch = batchLoadAgentsAndDefaultAgents(appIds);
     return buildVoPageResult(page, app -> ApplicationAssembler.toListVo(app,
