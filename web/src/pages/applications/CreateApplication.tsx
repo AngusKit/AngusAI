@@ -372,7 +372,7 @@ export function CreateApplication() {
         .then((res: any) => {
           const data = res?.data;
           const list = (data?.list ?? []).map((item: any) => ({
-            id: item.id ?? 0,
+            id: item.id != null ? String(item.id) : '',
             name: item.name ?? '--',
             description: item.description,
           }));

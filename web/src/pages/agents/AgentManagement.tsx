@@ -137,7 +137,7 @@ export function AgentManagement() {
       const dto: AgentCreateDto = {
         name: createForm.name.trim(),
         description: createForm.description.trim() || undefined,
-        modelId: createForm.modelId,
+        defaultModelId: createForm.modelId,
       };
       await Agents.createAgent(dto);
       toast.success('智能体创建成功');
@@ -159,7 +159,7 @@ export function AgentManagement() {
       const dto: AgentUpdateDto = {
         name: editForm.name.trim(),
         description: editForm.description.trim() || undefined,
-        modelId: editForm.modelId || undefined,
+        defaultModelId: editForm.modelId || undefined,
       };
       await Agents.updateAgent(selectedAgent.id, dto);
       toast.success('智能体已更新');
