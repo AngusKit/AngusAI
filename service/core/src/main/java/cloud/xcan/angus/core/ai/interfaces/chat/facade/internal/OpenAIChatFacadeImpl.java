@@ -1,5 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.chat.facade.internal;
 
+import cloud.xcan.agentx.core.agent.AgentRegistry;
 import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
 import cloud.xcan.angus.core.ai.application.query.application.ApplicationQuery;
 import cloud.xcan.angus.core.ai.domain.application.AIApplication;
@@ -8,7 +9,6 @@ import cloud.xcan.angus.core.ai.interfaces.chat.openai.OpenAIChatCompletionsRequ
 import cloud.xcan.angus.core.ai.interfaces.chat.openai.OpenAIChatCompletionsResponse;
 import cloud.xcan.angus.core.ai.interfaces.chat.openai.OpenAIMessagesConverter;
 import cloud.xcan.angus.remote.message.ProtocolException;
-import cloud.xcan.agentx.core.agent.AgentRegistry;
 import dev.langchain4j.service.TokenStream;
 import jakarta.annotation.Resource;
 import java.util.List;
@@ -17,8 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
- * OpenAI Chat Completions 兼容实现
- * 解析 model → Agent，调用 AgentRegistry.chat/chatStream，组装 OpenAI 格式响应
+ * OpenAI Chat Completions 兼容实现 解析 model → Agent，调用 AgentRegistry.chat/chatStream，组装 OpenAI 格式响应
  */
 @Component
 public class OpenAIChatFacadeImpl implements OpenAIChatFacade {
@@ -78,7 +77,8 @@ public class OpenAIChatFacadeImpl implements OpenAIChatFacade {
       throw ProtocolException.of("messages 中必须包含至少一条 user 消息");
     }
 
-    String modelDisplay = request.getModel() != null ? request.getModel() : "agent_" + resolvedAgentId;
+    String modelDisplay =
+        request.getModel() != null ? request.getModel() : "agent_" + resolvedAgentId;
     return chatSync(resolvedAgentId, effectiveSessionId, message, modelDisplay);
   }
 
@@ -93,7 +93,8 @@ public class OpenAIChatFacadeImpl implements OpenAIChatFacade {
       throw ProtocolException.of("messages 中必须包含至少一条 user 消息");
     }
 
-    String modelDisplay = request.getModel() != null ? request.getModel() : "agent_" + resolvedAgentId;
+    String modelDisplay =
+        request.getModel() != null ? request.getModel() : "agent_" + resolvedAgentId;
     return chatStream(resolvedAgentId, effectiveSessionId, message, modelDisplay);
   }
 
@@ -122,8 +123,7 @@ public class OpenAIChatFacadeImpl implements OpenAIChatFacade {
   }
 
   /**
-   * 解析 model 参数为 Agent ID
-   * agent_123 或 123（纯数字）→ Agent
+   * 解析 model 参数为 Agent ID agent_123 或 123（纯数字）→ Agent
    */
   private String parseAgentIdFromModel(String model) {
     if (model == null) {
@@ -176,17 +176,17 @@ public class OpenAIChatFacadeImpl implements OpenAIChatFacade {
         TokenStream stream = agentRegistry.chatStream(agentId, sessionId, message);
 
         stream.onPartialResponse(token -> {
-          try {
-            String json = String.format(
-                "{\"id\":\"chatcmpl-stream\",\"object\":\"chat.completion.chunk\",\"created\":%d,\"model\":\"%s\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"%s\"},\"finish_reason\":null}]}",
-                System.currentTimeMillis() / 1000,
-                model.replace("\\", "\\\\").replace("\"", "\\\""),
-                escapeJson(token));
-            emitter.send(SseEmitter.event().data("data: " + json + "\n\n"));
-          } catch (Exception e) {
-            emitter.completeWithError(e);
-          }
-        })
+              try {
+                String json = String.format(
+                    "{\"id\":\"chatcmpl-stream\",\"object\":\"chat.completion.chunk\",\"created\":%d,\"model\":\"%s\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"%s\"},\"finish_reason\":null}]}",
+                    System.currentTimeMillis() / 1000,
+                    model.replace("\\", "\\\\").replace("\"", "\\\""),
+                    escapeJson(token));
+                emitter.send(SseEmitter.event().data("data: " + json + "\n\n"));
+              } catch (Exception e) {
+                emitter.completeWithError(e);
+              }
+            })
             .onCompleteResponse(r -> {
               try {
                 emitter.send(SseEmitter.event().data("data: [DONE]\n\n"));
@@ -206,7 +206,9 @@ public class OpenAIChatFacadeImpl implements OpenAIChatFacade {
   }
 
   private String escapeJson(String s) {
-    if (s == null) return "";
+    if (s == null) {
+      return "";
+    }
     return s.replace("\\", "\\\\")
         .replace("\"", "\\\"")
         .replace("\n", "\\n")
@@ -225,7 +227,9 @@ public class OpenAIChatFacadeImpl implements OpenAIChatFacade {
   }
 
   private int estimateTokens(String text) {
-    if (text == null || text.isEmpty()) return 0;
+    if (text == null || text.isEmpty()) {
+      return 0;
+    }
     return text.length() / 2;
   }
 }

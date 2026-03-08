@@ -1,11 +1,11 @@
 package cloud.xcan.angus.core.ai.interfaces.agent.facade.vo;
 
-import cloud.xcan.angus.core.ai.domain.agent.AgentStatus;
-import cloud.xcan.angus.remote.vo.TenantAuditingVo;
 import cloud.xcan.agentx.core.agent.enums.AutonomyLevel;
 import cloud.xcan.agentx.core.agent.enums.InteractionMode;
 import cloud.xcan.agentx.core.agent.enums.ReasoningStrategy;
 import cloud.xcan.agentx.core.memory.enums.MemoryStrategy;
+import cloud.xcan.angus.core.ai.domain.agent.AgentStatus;
+import cloud.xcan.angus.remote.vo.TenantAuditingVo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.Map;

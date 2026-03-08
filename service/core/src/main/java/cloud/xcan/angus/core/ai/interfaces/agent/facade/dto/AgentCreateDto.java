@@ -1,6 +1,5 @@
 package cloud.xcan.angus.core.ai.interfaces.agent.facade.dto;
 
-import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_DESC_LENGTH;
 import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_DESC_LENGTH_X4;
 import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_NAME_LENGTH;
 
@@ -69,6 +68,7 @@ public class AgentCreateDto {
   @Data
   @Schema(description = "关联资源")
   public static class ResourcesDto {
+
     @Size(max = 5)
     @Schema(description = "知识库ID列表")
     private List<Long> knowledgeBaseIds;
@@ -91,6 +91,7 @@ public class AgentCreateDto {
   @Data
   @Schema(description = "记忆配置")
   public static class MemoryDto {
+
     @Schema(description = "策略")
     private MemoryStrategy strategy = MemoryStrategy.TOKEN_WINDOW;
     @Schema(description = "窗口大小")
@@ -104,6 +105,7 @@ public class AgentCreateDto {
   @Data
   @Schema(description = "护栏配置")
   public static class GuardrailsDto {
+
     @Schema(description = "输入护栏ID列表")
     private List<String> inputGuardrailIds;
     @Schema(description = "输出护栏ID列表")

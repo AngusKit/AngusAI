@@ -12,7 +12,8 @@ import lombok.Data;
 /**
  * OpenAI Chat Completions 请求体（兼容 OpenAI API 标准）
  *
- * @see <a href="https://platform.openai.com/docs/api-reference/chat/create">OpenAI API Reference</a>
+ * @see <a href="https://platform.openai.com/docs/api-reference/chat/create">OpenAI API
+ * Reference</a>
  */
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -59,7 +60,8 @@ public class OpenAIChatCompletionsRequest {
   @Schema(description = "Chat 消息")
   public static class ChatMessage {
 
-    @Schema(description = "角色：system/user/assistant", requiredMode = Schema.RequiredMode.REQUIRED, allowableValues = {"system", "user", "assistant"})
+    @Schema(description = "角色：system/user/assistant", requiredMode = Schema.RequiredMode.REQUIRED, allowableValues = {
+        "system", "user", "assistant"})
     private String role;
 
     @Schema(description = "消息内容", requiredMode = Schema.RequiredMode.REQUIRED)

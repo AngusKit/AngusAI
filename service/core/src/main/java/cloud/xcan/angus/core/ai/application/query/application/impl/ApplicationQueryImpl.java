@@ -69,7 +69,8 @@ public class ApplicationQueryImpl implements ApplicationQuery {
       protected void checkParams() {
         // 检查应用是否存在
         application = findAndCheck(id);
-        Long defaultAgentId = applicationAgentRepo.findByApplicationIdOrderBySortOrderAsc(id).stream()
+        Long defaultAgentId = applicationAgentRepo.findByApplicationIdOrderBySortOrderAsc(id)
+            .stream()
             .filter(b -> Boolean.TRUE.equals(b.getIsDefault()))
             .findFirst()
             .map(ApplicationAgent::getAgentId)

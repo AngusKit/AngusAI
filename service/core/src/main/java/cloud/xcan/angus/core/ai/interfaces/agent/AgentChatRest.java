@@ -1,9 +1,9 @@
 package cloud.xcan.angus.core.ai.interfaces.agent;
 
+import cloud.xcan.agentx.core.agent.AgentRegistry;
 import cloud.xcan.angus.core.ai.interfaces.agent.facade.dto.AgentChatRequestDto;
 import cloud.xcan.angus.core.ai.interfaces.agent.facade.vo.AgentChatResponseVo;
 import cloud.xcan.angus.remote.ApiLocaleResult;
-import cloud.xcan.agentx.core.agent.AgentRegistry;
 import dev.langchain4j.service.TokenStream;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -74,12 +74,12 @@ public class AgentChatRest {
       try {
         TokenStream stream = agentRegistry.chatStream(agentIdStr, sessionId, message);
         stream.onPartialResponse(token -> {
-          try {
-            emitter.send(SseEmitter.event().data(token));
-          } catch (Exception e) {
-            emitter.completeWithError(e);
-          }
-        })
+              try {
+                emitter.send(SseEmitter.event().data(token));
+              } catch (Exception e) {
+                emitter.completeWithError(e);
+              }
+            })
             .onCompleteResponse(r -> emitter.complete())
             .onError(emitter::completeWithError);
         stream.start();

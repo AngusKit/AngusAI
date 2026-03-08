@@ -33,7 +33,8 @@ public class MemberFacadeImpl implements MemberFacade {
     UserDetailVo userDetailVo = userRemote.getDetail(id).orElseContentThrow();
     MemberDetailVo memberDetailVo = MemberDetailVo.of(userDetailVo);
     Map<Long, Integer> shareCountMap = resourceSharingQuery.getShareCountMap(List.of(id));
-    Map<Long, Integer> accessCountMap = resourceSharingAccessLogQuery.getAccessCountMap(List.of(id));
+    Map<Long, Integer> accessCountMap = resourceSharingAccessLogQuery.getAccessCountMap(
+        List.of(id));
     memberDetailVo.setShareCount(shareCountMap.getOrDefault(id, 0));
     memberDetailVo.setShareAccessCount(accessCountMap.getOrDefault(id, 0));
     return memberDetailVo;

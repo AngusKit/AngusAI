@@ -12,7 +12,6 @@ import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM;
 
 import cloud.xcan.angus.core.ai.application.cmd.apis.ApiCollectionCmd;
 import cloud.xcan.angus.core.ai.application.query.apis.ApiCollectionQuery;
-import cloud.xcan.angus.core.ai.application.query.apis.ApiComponentQuery;
 import cloud.xcan.angus.core.ai.application.query.apis.ApiEndpointCallLogQuery;
 import cloud.xcan.angus.core.ai.application.query.apis.ApiEndpointQuery;
 import cloud.xcan.angus.core.ai.application.query.apis.ApiSchemaQuery;

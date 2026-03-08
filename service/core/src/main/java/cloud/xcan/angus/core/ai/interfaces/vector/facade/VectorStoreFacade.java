@@ -1,5 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.vector.facade;
 
+import cloud.xcan.agentx.core.vectorstore.VectorStoreType;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.VectorStoreConnectionTestDto;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.VectorStoreCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.VectorStoreFindDto;
@@ -7,7 +8,6 @@ import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.VectorStoreUpdateDt
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.vo.ConnectionTestVo;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.vo.VectorStoreStatisticsVo;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.vo.VectorStoreVo;
-import cloud.xcan.agentx.core.vectorstore.VectorStoreType;
 import cloud.xcan.angus.remote.PageResult;
 import cloud.xcan.angus.remote.dto.SimpleStatisticsDto;
 import java.util.List;

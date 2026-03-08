@@ -21,10 +21,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
- * OpenAI Chat Completions 兼容接口
- * 遵循 OpenAI API 标准，支持 SDK/第三方集成
+ * OpenAI Chat Completions 兼容接口 遵循 OpenAI API 标准，支持 SDK/第三方集成
  *
- * @see <a href="https://platform.openai.com/docs/api-reference/chat/create">OpenAI API Reference</a>
+ * @see <a href="https://platform.openai.com/docs/api-reference/chat/create">OpenAI API
+ * Reference</a>
  */
 @Tag(name = "OpenAIChat", description = "OpenAI Chat Completions 兼容接口 - 支持 OpenAI SDK 及第三方集成")
 @Validated
@@ -36,9 +36,8 @@ public class OpenAIChatRest {
   private OpenAIChatFacade openAIChatFacade;
 
   /**
-   * 通用 Chat Completions（必须传 model）
-   * POST /api/v1/chat/completions
-   * 根据 request.stream 及 Accept 头返回同步 JSON 或 SSE 流
+   * 通用 Chat Completions（必须传 model） POST /api/v1/chat/completions 根据 request.stream 及 Accept 头返回同步
+   * JSON 或 SSE 流
    */
   @Operation(operationId = "openaiChatCompletions", summary = "Chat Completions",
       description = "OpenAI 标准对话接口，model 必填，支持 agent_123 或 123 指定智能体")
@@ -46,7 +45,8 @@ public class OpenAIChatRest {
       @ApiResponse(responseCode = "200", description = "成功"),
       @ApiResponse(responseCode = "400", description = "请求参数无效")
   })
-  @PostMapping(value = "/chat/completions", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_EVENT_STREAM_VALUE})
+  @PostMapping(value = "/chat/completions", produces = {MediaType.APPLICATION_JSON_VALUE,
+      MediaType.TEXT_EVENT_STREAM_VALUE})
   public Object chatCompletions(
       @Valid @RequestBody OpenAIChatCompletionsRequest request,
       @RequestHeader(value = "X-Session-Id", required = false) String sessionId,
@@ -60,8 +60,7 @@ public class OpenAIChatRest {
   }
 
   /**
-   * 应用入口 Chat Completions（model 可选）
-   * POST /api/v1/applications/{appId}/chat/completions
+   * 应用入口 Chat Completions（model 可选） POST /api/v1/applications/{appId}/chat/completions
    */
   @Operation(operationId = "openaiChatCompletionsByApp", summary = "应用入口 Chat Completions",
       description = "按应用默认智能体对话，model 可选")
@@ -88,8 +87,8 @@ public class OpenAIChatRest {
   }
 
   /**
-   * 智能体直连 Chat Completions（等价于 model=agent_{agentId}）
-   * POST /api/v1/agents/{agentId}/chat/completions
+   * 智能体直连 Chat Completions（等价于 model=agent_{agentId}） POST
+   * /api/v1/agents/{agentId}/chat/completions
    */
   @Operation(operationId = "openaiChatCompletionsByAgent", summary = "智能体直连 Chat Completions")
   @PostMapping(value = "/agents/{agentId}/chat/completions", produces = MediaType.APPLICATION_JSON_VALUE)

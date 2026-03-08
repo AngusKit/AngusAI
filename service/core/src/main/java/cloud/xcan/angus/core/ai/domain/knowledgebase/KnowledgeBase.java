@@ -1,6 +1,5 @@
 package cloud.xcan.angus.core.ai.domain.knowledgebase;
 
-import cloud.xcan.angus.core.ai.domain.Constants;
 import cloud.xcan.angus.core.ai.domain.Visibility;
 import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
@@ -30,7 +29,7 @@ public class KnowledgeBase extends TenantAuditingEntity<KnowledgeBase, Long> {
   @Id
   private Long id;
 
-  @Column(name = "name", nullable = false, length = Constants.KNOWLEDGE_BASE_NAME_MAX_LENGTH)
+  @Column(name = "name", nullable = false, length = 100)
   private String name;
 
   @Column(name = "icon", nullable = false)
@@ -39,7 +38,7 @@ public class KnowledgeBase extends TenantAuditingEntity<KnowledgeBase, Long> {
   @Column(name = "icon_bg", nullable = false)
   private String iconBg;
 
-  @Column(name = "description", length = Constants.KNOWLEDGE_BASE_DESCRIPTION_MAX_LENGTH)
+  @Column(name = "description", length = 800)
   private String description;
 
   @Enumerated(EnumType.STRING)

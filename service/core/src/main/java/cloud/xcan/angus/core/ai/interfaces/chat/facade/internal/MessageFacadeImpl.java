@@ -10,7 +10,6 @@ import cloud.xcan.angus.core.ai.domain.chat.Message;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRole;
 import cloud.xcan.angus.core.ai.domain.chat.Session;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.MessageFacade;
-import cloud.xcan.angus.remote.message.ProtocolException;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.MessageFeedbackDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.MessageFindDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.MessageSendDto;
@@ -20,6 +19,7 @@ import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.ChatStatisticsVo;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.MessageSendVo;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.MessageVo;
 import cloud.xcan.angus.remote.PageResult;
+import cloud.xcan.angus.remote.message.ProtocolException;
 import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -118,13 +118,13 @@ public class MessageFacadeImpl implements MessageFacade {
             agentIdStr, sessionIdStr, dto.getContent());
         StringBuilder fullContent = new StringBuilder();
         stream.onPartialResponse(token -> {
-          fullContent.append(token);
-          try {
-            emitter.send(SseEmitter.event().data(token));
-          } catch (Exception e) {
-            emitter.completeWithError(e);
-          }
-        })
+              fullContent.append(token);
+              try {
+                emitter.send(SseEmitter.event().data(token));
+              } catch (Exception e) {
+                emitter.completeWithError(e);
+              }
+            })
             .onCompleteResponse(r -> {
               messageQuery.updateContent(assistantMessageId, fullContent.toString());
               messageCmd.setStreaming(assistantMessageId, false);

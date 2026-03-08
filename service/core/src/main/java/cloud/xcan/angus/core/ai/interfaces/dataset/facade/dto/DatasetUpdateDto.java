@@ -1,8 +1,8 @@
 package cloud.xcan.angus.core.ai.interfaces.dataset.facade.dto;
 
-import static cloud.xcan.angus.core.ai.domain.Constants.DATASET_DESCRIPTION_MAX_LENGTH;
-import static cloud.xcan.angus.core.ai.domain.Constants.DATASET_NAME_MAX_LENGTH;
 import static cloud.xcan.angus.core.ai.domain.Constants.DATASET_TAGS_MAX_COUNT;
+import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_DESC_LENGTH_X4;
+import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_NAME_LENGTH;
 
 import cloud.xcan.angus.core.ai.domain.Visibility;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -15,11 +15,11 @@ import org.hibernate.validator.constraints.Length;
 @Schema(description = "更新数据集请求参数")
 public class DatasetUpdateDto {
 
-  @Length(max = DATASET_NAME_MAX_LENGTH)
+  @Length(max = MAX_NAME_LENGTH)
   @Schema(description = "数据集名称", example = "用户行为数据")
   private String name;
 
-  @Length(max = DATASET_DESCRIPTION_MAX_LENGTH)
+  @Length(max = MAX_DESC_LENGTH_X4)
   @Schema(description = "数据集描述", example = "用户行为分析数据集")
   private String description;
 

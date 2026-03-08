@@ -1,5 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.model;
 
+import cloud.xcan.agentx.core.model.ModelConfigDefinition;
 import cloud.xcan.agentx.core.model.ModelProvider;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.ModelFacade;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelCreateDto;
@@ -13,7 +14,6 @@ import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelStatisticsVo;
 import cloud.xcan.angus.remote.ApiLocaleResult;
 import cloud.xcan.angus.remote.PageResult;
 import cloud.xcan.angus.remote.dto.SimpleStatisticsDto;
-import cloud.xcan.agentx.core.model.ModelConfigDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

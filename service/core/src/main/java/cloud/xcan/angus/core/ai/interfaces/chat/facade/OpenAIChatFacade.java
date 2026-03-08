@@ -12,7 +12,7 @@ public interface OpenAIChatFacade {
   /**
    * 通用 Chat Completions（必须传 model）
    *
-   * @param request OpenAI 格式请求
+   * @param request   OpenAI 格式请求
    * @param sessionId 可选，X-Session-Id Header
    * @return 同步响应
    */
@@ -22,7 +22,7 @@ public interface OpenAIChatFacade {
   /**
    * 流式 Chat Completions
    *
-   * @param request OpenAI 格式请求
+   * @param request   OpenAI 格式请求
    * @param sessionId 可选，X-Session-Id Header
    * @return SSE 流
    */
@@ -31,8 +31,8 @@ public interface OpenAIChatFacade {
   /**
    * 应用入口 Chat Completions（model 可选，按应用默认 Agent）
    *
-   * @param appId 应用 ID
-   * @param request OpenAI 格式请求
+   * @param appId     应用 ID
+   * @param request   OpenAI 格式请求
    * @param sessionId 可选
    * @return 同步响应
    */
@@ -48,8 +48,8 @@ public interface OpenAIChatFacade {
   /**
    * 智能体直连 Chat Completions（等价于 model=agent_{agentId}）
    *
-   * @param agentId 智能体 ID
-   * @param request OpenAI 格式请求
+   * @param agentId   智能体 ID
+   * @param request   OpenAI 格式请求
    * @param sessionId 可选
    * @return 同步响应
    */

@@ -1,8 +1,8 @@
 package cloud.xcan.angus.core.ai.interfaces.vector.facade.dto;
 
 
-import cloud.xcan.angus.core.ai.domain.ConnectionStatus;
 import cloud.xcan.agentx.core.vectorstore.VectorStoreType;
+import cloud.xcan.angus.core.ai.domain.ConnectionStatus;
 import cloud.xcan.angus.remote.PageQuery;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -22,7 +22,8 @@ public class VectorStoreFindDto extends PageQuery {
   @Schema(description = "启用状态筛选")
   private Boolean enabled;
 
-  @Schema(description = "排序字段", allowableValues = {"id", "name", "createdDate", "type", "status"})
+  @Schema(description = "排序字段", allowableValues = {"id", "name", "createdDate", "type",
+      "status"})
   private String orderBy = "createdDate";
 
   @Override

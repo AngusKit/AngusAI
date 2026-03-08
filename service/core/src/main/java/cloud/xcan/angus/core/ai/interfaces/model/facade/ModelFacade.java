@@ -1,5 +1,7 @@
 package cloud.xcan.angus.core.ai.interfaces.model.facade;
 
+import cloud.xcan.agentx.core.model.ModelConfigDefinition;
+import cloud.xcan.agentx.core.model.ModelProvider;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelFindDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelTestDto;
@@ -10,8 +12,6 @@ import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelListVo;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelStatisticsVo;
 import cloud.xcan.angus.remote.PageResult;
 import cloud.xcan.angus.remote.dto.SimpleStatisticsDto;
-import cloud.xcan.agentx.core.model.ModelConfigDefinition;
-import cloud.xcan.agentx.core.model.ModelProvider;
 import java.util.List;
 
 public interface ModelFacade {

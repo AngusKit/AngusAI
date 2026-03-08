@@ -16,16 +16,6 @@ public interface Constants {
   String KNOWLEDGE_DOC_UPLOAD_BIZ_KEY = "angusAIKnowledgeBaseDocs";
 
   /**
-   * 知识库名称最大长度
-   */
-  int KNOWLEDGE_BASE_NAME_MAX_LENGTH = 50;
-
-  /**
-   * 知识库描述最大长度
-   */
-  int KNOWLEDGE_BASE_DESCRIPTION_MAX_LENGTH = 500;
-
-  /**
    * 知识库标签最大数量
    */
   int KNOWLEDGE_BASE_TAGS_MAX_COUNT = 5;
@@ -102,16 +92,6 @@ public interface Constants {
   // ==================== 数据集常量 ====================
 
   String DATASET_UPLOAD_BIZ_KEY = "angusAIDatasetFiles";
-
-  /**
-   * 数据集名称最大长度
-   */
-  int DATASET_NAME_MAX_LENGTH = 50;
-
-  /**
-   * 数据集描述最大长度
-   */
-  int DATASET_DESCRIPTION_MAX_LENGTH = 500;
 
   /**
    * 数据集标签最大数量

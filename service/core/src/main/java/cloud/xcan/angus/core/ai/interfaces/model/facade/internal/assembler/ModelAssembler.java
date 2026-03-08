@@ -3,6 +3,7 @@ package cloud.xcan.angus.core.ai.interfaces.model.facade.internal.assembler;
 import static cloud.xcan.angus.core.utils.PrincipalContextUtils.getOptTenantId;
 import static cloud.xcan.angus.spec.utils.ObjectUtils.nullSafe;
 
+import cloud.xcan.agentx.core.model.ModelConfigDefinition;
 import cloud.xcan.angus.core.ai.domain.model.Model;
 import cloud.xcan.angus.core.ai.domain.model.ModelStatus;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelCreateDto;
@@ -13,7 +14,6 @@ import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelListVo;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder;
 import cloud.xcan.angus.remote.search.SearchCriteria;
-import cloud.xcan.agentx.core.model.ModelConfigDefinition;
 import java.util.Set;
 
 public class ModelAssembler {

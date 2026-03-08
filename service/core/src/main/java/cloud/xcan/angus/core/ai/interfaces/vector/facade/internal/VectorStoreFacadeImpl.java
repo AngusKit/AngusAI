@@ -3,11 +3,11 @@ package cloud.xcan.angus.core.ai.interfaces.vector.facade.internal;
 import static cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder.getMatchSearchFields;
 import static cloud.xcan.angus.core.utils.CoreUtils.buildVoPageResult;
 
+import cloud.xcan.agentx.core.vectorstore.VectorStoreFactory;
+import cloud.xcan.agentx.core.vectorstore.VectorStoreType;
 import cloud.xcan.angus.core.ai.application.cmd.vector.VectorStoreCmd;
 import cloud.xcan.angus.core.ai.application.query.vector.VectorStoreQuery;
 import cloud.xcan.angus.core.ai.domain.vector.VectorStore;
-import cloud.xcan.agentx.core.vectorstore.VectorStoreFactory;
-import cloud.xcan.agentx.core.vectorstore.VectorStoreType;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.VectorStoreFacade;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.VectorStoreConnectionTestDto;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.dto.VectorStoreCreateDto;

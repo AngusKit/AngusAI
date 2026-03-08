@@ -10,7 +10,6 @@ import cloud.xcan.angus.api.gm.user.dto.UserLockDto;
 import cloud.xcan.angus.api.gm.user.dto.UserPatchDto;
 import cloud.xcan.angus.api.gm.user.dto.UserUpdateDto;
 import cloud.xcan.angus.api.gm.user.vo.UserDetailVo;
-import cloud.xcan.angus.api.gm.user.vo.UserListVo;
 import cloud.xcan.angus.api.gm.user.vo.UserLockVo;
 import cloud.xcan.angus.api.gm.user.vo.UserStatsVo;
 import cloud.xcan.angus.api.gm.user.vo.UserStatusUpdateVo;

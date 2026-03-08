@@ -12,7 +12,8 @@ import lombok.NoArgsConstructor;
 /**
  * OpenAI Chat Completions 响应体（兼容 OpenAI API 标准）
  *
- * @see <a href="https://platform.openai.com/docs/api-reference/chat/object">OpenAI API Reference</a>
+ * @see <a href="https://platform.openai.com/docs/api-reference/chat/object">OpenAI API
+ * Reference</a>
  */
 @Data
 @Builder

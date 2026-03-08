@@ -1,5 +1,8 @@
 package cloud.xcan.angus.core.ai.interfaces.knowledgebase.facade.dto;
 
+import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_DESC_LENGTH_X4;
+import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_NAME_LENGTH;
+
 import cloud.xcan.angus.core.ai.domain.Constants;
 import cloud.xcan.angus.core.ai.domain.Visibility;
 import cloud.xcan.angus.core.ai.domain.knowledgebase.KnowledgeBaseConfig;
@@ -13,7 +16,7 @@ import lombok.Data;
 @Schema(description = "更新知识库请求参数")
 public class KnowledgeBaseUpdateDto {
 
-  @Size(max = Constants.KNOWLEDGE_BASE_NAME_MAX_LENGTH)
+  @Size(max = MAX_NAME_LENGTH)
   @Schema(description = "知识库名称", example = "产品文档库")
   private String name;
 
@@ -23,7 +26,7 @@ public class KnowledgeBaseUpdateDto {
   @Schema(description = "背景色", example = "bg-blue-100")
   private String iconBg;
 
-  @Size(max = Constants.KNOWLEDGE_BASE_DESCRIPTION_MAX_LENGTH)
+  @Size(max = MAX_DESC_LENGTH_X4)
   @Schema(description = "描述", example = "存储产品相关文档和资料")
   private String description;
 

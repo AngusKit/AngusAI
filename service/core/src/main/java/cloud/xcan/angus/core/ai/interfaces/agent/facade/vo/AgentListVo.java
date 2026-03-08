@@ -1,8 +1,8 @@
 package cloud.xcan.angus.core.ai.interfaces.agent.facade.vo;
 
+import cloud.xcan.agentx.core.agent.enums.InteractionMode;
 import cloud.xcan.angus.core.ai.domain.agent.AgentStatus;
 import cloud.xcan.angus.remote.vo.TenantAuditingVo;
-import cloud.xcan.agentx.core.agent.enums.InteractionMode;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
