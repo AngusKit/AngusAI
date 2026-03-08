@@ -5,7 +5,11 @@ import cloud.xcan.agentx.core.agent.definition.AgentDefinition;
 import cloud.xcan.agentx.core.model.ModelRegistry;
 import cloud.xcan.angus.core.ai.application.cmd.agent.AgentCmd;
 import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
+import cloud.xcan.angus.core.ai.application.query.apis.ApiCollectionQuery;
+import cloud.xcan.angus.core.ai.application.query.dataset.DatasetQuery;
+import cloud.xcan.angus.core.ai.application.query.knowledgebase.KnowledgeBaseQuery;
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
+import cloud.xcan.angus.core.ai.application.query.workflow.WorkflowQuery;
 import cloud.xcan.angus.core.ai.domain.agent.Agent;
 import cloud.xcan.angus.core.ai.domain.agent.AgentRepo;
 import cloud.xcan.angus.core.ai.domain.agent.AgentStatus;
@@ -19,7 +23,9 @@ import cloud.xcan.angus.remote.message.http.ResourceExisted;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.StreamingChatModel;
 import jakarta.annotation.Resource;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +48,18 @@ public class AgentCmdImpl extends CommCmd<Agent, Long> implements AgentCmd {
   @Resource
   private ModelQuery modelQuery;
 
+  @Resource
+  private KnowledgeBaseQuery knowledgeBaseQuery;
+
+  @Resource
+  private WorkflowQuery workflowQuery;
+
+  @Resource
+  private DatasetQuery datasetQuery;
+
+  @Resource
+  private ApiCollectionQuery apiCollectionQuery;
+
   @Override
   @Transactional
   public Agent create(Agent agent) {
@@ -52,6 +70,7 @@ public class AgentCmdImpl extends CommCmd<Agent, Long> implements AgentCmd {
           throw ResourceExisted.of("智能体名称「{0}」已存在", new Object[]{agent.getName()});
         }
         modelQuery.findAndCheck(agent.getDefaultModelId());
+        validateReferencedResources(agent);
       }
 
       @Override
@@ -74,6 +93,7 @@ public class AgentCmdImpl extends CommCmd<Agent, Long> implements AgentCmd {
         if (agent.getDefaultModelId() != null) {
           modelQuery.findAndCheck(agent.getDefaultModelId());
         }
+        validateReferencedResources(agent);
       }
 
       @Override
@@ -135,6 +155,28 @@ public class AgentCmdImpl extends CommCmd<Agent, Long> implements AgentCmd {
         return null;
       }
     }.execute();
+  }
+
+  /**
+   * 校验智能体关联资源是否存在
+   */
+  private void validateReferencedResources(Agent agent) {
+    List<Long> kbIds = agent.getKnowledgeBaseIds();
+    if (CollectionUtils.isNotEmpty(kbIds)) {
+      kbIds.forEach(knowledgeBaseQuery::findAndCheck);
+    }
+    Long workflowId = agent.getWorkflowId();
+    if (workflowId != null) {
+      workflowQuery.findAndCheck(workflowId);
+    }
+    List<Long> datasetIds = agent.getDatasetIds();
+    if (CollectionUtils.isNotEmpty(datasetIds)) {
+      datasetIds.forEach(datasetQuery::findAndCheck);
+    }
+    List<Long> apiCollectionIds = agent.getApiCollectionIds();
+    if (CollectionUtils.isNotEmpty(apiCollectionIds)) {
+      apiCollectionIds.forEach(apiCollectionQuery::findAndCheck);
+    }
   }
 
   /**
