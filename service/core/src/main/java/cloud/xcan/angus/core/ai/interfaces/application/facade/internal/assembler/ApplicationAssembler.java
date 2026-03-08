@@ -82,7 +82,8 @@ public class ApplicationAssembler {
   }
 
   public static ApplicationDetailVo toDetailVo(AIApplication application,
-      ResourcesConfigVo resourcesConfigVo, java.util.List<Long> agentIds, Long defaultAgentId) {
+      ResourcesConfigVo resourcesConfigVo, java.util.List<ApplicationDetailVo.ResourceInfoVo> agents,
+      ApplicationDetailVo.ResourceInfoVo defaultAgent) {
     ApplicationDetailVo vo = new ApplicationDetailVo();
     vo.setId(application.getId());
     vo.setName(application.getName());
@@ -99,11 +100,11 @@ public class ApplicationAssembler {
     vo.setModifiedBy(application.getModifiedBy());
     vo.setModifiedDate(application.getModifiedDate());
 
-    // 设置配置信息（agentIds、defaultAgentId、conversation、features、security、publish）
+    // 设置配置信息（agents、defaultAgent、conversation、features、security、publish）
     ApplicationConfigVo configVo = new ApplicationConfigVo();
     if (application.getConfig() != null) {
-      configVo.setAgentIds(agentIds != null ? agentIds : java.util.List.of());
-      configVo.setDefaultAgentId(defaultAgentId);
+      configVo.setAgents(agents != null ? agents : java.util.List.of());
+      configVo.setDefaultAgent(defaultAgent);
       CoreUtils.copyProperties(application.getConfig(), configVo);
     }
     configVo.setResources(resourcesConfigVo);

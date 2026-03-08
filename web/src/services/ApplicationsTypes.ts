@@ -42,16 +42,22 @@ export type ApplicationDetailResult = ApiLocaleResult & {
   data?: ApplicationDetailVo;
 };
 
+/** 资源信息（id + name） */
+export interface ResourceInfoVo {
+  id?: number;
+  name?: string;
+}
+
 /** 应用配置 */
 export interface ApplicationConfigVo {
   /**
-   * 绑定的智能体ID列表
+   * 绑定的智能体列表
    */
-  agentIds?: string[];
+  agents?: ResourceInfoVo[];
   /**
-   * 默认智能体ID（用于对话）
+   * 默认智能体（用于对话）
    */
-  defaultAgentId?: string;
+  defaultAgent?: ResourceInfoVo;
   /** 模型配置 */
   model?: ModelConfigVo;
   /** 关联资源 */

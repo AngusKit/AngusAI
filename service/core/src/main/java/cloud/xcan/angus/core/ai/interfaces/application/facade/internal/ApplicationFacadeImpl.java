@@ -70,14 +70,14 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
     AIApplication application = ApplicationAssembler.toCreateDomain(dto);
     AIApplication saved = applicationCmd.create(application);
     return ApplicationAssembler.toDetailVo(saved, getResourcesConfigVo(saved.getId()),
-        applicationQuery.getAgentIds(saved.getId()), applicationQuery.getDefaultAgentId(saved.getId()));
+        getAgentsVo(saved.getId()), getDefaultAgentVo(saved.getId()));
   }
 
   @Override
   public ApplicationDetailVo duplicate(Long id, ApplicationDuplicateDto dto) {
     AIApplication saved = applicationCmd.duplicate(id, dto.getName());
     return ApplicationAssembler.toDetailVo(saved, getResourcesConfigVo(saved.getId()),
-        applicationQuery.getAgentIds(saved.getId()), applicationQuery.getDefaultAgentId(saved.getId()));
+        getAgentsVo(saved.getId()), getDefaultAgentVo(saved.getId()));
   }
 
   @Override
@@ -85,21 +85,21 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
     AIApplication application = ApplicationAssembler.toUpdateDomain(id, dto);
     AIApplication saved = applicationCmd.update(application);
     return ApplicationAssembler.toDetailVo(saved, getResourcesConfigVo(saved.getId()),
-        applicationQuery.getAgentIds(saved.getId()), applicationQuery.getDefaultAgentId(saved.getId()));
+        getAgentsVo(saved.getId()), getDefaultAgentVo(saved.getId()));
   }
 
   @Override
   public ApplicationDetailVo updateConfig(Long id, ApplicationConfig config) {
     AIApplication saved = applicationCmd.updateConfig(id, config);
     return ApplicationAssembler.toDetailVo(saved, getResourcesConfigVo(saved.getId()),
-        applicationQuery.getAgentIds(saved.getId()), applicationQuery.getDefaultAgentId(saved.getId()));
+        getAgentsVo(saved.getId()), getDefaultAgentVo(saved.getId()));
   }
 
   @Override
   public ApplicationDetailVo modifyStatus(Long id, ApplicationStatus status) {
     AIApplication saved = applicationCmd.modifyStatus(id, status);
     return ApplicationAssembler.toDetailVo(saved, getResourcesConfigVo(saved.getId()),
-        applicationQuery.getAgentIds(saved.getId()), applicationQuery.getDefaultAgentId(saved.getId()));
+        getAgentsVo(saved.getId()), getDefaultAgentVo(saved.getId()));
   }
 
   @Override
@@ -107,7 +107,7 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
     AIApplication application = ApplicationAssembler.shareDomain(id, dto);
     AIApplication saved = applicationCmd.share(application);
     return ApplicationAssembler.toDetailVo(saved, getResourcesConfigVo(saved.getId()),
-        applicationQuery.getAgentIds(saved.getId()), applicationQuery.getDefaultAgentId(saved.getId()));
+        getAgentsVo(saved.getId()), getDefaultAgentVo(saved.getId()));
   }
 
   @Override
@@ -120,7 +120,7 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
   public ApplicationDetailVo getDetail(Long id) {
     AIApplication saved = applicationQuery.findAndCheck(id);
     return ApplicationAssembler.toDetailVo(saved, getResourcesConfigVo(id),
-        applicationQuery.getAgentIds(id), applicationQuery.getDefaultAgentId(id));
+        getAgentsVo(id), getDefaultAgentVo(id));
   }
 
   @NameJoin
@@ -141,6 +141,36 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
     ApplicationStatisticsVo statistics = new ApplicationStatisticsVo();
     // TODO: 实现统计逻辑
     return statistics;
+  }
+
+  private ResourceInfoVo getDefaultAgentVo(Long applicationId) {
+    Long defaultAgentId = applicationQuery.getDefaultAgentId(applicationId);
+    if (defaultAgentId == null) {
+      return null;
+    }
+    try {
+      Agent agent = agentQuery.findAndCheck(defaultAgentId);
+      return new ResourceInfoVo(agent.getId(), agent.getName());
+    } catch (Exception e) {
+      return new ResourceInfoVo(defaultAgentId, "未知");
+    }
+  }
+
+  private List<ResourceInfoVo> getAgentsVo(Long applicationId) {
+    List<Long> agentIds = applicationQuery.getAgentIds(applicationId);
+    if (agentIds == null || agentIds.isEmpty()) {
+      return List.of();
+    }
+    return agentIds.stream()
+        .map(id -> {
+          try {
+            Agent agent = agentQuery.findAndCheck(id);
+            return new ResourceInfoVo(agent.getId(), agent.getName());
+          } catch (Exception e) {
+            return new ResourceInfoVo(id, "未知");
+          }
+        })
+        .collect(Collectors.toList());
   }
 
   private ResourcesConfigVo getResourcesConfigVo(Long applicationId) {
