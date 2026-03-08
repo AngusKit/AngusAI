@@ -7,11 +7,6 @@ import java.io.File;
  */
 public interface Constants {
 
-  /**
-   * 应用语言最大长度
-   */
-  int APPLICATION_LANGUAGE_MAX_LENGTH = 20;
-
   // ==================== 聊天常量 ====================
 
   String CHAT_ATTACHMENTS_UPLOAD_BIZ_KEY = "angusAIChatAttachments";

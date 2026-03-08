@@ -9,6 +9,8 @@ import cloud.xcan.angus.core.ai.application.cmd.application.ApplicationCmd;
 import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
 import cloud.xcan.angus.core.ai.application.query.application.ApplicationQuery;
 import cloud.xcan.angus.core.ai.domain.application.AIApplication;
+import cloud.xcan.angus.core.ai.domain.application.ApplicationAgent;
+import cloud.xcan.angus.core.ai.domain.application.ApplicationAgentRepo;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationConfig;
 import cloud.xcan.angus.core.ai.domain.application.AIApplicationRepo;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
@@ -33,6 +35,9 @@ public class ApplicationCmdImpl extends CommCmd<AIApplication, Long> implements 
   private AIApplicationRepo applicationRepo;
 
   @Resource
+  private ApplicationAgentRepo applicationAgentRepo;
+
+  @Resource
   private ApplicationQuery applicationQuery;
 
   @Resource
@@ -49,10 +54,11 @@ public class ApplicationCmdImpl extends CommCmd<AIApplication, Long> implements 
           throw ResourceExisted.of("应用名称「{0}」已存在", new Object[]{application.getName()});
         }
         // 检查绑定的智能体是否存在（至少一个，且全部有效）
-        if (application.getAgentIds() == null || application.getAgentIds().isEmpty()) {
+        if (application.getConfig() == null || application.getConfig().getAgentIds() == null
+            || application.getConfig().getAgentIds().isEmpty()) {
           throw ProtocolException.of("应用必须绑定至少一个智能体");
         }
-        for (Long agentId : application.getAgentIds()) {
+        for (Long agentId : application.getConfig().getAgentIds()) {
           agentQuery.findAndCheck(agentId);
         }
       }
@@ -60,6 +66,19 @@ public class ApplicationCmdImpl extends CommCmd<AIApplication, Long> implements 
       @Override
       protected AIApplication process() {
         insert0(application);
+        // 保存智能体绑定（以 applicationId 关联）
+        Long defaultId = application.getConfig().getDefaultAgentId() != null
+            && application.getConfig().getAgentIds().contains(application.getConfig().getDefaultAgentId())
+            ? application.getConfig().getDefaultAgentId() : application.getConfig().getAgentIds().get(0);
+        int sortOrder = 0;
+        for (Long agentId : application.getConfig().getAgentIds()) {
+          ApplicationAgent binding = new ApplicationAgent()
+              .setApplicationId(application.getId())
+              .setAgentId(agentId)
+              .setIsDefault(agentId.equals(defaultId))
+              .setSortOrder(sortOrder++);
+          applicationAgentRepo.save(binding);
+        }
         return application;
       }
     }.execute();
@@ -87,7 +106,18 @@ public class ApplicationCmdImpl extends CommCmd<AIApplication, Long> implements 
         }
 
         AIApplication newApplication = toDuplicateApplication(newName, applicationDb);
-        return applicationRepo.save(newApplication);
+        AIApplication saved = applicationRepo.save(newApplication);
+        // 复制智能体绑定
+        for (ApplicationAgent src : applicationAgentRepo.findByApplicationIdOrderBySortOrderAsc(sourceId)) {
+          ApplicationAgent binding = new ApplicationAgent()
+              .setId(uidGenerator.getUID())
+              .setApplicationId(saved.getId())
+              .setAgentId(src.getAgentId())
+              .setIsDefault(src.getIsDefault())
+              .setSortOrder(src.getSortOrder());
+          applicationAgentRepo.save(binding);
+        }
+        return saved;
       }
     }.execute();
   }
@@ -116,7 +146,7 @@ public class ApplicationCmdImpl extends CommCmd<AIApplication, Long> implements 
       @Override
       protected AIApplication process() {
         // 设置关联资源ID（冗余字段）
-        updateAssociatedIds(application.getConfig(), applicationDb);
+        updateAssociatedIds(application.getConfig(), applicationDb.getId(), applicationAgentRepo);
 
         update(application, applicationDb);
         return applicationDb;
@@ -146,7 +176,7 @@ public class ApplicationCmdImpl extends CommCmd<AIApplication, Long> implements 
         applicationDb.setConfig(config);
 
         // 设置关联资源ID（冗余字段）
-        updateAssociatedIds(config, applicationDb);
+        updateAssociatedIds(config, applicationDb.getId(), applicationAgentRepo);
         return applicationRepo.save(applicationDb);
       }
     }.execute();
@@ -202,6 +232,7 @@ public class ApplicationCmdImpl extends CommCmd<AIApplication, Long> implements 
     new BizTemplate<Void>() {
       @Override
       protected Void process() {
+        applicationAgentRepo.deleteByApplicationId(id);
         applicationRepo.deleteById(id);
         return null;
       }

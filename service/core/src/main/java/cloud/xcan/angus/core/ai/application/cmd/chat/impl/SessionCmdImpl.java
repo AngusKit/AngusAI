@@ -59,7 +59,7 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
         // 检查应用和模型是否存在（appId 必填，modelId 可选，默认从 Agent 获取）
         application = applicationQuery.findAndCheck(session.getAppId(), session.getModelId());
         currentModel = application.getCurrentUseMode();
-        agent = agentQuery.findAndCheck(application.getDefaultAgentId());
+        agent = agentQuery.findAndCheck(applicationQuery.getDefaultAgentId(application.getId()));
         // TODO 检查会话配额，默认每个用户应用会话数不超过500，应用总会话不超过10000
       }
 

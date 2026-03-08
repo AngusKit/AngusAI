@@ -35,9 +35,6 @@ public class ApplicationDetailVo extends TenantAuditingVo {
   @Schema(description = "应用状态")
   private ApplicationStatus status;
 
-  @Schema(description = "默认语言")
-  private String language;
-
   @Schema(description = "发布时间")
   private LocalDateTime publishedDate;
 

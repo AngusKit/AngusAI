@@ -18,8 +18,6 @@ export interface ApplicationDetailVo extends TenantAuditingVo {
   category?: ApplicationCategoryEnum;
   /** 应用状态 */
   status?: string;
-  /** 默认语言 */
-  language?: string;
   /**
    * 发布时间
    * @format date-time
@@ -377,11 +375,6 @@ export interface ApplicationCreateDto {
   description?: string;
   /** 应用分类 */
   category: ApplicationCategoryEnum;
-  /**
-   * 默认语言
-   * @example "zh-CN"
-   */
-  language?: string;
 }
 
 /** 应用分享请求参数，访问设置全部为false时，只允许自己访问 */
@@ -436,11 +429,6 @@ export interface ApplicationUpdateDto {
   description?: string;
   /** 应用分类 */
   category?: ApplicationCategoryEnum;
-  /**
-   * 默认语言
-   * @example "zh-CN"
-   */
-  language?: string;
 }
 
 /** 概览统计 */

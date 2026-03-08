@@ -1,7 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.application.facade.internal.assembler;
 
 import cloud.xcan.angus.core.ai.domain.application.AIApplication;
-import cloud.xcan.angus.core.ai.domain.application.ApplicationAgent;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationConfig;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.dto.ApplicationCreateDto;
@@ -28,21 +27,11 @@ public class ApplicationAssembler {
         .setName(dto.getName())
         .setIcon(dto.getIcon())
         .setDescription(dto.getDescription())
-        .setCategory(dto.getCategory())
-        .setLanguage(dto.getLanguage());
+        .setCategory(dto.getCategory());
 
-    // 创建智能体绑定（agentIds 必填，模型/资源/提示词由 Agent 提供）
+    // 智能体绑定由 ApplicationCmdImpl.create 在保存应用后写入 ai_application_agent
     Long defaultId = dto.getDefaultAgentId() != null && dto.getAgentIds().contains(dto.getDefaultAgentId())
         ? dto.getDefaultAgentId() : dto.getAgentIds().get(0);
-    int sortOrder = 0;
-    for (Long agentId : dto.getAgentIds()) {
-      ApplicationAgent binding = new ApplicationAgent()
-          .setAgentId(agentId)
-          .setIsDefault(agentId.equals(defaultId))
-          .setSortOrder(sortOrder++);
-      binding.setApplication(application);
-      application.getAgentBindings().add(binding);
-    }
 
     // 设置默认配置
     ApplicationConfig config = new ApplicationConfig();
@@ -69,8 +58,7 @@ public class ApplicationAssembler {
     application.setIcon(dto.getIcon());
     application.setDescription(dto.getDescription());
     application.setCategory(dto.getCategory());
-    application.setLanguage(dto.getLanguage());
-    // agentBindings 由 updateAssociatedIds 根据 config.agentIds 在 applicationDb 上更新
+    // agentIds 由 updateAssociatedIds 根据 config 在 applicationDb 对应的 ai_application_agent 表更新
     if (dto.getAgentIds() != null && !dto.getAgentIds().isEmpty()) {
       ApplicationConfig config = new ApplicationConfig();
       config.setAgentIds(dto.getAgentIds());
@@ -94,7 +82,7 @@ public class ApplicationAssembler {
   }
 
   public static ApplicationDetailVo toDetailVo(AIApplication application,
-      ResourcesConfigVo resourcesConfigVo) {
+      ResourcesConfigVo resourcesConfigVo, java.util.List<Long> agentIds, Long defaultAgentId) {
     ApplicationDetailVo vo = new ApplicationDetailVo();
     vo.setId(application.getId());
     vo.setName(application.getName());
@@ -102,7 +90,6 @@ public class ApplicationAssembler {
     vo.setDescription(application.getDescription());
     vo.setCategory(application.getCategory());
     vo.setStatus(application.getStatus());
-    vo.setLanguage(application.getLanguage());
     vo.setPublishedDate(application.getPublishedDate());
 
     // 设置审计信息
@@ -115,8 +102,8 @@ public class ApplicationAssembler {
     // 设置配置信息（agentIds、defaultAgentId、conversation、features、security、publish）
     ApplicationConfigVo configVo = new ApplicationConfigVo();
     if (application.getConfig() != null) {
-      configVo.setAgentIds(application.getAgentIds());
-      configVo.setDefaultAgentId(application.getDefaultAgentId());
+      configVo.setAgentIds(agentIds != null ? agentIds : java.util.List.of());
+      configVo.setDefaultAgentId(defaultAgentId);
       CoreUtils.copyProperties(application.getConfig(), configVo);
     }
     configVo.setResources(resourcesConfigVo);
@@ -135,7 +122,8 @@ public class ApplicationAssembler {
     return vo;
   }
 
-  public static ApplicationListVo toListVo(AIApplication application) {
+  public static ApplicationListVo toListVo(AIApplication application,
+      java.util.List<Long> agentIds, Long defaultAgentId) {
     ApplicationListVo vo = new ApplicationListVo();
     vo.setId(application.getId());
     vo.setName(application.getName());
@@ -143,8 +131,8 @@ public class ApplicationAssembler {
     vo.setDescription(application.getDescription());
     vo.setCategory(application.getCategory());
     vo.setStatus(application.getStatus());
-    vo.setAgentIds(application.getAgentIds());
-    vo.setDefaultAgentId(application.getDefaultAgentId());
+    vo.setAgentIds(agentIds != null ? agentIds : java.util.List.of());
+    vo.setDefaultAgentId(defaultAgentId);
     vo.setApiCalls(application.getApiCalls());
     vo.setPublicAccess(application.getPublicAccess());
     vo.setEmbedEnabled(application.getEmbedEnabled());

@@ -483,7 +483,6 @@ export function CreateApplication() {
           category: mapAppTypeToCategory(selectedType),
           agentIds: [selectedAgent.id],
           defaultAgentId: selectedAgent.id,
-          language: 'zh-CN',
         });
         toast.success('应用创建成功！');
         onBack();

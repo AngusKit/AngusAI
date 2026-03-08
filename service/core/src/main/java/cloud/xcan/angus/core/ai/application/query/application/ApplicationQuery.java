@@ -79,4 +79,14 @@ public interface ApplicationQuery {
    */
   Page<AIApplication> findByWorkflowId(Long workflowId, PageRequest pageable);
 
+  /**
+   * 获取应用绑定的默认智能体ID（优先 isDefault=true，否则按 sortOrder 取第一个）
+   */
+  Long getDefaultAgentId(Long applicationId);
+
+  /**
+   * 获取应用绑定的所有智能体ID列表（按 sortOrder 排序）
+   */
+  java.util.List<Long> getAgentIds(Long applicationId);
+
 }

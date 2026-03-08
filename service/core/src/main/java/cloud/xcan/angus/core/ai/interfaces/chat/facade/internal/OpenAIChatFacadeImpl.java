@@ -104,7 +104,7 @@ public class OpenAIChatFacadeImpl implements OpenAIChatFacade {
     }
     if (appId != null) {
       AIApplication app = applicationQuery.findAndCheck(appId);
-      Long defaultAgentId = app.getDefaultAgentId();
+      Long defaultAgentId = applicationQuery.getDefaultAgentId(appId);
       if (defaultAgentId == null) {
         throw ProtocolException.of("应用未绑定智能体，请先配置应用");
       }

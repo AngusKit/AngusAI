@@ -66,10 +66,11 @@ public class MessageFacadeImpl implements MessageFacade {
     // 2. Session → Application → agentId → AgentRegistry.chat
     Session session = sessionQuery.findAndCheck(sessionId);
     AIApplication application = applicationQuery.findAndCheck(session.getAppId());
-    if (application.getDefaultAgentId() == null) {
+    Long defaultAgentId = applicationQuery.getDefaultAgentId(session.getAppId());
+    if (defaultAgentId == null) {
       throw ProtocolException.of("应用未绑定智能体，无法进行对话");
     }
-    String agentIdStr = String.valueOf(application.getDefaultAgentId());
+    String agentIdStr = String.valueOf(defaultAgentId);
     String sessionIdStr = String.valueOf(sessionId);
     String aiResponse = agentRegistry.chat(agentIdStr, sessionIdStr, dto.getContent());
 
@@ -98,10 +99,11 @@ public class MessageFacadeImpl implements MessageFacade {
     // 2. Session → Application → agentId → AgentRegistry.chatStream
     Session session = sessionQuery.findAndCheck(sessionId);
     AIApplication application = applicationQuery.findAndCheck(session.getAppId());
-    if (application.getDefaultAgentId() == null) {
+    Long defaultAgentId = applicationQuery.getDefaultAgentId(session.getAppId());
+    if (defaultAgentId == null) {
       throw ProtocolException.of("应用未绑定智能体，无法进行对话");
     }
-    String agentIdStr = String.valueOf(application.getDefaultAgentId());
+    String agentIdStr = String.valueOf(defaultAgentId);
     String sessionIdStr = String.valueOf(sessionId);
 
     // 3. 创建空的助手消息用于流式更新

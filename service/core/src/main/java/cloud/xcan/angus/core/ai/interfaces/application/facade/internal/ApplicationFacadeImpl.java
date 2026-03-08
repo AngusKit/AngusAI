@@ -69,39 +69,45 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
   public ApplicationDetailVo create(ApplicationCreateDto dto) {
     AIApplication application = ApplicationAssembler.toCreateDomain(dto);
     AIApplication saved = applicationCmd.create(application);
-    return ApplicationAssembler.toDetailVo(saved, getResourcesConfigVo(saved));
+    return ApplicationAssembler.toDetailVo(saved, getResourcesConfigVo(saved.getId()),
+        applicationQuery.getAgentIds(saved.getId()), applicationQuery.getDefaultAgentId(saved.getId()));
   }
 
   @Override
   public ApplicationDetailVo duplicate(Long id, ApplicationDuplicateDto dto) {
     AIApplication saved = applicationCmd.duplicate(id, dto.getName());
-    return ApplicationAssembler.toDetailVo(saved, getResourcesConfigVo(saved));
+    return ApplicationAssembler.toDetailVo(saved, getResourcesConfigVo(saved.getId()),
+        applicationQuery.getAgentIds(saved.getId()), applicationQuery.getDefaultAgentId(saved.getId()));
   }
 
   @Override
   public ApplicationDetailVo update(Long id, ApplicationUpdateDto dto) {
     AIApplication application = ApplicationAssembler.toUpdateDomain(id, dto);
     AIApplication saved = applicationCmd.update(application);
-    return ApplicationAssembler.toDetailVo(saved, getResourcesConfigVo(saved));
+    return ApplicationAssembler.toDetailVo(saved, getResourcesConfigVo(saved.getId()),
+        applicationQuery.getAgentIds(saved.getId()), applicationQuery.getDefaultAgentId(saved.getId()));
   }
 
   @Override
   public ApplicationDetailVo updateConfig(Long id, ApplicationConfig config) {
     AIApplication saved = applicationCmd.updateConfig(id, config);
-    return ApplicationAssembler.toDetailVo(saved, getResourcesConfigVo(saved));
+    return ApplicationAssembler.toDetailVo(saved, getResourcesConfigVo(saved.getId()),
+        applicationQuery.getAgentIds(saved.getId()), applicationQuery.getDefaultAgentId(saved.getId()));
   }
 
   @Override
   public ApplicationDetailVo modifyStatus(Long id, ApplicationStatus status) {
     AIApplication saved = applicationCmd.modifyStatus(id, status);
-    return ApplicationAssembler.toDetailVo(saved, getResourcesConfigVo(saved));
+    return ApplicationAssembler.toDetailVo(saved, getResourcesConfigVo(saved.getId()),
+        applicationQuery.getAgentIds(saved.getId()), applicationQuery.getDefaultAgentId(saved.getId()));
   }
 
   @Override
   public ApplicationDetailVo share(Long id, ApplicationShareDto dto) {
     AIApplication application = ApplicationAssembler.shareDomain(id, dto);
     AIApplication saved = applicationCmd.share(application);
-    return ApplicationAssembler.toDetailVo(saved, getResourcesConfigVo(saved));
+    return ApplicationAssembler.toDetailVo(saved, getResourcesConfigVo(saved.getId()),
+        applicationQuery.getAgentIds(saved.getId()), applicationQuery.getDefaultAgentId(saved.getId()));
   }
 
   @Override
@@ -113,7 +119,8 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
   @Override
   public ApplicationDetailVo getDetail(Long id) {
     AIApplication saved = applicationQuery.findAndCheck(id);
-    return ApplicationAssembler.toDetailVo(saved, getResourcesConfigVo(saved));
+    return ApplicationAssembler.toDetailVo(saved, getResourcesConfigVo(id),
+        applicationQuery.getAgentIds(id), applicationQuery.getDefaultAgentId(id));
   }
 
   @NameJoin
@@ -122,7 +129,8 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
     GenericSpecification<AIApplication> spec = ApplicationAssembler.getSpecification(dto);
     Page<AIApplication> page = applicationQuery.find(spec, dto.tranPage(),
         dto.fullTextSearch, getMatchSearchFields(dto.getClass()));
-    return buildVoPageResult(page, ApplicationAssembler::toListVo);
+    return buildVoPageResult(page, app -> ApplicationAssembler.toListVo(app,
+        applicationQuery.getAgentIds(app.getId()), applicationQuery.getDefaultAgentId(app.getId())));
   }
 
   @Override
@@ -135,9 +143,9 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
     return statistics;
   }
 
-  private ResourcesConfigVo getResourcesConfigVo(AIApplication saved) {
+  private ResourcesConfigVo getResourcesConfigVo(Long applicationId) {
     ResourcesConfigVo vo = new ResourcesConfigVo();
-    Long defaultAgentId = saved.getDefaultAgentId();
+    Long defaultAgentId = applicationQuery.getDefaultAgentId(applicationId);
     if (defaultAgentId == null) {
       return vo;
     }

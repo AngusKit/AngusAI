@@ -4,7 +4,6 @@ import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_DESC_LENGTH;
 import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_DESC_LENGTH_X4;
 import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_NAME_LENGTH;
 
-import cloud.xcan.angus.core.ai.domain.Constants;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationCategory;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
@@ -41,8 +40,4 @@ public class ApplicationCreateDto {
 
   @Schema(description = "默认智能体ID（用于对话，不传则取 agentIds 第一个）")
   private Long defaultAgentId;
-
-  @Length(max = Constants.APPLICATION_LANGUAGE_MAX_LENGTH)
-  @Schema(description = "默认语言", example = "zh-CN")
-  private String language = "zh-CN";
 }

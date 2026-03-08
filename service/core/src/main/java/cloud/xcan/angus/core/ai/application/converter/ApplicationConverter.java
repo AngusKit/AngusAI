@@ -2,6 +2,7 @@ package cloud.xcan.angus.core.ai.application.converter;
 
 import cloud.xcan.angus.core.ai.domain.application.AIApplication;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationAgent;
+import cloud.xcan.angus.core.ai.domain.application.ApplicationAgentRepo;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationConfig;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationShare;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
@@ -23,35 +24,28 @@ public class ApplicationConverter {
     newApplication.setIcon(sourceApplication.getIcon());
     newApplication.setDescription(sourceApplication.getDescription());
     newApplication.setCategory(sourceApplication.getCategory());
-    newApplication.setLanguage(sourceApplication.getLanguage());
     newApplication.setConfig(sourceApplication.getConfig());
-    // 复制智能体绑定关系
-    if (sourceApplication.getAgentBindings() != null && !sourceApplication.getAgentBindings().isEmpty()) {
-      for (ApplicationAgent src : sourceApplication.getAgentBindings()) {
-        ApplicationAgent binding = new ApplicationAgent()
-            .setAgentId(src.getAgentId())
-            .setIsDefault(src.getIsDefault())
-            .setSortOrder(src.getSortOrder());
-        binding.setApplication(newApplication);
-        newApplication.getAgentBindings().add(binding);
-      }
-    }
+    // 智能体绑定关系由 ApplicationCmdImpl.duplicate 在保存新应用后根据 sourceBindings 写入
     return newApplication;
   }
 
-  public static void updateAssociatedIds(ApplicationConfig config, AIApplication applicationDb) {
+  /**
+   * 根据 config 更新应用绑定的智能体（先删后增）
+   */
+  public static void updateAssociatedIds(ApplicationConfig config, Long applicationId,
+      ApplicationAgentRepo applicationAgentRepo) {
     if (config != null && config.getAgentIds() != null && !config.getAgentIds().isEmpty()) {
       Long defaultId = config.getDefaultAgentId() != null && config.getAgentIds().contains(config.getDefaultAgentId())
           ? config.getDefaultAgentId() : config.getAgentIds().get(0);
-      applicationDb.getAgentBindings().clear();
+      applicationAgentRepo.deleteByApplicationId(applicationId);
       int sortOrder = 0;
       for (Long agentId : config.getAgentIds()) {
         ApplicationAgent binding = new ApplicationAgent()
+            .setApplicationId(applicationId)
             .setAgentId(agentId)
             .setIsDefault(agentId.equals(defaultId))
             .setSortOrder(sortOrder++);
-        binding.setApplication(applicationDb);
-        applicationDb.getAgentBindings().add(binding);
+        applicationAgentRepo.save(binding);
       }
     }
   }

@@ -10,6 +10,8 @@ import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.domain.application.AIApplication;
 import cloud.xcan.angus.core.ai.domain.application.AIApplicationRepo;
 import cloud.xcan.angus.core.ai.domain.application.AIApplicationSearchRepo;
+import cloud.xcan.angus.core.ai.domain.application.ApplicationAgent;
+import cloud.xcan.angus.core.ai.domain.application.ApplicationAgentRepo;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
 import cloud.xcan.angus.core.ai.domain.model.Model;
 import cloud.xcan.angus.core.biz.BizTemplate;
@@ -19,6 +21,7 @@ import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import cloud.xcan.angus.remote.search.SearchCriteria;
 import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,6 +33,9 @@ public class ApplicationQueryImpl implements ApplicationQuery {
 
   @Resource
   private AIApplicationRepo applicationRepo;
+
+  @Resource
+  private ApplicationAgentRepo applicationAgentRepo;
 
   @Resource
   private AIApplicationSearchRepo applicationSearchRepo;
@@ -63,11 +69,19 @@ public class ApplicationQueryImpl implements ApplicationQuery {
       protected void checkParams() {
         // 检查应用是否存在
         application = findAndCheck(id);
-        if (application.getDefaultAgentId() == null) {
+        Long defaultAgentId = applicationAgentRepo.findByApplicationIdOrderBySortOrderAsc(id).stream()
+            .filter(b -> Boolean.TRUE.equals(b.getIsDefault()))
+            .findFirst()
+            .map(ApplicationAgent::getAgentId)
+            .orElseGet(() -> {
+              List<ApplicationAgent> list = applicationAgentRepo.findByApplicationIdOrderBySortOrderAsc(id);
+              return list.isEmpty() ? null : list.get(0).getAgentId();
+            });
+        if (defaultAgentId == null) {
           throw ProtocolException.of("应用未绑定智能体，请先配置应用");
         }
         // 从绑定的智能体获取模型
-        agent = agentQuery.findAndCheck(application.getDefaultAgentId());
+        agent = agentQuery.findAndCheck(defaultAgentId);
         if (nonNull(agent.getDefaultModelId())) {
           appDefaultModel = modelQuery.findAndCheck(agent.getDefaultModelId());
         }
@@ -171,6 +185,26 @@ public class ApplicationQueryImpl implements ApplicationQuery {
     GenericSpecification<AIApplication> specification = new GenericSpecification<>(
         SearchCriteria.criteria(SearchCriteria.equal("datasetId", datasetId)));
     return applicationRepo.findAll(specification, pageable);
+  }
+
+  @Override
+  public Long getDefaultAgentId(Long applicationId) {
+    List<ApplicationAgent> list = applicationAgentRepo.findByApplicationIdOrderBySortOrderAsc(applicationId);
+    if (list.isEmpty()) {
+      return null;
+    }
+    return list.stream()
+        .filter(b -> Boolean.TRUE.equals(b.getIsDefault()))
+        .findFirst()
+        .map(ApplicationAgent::getAgentId)
+        .orElse(list.get(0).getAgentId());
+  }
+
+  @Override
+  public List<Long> getAgentIds(Long applicationId) {
+    return applicationAgentRepo.findByApplicationIdOrderBySortOrderAsc(applicationId).stream()
+        .map(ApplicationAgent::getAgentId)
+        .toList();
   }
 
   @Override
