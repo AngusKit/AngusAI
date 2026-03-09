@@ -18,31 +18,31 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
   const location = useLocation();
 
   const mainMenuItems = [
-    { id: 'home', icon: Home, label: t('nav.dashboard') },
-    { id: 'chat', icon: MessageSquare, label: t('nav.chat') },
-    { id: 'apps', icon: FileText, label: t('nav.myApps'), badge: '12' },
-    { id: 'workflow', icon: Workflow, label: t('nav.workflow') },
-    { id: 'knowledge', icon: BookOpen, label: t('nav.knowledge') },
-    { id: 'dataset', icon: Database, label: t('nav.dataset') },
-    { id: 'api-collection', icon: Code2, label: t('nav.apiCollection') },
-    { id: 'prompts', icon: Sparkles, label: t('nav.prompts') },
+    { id: 'home', icon: Home, label: t('sidebar.nav.dashboard') },
+    { id: 'chat', icon: MessageSquare, label: t('sidebar.nav.chat') },
+    { id: 'apps', icon: FileText, label: t('sidebar.nav.apps'), badge: '12' },
+    { id: 'agents', icon: Bot, label: t('sidebar.nav.agents') },
+    { id: 'workflow', icon: Workflow, label: t('sidebar.nav.workflow') },
+    { id: 'knowledge', icon: BookOpen, label: t('sidebar.nav.knowledge') },
+    { id: 'dataset', icon: Database, label: t('sidebar.nav.dataset') },
+    { id: 'api-collection', icon: Code2, label: t('sidebar.nav.apiCollection') },
+    { id: 'prompts', icon: Sparkles, label: t('sidebar.nav.prompts') },
   ];
 
   const teamMenuItems = [
-    { id: 'team-members', icon: Users, label: t('nav.members') },
-    { id: 'resource-sharing', icon: Share2, label: t('nav.sharing') },
-    { id: 'notifications', icon: Bell, label: t('nav.notifications') },
-    { id: 'activity-log', icon: Activity, label: t('nav.activityLog') },
+    { id: 'team-members', icon: Users, label: t('sidebar.nav.members') },
+    { id: 'resource-sharing', icon: Share2, label: t('sidebar.nav.sharing') },
+    { id: 'notifications', icon: Bell, label: t('sidebar.nav.notifications') },
+    { id: 'activity-log', icon: Activity, label: t('sidebar.nav.activityLog') },
   ];
 
   const systemMenuItems = [
     { id: 'usage-analytics', icon: BarChart3, label: t('analytics.title') },
-    { id: 'plugins', icon: Package, label: t('nav.plugins') },
-    { id: 'agents', icon: Bot, label: t('nav.agents') },
-    { id: 'models', icon: Settings, label: t('nav.models') },
-    { id: 'vector-store', icon: Server, label: t('nav.vectorStore') },
-    { id: 'api-keys', icon: Key, label: t('nav.apiKeys') },
-    { id: 'billing', icon: CreditCard, label: t('nav.billing') },
+    { id: 'plugins', icon: Package, label: t('sidebar.nav.plugins') },
+    { id: 'models', icon: Settings, label: t('sidebar.nav.models') },
+    { id: 'vector-store', icon: Server, label: t('sidebar.nav.vectorStore') },
+    { id: 'api-keys', icon: Key, label: t('sidebar.nav.apiKeys') },
+    { id: 'billing', icon: CreditCard, label: t('sidebar.nav.billing') },
   ];
 
   const getIsActive = (id: string) => {
@@ -134,13 +134,13 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
                 {mainMenuItems.map((item) => renderMenuItem(item))}
               </div>
               <div className="px-2 py-1.5 mb-1 mt-4">
-                <span className="text-xs text-gray-500 dark:text-gray-400">{t('nav.team')}</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">{t('sidebar.nav.team')}</span>
               </div>
               <div className="my-1 space-y-0.5">
                 {teamMenuItems.map((item) => renderMenuItem(item))}
               </div>
               <div className="px-2 py-1.5 mb-1 mt-4">
-                <span className="text-xs text-gray-500 dark:text-gray-400">{t('nav.system')}</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">{t('sidebar.nav.system')}</span>
               </div>
               <div className="my-1 space-y-0.5">
                 {systemMenuItems.map((item) => renderMenuItem(item))}
