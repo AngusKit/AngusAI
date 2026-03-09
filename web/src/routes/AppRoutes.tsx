@@ -4,6 +4,8 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { Home } from '@/pages/home';
 import { CreateApplication } from '@/pages/applications/CreateApplication';
 import { MyApplications } from '@/pages/applications/MyApplications';
+import { ApplicationDetailPage } from '@/pages/applications/ApplicationDetailPage';
+import { EditApplicationPage } from '@/pages/applications/EditApplicationPage';
 import { Workflow } from '@/pages/workflow/Workflow';
 import { WorkflowDesignPage } from '@/pages/workflow/WorkflowDesignPage';
 import { WorkflowDetailPage } from '@/pages/workflow/WorkflowDetailPage';
@@ -36,6 +38,9 @@ export function AppRoutes() {
       <Route path='/' element={<MainLayout />}>
         <Route path='home' element={<Home />} />
         <Route path='apps' element={<MyApplications />} />
+        <Route path='apps/create' element={<CreateApplication />} />
+        <Route path='apps/:id' element={<ApplicationDetailPage />} />
+        <Route path='apps/:id/edit' element={<EditApplicationPage />} />
         <Route path='create-app' element={<CreateApplication />} />
         <Route path='workflow' element={<Workflow />} />
         <Route path='workflow/:id' element={<WorkflowDetailPage />} />

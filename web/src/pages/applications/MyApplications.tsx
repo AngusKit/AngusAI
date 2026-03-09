@@ -8,7 +8,6 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink, Paginati
 import { useState, useEffect } from 'react';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { toast } from 'sonner';
-import { EditApplicationDialog } from './EditApplicationDialog';
 import { ShareApplicationDialog } from './ShareApplicationDialog';
 import Applications from '@/services/Applications';
 import { ApplicationDetailVo } from '@/services/ApplicationsTypes';
@@ -42,7 +41,6 @@ export function MyApplications() {
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12;
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
   const [applications, setApplications] = useState<Application[]>([]);
@@ -164,8 +162,8 @@ export function MyApplications() {
     setCurrentPage(1);
   };
 
-  const handleAppClick = (appName: string) => {
-    toast.success(`打开应用: ${appName}`);
+  const handleAppClick = (app: Application) => {
+    navigate(`/apps/${app.id}`);
   };
 
   const handleStarToggle = async (e: React.MouseEvent, appId: string) => {
@@ -202,8 +200,7 @@ export function MyApplications() {
   };
 
   const handleEdit = (app: Application) => {
-    setSelectedApp(app);
-    setEditDialogOpen(true);
+    navigate(`/apps/${app.id}/edit`);
   };
 
   const handleShare = (app: Application) => {
@@ -214,34 +211,6 @@ export function MyApplications() {
   const handleSettings = (app: Application) => {
     setSelectedApp(app);
     handleNavigate('individual-app-settings');
-  };
-
-  const handleSaveEdit = async (updatedData: Partial<Application>) => {
-    if (!selectedApp) return;
-
-    try {
-      // 构建更新数据
-      const updateDto: any = {};
-      if (updatedData.name !== undefined) updateDto.name = updatedData.name;
-      if (updatedData.description !== undefined) updateDto.description = updatedData.description;
-      if (updatedData.tags !== undefined) updateDto.tags = updatedData.tags;
-      if (updatedData.agentIds !== undefined) updateDto.agentIds = updatedData.agentIds;
-      if (updatedData.defaultAgentId !== undefined) updateDto.defaultAgentId = updatedData.defaultAgentId;
-
-      await Applications.updateApplication(selectedApp.id, updateDto);
-
-      // 更新本地状态
-      setApplications(prev => prev.map(app => (app.id === selectedApp.id ? { ...app, ...updatedData } : app)));
-
-      toast.success('应用已更新');
-      setEditDialogOpen(false);
-
-      // 重新加载列表
-      await loadApplications();
-    } catch (error: any) {
-      console.error('Failed to update application:', error);
-      toast.error(error?.data?.message || error?.message || '更新应用失败');
-    }
   };
 
   const handleMoreAction = async (action: string, appId: string, appName: string) => {
@@ -435,7 +404,7 @@ export function MyApplications() {
             </button>
           </div>
 
-          <Button size='sm' className='bg-blue-500 hover:bg-blue-600 text-white' onClick={() => handleNavigate('create-app')}>
+          <Button size='sm' className='bg-blue-500 hover:bg-blue-600 text-white' onClick={() => navigate('/apps/create')}>
             <Plus className='w-4 h-4 mr-2' />
             新建应用
           </Button>
@@ -457,7 +426,7 @@ export function MyApplications() {
             return (
               <div
                 key={app.id}
-                onClick={() => handleAppClick(app.name)}
+                onClick={() => handleAppClick(app)}
                 className='bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 hover:shadow-md dark:hover:shadow-gray-900/50 transition-shadow cursor-pointer group'
               >
                 <div className='flex items-center gap-4'>
@@ -641,7 +610,7 @@ export function MyApplications() {
           return (
             <div
               key={app.id}
-              onClick={() => handleAppClick(app.name)}
+              onClick={() => handleAppClick(app)}
               className='bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md dark:hover:shadow-gray-900/50 transition-shadow cursor-pointer group'
             >
               {/* Header */}
@@ -863,21 +832,13 @@ export function MyApplications() {
             {searchQuery ? `没有找到包含"${searchQuery}"的应用` : '开始创建您的第一个AI应用'}
           </p>
           {!searchQuery && (
-            <Button className='bg-blue-500 hover:bg-blue-600 text-white' onClick={() => handleNavigate('create-app')}>
+            <Button className='bg-blue-500 hover:bg-blue-600 text-white' onClick={() => navigate('/apps/create')}>
               <Plus className='w-4 h-4 mr-2' />
               创建应用
             </Button>
           )}
         </div>
       )}
-
-      {/* 编辑对话框 */}
-      <EditApplicationDialog
-        open={editDialogOpen}
-        onOpenChange={setEditDialogOpen}
-        application={selectedApp}
-        onSave={handleSaveEdit}
-      />
 
       {/* 分享对话框 */}
       <ShareApplicationDialog open={shareDialogOpen} onOpenChange={setShareDialogOpen} application={selectedApp} />

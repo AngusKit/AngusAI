@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
-import { Settings, Info, Zap, Database, MessageSquare, Puzzle, Shield, Key, Rocket, Save, Upload, Image as ImageIcon, Globe, Languages, Thermometer, Hash, BarChart, MessageCircle, FileText, Mic, Paperclip, Code, Lock, Eye, Copy, RefreshCw, CheckCircle, XCircle, AlertCircle, ChevronRight, Trash2, Plus, X, Search, MoreVertical, Clock, Users, GitBranch, ArrowLeft, } from 'lucide-react';
+import { Settings, Info, Puzzle, Shield, Key, Rocket, Save, Image as ImageIcon, Globe, Languages, Mic, Paperclip, Code, Lock, ArrowLeft, MessageSquare, } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -11,33 +11,9 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
-import { Slider } from '@/components/ui/slider';
 import { toast } from 'sonner';
 import { copyToClipboard } from '../../lib/clipboard';
 import { useNavigate } from 'react-router-dom';
-
-interface KnowledgeBaseItem {
-  id: number;
-  name: string;
-  documentsCount: number;
-  enabled: boolean;
-}
-
-interface DatasetItem {
-  id: number;
-  name: string;
-  type: string;
-  dataCount: string;
-  enabled: boolean;
-}
-
-interface WorkflowItem {
-  id: number;
-  name: string;
-  type: string;
-  nodesCount: number;
-  enabled: boolean;
-}
 
 interface APIKey {
   id: number;
@@ -59,75 +35,6 @@ export function AppSettingsPage() {
   const [description, setDescription] = useState('基于AI的智能客服应用，提供24/7在线服务');
   const [category, setCategory] = useState('chatbot');
   const [language, setLanguage] = useState('zh-CN');
-
-  // 模型配置
-  const [selectedModel, setSelectedModel] = useState('gpt-4');
-  const [temperature, setTemperature] = useState([0.7]);
-  const [maxTokens, setMaxTokens] = useState([2048]);
-  const [topP, setTopP] = useState([0.9]);
-  const [frequencyPenalty, setFrequencyPenalty] = useState([0]);
-  const [presencePenalty, setPresencePenalty] = useState([0]);
-
-  // 知识库
-  const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeBaseItem[]>([
-    { id: 1, name: '产品知识库', documentsCount: 128, enabled: true },
-    { id: 2, name: '常见问题', documentsCount: 64, enabled: false },
-    { id: 3, name: '技术文档', documentsCount: 256, enabled: false },
-  ]);
-
-  // 数据集
-  const [datasets, setDatasets] = useState<DatasetItem[]>([
-    {
-      id: 1,
-      name: '客户对话数据集',
-      type: '文本',
-      dataCount: '12.5K 条',
-      enabled: true,
-    },
-    {
-      id: 2,
-      name: '技术问答集',
-      type: '表格',
-      dataCount: '5.2K 条',
-      enabled: false,
-    },
-    {
-      id: 3,
-      name: '产品评价数据集',
-      type: '文本',
-      dataCount: '18.7K 条',
-      enabled: false,
-    },
-  ]);
-
-  // 工作流
-  const [workflows, setWorkflows] = useState<WorkflowItem[]>([
-    {
-      id: 1,
-      name: '客服问答流程',
-      type: '多轮对话流（记忆）',
-      nodesCount: 8,
-      enabled: true,
-    },
-    {
-      id: 2,
-      name: '内容审核流程',
-      type: '单轮任务流',
-      nodesCount: 5,
-      enabled: false,
-    },
-    {
-      id: 3,
-      name: '数据处理流程',
-      type: '单轮任务流',
-      nodesCount: 12,
-      enabled: false,
-    },
-  ]);
-
-  // 提示词设置
-  const [systemPrompt, setSystemPrompt] = useState('你是一个专业的客服助手，请礼貌、专业地回答用户的问题。');
-  const [contextPrompt, setContextPrompt] = useState('');
 
   // 功能设置
   const [enableFileUpload, setEnableFileUpload] = useState(true);
@@ -173,18 +80,6 @@ export function AppSettingsPage() {
     toast.success('基本信息已保存');
   };
 
-  const handleSaveModelConfig = () => {
-    toast.success('模型配置已保存');
-  };
-
-  const handleSaveKnowledgeBase = () => {
-    toast.success('知识库配置已保存');
-  };
-
-  const handleSavePrompt = () => {
-    toast.success('提示词设置已保存');
-  };
-
   const handleSaveFeatures = () => {
     toast.success('功能设置已保存');
   };
@@ -196,19 +91,6 @@ export function AppSettingsPage() {
   const handleSavePublish = () => {
     toast.success('发布设置已保存');
   };
-
-  const handleToggleKnowledgeBase = (id: number) => {
-    setKnowledgeBases(prev => prev.map(kb => ({ ...kb, enabled: kb.id === id })));
-  };
-
-  const handleToggleDataset = (id: number) => {
-    setDatasets(prev => prev.map(ds => ({ ...ds, enabled: ds.id === id })));
-  };
-
-  const handleToggleWorkflow = (id: number) => {
-    setWorkflows(prev => prev.map(wf => (wf.id === id ? { ...wf, enabled: !wf.enabled } : wf)));
-  };
-
 
   const handleCopyKey = (key: string) => {
     copyToClipboard(key);
@@ -245,22 +127,10 @@ export function AppSettingsPage() {
       </div>
 
       <Tabs defaultValue='basic' className='mt-4'>
-        <TabsList className='grid grid-cols-4 lg:grid-cols-8 gap-2 h-auto dark:bg-gray-800'>
+        <TabsList className='grid grid-cols-4 lg:grid-cols-5 gap-2 h-auto dark:bg-gray-800'>
           <TabsTrigger value='basic' className='dark:data-[state=active]:bg-gray-700'>
             <Info className='w-4 h-4 mr-1' />
             基本信息
-          </TabsTrigger>
-          <TabsTrigger value='model' className='dark:data-[state=active]:bg-gray-700'>
-            <Zap className='w-4 h-4 mr-1' />
-            模型配置
-          </TabsTrigger>
-          <TabsTrigger value='knowledge' className='dark:data-[state=active]:bg-gray-700'>
-            <Database className='w-4 h-4 mr-1' />
-            知识库
-          </TabsTrigger>
-          <TabsTrigger value='prompt' className='dark:data-[state=active]:bg-gray-700'>
-            <MessageSquare className='w-4 h-4 mr-1' />
-            提示词
           </TabsTrigger>
           <TabsTrigger value='features' className='dark:data-[state=active]:bg-gray-700'>
             <Puzzle className='w-4 h-4 mr-1' />
@@ -339,177 +209,6 @@ export function AppSettingsPage() {
                 <Button onClick={handleSaveBasicInfo} className='dark:bg-blue-600 dark:hover:bg-blue-700'>
                   <Save className='w-4 h-4 mr-2' />
                   保存基本信息
-                </Button>
-              </div>
-            </div>
-          </Card>
-        </TabsContent>
-
-        {/* 模型配置 */}
-        <TabsContent value='model' className='space-y-4 mt-4'>
-          <Card className='p-6 dark:bg-gray-800 dark:border-gray-700'>
-            <div className='space-y-6'>
-              <div>
-                <Label className='dark:text-gray-200'>AI 模型</Label>
-                <Select value={selectedModel} onValueChange={setSelectedModel}>
-                  <SelectTrigger className='mt-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white'>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
-                    <SelectItem value='gpt-4'>GPT-4</SelectItem>
-                    <SelectItem value='gpt-4-turbo'>GPT-4 Turbo</SelectItem>
-                    <SelectItem value='gpt-3.5-turbo'>GPT-3.5 Turbo</SelectItem>
-                    <SelectItem value='claude-3'>Claude 3</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <Separator className='dark:bg-gray-700' />
-
-              <div>
-                <div className='flex justify-between items-center mb-2'>
-                  <Label className='dark:text-gray-200'>
-                    <Thermometer className='w-4 h-4 inline mr-1' />
-                    Temperature (创造性)
-                  </Label>
-                  <span className='text-sm dark:text-gray-400'>{temperature[0]}</span>
-                </div>
-                <Slider
-                  value={temperature}
-                  onValueChange={setTemperature}
-                  min={0}
-                  max={2}
-                  step={0.1}
-                  className='mt-2'
-                />
-                <p className='text-xs text-gray-500 dark:text-gray-400 mt-1'>
-                  较低的值使输出更确定，较高的值使输出更随机
-                </p>
-              </div>
-
-              <div>
-                <div className='flex justify-between items-center mb-2'>
-                  <Label className='dark:text-gray-200'>
-                    <Hash className='w-4 h-4 inline mr-1' />
-                    Max Tokens (最大长度)
-                  </Label>
-                  <span className='text-sm dark:text-gray-400'>{maxTokens[0]}</span>
-                </div>
-                <Slider
-                  value={maxTokens}
-                  onValueChange={setMaxTokens}
-                  min={256}
-                  max={4096}
-                  step={256}
-                  className='mt-2'
-                />
-              </div>
-
-              <div>
-                <div className='flex justify-between items-center mb-2'>
-                  <Label className='dark:text-gray-200'>Top P (采样)</Label>
-                  <span className='text-sm dark:text-gray-400'>{topP[0]}</span>
-                </div>
-                <Slider value={topP} onValueChange={setTopP} min={0} max={1} step={0.1} className='mt-2' />
-              </div>
-
-              <div className='flex justify-end pt-4'>
-                <Button onClick={handleSaveModelConfig} className='dark:bg-blue-600 dark:hover:bg-blue-700'>
-                  <Save className='w-4 h-4 mr-2' />
-                  保存模型配置
-                </Button>
-              </div>
-            </div>
-          </Card>
-        </TabsContent>
-
-        {/* 知识库 */}
-        <TabsContent value='knowledge' className='space-y-4 mt-4'>
-          <Card className='p-6 dark:bg-gray-800 dark:border-gray-700'>
-            <div className='space-y-4'>
-              <div className='flex justify-between items-center'>
-                <div>
-                  <h3 className='dark:text-white'>知识库选择</h3>
-                  <p className='text-sm text-gray-500 dark:text-gray-400'>选择一个知识库作为应用的知识来源</p>
-                </div>
-                <Button variant='outline' size='sm' className='dark:border-gray-600 dark:text-gray-300'>
-                  <Plus className='w-4 h-4 mr-1' />
-                  新建知识库
-                </Button>
-              </div>
-
-              <div className='space-y-2'>
-                {knowledgeBases.map(kb => (
-                  <div
-                    key={kb.id}
-                    className={`p-4 rounded-lg border cursor-pointer transition-colors ${
-                      kb.enabled
-                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-600'
-                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-                    }`}
-                    onClick={() => handleToggleKnowledgeBase(kb.id)}
-                  >
-                    <div className='flex items-center justify-between'>
-                      <div className='flex items-center gap-3'>
-                        <div
-                          className={`p-2 rounded-lg ${kb.enabled ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-gray-100 dark:bg-gray-800'}`}
-                        >
-                          <Database
-                            className={`w-5 h-5 ${kb.enabled ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'}`}
-                          />
-                        </div>
-                        <div>
-                          <div className='dark:text-white'>{kb.name}</div>
-                          <div className='text-sm text-gray-500 dark:text-gray-400'>{kb.documentsCount} 个文档</div>
-                        </div>
-                      </div>
-                      {kb.enabled && <CheckCircle className='w-5 h-5 text-blue-600 dark:text-blue-400' />}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className='flex justify-end pt-4'>
-                <Button onClick={handleSaveKnowledgeBase} className='dark:bg-blue-600 dark:hover:bg-blue-700'>
-                  <Save className='w-4 h-4 mr-2' />
-                  保存知识库配置
-                </Button>
-              </div>
-            </div>
-          </Card>
-        </TabsContent>
-
-        {/* 提示词 */}
-        <TabsContent value='prompt' className='space-y-4 mt-4'>
-          <Card className='p-6 dark:bg-gray-800 dark:border-gray-700'>
-            <div className='space-y-4'>
-              <div>
-                <Label className='dark:text-gray-200'>系统提示词</Label>
-                <Textarea
-                  value={systemPrompt}
-                  onChange={e => setSystemPrompt(e.target.value)}
-                  placeholder='定义AI的角色和行为...'
-                  rows={6}
-                  className='mt-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white font-mono'
-                />
-                <p className='text-xs text-gray-500 dark:text-gray-400 mt-1'>系统提示词定义了AI的基本行为和角色</p>
-              </div>
-
-              <div>
-                <Label className='dark:text-gray-200'>上下文提示词（可选）</Label>
-                <Textarea
-                  value={contextPrompt}
-                  onChange={e => setContextPrompt(e.target.value)}
-                  placeholder='添加额外的上下文信息...'
-                  rows={4}
-                  className='mt-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white font-mono'
-                />
-              </div>
-
-              <div className='flex justify-end pt-4'>
-                <Button onClick={handleSavePrompt} className='dark:bg-blue-600 dark:hover:bg-blue-700'>
-                  <Save className='w-4 h-4 mr-2' />
-                  保存提示词设置
                 </Button>
               </div>
             </div>
