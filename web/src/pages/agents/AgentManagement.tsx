@@ -278,7 +278,7 @@ export function AgentManagement() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3
-                      className="mb-1 text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+                      className="mb-1 text-blue-600 dark:text-blue-400 cursor-pointer"
                       onClick={(e) => { e.stopPropagation(); navigate(`/agents/${agent.id}`); }}
                     >
                       {agent.name}
@@ -327,7 +327,7 @@ export function AgentManagement() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3
-                      className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+                      className="text-blue-600 dark:text-blue-400 cursor-pointer"
                       onClick={(e) => { e.stopPropagation(); navigate(`/agents/${agent.id}`); }}
                     >
                       {agent.name}

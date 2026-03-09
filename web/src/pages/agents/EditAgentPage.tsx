@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Bot, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Bot, ChevronLeft, ChevronRight, Cpu, Link2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -17,9 +17,7 @@ import Workflows from '@/services/Workflows';
 import ApiCollections from '@/services/ApiCollections';
 import { WorkflowStatusEnum } from '@/enums/enums';
 import type { AgentUpdateDto, AgentDetailVo } from '@/services/AgentsTypes';
-import { ModelListVo } from '@/services/ModelsTypes';
 import {
-  ModelStatusEnum,
   InteractionModeEnum,
   ReasoningStrategyEnum,
   AutonomyLevelEnum,
@@ -32,13 +30,14 @@ import {
   AGENT_SUMMARY_PROMPT_MAX_LENGTH,
 } from './constants';
 import { AgentResourcesSection, type AgentResourcesFormValue } from './AgentResourcesSection';
+import { ModelSelectDialog } from './ModelSelectDialog';
 
 export function EditAgentPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [models, setModels] = useState<ModelListVo[]>([]);
+  const [modelDialogOpen, setModelDialogOpen] = useState(false);
   const [form, setForm] = useState({
     name: '',
     description: '',
@@ -46,6 +45,7 @@ export function EditAgentPage() {
     reasoningStrategy: ReasoningStrategyEnum.FUNCTION_CALLING,
     autonomyLevel: AutonomyLevelEnum.ASSISTANT,
     defaultModelId: undefined as string | undefined,
+    defaultModelName: undefined as string | undefined,
     systemPrompt: '',
     welcomeMessage: '',
     suggestedQuestions: [] as string[],
@@ -62,20 +62,6 @@ export function EditAgentPage() {
       apiCollectionIds: [] as string[],
     } as AgentResourcesFormValue,
   });
-
-  const loadModels = useCallback(async () => {
-    try {
-      const res = await Models.getModelList({
-        status: ModelStatusEnum.ACTIVE,
-        pageNo: 1,
-        pageSize: 100,
-      });
-      const data = (res as any)?.data;
-      setModels(data?.list ?? []);
-    } catch (e) {
-      console.error('Failed to load models:', e);
-    }
-  }, []);
 
   const loadDetail = useCallback(async () => {
     if (!id) return;
@@ -97,11 +83,12 @@ export function EditAgentPage() {
       const apiIds = (d.apiCollectionIds ?? []).map((x: unknown) => String(x));
       const wfId = d.workflowId != null && d.workflowId !== '' ? String(d.workflowId) : null;
 
-      const [kbRes, dsRes, wfRes, apiRes] = await Promise.all([
+      const [kbRes, dsRes, wfRes, apiRes, modelRes] = await Promise.all([
         kbIds.length ? KnowledgeBases.getKnowledgeBaseList({ pageNo: 1, pageSize: 100 }) : null,
         dsIds.length ? Datasets.getDatasetList({ pageNo: 1, pageSize: 100 }) : null,
         wfId ? Workflows.getWorkflowList({ pageNo: 1, pageSize: 100, status: WorkflowStatusEnum.RUNNING }) : null,
         apiIds.length ? ApiCollections.apiCollectionList({ pageNo: 1, pageSize: 100 }) : null,
+        defaultModelId ? Models.getModelList({ pageNo: 1, pageSize: 500 }) : null,
       ]);
 
       const toNameMap = (list: { id?: string; name?: string }[], ids: string[]) =>
@@ -119,6 +106,9 @@ export function EditAgentPage() {
       const wfItem = wfList.find((i: { id?: string }) => i?.id === wfId);
       const wfName = wfItem?.name ?? null;
       const apiNames = toNameMap(apiList, apiIds);
+      const modelList = (modelRes as any)?.data?.list ?? [];
+      const modelItem = modelList.find((m: { id?: string }) => String(m?.id) === String(defaultModelId));
+      const defaultModelName = modelItem?.name ?? undefined;
 
       setForm({
         name: d.name ?? '',
@@ -127,6 +117,7 @@ export function EditAgentPage() {
         reasoningStrategy: (d.reasoningStrategy ?? ReasoningStrategyEnum.FUNCTION_CALLING) as ReasoningStrategyEnum,
         autonomyLevel: (d.autonomyLevel ?? AutonomyLevelEnum.ASSISTANT) as AutonomyLevelEnum,
         defaultModelId,
+        defaultModelName,
         systemPrompt: d.systemPrompt ?? '',
         welcomeMessage: d.welcomeMessage ?? '',
         suggestedQuestions: Array.isArray(d.suggestedQuestions) ? [...d.suggestedQuestions] : [],
@@ -158,10 +149,6 @@ export function EditAgentPage() {
   useEffect(() => {
     loadDetail();
   }, [loadDetail]);
-
-  useEffect(() => {
-    loadModels();
-  }, [loadModels]);
 
   const onBack = () => navigate('/agents');
 
@@ -289,38 +276,20 @@ export function EditAgentPage() {
                   className="mt-2 dark:bg-gray-900 dark:border-gray-700 dark:text-white resize-none"
                 />
               </div>
-              <div>
-                <Label className="dark:text-gray-300">默认模型</Label>
-                <Select
-                  value={form.defaultModelId != null ? String(form.defaultModelId) : '__none__'}
-                  onValueChange={(v) =>
-                    setForm((f) => ({
-                      ...f,
-                      defaultModelId: v && v !== '__none__' ? v : undefined,
-                    }))
-                  }
-                >
-                  <SelectTrigger className="mt-2 dark:bg-gray-900 dark:border-gray-700 dark:text-white">
-                    <SelectValue placeholder="选择默认模型（可选）" />
-                  </SelectTrigger>
-                  <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                    <SelectItem value="__none__" className="dark:text-gray-300">
-                      （不选择）
-                    </SelectItem>
-                    {models
-                      .filter((m) => m.id != null)
-                      .map((m) => (
-                        <SelectItem
-                          key={String(m.id)}
-                          value={String(m.id)}
-                          className="dark:text-gray-300"
-                        >
-                          {m.name ?? m.id}
-                        </SelectItem>
-                      ))}
-                  </SelectContent>
-                </Select>
-                <p className="text-xs text-gray-500 mt-1">可选，支持二次修改</p>
+              <div className="flex items-center justify-between py-3 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <Cpu className="w-5 h-5 text-orange-500 shrink-0" />
+                  <div>
+                    <div className="text-sm font-medium dark:text-white">默认模型</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                      {form.defaultModelName ?? (form.defaultModelId ? String(form.defaultModelId) : '未选择')}
+                    </div>
+                  </div>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => setModelDialogOpen(true)} className="shrink-0">
+                  <Link2 className="w-4 h-4 mr-1" />
+                  关联
+                </Button>
               </div>
             </div>
           </Card>
@@ -556,6 +525,20 @@ export function EditAgentPage() {
           <ChevronRight className="w-4 h-4 ml-1" />
         </Button>
       </div>
+
+      <ModelSelectDialog
+        open={modelDialogOpen}
+        onClose={() => setModelDialogOpen(false)}
+        selectedModelId={form.defaultModelId}
+        selectedModelName={form.defaultModelName}
+        onSelect={(id, name) =>
+          setForm((f) => ({
+            ...f,
+            defaultModelId: id ?? undefined,
+            defaultModelName: name ?? undefined,
+          }))
+        }
+      />
     </div>
   );
 }

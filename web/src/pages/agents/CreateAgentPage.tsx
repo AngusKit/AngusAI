@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Cpu, Link2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -27,10 +27,12 @@ import {
   AGENT_SUMMARY_PROMPT_MAX_LENGTH,
 } from './constants';
 import { AgentResourcesSection, type AgentResourcesFormValue } from './AgentResourcesSection';
+import { ModelSelectDialog } from './ModelSelectDialog';
 
 export function CreateAgentPage() {
   const navigate = useNavigate();
   const [models, setModels] = useState<ModelListVo[]>([]);
+  const [modelDialogOpen, setModelDialogOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
     name: '',
@@ -39,6 +41,7 @@ export function CreateAgentPage() {
     reasoningStrategy: ReasoningStrategyEnum.FUNCTION_CALLING,
     autonomyLevel: AutonomyLevelEnum.ASSISTANT,
     defaultModelId: undefined as string | undefined,
+    defaultModelName: undefined as string | undefined,
     systemPrompt: '',
     welcomeMessage: '',
     suggestedQuestions: [] as string[],
@@ -193,38 +196,20 @@ export function CreateAgentPage() {
                 />
                 <p className="text-xs text-gray-500 mt-1">不超过 800 字</p>
               </div>
-              <div>
-                <Label className="dark:text-gray-300">默认模型</Label>
-                <Select
-                  value={form.defaultModelId != null ? String(form.defaultModelId) : '__none__'}
-                  onValueChange={(v) =>
-                    setForm((f) => ({
-                      ...f,
-                      defaultModelId: v && v !== '__none__' ? v : undefined,
-                    }))
-                  }
-                >
-                  <SelectTrigger className="mt-2 dark:bg-gray-900 dark:border-gray-700 dark:text-white">
-                    <SelectValue placeholder="选择默认模型（可选）" />
-                  </SelectTrigger>
-                  <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                    <SelectItem value="__none__" className="dark:text-gray-300">
-                      （不选择）
-                    </SelectItem>
-                    {models
-                      .filter((m) => m.id != null)
-                      .map((m) => (
-                        <SelectItem
-                          key={String(m.id)}
-                          value={String(m.id)}
-                          className="dark:text-gray-300"
-                        >
-                          {m.name ?? m.id}
-                        </SelectItem>
-                      ))}
-                  </SelectContent>
-                </Select>
-                <p className="text-xs text-gray-500 mt-1">可选，可后续修改</p>
+              <div className="flex items-center justify-between py-3 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <Cpu className="w-5 h-5 text-orange-500 shrink-0" />
+                  <div>
+                    <div className="text-sm font-medium dark:text-white">默认模型</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                      {form.defaultModelName ?? (form.defaultModelId ? String(form.defaultModelId) : '未选择')}
+                    </div>
+                  </div>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => setModelDialogOpen(true)} className="shrink-0">
+                  <Link2 className="w-4 h-4 mr-1" />
+                  关联
+                </Button>
               </div>
             </div>
           </Card>
@@ -460,6 +445,20 @@ export function CreateAgentPage() {
           <ChevronRight className="w-4 h-4 ml-1" />
         </Button>
       </div>
+
+      <ModelSelectDialog
+        open={modelDialogOpen}
+        onClose={() => setModelDialogOpen(false)}
+        selectedModelId={form.defaultModelId}
+        selectedModelName={form.defaultModelName}
+        onSelect={(id, name) =>
+          setForm((f) => ({
+            ...f,
+            defaultModelId: id ?? undefined,
+            defaultModelName: name ?? undefined,
+          }))
+        }
+      />
     </div>
   );
 }

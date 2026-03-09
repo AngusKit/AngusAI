@@ -156,20 +156,36 @@ export function AgentDetailPage() {
       : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400';
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      {/* 顶部操作栏 */}
-      <div className="flex items-center justify-between">
-        <Button variant="ghost" size="sm" onClick={onBack} className="gap-1 -ml-2 text-gray-600 dark:text-gray-400">
-          <ChevronLeft className="w-4 h-4" />
-          返回列表
+    <div className="space-y-6">
+      <div className="flex items-center gap-4">
+        <Button variant="ghost" size="sm" onClick={onBack} className="dark:text-gray-300">
+          <ChevronLeft className="w-4 h-4 mr-1" />
+          返回
         </Button>
-        <div className="flex items-center gap-2">
+      </div>
+
+      <div className="flex items-start justify-between">
+        <div className="flex items-center gap-3">
+          <div className="bg-gradient-to-br from-orange-500 to-orange-600 w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0">
+            <Bot className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h1 className="text-2xl dark:text-white mb-1">{detail.name ?? '--'}</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {detail.description || '智能体详情与配置'}
+            </p>
+            <Badge className={`text-xs mt-2 ${statusColor} border-0`}>
+              {detail.status === 'ACTIVE' ? '已发布' : '离线'}
+            </Badge>
+          </div>
+        </div>
+        <div className="flex gap-2">
           <Button
             variant="outline"
             size="sm"
             onClick={handleToggleStatus}
             disabled={!detail.status}
-            className="dark:bg-gray-800 dark:border-gray-600"
+            className="dark:bg-gray-800 dark:border-gray-700"
           >
             {detail.status === 'ACTIVE' ? <Pause className="w-4 h-4 mr-1.5" /> : <Play className="w-4 h-4 mr-1.5" />}
             {detail.status === 'ACTIVE' ? '下线' : '发布'}
@@ -181,31 +197,38 @@ export function AgentDetailPage() {
         </div>
       </div>
 
-      {/* 基本信息卡片 */}
+      <div className="space-y-6">
+      {/* 基本信息 */}
       <Card className="p-6 dark:bg-gray-800 dark:border-gray-700">
-        <div className="flex items-start gap-5">
-          <div className="bg-gradient-to-br from-orange-500 to-orange-600 w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0">
-            <Bot className="w-7 h-7 text-white" />
+        <h3 className="flex items-center gap-2 text-gray-900 dark:text-white mb-4">
+          <Bot className="w-4 h-4" />
+          基本信息
+        </h3>
+        <div className="space-y-4 pl-6">
+          <div className="space-y-2">
+            <div className="text-xs text-gray-500 dark:text-gray-400">名称</div>
+            <p className="text-sm text-gray-700 dark:text-gray-300">{detail.name ?? '--'}</p>
           </div>
-          <div className="flex-1 min-w-0">
-            <h1 className="text-xl font-semibold dark:text-white mb-1">{detail.name ?? '--'}</h1>
+          <div className="space-y-2">
+            <div className="text-xs text-gray-500 dark:text-gray-400">描述</div>
+            <p className="text-sm text-gray-700 dark:text-gray-300">{detail.description || '--'}</p>
+          </div>
+          <div className="space-y-2">
+            <div className="text-xs text-gray-500 dark:text-gray-400">状态</div>
             <Badge className={`text-xs ${statusColor} border-0`}>
               {detail.status === 'ACTIVE' ? '已发布' : '离线'}
             </Badge>
-            {detail.description && (
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 leading-relaxed">{detail.description}</p>
-            )}
           </div>
         </div>
       </Card>
 
       {/* 对话配置 */}
       <Card className="p-6 dark:bg-gray-800 dark:border-gray-700">
-        <h3 className="flex items-center gap-2 text-base font-medium dark:text-white mb-4">
-          <MessageSquare className="w-4 h-4 text-orange-500" />
+        <h3 className="flex items-center gap-2 text-gray-900 dark:text-white mb-4">
+          <MessageSquare className="w-4 h-4" />
           对话配置
         </h3>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2 pl-6">
           <ConfigItem
             label="默认模型"
             value={modelName ?? (detail.defaultModelId ? String(detail.defaultModelId) : '未选择')}
@@ -269,11 +292,11 @@ export function AgentDetailPage() {
 
       {/* 记忆配置 */}
       <Card className="p-6 dark:bg-gray-800 dark:border-gray-700">
-        <h3 className="flex items-center gap-2 text-base font-medium dark:text-white mb-4">
-          <Brain className="w-4 h-4 text-orange-500" />
+        <h3 className="flex items-center gap-2 text-gray-900 dark:text-white mb-4">
+          <Brain className="w-4 h-4" />
           记忆配置
         </h3>
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-3 pl-6">
           <ConfigItem
             label="记忆策略"
             value={
@@ -303,15 +326,15 @@ export function AgentDetailPage() {
 
       {/* 关联资源 */}
       <Card className="p-6 dark:bg-gray-800 dark:border-gray-700">
-        <h3 className="flex items-center gap-2 text-base font-medium dark:text-white mb-4">
-          <Settings2 className="w-4 h-4 text-orange-500" />
+        <h3 className="flex items-center gap-2 text-gray-900 dark:text-white mb-4">
+          <Settings2 className="w-4 h-4" />
           关联资源
         </h3>
         {(detail.knowledgeBaseIds?.length ?? 0) > 0 ||
         (detail.datasetIds?.length ?? 0) > 0 ||
         detail.workflowId != null ||
         (detail.apiCollectionIds?.length ?? 0) > 0 ? (
-          <div className="space-y-4">
+          <div className="space-y-4 pl-6">
             {detail.knowledgeBaseIds && detail.knowledgeBaseIds.length > 0 && (
               <ResourceSection
                 icon={<BookOpen className="w-4 h-4 text-blue-500" />}
@@ -346,9 +369,10 @@ export function AgentDetailPage() {
             )}
           </div>
         ) : (
-          <p className="text-sm text-gray-500 dark:text-gray-400 py-4">暂无关联资源</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 py-4 pl-6">暂无关联资源</p>
         )}
       </Card>
+      </div>
     </div>
   );
 }

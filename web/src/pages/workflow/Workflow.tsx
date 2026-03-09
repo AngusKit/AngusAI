@@ -522,7 +522,7 @@ export function Workflow() {
                       </div>
                       <div className='flex-1'>
                         <h3
-                          className='mb-1 text-blue-600 dark:text-blue-400 hover:underline cursor-pointer'
+                          className='mb-1 text-blue-600 dark:text-blue-400 cursor-pointer'
                           onClick={e => {
                             e.stopPropagation();
                             navigate(`/workflow/${workflow.id}`);
@@ -615,7 +615,7 @@ export function Workflow() {
                               </div>
                               <div>
                                 <div
-                                  className='text-sm text-blue-600 dark:text-blue-400 hover:underline mb-1'
+                                  className='text-sm text-blue-600 dark:text-blue-400 mb-1 cursor-pointer'
                                   onClick={e => {
                                     e.stopPropagation();
                                     navigate(`/workflow/${workflow.id}`);
