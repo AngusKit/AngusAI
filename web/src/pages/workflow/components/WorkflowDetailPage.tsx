@@ -1,3 +1,7 @@
+/**
+ * 工作流详情页
+ * 展示工作流基本信息，支持编辑、启动/停止
+ */
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button.tsx';

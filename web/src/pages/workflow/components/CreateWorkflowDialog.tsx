@@ -1,3 +1,7 @@
+/**
+ * 新建工作流对话框
+ * 支持选择类型、图标、标签等，创建后可选自动启动
+ */
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { Input } from '@/components/ui/input.tsx';
@@ -112,7 +116,7 @@ export function CreateWorkflowDialog({ open, onOpenChange, onSuccess }: CreateWo
     ];
 
     const index = tag.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
-    return colors[index];
+    return colors[index] ?? colors[0]!;
   };
 
   const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -225,7 +229,7 @@ export function CreateWorkflowDialog({ open, onOpenChange, onSuccess }: CreateWo
 
             <div>
               <Label className='text-sm mb-2 block dark:text-gray-300'>工作流类型</Label>
-              <Select value={workflowType} onValueChange={setWorkflowType}>
+              <Select value={workflowType} onValueChange={v => setWorkflowType(v as WorkflowTypeEnum)}>
                 <SelectTrigger className='dark:bg-gray-800 dark:border-gray-700 dark:text-white'>
                   <SelectValue />
                 </SelectTrigger>

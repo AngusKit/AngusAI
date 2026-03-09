@@ -1,3 +1,7 @@
+/**
+ * 工作流信息弹窗
+ * 查看/编辑工作流基本信息
+ */
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, } from '@/components/ui/dialog.tsx';
 import { Button } from '@/components/ui/button.tsx';

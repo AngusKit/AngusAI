@@ -1,3 +1,7 @@
+/**
+ * 工作流设计器
+ * 基于 ReactFlow 的节点编排，支持保存配置、启动/停止
+ */
 import { useState, useCallback, useEffect } from 'react';
 import ReactFlow, { Node, Edge, Controls, Background, useNodesState, useEdgesState, addEdge, Connection, BackgroundVariant, MiniMap } from 'reactflow';
 import 'reactflow/dist/style.css';

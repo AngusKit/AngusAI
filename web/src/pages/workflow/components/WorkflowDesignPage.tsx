@@ -1,3 +1,7 @@
+/**
+ * 工作流设计页
+ * 承载 WorkflowEditor，提供返回按钮和标题
+ */
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button.tsx';
 import { WorkflowEditor } from './WorkflowEditor.tsx';
