@@ -1,7 +1,6 @@
 import { MessageSquare, Sparkles, HelpCircle, Bot, ChevronLeft, ChevronRight, Check, Code2, Search, Zap, Database, FileText, Users, Send, Palette, Image, Smile, Star, Heart, Briefcase, Coffee, Globe, Bookmark, Cloud, Cpu, Music, Video, Camera, Mail, Phone, Map, Calendar, Bell, Settings, Folder, Archive, Download, Upload, Share2, Lock, Unlock, Eye, EyeOff, Edit, Trash2, Copy, Link, Hash, Percent, TrendingUp, BarChart, PieChart, Activity, Target, Flag, Award, Gift, Rocket, Layers, Command, BookOpen, } from 'lucide-react';
 import Agents from '@/services/Agents';
 import Applications from '@/services/Applications';
-import { ApplicationCategoryEnum } from '@/enums/enums';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -383,13 +382,6 @@ export function CreateApplication() {
     }
   }, [currentStep]);
 
-  const mapAppTypeToCategory = (type: AppType | null): ApplicationCategoryEnum => {
-    if (type === 'chatbot') return ApplicationCategoryEnum.CHATBOT;
-    if (type === 'text-generation') return ApplicationCategoryEnum.CONTENT_CREATION;
-    if (type === 'knowledge') return ApplicationCategoryEnum.KNOWLEDGE_QA;
-    if (type === 'agent') return ApplicationCategoryEnum.AGENT_PROXY;
-    return ApplicationCategoryEnum.CHATBOT;
-  };
 
   const iconToEmoji: Record<IconType, string> = {
     message: '💬',
@@ -480,7 +472,7 @@ export function CreateApplication() {
           name: appName.trim(),
           icon: iconToEmoji[selectedIcon] || '🤖',
           description: appDescription.trim() || undefined,
-          category: mapAppTypeToCategory(selectedType),
+          tags: selectedType ? [selectedType] : [],
           agentIds: [selectedAgent.id],
           defaultAgentId: selectedAgent.id,
         });

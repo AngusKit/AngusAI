@@ -1,7 +1,7 @@
 import { ApiLocaleResult, PageQuery, AI } from '@xcan-angus/infra';
 import { ApplicationConfig, ApplicationCreateDto, ApplicationDetailResult, ApplicationDuplicateDto, ApplicationShareDto, ApplicationStatisticsResult, ApplicationUpdateDto, GetApplicationListOrderByEnum, } from './ApplicationsTypes.ts';
 import http, { ContentType, HttpClient, QueryParamsType, RequestParams } from './HttpClient.ts';
-import { ApplicationCategoryEnum, ApplicationStatusEnum } from '@/enums/enums.ts';
+import { ApplicationStatusEnum } from '@/enums/enums.ts';
 
 export class Applications<SecurityDataType = unknown> {
   http: HttpClient<SecurityDataType>;
@@ -63,8 +63,8 @@ export class Applications<SecurityDataType = unknown> {
    */
   getApplicationList = (
     query?: PageQuery & {
-      /** 分类筛选 */
-      category?: ApplicationCategoryEnum;
+      /** 标签筛选 */
+      tag?: string;
       /** 状态筛选 */
       status?: ApplicationStatusEnum;
       /** 是否公开访问 */

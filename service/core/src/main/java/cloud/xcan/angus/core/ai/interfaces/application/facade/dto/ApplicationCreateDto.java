@@ -3,11 +3,10 @@ package cloud.xcan.angus.core.ai.interfaces.application.facade.dto;
 import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_DESC_LENGTH_X4;
 import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_NAME_LENGTH;
 
-import cloud.xcan.angus.core.ai.domain.application.ApplicationCategory;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.util.List;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
@@ -29,9 +28,9 @@ public class ApplicationCreateDto {
   @Schema(description = "应用描述", example = "这是一个智能助手应用")
   private String description;
 
-  @NotNull
-  @Schema(description = "应用分类", requiredMode = Schema.RequiredMode.REQUIRED)
-  private ApplicationCategory category;
+  @Size(max = 5, message = "最多设置5个标签")
+  @Schema(description = "应用标签（最多5个）")
+  private List<String> tags;
 
   @NotEmpty
   @Schema(description = "绑定的智能体ID列表（必填，每个应用至少绑定一个智能体）", requiredMode = Schema.RequiredMode.REQUIRED)

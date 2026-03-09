@@ -6,9 +6,9 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ApplicationStatusEnum, ApplicationCategoryEnum } from '@/enums/enums';
+import { ApplicationStatusEnum } from '@/enums/enums';
 import Agents from '@/services/Agents';
-import { getEnumDescription, enumToMessages } from '@/enums/utils';
+import { getEnumDescription } from '@/enums/utils';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { MessageSquare, Sparkles, Database, Bot, Code, Zap, Heart, Star, Users, FileText, Calendar, Settings, Bell, Globe, Lock, Mail, Phone, Camera, Image, Music, Video, BookOpen, Briefcase, Coffee, ShoppingCart, CreditCard, Gift, Trophy, Target, Rocket, Lightbulb, Brain, Cpu, Cloud, Server, Terminal, Package, Wrench, Shield, ChevronLeft, ChevronRight, } from 'lucide-react';
 import { toast } from 'sonner';
@@ -21,9 +21,8 @@ interface Application {
   iconBgColor: string;
   status: ApplicationStatusEnum;
   isStarred: boolean;
-  tags: { label: string; color: string }[];
+  tags: string[];
   visits: string;
-  category: ApplicationCategoryEnum;
   agentIds?: string[];
   defaultAgentId?: string;
 }
@@ -97,17 +96,11 @@ const iconOptions = [
   { id: 'shield', icon: Shield, label: '盾牌', bgColor: 'bg-blue-700' },
 ];
 
-const categories = enumToMessages(ApplicationCategoryEnum).map(cat => {
-  return {
-    value: cat.value,
-    label: cat.message,
-  };
-});
-
 export function EditApplicationDialog({ open, onOpenChange, application, onSave }: EditApplicationDialogProps) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [category, setCategory] = useState<ApplicationCategoryEnum>(ApplicationCategoryEnum.CHATBOT);
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState('');
   const [defaultAgentId, setDefaultAgentId] = useState<string | undefined>(undefined);
   const [agentsList, setAgentsList] = useState<{ id: string; name: string }[]>([]);
   const [selectedIconId, setSelectedIconId] = useState('message');
@@ -129,7 +122,8 @@ export function EditApplicationDialog({ open, onOpenChange, application, onSave 
     if (application) {
       setName(application.name);
       setDescription(application.description);
-      setCategory(application.category);
+      setTags(application.tags ?? []);
+      setTagInput('');
       setDefaultAgentId(application.defaultAgentId ?? application.agentIds?.[0]);
       // 找到对应的图标ID
       const iconOption = iconOptions.find(opt => opt.bgColor === application.iconBgColor);
@@ -149,11 +143,15 @@ export function EditApplicationDialog({ open, onOpenChange, application, onSave 
       return;
     }
 
+    if (tags.length > 5) {
+      toast.error('最多设置5个标签');
+      return;
+    }
     const selectedIcon = iconOptions.find(opt => opt.id === selectedIconId);
     onSave({
       name,
       description,
-      category,
+      tags,
       icon: selectedIcon?.icon,
       iconBgColor: selectedIcon?.bgColor,
       agentIds: defaultAgentId ? [defaultAgentId] : undefined,
@@ -240,23 +238,39 @@ export function EditApplicationDialog({ open, onOpenChange, application, onSave 
             </Select>
           </div>
 
-          {/* 应用分类 */}
+          {/* 应用标签 */}
           <div className='space-y-2'>
-            <Label htmlFor='category' className='dark:text-gray-300'>
-              应用分类
+            <Label htmlFor='tags' className='dark:text-gray-300'>
+              应用标签（最多5个）
             </Label>
-            <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger className='dark:bg-gray-900 dark:border-gray-700 dark:text-white'>
-                <SelectValue placeholder='选择分类' />
-              </SelectTrigger>
-              <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
-                {categories.map(cat => (
-                  <SelectItem key={cat.value} value={cat.value} className='dark:text-gray-300'>
-                    {cat.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className='flex flex-wrap gap-2'>
+              {tags.map((t, i) => (
+                <Badge
+                  key={i}
+                  variant='secondary'
+                  className='cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-600'
+                  onClick={() => setTags(prev => prev.filter((_, idx) => idx !== i))}
+                >
+                  {t} ×
+                </Badge>
+              ))}
+              {tags.length < 5 && (
+                <Input
+                  placeholder='输入标签后按回车'
+                  value={tagInput}
+                  onChange={e => setTagInput(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' && tagInput.trim()) {
+                      e.preventDefault();
+                      if (tags.length >= 5) return;
+                      setTags(prev => [...prev, tagInput.trim()]);
+                      setTagInput('');
+                    }
+                  }}
+                  className='w-32 dark:bg-gray-900 dark:border-gray-700 dark:text-white'
+                />
+              )}
+            </div>
           </div>
 
           {/* 应用图标 */}

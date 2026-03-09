@@ -28,7 +28,7 @@ public class ApplicationAssembler {
         .setName(dto.getName())
         .setIcon(dto.getIcon())
         .setDescription(dto.getDescription())
-        .setCategory(dto.getCategory());
+        .setTags(dto.getTags());
 
     // 智能体绑定由 ApplicationCmdImpl.create 在保存应用后写入 ai_application_agent
     Long defaultId = dto.getDefaultAgentId() != null
@@ -59,7 +59,7 @@ public class ApplicationAssembler {
     application.setName(dto.getName());
     application.setIcon(dto.getIcon());
     application.setDescription(dto.getDescription());
-    application.setCategory(dto.getCategory());
+    application.setTags(dto.getTags());
     // agentIds 由 updateAssociatedIds 根据 config 在 applicationDb 对应的 ai_application_agent 表更新
     if (dto.getAgentIds() != null && !dto.getAgentIds().isEmpty()) {
       ApplicationConfig config = new ApplicationConfig();
@@ -91,7 +91,7 @@ public class ApplicationAssembler {
     vo.setName(application.getName());
     vo.setIcon(application.getIcon());
     vo.setDescription(application.getDescription());
-    vo.setCategory(application.getCategory());
+    vo.setTags(application.getTags());
     vo.setStatus(application.getStatus());
     vo.setPublishedDate(application.getPublishedDate());
 
@@ -131,7 +131,7 @@ public class ApplicationAssembler {
     vo.setName(application.getName());
     vo.setIcon(application.getIcon());
     vo.setDescription(application.getDescription());
-    vo.setCategory(application.getCategory());
+    vo.setTags(application.getTags());
     vo.setStatus(application.getStatus());
     vo.setAgents(agents != null ? agents : List.of());
     vo.setDefaultAgent(defaultAgent);
@@ -154,10 +154,10 @@ public class ApplicationAssembler {
     // Build the final filters
     Set<SearchCriteria> filters = new SearchCriteriaBuilder<>(dto)
         .rangeSearchFields("id", "createdDate", "modifiedDate")
-        .orderByFields("id", "createdDate", "modifiedDate", "apiCalls", "category", "status",
+        .orderByFields("id", "createdDate", "modifiedDate", "apiCalls", "status",
             "name")
         .matchSearchFields("name", "description")
-        .inAndNotFields("category", "status", "createdBy")
+        .inAndNotFields("status", "createdBy")
         .build();
     return new GenericSpecification<>(filters);
   }

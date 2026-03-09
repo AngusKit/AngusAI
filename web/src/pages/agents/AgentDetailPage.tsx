@@ -108,9 +108,6 @@ export function AgentDetailPage() {
           </div>
           <div>
             <h1 className="text-2xl dark:text-white mb-1">{detail.name ?? '--'}</h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              {detail.description || '智能体详情与配置'}
-            </p>
             <Badge className={`text-xs mt-2 ${statusColor} border-0`}>
               {detail.status === 'ACTIVE' ? '已发布' : '离线'}
             </Badge>
@@ -149,12 +146,6 @@ export function AgentDetailPage() {
           <div className="space-y-2">
             <div className="text-xs text-gray-500 dark:text-gray-400">描述</div>
             <p className="text-sm text-gray-700 dark:text-gray-300">{detail.description || '--'}</p>
-          </div>
-          <div className="space-y-2">
-            <div className="text-xs text-gray-500 dark:text-gray-400">状态</div>
-            <Badge className={`text-xs ${statusColor} border-0`}>
-              {detail.status === 'ACTIVE' ? '已发布' : '离线'}
-            </Badge>
           </div>
         </div>
       </Card>

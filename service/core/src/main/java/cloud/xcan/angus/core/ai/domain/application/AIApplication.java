@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -38,9 +39,9 @@ public class AIApplication extends TenantAuditingEntity<AIApplication, Long> {
   @Column(name = "description", length = 800)
   private String description;
 
-  @Enumerated(EnumType.STRING)
-  @Column(name = "category", nullable = false)
-  private ApplicationCategory category;
+  @Type(JsonType.class)
+  @Column(columnDefinition = "json", name = "tags")
+  private List<String> tags;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "status", nullable = false)

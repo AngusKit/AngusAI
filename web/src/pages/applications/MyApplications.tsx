@@ -12,17 +12,12 @@ import { EditApplicationDialog } from './EditApplicationDialog';
 import { ShareApplicationDialog } from './ShareApplicationDialog';
 import Applications from '@/services/Applications';
 import { ApplicationDetailVo } from '@/services/ApplicationsTypes';
-import { ApplicationStatusEnum, ApplicationCategoryEnum } from '@/enums/enums';
+import { ApplicationStatusEnum } from '@/enums/enums';
 import { useDebounce } from '@/hooks/useDebounce';
 import { getEnumDescription } from '@/enums/utils';
 import { useNavigate } from 'react-router-dom';
 
 type ViewMode = 'grid' | 'list';
-
-interface Tag {
-  label: string;
-  color: string;
-}
 
 interface Application {
   id: string;
@@ -32,9 +27,8 @@ interface Application {
   iconBgColor: string;
   status: ApplicationStatusEnum;
   isStarred: boolean;
-  tags: Tag[];
+  tags: string[];
   visits: string;
-  category: ApplicationCategoryEnum;
   agentIds?: string[];
   defaultAgentId?: string;
 }
@@ -57,21 +51,11 @@ export function MyApplications() {
   const [totalCount, setTotalCount] = useState(0);
 
 
-  // 图标映射：根据分类或名称返回图标
-  const getIconForApplication = (category?: ApplicationCategoryEnum, name?: string): any => {
-    if (category === ApplicationCategoryEnum.CHATBOT) return MessageSquare;
-    if (category === ApplicationCategoryEnum.KNOWLEDGE_QA) return Database;
-    if (category === ApplicationCategoryEnum.CONTENT_CREATION) return Zap;
-    return Bot;
-  };
+  // 图标映射：默认使用 Bot 图标
+  const getIconForApplication = (): any => Bot;
 
   // 图标背景色映射
-  const getIconBgColor = (category?: ApplicationCategoryEnum): string => {
-    if (category === ApplicationCategoryEnum.CHATBOT) return 'bg-purple-500';
-    if (category === ApplicationCategoryEnum.KNOWLEDGE_QA) return 'bg-green-500';
-    if (category === ApplicationCategoryEnum.CONTENT_CREATION) return 'bg-yellow-500';
-    return 'bg-blue-500';
-  };
+  const getIconBgColor = (): string => 'bg-blue-500';
 
   const handleNavigate = (page: string) => {
     navigate(`/${page}`);
@@ -94,12 +78,6 @@ export function MyApplications() {
         queryParams.status = ApplicationStatusEnum.PAUSED;
       } else if (activeTab === 'draft') {
         queryParams.status = ApplicationStatusEnum.DRAFT;
-      } else if (activeTab === 'chatbot') {
-        queryParams.category = ApplicationCategoryEnum.CHATBOT;
-      } else if (activeTab === 'text-generation') {
-        queryParams.category = ApplicationCategoryEnum.CONTENT_CREATION;
-      } else if (activeTab === 'knowledge') {
-        queryParams.category = ApplicationCategoryEnum.KNOWLEDGE_QA;
       }
 
       const response = await Applications.getApplicationList(queryParams);
@@ -126,13 +104,12 @@ export function MyApplications() {
           id: app.id ?? '',
           name: app.name ?? '',
           description: app.description ?? '',
-          icon: getIconForApplication(app.category, app.name),
-          iconBgColor: getIconBgColor(app.category),
+          icon: getIconForApplication(),
+          iconBgColor: getIconBgColor(),
           status: (app.status as ApplicationStatusEnum) ?? ApplicationStatusEnum.DRAFT,
-          isStarred: false, // API中没有星标字段，默认为false
-          tags: [], // API中没有标签字段，需要从其他地方获取或留空
-          visits: `${app.apiCalls ?? 0} 次调用`, // API中没有调用次数字段，需要从统计接口获取
-          category: app.category ?? ApplicationCategoryEnum.CHATBOT,
+          isStarred: false,
+          tags: app.tags ?? [],
+          visits: `${app.apiCalls ?? 0} 次调用`,
           agentIds: app.agents?.map(a => a.id).filter((id): id is string => !!id) ?? (app as any).agentIds ?? app.config?.agents?.map(a => a.id).filter((id): id is string => !!id) ?? [],
           defaultAgentId: app.defaultAgent?.id ?? (app as any).defaultAgentId ?? app.config?.defaultAgent?.id,
         }));
@@ -172,15 +149,6 @@ export function MyApplications() {
     }
     if (category === 'starred') {
       return applications.filter(app => app.isStarred).length;
-    }
-    if (category === 'chatbot') {
-      return applications.filter(app => app.category === ApplicationCategoryEnum.CHATBOT).length;
-    }
-    if (category === 'text-generation') {
-      return applications.filter(app => app.category === ApplicationCategoryEnum.CONTENT_CREATION).length;
-    }
-    if (category === 'knowledge') {
-      return applications.filter(app => app.category === ApplicationCategoryEnum.KNOWLEDGE_QA).length;
     }
     return 0;
   };
@@ -256,7 +224,7 @@ export function MyApplications() {
       const updateDto: any = {};
       if (updatedData.name !== undefined) updateDto.name = updatedData.name;
       if (updatedData.description !== undefined) updateDto.description = updatedData.description;
-      if (updatedData.category !== undefined) updateDto.category = updatedData.category;
+      if (updatedData.tags !== undefined) updateDto.tags = updatedData.tags;
       if (updatedData.agentIds !== undefined) updateDto.agentIds = updatedData.agentIds;
       if (updatedData.defaultAgentId !== undefined) updateDto.defaultAgentId = updatedData.defaultAgentId;
 
@@ -403,36 +371,6 @@ export function MyApplications() {
           >
             星标 ({getCategoryCount('starred')})
           </button>
-          <button
-            onClick={() => handleTabChange('chatbot')}
-            className={`pb-3 px-1 border-b-2 text-sm whitespace-nowrap transition-colors ${
-              activeTab === 'chatbot'
-                ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300'
-            }`}
-          >
-            聊天助手 ({getCategoryCount('chatbot')})
-          </button>
-          <button
-            onClick={() => handleTabChange('text-generation')}
-            className={`pb-3 px-1 border-b-2 text-sm whitespace-nowrap transition-colors ${
-              activeTab === 'text-generation'
-                ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300'
-            }`}
-          >
-            文本生成 ({getCategoryCount('text-generation')})
-          </button>
-          <button
-            onClick={() => handleTabChange('knowledge')}
-            className={`pb-3 px-1 border-b-2 text-sm whitespace-nowrap transition-colors ${
-              activeTab === 'knowledge'
-                ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300'
-            }`}
-          >
-            知识问答 ({getCategoryCount('knowledge')})
-          </button>
         </div>
       </div>
 
@@ -542,8 +480,8 @@ export function MyApplications() {
                     {/* 标签 */}
                     <div className='flex flex-wrap gap-1.5'>
                       {app.tags.slice(0, 2).map((tag, index) => (
-                        <span key={index} className={`text-xs px-2 py-1 rounded-md ${tag.color} border-0`}>
-                          {tag.label}
+                        <span key={index} className='text-xs px-2 py-1 rounded-md bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400 border-0'>
+                          {tag}
                         </span>
                       ))}
                       {app.tags.length > 2 && (
@@ -834,8 +772,8 @@ export function MyApplications() {
               {/* Tags */}
               <div className='flex flex-wrap gap-2 mb-4'>
                 {app.tags.map((tag, index) => (
-                  <span key={index} className={`text-xs px-2 py-1 rounded-md ${tag.color}`}>
-                    {tag.label}
+                  <span key={index} className='text-xs px-2 py-1 rounded-md bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'>
+                    {tag}
                   </span>
                 ))}
               </div>

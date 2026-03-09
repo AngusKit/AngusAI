@@ -1,5 +1,5 @@
 import { ApiLocaleResult, TenantAuditingVo } from '@xcan-angus/infra';
-import { ApplicationCategoryEnum, ModelProviderEnum, ModelTypeEnum } from '@/enums/enums.ts';
+import { ModelProviderEnum, ModelTypeEnum } from '@/enums/enums.ts';
 
 /** 应用详情 */
 export interface ApplicationDetailVo extends TenantAuditingVo {
@@ -14,8 +14,8 @@ export interface ApplicationDetailVo extends TenantAuditingVo {
   icon?: string;
   /** 应用描述 */
   description?: string;
-  /** 应用分类 */
-  category?: ApplicationCategoryEnum;
+  /** 应用标签（最多5个） */
+  tags?: string[];
   /** 应用状态 */
   status?: string;
   /**
@@ -348,8 +348,8 @@ export interface ApplicationCreateDto {
    * @example "这是一个智能助手应用"
    */
   description?: string;
-  /** 应用分类 */
-  category: ApplicationCategoryEnum;
+  /** 应用标签（最多5个） */
+  tags?: string[];
 }
 
 /** 应用分享请求参数，访问设置全部为false时，只允许自己访问 */
@@ -402,8 +402,8 @@ export interface ApplicationUpdateDto {
    * @example "这是一个智能助手应用"
    */
   description?: string;
-  /** 应用分类 */
-  category?: ApplicationCategoryEnum;
+  /** 应用标签（最多5个） */
+  tags?: string[];
 }
 
 /** 概览统计 */
@@ -499,6 +499,5 @@ export enum GetApplicationListOrderByEnum {
   CreatedDate = 'createdDate',
   ModifiedDate = 'modifiedDate',
   Status = 'status',
-  Category = 'category',
   Name = 'name',
 }

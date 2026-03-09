@@ -1,6 +1,5 @@
 package cloud.xcan.angus.core.ai.interfaces.application.facade.vo;
 
-import cloud.xcan.angus.core.ai.domain.application.ApplicationCategory;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
 import cloud.xcan.angus.remote.vo.TenantAuditingVo;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -28,8 +27,8 @@ public class ApplicationDetailVo extends TenantAuditingVo {
   @Schema(description = "应用描述")
   private String description;
 
-  @Schema(description = "应用分类")
-  private ApplicationCategory category;
+  @Schema(description = "应用标签（最多5个）")
+  private List<String> tags;
 
   @Schema(description = "应用状态")
   private ApplicationStatus status;

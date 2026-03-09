@@ -186,12 +186,6 @@ export const enumTranslations = {
     PostgreSQL: 'PostgreSQL',
     Oracle: 'Oracle',
   },
-  ApplicationCategoryEnum: {
-    CHATBOT: '聊天机器人',
-    CONTENT_CREATION: '内容创作',
-    KNOWLEDGE_QA: '知识问题',
-    AGENT_PROXY: '智能代理',
-  },
   ApplicationStatusEnum: {
     DRAFT: '草稿',
     PUBLISHED: '已发布',

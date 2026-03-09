@@ -1,6 +1,5 @@
 package cloud.xcan.angus.core.ai.interfaces.application.facade.dto;
 
-import cloud.xcan.angus.core.ai.domain.application.ApplicationCategory;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
 import cloud.xcan.angus.remote.PageQuery;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -12,8 +11,8 @@ import lombok.EqualsAndHashCode;
 @Schema(description = "应用查询参数")
 public class ApplicationFindDto extends PageQuery {
 
-  @Schema(description = "分类筛选")
-  private ApplicationCategory category;
+  @Schema(description = "标签筛选（包含指定标签的应用）")
+  private String tag;
 
   @Schema(description = "状态筛选")
   private ApplicationStatus status;
@@ -28,7 +27,7 @@ public class ApplicationFindDto extends PageQuery {
   private Boolean apiEnabled;
 
   @Schema(description = "排序字段", example = "modifiedDate", allowableValues = {"createdDate",
-      "modifiedDate", "status", "category", "name"})
+      "modifiedDate", "status", "name"})
   private String orderBy = "modifiedDate";
 
 }

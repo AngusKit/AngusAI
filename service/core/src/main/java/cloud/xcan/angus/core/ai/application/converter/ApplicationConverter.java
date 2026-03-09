@@ -6,6 +6,8 @@ import cloud.xcan.angus.core.ai.domain.application.ApplicationAgentRepo;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationConfig;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationShare;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class ApplicationConverter {
@@ -23,7 +25,8 @@ public class ApplicationConverter {
         .setApiEnabled(false);
     newApplication.setIcon(sourceApplication.getIcon());
     newApplication.setDescription(sourceApplication.getDescription());
-    newApplication.setCategory(sourceApplication.getCategory());
+    List<String> srcTags = sourceApplication.getTags();
+    newApplication.setTags(srcTags != null ? new ArrayList<>(srcTags) : null);
     newApplication.setConfig(sourceApplication.getConfig());
     // 智能体绑定关系由 ApplicationCmdImpl.duplicate 在保存新应用后根据 sourceBindings 写入
     return newApplication;
