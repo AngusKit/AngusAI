@@ -508,7 +508,7 @@ export function Workflow() {
                             className='dark:text-gray-300'
                           >
                             <Edit className='w-4 h-4 mr-2' />
-                            编辑信息
+                            编辑工作流
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={e => {
@@ -518,7 +518,7 @@ export function Workflow() {
                             className='dark:text-gray-300'
                           >
                             <Copy className='w-4 h-4 mr-2' />
-                            复制
+                            复制工作流
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={e => {
@@ -528,7 +528,7 @@ export function Workflow() {
                             className='text-red-600 dark:text-red-400'
                           >
                             <Trash2 className='w-4 h-4 mr-2' />
-                            删除
+                            删除工作流
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>

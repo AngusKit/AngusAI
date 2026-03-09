@@ -1,4 +1,4 @@
-import { Plus, Filter, Grid3x3, List, MoreVertical, Star, Clock, MessageSquare, FileText, Database, Code, Zap, Globe, Bot, Sparkles, Search, X, PlayCircle, PauseCircle, Rocket, Image, Book, Mic, Video, Mail, ShoppingCart, BarChart3, } from 'lucide-react';
+import { Plus, Filter, Grid3x3, List, MoreVertical, Star, Clock, MessageSquare, FileText, Database, Code, Zap, Globe, Bot, Sparkles, Search, X, PlayCircle, PauseCircle, Rocket, Image, Book, Mic, Video, Mail, ShoppingCart, BarChart3, Settings, Edit, Copy, Share2, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -649,7 +649,8 @@ export function MyApplications() {
                             }}
                             className='dark:text-gray-300'
                           >
-                            设置
+                            <Settings className='w-4 h-4 mr-2' />
+                            设置应用
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={e => {
@@ -658,7 +659,8 @@ export function MyApplications() {
                             }}
                             className='dark:text-gray-300'
                           >
-                            编辑
+                            <Edit className='w-4 h-4 mr-2' />
+                            编辑应用
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={e => {
@@ -667,7 +669,8 @@ export function MyApplications() {
                             }}
                             className='dark:text-gray-300'
                           >
-                            复制
+                            <Copy className='w-4 h-4 mr-2' />
+                            复制应用
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={e => {
@@ -676,14 +679,16 @@ export function MyApplications() {
                             }}
                             className='dark:text-gray-300'
                           >
-                            分享
+                            <Share2 className='w-4 h-4 mr-2' />
+                            分享应用
                           </DropdownMenuItem>
                           <DropdownMenuSeparator className='dark:bg-gray-700' />
                           <DropdownMenuItem
                             onClick={() => handleMoreAction('删除', app.id as string, app.name)}
                             className='text-red-600 dark:text-red-400'
                           >
-                            删除
+                            <Trash2 className='w-4 h-4 mr-2' />
+                            删除应用
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -778,7 +783,8 @@ export function MyApplications() {
                       }}
                       className='dark:text-gray-300'
                     >
-                      设置
+                      <Settings className='w-4 h-4 mr-2' />
+                      设置应用
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={e => {
@@ -787,7 +793,8 @@ export function MyApplications() {
                       }}
                       className='dark:text-gray-300'
                     >
-                      编辑
+                      <Edit className='w-4 h-4 mr-2' />
+                      编辑应用
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={e => {
@@ -796,7 +803,8 @@ export function MyApplications() {
                       }}
                       className='dark:text-gray-300'
                     >
-                      复制
+                      <Copy className='w-4 h-4 mr-2' />
+                      复制应用
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={e => {
@@ -805,14 +813,16 @@ export function MyApplications() {
                       }}
                       className='dark:text-gray-300'
                     >
-                      分享
+                      <Share2 className='w-4 h-4 mr-2' />
+                      分享应用
                     </DropdownMenuItem>
                     <DropdownMenuSeparator className='dark:bg-gray-700' />
                     <DropdownMenuItem
                       onClick={() => handleMoreAction('删除', app.id as string, app.name)}
                       className='text-red-600 dark:text-red-400'
                     >
-                      删除
+                      <Trash2 className='w-4 h-4 mr-2' />
+                      删除应用
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
