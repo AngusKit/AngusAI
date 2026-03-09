@@ -20,7 +20,6 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import Agents from '@/services/Agents';
-import Models from '@/services/Models';
 import type { AgentDetailVo } from '@/services/AgentsTypes';
 import { AgentStatusEnum } from '@/enums/enums';
 import {
@@ -36,7 +35,6 @@ export function AgentDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [loading, setLoading] = useState(true);
   const [detail, setDetail] = useState<AgentDetailVo | null>(null);
-  const [modelName, setModelName] = useState<string | null>(null);
 
   const loadDetail = useCallback(async () => {
     if (!id) return;
@@ -61,21 +59,6 @@ export function AgentDetailPage() {
   useEffect(() => {
     loadDetail();
   }, [loadDetail]);
-
-  useEffect(() => {
-    if (!detail?.id || !detail.defaultModelId) return;
-    const loadModelName = async () => {
-      try {
-        const res = await Models.getModelList({ pageNo: 1, pageSize: 500 });
-        const list = (res as any)?.data?.list ?? [];
-        const model = list.find((m: { id?: string }) => String(m?.id) === String(detail.defaultModelId));
-        setModelName(model?.name ?? null);
-      } catch {
-        // ignore
-      }
-    };
-    loadModelName();
-  }, [detail?.id, detail?.defaultModelId]);
 
   const onBack = () => navigate('/agents');
   const onEdit = () => navigate(`/agents/${id}/edit`);
@@ -185,7 +168,7 @@ export function AgentDetailPage() {
         <div className="grid gap-4 sm:grid-cols-2 pl-6">
           <ConfigItem
             label="默认模型"
-            value={modelName ?? (detail.defaultModelId ? String(detail.defaultModelId) : '未选择')}
+            value={detail.defaultModel?.name ?? (detail.defaultModel?.id != null ? String(detail.defaultModel.id) : '未选择')}
             icon={<Cpu className="w-4 h-4 text-gray-500" />}
           />
           <ConfigItem

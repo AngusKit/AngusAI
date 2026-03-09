@@ -40,8 +40,8 @@ public class AgentDetailVo extends TenantAuditingVo {
   @Schema(description = "自治等级")
   private AutonomyLevel autonomyLevel;
 
-  @Schema(description = "默认模型ID")
-  private Long defaultModelId;
+  @Schema(description = "默认模型（含ID和名称）")
+  private ResourceInfoVo defaultModel;
 
   @Schema(description = "系统提示词")
   private String systemPrompt;

@@ -10,7 +10,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
 import Agents from '@/services/Agents';
-import Models from '@/services/Models';
 import type { AgentUpdateDto, AgentDetailVo } from '@/services/AgentsTypes';
 import {
   InteractionModeEnum,
@@ -69,10 +68,10 @@ export function EditAgentPage() {
         navigate('/agents');
         return;
       }
+      const defaultModel = d.defaultModel;
       const defaultModelId =
-        d.defaultModelId != null && d.defaultModelId !== ''
-          ? String(d.defaultModelId)
-          : undefined;
+        defaultModel?.id != null ? String(defaultModel.id) : undefined;
+      const defaultModelName = defaultModel?.name ?? undefined;
 
       const resources = d.resources;
       const kbIds = (resources?.knowledgeBases ?? []).map((r) => String(r.id));
@@ -89,11 +88,6 @@ export function EditAgentPage() {
       const apiNames = Object.fromEntries(
         (resources?.apiCollections ?? []).filter((r) => r.id != null && r.name).map((r) => [String(r.id), r.name!])
       );
-
-      const modelRes = defaultModelId ? await Models.getModelList({ pageNo: 1, pageSize: 500 }) : null;
-      const modelList = (modelRes as any)?.data?.list ?? [];
-      const modelItem = modelList.find((m: { id?: string }) => String(m?.id) === String(defaultModelId));
-      const defaultModelName = modelItem?.name ?? undefined;
 
       setForm({
         name: d.name ?? '',

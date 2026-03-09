@@ -23,8 +23,8 @@ export interface AgentDetailVo extends TenantAuditingVo {
   reasoningStrategy?: ReasoningStrategyEnum;
   /** 自治等级 */
   autonomyLevel?: AutonomyLevelEnum;
-  /** 默认模型ID（可选，后端可能返回 null） */
-  defaultModelId?: string | null;
+  /** 默认模型（含ID和名称，由后端返回） */
+  defaultModel?: AgentResourceInfoVo;
   /** 系统提示词 */
   systemPrompt?: string;
   /** 欢迎消息 */

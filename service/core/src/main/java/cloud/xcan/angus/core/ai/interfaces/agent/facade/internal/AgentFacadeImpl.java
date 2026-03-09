@@ -9,6 +9,7 @@ import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
 import cloud.xcan.angus.core.ai.application.query.apis.ApiCollectionQuery;
 import cloud.xcan.angus.core.ai.application.query.dataset.DatasetQuery;
 import cloud.xcan.angus.core.ai.application.query.knowledgebase.KnowledgeBaseQuery;
+import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.application.query.workflow.WorkflowQuery;
 import cloud.xcan.angus.core.ai.domain.agent.Agent;
 import cloud.xcan.angus.core.ai.domain.apis.ApiCollection;
@@ -61,12 +62,15 @@ public class AgentFacadeImpl implements AgentFacade {
   @Resource
   private ApiCollectionQuery apiCollectionQuery;
 
+  @Resource
+  private ModelQuery modelQuery;
+
   @NameJoin
   @Override
   public AgentDetailVo create(AgentCreateDto dto) {
     Agent agent = AgentAssembler.toDomain(dto);
     Agent saved = agentCmd.create(agent);
-    return AgentAssembler.toDetailVo(saved, getAgentResourcesVo(saved));
+    return AgentAssembler.toDetailVo(saved, getAgentResourcesVo(saved), getDefaultModelVo(saved));
   }
 
   @NameJoin
@@ -75,14 +79,14 @@ public class AgentFacadeImpl implements AgentFacade {
     Agent existing = agentQuery.findAndCheck(id);
     AgentAssembler.mergeUpdate(existing, dto);
     Agent saved = agentCmd.update(existing);
-    return AgentAssembler.toDetailVo(saved, getAgentResourcesVo(saved));
+    return AgentAssembler.toDetailVo(saved, getAgentResourcesVo(saved), getDefaultModelVo(saved));
   }
 
   @NameJoin
   @Override
   public AgentDetailVo updateStatus(Long id, AgentStatus status) {
     Agent updated = agentCmd.updateStatus(id, status);
-    return AgentAssembler.toDetailVo(updated, getAgentResourcesVo(updated));
+    return AgentAssembler.toDetailVo(updated, getAgentResourcesVo(updated), getDefaultModelVo(updated));
   }
 
   @Override
@@ -94,7 +98,16 @@ public class AgentFacadeImpl implements AgentFacade {
   @Override
   public AgentDetailVo getDetail(Long id) {
     Agent agent = agentQuery.findAndCheck(id);
-    return AgentAssembler.toDetailVo(agent, getAgentResourcesVo(agent));
+    return AgentAssembler.toDetailVo(agent, getAgentResourcesVo(agent), getDefaultModelVo(agent));
+  }
+
+  private ResourceInfoVo getDefaultModelVo(Agent agent) {
+    if (agent.getDefaultModelId() == null) {
+      return null;
+    }
+    return modelQuery.findById(agent.getDefaultModelId())
+        .map(m -> new ResourceInfoVo(m.getId(), m.getName()))
+        .orElse(null);
   }
 
   private AgentResourcesVo getAgentResourcesVo(Agent agent) {

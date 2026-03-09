@@ -106,10 +106,14 @@ public class AgentAssembler {
     agent.setVariables(nullSafe(dto.getVariables(), emptyMap()));
   }
 
-  public static AgentDetailVo toDetailVo(Agent agent, AgentDetailVo.AgentResourcesVo resources) {
+  public static AgentDetailVo toDetailVo(Agent agent, AgentDetailVo.AgentResourcesVo resources,
+      AgentDetailVo.ResourceInfoVo defaultModel) {
     AgentDetailVo vo = toDetailVo(agent);
     if (resources != null) {
       vo.setResources(resources);
+    }
+    if (defaultModel != null) {
+      vo.setDefaultModel(defaultModel);
     }
     return vo;
   }
@@ -123,7 +127,6 @@ public class AgentAssembler {
     vo.setInteractionMode(agent.getInteractionMode());
     vo.setReasoningStrategy(agent.getReasoningStrategy());
     vo.setAutonomyLevel(agent.getAutonomyLevel());
-    vo.setDefaultModelId(agent.getDefaultModelId());
     vo.setSystemPrompt(agent.getSystemPrompt());
     vo.setWelcomeMessage(agent.getWelcomeMessage());
     vo.setSuggestedQuestions(agent.getSuggestedQuestions());
