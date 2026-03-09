@@ -64,15 +64,15 @@ public class CoreBeansConfiguration {
   // ===== Model =====
   @Bean
   public ModelRegistry modelRegistry(List<ModelFactory> factories,
-      ModelConfigProvider configProvider) {
-    return new ModelRegistry(factories, configProvider);
+      ModelConfigProvider modelConfigProvider) {
+    return new ModelRegistry(factories, modelConfigProvider);
   }
 
   // ===== Vector Store =====
   @Bean
   public VectorStoreRegistry vectorStoreRegistry(List<VectorStoreFactory> factories,
-      VectorStoreConfigProvider configProvider) {
-    return new VectorStoreRegistry(factories, configProvider);
+      VectorStoreConfigProvider vectorStoreConfigProvider) {
+    return new VectorStoreRegistry(factories, vectorStoreConfigProvider);
   }
 
   @Bean

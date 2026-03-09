@@ -188,7 +188,7 @@ public class AgentCmdImpl extends CommCmd<Agent, Long> implements AgentCmd {
     AgentDefinition definition = AgentDefinitionConverter.toDefinition(agent, model);
     String configId = String.valueOf(agent.getDefaultModelId());
     ChatModel chatModel;
-    StreamingChatModel streamingModel = null;
+    StreamingChatModel streamingModel;
     try {
       chatModel = modelRegistry.getChatModel(configId);
       streamingModel = modelRegistry.getStreamingChatModel(configId);

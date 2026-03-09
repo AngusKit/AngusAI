@@ -11,6 +11,7 @@ import cloud.xcan.angus.core.ai.domain.vector.VectorStore;
 import cloud.xcan.angus.core.ai.domain.vector.VectorStoreAccessLogRepo;
 import cloud.xcan.angus.core.ai.domain.vector.VectorStoreRepo;
 import cloud.xcan.angus.core.ai.domain.vector.VectorStoreSearchRepo;
+import cloud.xcan.angus.remote.search.SearchCriteria;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.vo.VectorStoreStatisticsVo;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
@@ -26,6 +27,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -70,6 +73,22 @@ public class VectorStoreQueryImpl implements VectorStoreQuery {
             : vectorStoreRepo.findAll(spec, pageable);
       }
     }.execute();
+  }
+
+  @Override
+  public Optional<VectorStore> findById(Long id) {
+    return id == null ? Optional.empty() : vectorStoreRepo.findById(id);
+  }
+
+  @Override
+  public List<VectorStore> findVectorStoresForConfig(String tenantId) {
+    Set<SearchCriteria> filters = SearchCriteria.merge(SearchCriteria.criteria(),
+        SearchCriteria.equal("enabled", true));
+    if (tenantId != null && !tenantId.isBlank()) {
+      filters = SearchCriteria.merge(filters, SearchCriteria.equal("tenantId", tenantId));
+    }
+    GenericSpecification<VectorStore> spec = new GenericSpecification<>(filters);
+    return vectorStoreRepo.findAll(spec);
   }
 
   @Override

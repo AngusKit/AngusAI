@@ -22,6 +22,8 @@ import cloud.xcan.angus.remote.search.SearchCriteria;
 import jakarta.annotation.Resource;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import lombok.Getter;
 import org.springframework.data.domain.Page;
@@ -96,6 +98,22 @@ public class ModelQueryImpl implements ModelQuery {
   @Override
   public boolean existsByNameAndIdNot(String name, Long id) {
     return modelRepo.existsByNameAndIdNot(name, id);
+  }
+
+  @Override
+  public Optional<Model> findById(Long id) {
+    return id == null ? Optional.empty() : modelRepo.findById(id);
+  }
+
+  @Override
+  public List<Model> findModelsForConfig(String tenantId) {
+    Set<SearchCriteria> filters = SearchCriteria.merge(SearchCriteria.criteria(),
+        SearchCriteria.equal("status", ModelStatus.ACTIVE.getValue()));
+    if (tenantId != null && !tenantId.isBlank()) {
+      filters = SearchCriteria.merge(filters, SearchCriteria.equal("tenantId", tenantId));
+    }
+    GenericSpecification<Model> spec = new GenericSpecification<>(filters);
+    return modelRepo.findAll(spec);
   }
 
   private void buildOverview(ModelStatisticsVo vo, LocalDateTime start, LocalDateTime end) {
