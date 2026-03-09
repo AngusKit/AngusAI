@@ -9,13 +9,16 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.Type;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
+@Setter
+@Getter
 @Entity
 @Table(name = "ai_workflow")
 public class Workflow extends TenantAuditingEntity<Workflow, Long> {
@@ -81,10 +84,10 @@ public class Workflow extends TenantAuditingEntity<Workflow, Long> {
   private Long failedExecutions = 0L;
 
   @Column(name = "avg_execution_time")
-  private Double avgExecutionTime = 0.0;
+  private Integer avgExecutionTime;
 
   @Column(name = "last_execution_time")
-  private Long lastExecutionTime;
+  private LocalDateTime lastExecutionTime;
 
   @Column(name = "last_execution_status")
   private String lastExecutionStatus;

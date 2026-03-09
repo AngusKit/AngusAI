@@ -1,5 +1,6 @@
 package cloud.xcan.angus.core.ai.domain.workflow;
 
+import java.time.LocalDateTime;
 import lombok.Data;
 
 @Data
@@ -11,9 +12,9 @@ public class ExecutionStats {
 
   private Long failedExecutions = 0L;
 
-  private Double avgExecutionTime = 0.0;
+  private Integer avgExecutionTime = 0;
 
-  private Long lastExecutionTime;
+  private LocalDateTime lastExecutionTime;
 
   private String lastExecutionStatus;
 

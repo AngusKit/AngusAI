@@ -193,15 +193,8 @@ export function AgentManagement() {
               暂无智能体
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 leading-relaxed">
-              创建您的第一个智能体，配置模型与能力，开启 AI 对话体验
+              请先创建智能体，配置模型与能力，开启 AI 对话体验
             </p>
-            <Button
-              onClick={() => navigate('/agents/create')}
-              className="bg-blue-500 hover:bg-blue-600 gap-2"
-            >
-              <Plus className="w-4 h-4" />
-              创建智能体
-            </Button>
           </div>
         </Card>
       ) : viewMode === 'grid' ? (
