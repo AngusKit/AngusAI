@@ -33,7 +33,7 @@ export function WorkflowListEmpty({ hasFilter, searchQuery, onCreateClick }: Wor
           ? searchQuery
             ? `没有找到包含「${searchQuery}」的工作流，尝试调整搜索或筛选条件`
             : '当前筛选条件下暂无数据，尝试调整筛选条件'
-          : '创建您的工作流，将 AI 任务流程自动化'}
+          : '创建工作流，将 AI 任务流程自动化'}
       </p>
     </div>
   );

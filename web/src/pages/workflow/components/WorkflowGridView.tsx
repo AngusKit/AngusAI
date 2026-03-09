@@ -130,11 +130,13 @@ export function WorkflowGridView({ workflows, loading, actions, hasFilter = fals
 
       {loading && <div className='text-center py-12 text-gray-500 dark:text-gray-400'>加载中...</div>}
       {!loading && workflows.length === 0 && (
-        <WorkflowListEmpty
+        <div style={{ marginTop: 100 }}>
+          <WorkflowListEmpty
           hasFilter={hasFilter}
           searchQuery={searchQuery}
           onCreateClick={onCreateClick ?? (() => {})}
         />
+        </div>
       )}
     </>
   );

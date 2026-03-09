@@ -112,11 +112,13 @@ export function WorkflowTableView({
 
       {loading && <div className='text-center py-6 text-gray-500 dark:text-gray-400'>加载中...</div>}
       {!loading && workflows.length === 0 && (
-        <WorkflowListEmpty
+        <div style={{ marginTop: 100 }}>
+          <WorkflowListEmpty
           hasFilter={hasFilter}
           searchQuery={searchQuery}
           onCreateClick={onCreateClick ?? (() => {})}
         />
+        </div>
       )}
     </>
   );
