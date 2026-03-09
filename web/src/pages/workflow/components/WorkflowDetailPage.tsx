@@ -2,8 +2,6 @@
  * 工作流详情页
  * 展示工作流基本信息，支持编辑、启动/停止
  */
-import { useState, useEffect, useCallback } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button.tsx';
 import { Input } from '@/components/ui/input.tsx';
 import { Label } from '@/components/ui/label.tsx';
@@ -11,11 +9,9 @@ import { Textarea } from '@/components/ui/textarea.tsx';
 import { Card } from '@/components/ui/card.tsx';
 import { Badge } from '@/components/ui/badge.tsx';
 import { ChevronLeft, Save, X, Calendar, Clock, TrendingUp, Activity, Tag, Workflow as WorkflowIcon, Edit2 } from 'lucide-react';
-import { toast } from 'sonner';
-import Workflows from '@/services/Workflows.ts';
-import { WorkflowDetailVo } from '@/services/WorkflowsTypes.ts';
 import { WorkflowStatusEnum, WorkflowTypeEnum } from '@/enums/enums.ts';
 import { getEnumDescription } from '@/enums/utils.ts';
+import { useWorkflowDetail } from '../hooks/useWorkflowDetail';
 
 const statusDisplayMap: Record<WorkflowStatusEnum, string> = {
   [WorkflowStatusEnum.DRAFT]: '草稿',
@@ -24,98 +20,25 @@ const statusDisplayMap: Record<WorkflowStatusEnum, string> = {
 };
 
 export function WorkflowDetailPage() {
-  const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>();
-  const [detail, setDetail] = useState<WorkflowDetailVo | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [mode, setMode] = useState<'view' | 'edit'>('view');
-  const [formData, setFormData] = useState({ name: '', description: '', status: WorkflowStatusEnum.DRAFT });
-  const [saving, setSaving] = useState(false);
-  const [newTag, setNewTag] = useState('');
-  const [tags, setTags] = useState<string[]>([]);
-
-  const loadDetail = useCallback(async () => {
-    if (!id) return;
-    setLoading(true);
-    try {
-      const res = await Workflows.getWorkflowDetail(id);
-      const data = (res as { data?: WorkflowDetailVo }).data;
-      if (data) {
-        setDetail(data);
-        setFormData({
-          name: data.name ?? '',
-          description: data.description ?? '',
-          status: (data.status as WorkflowStatusEnum) ?? WorkflowStatusEnum.DRAFT,
-        });
-      } else {
-        toast.error('工作流不存在');
-        navigate('/workflow');
-      }
-    } catch (e: unknown) {
-      toast.error((e as { message?: string })?.message ?? '加载失败');
-      navigate('/workflow');
-    } finally {
-      setLoading(false);
-    }
-  }, [id, navigate]);
-
-  useEffect(() => {
-    loadDetail();
-  }, [loadDetail]);
-
-  useEffect(() => {
-    if (id && !loading && !detail) {
-      navigate('/workflow');
-    }
-  }, [id, loading, detail, navigate]);
-
-  const handleSave = async () => {
-    if (!id) return;
-    setSaving(true);
-    try {
-      await Workflows.updateWorkflow(id, {
-        name: formData.name,
-        description: formData.description,
-      });
-      toast.success('工作流信息已保存');
-      setMode('view');
-      loadDetail();
-    } catch (e: unknown) {
-      toast.error((e as { message?: string })?.message ?? '保存失败');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleEdit = () => setMode('edit');
-
-  const handleCancel = () => {
-    if (detail) {
-      setFormData({
-        name: detail.name ?? '',
-        description: detail.description ?? '',
-        status: (detail.status as WorkflowStatusEnum) ?? WorkflowStatusEnum.DRAFT,
-      });
-    }
-    setMode('view');
-  };
-
-  const handleAddTag = () => {
-    if (newTag.trim() && !tags.includes(newTag.trim())) {
-      setTags([...tags, newTag.trim()]);
-      setNewTag('');
-    }
-  };
-
-  const handleRemoveTag = (tagToRemove: string) => {
-    setTags(tags.filter(tag => tag !== tagToRemove));
-  };
-
-  const handleDesign = () => {
-    if (!detail) return;
-    const statusDisplay = statusDisplayMap[(detail.status as WorkflowStatusEnum) ?? WorkflowStatusEnum.DRAFT];
-    navigate(`/workflow-design?workflowId=${id}&workflowName=${encodeURIComponent(detail.name ?? '')}&workflowStatus=${statusDisplay}`);
-  };
+  const {
+    id,
+    navigate,
+    detail,
+    loading,
+    mode,
+    formData,
+    setFormData,
+    saving,
+    newTag,
+    setNewTag,
+    tags,
+    handleSave,
+    handleEdit,
+    handleCancel,
+    handleAddTag,
+    handleRemoveTag,
+    handleDesign,
+  } = useWorkflowDetail();
 
   if (loading || !detail) {
     return (

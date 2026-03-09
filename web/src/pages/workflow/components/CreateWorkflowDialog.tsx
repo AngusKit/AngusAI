@@ -10,10 +10,8 @@ import { Label } from '@/components/ui/label.tsx';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.tsx';
 import { Badge } from '@/components/ui/badge.tsx';
 import { Workflow, Zap, Bot, FileText, Database, MessageSquare, Brain, Code, Settings, GitBranch } from 'lucide-react';
-import { useState } from 'react';
-import { toast } from 'sonner';
-import Workflows from '@/services/Workflows.ts';
 import { WorkflowTypeEnum } from '@/enums/enums.ts';
+import { useCreateWorkflowForm } from '../hooks/useCreateWorkflowForm';
 
 interface CreateWorkflowDialogProps {
   open: boolean;
@@ -92,115 +90,43 @@ const workflowTypes = [
   { value: WorkflowTypeEnum.MULTI_TURN, label: '多轮对话流（记忆）', description: '支持多轮对话并保留上下文记忆的工作流' },
 ];
 
+/** 标签颜色映射 */
+function getTagColor(tag: string): string {
+  const colors = [
+    'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+    'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+    'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+    'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
+    'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400',
+    'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
+    'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400',
+    'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
+  ];
+  const index = tag.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
+  return colors[index] ?? colors[0]!;
+}
+
 export function CreateWorkflowDialog({ open, onOpenChange, onSuccess }: CreateWorkflowDialogProps) {
-  const [workflowName, setWorkflowName] = useState('');
-  const [description, setDescription] = useState('');
-  const [workflowType, setWorkflowType] = useState<WorkflowTypeEnum>(WorkflowTypeEnum.SINGLE_TASK);
-  const [submitting, setSubmitting] = useState(false);
-  const [selectedIcon, setSelectedIcon] = useState(0);
-  const [tags, setTags] = useState<string[]>([]);
-  const [tagInput, setTagInput] = useState('');
-  const [autoStart, setAutoStart] = useState(false);
-
-  // 标签颜色映射
-  const getTagColor = (tag: string): string => {
-    const colors = [
-      'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-      'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-      'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
-      'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
-      'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400',
-      'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
-      'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400',
-      'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
-    ];
-
-    const index = tag.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
-    return colors[index] ?? colors[0]!;
-  };
-
-  const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' || e.key === ',') {
-      e.preventDefault();
-      const newTag = tagInput.trim();
-
-      if (!newTag) return;
-
-      if (newTag.length > 10) {
-        toast.error('标签长度不能超过10个字符');
-        return;
-      }
-
-      if (tags.length >= 5) {
-        toast.error('最多只能添加5个标签');
-        return;
-      }
-
-      if (tags.includes(newTag)) {
-        toast.error('标签已存在');
-        return;
-      }
-
-      setTags([...tags, newTag]);
-      setTagInput('');
-    }
-  };
-
-  const handleRemoveTag = (tagToRemove: string) => {
-    setTags(tags.filter(tag => tag !== tagToRemove));
-  };
-
-  const handleCreate = async () => {
-    if (!workflowName.trim()) {
-      toast.error('请输入工作流名称');
-      return;
-    }
-    if (!description.trim()) {
-      toast.error('请输入工作流描述');
-      return;
-    }
-
-    setSubmitting(true);
-    try {
-      const iconBgMap = ['bg-blue-500', 'bg-yellow-500', 'bg-purple-500', 'bg-green-500', 'bg-indigo-500', 'bg-pink-500', 'bg-orange-500', 'bg-cyan-500', 'bg-gray-500', 'bg-teal-500'];
-      const iconBg = iconBgMap[selectedIcon] ?? 'bg-blue-500';
-      const res = await Workflows.createWorkflow({
-        name: workflowName.trim(),
-        description: description.trim(),
-        type: workflowType,
-        icon: '🔄',
-        iconBg,
-      });
-      const created = (res as { data?: { id?: string } })?.data;
-      toast.success('工作流创建成功！');
-      setWorkflowName('');
-      setDescription('');
-      setWorkflowType(WorkflowTypeEnum.SINGLE_TASK);
-      setSelectedIcon(0);
-      setTags([]);
-      setTagInput('');
-      setAutoStart(false);
-      onOpenChange(false);
-      onSuccess?.();
-    } catch (e: unknown) {
-      toast.error((e as { message?: string })?.message ?? '创建工作流失败');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleCancel = () => {
-    // 重置表单
-    setWorkflowName('');
-    setDescription('');
-    setWorkflowType(WorkflowTypeEnum.SINGLE_TASK);
-    setSelectedIcon(0);
-    setTags([]);
-    setTagInput('');
-    setAutoStart(false);
-
-    onOpenChange(false);
-  };
+  const {
+    workflowName,
+    setWorkflowName,
+    description,
+    setDescription,
+    workflowType,
+    setWorkflowType,
+    submitting,
+    selectedIcon,
+    setSelectedIcon,
+    tags,
+    tagInput,
+    setTagInput,
+    autoStart,
+    setAutoStart,
+    handleAddTag,
+    handleRemoveTag,
+    handleCreate,
+    handleCancel,
+  } = useCreateWorkflowForm(onOpenChange, onSuccess);
 
   const selectedWorkflowType = workflowTypes.find(t => t.value === workflowType);
 

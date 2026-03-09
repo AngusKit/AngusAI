@@ -2,16 +2,13 @@
  * 工作流设计器
  * 基于 ReactFlow 的节点编排，支持保存配置、启动/停止
  */
-import { useState, useCallback, useEffect } from 'react';
-import ReactFlow, { Node, Edge, Controls, Background, useNodesState, useEdgesState, addEdge, Connection, BackgroundVariant, MiniMap } from 'reactflow';
+import ReactFlow, { Controls, Background, Connection, BackgroundVariant, MiniMap } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { Button } from '@/components/ui/button.tsx';
 import { Save, Maximize2, Minimize2, X, Play, Pause } from 'lucide-react';
 import { Card } from '@/components/ui/card.tsx';
 import { Badge } from '@/components/ui/badge.tsx';
-import { toast } from 'sonner';
-import Workflows from '@/services/Workflows.ts';
-import { WorkflowDetailVo } from '@/services/WorkflowsTypes.ts';
+import { useWorkflowEditor } from '../hooks/useWorkflowEditor';
 
 interface WorkflowEditorProps {
   workflowId: string;
@@ -20,223 +17,22 @@ interface WorkflowEditorProps {
   onClose: () => void;
 }
 
-// 初始节点数据
-const initialNodes: Node[] = [
-  {
-    id: '1',
-    type: 'input',
-    data: { label: '开始' },
-    position: { x: 0, y: 0 },
-    style: {
-      background: '#3b82f6',
-      color: 'white',
-      border: '2px solid #2563eb',
-      borderRadius: '8px',
-      padding: '10px 20px',
-    },
-  },
-  {
-    id: '2',
-    data: { label: 'AI处理节点' },
-    position: { x: 0, y: 0 },
-    style: {
-      background: '#8b5cf6',
-      color: 'white',
-      border: '2px solid #7c3aed',
-      borderRadius: '8px',
-      padding: '10px 20px',
-    },
-  },
-  {
-    id: '3',
-    data: { label: '条件判断' },
-    position: { x: 0, y: 0 },
-    style: {
-      background: '#f59e0b',
-      color: 'white',
-      border: '2px solid #d97706',
-      borderRadius: '8px',
-      padding: '10px 20px',
-    },
-  },
-  {
-    id: '4',
-    data: { label: '数据存储' },
-    position: { x: 0, y: 0 },
-    style: {
-      background: '#10b981',
-      color: 'white',
-      border: '2px solid #059669',
-      borderRadius: '8px',
-      padding: '10px 20px',
-    },
-  },
-  {
-    id: '5',
-    type: 'output',
-    data: { label: '结束' },
-    position: { x: 0, y: 0 },
-    style: {
-      background: '#ef4444',
-      color: 'white',
-      border: '2px solid #dc2626',
-      borderRadius: '8px',
-      padding: '10px 20px',
-    },
-  },
-];
-
-// 初始连线数据
-const initialEdges: Edge[] = [
-  {
-    id: 'e1-2',
-    source: '1',
-    target: '2',
-    type: 'smoothstep',
-    animated: true,
-    style: { stroke: '#3b82f6' },
-  },
-  {
-    id: 'e2-3',
-    source: '2',
-    target: '3',
-    type: 'smoothstep',
-    animated: true,
-    style: { stroke: '#8b5cf6' },
-  },
-  {
-    id: 'e2-4',
-    source: '2',
-    target: '4',
-    type: 'smoothstep',
-    animated: true,
-    style: { stroke: '#8b5cf6' },
-  },
-  {
-    id: 'e3-5',
-    source: '3',
-    target: '5',
-    type: 'smoothstep',
-    style: { stroke: '#f59e0b' },
-  },
-  {
-    id: 'e4-5',
-    source: '4',
-    target: '5',
-    type: 'smoothstep',
-    style: { stroke: '#10b981' },
-  },
-];
-
-function parseConfigToNodesEdges(config: object | undefined): { nodes: Node[]; edges: Edge[] } {
-  if (!config || typeof config !== 'object') {
-    return { nodes: initialNodes, edges: initialEdges };
-  }
-  const c = config as { nodes?: Node[]; edges?: Edge[] };
-  if (Array.isArray(c.nodes) && Array.isArray(c.edges)) {
-    return { nodes: c.nodes.length ? c.nodes : initialNodes, edges: c.edges };
-  }
-  return { nodes: initialNodes, edges: initialEdges };
-}
-
 export function WorkflowEditor({ workflowId, workflowName, workflowStatus, onClose }: WorkflowEditorProps) {
-  const [loading, setLoading] = useState(true);
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [hasChanges, setHasChanges] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [actionLoading, setActionLoading] = useState(false);
-
-  useEffect(() => {
-    if (!workflowId) {
-      setLoading(false);
-      return;
-    }
-    let cancelled = false;
-    Workflows.getWorkflowDetail(workflowId)
-      .then((res: unknown) => {
-        if (cancelled) return;
-        const data = (res as { data?: WorkflowDetailVo }).data;
-        const cfg = data?.config;
-        const { nodes: n, edges: e } = parseConfigToNodesEdges(cfg);
-        setNodes(n);
-        setEdges(e);
-      })
-      .catch(() => {
-        if (!cancelled) toast.error('加载工作流配置失败');
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [workflowId, setNodes, setEdges]);
-
-  const onConnect = useCallback(
-    (params: Connection) => {
-      setEdges(eds => addEdge({ ...params, animated: true }, eds));
-      setHasChanges(true);
-    },
-    [setEdges]
-  );
-
-  const handleSave = async () => {
-    if (!workflowId) return;
-    setSaving(true);
-    try {
-      await Workflows.updateWorkflowConfig(workflowId, {
-        nodes: nodes.map(n => ({ id: n.id, type: n.type, data: n.data, position: n.position })),
-        edges: edges.map(e => ({ id: e.id, source: e.source, target: e.target })),
-      });
-      toast.success('工作流已保存');
-      setHasChanges(false);
-    } catch (e: unknown) {
-      toast.error((e as { message?: string })?.message ?? '保存失败');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleStartStop = async () => {
-    if (!workflowId) return;
-    setActionLoading(true);
-    try {
-      if (workflowStatus === '运行中') {
-        await Workflows.stopWorkflow(workflowId);
-        toast.success('工作流已停止');
-      } else {
-        await Workflows.startWorkflow(workflowId);
-        toast.success('工作流已启动');
-      }
-      onClose(); // 返回列表以刷新状态
-    } catch (e: unknown) {
-      toast.error((e as { message?: string })?.message ?? '操作失败');
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
-  const toggleFullscreen = () => {
-    setIsFullscreen(!isFullscreen);
-  };
-
-  const handleNodeChange = useCallback(
-    (changes: any) => {
-      onNodesChange(changes);
-      setHasChanges(true);
-    },
-    [onNodesChange]
-  );
-
-  const handleEdgeChange = useCallback(
-    (changes: any) => {
-      onEdgesChange(changes);
-      setHasChanges(true);
-    },
-    [onEdgesChange]
-  );
+  const {
+    loading,
+    nodes,
+    edges,
+    onNodesChange,
+    onEdgesChange,
+    onConnect,
+    isFullscreen,
+    hasChanges,
+    saving,
+    actionLoading,
+    handleSave,
+    handleStartStop,
+    toggleFullscreen,
+  } = useWorkflowEditor(workflowId, workflowStatus, onClose);
 
   if (loading) {
     return (
