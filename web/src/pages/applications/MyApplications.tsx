@@ -44,7 +44,7 @@ import { ShareApplicationDialog } from './components/ShareApplicationDialog';
 import { ApplicationStatusEnum } from '@/enums/enums';
 import { getEnumDescription } from '@/enums/utils';
 import { useApplicationList, type ApplicationListItem } from './hooks';
-import { getStatusBadgeColor, getStatusIcon } from './utils';
+import { getStatusBadgeColor, getStatusIcon, getTagColor } from './utils';
 
 /**
  * 应用列表主页面：展示所有应用，支持筛选、分页、操作
@@ -350,10 +350,7 @@ function ApplicationCard({
           <div className="flex items-center gap-4">
             <div className="flex flex-wrap gap-1.5">
               {app.tags.slice(0, 2).map((tag, index) => (
-                <span
-                  key={index}
-                  className="text-xs px-2 py-1 rounded-md bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400 border-0"
-                >
+                <span key={index} className={`text-xs px-2 py-1 rounded-md border ${getTagColor(tag, index)}`}>
                   {tag}
                 </span>
               ))}
@@ -430,10 +427,7 @@ function ApplicationCard({
       <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">{app.description}</p>
       <div className="flex flex-wrap gap-2 mb-4">
         {app.tags.map((tag, index) => (
-          <span
-            key={index}
-            className="text-xs px-2 py-1 rounded-md bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400"
-          >
+          <span key={index} className={`text-xs px-2 py-1 rounded-md border ${getTagColor(tag, index)}`}>
             {tag}
           </span>
         ))}
