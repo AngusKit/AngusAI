@@ -187,7 +187,7 @@ export function AgentManagement() {
         <Card className="py-16 px-8 text-center dark:bg-gray-800 dark:border-gray-700 border-2 border-dashed border-gray-200 dark:border-gray-600">
           <div className="flex flex-col items-center max-w-md mx-auto">
             <div className="bg-gradient-to-br from-orange-100 to-orange-50 dark:from-orange-900/30 dark:to-orange-800/20 w-20 h-20 rounded-2xl flex items-center justify-center mt-5 mb-6">
-              <Bot className="w-10 h-10 text-orange-500 dark:text-orange-400" />
+              <Bot className="w-20 h-20 text-orange-500 dark:text-orange-400" />
             </div>
             <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">
               暂无智能体
