@@ -1,7 +1,7 @@
 import { Clock, ChevronRight, Info } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { ActivityRecord } from '../types';
+import type { ActivityDetailVo } from '@/services/ActivityTypes';
 import {
   getActionIcon,
   getActionLabel,
@@ -14,17 +14,19 @@ import {
 
 interface ActivityListItemProps {
   /** 活动记录 */
-  activity: ActivityRecord;
+  activity: ActivityDetailVo;
   /** 当前语言 */
   language: string;
   /** 点击查看详情回调 */
-  onClick: (activity: ActivityRecord) => void;
+  onClick: (activity: ActivityDetailVo) => void;
 }
 
 /** 单条活动记录展示（列表项） */
 export function ActivityListItem({ activity, language, onClick }: ActivityListItemProps) {
-  const ActionIcon = getActionIcon(activity.actionType);
-  const TargetIcon = getTargetIcon(activity.targetType);
+  const ActionIcon = getActionIcon(activity.actionType ?? '');
+  const resourceType = activity.resourceType ?? '';
+  const resourceName = activity.resourceName ?? '';
+  const TargetIcon = getTargetIcon(resourceType);
 
   return (
     <div
@@ -35,7 +37,7 @@ export function ActivityListItem({ activity, language, onClick }: ActivityListIt
         {/* 用户头像 */}
         <Avatar className='w-10 h-10 flex-shrink-0'>
           <AvatarFallback className='bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'>
-            {activity.userAvatar}
+            {activity.userAvatar ?? activity.userAvatarFallback ?? '--'}
           </AvatarFallback>
         </Avatar>
 
@@ -44,13 +46,13 @@ export function ActivityListItem({ activity, language, onClick }: ActivityListIt
           <div className='flex items-start justify-between gap-4 mb-2'>
             <div className='flex items-center gap-2 flex-wrap'>
               <span className='dark:text-white'>{activity.userName || '--'}</span>
-              <ActionIcon className={`w-4 h-4 ${getActionColor(activity.actionType)}`} />
+              <ActionIcon className={`w-4 h-4 ${getActionColor(activity.actionType ?? '')}`} />
               <span className='text-sm text-gray-600 dark:text-gray-400'>
-                {getActionLabel(activity.actionType)}
+                {getActionLabel(activity.actionType ?? '')}
               </span>
-              <TargetIcon className={`w-4 h-4 ${getTargetColor(activity.targetType)}`} />
+              <TargetIcon className={`w-4 h-4 ${getTargetColor(resourceType)}`} />
               <Badge variant='secondary' className='dark:bg-gray-800 dark:text-gray-300'>
-                {getTargetLabel(activity.targetType)}
+                {getTargetLabel(resourceType)}
               </Badge>
               {activity.status && getStatusBadge(activity.status, language)}
             </div>
@@ -68,7 +70,7 @@ export function ActivityListItem({ activity, language, onClick }: ActivityListIt
             <span className='text-gray-500 dark:text-gray-500'>
               {language === 'zh-CN' ? '目标：' : 'Target:'}
             </span>
-            <span className='dark:text-white'>{activity.targetName || '--'}</span>
+            <span className='dark:text-white'>{resourceName || '--'}</span>
           </div>
 
           {activity.detail && (

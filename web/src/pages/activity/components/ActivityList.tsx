@@ -1,6 +1,6 @@
 import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ActivityRecord } from '../types';
+import type { ActivityDetailVo } from '@/services/ActivityTypes';
 import { ActivityListItem } from './ActivityListItem';
 import { ActivityListEmpty } from './ActivityListEmpty';
 import { ActivityPagination } from './ActivityPagination';
@@ -11,7 +11,7 @@ interface ActivityListProps {
   /** 是否正在加载 */
   loading: boolean;
   /** 活动列表数据 */
-  activities: ActivityRecord[];
+  activities: ActivityDetailVo[];
   /** 是否有筛选条件 */
   hasFilters: boolean;
   /** 总页数 */
@@ -21,7 +21,7 @@ interface ActivityListProps {
   /** 清除筛选回调 */
   onClearFilters: () => void;
   /** 查看详情回调 */
-  onViewDetail: (activity: ActivityRecord) => void;
+  onViewDetail: (activity: ActivityDetailVo) => void;
   /** 页码变更回调 */
   onPageChange: (page: number) => void;
 }
@@ -53,9 +53,9 @@ export function ActivityList({
         <>
           <ScrollArea className='h-[600px]'>
             <div className='divide-y divide-gray-200 dark:divide-gray-800'>
-              {activities.map(activity => (
+              {activities.map((activity, index) => (
                 <ActivityListItem
-                  key={activity.id}
+                  key={activity.id ?? `activity-${index}`}
                   activity={activity}
                   language={language}
                   onClick={onViewDetail}

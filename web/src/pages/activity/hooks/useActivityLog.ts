@@ -10,7 +10,6 @@ import {
   ActivityStatisticsVo,
   SimpleStatisticsDto,
 } from '@/services/ActivityTypes';
-import { ActivityRecord } from '../types';
 import { generateActivityId } from '../utils';
 
 const ITEMS_PER_PAGE = 20;
@@ -29,30 +28,37 @@ function inferActionType(record: ActivityDetailVo): string {
   return 'UNKNOWN';
 }
 
-/** 从描述/详情文本中推断状态 */
-function inferStatus(record: ActivityDetailVo): ActivityRecord['status'] {
+/** 从接口状态或描述/详情文本推断状态（返回小写便于 UI 展示） */
+function inferStatus(record: ActivityDetailVo): string {
+  if (record.status) {
+    const s = String(record.status).toLowerCase();
+    if (s === 'failed') return 'failed';
+    if (s === 'warning') return 'warning';
+    return 'success';
+  }
   const candidates = `${record.description ?? ''}${record.detail ?? ''}`;
   if (/失败|fail|error/i.test(candidates)) return 'failed';
   if (/警告|warning/i.test(candidates)) return 'warning';
   return 'success';
 }
 
-/** 将接口数据映射为前端活动记录 */
-function mapToActivityRecord(item: ActivityDetailVo): ActivityRecord {
-  const actionType = inferActionType(item);
+/** 将接口数据映射为 ActivityDetailVo（补全推断字段与兼容旧字段） */
+function mapToActivityDetailVo(item: ActivityDetailVo): ActivityDetailVo {
+  const actionType = item.actionType ?? inferActionType(item);
   const status = inferStatus(item);
-  const avatarFallback = item.userAvatar ?? (item.userName ? item.userName.slice(0, 2).toUpperCase() : 'NA');
+  const avatarFallback = item.userAvatar ?? item.userAvatarFallback ?? (item.userName ? item.userName.slice(0, 2).toUpperCase() : 'NA');
   return {
+    ...item,
     id: item.id ? String(item.id) : generateActivityId(),
     userId: item.userId ? String(item.userId) : undefined,
     userName: item.userName ?? '',
-    userAvatar: avatarFallback,
-    targetId: item.targetId ? String(item.targetId) : undefined,
-    targetType: item.targetType ?? '',
-    targetName: item.targetName ?? '',
+    userAvatar: item.userAvatar ?? avatarFallback,
+    userAvatarFallback: item.userAvatarFallback ?? avatarFallback,
+    resourceId: item.resourceId ? String(item.resourceId) : undefined,
+    resourceType: item.resourceType ?? undefined,
+    resourceName: item.resourceName ?? undefined,
     activityDate: item.activityDate ?? '',
     description: item.description ?? '',
-    detail: item.detail,
     actionType,
     status,
   };
@@ -80,9 +86,9 @@ export function useActivityLog() {
   const [selectedTargetType, setSelectedTargetType] = useState('all');
   const [selectedActionType, setSelectedActionType] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedActivity, setSelectedActivity] = useState<ActivityRecord | null>(null);
+  const [selectedActivity, setSelectedActivity] = useState<ActivityDetailVo | null>(null);
   const [showDetailDialog, setShowDetailDialog] = useState(false);
-  const [activities, setActivities] = useState<ActivityRecord[]>([]);
+  const [activities, setActivities] = useState<ActivityDetailVo[]>([]);
   const [totalRecords, setTotalRecords] = useState(0);
   const [loading, setLoading] = useState(false);
   const [statistics, setStatistics] = useState<ActivityStatisticsVo | null>(null);
@@ -104,7 +110,7 @@ export function useActivityLog() {
       const responseData = (response as any).data;
       const listData = responseData?.list;
       setTotalRecords(responseData?.total ?? listData?.length ?? 0);
-      const mapped = listData?.map(mapToActivityRecord) ?? [];
+      const mapped = listData?.map(mapToActivityDetailVo) ?? [];
       setActivities(mapped);
     } catch (error: any) {
       console.error('加载活动记录失败:', error);

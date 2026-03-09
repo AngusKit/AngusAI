@@ -16,32 +16,29 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Data
 public class ActivityFindDto extends PageQuery {
 
-  @Schema(description = "Activity record identifier")
+  @Schema(description = "活动记录ID")
   private Long id;
 
-  @Schema(description = "Target resource identifier")
+  @Schema(description = "关联资源ID")
   private Long resourceId;
 
-  @Schema(description = "Target resource type for activity categorization")
+  @Schema(description = "关联资源类型，用于按资源分类筛选")
   private FullResourceType resourceType;
 
-  @Schema(description = "User identifier who performed the operation")
+  @Schema(description = "操作用户ID")
   private Long userId;
 
-  @Schema(description = "Activity action type")
+  @Schema(description = "操作类型")
   private ActionType actionType;
 
-  @Schema(description = "Activity status")
+  @Schema(description = "活动状态")
   private ActivityStatus status;
 
-  @Schema(description = "Associated Tenant ID", example = "1")
-  private Long tenantId;
-
   @DateTimeFormat(pattern = DATE_FMT)
-  @Schema(description = "Activity date")
+  @Schema(description = "活动日期")
   private LocalDateTime activityDate;
 
-  @Schema(description = "Sort field", example = "activityDate",
+  @Schema(description = "排序字段", example = "activityDate",
       allowableValues = {"id", "activityDate", "resourceType", "actionType", "status"})
   private String orderBy = "activityDate";
 

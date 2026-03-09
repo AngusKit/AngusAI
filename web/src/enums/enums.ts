@@ -441,29 +441,61 @@ export enum EnabledStatusEnum {
   DISABLED = 'DISABLED',
 }
 
-/** 活动记录目标类型 */
-export enum ActivityTargetTypeEnum {
+/** 活动关联资源类型（与后端 FullResourceType 一致） */
+export enum FullResourceTypeEnum {
   APPLICATION = 'APPLICATION',
   WORKFLOW = 'WORKFLOW',
   KNOWLEDGE_BASE = 'KNOWLEDGE_BASE',
   DATASET = 'DATASET',
   MODEL = 'MODEL',
-  TEAM_MEMBER = 'TEAM_MEMBER',
-  API_KEY = 'API_KEY',
   PROMPT = 'PROMPT',
+  PLUGIN = 'PLUGIN',
+  VECTOR_STORE = 'VECTOR_STORE',
+  API_COLLECTION = 'API_COLLECTION',
+  TEAM_MEMBER = 'TEAM_MEMBER',
+  TEAM_SETTINGS = 'TEAM_SETTINGS',
+  RESOURCE_SHARDING = 'RESOURCE_SHARDING',
+  API_KEY = 'API_KEY',
+  BILLING = 'BILLING',
 }
 
-/** 活动记录操作类型 */
+/** @deprecated 使用 FullResourceTypeEnum */
+export const ActivityTargetTypeEnum = FullResourceTypeEnum;
+
+/** 活动操作类型（与后端 ActionType 一致） */
 export enum ActivityActionTypeEnum {
   CREATE = 'CREATE',
   UPDATE = 'UPDATE',
   DELETE = 'DELETE',
   VIEW = 'VIEW',
+  COPY = 'COPY',
+  MOVE = 'MOVE',
   SHARE = 'SHARE',
+  UNSHARE = 'UNSHARE',
+  INVITE = 'INVITE',
   EXPORT = 'EXPORT',
   IMPORT = 'IMPORT',
+  UPLOAD = 'UPLOAD',
+  DOWNLOAD = 'DOWNLOAD',
   EXECUTE = 'EXECUTE',
+  START = 'START',
+  STOP = 'STOP',
+  RESTART = 'RESTART',
+  GRANT_PERMISSION = 'GRANT_PERMISSION',
+  REVOKE_PERMISSION = 'REVOKE_PERMISSION',
+  CHANGE_ROLE = 'CHANGE_ROLE',
+  CONFIGURE = 'CONFIGURE',
+  ENABLE = 'ENABLE',
+  DISABLE = 'DISABLE',
   UNKNOWN = 'UNKNOWN',
+}
+
+/** 活动状态（与后端 ActivityStatus 一致） */
+export enum ActivityStatusEnum {
+  SUCCESS = 'SUCCESS',
+  FAILED = 'FAILED',
+  WARNING = 'WARNING',
+  PENDING = 'PENDING',
 }
 
 /** 角色效果：ALLOW-允许, DENY-拒绝 */
@@ -538,5 +570,7 @@ export const enumNamespaceMap = new Map<any, string>([
   [VectorStoreTypeEnum, 'enum.VectorStoreTypeEnum'],
   [EnabledStatusEnum, 'enum.EnabledStatusEnum'],
   [ActivityTargetTypeEnum, 'enum.ActivityTargetTypeEnum'],
+  [FullResourceTypeEnum, 'enum.FullResourceTypeEnum'],
   [ActivityActionTypeEnum, 'enum.ActivityActionTypeEnum'],
+  [ActivityStatusEnum, 'enum.ActivityStatusEnum'],
 ]);

@@ -10,7 +10,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Label } from '@/components/ui/label';
-import { ActivityRecord } from '../types';
+import type { ActivityDetailVo } from '@/services/ActivityTypes';
 import {
   getActionIcon,
   getActionLabel,
@@ -27,7 +27,7 @@ interface ActivityDetailDialogProps {
   /** 关闭弹窗回调 */
   onOpenChange: (open: boolean) => void;
   /** 选中的活动记录 */
-  selectedActivity: ActivityRecord | null;
+  selectedActivity: ActivityDetailVo | null;
   /** 当前语言 */
   language: string;
 }
@@ -41,8 +41,11 @@ export function ActivityDetailDialog({
 }: ActivityDetailDialogProps) {
   if (!selectedActivity) return null;
 
-  const ActionIcon = getActionIcon(selectedActivity.actionType);
-  const TargetIcon = getTargetIcon(selectedActivity.targetType);
+  const resourceType = selectedActivity.resourceType ?? '';
+  const resourceName = selectedActivity.resourceName ?? '';
+  const resourceId = selectedActivity.resourceId;
+  const ActionIcon = getActionIcon(selectedActivity.actionType ?? '');
+  const TargetIcon = getTargetIcon(resourceType);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -63,7 +66,7 @@ export function ActivityDetailDialog({
           <div className='flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg'>
             <Avatar className='w-12 h-12'>
               <AvatarFallback className='bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'>
-                {selectedActivity.userAvatar}
+                {selectedActivity.userAvatar ?? selectedActivity.userAvatarFallback ?? '--'}
               </AvatarFallback>
             </Avatar>
             <div>
@@ -83,10 +86,10 @@ export function ActivityDetailDialog({
                 </Label>
                 <div className='flex items-center gap-2 mt-1'>
                   <ActionIcon
-                    className={`w-4 h-4 ${getActionColor(selectedActivity.actionType)}`}
+                    className={`w-4 h-4 ${getActionColor(selectedActivity.actionType ?? '')}`}
                   />
                   <span className='dark:text-white'>
-                    {getActionLabel(selectedActivity.actionType)}
+                    {getActionLabel(selectedActivity.actionType ?? '')}
                   </span>
                 </div>
               </div>
@@ -97,10 +100,10 @@ export function ActivityDetailDialog({
                 </Label>
                 <div className='flex items-center gap-2 mt-1'>
                   <TargetIcon
-                    className={`w-4 h-4 ${getTargetColor(selectedActivity.targetType)}`}
+                    className={`w-4 h-4 ${getTargetColor(resourceType)}`}
                   />
                   <span className='dark:text-white'>
-                    {getTargetLabel(selectedActivity.targetType)}
+                    {getTargetLabel(resourceType)}
                   </span>
                 </div>
               </div>
@@ -109,14 +112,14 @@ export function ActivityDetailDialog({
                 <Label className='text-sm text-gray-600 dark:text-gray-400'>
                   {language === 'zh-CN' ? '目标名称' : 'Target Name'}
                 </Label>
-                <p className='dark:text-white mt-1'>{selectedActivity.targetName || '--'}</p>
+                <p className='dark:text-white mt-1'>{resourceName || '--'}</p>
               </div>
 
               <div>
                 <Label className='text-sm text-gray-600 dark:text-gray-400'>
                   {language === 'zh-CN' ? '目标ID' : 'Target ID'}
                 </Label>
-                <p className='dark:text-white mt-1'>{selectedActivity.targetId ?? '--'}</p>
+                <p className='dark:text-white mt-1'>{resourceId ?? '--'}</p>
               </div>
 
               <div>

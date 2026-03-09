@@ -14,19 +14,35 @@ import {
   Upload,
   Download,
   Info,
+  Puzzle,
+  Layers,
+  Link2,
+  CreditCard,
+  Copy,
+  Move,
+  UserPlus,
+  Power,
+  Shield,
+  Key,
 } from 'lucide-react';
-import { ActivityTargetTypeEnum, ActivityActionTypeEnum } from '@/enums/enums';
+import { FullResourceTypeEnum, ActivityActionTypeEnum } from '@/enums/enums';
 
 /** 目标类型对应图标与颜色配置（文案通过枚举国际化获取） */
-export const targetTypeMeta: Partial<Record<ActivityTargetTypeEnum, { icon: any; color: string }>> = {
-  [ActivityTargetTypeEnum.APPLICATION]: { icon: Brain, color: 'text-blue-500' },
-  [ActivityTargetTypeEnum.WORKFLOW]: { icon: Workflow, color: 'text-purple-500' },
-  [ActivityTargetTypeEnum.KNOWLEDGE_BASE]: { icon: Database, color: 'text-green-500' },
-  [ActivityTargetTypeEnum.DATASET]: { icon: FileText, color: 'text-orange-500' },
-  [ActivityTargetTypeEnum.MODEL]: { icon: Settings, color: 'text-indigo-500' },
-  [ActivityTargetTypeEnum.TEAM_MEMBER]: { icon: User, color: 'text-pink-500' },
-  [ActivityTargetTypeEnum.API_KEY]: { icon: Settings, color: 'text-red-500' },
-  [ActivityTargetTypeEnum.PROMPT]: { icon: FileText, color: 'text-cyan-500' },
+export const targetTypeMeta: Partial<Record<FullResourceTypeEnum, { icon: any; color: string }>> = {
+  [FullResourceTypeEnum.APPLICATION]: { icon: Brain, color: 'text-blue-500' },
+  [FullResourceTypeEnum.WORKFLOW]: { icon: Workflow, color: 'text-purple-500' },
+  [FullResourceTypeEnum.KNOWLEDGE_BASE]: { icon: Database, color: 'text-green-500' },
+  [FullResourceTypeEnum.DATASET]: { icon: FileText, color: 'text-orange-500' },
+  [FullResourceTypeEnum.MODEL]: { icon: Settings, color: 'text-indigo-500' },
+  [FullResourceTypeEnum.PROMPT]: { icon: FileText, color: 'text-cyan-500' },
+  [FullResourceTypeEnum.PLUGIN]: { icon: Puzzle, color: 'text-amber-500' },
+  [FullResourceTypeEnum.VECTOR_STORE]: { icon: Layers, color: 'text-teal-500' },
+  [FullResourceTypeEnum.API_COLLECTION]: { icon: Link2, color: 'text-sky-500' },
+  [FullResourceTypeEnum.TEAM_MEMBER]: { icon: User, color: 'text-pink-500' },
+  [FullResourceTypeEnum.TEAM_SETTINGS]: { icon: Settings, color: 'text-slate-500' },
+  [FullResourceTypeEnum.RESOURCE_SHARDING]: { icon: Database, color: 'text-violet-500' },
+  [FullResourceTypeEnum.API_KEY]: { icon: Key, color: 'text-red-500' },
+  [FullResourceTypeEnum.BILLING]: { icon: CreditCard, color: 'text-emerald-500' },
 };
 
 /** 操作类型对应图标与颜色配置（文案通过枚举国际化获取） */
@@ -35,10 +51,25 @@ export const actionTypeMeta: Partial<Record<ActivityActionTypeEnum, { icon: any;
   [ActivityActionTypeEnum.UPDATE]: { icon: Edit, color: 'text-blue-500' },
   [ActivityActionTypeEnum.DELETE]: { icon: Trash2, color: 'text-red-500' },
   [ActivityActionTypeEnum.VIEW]: { icon: Eye, color: 'text-gray-500' },
+  [ActivityActionTypeEnum.COPY]: { icon: Copy, color: 'text-sky-500' },
+  [ActivityActionTypeEnum.MOVE]: { icon: Move, color: 'text-amber-500' },
   [ActivityActionTypeEnum.SHARE]: { icon: Share2, color: 'text-purple-500' },
+  [ActivityActionTypeEnum.UNSHARE]: { icon: Share2, color: 'text-slate-500' },
+  [ActivityActionTypeEnum.INVITE]: { icon: UserPlus, color: 'text-pink-500' },
   [ActivityActionTypeEnum.EXPORT]: { icon: Download, color: 'text-indigo-500' },
   [ActivityActionTypeEnum.IMPORT]: { icon: Upload, color: 'text-orange-500' },
+  [ActivityActionTypeEnum.UPLOAD]: { icon: Upload, color: 'text-orange-500' },
+  [ActivityActionTypeEnum.DOWNLOAD]: { icon: Download, color: 'text-indigo-500' },
   [ActivityActionTypeEnum.EXECUTE]: { icon: Activity, color: 'text-cyan-500' },
+  [ActivityActionTypeEnum.START]: { icon: Power, color: 'text-green-500' },
+  [ActivityActionTypeEnum.STOP]: { icon: Power, color: 'text-red-500' },
+  [ActivityActionTypeEnum.RESTART]: { icon: Power, color: 'text-amber-500' },
+  [ActivityActionTypeEnum.GRANT_PERMISSION]: { icon: Shield, color: 'text-emerald-500' },
+  [ActivityActionTypeEnum.REVOKE_PERMISSION]: { icon: Shield, color: 'text-red-500' },
+  [ActivityActionTypeEnum.CHANGE_ROLE]: { icon: User, color: 'text-violet-500' },
+  [ActivityActionTypeEnum.CONFIGURE]: { icon: Settings, color: 'text-slate-500' },
+  [ActivityActionTypeEnum.ENABLE]: { icon: Power, color: 'text-green-500' },
+  [ActivityActionTypeEnum.DISABLE]: { icon: Power, color: 'text-red-500' },
   [ActivityActionTypeEnum.UNKNOWN]: { icon: Info, color: 'text-gray-500' },
 };
 

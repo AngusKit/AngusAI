@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card } from '@/components/ui/card';
 import { getEnumDescription } from '@/enums/utils';
-import { ActivityTargetTypeEnum, ActivityActionTypeEnum } from '@/enums/enums';
+import { FullResourceTypeEnum, ActivityActionTypeEnum } from '@/enums/enums';
 import { orderedActionTypes } from '../constants';
 
 interface ActivityFiltersProps {
@@ -65,9 +65,9 @@ export function ActivityFilters({
               <SelectItem value='all' className='dark:text-white'>
                 {language === 'zh-CN' ? '所有类型' : 'All Types'}
               </SelectItem>
-              {Object.values(ActivityTargetTypeEnum).map(key => (
+              {Object.values(FullResourceTypeEnum).map(key => (
                 <SelectItem key={key} value={key} className='dark:text-white'>
-                  {getEnumDescription(ActivityTargetTypeEnum, key)}
+                  {getEnumDescription(FullResourceTypeEnum, key)}
                 </SelectItem>
               ))}
             </SelectContent>
