@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useLanguage } from '@/components/LanguageProvider.tsx';
+import { useNavigate } from 'react-router-dom';
 import { Bot, Search, Filter, Grid3x3, List, Eye, Edit, Trash2, MoreHorizontal, Play, Pause, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -7,23 +7,12 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { XcanPagination } from '@/components/ui/pagination';
 import { toast } from 'sonner';
 import { useDebounce } from '@/hooks/useDebounce';
 import Agents from '@/services/Agents';
-import Models from '@/services/Models';
-import {
-  AgentListVo,
-  AgentCreateDto,
-  AgentUpdateDto,
-} from '@/services/AgentsTypes';
-import type { AgentStatusEnum } from '@/services/AgentsTypes';
-import { AgentStatusEnum as AgentStatusEnumValue } from '@/enums/enums';
-import { ModelListVo } from '@/services/ModelsTypes';
-import { ModelStatusEnum } from '@/enums/enums';
+import { AgentListVo } from '@/services/AgentsTypes';
+import { AgentStatusEnum } from '@/enums/enums';
 
 interface AgentListItem {
   id: string;
@@ -40,47 +29,17 @@ const AGENT_STATUS_CONFIG: Record<string, { color: string }> = {
 };
 
 export function AgentManagement() {
-  const { t } = useLanguage();
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
   const [statusFilter, setStatusFilter] = useState<'all' | AgentStatusEnum>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [createDialogOpen, setCreateDialogOpen] = useState(false);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
-  const [selectedAgent, setSelectedAgent] = useState<AgentListItem | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
   const [agents, setAgents] = useState<AgentListItem[]>([]);
   const [agentsLoading, setAgentsLoading] = useState(false);
   const [agentsTotal, setAgentsTotal] = useState(0);
-  const [models, setModels] = useState<ModelListVo[]>([]);
-
-  const [createForm, setCreateForm] = useState({
-    name: '',
-    description: '',
-    modelId: 0,
-  });
-  const [editForm, setEditForm] = useState({
-    name: '',
-    description: '',
-    modelId: 0,
-  });
-
-  const loadModels = useCallback(async () => {
-    try {
-      const res = await Models.getModelList({
-        status: ModelStatusEnum.ACTIVE,
-        pageNo: 1,
-        pageSize: 100,
-      });
-      const data = (res as any)?.data;
-      setModels(data?.list ?? []);
-    } catch (e) {
-      console.error('Failed to load models:', e);
-    }
-  }, []);
 
   const loadAgents = useCallback(async () => {
     setAgentsLoading(true);
@@ -118,65 +77,13 @@ export function AgentManagement() {
     loadAgents();
   }, [loadAgents]);
 
-  useEffect(() => {
-    if (createDialogOpen || editDialogOpen) {
-      loadModels();
-    }
-  }, [createDialogOpen, editDialogOpen, loadModels]);
-
-  const handleCreate = async () => {
-    if (!createForm.name.trim()) {
-      toast.error('请输入智能体名称');
-      return;
-    }
-    if (!createForm.modelId) {
-      toast.error('请选择模型');
-      return;
-    }
-    try {
-      const dto: AgentCreateDto = {
-        name: createForm.name.trim(),
-        description: createForm.description.trim() || undefined,
-        defaultModelId: createForm.modelId,
-      };
-      await Agents.createAgent(dto);
-      toast.success('智能体创建成功');
-      setCreateDialogOpen(false);
-      setCreateForm({ name: '', description: '', modelId: 0 });
-      loadAgents();
-    } catch (error: any) {
-      toast.error(error?.message || '创建失败');
-    }
-  };
-
-  const handleEdit = async () => {
-    if (!selectedAgent) return;
-    if (!editForm.name.trim()) {
-      toast.error('请输入智能体名称');
-      return;
-    }
-    try {
-      const dto: AgentUpdateDto = {
-        name: editForm.name.trim(),
-        description: editForm.description.trim() || undefined,
-        defaultModelId: editForm.modelId || undefined,
-      };
-      await Agents.updateAgent(selectedAgent.id, dto);
-      toast.success('智能体已更新');
-      setEditDialogOpen(false);
-      loadAgents();
-    } catch (error: any) {
-      toast.error(error?.message || '更新失败');
-    }
-  };
-
   const handleToggleStatus = async (agent: AgentListItem) => {
     if (!agent.id || !agent.statusEnum) return;
     const newStatus: AgentStatusEnum =
-      agent.statusEnum === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+      agent.statusEnum === AgentStatusEnum.ACTIVE ? AgentStatusEnum.INACTIVE : AgentStatusEnum.ACTIVE;
     try {
       await Agents.updateAgentStatus(agent.id, newStatus);
-      toast.success(newStatus === 'ACTIVE' ? '已发布' : '已下线');
+      toast.success(newStatus === AgentStatusEnum.ACTIVE ? '已发布' : '已下线');
       loadAgents();
     } catch (error: any) {
       toast.error(error?.message || '操作失败');
@@ -192,31 +99,6 @@ export function AgentManagement() {
     } catch (error: any) {
       toast.error(error?.message || '删除失败');
     }
-  };
-
-  const openEdit = async (agent: AgentListItem) => {
-    setSelectedAgent(agent);
-    let modelId = 0;
-    try {
-      const res = await Agents.getAgentDetail(agent.id);
-      const detail = (res as any)?.data;
-      if (detail?.modelId) {
-        modelId = typeof detail.modelId === 'number' ? detail.modelId : parseInt(String(detail.modelId), 10) || 0;
-      }
-    } catch {
-      // ignore
-    }
-    setEditForm({
-      name: agent.name,
-      description: agent.description,
-      modelId,
-    });
-    setEditDialogOpen(true);
-  };
-
-  const openDetail = (agent: AgentListItem) => {
-    setSelectedAgent(agent);
-    setDetailDialogOpen(true);
   };
 
   const getStatusConfig = (status?: string) =>
@@ -260,10 +142,10 @@ export function AgentManagement() {
               <SelectItem value="all" className="dark:text-gray-300">
                 全部状态
               </SelectItem>
-              <SelectItem value={AgentStatusEnumValue.ACTIVE} className="dark:text-gray-300">
+              <SelectItem value={AgentStatusEnum.ACTIVE} className="dark:text-gray-300">
                 已发布
               </SelectItem>
-              <SelectItem value={AgentStatusEnumValue.INACTIVE} className="dark:text-gray-300">
+              <SelectItem value={AgentStatusEnum.INACTIVE} className="dark:text-gray-300">
                 已下线
               </SelectItem>
             </SelectContent>
@@ -287,12 +169,10 @@ export function AgentManagement() {
             </Button>
           </div>
           <Button
-            onClick={() => {
-              setCreateForm({ name: '', description: '', modelId: 0 });
-              setCreateDialogOpen(true);
-            }}
+            onClick={() => navigate('/agents/create')}
             className="bg-blue-500 hover:bg-blue-600"
           >
+            <Plus className="w-4 h-4 mr-2" />
             创建智能体
           </Button>
         </div>
@@ -307,7 +187,7 @@ export function AgentManagement() {
         <Card className="py-16 px-8 text-center dark:bg-gray-800 dark:border-gray-700 border-2 border-dashed border-gray-200 dark:border-gray-600">
           <div className="flex flex-col items-center max-w-md mx-auto">
             <div className="bg-gradient-to-br from-orange-100 to-orange-50 dark:from-orange-900/30 dark:to-orange-800/20 w-20 h-20 rounded-2xl flex items-center justify-center mt-5 mb-6">
-              <Bot className="w-20 h-20 text-orange-500 dark:text-orange-400" />
+              <Bot className="w-10 h-10 text-orange-500 dark:text-orange-400" />
             </div>
             <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">
               暂无智能体
@@ -315,6 +195,13 @@ export function AgentManagement() {
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 leading-relaxed">
               创建您的第一个智能体，配置模型与能力，开启 AI 对话体验
             </p>
+            <Button
+              onClick={() => navigate('/agents/create')}
+              className="bg-blue-500 hover:bg-blue-600 gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              创建智能体
+            </Button>
           </div>
         </Card>
       ) : viewMode === 'grid' ? (
@@ -324,11 +211,15 @@ export function AgentManagement() {
             return (
               <Card
                 key={agent.id}
-                className="p-5 dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow"
+                className="p-5 dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow cursor-pointer"
+                onClick={() => navigate(`/agents/${agent.id}`)}
               >
                 <div className="flex items-start justify-between mb-2">
                   <button
-                    onClick={() => handleToggleStatus(agent)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleToggleStatus(agent);
+                    }}
                     className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                     disabled={!agent.statusEnum}
                   >
@@ -339,17 +230,17 @@ export function AgentManagement() {
                     )}
                   </button>
                   <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
+                    <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                       <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
                         <MoreHorizontal className="w-4 h-4 text-gray-600 dark:text-gray-400" />
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="dark:bg-gray-800 dark:border-gray-700">
-                      <DropdownMenuItem onClick={() => openDetail(agent)} className="dark:text-gray-300">
+                      <DropdownMenuItem onClick={() => navigate(`/agents/${agent.id}`)} className="dark:text-gray-300">
                         <Eye className="w-4 h-4 mr-2" />
                         查看详情
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => openEdit(agent)} className="dark:text-gray-300">
+                      <DropdownMenuItem onClick={() => navigate(`/agents/${agent.id}/edit`)} className="dark:text-gray-300">
                         <Edit className="w-4 h-4 mr-2" />
                         编辑
                       </DropdownMenuItem>
@@ -397,7 +288,10 @@ export function AgentManagement() {
                   const statusCfg = getStatusConfig(agent.statusEnum);
                   return (
                     <tr key={agent.id} className="hover:bg-gray-50 dark:hover:bg-gray-900">
-                      <td className="px-6 py-4">
+                      <td
+                        className="px-6 py-4 cursor-pointer"
+                        onClick={() => navigate(`/agents/${agent.id}`)}
+                      >
                         <div className="flex items-center gap-3">
                           <div className="bg-gradient-to-br from-orange-500 to-orange-600 w-10 h-10 rounded-lg flex items-center justify-center">
                             <Bot className="w-5 h-5 text-white" />
@@ -429,13 +323,13 @@ export function AgentManagement() {
                             )}
                           </button>
                           <button
-                            onClick={() => openDetail(agent)}
+                            onClick={() => navigate(`/agents/${agent.id}`)}
                             className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
                           >
                             <Eye className="w-4 h-4 text-blue-500" />
                           </button>
                           <button
-                            onClick={() => openEdit(agent)}
+                            onClick={() => navigate(`/agents/${agent.id}/edit`)}
                             className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
                           >
                             <Edit className="w-4 h-4 text-gray-600 dark:text-gray-400" />
@@ -465,163 +359,6 @@ export function AgentManagement() {
           onChange={({ pageNo }) => setCurrentPage(pageNo)}
         />
       )}
-
-      {/* 创建对话框 */}
-      <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-        <DialogContent className="dark:bg-gray-800 dark:border-gray-700 sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle className="dark:text-white">创建智能体</DialogTitle>
-            <DialogDescription className="dark:text-gray-400">
-              填写基本信息并选择模型
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div>
-              <Label className="dark:text-gray-300">名称</Label>
-              <Input
-                value={createForm.name}
-                onChange={(e) => setCreateForm((f) => ({ ...f, name: e.target.value }))}
-                placeholder="智能体名称"
-                maxLength={100}
-                className="mt-2 dark:bg-gray-900 dark:border-gray-700 dark:text-white"
-              />
-            </div>
-            <div>
-              <Label className="dark:text-gray-300">描述</Label>
-              <Textarea
-                value={createForm.description}
-                onChange={(e) => setCreateForm((f) => ({ ...f, description: e.target.value }))}
-                placeholder="智能体简要介绍, 不超过800字"
-                maxLength={800}
-                rows={5}
-                className="mt-2 dark:bg-gray-900 dark:border-gray-700 dark:text-white resize-none"
-              />
-            </div>
-            <div>
-              <Label className="dark:text-gray-300">默认模型</Label>
-              <Select
-                value={createForm.modelId ? String(createForm.modelId) : ''}
-                onValueChange={(v) => setCreateForm((f) => ({ ...f, modelId: parseInt(v, 10) }))}
-              >
-                <SelectTrigger className="mt-2 dark:bg-gray-900 dark:border-gray-700 dark:text-white">
-                  <SelectValue placeholder="选择默认模型" />
-                </SelectTrigger>
-                <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                  {models.map((m) => (
-                    <SelectItem key={m.id} value={m.id} className="dark:text-gray-300">
-                      {m.name ?? m.id}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setCreateDialogOpen(false)} className="dark:bg-gray-700 dark:border-gray-600">
-              取消
-            </Button>
-            <Button onClick={handleCreate} className="bg-blue-500 hover:bg-blue-600">
-              创建
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* 编辑对话框 */}
-      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-        <DialogContent className="dark:bg-gray-800 dark:border-gray-700 sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle className="dark:text-white">编辑智能体</DialogTitle>
-            <DialogDescription className="dark:text-gray-400">
-              修改智能体基本信息
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div>
-              <Label className="dark:text-gray-300">名称</Label>
-              <Input
-                value={editForm.name}
-                onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))}
-                placeholder="智能体名称"
-                maxLength={100}
-                className="mt-2 dark:bg-gray-900 dark:border-gray-700 dark:text-white"
-              />
-            </div>
-            <div>
-              <Label className="dark:text-gray-300">描述</Label>
-              <Textarea
-                value={editForm.description}
-                onChange={(e) => setEditForm((f) => ({ ...f, description: e.target.value }))}
-                placeholder="智能体简要介绍, 不超过800字"
-                maxLength={800}
-                rows={5}
-                className="mt-2 dark:bg-gray-900 dark:border-gray-700 dark:text-white resize-none"
-              />
-            </div>
-            <div>
-              <Label className="dark:text-gray-300">模型</Label>
-              <Select
-                value={editForm.modelId ? String(editForm.modelId) : ''}
-                onValueChange={(v) => setEditForm((f) => ({ ...f, modelId: parseInt(v, 10) }))}
-              >
-                <SelectTrigger className="mt-2 dark:bg-gray-900 dark:border-gray-700 dark:text-white">
-                  <SelectValue placeholder="选择模型" />
-                </SelectTrigger>
-                <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                  {models.map((m) => (
-                    <SelectItem key={m.id} value={m.id} className="dark:text-gray-300">
-                      {m.name ?? m.id}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditDialogOpen(false)} className="dark:bg-gray-700 dark:border-gray-600">
-              取消
-            </Button>
-            <Button onClick={handleEdit} className="bg-blue-500 hover:bg-blue-600">
-              保存
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* 详情对话框 */}
-      <Dialog open={detailDialogOpen} onOpenChange={setDetailDialogOpen}>
-        <DialogContent className="dark:bg-gray-800 dark:border-gray-700 sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle className="dark:text-white">智能体详情</DialogTitle>
-          </DialogHeader>
-          {selectedAgent && (
-            <div className="space-y-4 py-4">
-              <div className="flex items-start gap-4">
-                <div className="bg-gradient-to-br from-orange-500 to-orange-600 w-16 h-16 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Bot className="w-8 h-8 text-white" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-xl mb-1 dark:text-white">{selectedAgent.name}</h3>
-                  <Badge className={`text-xs ${(getStatusConfig(selectedAgent?.statusEnum) ?? { color: 'bg-gray-100' }).color} border-0`}>
-                    {selectedAgent.statusEnum === 'ACTIVE' ? '已发布' : '已下线'}
-                  </Badge>
-                </div>
-              </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{selectedAgent.description}</p>
-            </div>
-          )}
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDetailDialogOpen(false)} className="dark:bg-gray-700 dark:border-gray-600">
-              关闭
-            </Button>
-            {selectedAgent && (
-              <Button onClick={() => { setDetailDialogOpen(false); openEdit(selectedAgent); }} className="bg-blue-500 hover:bg-blue-600">
-                编辑
-              </Button>
-            )}
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

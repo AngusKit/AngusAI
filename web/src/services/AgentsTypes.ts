@@ -1,7 +1,11 @@
 import { ApiLocaleResult, TenantAuditingVo } from '@xcan-angus/infra';
-
-/** 智能体状态：ACTIVE=已发布，INACTIVE=下线 */
-export type AgentStatusEnum = 'ACTIVE' | 'INACTIVE';
+import type {
+  AgentStatusEnum,
+  InteractionModeEnum,
+  ReasoningStrategyEnum,
+  AutonomyLevelEnum,
+  MemoryStrategyEnum,
+} from '@/enums/enums';
 
 /** 智能体详情 */
 export interface AgentDetailVo extends TenantAuditingVo {
@@ -14,13 +18,13 @@ export interface AgentDetailVo extends TenantAuditingVo {
   /** 状态 */
   status?: AgentStatusEnum;
   /** 交互模式 */
-  interactionMode?: string;
+  interactionMode?: InteractionModeEnum;
   /** 推理策略 */
-  reasoningStrategy?: string;
+  reasoningStrategy?: ReasoningStrategyEnum;
   /** 自治等级 */
-  autonomyLevel?: string;
-  /** 模型ID */
-  modelId?: string;
+  autonomyLevel?: AutonomyLevelEnum;
+  /** 默认模型ID（可选，后端可能返回 null） */
+  defaultModelId?: string | null;
   /** 系统提示词 */
   systemPrompt?: string;
   /** 欢迎消息 */
@@ -40,11 +44,13 @@ export interface AgentDetailVo extends TenantAuditingVo {
   /** 接口集ID列表 */
   apiCollectionIds?: string[];
   /** 记忆策略 */
-  memoryStrategy?: string;
+  memoryStrategy?: MemoryStrategyEnum;
   /** 记忆窗口大小 */
   memoryWindowSize?: number;
   /** 记忆最大Token数 */
   memoryMaxTokens?: number;
+  /** 摘要提示词（后端字段 memorySummaryPrompt） */
+  memorySummaryPrompt?: string;
   /** 输入护栏ID列表 */
   inputGuardrailIds?: string[];
   /** 输出护栏ID列表 */
@@ -66,7 +72,7 @@ export interface AgentListVo {
   /** 模型ID */
   modelId?: string;
   /** 交互模式 */
-  interactionMode?: string;
+  interactionMode?: InteractionModeEnum;
 }
 
 /** 智能体详情结果 */
@@ -96,13 +102,13 @@ export interface AgentCreateDto {
   /** 描述 */
   description?: string;
   /** 交互模式，默认 CHATBOT */
-  interactionMode?: string;
+  interactionMode?: InteractionModeEnum;
   /** 推理策略，默认 FUNCTION_CALLING */
-  reasoningStrategy?: string;
+  reasoningStrategy?: ReasoningStrategyEnum;
   /** 自治等级，默认 ASSISTANT */
-  autonomyLevel?: string;
-  /** 默认模型ID（必填） */
-  defaultModelId: number;
+  autonomyLevel?: AutonomyLevelEnum;
+  /** 默认模型ID（可选，后端可接受 null） */
+  defaultModelId?: string | null;
   /** 系统提示词 */
   systemPrompt?: string;
   /** 欢迎消息 */
@@ -126,13 +132,13 @@ export interface AgentUpdateDto {
   /** 描述 */
   description?: string;
   /** 交互模式 */
-  interactionMode?: string;
+  interactionMode?: InteractionModeEnum;
   /** 推理策略 */
-  reasoningStrategy?: string;
+  reasoningStrategy?: ReasoningStrategyEnum;
   /** 自治等级 */
-  autonomyLevel?: string;
-  /** 默认模型ID（必填） */
-  defaultModelId?: number;
+  autonomyLevel?: AutonomyLevelEnum;
+  /** 默认模型ID（可选） */
+  defaultModelId?: string | null;
   /** 系统提示词 */
   systemPrompt?: string;
   /** 欢迎消息 */
@@ -153,11 +159,11 @@ export interface AgentUpdateDto {
 export interface AgentResourcesDto {
   /** 知识库ID列表，最多5个 */
   knowledgeBaseIds?: string[];
-  /** 工具ID列表，最多20个 */
+  /** 工具ID列表，最多20个（后期实现） */
   toolIds?: string[];
   /** 工作流ID */
   workflowId?: string;
-  /** 技能ID列表，最多20个 */
+  /** 技能ID列表，最多20个（后期实现） */
   skillIds?: string[];
   /** 数据集ID列表，最多5个 */
   datasetIds?: string[];
@@ -168,12 +174,12 @@ export interface AgentResourcesDto {
 /** 记忆配置 */
 export interface AgentMemoryDto {
   /** 策略，默认 TOKEN_WINDOW */
-  strategy?: string;
+  strategy?: MemoryStrategyEnum;
   /** 窗口大小，默认20 */
   windowSize?: number;
   /** 最大Token数，默认8000 */
   maxTokens?: number;
-  /** 摘要提示词 */
+  /** 摘要提示词，最大 2000 字符 */
   summaryPrompt?: string;
 }
 

@@ -27,6 +27,6 @@ public class AgentListVo extends TenantAuditingVo {
   @Schema(description = "交互模式")
   private InteractionMode interactionMode;
 
-  @Schema(description = "模型ID")
-  private Long modelId;
+  @Schema(description = "默认模型ID")
+  private Long defaultModelId;
 }

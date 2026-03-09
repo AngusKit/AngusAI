@@ -12,7 +12,6 @@ import cloud.xcan.agentx.core.agent.enums.ReasoningStrategy;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.List;
 import java.util.Map;
@@ -40,8 +39,7 @@ public class AgentUpdateDto {
   @Schema(description = "自治等级", example = "ASSISTANT")
   private AutonomyLevel autonomyLevel = AutonomyLevel.ASSISTANT;
 
-  @NotNull
-  @Schema(description = "默认模型ID", requiredMode = RequiredMode.REQUIRED)
+  @Schema(description = "默认模型ID，可选")
   private Long defaultModelId;
 
   @Size(max = AGENT_SYSTEM_PROMPT_MAX_LENGTH)

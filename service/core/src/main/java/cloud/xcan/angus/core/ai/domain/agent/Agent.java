@@ -63,7 +63,7 @@ public class Agent extends TenantAuditingEntity<Agent, Long> {
   @Column(name = "autonomy_level", length = 30)
   private AutonomyLevel autonomyLevel = AutonomyLevel.ASSISTANT;
 
-  @Column(name = "default_model_id", nullable = false)
+  @Column(name = "default_model_id")
   private Long defaultModelId;
 
   @Column(name = "system_prompt", length = Constants.AGENT_SYSTEM_PROMPT_MAX_LENGTH)

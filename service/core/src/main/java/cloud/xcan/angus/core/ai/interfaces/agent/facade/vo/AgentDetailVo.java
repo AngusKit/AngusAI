@@ -38,8 +38,8 @@ public class AgentDetailVo extends TenantAuditingVo {
   @Schema(description = "自治等级")
   private AutonomyLevel autonomyLevel;
 
-  @Schema(description = "模型ID")
-  private Long modelId;
+  @Schema(description = "默认模型ID")
+  private Long defaultModelId;
 
   @Schema(description = "系统提示词")
   private String systemPrompt;
@@ -76,6 +76,9 @@ public class AgentDetailVo extends TenantAuditingVo {
 
   @Schema(description = "记忆最大Token数")
   private Integer memoryMaxTokens;
+
+  @Schema(description = "摘要提示词")
+  private String memorySummaryPrompt;
 
   @Schema(description = "输入护栏ID列表")
   private List<String> inputGuardrailIds;

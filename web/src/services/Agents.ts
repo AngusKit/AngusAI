@@ -6,7 +6,7 @@ import {
   AgentUpdateDto,
 } from './AgentsTypes.ts';
 import http, { ContentType, HttpClient, QueryParamsType, RequestParams } from './HttpClient.ts';
-import type { AgentStatusEnum } from './AgentsTypes.ts';
+import type { AgentStatusEnum } from '@/enums/enums';
 
 export class Agents<SecurityDataType = unknown> {
   http: HttpClient<SecurityDataType>;

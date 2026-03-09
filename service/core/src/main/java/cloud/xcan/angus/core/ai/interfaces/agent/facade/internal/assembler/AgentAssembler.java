@@ -115,7 +115,7 @@ public class AgentAssembler {
     vo.setInteractionMode(agent.getInteractionMode());
     vo.setReasoningStrategy(agent.getReasoningStrategy());
     vo.setAutonomyLevel(agent.getAutonomyLevel());
-    vo.setModelId(agent.getDefaultModelId());
+    vo.setDefaultModelId(agent.getDefaultModelId());
     vo.setSystemPrompt(agent.getSystemPrompt());
     vo.setWelcomeMessage(agent.getWelcomeMessage());
     vo.setSuggestedQuestions(agent.getSuggestedQuestions());
@@ -132,6 +132,7 @@ public class AgentAssembler {
     vo.setMemoryStrategy(agent.getMemoryStrategy());
     vo.setMemoryWindowSize(agent.getMemoryWindowSize());
     vo.setMemoryMaxTokens(agent.getMemoryMaxTokens());
+    vo.setMemorySummaryPrompt(agent.getMemorySummaryPrompt());
     vo.setInputGuardrailIds(agent.getInputGuardrailIds());
     vo.setOutputGuardrailIds(agent.getOutputGuardrailIds());
     vo.setVariables(agent.getVariables());
@@ -152,7 +153,7 @@ public class AgentAssembler {
     vo.setDescription(agent.getDescription());
     vo.setStatus(agent.getStatus());
     vo.setInteractionMode(agent.getInteractionMode());
-    vo.setModelId(agent.getDefaultModelId());
+    vo.setDefaultModelId(agent.getDefaultModelId());
 
     // 设置审计字段
     vo.setTenantId(agent.getTenantId());

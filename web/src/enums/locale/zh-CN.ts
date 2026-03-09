@@ -197,6 +197,37 @@ export const enumTranslations = {
     PUBLISHED: '已发布',
     PAUSED: '已暂停',
   },
+  AgentStatusEnum: {
+    ACTIVE: '已发布',
+    INACTIVE: '已下线',
+  },
+  InteractionModeEnum: {
+    CHATBOT: '多轮对话',
+    COMPLETION: '单次生成',
+    WORKFLOW: '工作流触发',
+    AGENT_AS_API: '纯 REST API',
+    MULTI_TURN_TASK: '多轮引导任务',
+  },
+  ReasoningStrategyEnum: {
+    SIMPLE_LLM: 'Prompt → Response',
+    FUNCTION_CALLING: '函数调用',
+    REACT: 'ReAct 循环',
+    PLAN_AND_EXECUTE: '计划执行',
+    MULTI_AGENT: '多 Agent 协作',
+  },
+  AutonomyLevelEnum: {
+    TOOL: 'L0 被动响应',
+    ASSISTANT: 'L1 助手',
+    COLLABORATOR: 'L2 协作者',
+    DELEGATE: 'L3 委托',
+    AUTONOMOUS: 'L4 自主',
+  },
+  MemoryStrategyEnum: {
+    NONE: '不保留',
+    MESSAGE_WINDOW: '消息窗口',
+    TOKEN_WINDOW: 'Token 窗口',
+    SUMMARY: '摘要记忆',
+  },
   ApiKeyPermissionsEnum: {
     READ: '读取',
     WRITE: '写入',

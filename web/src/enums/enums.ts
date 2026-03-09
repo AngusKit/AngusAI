@@ -273,10 +273,39 @@ export enum AgentStatusEnum {
   INACTIVE = 'INACTIVE',
 }
 
-/** 智能体状态：ACTIVE-已发布, INACTIVE-已下线 */
-export enum AgentStatusEnum {
-  ACTIVE = 'ACTIVE',
-  INACTIVE = 'INACTIVE',
+/** 智能体交互模式（与后端 InteractionMode 一致） */
+export enum InteractionModeEnum {
+  CHATBOT = 'CHATBOT',
+  COMPLETION = 'COMPLETION',
+  WORKFLOW = 'WORKFLOW',
+  AGENT_AS_API = 'AGENT_AS_API',
+  MULTI_TURN_TASK = 'MULTI_TURN_TASK',
+}
+
+/** 智能体推理策略（与后端 ReasoningStrategy 一致） */
+export enum ReasoningStrategyEnum {
+  SIMPLE_LLM = 'SIMPLE_LLM',
+  FUNCTION_CALLING = 'FUNCTION_CALLING',
+  REACT = 'REACT',
+  PLAN_AND_EXECUTE = 'PLAN_AND_EXECUTE',
+  MULTI_AGENT = 'MULTI_AGENT',
+}
+
+/** 智能体自治等级（与后端 AutonomyLevel 一致） */
+export enum AutonomyLevelEnum {
+  TOOL = 'TOOL',
+  ASSISTANT = 'ASSISTANT',
+  COLLABORATOR = 'COLLABORATOR',
+  DELEGATE = 'DELEGATE',
+  AUTONOMOUS = 'AUTONOMOUS',
+}
+
+/** 记忆策略（与后端 MemoryStrategy 一致） */
+export enum MemoryStrategyEnum {
+  NONE = 'NONE',
+  MESSAGE_WINDOW = 'MESSAGE_WINDOW',
+  TOKEN_WINDOW = 'TOKEN_WINDOW',
+  SUMMARY = 'SUMMARY',
 }
 
 export enum ApiKeyPermissionsEnum {
@@ -494,6 +523,11 @@ export const enumNamespaceMap = new Map<any, string>([
   [DatasourceTypeEnum, 'enum.DatasourceTypeEnum'],
   [ApplicationCategoryEnum, 'enum.ApplicationCategoryEnum'],
   [ApplicationStatusEnum, 'enum.ApplicationStatusEnum'],
+  [AgentStatusEnum, 'enum.AgentStatusEnum'],
+  [InteractionModeEnum, 'enum.InteractionModeEnum'],
+  [ReasoningStrategyEnum, 'enum.ReasoningStrategyEnum'],
+  [AutonomyLevelEnum, 'enum.AutonomyLevelEnum'],
+  [MemoryStrategyEnum, 'enum.MemoryStrategyEnum'],
   [ApiKeyPermissionsEnum, 'enum.ApiKeyPermissionsEnum'],
   [ApiKeyStatusEnum, 'enum.ApiKeyStatusEnum'],
   [DatasetDataTypeEnum, 'enum.DatasetDataTypeEnum'],

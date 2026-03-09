@@ -197,6 +197,37 @@ export const enumTranslations = {
     PUBLISHED: 'Published',
     PAUSED: 'Paused',
   },
+  AgentStatusEnum: {
+    ACTIVE: 'Published',
+    INACTIVE: 'Inactive',
+  },
+  InteractionModeEnum: {
+    CHATBOT: 'Multi-turn Chat',
+    COMPLETION: 'Single Completion',
+    WORKFLOW: 'Workflow Trigger',
+    AGENT_AS_API: 'REST API Only',
+    MULTI_TURN_TASK: 'Multi-turn Task',
+  },
+  ReasoningStrategyEnum: {
+    SIMPLE_LLM: 'Prompt → Response',
+    FUNCTION_CALLING: 'Function Calling',
+    REACT: 'ReAct Loop',
+    PLAN_AND_EXECUTE: 'Plan & Execute',
+    MULTI_AGENT: 'Multi-Agent',
+  },
+  AutonomyLevelEnum: {
+    TOOL: 'L0 Passive',
+    ASSISTANT: 'L1 Assistant',
+    COLLABORATOR: 'L2 Collaborator',
+    DELEGATE: 'L3 Delegate',
+    AUTONOMOUS: 'L4 Autonomous',
+  },
+  MemoryStrategyEnum: {
+    NONE: 'None',
+    MESSAGE_WINDOW: 'Message Window',
+    TOKEN_WINDOW: 'Token Window',
+    SUMMARY: 'Summary',
+  },
   ApiKeyPermissionsEnum: {
     READ: 'Read',
     WRITE: 'Write',

@@ -23,6 +23,11 @@ public interface Constants {
   int AGENT_WELCOME_MESSAGE_MAX_LENGTH = 1000;
 
   /**
+   * 智能体记忆摘要提示词最大长度
+   */
+  int AGENT_SUMMARY_PROMPT_MAX_LENGTH = 2000;
+
+  /**
    * 智能体建议问题最大数量
    */
   int AGENT_SUGGESTED_QUESTIONS_MAX_SIZE = 10;

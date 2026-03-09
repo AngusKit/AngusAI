@@ -12,6 +12,9 @@ import { APICollection } from '@/pages/apis/APICollection';
 import { PluginMarket } from '@/pages/plugins/PluginMarket';
 import { ModelManagement } from '@/pages/models/ModelManagement';
 import { AgentManagement } from '@/pages/agents/AgentManagement';
+import { CreateAgentPage } from '@/pages/agents/CreateAgentPage';
+import { EditAgentPage } from '@/pages/agents/EditAgentPage';
+import { AgentDetailPage } from '@/pages/agents/AgentDetailPage';
 import { VectorStore } from '@/pages/vector/VectorStore';
 import { TeamMembersPage } from '@/pages/member/TeamMembersPage';
 import { ResourceSharing } from '@/pages/sharding/ResourceSharing';
@@ -41,6 +44,9 @@ export function AppRoutes() {
         <Route path='plugins' element={<PluginMarket />} />
         <Route path='models' element={<ModelManagement />} />
         <Route path='agents' element={<AgentManagement />} />
+        <Route path='agents/create' element={<CreateAgentPage />} />
+        <Route path='agents/:id/edit' element={<EditAgentPage />} />
+        <Route path='agents/:id' element={<AgentDetailPage />} />
         <Route path='vector-store' element={<VectorStore />} />
         <Route path='prompts' element={<PromptLibraryPage />} />
         <Route path='notifications' element={<NotificationsPage />} />

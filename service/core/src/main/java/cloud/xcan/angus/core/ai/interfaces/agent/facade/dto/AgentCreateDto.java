@@ -8,6 +8,7 @@ import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_MEMORY_DEFAULT_WIN
 import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_SKILL_IDS_MAX_SIZE;
 import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_SUGGESTED_QUESTIONS_MAX_SIZE;
 import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_TOOL_IDS_MAX_SIZE;
+import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_SUMMARY_PROMPT_MAX_LENGTH;
 import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_SYSTEM_PROMPT_MAX_LENGTH;
 import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_WELCOME_MESSAGE_MAX_LENGTH;
 import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_DESC_LENGTH_X4;
@@ -48,8 +49,7 @@ public class AgentCreateDto {
   @Schema(description = "自治等级", example = "ASSISTANT")
   private AutonomyLevel autonomyLevel = AutonomyLevel.ASSISTANT;
 
-  @NotNull
-  @Schema(description = "默认模型ID", requiredMode = RequiredMode.REQUIRED)
+  @Schema(description = "默认模型ID，可选")
   private Long defaultModelId;
 
   @Size(max = AGENT_SYSTEM_PROMPT_MAX_LENGTH)
@@ -109,6 +109,7 @@ public class AgentCreateDto {
     private Integer windowSize = AGENT_MEMORY_DEFAULT_WINDOW_SIZE;
     @Schema(description = "最大Token数")
     private Integer maxTokens = AGENT_MEMORY_DEFAULT_MAX_TOKENS;
+    @Size(max = AGENT_SUMMARY_PROMPT_MAX_LENGTH)
     @Schema(description = "摘要提示词")
     private String summaryPrompt;
   }
