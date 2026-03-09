@@ -26,10 +26,10 @@ public class Workflow extends TenantAuditingEntity<Workflow, Long> {
   @Id
   private Long id;
 
-  @Column(name = "name", nullable = false, length = 50)
+  @Column(name = "name", nullable = false, length = 100)
   private String name;
 
-  @Column(name = "description", length = 500)
+  @Column(name = "description", length = 800)
   private String description;
 
   @Column(name = "icon", length = 10)

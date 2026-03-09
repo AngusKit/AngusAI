@@ -1,5 +1,8 @@
 package cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto;
 
+import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_DESC_LENGTH_X4;
+import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_NAME_LENGTH;
+
 import cloud.xcan.angus.core.ai.domain.workflow.WorkflowType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -9,11 +12,11 @@ import org.hibernate.validator.constraints.Length;
 @Schema(description = "更新工作流请求参数")
 public class WorkflowUpdateDto {
 
-  @Length(max = 50)
+  @Length(max = MAX_NAME_LENGTH)
   @Schema(description = "工作流名称", example = "用户注册流程")
   private String name;
 
-  @Length(max = 500)
+  @Length(max = MAX_DESC_LENGTH_X4)
   @Schema(description = "工作流描述", example = "处理用户注册的完整流程")
   private String description;
 
