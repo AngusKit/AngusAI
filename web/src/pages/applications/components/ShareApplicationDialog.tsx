@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.t
 import { Badge } from '@/components/ui/badge.tsx';
 import { ApplicationStatusEnum } from '@/enums/enums.ts';
 import { Copy, Link2, Mail, QrCode, Globe, Lock, Users, Eye } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { getEnumDescription } from '@/enums/utils.ts';
 
@@ -32,48 +32,37 @@ export function ShareApplicationDialog({ open, onOpenChange, application }: Shar
   const [allowAnonymous, setAllowAnonymous] = useState(true);
   const [requireAuth, setRequireAuth] = useState(false);
 
-  // 生成分享链接
-  const generateShareLink = () => {
-    if (application) {
-      const link = `https://angusai.app/apps/${application.id}`;
-      setShareLink(link);
-      return link;
-    }
-    return '';
-  };
+  /** 生成分享链接（纯函数，不修改 state） */
+  const getShareLink = () =>
+    application ? `https://angusai.app/apps/${application.id}` : '';
+  /** 生成嵌入代码（纯函数） */
+  const getEmbedCode = () =>
+    application
+      ? `<iframe src="https://angusai.app/embed/${application.id}" width="400" height="600" frameborder="0"></iframe>`
+      : '';
 
-  // 生成嵌入代码
-  const generateEmbedCode = () => {
-    if (application) {
-      const code = `<iframe src="https://angusai.app/embed/${application.id}" width="400" height="600" frameborder="0"></iframe>`;
-      setEmbedCode(code);
-      return code;
-    }
-    return '';
-  };
-
-  // 打开对话框时生成链接
-  useState(() => {
+  /** 打开对话框时初始化分享链接和嵌入代码 */
+  useEffect(() => {
     if (open && application) {
-      generateShareLink();
-      generateEmbedCode();
+      setShareLink(getShareLink());
+      setEmbedCode(getEmbedCode());
     }
-  });
+  }, [open, application?.id]);
 
   const handleCopyLink = () => {
-    const link = shareLink || generateShareLink();
+    const link = shareLink || getShareLink();
     navigator.clipboard.writeText(link);
     toast.success('链接已复制到剪贴板');
   };
 
   const handleCopyEmbedCode = () => {
-    const code = embedCode || generateEmbedCode();
+    const code = embedCode || getEmbedCode();
     navigator.clipboard.writeText(code);
     toast.success('嵌入代码已复制到剪贴板');
   };
 
   const handleEmailShare = () => {
-    const link = shareLink || generateShareLink();
+    const link = shareLink || getShareLink();
     const subject = encodeURIComponent(`分享应用: ${application?.name}`);
     const body = encodeURIComponent(
       `查看这个AI应用: ${application?.name}\n\n${application?.description}\n\n链接: ${link}`
@@ -133,7 +122,7 @@ export function ShareApplicationDialog({ open, onOpenChange, application }: Shar
               <Label className='dark:text-gray-300'>分享链接</Label>
               <div className='flex gap-2'>
                 <Input
-                  value={shareLink || generateShareLink()}
+                  value={shareLink || getShareLink()}
                   readOnly
                   className='dark:bg-gray-900 dark:border-gray-700 dark:text-white'
                 />
@@ -183,7 +172,7 @@ export function ShareApplicationDialog({ open, onOpenChange, application }: Shar
               <Label className='dark:text-gray-300'>嵌入代码</Label>
               <div className='relative'>
                 <Textarea
-                  value={embedCode || generateEmbedCode()}
+                  value={embedCode || getEmbedCode()}
                   readOnly
                   rows={5}
                   className='dark:bg-gray-900 dark:border-gray-700 dark:text-white font-mono text-sm resize-none'

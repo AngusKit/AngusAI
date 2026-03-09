@@ -1,157 +1,45 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, Search, Bot, Check } from 'lucide-react';
-import Agents from '@/services/Agents.ts';
-import Applications from '@/services/Applications.ts';
-import { Button } from '@/components/ui/button.tsx';
-import { Input } from '@/components/ui/input.tsx';
-import { Textarea } from '@/components/ui/textarea.tsx';
-import { Label } from '@/components/ui/label.tsx';
-import { Card } from '@/components/ui/card.tsx';
-import { ScrollArea } from '@/components/ui/scroll-area.tsx';
-import { Badge } from '@/components/ui/badge.tsx';
-import { toast } from 'sonner';
-import { getTagColor } from '../utils.ts';
-import { AgentStatusEnum } from '@/enums/enums.ts';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Card } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Badge } from '@/components/ui/badge';
+import { getTagColor } from '../utils';
+import { useEditApplication } from '../hooks';
+import { ICON_OPTIONS, NAME_MAX_LENGTH, DESC_MAX_LENGTH, TAG_MAX_COUNT, TAG_MAX_LENGTH } from '../constants';
 
-const ICON_OPTIONS = [
-  { emoji: '🤖', label: '机器人' },
-  { emoji: '💬', label: '对话' },
-  { emoji: '✨', label: '创意' },
-  { emoji: '📚', label: '知识' },
-  { emoji: '⚡', label: '闪电' },
-  { emoji: '🎯', label: '目标' },
-  { emoji: '📊', label: '分析' },
-  { emoji: '💼', label: '办公' },
-  { emoji: '🌐', label: '全球' },
-  { emoji: '🔧', label: '工具' },
-  { emoji: '📝', label: '文档' },
-  { emoji: '🎨', label: '设计' },
-];
-
+/**
+ * 编辑应用页：修改应用基本信息与绑定智能体
+ */
 export function EditApplicationPage() {
-  const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>();
-  const [loading, setLoading] = useState(true);
-  const [detail, setDetail] = useState<any>(null);
-  const [agentSearchQuery, setAgentSearchQuery] = useState('');
-  const [agentsList, setAgentsList] = useState<{ id: string; name: string; description?: string }[]>([]);
-  const [agentsLoading, setAgentsLoading] = useState(false);
-  const [selectedAgentIds, setSelectedAgentIds] = useState<string[]>([]);
-  const [defaultAgentId, setDefaultAgentId] = useState<string | undefined>();
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [icon, setIcon] = useState('🤖');
-  const [tagInput, setTagInput] = useState('');
-  const [tags, setTags] = useState<string[]>([]);
-  const [submitting, setSubmitting] = useState(false);
-
-  useEffect(() => {
-    if (!id) return;
-    setLoading(true);
-    Applications.getApplicationDetail(id)
-      .then((res: any) => {
-        const d = res?.data ?? res;
-        if (!d) {
-          toast.error('应用不存在');
-          navigate('/apps');
-          return;
-        }
-        setDetail(d);
-        setName(d.name ?? '');
-        setDescription(d.description ?? '');
-        setIcon(d.icon && /[\u{1F300}-\u{1F9FF}\u2600-\u26FF\u2700-\u27BF]/u.test(d.icon) ? d.icon : '🤖');
-        setTags(d.tags ?? []);
-        const agents = d.config?.agents ?? d.agents ?? [];
-        const ids = agents.map((a: any) => String(a.id)).filter(Boolean);
-        setSelectedAgentIds(ids.length > 0 ? ids : []);
-        const def = d.config?.defaultAgent ?? d.defaultAgent;
-        setDefaultAgentId(def?.id != null ? String(def.id) : ids[0]);
-      })
-      .catch(() => {
-        toast.error('加载失败');
-        navigate('/apps');
-      })
-      .finally(() => setLoading(false));
-  }, [id, navigate]);
-
-  useEffect(() => {
-    setAgentsLoading(true);
-    Agents.getAgentList({
-      status: AgentStatusEnum.ACTIVE,
-      bindable: true,
-      pageNo: 1,
-      pageSize: 100,
-      keyword: agentSearchQuery.trim() || undefined,
-    })
-      .then((res: any) => {
-        const list = (res?.data?.list ?? []).map((a: any) => ({
-          id: a.id != null ? String(a.id) : '',
-          name: a.name ?? '--',
-          description: a.description,
-        }));
-        setAgentsList(list);
-      })
-      .catch(() => setAgentsList([]))
-      .finally(() => setAgentsLoading(false));
-  }, [agentSearchQuery]);
-
-  const addTag = () => {
-    const t = tagInput.trim().slice(0, 40);
-    if (!t || tags.length >= 5) return;
-    if (tags.includes(t)) return;
-    setTags([...tags, t]);
-    setTagInput('');
-  };
-
-  const removeTag = (idx: number) => setTags(tags.filter((_, i) => i !== idx));
-
-  const toggleAgent = (agentId: string) => {
-    if (selectedAgentIds.includes(agentId)) {
-      const next = selectedAgentIds.filter((a) => a !== agentId);
-      setSelectedAgentIds(next);
-      if (defaultAgentId === agentId) setDefaultAgentId(next[0]);
-    } else {
-      const next = [...selectedAgentIds, agentId];
-      setSelectedAgentIds(next);
-      if (!defaultAgentId) setDefaultAgentId(agentId);
-    }
-  };
-
-  const setAsDefault = (agentId: string) => setDefaultAgentId(agentId);
-
-  const handleSave = async () => {
-    if (!id) return;
-    if (!name.trim()) {
-      toast.error('请输入应用名称');
-      return;
-    }
-    if (selectedAgentIds.length === 0) {
-      toast.error('请至少选择一个智能体');
-      return;
-    }
-
-    setSubmitting(true);
-    try {
-      await Applications.updateApplication(id, {
-        name: name.trim(),
-        icon,
-        description: description.trim() || undefined,
-        tags: tags.length > 0 ? tags : undefined,
-        agentIds: selectedAgentIds,
-        defaultAgentId: defaultAgentId || selectedAgentIds[0],
-      });
-      toast.success('保存成功');
-      navigate(`/apps/${id}`);
-    } catch (error: any) {
-      const msg = error?.data?.message ?? error?.message ?? '保存失败';
-      toast.error(msg);
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleBack = () => navigate(`/apps/${id}`);
+  const {
+    loading,
+    detail,
+    agentSearchQuery,
+    setAgentSearchQuery,
+    agentsList,
+    agentsLoading,
+    selectedAgentIds,
+    defaultAgentId,
+    name,
+    setName,
+    description,
+    setDescription,
+    icon,
+    setIcon,
+    tagInput,
+    setTagInput,
+    tags,
+    submitting,
+    addTag,
+    removeTag,
+    toggleAgent,
+    setAsDefault,
+    handleSave,
+    handleBack,
+  } = useEditApplication();
 
   if (loading || !detail) {
     return (
@@ -174,62 +62,55 @@ export function EditApplicationPage() {
           <Label className="dark:text-gray-300">应用名称</Label>
           <Input
             value={name}
-            onChange={(e) => setName(e.target.value.slice(0, 100))}
+            onChange={e => setName(e.target.value.slice(0, NAME_MAX_LENGTH))}
             placeholder="我的智能助手"
-            maxLength={100}
+            maxLength={NAME_MAX_LENGTH}
             className="mt-2 dark:bg-gray-900 dark:border-gray-700"
           />
-          <p className="text-xs text-gray-500 mt-1">{name.length}/100</p>
+          <p className="text-xs text-gray-500 mt-1">{name.length}/{NAME_MAX_LENGTH}</p>
         </div>
         <div>
           <Label className="dark:text-gray-300">应用图标（emoji）</Label>
           <div className="flex flex-wrap gap-2 mt-2">
-            {ICON_OPTIONS.map((opt) => (
+            {ICON_OPTIONS.map(opt => (
               <button
                 key={opt.emoji}
                 type="button"
                 onClick={() => setIcon(opt.emoji)}
                 className={`w-10 h-10 rounded-lg flex items-center justify-center text-xl transition-all ${
-                  icon === opt.emoji
-                    ? 'ring-2 ring-blue-500 bg-blue-50 dark:bg-blue-900/30'
-                    : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  icon === opt.emoji ? 'ring-2 ring-blue-500 bg-blue-50 dark:bg-blue-900/30' : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600'
                 }`}
                 title={opt.label}
               >
                 {opt.emoji}
               </button>
             ))}
-            <Input
-              value={icon}
-              onChange={(e) => setIcon(e.target.value)}
-              placeholder="或输入 emoji"
-              className="w-24 h-10 text-center"
-            />
+            <Input value={icon} onChange={e => setIcon(e.target.value)} placeholder="或输入 emoji" className="w-24 h-10 text-center" />
           </div>
         </div>
         <div>
           <Label className="dark:text-gray-300">应用描述</Label>
           <Textarea
             value={description}
-            onChange={(e) => setDescription(e.target.value.slice(0, 800))}
+            onChange={e => setDescription(e.target.value.slice(0, DESC_MAX_LENGTH))}
             placeholder="简要描述应用的功能和用途"
             rows={3}
-            maxLength={800}
+            maxLength={DESC_MAX_LENGTH}
             className="mt-2 dark:bg-gray-900 dark:border-gray-700 resize-none"
           />
-          <p className="text-xs text-gray-500 mt-1">{description.length}/800</p>
+          <p className="text-xs text-gray-500 mt-1">{description.length}/{DESC_MAX_LENGTH}</p>
         </div>
         <div>
-          <Label className="dark:text-gray-300">标签（最多 5 个，每项最多 40 字符）</Label>
+          <Label className="dark:text-gray-300">标签（最多 {TAG_MAX_COUNT} 个，每项最多 {TAG_MAX_LENGTH} 字符）</Label>
           <div className="space-y-2 mt-2">
-            {tags.length < 5 && (
+            {tags.length < TAG_MAX_COUNT && (
               <div className="flex gap-2">
                 <Input
                   value={tagInput}
-                  onChange={(e) => setTagInput(e.target.value.slice(0, 40))}
-                  onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
-                  placeholder="输入后按回车，最多 40 字符"
-                  maxLength={40}
+                  onChange={e => setTagInput(e.target.value.slice(0, TAG_MAX_LENGTH))}
+                  onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addTag())}
+                  placeholder={`输入后按回车，最多 ${TAG_MAX_LENGTH} 字符`}
+                  maxLength={TAG_MAX_LENGTH}
                   className="w-64 min-w-[200px] dark:bg-gray-900"
                 />
                 <Button type="button" size="sm" variant="outline" onClick={addTag}>
@@ -240,12 +121,7 @@ export function EditApplicationPage() {
             {tags.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {tags.map((t, i) => (
-                  <Badge
-                    key={i}
-                    variant="secondary"
-                    className={`cursor-pointer border ${getTagColor(t, i)}`}
-                    onClick={() => removeTag(i)}
-                  >
+                  <Badge key={i} variant="secondary" className={`cursor-pointer border ${getTagColor(t, i)}`} onClick={() => removeTag(i)}>
                     {t} ×
                   </Badge>
                 ))}
@@ -253,18 +129,15 @@ export function EditApplicationPage() {
             )}
           </div>
         </div>
-
         <div>
           <Label className="dark:text-gray-300">绑定智能体</Label>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 mb-2">
-            至少选择一个智能体，默认智能体将用于对话
-          </p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 mb-2">至少选择一个智能体，默认智能体将用于对话</p>
           <div className="relative mb-3">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <Input
               placeholder="搜索智能体..."
               value={agentSearchQuery}
-              onChange={(e) => setAgentSearchQuery(e.target.value)}
+              onChange={e => setAgentSearchQuery(e.target.value)}
               className="pl-10 dark:bg-gray-900 dark:border-gray-700"
             />
           </div>
@@ -275,7 +148,7 @@ export function EditApplicationPage() {
               <div className="py-8 text-center text-gray-500">暂无智能体</div>
             ) : (
               <div className="space-y-1">
-                {agentsList.map((agent) => {
+                {agentsList.map(agent => {
                   const selected = selectedAgentIds.includes(agent.id);
                   const isDefault = defaultAgentId === agent.id;
                   return (
@@ -298,7 +171,7 @@ export function EditApplicationPage() {
                           size="sm"
                           variant={isDefault ? 'default' : 'outline'}
                           className="text-xs h-7"
-                          onClick={(e) => {
+                          onClick={e => {
                             e.stopPropagation();
                             setAsDefault(agent.id);
                           }}
