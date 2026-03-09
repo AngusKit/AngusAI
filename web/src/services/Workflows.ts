@@ -1,5 +1,17 @@
 import { ApiLocaleResult, PageQuery, AI } from '@xcan-angus/infra';
-import { ExecutionDetailResult, ExecutionLogResult, GetWorkflowListOrderByEnum, WorkflowConfigUpdateDto, WorkflowCreateDto, WorkflowDetailResult, WorkflowExecuteDto, WorkflowListResult, WorkflowStatisticsResult, WorkflowUpdateDto, } from './WorkflowsTypes.ts';
+import {
+  ExecutionDetailResult,
+  ExecutionLogResult,
+  GetWorkflowListOrderByEnum,
+  WorkflowConfigUpdateDto,
+  WorkflowCreateDto,
+  WorkflowDetailResult,
+  WorkflowExecuteDto,
+  WorkflowExecuteResultResult,
+  WorkflowListResult,
+  WorkflowStatisticsResult,
+  WorkflowUpdateDto,
+} from './WorkflowsTypes.ts';
 import http, { ContentType, HttpClient, QueryParamsType, RequestParams } from './HttpClient.ts';
 import { VisibilityEnum, WorkflowStatusEnum, WorkflowTypeEnum } from '@/enums/enums.ts';
 
@@ -149,7 +161,7 @@ export class Workflows<SecurityDataType = unknown> {
    * @secure
    */
   executeWorkflow = (id: string, data: WorkflowExecuteDto, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResult>({
+    this.http.request<WorkflowExecuteResultResult>({
       path: `${AI}/workflows/${id}/execute`,
       method: 'POST',
       body: data,

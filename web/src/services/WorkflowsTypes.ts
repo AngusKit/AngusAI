@@ -11,8 +11,8 @@ export interface ExecutionStats {
   failedExecutions?: number;
   /** @format double */
   avgExecutionTime?: number;
-  /** @format int64 */
-  lastExecutionTime?: number;
+  /** 最后执行时间 @format date-time */
+  lastExecutionTime?: string;
   lastExecutionStatus?: string;
 }
 
@@ -101,6 +101,37 @@ export interface WorkflowExecuteDto {
    */
   mode?: string;
 }
+
+/** 工作流执行结果响应 */
+export interface WorkflowExecuteResultVo {
+  /** 执行ID */
+  executionId?: string;
+  /** 执行状态 */
+  status?: string;
+  /** 执行结果 */
+  result?: object;
+  /**
+   * 执行时间（毫秒）
+   * @format int64
+   */
+  executionTime?: number;
+  /**
+   * 开始时间
+   * @format int64
+   */
+  startedAt?: number;
+  /**
+   * 完成时间
+   * @format int64
+   */
+  completedAt?: number;
+}
+
+/** The API response result of supporting international message. */
+export type WorkflowExecuteResultResult = ApiLocaleResult & {
+  /** Actual response data or error details. */
+  data?: WorkflowExecuteResultVo;
+};
 
 /** 更新工作流请求参数 */
 export interface WorkflowUpdateDto {
