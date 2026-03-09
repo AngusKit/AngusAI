@@ -2,7 +2,6 @@
  * 工作流列表主页面
  * 展示工作流统计、搜索筛选、列表（网格/表格视图）
  */
-import { CreateWorkflowDialog } from './components/CreateWorkflowDialog';
 import { WorkflowStatsCards } from './components/WorkflowStatsCards';
 import { WorkflowToolbar } from './components/WorkflowToolbar';
 import { WorkflowGridView } from './components/WorkflowGridView';
@@ -15,12 +14,9 @@ export function Workflow() {
   const {
     viewMode,
     setViewMode,
-    createDialogOpen,
-    setCreateDialogOpen,
     workflowList,
     workflowActions,
-    handleCreateSuccess,
-    openCreateDialog,
+    openCreatePage,
   } = useWorkflowPage();
 
   const {
@@ -59,7 +55,7 @@ export function Workflow() {
           onStatusFilterChange={setStatusFilter}
           viewMode={viewMode}
           onViewModeChange={setViewMode}
-          onCreateClick={openCreateDialog}
+          onCreateClick={openCreatePage}
         />
 
         {viewMode === 'grid' && (
@@ -70,7 +66,7 @@ export function Workflow() {
               actions={workflowActions}
               hasFilter={!!(searchQuery.trim() || statusFilter !== 'all')}
               searchQuery={searchQuery.trim() || undefined}
-              onCreateClick={openCreateDialog}
+              onCreateClick={openCreatePage}
             />
             <WorkflowPagination
               currentPage={currentPage}
@@ -88,7 +84,7 @@ export function Workflow() {
               actions={workflowActions}
               hasFilter={!!(searchQuery.trim() || statusFilter !== 'all')}
               searchQuery={searchQuery.trim() || undefined}
-              onCreateClick={openCreateDialog}
+              onCreateClick={openCreatePage}
             />
             <WorkflowPagination
               currentPage={currentPage}
@@ -98,13 +94,6 @@ export function Workflow() {
           </>
         )}
       </div>
-
-      {/* 新建工作流对话框 */}
-      <CreateWorkflowDialog
-        open={createDialogOpen}
-        onOpenChange={setCreateDialogOpen}
-        onSuccess={handleCreateSuccess}
-      />
     </div>
   );
 }

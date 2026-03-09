@@ -9,6 +9,8 @@ import { EditApplicationPage } from '@/pages/applications/components/EditApplica
 import { Workflow } from '@/pages/workflow/Workflow';
 import { WorkflowDesignPage } from '@/pages/workflow/components/WorkflowDesignPage.tsx';
 import { WorkflowDetailPage } from '@/pages/workflow/components/WorkflowDetailPage.tsx';
+import { CreateWorkflowPage } from '@/pages/workflow/components/CreateWorkflowPage.tsx';
+import { WorkflowInfoPage } from '@/pages/workflow/components/WorkflowInfoPage.tsx';
 import { KnowledgeBase } from '@/pages/knowledge/KnowledgeBase';
 import { Dataset } from '@/pages/dataset/Dataset';
 import { APICollection } from '@/pages/apis/APICollection';
@@ -44,6 +46,8 @@ export function AppRoutes() {
         <Route path='apps/:id/settings' element={<AppSettingsPage />} />
         <Route path='create-app' element={<CreateApplication />} />
         <Route path='workflow' element={<Workflow />} />
+        <Route path='workflow/create' element={<CreateWorkflowPage />} />
+        <Route path='workflow/:id/info' element={<WorkflowInfoPage />} />
         <Route path='workflow/:id' element={<WorkflowDetailPage />} />
         <Route path='workflow-design' element={<WorkflowDesignPage />} />
         <Route path='knowledge' element={<KnowledgeBase />} />

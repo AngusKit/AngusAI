@@ -1,19 +1,17 @@
 /**
  * 工作流列表主页面 Hook
- * 管理视图模式、新建对话框、工作流操作
+ * 管理视图模式、新建页面跳转、工作流操作
  */
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import Workflows from '@/services/Workflows';
-import { WorkflowStatusEnum } from '@/enums/enums';
 import { useWorkflowList } from './useWorkflowList';
 import type { WorkflowDisplayItem } from '../utils';
 
 export function useWorkflowPage() {
   const navigate = useNavigate();
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
-  const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   const workflowList = useWorkflowList();
   const { loadWorkflows } = workflowList;
@@ -69,12 +67,6 @@ export function useWorkflowPage() {
     }
   };
 
-  /** 创建成功回调 */
-  const handleCreateSuccess = () => {
-    loadWorkflows();
-    setCreateDialogOpen(false);
-  };
-
   /** 传入子组件的操作集合 */
   const workflowActions = {
     onStart: handleStartWorkflow,
@@ -87,11 +79,8 @@ export function useWorkflowPage() {
   return {
     viewMode,
     setViewMode,
-    createDialogOpen,
-    setCreateDialogOpen,
     workflowList,
     workflowActions,
-    handleCreateSuccess,
-    openCreateDialog: () => setCreateDialogOpen(true),
+    openCreatePage: () => navigate('/workflow/create'),
   };
 }

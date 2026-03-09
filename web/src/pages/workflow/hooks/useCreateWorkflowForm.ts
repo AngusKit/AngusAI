@@ -3,13 +3,15 @@
  * 表单状态、标签管理、创建提交
  */
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import Workflows from '@/services/Workflows';
 import { WorkflowTypeEnum } from '@/enums/enums';
 
 const ICON_BG_MAP = ['bg-blue-500', 'bg-yellow-500', 'bg-purple-500', 'bg-green-500', 'bg-indigo-500', 'bg-pink-500', 'bg-orange-500', 'bg-cyan-500', 'bg-gray-500', 'bg-teal-500'];
 
-export function useCreateWorkflowForm(onOpenChange: (open: boolean) => void, onSuccess?: () => void) {
+export function useCreateWorkflowForm(onSuccess?: () => void) {
+  const navigate = useNavigate();
   const [workflowName, setWorkflowName] = useState('');
   const [description, setDescription] = useState('');
   const [workflowType, setWorkflowType] = useState<WorkflowTypeEnum>(WorkflowTypeEnum.SINGLE_TASK);
@@ -76,8 +78,8 @@ export function useCreateWorkflowForm(onOpenChange: (open: boolean) => void, onS
       });
       toast.success('工作流创建成功！');
       resetForm();
-      onOpenChange(false);
       onSuccess?.();
+      navigate('/workflow');
     } catch (e: unknown) {
       toast.error((e as { message?: string })?.message ?? '创建工作流失败');
     } finally {
@@ -87,7 +89,7 @@ export function useCreateWorkflowForm(onOpenChange: (open: boolean) => void, onS
 
   const handleCancel = () => {
     resetForm();
-    onOpenChange(false);
+    navigate('/workflow');
   };
 
   return {
@@ -109,5 +111,6 @@ export function useCreateWorkflowForm(onOpenChange: (open: boolean) => void, onS
     handleRemoveTag,
     handleCreate,
     handleCancel,
+    onBack: handleCancel,
   };
 }

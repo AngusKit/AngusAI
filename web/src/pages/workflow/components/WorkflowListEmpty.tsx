@@ -3,8 +3,6 @@
  * 区分「无数据」与「无搜索结果」场景
  */
 import { Workflow as WorkflowIcon, Search } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
 
 interface WorkflowListEmptyProps {
   /** 是否有搜索/筛选条件 */
