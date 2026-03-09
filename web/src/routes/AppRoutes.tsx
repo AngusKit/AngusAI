@@ -6,6 +6,7 @@ import { CreateApplication } from '@/pages/applications/CreateApplication';
 import { MyApplications } from '@/pages/applications/MyApplications';
 import { Workflow } from '@/pages/workflow/Workflow';
 import { WorkflowDesignPage } from '@/pages/workflow/WorkflowDesignPage';
+import { WorkflowDetailPage } from '@/pages/workflow/WorkflowDetailPage';
 import { KnowledgeBase } from '@/pages/knowledge/KnowledgeBase';
 import { Dataset } from '@/pages/dataset/Dataset';
 import { APICollection } from '@/pages/apis/APICollection';
@@ -37,6 +38,7 @@ export function AppRoutes() {
         <Route path='apps' element={<MyApplications />} />
         <Route path='create-app' element={<CreateApplication />} />
         <Route path='workflow' element={<Workflow />} />
+        <Route path='workflow/:id' element={<WorkflowDetailPage />} />
         <Route path='workflow-design' element={<WorkflowDesignPage />} />
         <Route path='knowledge' element={<KnowledgeBase />} />
         <Route path='dataset' element={<Dataset />} />

@@ -1,4 +1,4 @@
-import { Workflow as WorkflowIcon, Plus, Play, Edit, Trash2, MoreHorizontal, Eye, Copy, ChevronDown, Search, X, Filter, Grid3x3, List, } from 'lucide-react';
+import { Workflow as WorkflowIcon, Plus, Play, Edit, Trash2, MoreHorizontal, Copy, ChevronDown, Search, X, Filter, Grid3x3, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -10,7 +10,6 @@ import { useState } from 'react';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { toast } from 'sonner';
 import { CreateWorkflowDialog } from './CreateWorkflowDialog';
-import { WorkflowInfoDialog } from './WorkflowInfoDialog';
 import { useNavigate } from 'react-router-dom';
 
 interface WorkflowItem {
@@ -44,9 +43,6 @@ export function Workflow() {
   const [sortBy, setSort] = useState('default');
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
-  const [infoDialogOpen, setInfoDialogOpen] = useState(false);
-  const [infoDialogWorkflow, setInfoDialogWorkflow] = useState<WorkflowItem | null>(null);
-  const [infoDialogMode, setInfoDialogMode] = useState<'view' | 'edit'>('view');
 
   // 分页状态
   const [workflowPage, setWorkflowPage] = useState(1);
@@ -297,14 +293,8 @@ export function Workflow() {
   ];
 
   const handleAction = (action: string, workflow: WorkflowItem) => {
-    if (action === '查看') {
-      setInfoDialogWorkflow(workflow);
-      setInfoDialogMode('view');
-      setInfoDialogOpen(true);
-    } else if (action === '编辑') {
-      setInfoDialogWorkflow(workflow);
-      setInfoDialogMode('edit');
-      setInfoDialogOpen(true);
+    if (action === '编辑') {
+      navigate(`/workflow/${workflow.id}`);
     } else {
       toast.success(`${action}: ${workflow.name}`);
     }
@@ -493,16 +483,6 @@ export function Workflow() {
                           <DropdownMenuItem
                             onClick={e => {
                               e.stopPropagation();
-                              handleAction('查看', workflow);
-                            }}
-                            className='dark:text-gray-300'
-                          >
-                            <Eye className='w-4 h-4 mr-2' />
-                            查看详情
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={e => {
-                              e.stopPropagation();
                               handleAction('编辑', workflow);
                             }}
                             className='dark:text-gray-300'
@@ -541,7 +521,15 @@ export function Workflow() {
                         <Icon className={`w-6 h-6 ${workflow.iconColor}`} />
                       </div>
                       <div className='flex-1'>
-                        <h3 className='mb-1 dark:text-white'>{workflow.name}</h3>
+                        <h3
+                          className='mb-1 text-blue-600 dark:text-blue-400 hover:underline cursor-pointer'
+                          onClick={e => {
+                            e.stopPropagation();
+                            navigate(`/workflow/${workflow.id}`);
+                          }}
+                        >
+                          {workflow.name}
+                        </h3>
                         <Badge className={`text-xs ${workflow.statusColor} border-0`}>{workflow.status}</Badge>
                       </div>
                     </div>
@@ -612,14 +600,11 @@ export function Workflow() {
                   <tbody className='divide-y divide-gray-200 dark:divide-gray-700'>
                     {paginatedWorkflows.map(workflow => {
                       const Icon = workflow.icon;
-                      const isSelected = selectedWorkflow?.id === workflow.id;
                       return (
                         <tr
                           key={workflow.id}
-                          className={`hover:bg-gray-50 dark:hover:bg-gray-900 cursor-pointer ${
-                            isSelected ? 'bg-blue-50 dark:bg-blue-900/20' : ''
-                          }`}
-                          onClick={() => setSelectedWorkflow(workflow)}
+                          className='hover:bg-gray-50 dark:hover:bg-gray-900 cursor-pointer'
+                          onClick={() => navigate(`/workflow/${workflow.id}`)}
                         >
                           <td className='px-6 py-4'>
                             <div className='flex items-center gap-3'>
@@ -629,7 +614,15 @@ export function Workflow() {
                                 <Icon className={`w-5 h-5 ${workflow.iconColor}`} />
                               </div>
                               <div>
-                                <div className='text-sm dark:text-white mb-1'>{workflow.name}</div>
+                                <div
+                                  className='text-sm text-blue-600 dark:text-blue-400 hover:underline mb-1'
+                                  onClick={e => {
+                                    e.stopPropagation();
+                                    navigate(`/workflow/${workflow.id}`);
+                                  }}
+                                >
+                                  {workflow.name}
+                                </div>
                                 <div className='text-xs text-gray-500 dark:text-gray-400'>{workflow.description}</div>
                               </div>
                             </div>
@@ -639,7 +632,7 @@ export function Workflow() {
                           </td>
                           <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{workflow.calls}</td>
                           <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{workflow.successRate}</td>
-                          <td className='px-6 py-4'>
+                          <td className='px-6 py-4' onClick={e => e.stopPropagation()}>
                             <div className='flex items-center gap-2'>
                               <button
                                 className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
@@ -649,15 +642,6 @@ export function Workflow() {
                                 }}
                               >
                                 <Play className='w-4 h-4 text-green-500' />
-                              </button>
-                              <button
-                                className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
-                                onClick={e => {
-                                  e.stopPropagation();
-                                  handleAction('查看', workflow);
-                                }}
-                              >
-                                <Eye className='w-4 h-4 text-blue-500' />
                               </button>
                               <button
                                 className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
@@ -864,16 +848,6 @@ export function Workflow() {
 
       {/* Create Workflow Dialog */}
       <CreateWorkflowDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} />
-
-      {/* Workflow Info Dialog */}
-      {infoDialogWorkflow && (
-        <WorkflowInfoDialog
-          open={infoDialogOpen}
-          onOpenChange={setInfoDialogOpen}
-          workflow={infoDialogWorkflow}
-          mode={infoDialogMode}
-        />
-      )}
     </div>
   );
 }

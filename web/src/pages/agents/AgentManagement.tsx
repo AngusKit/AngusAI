@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bot, Search, Filter, Grid3x3, List, Eye, Edit, Trash2, MoreHorizontal, Play, Pause, Plus, Cpu, MessageSquare } from 'lucide-react';
+import { Bot, Search, Filter, Grid3x3, List, Edit, Trash2, MoreHorizontal, Play, Pause, Plus, Cpu, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -234,8 +234,7 @@ export function AgentManagement() {
             return (
               <Card
                 key={agent.id}
-                className="p-5 dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow cursor-pointer"
-                onClick={() => navigate(`/agents/${agent.id}/edit`)}
+                className="p-5 dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow"
               >
                 <div className="flex items-start justify-between mb-2">
                   <button
@@ -259,10 +258,6 @@ export function AgentManagement() {
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="dark:bg-gray-800 dark:border-gray-700">
-                      <DropdownMenuItem onClick={(e) => { e.stopPropagation(); navigate(`/agents/${agent.id}`); }} className="dark:text-gray-300">
-                          <Eye className="w-4 h-4 mr-2" />
-                          查看详情
-                        </DropdownMenuItem>
                       <DropdownMenuItem onClick={(e) => { e.stopPropagation(); navigate(`/agents/${agent.id}/edit`); }} className="dark:text-gray-300">
                         <Edit className="w-4 h-4 mr-2" />
                         编辑智能体
@@ -282,7 +277,12 @@ export function AgentManagement() {
                     <Bot className="w-6 h-6 text-white" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="mb-1 dark:text-white">{agent.name}</h3>
+                    <h3
+                      className="mb-1 text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+                      onClick={(e) => { e.stopPropagation(); navigate(`/agents/${agent.id}`); }}
+                    >
+                      {agent.name}
+                    </h3>
                     <Badge className={`text-xs ${statusCfg?.color ?? 'bg-gray-100 text-gray-700'} border-0`}>
                       {agent.statusEnum === 'ACTIVE' ? '已发布' : '离线'}
                     </Badge>
@@ -318,7 +318,7 @@ export function AgentManagement() {
             return (
               <div
                 key={agent.id}
-                onClick={() => navigate(`/agents/${agent.id}/edit`)}
+                onClick={() => navigate(`/agents/${agent.id}`)}
                 className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 hover:shadow-md dark:hover:shadow-gray-900/50 transition-shadow cursor-pointer group"
               >
                 <div className="flex items-center gap-4">
@@ -326,7 +326,10 @@ export function AgentManagement() {
                     <Bot className="w-5 h-5 text-white" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                    <h3
+                      className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+                      onClick={(e) => { e.stopPropagation(); navigate(`/agents/${agent.id}`); }}
+                    >
                       {agent.name}
                     </h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-1">{agent.description}</p>
@@ -362,13 +365,6 @@ export function AgentManagement() {
                           </button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="dark:bg-gray-800 dark:border-gray-700">
-                          <DropdownMenuItem
-                              onClick={(e) => { e.stopPropagation(); navigate(`/agents/${agent.id}`); }}
-                              className="dark:text-gray-300"
-                            >
-                            <Eye className="w-4 h-4 mr-2" />
-                            查看详情
-                          </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={(e) => { e.stopPropagation(); navigate(`/agents/${agent.id}/edit`); }}
                             className="dark:text-gray-300"
