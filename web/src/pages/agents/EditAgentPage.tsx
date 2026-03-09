@@ -11,6 +11,11 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
 import Agents from '@/services/Agents';
 import Models from '@/services/Models';
+import KnowledgeBases from '@/services/KnowledgeBases';
+import Datasets from '@/services/Datasets';
+import Workflows from '@/services/Workflows';
+import ApiCollections from '@/services/ApiCollections';
+import { WorkflowStatusEnum } from '@/enums/enums';
 import type { AgentUpdateDto, AgentDetailVo } from '@/services/AgentsTypes';
 import { ModelListVo } from '@/services/ModelsTypes';
 import {
@@ -91,6 +96,30 @@ export function EditAgentPage() {
       const dsIds = (d.datasetIds ?? []).map((x: unknown) => String(x));
       const apiIds = (d.apiCollectionIds ?? []).map((x: unknown) => String(x));
       const wfId = d.workflowId != null && d.workflowId !== '' ? String(d.workflowId) : null;
+
+      const [kbRes, dsRes, wfRes, apiRes] = await Promise.all([
+        kbIds.length ? KnowledgeBases.getKnowledgeBaseList({ pageNo: 1, pageSize: 100 }) : null,
+        dsIds.length ? Datasets.getDatasetList({ pageNo: 1, pageSize: 100 }) : null,
+        wfId ? Workflows.getWorkflowList({ pageNo: 1, pageSize: 100, status: WorkflowStatusEnum.RUNNING }) : null,
+        apiIds.length ? ApiCollections.apiCollectionList({ pageNo: 1, pageSize: 100 }) : null,
+      ]);
+
+      const toNameMap = (list: { id?: string; name?: string }[], ids: string[]) =>
+        Object.fromEntries(
+          (list ?? []).filter((i) => i?.id && ids.includes(i.id) && i.name).map((i) => [i.id!, i.name!])
+        );
+
+      const kbList = (kbRes as any)?.data?.list ?? [];
+      const dsList = (dsRes as any)?.data?.list ?? [];
+      const wfList = (wfRes as any)?.data?.list ?? [];
+      const apiList = (apiRes as any)?.data?.list ?? [];
+
+      const kbNames = toNameMap(kbList, kbIds);
+      const dsNames = toNameMap(dsList, dsIds);
+      const wfItem = wfList.find((i: { id?: string }) => i?.id === wfId);
+      const wfName = wfItem?.name ?? null;
+      const apiNames = toNameMap(apiList, apiIds);
+
       setForm({
         name: d.name ?? '',
         description: d.description ?? '',
@@ -109,9 +138,13 @@ export function EditAgentPage() {
         },
         resources: {
           knowledgeBaseIds: kbIds,
+          knowledgeBaseNames: Object.keys(kbNames).length ? kbNames : undefined,
           datasetIds: dsIds,
+          datasetNames: Object.keys(dsNames).length ? dsNames : undefined,
           workflowId: wfId,
+          workflowName: wfName,
           apiCollectionIds: apiIds,
+          apiCollectionNames: Object.keys(apiNames).length ? apiNames : undefined,
         },
       });
     } catch (error: any) {

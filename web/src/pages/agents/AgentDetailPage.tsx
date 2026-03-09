@@ -66,7 +66,7 @@ export function AgentDetailPage() {
       detail.status === AgentStatusEnum.ACTIVE ? AgentStatusEnum.INACTIVE : AgentStatusEnum.ACTIVE;
     try {
       await Agents.updateAgentStatus(id, newStatus);
-      toast.success(newStatus === AgentStatusEnum.ACTIVE ? '已发布' : '已下线');
+      toast.success(newStatus === AgentStatusEnum.ACTIVE ? '已发布' : '离线');
       setDetail((d) => (d ? { ...d, status: newStatus } : null));
     } catch (error: any) {
       toast.error(error?.message || '操作失败');
@@ -135,7 +135,7 @@ export function AgentDetailPage() {
               <div className="flex-1 min-w-0">
                 <h2 className="text-xl dark:text-white mb-2">{detail.name ?? '--'}</h2>
                 <Badge className={`text-xs ${statusColor} border-0`}>
-                  {detail.status === 'ACTIVE' ? '已发布' : '已下线'}
+                  {detail.status === 'ACTIVE' ? '已发布' : '离线'}
                 </Badge>
                 {detail.description && (
                   <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">

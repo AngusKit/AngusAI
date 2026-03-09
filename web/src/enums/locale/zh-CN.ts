@@ -199,7 +199,7 @@ export const enumTranslations = {
   },
   AgentStatusEnum: {
     ACTIVE: '已发布',
-    INACTIVE: '已下线',
+    INACTIVE: '离线',
   },
   InteractionModeEnum: {
     CHATBOT: '多轮对话',

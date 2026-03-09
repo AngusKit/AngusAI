@@ -83,7 +83,7 @@ export function AgentManagement() {
       agent.statusEnum === AgentStatusEnum.ACTIVE ? AgentStatusEnum.INACTIVE : AgentStatusEnum.ACTIVE;
     try {
       await Agents.updateAgentStatus(agent.id, newStatus);
-      toast.success(newStatus === AgentStatusEnum.ACTIVE ? '已发布' : '已下线');
+      toast.success(newStatus === AgentStatusEnum.ACTIVE ? '已发布' : '离线');
       loadAgents();
     } catch (error: any) {
       toast.error(error?.message || '操作失败');
@@ -146,7 +146,7 @@ export function AgentManagement() {
                 已发布
               </SelectItem>
               <SelectItem value={AgentStatusEnum.INACTIVE} className="dark:text-gray-300">
-                已下线
+                离线
               </SelectItem>
             </SelectContent>
           </Select>
@@ -254,7 +254,7 @@ export function AgentManagement() {
                   <div className="flex-1 min-w-0">
                     <h3 className="mb-1 dark:text-white">{agent.name}</h3>
                     <Badge className={`text-xs ${statusCfg?.color ?? 'bg-gray-100 text-gray-700'} border-0`}>
-                      {agent.statusEnum === 'ACTIVE' ? '已发布' : '已下线'}
+                      {agent.statusEnum === 'ACTIVE' ? '已发布' : '离线'}
                     </Badge>
                   </div>
                 </div>
@@ -299,7 +299,7 @@ export function AgentManagement() {
                       </td>
                       <td className="px-6 py-4">
                         <Badge className={`text-xs ${statusCfg?.color ?? 'bg-gray-100 text-gray-700'} border-0`}>
-                          {agent.statusEnum === 'ACTIVE' ? '已发布' : '已下线'}
+                          {agent.statusEnum === 'ACTIVE' ? '已发布' : '离线'}
                         </Badge>
                       </td>
                       <td className="px-6 py-4">

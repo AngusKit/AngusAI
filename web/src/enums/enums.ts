@@ -267,7 +267,7 @@ export enum ApplicationStatusEnum {
   PAUSED = 'PAUSED',
 }
 
-/** 智能体状态：ACTIVE-已发布, INACTIVE-已下线 */
+/** 智能体状态：ACTIVE-已发布, INACTIVE-离线 */
 export enum AgentStatusEnum {
   ACTIVE = 'ACTIVE',
   INACTIVE = 'INACTIVE',

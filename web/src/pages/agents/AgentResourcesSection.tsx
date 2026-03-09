@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, Database, Zap, Code2, Check, Search, Link2 } from 'lucide-react';
+import { BookOpen, Database, Zap, Code2, Check, Search, Link2, Inbox, SearchX } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -30,9 +30,13 @@ const DIALOG_MIN_HEIGHT = 480;
 
 export interface AgentResourcesFormValue {
   knowledgeBaseIds: string[];
+  knowledgeBaseNames?: Record<string, string>;
   datasetIds: string[];
+  datasetNames?: Record<string, string>;
   workflowId: string | null;
+  workflowName?: string | null;
   apiCollectionIds: string[];
+  apiCollectionNames?: Record<string, string>;
 }
 
 interface AgentResourcesSectionProps {
@@ -58,7 +62,7 @@ interface ResourceSelectDialogProps {
   selectedSingle?: string | null;
   maxCount?: number;
   accent: { selected: string; border: string; hover: string; bg: string };
-  onToggle: (id: string) => void;
+  onToggle: (id: string, name?: string) => void;
   emptyLink: string;
   emptyText: string;
   open: boolean;
@@ -186,18 +190,32 @@ function ResourceSelectDialog({
           style={{ height: 320 }}
         >
           {loading ? (
-            <p className="text-sm text-gray-500 dark:text-gray-400 py-8">加载中...</p>
+            <div className="flex flex-col items-center justify-center py-16">
+              <div className="w-10 h-10 border-2 border-gray-300 dark:border-gray-600 border-t-blue-500 dark:border-t-blue-400 rounded-full animate-spin" />
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-3">加载中...</p>
+            </div>
           ) : items.length === 0 ? (
-            <p className="text-sm text-gray-500 dark:text-gray-400 py-4">
-              {debouncedSearch.trim() ? '无匹配结果' : (
+            <div className="flex flex-col items-center justify-center py-12 px-4">
+              {debouncedSearch.trim() ? (
                 <>
-                  {emptyText}
-                  <Link to={emptyLink} className="text-blue-500 hover:underline ml-1" onClick={onClose}>
+                  <SearchX className="w-12 h-12 text-gray-300 dark:text-gray-600 mb-3" />
+                  <p className="text-base font-medium text-gray-600 dark:text-gray-400 mb-1">无匹配结果</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">尝试更换关键词搜索</p>
+                </>
+              ) : (
+                <>
+                  <Inbox className="w-12 h-12 text-gray-300 dark:text-gray-600 mb-3" />
+                  <p className="text-base font-medium text-gray-600 dark:text-gray-400 mb-2">{emptyText.replace('，', '')}</p>
+                  <Link
+                    to={emptyLink}
+                    onClick={onClose}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                  >
                     去创建
                   </Link>
                 </>
               )}
-            </p>
+            </div>
           ) : (
             <div className="space-y-2 pr-2 pb-4">
               {items
@@ -207,7 +225,7 @@ function ResourceSelectDialog({
                   return (
                     <Card
                       key={item.id}
-                      onClick={() => onToggle(item.id)}
+                      onClick={() => onToggle(item.id, item.name)}
                       className={`p-3 cursor-pointer transition-all select-none hover:shadow-sm ${
                         isSelected
                           ? `border-2 ${accent.border} ${accent.bg}`
@@ -251,82 +269,113 @@ export function AgentResourcesSection({ value, onChange }: AgentResourcesSection
     setDialogSearch('');
   };
 
-  const toggleKnowledgeBase = (id: string) => {
+  const toggleKnowledgeBase = (id: string, name?: string) => {
     if (value.knowledgeBaseIds.includes(id)) {
-      onChange({ ...value, knowledgeBaseIds: value.knowledgeBaseIds.filter((x) => x !== id) });
+      const nextIds = value.knowledgeBaseIds.filter((x) => x !== id);
+      const nextNames = { ...value.knowledgeBaseNames };
+      delete nextNames[id];
+      onChange({ ...value, knowledgeBaseIds: nextIds, knowledgeBaseNames: nextIds.length ? nextNames : undefined });
       return;
     }
     if (value.knowledgeBaseIds.length >= AGENT_MAX_KNOWLEDGE_BASE) {
       toast.error(`知识库最多选择 ${AGENT_MAX_KNOWLEDGE_BASE} 个`);
       return;
     }
-    onChange({ ...value, knowledgeBaseIds: [...value.knowledgeBaseIds, id] });
+    const nextNames = name ? { ...(value.knowledgeBaseNames ?? {}), [id]: name } : value.knowledgeBaseNames;
+    onChange({ ...value, knowledgeBaseIds: [...value.knowledgeBaseIds, id], knowledgeBaseNames: nextNames });
   };
 
-  const toggleDataset = (id: string) => {
+  const toggleDataset = (id: string, name?: string) => {
     if (value.datasetIds.includes(id)) {
-      onChange({ ...value, datasetIds: value.datasetIds.filter((x) => x !== id) });
+      const nextIds = value.datasetIds.filter((x) => x !== id);
+      const nextNames = { ...value.datasetNames };
+      delete nextNames[id];
+      onChange({ ...value, datasetIds: nextIds, datasetNames: nextIds.length ? nextNames : undefined });
       return;
     }
     if (value.datasetIds.length >= AGENT_MAX_DATASET) {
       toast.error(`数据集最多选择 ${AGENT_MAX_DATASET} 个`);
       return;
     }
-    onChange({ ...value, datasetIds: [...value.datasetIds, id] });
+    const nextNames = name ? { ...(value.datasetNames ?? {}), [id]: name } : value.datasetNames;
+    onChange({ ...value, datasetIds: [...value.datasetIds, id], datasetNames: nextNames });
   };
 
-  const selectWorkflow = (id: string) => {
-    onChange({ ...value, workflowId: value.workflowId === id ? null : id });
+  const selectWorkflow = (id: string, name?: string) => {
+    onChange({
+      ...value,
+      workflowId: value.workflowId === id ? null : id,
+      workflowName: value.workflowId === id ? null : name ?? null,
+    });
   };
 
-  const toggleApiCollection = (id: string) => {
+  const toggleApiCollection = (id: string, name?: string) => {
     if (value.apiCollectionIds.includes(id)) {
-      onChange({ ...value, apiCollectionIds: value.apiCollectionIds.filter((x) => x !== id) });
+      const nextIds = value.apiCollectionIds.filter((x) => x !== id);
+      const nextNames = { ...value.apiCollectionNames };
+      delete nextNames[id];
+      onChange({ ...value, apiCollectionIds: nextIds, apiCollectionNames: nextIds.length ? nextNames : undefined });
       return;
     }
     if (value.apiCollectionIds.length >= AGENT_MAX_API_COLLECTION) {
       toast.error(`接口集最多选择 ${AGENT_MAX_API_COLLECTION} 个`);
       return;
     }
-    onChange({ ...value, apiCollectionIds: [...value.apiCollectionIds, id] });
+    const nextNames = name ? { ...(value.apiCollectionNames ?? {}), [id]: name } : value.apiCollectionNames;
+    onChange({ ...value, apiCollectionIds: [...value.apiCollectionIds, id], apiCollectionNames: nextNames });
   };
 
   const ResourceRow = ({
     type,
     title,
     icon: Icon,
-    selectedCount,
+    selectedIds,
+    selectedNames,
+    selectedSingleName,
     maxCount,
     accent,
   }: {
     type: ResourceType;
     title: string;
     icon: React.ElementType;
-    selectedCount: number;
+    selectedIds: string[];
+    selectedNames?: Record<string, string>;
+    selectedSingleName?: string | null;
     maxCount?: number;
     accent: string;
-  }) => (
-    <div className="flex items-center justify-between py-3 border-b border-gray-200 dark:border-gray-700 last:border-0">
-      <div className="flex items-center gap-3">
-        <Icon className={`w-5 h-5 ${accent} shrink-0`} />
-        <div>
-          <span className="font-medium dark:text-white">{title}</span>
-          {maxCount != null && (
-            <Badge variant="secondary" className="ml-2 text-xs">
-              {selectedCount}/{maxCount}
-            </Badge>
-          )}
-          {maxCount == null && selectedCount > 0 && (
-            <Badge className={`ml-2 text-xs ${accent.replace('text-', 'bg-')}`}>已选</Badge>
+  }) => {
+    const names = selectedIds.map((id) => selectedNames?.[id] ?? null).filter(Boolean) as string[];
+    const displayName = selectedSingleName ?? (names.length > 0 ? names.join('、') : null);
+    return (
+      <div className="flex items-center justify-between py-3 border-b border-gray-200 dark:border-gray-700 last:border-0">
+        <div className="flex flex-col gap-1.5 min-w-0 flex-1">
+          <div className="flex items-center gap-3">
+            <Icon className={`w-5 h-5 ${accent} shrink-0`} />
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="font-medium dark:text-white">{title}</span>
+              {maxCount != null && (
+                <Badge variant="secondary" className="text-xs shrink-0">
+                  {selectedIds.length}/{maxCount}
+                </Badge>
+              )}
+              {maxCount == null && selectedIds.length > 0 && (
+                <Badge className={`text-xs shrink-0 ${accent.replace('text-', 'bg-')}`}>已选</Badge>
+              )}
+            </div>
+          </div>
+          {displayName && (
+            <p className="text-sm text-gray-500 dark:text-gray-400 truncate pl-8" title={displayName}>
+              {displayName}
+            </p>
           )}
         </div>
+        <Button variant="outline" size="sm" onClick={() => openDialog(type)} className="shrink-0 ml-2">
+          <Link2 className="w-4 h-4 mr-1" />
+          关联
+        </Button>
       </div>
-      <Button variant="outline" size="sm" onClick={() => openDialog(type)} className="shrink-0">
-        <Link2 className="w-4 h-4 mr-1" />
-        关联
-      </Button>
-    </div>
-  );
+    );
+  };
 
   const fetchKnowledgeBases: FetchResourceFn = useCallback(async (pageNo, keyword) => {
     const res = await KnowledgeBases.getKnowledgeBaseList({
@@ -393,7 +442,8 @@ export function AgentResourcesSection({ value, onChange }: AgentResourcesSection
             type="knowledgeBase"
             title="知识库"
             icon={BookOpen}
-            selectedCount={value.knowledgeBaseIds.length}
+            selectedIds={value.knowledgeBaseIds}
+            selectedNames={value.knowledgeBaseNames}
             maxCount={AGENT_MAX_KNOWLEDGE_BASE}
             accent="text-blue-500"
           />
@@ -401,7 +451,8 @@ export function AgentResourcesSection({ value, onChange }: AgentResourcesSection
             type="dataset"
             title="数据集"
             icon={Database}
-            selectedCount={value.datasetIds.length}
+            selectedIds={value.datasetIds}
+            selectedNames={value.datasetNames}
             maxCount={AGENT_MAX_DATASET}
             accent="text-green-500"
           />
@@ -409,14 +460,16 @@ export function AgentResourcesSection({ value, onChange }: AgentResourcesSection
             type="workflow"
             title="工作流"
             icon={Zap}
-            selectedCount={value.workflowId ? 1 : 0}
+            selectedIds={value.workflowId ? [value.workflowId] : []}
+            selectedSingleName={value.workflowName}
             accent="text-purple-500"
           />
           <ResourceRow
             type="apiCollection"
             title="接口集"
             icon={Code2}
-            selectedCount={value.apiCollectionIds.length}
+            selectedIds={value.apiCollectionIds}
+            selectedNames={value.apiCollectionNames}
             maxCount={AGENT_MAX_API_COLLECTION}
             accent="text-orange-500"
           />
