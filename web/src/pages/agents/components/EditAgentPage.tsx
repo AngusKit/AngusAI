@@ -1,30 +1,30 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Bot, ChevronLeft, ChevronRight, Cpu, Link2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { Button } from '@/components/ui/button.tsx';
+import { Card } from '@/components/ui/card.tsx';
+import { Input } from '@/components/ui/input.tsx';
+import { Label } from '@/components/ui/label.tsx';
+import { Textarea } from '@/components/ui/textarea.tsx';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.tsx';
+import { ScrollArea } from '@/components/ui/scroll-area.tsx';
 import { toast } from 'sonner';
-import Agents from '@/services/Agents';
-import type { AgentUpdateDto, AgentDetailVo } from '@/services/AgentsTypes';
+import Agents from '@/services/Agents.ts';
+import type { AgentUpdateDto, AgentDetailVo } from '@/services/AgentsTypes.ts';
 import {
   InteractionModeEnum,
   ReasoningStrategyEnum,
   AutonomyLevelEnum,
   MemoryStrategyEnum,
-} from '@/enums/enums';
-import { enumToMessages } from '@/enums/utils';
+} from '@/enums/enums.ts';
+import { enumToMessages } from '@/enums/utils.ts';
 import {
   AGENT_SYSTEM_PROMPT_MAX_LENGTH,
   AGENT_WELCOME_MESSAGE_MAX_LENGTH,
   AGENT_SUMMARY_PROMPT_MAX_LENGTH,
-} from './constants';
-import { AgentResourcesSection, type AgentResourcesFormValue } from './AgentResourcesSection';
-import { ModelSelectDialog } from './ModelSelectDialog';
+} from '../constants.ts';
+import { AgentResourcesSection, type AgentResourcesFormValue } from './AgentResourcesSection.tsx';
+import { ModelSelectDialog } from './ModelSelectDialog.tsx';
 
 export function EditAgentPage() {
   const navigate = useNavigate();

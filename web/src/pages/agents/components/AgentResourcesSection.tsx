@@ -1,29 +1,29 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, Database, Zap, Code2, Check, Search, Link2, Inbox, SearchX } from 'lucide-react';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Card } from '@/components/ui/card.tsx';
+import { Badge } from '@/components/ui/badge.tsx';
+import { Button } from '@/components/ui/button.tsx';
+import { Input } from '@/components/ui/input.tsx';
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from '@/components/ui/dialog.tsx';
 import { toast } from 'sonner';
-import { useDebounce } from '@/hooks/useDebounce';
-import KnowledgeBases from '@/services/KnowledgeBases';
-import Datasets from '@/services/Datasets';
-import Workflows from '@/services/Workflows';
-import ApiCollections from '@/services/ApiCollections';
-import type { KnowledgeBaseListVo } from '@/services/KnowledgeBasesTypes';
-import type { DatasetListVo } from '@/services/DatasetsTypes';
-import type { WorkflowListVo } from '@/services/WorkflowsTypes';
-import type { ApiCollectionListVo } from '@/services/ApiCollectionsTypes';
-import { WorkflowStatusEnum } from '@/enums/enums';
-import { AGENT_MAX_API_COLLECTION, AGENT_MAX_DATASET, AGENT_MAX_KNOWLEDGE_BASE } from './constants';
+import { useDebounce } from '@/hooks/useDebounce.ts';
+import KnowledgeBases from '@/services/KnowledgeBases.ts';
+import Datasets from '@/services/Datasets.ts';
+import Workflows from '@/services/Workflows.ts';
+import ApiCollections from '@/services/ApiCollections.ts';
+import type { KnowledgeBaseListVo } from '@/services/KnowledgeBasesTypes.ts';
+import type { DatasetListVo } from '@/services/DatasetsTypes.ts';
+import type { WorkflowListVo } from '@/services/WorkflowsTypes.ts';
+import type { ApiCollectionListVo } from '@/services/ApiCollectionsTypes.ts';
+import { WorkflowStatusEnum } from '@/enums/enums.ts';
+import { AGENT_MAX_API_COLLECTION, AGENT_MAX_DATASET, AGENT_MAX_KNOWLEDGE_BASE } from '../constants.ts';
 
 const PAGE_SIZE = 10;
 const DIALOG_MIN_HEIGHT = 480;

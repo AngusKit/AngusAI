@@ -1,20 +1,20 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Cpu, Check, Search, Inbox, SearchX } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button.tsx';
+import { Card } from '@/components/ui/card.tsx';
+import { Input } from '@/components/ui/input.tsx';
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from '@/components/ui/dialog.tsx';
 import { toast } from 'sonner';
-import { useDebounce } from '@/hooks/useDebounce';
-import Models from '@/services/Models';
-import { ModelStatusEnum } from '@/enums/enums';
+import { useDebounce } from '@/hooks/useDebounce.ts';
+import Models from '@/services/Models.ts';
+import { ModelStatusEnum } from '@/enums/enums.ts';
 
 const PAGE_SIZE = 10;
 const DIALOG_MIN_HEIGHT = 480;

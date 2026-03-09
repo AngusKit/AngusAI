@@ -15,20 +15,20 @@ import {
   Brain,
   Settings2,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button.tsx';
+import { Card } from '@/components/ui/card.tsx';
+import { Badge } from '@/components/ui/badge.tsx';
 import { toast } from 'sonner';
-import Agents from '@/services/Agents';
-import type { AgentDetailVo } from '@/services/AgentsTypes';
-import { AgentStatusEnum } from '@/enums/enums';
+import Agents from '@/services/Agents.ts';
+import type { AgentDetailVo } from '@/services/AgentsTypes.ts';
+import { AgentStatusEnum } from '@/enums/enums.ts';
 import {
   InteractionModeEnum,
   ReasoningStrategyEnum,
   AutonomyLevelEnum,
   MemoryStrategyEnum,
-} from '@/enums/enums';
-import { getEnumDescription } from '@/enums/utils';
+} from '@/enums/enums.ts';
+import { getEnumDescription } from '@/enums/utils.ts';
 
 export function AgentDetailPage() {
   const navigate = useNavigate();
