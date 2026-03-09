@@ -1,6 +1,6 @@
 import { ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { WorkflowEditor } from './WorkflowEditor';
+import { Button } from '@/components/ui/button.tsx';
+import { WorkflowEditor } from './WorkflowEditor.tsx';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 export function WorkflowDesignPage() {

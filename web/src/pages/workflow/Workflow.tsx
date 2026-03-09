@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { CreateWorkflowDialog } from './CreateWorkflowDialog';
+import { CreateWorkflowDialog } from './components/CreateWorkflowDialog.tsx';
 import { useNavigate } from 'react-router-dom';
 import { useWorkflowList, getStatsFromStatistics, type WorkflowDisplayItem } from './hooks/useWorkflowList';
 import Workflows from '@/services/Workflows';

@@ -1,13 +1,13 @@
 import { useState, useCallback, useEffect } from 'react';
 import ReactFlow, { Node, Edge, Controls, Background, useNodesState, useEdgesState, addEdge, Connection, BackgroundVariant, MiniMap } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/button.tsx';
 import { Save, Maximize2, Minimize2, X, Play, Pause } from 'lucide-react';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card.tsx';
+import { Badge } from '@/components/ui/badge.tsx';
 import { toast } from 'sonner';
-import Workflows from '@/services/Workflows';
-import { WorkflowDetailVo } from '@/services/WorkflowsTypes';
+import Workflows from '@/services/Workflows.ts';
+import { WorkflowDetailVo } from '@/services/WorkflowsTypes.ts';
 
 interface WorkflowEditorProps {
   workflowId: string;

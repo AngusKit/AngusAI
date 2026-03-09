@@ -1,15 +1,15 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog.tsx';
+import { Button } from '@/components/ui/button.tsx';
+import { Input } from '@/components/ui/input.tsx';
+import { Textarea } from '@/components/ui/textarea.tsx';
+import { Label } from '@/components/ui/label.tsx';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.tsx';
+import { Badge } from '@/components/ui/badge.tsx';
 import { Workflow, Zap, Bot, FileText, Database, MessageSquare, Brain, Code, Settings, GitBranch } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import Workflows from '@/services/Workflows';
-import { WorkflowTypeEnum } from '@/enums/enums';
+import Workflows from '@/services/Workflows.ts';
+import { WorkflowTypeEnum } from '@/enums/enums.ts';
 
 interface CreateWorkflowDialogProps {
   open: boolean;

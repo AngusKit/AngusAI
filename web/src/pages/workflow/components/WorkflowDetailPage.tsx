@@ -1,17 +1,17 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button.tsx';
+import { Input } from '@/components/ui/input.tsx';
+import { Label } from '@/components/ui/label.tsx';
+import { Textarea } from '@/components/ui/textarea.tsx';
+import { Card } from '@/components/ui/card.tsx';
+import { Badge } from '@/components/ui/badge.tsx';
 import { ChevronLeft, Save, X, Calendar, Clock, TrendingUp, Activity, Tag, Workflow as WorkflowIcon, Edit2 } from 'lucide-react';
 import { toast } from 'sonner';
-import Workflows from '@/services/Workflows';
-import { WorkflowDetailVo } from '@/services/WorkflowsTypes';
-import { WorkflowStatusEnum, WorkflowTypeEnum } from '@/enums/enums';
-import { getEnumDescription } from '@/enums/utils';
+import Workflows from '@/services/Workflows.ts';
+import { WorkflowDetailVo } from '@/services/WorkflowsTypes.ts';
+import { WorkflowStatusEnum, WorkflowTypeEnum } from '@/enums/enums.ts';
+import { getEnumDescription } from '@/enums/utils.ts';
 
 const statusDisplayMap: Record<WorkflowStatusEnum, string> = {
   [WorkflowStatusEnum.DRAFT]: '草稿',
