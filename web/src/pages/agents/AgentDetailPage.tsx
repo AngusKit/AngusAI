@@ -287,69 +287,37 @@ export function AgentDetailPage() {
         {(detail.resources?.knowledgeBases?.length ?? 0) > 0 ||
         (detail.resources?.datasets?.length ?? 0) > 0 ||
         detail.resources?.workflow != null ||
-        (detail.resources?.apiCollections?.length ?? 0) > 0 ||
-        (detail.knowledgeBaseIds?.length ?? 0) > 0 ||
-        (detail.datasetIds?.length ?? 0) > 0 ||
-        detail.workflowId != null ||
-        (detail.apiCollectionIds?.length ?? 0) > 0 ? (
+        (detail.resources?.apiCollections?.length ?? 0) > 0 ? (
           <div className="space-y-4 pl-6">
-            {detail.resources?.knowledgeBases && detail.resources.knowledgeBases.length > 0 ? (
+            {detail.resources?.knowledgeBases && detail.resources.knowledgeBases.length > 0 && (
               <ResourceSection
                 icon={<BookOpen className="w-4 h-4 text-blue-500" />}
                 title="知识库"
                 items={detail.resources.knowledgeBases.map((r) => r.name ?? String(r.id))}
                 baseLink="/knowledge"
               />
-            ) : detail.knowledgeBaseIds && detail.knowledgeBaseIds.length > 0 && (
-              <ResourceSection
-                icon={<BookOpen className="w-4 h-4 text-blue-500" />}
-                title="知识库"
-                items={detail.knowledgeBaseIds.map((id) => String(id))}
-                baseLink="/knowledge"
-              />
             )}
-            {detail.resources?.datasets && detail.resources.datasets.length > 0 ? (
+            {detail.resources?.datasets && detail.resources.datasets.length > 0 && (
               <ResourceSection
                 icon={<Database className="w-4 h-4 text-green-500" />}
                 title="数据集"
                 items={detail.resources.datasets.map((r) => r.name ?? String(r.id))}
                 baseLink="/dataset"
               />
-            ) : detail.datasetIds && detail.datasetIds.length > 0 && (
-              <ResourceSection
-                icon={<Database className="w-4 h-4 text-green-500" />}
-                title="数据集"
-                items={detail.datasetIds.map((id) => String(id))}
-                baseLink="/dataset"
-              />
             )}
-            {detail.resources?.workflow ? (
+            {detail.resources?.workflow && (
               <ResourceSection
                 icon={<Zap className="w-4 h-4 text-purple-500" />}
                 title="工作流"
                 items={[detail.resources.workflow.name ?? String(detail.resources.workflow.id)]}
                 baseLink="/workflow"
               />
-            ) : detail.workflowId != null && (
-              <ResourceSection
-                icon={<Zap className="w-4 h-4 text-purple-500" />}
-                title="工作流"
-                items={[String(detail.workflowId)]}
-                baseLink="/workflow"
-              />
             )}
-            {detail.resources?.apiCollections && detail.resources.apiCollections.length > 0 ? (
+            {detail.resources?.apiCollections && detail.resources.apiCollections.length > 0 && (
               <ResourceSection
                 icon={<Code2 className="w-4 h-4 text-orange-500" />}
                 title="接口集"
                 items={detail.resources.apiCollections.map((r) => r.name ?? String(r.id))}
-                baseLink="/api-collection"
-              />
-            ) : detail.apiCollectionIds && detail.apiCollectionIds.length > 0 && (
-              <ResourceSection
-                icon={<Code2 className="w-4 h-4 text-orange-500" />}
-                title="接口集"
-                items={detail.apiCollectionIds.map((id) => String(id))}
                 baseLink="/api-collection"
               />
             )}

@@ -129,12 +129,8 @@ public class AgentAssembler {
     vo.setSuggestedQuestions(agent.getSuggestedQuestions());
 
     // 关联智能体能力
-    vo.setKnowledgeBaseIds(agent.getKnowledgeBaseIds());
     vo.setToolIds(agent.getToolIds());
-    vo.setWorkflowId(agent.getWorkflowId());
     vo.setSkillIds(agent.getSkillIds());
-    vo.setDatasetIds(agent.getDatasetIds());
-    vo.setApiCollectionIds(agent.getApiCollectionIds());
 
     // 智能体配置
     vo.setMemoryStrategy(agent.getMemoryStrategy());

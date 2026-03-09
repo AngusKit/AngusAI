@@ -11,11 +11,6 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
 import Agents from '@/services/Agents';
 import Models from '@/services/Models';
-import KnowledgeBases from '@/services/KnowledgeBases';
-import Datasets from '@/services/Datasets';
-import Workflows from '@/services/Workflows';
-import ApiCollections from '@/services/ApiCollections';
-import { WorkflowStatusEnum } from '@/enums/enums';
 import type { AgentUpdateDto, AgentDetailVo } from '@/services/AgentsTypes';
 import {
   InteractionModeEnum,
@@ -78,34 +73,24 @@ export function EditAgentPage() {
         d.defaultModelId != null && d.defaultModelId !== ''
           ? String(d.defaultModelId)
           : undefined;
-      const kbIds = (d.knowledgeBaseIds ?? []).map((x: unknown) => String(x));
-      const dsIds = (d.datasetIds ?? []).map((x: unknown) => String(x));
-      const apiIds = (d.apiCollectionIds ?? []).map((x: unknown) => String(x));
-      const wfId = d.workflowId != null && d.workflowId !== '' ? String(d.workflowId) : null;
 
-      const [kbRes, dsRes, wfRes, apiRes, modelRes] = await Promise.all([
-        kbIds.length ? KnowledgeBases.getKnowledgeBaseList({ pageNo: 1, pageSize: 100 }) : null,
-        dsIds.length ? Datasets.getDatasetList({ pageNo: 1, pageSize: 100 }) : null,
-        wfId ? Workflows.getWorkflowList({ pageNo: 1, pageSize: 100, status: WorkflowStatusEnum.RUNNING }) : null,
-        apiIds.length ? ApiCollections.apiCollectionList({ pageNo: 1, pageSize: 100 }) : null,
-        defaultModelId ? Models.getModelList({ pageNo: 1, pageSize: 500 }) : null,
-      ]);
+      const resources = d.resources;
+      const kbIds = (resources?.knowledgeBases ?? []).map((r) => String(r.id));
+      const dsIds = (resources?.datasets ?? []).map((r) => String(r.id));
+      const apiIds = (resources?.apiCollections ?? []).map((r) => String(r.id));
+      const wfId = resources?.workflow?.id != null ? String(resources.workflow.id) : null;
+      const wfName = resources?.workflow?.name ?? null;
+      const kbNames = Object.fromEntries(
+        (resources?.knowledgeBases ?? []).filter((r) => r.id != null && r.name).map((r) => [String(r.id), r.name!])
+      );
+      const dsNames = Object.fromEntries(
+        (resources?.datasets ?? []).filter((r) => r.id != null && r.name).map((r) => [String(r.id), r.name!])
+      );
+      const apiNames = Object.fromEntries(
+        (resources?.apiCollections ?? []).filter((r) => r.id != null && r.name).map((r) => [String(r.id), r.name!])
+      );
 
-      const toNameMap = (list: { id?: string; name?: string }[], ids: string[]) =>
-        Object.fromEntries(
-          (list ?? []).filter((i) => i?.id && ids.includes(i.id) && i.name).map((i) => [i.id!, i.name!])
-        );
-
-      const kbList = (kbRes as any)?.data?.list ?? [];
-      const dsList = (dsRes as any)?.data?.list ?? [];
-      const wfList = (wfRes as any)?.data?.list ?? [];
-      const apiList = (apiRes as any)?.data?.list ?? [];
-
-      const kbNames = toNameMap(kbList, kbIds);
-      const dsNames = toNameMap(dsList, dsIds);
-      const wfItem = wfList.find((i: { id?: string }) => i?.id === wfId);
-      const wfName = wfItem?.name ?? null;
-      const apiNames = toNameMap(apiList, apiIds);
+      const modelRes = defaultModelId ? await Models.getModelList({ pageNo: 1, pageSize: 500 }) : null;
       const modelList = (modelRes as any)?.data?.list ?? [];
       const modelItem = modelList.find((m: { id?: string }) => String(m?.id) === String(defaultModelId));
       const defaultModelName = modelItem?.name ?? undefined;

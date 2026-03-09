@@ -52,18 +52,6 @@ public class AgentDetailVo extends TenantAuditingVo {
   @Schema(description = "建议问题列表")
   private List<String> suggestedQuestions;
 
-  @Schema(description = "知识库ID列表")
-  private List<Long> knowledgeBaseIds;
-
-  @Schema(description = "数据集ID列表")
-  private List<Long> datasetIds;
-
-  @Schema(description = "接口集ID列表")
-  private List<Long> apiCollectionIds;
-
-  @Schema(description = "工作流ID")
-  private Long workflowId;
-
   @Schema(description = "工具ID列表")
   private List<String> toolIds;
 

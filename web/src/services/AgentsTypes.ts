@@ -31,18 +31,10 @@ export interface AgentDetailVo extends TenantAuditingVo {
   welcomeMessage?: string;
   /** 建议问题列表 */
   suggestedQuestions?: string[];
-  /** 知识库ID列表 */
-  knowledgeBaseIds?: string[];
   /** 工具ID列表 */
   toolIds?: string[];
-  /** 工作流ID */
-  workflowId?: string;
   /** 技能ID列表 */
   skillIds?: string[];
-  /** 数据集ID列表 */
-  datasetIds?: string[];
-  /** 接口集ID列表 */
-  apiCollectionIds?: string[];
   /** 记忆策略 */
   memoryStrategy?: MemoryStrategyEnum;
   /** 记忆窗口大小 */
