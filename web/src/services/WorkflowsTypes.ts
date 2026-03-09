@@ -117,14 +117,12 @@ export interface WorkflowExecuteResultVo {
   executionTime?: number;
   /**
    * 开始时间
-   * @format int64
    */
-  startedAt?: number;
+  startedAt?: string;
   /**
    * 完成时间
-   * @format int64
    */
-  completedAt?: number;
+  completedAt?: string;
 }
 
 /** The API response result of supporting international message. */
@@ -241,14 +239,12 @@ export interface ExecutionDetailVo {
   status?: string;
   /**
    * 开始时间
-   * @format int64
    */
-  startedAt?: number;
+  startedAt?: string;
   /**
    * 完成时间
-   * @format int64
    */
-  completedAt?: number;
+  completedAt?: string;
   /**
    * 执行时间（毫秒）
    * @format int64
