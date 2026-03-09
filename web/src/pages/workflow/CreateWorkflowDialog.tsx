@@ -8,10 +8,14 @@ import { Badge } from '@/components/ui/badge';
 import { Workflow, Zap, Bot, FileText, Database, MessageSquare, Brain, Code, Settings, GitBranch } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import Workflows from '@/services/Workflows';
+import { WorkflowTypeEnum } from '@/enums/enums';
 
 interface CreateWorkflowDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** 创建成功回调，用于刷新列表 */
+  onSuccess?: () => void;
 }
 
 // 工作流图标选项 - 包含不同类型的工作流图标
@@ -78,24 +82,17 @@ const iconOptions = [
   },
 ];
 
-// 工作流类型
+// 工作流类型（value 对应后端 WorkflowTypeEnum）
 const workflowTypes = [
-  {
-    value: 'single-task',
-    label: '单轮任务流',
-    description: '执行单次任务的工作流，不保留上下文',
-  },
-  {
-    value: 'multi-conversation',
-    label: '多轮对话流（记忆）',
-    description: '支持多轮对话并保留上下文记忆的工作流',
-  },
+  { value: WorkflowTypeEnum.SINGLE_TASK, label: '单轮任务流', description: '执行单次任务的工作流，不保留上下文' },
+  { value: WorkflowTypeEnum.MULTI_TURN, label: '多轮对话流（记忆）', description: '支持多轮对话并保留上下文记忆的工作流' },
 ];
 
-export function CreateWorkflowDialog({ open, onOpenChange }: CreateWorkflowDialogProps) {
+export function CreateWorkflowDialog({ open, onOpenChange, onSuccess }: CreateWorkflowDialogProps) {
   const [workflowName, setWorkflowName] = useState('');
   const [description, setDescription] = useState('');
-  const [workflowType, setWorkflowType] = useState('single-task');
+  const [workflowType, setWorkflowType] = useState<WorkflowTypeEnum>(WorkflowTypeEnum.SINGLE_TASK);
+  const [submitting, setSubmitting] = useState(false);
   const [selectedIcon, setSelectedIcon] = useState(0);
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
@@ -149,7 +146,7 @@ export function CreateWorkflowDialog({ open, onOpenChange }: CreateWorkflowDialo
     setTags(tags.filter(tag => tag !== tagToRemove));
   };
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     if (!workflowName.trim()) {
       toast.error('请输入工作流名称');
       return;
@@ -159,26 +156,40 @@ export function CreateWorkflowDialog({ open, onOpenChange }: CreateWorkflowDialo
       return;
     }
 
-    // 创建工作流
-    toast.success('工作流创建成功！');
-
-    // 重置表单
-    setWorkflowName('');
-    setDescription('');
-    setWorkflowType('single-task');
-    setSelectedIcon(0);
-    setTags([]);
-    setTagInput('');
-    setAutoStart(false);
-
-    onOpenChange(false);
+    setSubmitting(true);
+    try {
+      const iconBgMap = ['bg-blue-500', 'bg-yellow-500', 'bg-purple-500', 'bg-green-500', 'bg-indigo-500', 'bg-pink-500', 'bg-orange-500', 'bg-cyan-500', 'bg-gray-500', 'bg-teal-500'];
+      const iconBg = iconBgMap[selectedIcon] ?? 'bg-blue-500';
+      const res = await Workflows.createWorkflow({
+        name: workflowName.trim(),
+        description: description.trim(),
+        type: workflowType,
+        icon: '🔄',
+        iconBg,
+      });
+      const created = (res as { data?: { id?: string } })?.data;
+      toast.success('工作流创建成功！');
+      setWorkflowName('');
+      setDescription('');
+      setWorkflowType(WorkflowTypeEnum.SINGLE_TASK);
+      setSelectedIcon(0);
+      setTags([]);
+      setTagInput('');
+      setAutoStart(false);
+      onOpenChange(false);
+      onSuccess?.();
+    } catch (e: unknown) {
+      toast.error((e as { message?: string })?.message ?? '创建工作流失败');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleCancel = () => {
     // 重置表单
     setWorkflowName('');
     setDescription('');
-    setWorkflowType('single-task');
+    setWorkflowType(WorkflowTypeEnum.SINGLE_TASK);
     setSelectedIcon(0);
     setTags([]);
     setTagInput('');
@@ -327,8 +338,8 @@ export function CreateWorkflowDialog({ open, onOpenChange }: CreateWorkflowDialo
           >
             取消
           </Button>
-          <Button onClick={handleCreate} className='bg-blue-500 hover:bg-blue-600 text-white'>
-            创建
+          <Button onClick={handleCreate} disabled={submitting} className='bg-blue-500 hover:bg-blue-600 text-white'>
+            {submitting ? '创建中...' : '创建'}
           </Button>
         </div>
       </DialogContent>

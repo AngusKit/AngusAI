@@ -1,11 +1,13 @@
-import { useState, useCallback } from 'react';
-import ReactFlow, { Node, Edge, Controls, Background, useNodesState, useEdgesState, addEdge, Connection, BackgroundVariant, MiniMap, } from 'reactflow';
+import { useState, useCallback, useEffect } from 'react';
+import ReactFlow, { Node, Edge, Controls, Background, useNodesState, useEdgesState, addEdge, Connection, BackgroundVariant, MiniMap } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { Button } from '@/components/ui/button';
 import { Save, Maximize2, Minimize2, X, Play, Pause } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
+import Workflows from '@/services/Workflows';
+import { WorkflowDetailVo } from '@/services/WorkflowsTypes';
 
 interface WorkflowEditorProps {
   workflowId: string;
@@ -122,11 +124,51 @@ const initialEdges: Edge[] = [
   },
 ];
 
+function parseConfigToNodesEdges(config: object | undefined): { nodes: Node[]; edges: Edge[] } {
+  if (!config || typeof config !== 'object') {
+    return { nodes: initialNodes, edges: initialEdges };
+  }
+  const c = config as { nodes?: Node[]; edges?: Edge[] };
+  if (Array.isArray(c.nodes) && Array.isArray(c.edges)) {
+    return { nodes: c.nodes.length ? c.nodes : initialNodes, edges: c.edges };
+  }
+  return { nodes: initialNodes, edges: initialEdges };
+}
+
 export function WorkflowEditor({ workflowId, workflowName, workflowStatus, onClose }: WorkflowEditorProps) {
+  const [loading, setLoading] = useState(true);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
+
+  useEffect(() => {
+    if (!workflowId) {
+      setLoading(false);
+      return;
+    }
+    let cancelled = false;
+    Workflows.getWorkflowDetail(workflowId)
+      .then((res: unknown) => {
+        if (cancelled) return;
+        const data = (res as { data?: WorkflowDetailVo }).data;
+        const cfg = data?.config;
+        const { nodes: n, edges: e } = parseConfigToNodesEdges(cfg);
+        setNodes(n);
+        setEdges(e);
+      })
+      .catch(() => {
+        if (!cancelled) toast.error('加载工作流配置失败');
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [workflowId, setNodes, setEdges]);
 
   const onConnect = useCallback(
     (params: Connection) => {
@@ -136,9 +178,40 @@ export function WorkflowEditor({ workflowId, workflowName, workflowStatus, onClo
     [setEdges]
   );
 
-  const handleSave = () => {
-    toast.success('工作流已保存');
-    setHasChanges(false);
+  const handleSave = async () => {
+    if (!workflowId) return;
+    setSaving(true);
+    try {
+      await Workflows.updateWorkflowConfig(workflowId, {
+        nodes: nodes.map(n => ({ id: n.id, type: n.type, data: n.data, position: n.position })),
+        edges: edges.map(e => ({ id: e.id, source: e.source, target: e.target })),
+      });
+      toast.success('工作流已保存');
+      setHasChanges(false);
+    } catch (e: unknown) {
+      toast.error((e as { message?: string })?.message ?? '保存失败');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleStartStop = async () => {
+    if (!workflowId) return;
+    setActionLoading(true);
+    try {
+      if (workflowStatus === '运行中') {
+        await Workflows.stopWorkflow(workflowId);
+        toast.success('工作流已停止');
+      } else {
+        await Workflows.startWorkflow(workflowId);
+        toast.success('工作流已启动');
+      }
+      onClose(); // 返回列表以刷新状态
+    } catch (e: unknown) {
+      toast.error((e as { message?: string })?.message ?? '操作失败');
+    } finally {
+      setActionLoading(false);
+    }
   };
 
   const toggleFullscreen = () => {
@@ -160,6 +233,14 @@ export function WorkflowEditor({ workflowId, workflowName, workflowStatus, onClo
     },
     [onEdgesChange]
   );
+
+  if (loading) {
+    return (
+      <div className='flex items-center justify-center h-[600px] bg-white dark:bg-gray-900'>
+        <span className='text-gray-500 dark:text-gray-400'>加载工作流配置中...</span>
+      </div>
+    );
+  }
 
   return (
     <div className={`${isFullscreen ? 'fixed inset-0 z-50' : 'relative'} bg-white dark:bg-gray-900`}>
@@ -191,23 +272,29 @@ export function WorkflowEditor({ workflowId, workflowName, workflowStatus, onClo
               size='sm'
               variant='outline'
               onClick={handleSave}
-              disabled={!hasChanges}
+              disabled={!hasChanges || saving}
               className='dark:bg-gray-800 dark:border-gray-700 dark:text-white'
             >
               <Save className='w-4 h-4 mr-2' />
-              保存
+              {saving ? '保存中...' : '保存'}
             </Button>
 
-            <Button size='sm' variant='outline' className='dark:bg-gray-800 dark:border-gray-700 dark:text-white'>
+            <Button
+              size='sm'
+              variant='outline'
+              className='dark:bg-gray-800 dark:border-gray-700 dark:text-white'
+              onClick={handleStartStop}
+              disabled={actionLoading}
+            >
               {workflowStatus === '运行中' ? (
                 <>
                   <Pause className='w-4 h-4 mr-2' />
-                  暂停
+                  {actionLoading ? '处理中...' : '暂停'}
                 </>
               ) : (
                 <>
                   <Play className='w-4 h-4 mr-2' />
-                  启动
+                  {actionLoading ? '处理中...' : '启动'}
                 </>
               )}
             </Button>

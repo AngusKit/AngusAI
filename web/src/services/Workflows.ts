@@ -76,10 +76,10 @@ export class Workflows<SecurityDataType = unknown> {
   getWorkflowList = (
     query?: PageQuery & {
       /**
-       * 工作流名称
-       * @example "用户注册流程"
+       * 关键词搜索（匹配 name、description）
+       * @example "用户注册"
        */
-      name?: string;
+      keyword?: string;
       /**
        * 背景色
        * @example "bg-blue-500"
@@ -111,7 +111,7 @@ export class Workflows<SecurityDataType = unknown> {
    * @secure
    */
   createWorkflow = (data: WorkflowCreateDto, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResult>({
+    this.http.request<WorkflowDetailResult>({
       path: `${AI}/workflows`,
       method: 'POST',
       body: data,

@@ -419,7 +419,7 @@ export function AgentResourcesSection({ value, onChange }: AgentResourcesSection
     const res = await Workflows.getWorkflowList({
       pageNo,
       pageSize: PAGE_SIZE,
-      name: keyword.trim() || undefined,
+      keyword: keyword.trim() || undefined,
       status: WorkflowStatusEnum.RUNNING,
     });
     const data = (res as any)?.data;
