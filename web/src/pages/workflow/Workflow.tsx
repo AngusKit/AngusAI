@@ -25,16 +25,6 @@ interface WorkflowItem {
   successRate: string;
 }
 
-interface ActivityLog {
-  id: number;
-  workflowName: string;
-  activity: string;
-  status: '成功' | '失败';
-  statusColor: string;
-  operator: string;
-  createdTime: string;
-}
-
 export function Workflow() {
   const { t } = useLanguage();
   const navigate = useNavigate();
@@ -46,13 +36,7 @@ export function Workflow() {
 
   // 分页状态
   const [workflowPage, setWorkflowPage] = useState(1);
-  const [logPage, setLogPage] = useState(1);
   const workflowsPerPage = 6;
-  const logsPerPage = 6;
-
-  // 日志搜索和过滤状态
-  const [logSearchQuery, setLogSearchQuery] = useState('');
-  const [logWorkflowFilter, setLogWorkflowFilter] = useState('all');
 
   const handleDesignWorkflow = (workflow: { id: number; name: string; status: '运行中' | '已停止' }) => {
     navigate(`/workflow-design?workflowId=${workflow.id}&workflowName=${workflow.name}&workflowStatus=${workflow.status}`);
@@ -198,100 +182,6 @@ export function Workflow() {
     },
   ];
 
-  // 最近操作日志
-  const activityLogs: ActivityLog[] = [
-    {
-      id: 1,
-      workflowName: '客户服务自动化',
-      activity: '处理客户咨询 - 订单查询',
-      status: '成功',
-      statusColor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-      operator: '张三',
-      createdTime: '2023-10-15 14:30:25',
-    },
-    {
-      id: 2,
-      workflowName: '内容生成流程链',
-      activity: '生成产品描述文案',
-      status: '成功',
-      statusColor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-      operator: '李四',
-      createdTime: '2023-10-15 14:28:12',
-    },
-    {
-      id: 3,
-      workflowName: '数据分析评估',
-      activity: '分析销售数据报表',
-      status: '成功',
-      statusColor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-      operator: '王五',
-      createdTime: '2023-10-15 14:25:48',
-    },
-    {
-      id: 4,
-      workflowName: '客户服务自动化',
-      activity: '自动回复常见问题',
-      status: '成功',
-      statusColor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-      operator: '张三',
-      createdTime: '2023-10-15 14:20:15',
-    },
-    {
-      id: 5,
-      workflowName: '内容生成流程链',
-      activity: '生成社交媒体推广文案',
-      status: '失败',
-      statusColor: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-      operator: '赵六',
-      createdTime: '2023-10-15 14:15:33',
-    },
-    {
-      id: 6,
-      workflowName: '邮件营销自动化',
-      activity: '发送促销邮件活动',
-      status: '成功',
-      statusColor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-      operator: '李四',
-      createdTime: '2023-10-15 14:12:45',
-    },
-    {
-      id: 7,
-      workflowName: '智能文档处理',
-      activity: '分类合同文档',
-      status: '成功',
-      statusColor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-      operator: '王五',
-      createdTime: '2023-10-15 14:08:22',
-    },
-    {
-      id: 8,
-      workflowName: '订单处理流程',
-      activity: '处理新订单 #12458',
-      status: '成功',
-      statusColor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-      operator: '张三',
-      createdTime: '2023-10-15 14:05:10',
-    },
-    {
-      id: 9,
-      workflowName: '知识库维护',
-      activity: '更新产品文档',
-      status: '成功',
-      statusColor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-      operator: '赵六',
-      createdTime: '2023-10-15 14:02:33',
-    },
-    {
-      id: 10,
-      workflowName: '社交媒体发布',
-      activity: '发布微博内容',
-      status: '失败',
-      statusColor: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-      operator: '李四',
-      createdTime: '2023-10-15 13:58:47',
-    },
-  ];
-
   const handleAction = (action: string, workflow: WorkflowItem) => {
     if (action === '编辑') {
       navigate(`/workflow/${workflow.id}`);
@@ -303,25 +193,6 @@ export function Workflow() {
   // 分页计算
   const totalWorkflowPages = Math.ceil(workflows.length / workflowsPerPage);
   const paginatedWorkflows = workflows.slice((workflowPage - 1) * workflowsPerPage, workflowPage * workflowsPerPage);
-
-  // 日志搜索和过滤
-  const filteredLogs = activityLogs.filter(log => {
-    const matchesSearch =
-      logSearchQuery === '' ||
-      log.workflowName.toLowerCase().includes(logSearchQuery.toLowerCase()) ||
-      log.activity.toLowerCase().includes(logSearchQuery.toLowerCase()) ||
-      log.operator.toLowerCase().includes(logSearchQuery.toLowerCase());
-
-    const matchesWorkflow = logWorkflowFilter === 'all' || log.workflowName === logWorkflowFilter;
-
-    return matchesSearch && matchesWorkflow;
-  });
-
-  const totalLogPages = Math.ceil(filteredLogs.length / logsPerPage);
-  const paginatedLogs = filteredLogs.slice((logPage - 1) * logsPerPage, logPage * logsPerPage);
-
-  // 获取唯一的工作流名称用于过滤选项
-  const uniqueWorkflowNames = Array.from(new Set(activityLogs.map(log => log.workflowName)));
 
   return (
     <div className='space-y-6'>
@@ -480,16 +351,6 @@ export function Workflow() {
                           </button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align='end' className='dark:bg-gray-800 dark:border-gray-700'>
-                          <DropdownMenuItem
-                            onClick={e => {
-                              e.stopPropagation();
-                              handleAction('编辑', workflow);
-                            }}
-                            className='dark:text-gray-300'
-                          >
-                            <Edit className='w-4 h-4 mr-2' />
-                            编辑工作流
-                          </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={e => {
                               e.stopPropagation();
@@ -711,138 +572,6 @@ export function Workflow() {
               </div>
             )}
           </>
-        )}
-      </div>
-
-      {/* Activity Logs */}
-      <div>
-        <div className='mb-4'>
-          <h2 className='text-xl dark:text-white mb-4'>最近操作日志</h2>
-
-          {/* Search and Filter for Logs */}
-          <div className='flex items-center gap-3'>
-            {/* Search Bar */}
-            <div className='relative flex-1 max-w-md'>
-              <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500' />
-              <Input
-                type='text'
-                placeholder='搜索工作流、活动内容或操作人...'
-                value={logSearchQuery}
-                onChange={e => {
-                  setLogSearchQuery(e.target.value);
-                  setLogPage(1); // 重置到第一页
-                }}
-                className='pl-10 pr-10 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 focus-visible:border-blue-500 focus-visible:ring-blue-500/50'
-              />
-              {logSearchQuery && (
-                <button
-                  onClick={() => {
-                    setLogSearchQuery('');
-                    setLogPage(1);
-                  }}
-                  className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors'
-                >
-                  <X className='w-4 h-4' />
-                </button>
-              )}
-            </div>
-
-            {/* Workflow Filter */}
-            <Select
-              value={logWorkflowFilter}
-              onValueChange={value => {
-                setLogWorkflowFilter(value);
-                setLogPage(1); // 重置到第一页
-              }}
-            >
-              <SelectTrigger className='w-[240px] dark:bg-gray-800 dark:border-gray-700 dark:text-white'>
-                <SelectValue placeholder='选择工作流' />
-              </SelectTrigger>
-              <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
-                <SelectItem value='all' className='dark:text-gray-300'>
-                  全部工作流
-                </SelectItem>
-                {uniqueWorkflowNames.map(name => (
-                  <SelectItem key={name} value={name} className='dark:text-gray-300'>
-                    {name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        <Card className='dark:bg-gray-800 dark:border-gray-700 mb-4'>
-          <div className='overflow-x-auto'>
-            <table className='w-full'>
-              <thead className='bg-gray-50 dark:bg-gray-900'>
-                <tr>
-                  <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>工作流</th>
-                  <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>活动内容</th>
-                  <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>状态</th>
-                  <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>操作人</th>
-                  <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>操作时间</th>
-                </tr>
-              </thead>
-              <tbody className='divide-y divide-gray-200 dark:divide-gray-700'>
-                {paginatedLogs.length > 0 ? (
-                  paginatedLogs.map(log => (
-                    <tr key={log.id} className='hover:bg-gray-50 dark:hover:bg-gray-900'>
-                      <td className='px-6 py-4 text-sm dark:text-white'>{log.workflowName}</td>
-                      <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{log.activity}</td>
-                      <td className='px-6 py-4'>
-                        <Badge className={`text-xs ${log.statusColor} border-0`}>{log.status}</Badge>
-                      </td>
-                      <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{log.operator}</td>
-                      <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{log.createdTime}</td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={5} className='px-6 py-12 text-center'>
-                      <div className='flex flex-col items-center justify-center'>
-                        <Search className='w-12 h-12 text-gray-300 dark:text-gray-600 mb-3' />
-                        <p className='text-sm text-gray-500 dark:text-gray-400'>没有找到匹配的操作日志</p>
-                      </div>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </Card>
-
-        {/* Pagination for Activity Logs */}
-        {totalLogPages > 1 && (
-          <div className='flex justify-center'>
-            <Pagination>
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious
-                    onClick={() => setLogPage(prev => Math.max(1, prev - 1))}
-                    className={logPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                  />
-                </PaginationItem>
-                {Array.from({ length: totalLogPages }, (_, i) => i + 1).map(page => (
-                  <PaginationItem key={page}>
-                    <PaginationLink
-                      onClick={() => setLogPage(page)}
-                      isActive={page === logPage}
-                      className='cursor-pointer'
-                    >
-                      {page}
-                    </PaginationLink>
-                  </PaginationItem>
-                ))}
-                <PaginationItem>
-                  <PaginationNext
-                    onClick={() => setLogPage(prev => Math.min(totalLogPages, prev + 1))}
-                    className={logPage === totalLogPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
-          </div>
         )}
       </div>
 

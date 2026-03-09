@@ -18,7 +18,7 @@ export function WorkflowDesignPage() {
       <div className='flex items-center gap-4 mb-6'>
         <Button variant='ghost' size='sm' onClick={handleBack} className='dark:text-gray-300 dark:hover:bg-gray-800'>
           <ArrowLeft className='w-4 h-4 mr-2' />
-          返回工作流列表
+          返回
         </Button>
         <div className='flex-1'>
           <h1 className='text-2xl dark:text-white'>{workflowName}</h1>
