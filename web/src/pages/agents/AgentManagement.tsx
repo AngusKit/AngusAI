@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
-import { Bot, Search, Filter, Grid3x3, List, Eye, Edit, Trash2, MoreHorizontal, Play, Pause } from 'lucide-react';
+import { Bot, Search, Filter, Grid3x3, List, Eye, Edit, Trash2, MoreHorizontal, Play, Pause, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -225,7 +225,7 @@ export function AgentManagement() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl mb-1 dark:text-white">{t('nav.agents')}</h1>
+        <h1 className="text-2xl mb-1 dark:text-white">智能体</h1>
         <p className="text-sm text-gray-600 dark:text-gray-400">
           管理智能体，配置模型与能力
         </p>
@@ -304,18 +304,18 @@ export function AgentManagement() {
           <h3 className="text-lg mb-2 dark:text-white">加载中...</h3>
         </Card>
       ) : agents.length === 0 ? (
-        <Card className="p-12 text-center dark:bg-gray-800 dark:border-gray-700">
-          <Bot className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg mb-2 dark:text-white">暂无智能体</h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-            创建第一个智能体开始使用
-          </p>
-          <Button
-            onClick={() => setCreateDialogOpen(true)}
-            className="bg-blue-500 hover:bg-blue-600"
-          >
-            创建智能体
-          </Button>
+        <Card className="py-16 px-8 text-center dark:bg-gray-800 dark:border-gray-700 border-2 border-dashed border-gray-200 dark:border-gray-600">
+          <div className="flex flex-col items-center max-w-md mx-auto">
+            <div className="bg-gradient-to-br from-orange-100 to-orange-50 dark:from-orange-900/30 dark:to-orange-800/20 w-20 h-20 rounded-2xl flex items-center justify-center mt-5 mb-6">
+              <Bot className="w-20 h-20 text-orange-500 dark:text-orange-400" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">
+              暂无智能体
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 leading-relaxed">
+              创建您的第一个智能体，配置模型与能力，开启 AI 对话体验
+            </p>
+          </div>
         </Card>
       ) : viewMode === 'grid' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
