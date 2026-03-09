@@ -95,10 +95,13 @@ export function ModelSelectDialog({
 
   useEffect(() => {
     if (!open) return;
-    setSearch('');
     setPageNo(1);
     loadRef.current(1, false);
   }, [open, debouncedSearch]);
+
+  useEffect(() => {
+    if (open) setSearch('');
+  }, [open]);
 
   const loadMoreIfNeeded = useCallback(() => {
     if (loading || loadMore || items.length >= total) return;
@@ -178,26 +181,13 @@ export function ModelSelectDialog({
                     onClick={onClose}
                     className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
                   >
-                    去创建
+                    去添加
                   </Link>
                 </>
               )}
             </div>
           ) : (
             <div className="space-y-2 pr-2 pb-4">
-              <Card
-                onClick={() => onSelect(null)}
-                className={`p-3 cursor-pointer transition-all select-none hover:shadow-sm ${
-                  !selectedModelId
-                    ? `border-2 ${ACCENT.border} ${ACCENT.bg}`
-                    : `border border-gray-200 dark:border-gray-700 ${ACCENT.hover}`
-                }`}
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <span className="dark:text-gray-400">（不选择）</span>
-                  {!selectedModelId && <Check className={`w-4 h-4 ${ACCENT.selected} shrink-0`} />}
-                </div>
-              </Card>
               {items.map((item) => {
                 const isSelected = selectedModelId === item.id;
                 return (
