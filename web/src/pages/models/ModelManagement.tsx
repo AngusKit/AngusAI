@@ -430,18 +430,25 @@ export function ModelManagement() {
         return;
       }
 
+      const newStatus = model.statusEnum === ModelStatusEnum.ACTIVE ? ModelStatusEnum.DISABLED : ModelStatusEnum.ACTIVE;
       try {
-        const newStatus = model.statusEnum === ModelStatusEnum.ACTIVE ? ModelStatusEnum.DISABLED : ModelStatusEnum.ACTIVE;
         await ModelsService.updateModelStatus(model.id, { status: newStatus });
         toast.success(newStatus === ModelStatusEnum.ACTIVE ? t('models.messages.modelActivated', { name: model.name }) : t('models.messages.modelDisabled', { name: model.name }));
-        await loadModels();
-        await loadStatistics();
+        const statusConfig = mapStatusToConfig(newStatus);
+        setModels(prev =>
+          prev.map(item =>
+            item.id === model.id ? { ...item, statusEnum: newStatus, status: statusConfig.label, statusColor: statusConfig.color } : item
+          )
+        );
+        setSelectedModel(prev =>
+          prev && prev.id === model.id ? { ...prev, statusEnum: newStatus, status: statusConfig.label, statusColor: statusConfig.color } : prev
+        );
       } catch (error: any) {
         console.error('Failed to toggle model status:', error);
         toast.error(error?.message || t('models.messages.updateStatusFailed'));
       }
     },
-    [loadModels, loadStatistics, t]
+    [t]
   );
 
   const handleViewDetails = useCallback(
