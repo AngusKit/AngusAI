@@ -108,7 +108,7 @@ public class CoreBeansConfiguration {
 
   @Bean
   public MemoryFactory memoryFactory(ChatMemoryStore chatMemoryStore, ModelRegistry modelRegistry) {
-    return new MemoryFactory(chatMemoryStore, modelRegistry.getDefaultChatModel().orElse(null));
+    return new MemoryFactory(chatMemoryStore, modelRegistry);
   }
 
   // ===== Agent =====

@@ -1,7 +1,8 @@
 package cloud.xcan.agentx.core.memory;
 
-import cloud.xcan.agentx.core.memory.enums.MemoryStrategy;
 import cloud.xcan.agentx.core.agent.definition.AgentDefinition;
+import cloud.xcan.agentx.core.memory.enums.MemoryStrategy;
+import cloud.xcan.agentx.core.model.ModelRegistry;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
@@ -21,15 +22,17 @@ public class MemoryFactory {
 
   private static final SimpleTokenCountEstimator TOKEN_ESTIMATOR = new SimpleTokenCountEstimator();
 
-  private final ChatMemoryStore memoryStore;
-  private final ChatModel chatModel;
+  private ChatMemoryStore memoryStore;
+  private ChatModel chatModel;
+  private ModelRegistry modelRegistry;
 
   /**
    * 无依赖构造函数，用于简单场景
    */
   public MemoryFactory() {
-    this.chatModel = null;
     this.memoryStore = new InMemoryChatMemoryStore();
+    this.chatModel = null;
+    this.modelRegistry = null;
   }
 
   /**
@@ -38,14 +41,16 @@ public class MemoryFactory {
   public MemoryFactory(ChatModel chatModel) {
     this.chatModel = chatModel;
     this.memoryStore = new InMemoryChatMemoryStore();
+    this.modelRegistry = null;
   }
 
   /**
    * 注入 ChatMemoryStore 和 ChatModel 的构造函数，支持自定义存储和 SUMMARY 策略
    */
-  public MemoryFactory(ChatMemoryStore memoryStore, ChatModel chatModel) {
+  public MemoryFactory(ChatMemoryStore memoryStore, ModelRegistry modelRegistry) {
     this.memoryStore = memoryStore != null ? memoryStore : new InMemoryChatMemoryStore();
-    this.chatModel = chatModel;
+    this.chatModel = null;
+    this.modelRegistry = modelRegistry;
   }
 
   /**
@@ -106,5 +111,16 @@ public class MemoryFactory {
         .maxMessages(windowSize)
         .chatMemoryStore(memoryStore)
         .build();
+  }
+
+  public ChatModel getChatModel() {
+    if (chatModel != null) {
+      return chatModel;
+    }
+    chatModel = modelRegistry != null ? modelRegistry.getDefaultChatModel().orElse(null) : null;
+    if (chatModel == null) {
+      throw new IllegalStateException("chatModel is null");
+    }
+    return chatModel;
   }
 }
