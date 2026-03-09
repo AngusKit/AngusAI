@@ -16,16 +16,16 @@ import {
   TrendingUp,
   Link2,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button.tsx';
+import { Card } from '@/components/ui/card.tsx';
+import { Badge } from '@/components/ui/badge.tsx';
 import { toast } from 'sonner';
-import Applications from '@/services/Applications';
-import type { ApplicationDetailVo } from '@/services/ApplicationsTypes';
-import { ApplicationStatusEnum } from '@/enums/enums';
-import { getEnumDescription } from '@/enums/utils';
-import { ShareApplicationDialog } from './ShareApplicationDialog';
-import { getTagColor } from '@/lib/tagColors';
+import Applications from '@/services/Applications.ts';
+import type { ApplicationDetailVo } from '@/services/ApplicationsTypes.ts';
+import { ApplicationStatusEnum } from '@/enums/enums.ts';
+import { getEnumDescription } from '@/enums/utils.ts';
+import { ShareApplicationDialog } from './ShareApplicationDialog.tsx';
+import { getTagColor } from '../utils.ts';
 
 export function ApplicationDetailPage() {
   const navigate = useNavigate();

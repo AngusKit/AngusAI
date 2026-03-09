@@ -1,14 +1,13 @@
 import { Plus, Filter, Grid3x3, List, MoreVertical, Star, Clock, MessageSquare, FileText, Database, Code, Zap, Globe, Bot, Sparkles, Search, X, PlayCircle, PauseCircle, Rocket, Image, Book, Mic, Video, Mail, ShoppingCart, BarChart3, Settings, Edit, Copy, Share2, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, } from '@/components/ui/pagination';
 import { useState, useEffect } from 'react';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { toast } from 'sonner';
-import { ShareApplicationDialog } from './ShareApplicationDialog';
+import { ShareApplicationDialog } from './components/ShareApplicationDialog.tsx';
 import Applications from '@/services/Applications';
 import { ApplicationDetailVo } from '@/services/ApplicationsTypes';
 import { ApplicationStatusEnum } from '@/enums/enums';

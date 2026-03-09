@@ -1,18 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Check, Search, Bot } from 'lucide-react';
-import Agents from '@/services/Agents';
-import Applications from '@/services/Applications';
-import { AgentStatusEnum } from '@/enums/enums';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Card } from '@/components/ui/card';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Badge } from '@/components/ui/badge';
+import Agents from '@/services/Agents.ts';
+import Applications from '@/services/Applications.ts';
+import { AgentStatusEnum } from '@/enums/enums.ts';
+import { Button } from '@/components/ui/button.tsx';
+import { Input } from '@/components/ui/input.tsx';
+import { Textarea } from '@/components/ui/textarea.tsx';
+import { Label } from '@/components/ui/label.tsx';
+import { Card } from '@/components/ui/card.tsx';
+import { ScrollArea } from '@/components/ui/scroll-area.tsx';
+import { Badge } from '@/components/ui/badge.tsx';
 import { toast } from 'sonner';
-import { getTagColor } from '@/lib/tagColors';
+import { getTagColor } from '../utils.ts';
 
 const ICON_OPTIONS = [
   { emoji: '🤖', label: '机器人' },
