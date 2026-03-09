@@ -272,7 +272,7 @@ export function AgentManagement() {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
-                <div className="flex items-start gap-3 mb-3">
+                <div className="flex items-start gap-3">
                   <div className="bg-gradient-to-br from-orange-500 to-orange-600 w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0">
                     <Bot className="w-6 h-6 text-white" />
                   </div>
@@ -300,7 +300,7 @@ export function AgentManagement() {
                     </span>
                   )}
                   {agent.modelName && (
-                    <span className="flex items-center gap-1">
+                    <span className="flex items-center gap-1 ml-auto">
                       <Cpu className="w-3.5 h-3.5" />
                       {agent.modelName}
                     </span>

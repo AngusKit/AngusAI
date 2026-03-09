@@ -469,14 +469,6 @@ export function AgentResourcesSection({ value, onChange }: AgentResourcesSection
             accent="text-green-500"
           />
           <ResourceRow
-            type="workflow"
-            title="工作流"
-            icon={Zap}
-            selectedIds={value.workflowId ? [value.workflowId] : []}
-            selectedSingleName={value.workflowName}
-            accent="text-purple-500"
-          />
-          <ResourceRow
             type="apiCollection"
             title="接口集"
             icon={Code2}
@@ -484,6 +476,14 @@ export function AgentResourcesSection({ value, onChange }: AgentResourcesSection
             selectedNames={value.apiCollectionNames}
             maxCount={AGENT_MAX_API_COLLECTION}
             accent="text-orange-500"
+          />
+          <ResourceRow
+            type="workflow"
+            title="工作流"
+            icon={Zap}
+            selectedIds={value.workflowId ? [value.workflowId] : []}
+            selectedSingleName={value.workflowName}
+            accent="text-purple-500"
           />
         </div>
       </Card>
@@ -531,26 +531,6 @@ export function AgentResourcesSection({ value, onChange }: AgentResourcesSection
         onClose={closeDialog}
       />
       <ResourceSelectDialog
-        title="选择工作流"
-        icon={Zap}
-        fetchFn={fetchWorkflows}
-        selectedSingle={value.workflowId}
-        accent={{
-          selected: 'text-purple-500',
-          border: 'border-purple-500',
-          hover: 'hover:border-purple-200 dark:hover:border-purple-800',
-          bg: 'bg-purple-50 dark:bg-purple-900/20',
-        }}
-        onToggle={selectWorkflow}
-        emptyLink="/workflow"
-        emptyText="暂无工作流，"
-        open={dialogOpen === 'workflow'}
-        search={dialogSearch}
-        onSearchChange={setDialogSearch}
-        debouncedSearch={debouncedSearch}
-        onClose={closeDialog}
-      />
-      <ResourceSelectDialog
         title="选择接口集"
         icon={Code2}
         fetchFn={fetchApiCollections}
@@ -566,6 +546,26 @@ export function AgentResourcesSection({ value, onChange }: AgentResourcesSection
         emptyLink="/api-collection"
         emptyText="暂无接口集，"
         open={dialogOpen === 'apiCollection'}
+        search={dialogSearch}
+        onSearchChange={setDialogSearch}
+        debouncedSearch={debouncedSearch}
+        onClose={closeDialog}
+      />
+      <ResourceSelectDialog
+        title="选择工作流"
+        icon={Zap}
+        fetchFn={fetchWorkflows}
+        selectedSingle={value.workflowId}
+        accent={{
+          selected: 'text-purple-500',
+          border: 'border-purple-500',
+          hover: 'hover:border-purple-200 dark:hover:border-purple-800',
+          bg: 'bg-purple-50 dark:bg-purple-900/20',
+        }}
+        onToggle={selectWorkflow}
+        emptyLink="/workflow"
+        emptyText="暂无工作流，"
+        open={dialogOpen === 'workflow'}
         search={dialogSearch}
         onSearchChange={setDialogSearch}
         debouncedSearch={debouncedSearch}

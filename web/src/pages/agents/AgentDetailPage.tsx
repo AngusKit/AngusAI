@@ -169,7 +169,6 @@ export function AgentDetailPage() {
           <ConfigItem
             label="默认模型"
             value={detail.defaultModel?.name ?? (detail.defaultModel?.id != null ? String(detail.defaultModel.id) : '未选择')}
-            icon={<Cpu className="w-4 h-4 text-gray-500" />}
           />
           <ConfigItem
             label="交互模式"
@@ -288,20 +287,20 @@ export function AgentDetailPage() {
                 baseLink="/dataset"
               />
             )}
-            {detail.resources?.workflow && (
-              <ResourceSection
-                icon={<Zap className="w-4 h-4 text-purple-500" />}
-                title="工作流"
-                items={[detail.resources.workflow.name ?? String(detail.resources.workflow.id)]}
-                baseLink="/workflow"
-              />
-            )}
             {detail.resources?.apiCollections && detail.resources.apiCollections.length > 0 && (
               <ResourceSection
                 icon={<Code2 className="w-4 h-4 text-orange-500" />}
                 title="接口集"
                 items={detail.resources.apiCollections.map((r) => r.name ?? String(r.id))}
                 baseLink="/api-collection"
+              />
+            )}
+            {detail.resources?.workflow && (
+              <ResourceSection
+                icon={<Zap className="w-4 h-4 text-purple-500" />}
+                title="工作流"
+                items={[detail.resources.workflow.name ?? String(detail.resources.workflow.id)]}
+                baseLink="/workflow"
               />
             )}
           </div>
