@@ -22,6 +22,8 @@ xcan:
       printLevel: FULL
   id-gen:
     enabled: true
+  plugin:
+    enabled: false
   datasource:
     enabled: true
     commonlink:
@@ -323,3 +325,6 @@ management:
     health:
       show-details: always
       access: read_only
+  health:
+    elasticsearch:
+      enabled: false  # 关闭 ElasticsearchRestClientHealthIndicator 自动检查

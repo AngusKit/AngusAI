@@ -2,10 +2,12 @@ package cloud.xcan.angus.core.ai.domain.agent;
 
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
 import java.util.List;
+import org.springframework.data.repository.NoRepositoryBean;
 
 /**
  * 智能体仓储
  */
+@NoRepositoryBean
 public interface AgentRepo extends BaseRepository<Agent, Long> {
 
   /**

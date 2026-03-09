@@ -113,11 +113,11 @@ public class Agent extends TenantAuditingEntity<Agent, Long> {
   private String memorySummaryPrompt;
 
   @Type(JsonType.class)
-  @Column(columnDefinition = "json", name = "guardrail_id")
+  @Column(columnDefinition = "json", name = "input_guardrail_id")
   private List<String> inputGuardrailIds = new ArrayList<>();
 
   @Type(JsonType.class)
-  @Column(columnDefinition = "json", name = "guardrail_id")
+  @Column(columnDefinition = "json", name = "output_guardrail_id")
   private List<String> outputGuardrailIds = new ArrayList<>();
 
   @Type(JsonType.class)
