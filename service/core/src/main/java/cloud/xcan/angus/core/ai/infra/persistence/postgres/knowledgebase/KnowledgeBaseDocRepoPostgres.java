@@ -9,7 +9,7 @@ public interface KnowledgeBaseDocRepoPostgres extends KnowledgeBaseDocRepo {
 
   @Query(value = "SELECT COUNT(DISTINCT d.id) FROM ai_knowledge_base_document d " +
       "JOIN ai_knowledge_base kb ON d.knowledge_base_id = kb.id " +
-      "JOIN ai_application app ON CAST(kb.id AS string) = ANY(CAST(app.knowledge_base_ids AS text[]))", nativeQuery = true)
+      "JOIN JOIN ai_agent agent ON CAST(kb.id AS string) = ANY(CAST(agent.knowledge_base_id AS text[]))", nativeQuery = true)
   Long countActiveFiles();
 
 }

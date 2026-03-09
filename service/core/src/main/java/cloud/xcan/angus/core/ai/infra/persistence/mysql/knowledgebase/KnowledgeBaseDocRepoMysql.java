@@ -12,7 +12,7 @@ public interface KnowledgeBaseDocRepoMysql extends KnowledgeBaseDocRepo {
    */
   @Query(value = "SELECT COUNT(DISTINCT d.id) FROM ai_knowledge_base_document d " +
       "JOIN ai_knowledge_base kb ON d.knowledge_base_id = kb.id " +
-      "JOIN ai_application app ON JSON_CONTAINS(app.knowledge_base_ids, CAST(kb.id AS CHAR))", nativeQuery = true)
+      "JOIN ai_agent agent ON JSON_CONTAINS(agent.knowledge_base_id, CAST(kb.id AS CHAR))", nativeQuery = true)
   Long countActiveFiles();
 
 }

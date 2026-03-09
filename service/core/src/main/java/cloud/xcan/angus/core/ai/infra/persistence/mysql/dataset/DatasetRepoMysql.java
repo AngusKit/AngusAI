@@ -12,6 +12,6 @@ public interface DatasetRepoMysql extends DatasetRepo {
    */
   @Override
   @Query(value = "SELECT COUNT(DISTINCT d.id) FROM ai_dataset d " +
-      "JOIN ai_application app ON JSON_CONTAINS(app.dataset_ids, CAST(d.id AS CHAR))", nativeQuery = true)
+      "JOIN ai_application app ON JSON_CONTAINS(app.dataset_id, CAST(d.id AS CHAR))", nativeQuery = true)
   Long countActiveDatasets();
 }
