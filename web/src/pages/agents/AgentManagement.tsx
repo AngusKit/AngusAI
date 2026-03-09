@@ -482,6 +482,7 @@ export function AgentManagement() {
                 value={createForm.name}
                 onChange={(e) => setCreateForm((f) => ({ ...f, name: e.target.value }))}
                 placeholder="智能体名称"
+                maxLength={100}
                 className="mt-2 dark:bg-gray-900 dark:border-gray-700 dark:text-white"
               />
             </div>
@@ -490,23 +491,24 @@ export function AgentManagement() {
               <Textarea
                 value={createForm.description}
                 onChange={(e) => setCreateForm((f) => ({ ...f, description: e.target.value }))}
-                placeholder="简要描述"
-                rows={3}
+                placeholder="智能体简要介绍, 不超过800字"
+                maxLength={800}
+                rows={5}
                 className="mt-2 dark:bg-gray-900 dark:border-gray-700 dark:text-white resize-none"
               />
             </div>
             <div>
-              <Label className="dark:text-gray-300">模型</Label>
+              <Label className="dark:text-gray-300">默认模型</Label>
               <Select
                 value={createForm.modelId ? String(createForm.modelId) : ''}
                 onValueChange={(v) => setCreateForm((f) => ({ ...f, modelId: parseInt(v, 10) }))}
               >
                 <SelectTrigger className="mt-2 dark:bg-gray-900 dark:border-gray-700 dark:text-white">
-                  <SelectValue placeholder="选择模型" />
+                  <SelectValue placeholder="选择默认模型" />
                 </SelectTrigger>
                 <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
                   {models.map((m) => (
-                    <SelectItem key={m.id} value={String(m.id)} className="dark:text-gray-300">
+                    <SelectItem key={m.id} value={m.id} className="dark:text-gray-300">
                       {m.name ?? m.id}
                     </SelectItem>
                   ))}
@@ -541,6 +543,7 @@ export function AgentManagement() {
                 value={editForm.name}
                 onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))}
                 placeholder="智能体名称"
+                maxLength={100}
                 className="mt-2 dark:bg-gray-900 dark:border-gray-700 dark:text-white"
               />
             </div>
@@ -549,8 +552,9 @@ export function AgentManagement() {
               <Textarea
                 value={editForm.description}
                 onChange={(e) => setEditForm((f) => ({ ...f, description: e.target.value }))}
-                placeholder="简要描述"
-                rows={3}
+                placeholder="智能体简要介绍, 不超过800字"
+                maxLength={800}
+                rows={5}
                 className="mt-2 dark:bg-gray-900 dark:border-gray-700 dark:text-white resize-none"
               />
             </div>
@@ -565,7 +569,7 @@ export function AgentManagement() {
                 </SelectTrigger>
                 <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
                   {models.map((m) => (
-                    <SelectItem key={m.id} value={String(m.id)} className="dark:text-gray-300">
+                    <SelectItem key={m.id} value={m.id} className="dark:text-gray-300">
                       {m.name ?? m.id}
                     </SelectItem>
                   ))}
