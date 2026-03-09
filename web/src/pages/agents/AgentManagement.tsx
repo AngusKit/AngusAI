@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bot, Search, Filter, Grid3x3, List, Eye, Edit, Trash2, MoreHorizontal, Play, Pause, Plus } from 'lucide-react';
+import { Bot, Search, Filter, Grid3x3, List, Eye, Edit, Trash2, MoreHorizontal, Play, Pause, Plus, Cpu, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -11,8 +11,11 @@ import { XcanPagination } from '@/components/ui/pagination';
 import { toast } from 'sonner';
 import { useDebounce } from '@/hooks/useDebounce';
 import Agents from '@/services/Agents';
+import Models from '@/services/Models';
 import { AgentListVo } from '@/services/AgentsTypes';
 import { AgentStatusEnum } from '@/enums/enums';
+import { getEnumDescription } from '@/enums/utils';
+import { InteractionModeEnum } from '@/enums/enums';
 
 interface AgentListItem {
   id: string;
@@ -21,6 +24,8 @@ interface AgentListItem {
   status: string;
   statusEnum?: AgentStatusEnum;
   interactionMode?: string;
+  modelId?: string;
+  modelName?: string;
 }
 
 const AGENT_STATUS_CONFIG: Record<string, { color: string }> = {
@@ -40,6 +45,21 @@ export function AgentManagement() {
   const [agents, setAgents] = useState<AgentListItem[]>([]);
   const [agentsLoading, setAgentsLoading] = useState(false);
   const [agentsTotal, setAgentsTotal] = useState(0);
+  const [modelMap, setModelMap] = useState<Record<string, string>>({});
+
+  const loadModels = useCallback(async () => {
+    try {
+      const res = await Models.getModelList({ pageNo: 1, pageSize: 500 });
+      const list = (res as any)?.data?.list ?? [];
+      const map: Record<string, string> = {};
+      for (const m of list) {
+        if (m?.id && m?.name) map[String(m.id)] = m.name;
+      }
+      setModelMap(map);
+    } catch {
+      // ignore
+    }
+  }, []);
 
   const loadAgents = useCallback(async () => {
     setAgentsLoading(true);
@@ -61,6 +81,7 @@ export function AgentManagement() {
           status: item.status ?? 'INACTIVE',
           statusEnum: item.status as AgentStatusEnum | undefined,
           interactionMode: item.interactionMode,
+          modelId: (item as any).modelId ?? (item as any).defaultModelId,
         }))
       );
     } catch (error: any) {
@@ -74,8 +95,17 @@ export function AgentManagement() {
   }, [debouncedSearchQuery, statusFilter, currentPage]);
 
   useEffect(() => {
+    loadModels();
+  }, [loadModels]);
+
+  useEffect(() => {
     loadAgents();
   }, [loadAgents]);
+
+  const agentsWithModels = agents.map((a) => ({
+    ...a,
+    modelName: a.modelId && modelMap[a.modelId] ? modelMap[a.modelId] : undefined,
+  }));
 
   const handleToggleStatus = async (agent: AgentListItem) => {
     if (!agent.id || !agent.statusEnum) return;
@@ -199,13 +229,13 @@ export function AgentManagement() {
         </Card>
       ) : viewMode === 'grid' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {agents.map((agent) => {
+          {agentsWithModels.map((agent) => {
             const statusCfg = getStatusConfig(agent.statusEnum);
             return (
               <Card
                 key={agent.id}
                 className="p-5 dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow cursor-pointer"
-                onClick={() => navigate(`/agents/${agent.id}`)}
+                onClick={() => navigate(`/agents/${agent.id}/edit`)}
               >
                 <div className="flex items-start justify-between mb-2">
                   <button
@@ -229,16 +259,16 @@ export function AgentManagement() {
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="dark:bg-gray-800 dark:border-gray-700">
-                      <DropdownMenuItem onClick={() => navigate(`/agents/${agent.id}`)} className="dark:text-gray-300">
-                        <Eye className="w-4 h-4 mr-2" />
-                        查看详情
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => navigate(`/agents/${agent.id}/edit`)} className="dark:text-gray-300">
+                      <DropdownMenuItem onClick={(e) => { e.stopPropagation(); navigate(`/agents/${agent.id}/edit`); }} className="dark:text-gray-300">
                         <Edit className="w-4 h-4 mr-2" />
                         编辑
                       </DropdownMenuItem>
+                      <DropdownMenuItem onClick={(e) => { e.stopPropagation(); navigate(`/agents/${agent.id}`); }} className="dark:text-gray-300">
+                        <Eye className="w-4 h-4 mr-2" />
+                        查看详情
+                      </DropdownMenuItem>
                       <DropdownMenuItem
-                        onClick={() => handleDelete(agent)}
+                        onClick={(e) => { e.stopPropagation(); handleDelete(agent); }}
                         className="text-red-600 dark:text-red-400"
                       >
                         <Trash2 className="w-4 h-4 mr-2" />
@@ -258,9 +288,23 @@ export function AgentManagement() {
                     </Badge>
                   </div>
                 </div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-2">
                   {agent.description}
                 </p>
+                <div className="flex flex-wrap gap-2 text-xs text-gray-500 dark:text-gray-400">
+                  {agent.interactionMode && (
+                    <span className="flex items-center gap-1">
+                      <MessageSquare className="w-3.5 h-3.5" />
+                      {getEnumDescription(InteractionModeEnum, agent.interactionMode as InteractionModeEnum)}
+                    </span>
+                  )}
+                  {agent.modelName && (
+                    <span className="flex items-center gap-1">
+                      <Cpu className="w-3.5 h-3.5" />
+                      {agent.modelName}
+                    </span>
+                  )}
+                </div>
               </Card>
             );
           })}
@@ -272,18 +316,20 @@ export function AgentManagement() {
               <thead className="bg-gray-50 dark:bg-gray-900">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400">智能体</th>
+                  <th className="px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400">交互模式</th>
+                  <th className="px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400">默认模型</th>
                   <th className="px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400">状态</th>
                   <th className="px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400">操作</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {agents.map((agent) => {
+                {agentsWithModels.map((agent) => {
                   const statusCfg = getStatusConfig(agent.statusEnum);
                   return (
                     <tr key={agent.id} className="hover:bg-gray-50 dark:hover:bg-gray-900">
                       <td
                         className="px-6 py-4 cursor-pointer"
-                        onClick={() => navigate(`/agents/${agent.id}`)}
+                        onClick={() => navigate(`/agents/${agent.id}/edit`)}
                       >
                         <div className="flex items-center gap-3">
                           <div className="bg-gradient-to-br from-orange-500 to-orange-600 w-10 h-10 rounded-lg flex items-center justify-center">
@@ -296,6 +342,14 @@ export function AgentManagement() {
                             </div>
                           </div>
                         </div>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+                        {agent.interactionMode
+                          ? getEnumDescription(InteractionModeEnum, agent.interactionMode as InteractionModeEnum)
+                          : '--'}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+                        {agent.modelName ?? '--'}
                       </td>
                       <td className="px-6 py-4">
                         <Badge className={`text-xs ${statusCfg?.color ?? 'bg-gray-100 text-gray-700'} border-0`}>
@@ -316,16 +370,16 @@ export function AgentManagement() {
                             )}
                           </button>
                           <button
-                            onClick={() => navigate(`/agents/${agent.id}`)}
-                            className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-                          >
-                            <Eye className="w-4 h-4 text-blue-500" />
-                          </button>
-                          <button
                             onClick={() => navigate(`/agents/${agent.id}/edit`)}
                             className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
                           >
                             <Edit className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                          </button>
+                          <button
+                            onClick={() => navigate(`/agents/${agent.id}`)}
+                            className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                          >
+                            <Eye className="w-4 h-4 text-blue-500" />
                           </button>
                           <button
                             onClick={() => handleDelete(agent)}

@@ -344,8 +344,13 @@ export function AgentResourcesSection({ value, onChange }: AgentResourcesSection
     maxCount?: number;
     accent: string;
   }) => {
-    const names = selectedIds.map((id) => selectedNames?.[id] ?? null).filter(Boolean) as string[];
-    const displayName = selectedSingleName ?? (names.length > 0 ? names.join('、') : null);
+    const items: { id: string; name: string }[] = selectedSingleName
+      ? selectedIds.length > 0 && selectedIds[0]
+        ? [{ id: selectedIds[0], name: selectedSingleName }]
+        : []
+      : selectedIds
+          .filter((id): id is string => !!id)
+          .map((id) => ({ id, name: selectedNames?.[id] ?? id }));
     return (
       <div className="flex items-center justify-between py-3 border-b border-gray-200 dark:border-gray-700 last:border-0">
         <div className="flex flex-col gap-1.5 min-w-0 flex-1">
@@ -363,10 +368,17 @@ export function AgentResourcesSection({ value, onChange }: AgentResourcesSection
               )}
             </div>
           </div>
-          {displayName && (
-            <p className="text-sm text-gray-500 dark:text-gray-400 truncate pl-8" title={displayName}>
-              {displayName}
-            </p>
+          {items.length > 0 && (
+            <div className="flex flex-wrap gap-2 pl-8">
+              {items.map(({ id, name }) => (
+                <span
+                  key={id}
+                  className="inline-flex items-center px-3 py-1.5 text-sm bg-gray-100 dark:bg-gray-700 dark:text-gray-300 rounded-lg"
+                >
+                  {name}
+                </span>
+              ))}
+            </div>
           )}
         </div>
         <Button variant="outline" size="sm" onClick={() => openDialog(type)} className="shrink-0 ml-2">
