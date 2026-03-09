@@ -16,8 +16,11 @@ import { useDebounce } from '@/hooks/useDebounce.ts';
 import Models from '@/services/Models.ts';
 import { ModelStatusEnum } from '@/enums/enums.ts';
 
+/** 模型选择弹窗每页条数 */
 const PAGE_SIZE = 10;
+/** 弹窗最小高度 */
 const DIALOG_MIN_HEIGHT = 480;
+/** 选中态配色（橙色系） */
 const ACCENT = {
   selected: 'text-orange-500',
   border: 'border-orange-500',

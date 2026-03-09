@@ -25,7 +25,9 @@ import type { ApiCollectionListVo } from '@/services/ApiCollectionsTypes.ts';
 import { WorkflowStatusEnum } from '@/enums/enums.ts';
 import { AGENT_MAX_API_COLLECTION, AGENT_MAX_DATASET, AGENT_MAX_KNOWLEDGE_BASE } from '../constants.ts';
 
+/** 资源选择弹窗每页条数 */
 const PAGE_SIZE = 10;
+/** 弹窗最小高度 */
 const DIALOG_MIN_HEIGHT = 480;
 
 export interface AgentResourcesFormValue {
