@@ -21,7 +21,7 @@ import { AgentDetailPage } from '@/pages/agents/components/AgentDetailPage.tsx';
 import { VectorStore } from '@/pages/vector/VectorStore';
 import { TeamMembersPage } from '@/pages/member/TeamMembersPage';
 import { ResourceSharing } from '@/pages/sharding/ResourceSharing';
-import { AppSettingsPage } from '@/pages/settings/AppSettingsPage';
+import { AppSettingsPage } from '@/pages/applications/components/AppSettingsPage.tsx';
 import { UsageAnalytics } from '@/pages/settings/UsageAnalytics';
 import { APIKeys } from '@/pages/settings/APIKeys';
 import { BillingSubscription } from '@/pages/settings/BillingSubscription';
@@ -41,6 +41,7 @@ export function AppRoutes() {
         <Route path='apps/create' element={<CreateApplication />} />
         <Route path='apps/:id' element={<ApplicationDetailPage />} />
         <Route path='apps/:id/edit' element={<EditApplicationPage />} />
+        <Route path='apps/app-settings' element={<AppSettingsPage />} />
         <Route path='create-app' element={<CreateApplication />} />
         <Route path='workflow' element={<Workflow />} />
         <Route path='workflow/:id' element={<WorkflowDetailPage />} />
@@ -60,7 +61,6 @@ export function AppRoutes() {
         <Route path='team-members' element={<TeamMembersPage />} />
         <Route path='activity-log' element={<ActivityLogPage />} />
         <Route path='resource-sharing' element={<ResourceSharing />} />
-        <Route path='individual-app-settings' element={<AppSettingsPage />} />
         <Route path='usage-analytics' element={<UsageAnalytics />} />
         <Route path='api-keys' element={<APIKeys />} />
         <Route path='billing' element={<BillingSubscription />} />

@@ -209,7 +209,7 @@ export function MyApplications() {
 
   const handleSettings = (app: Application) => {
     setSelectedApp(app);
-    handleNavigate('individual-app-settings');
+    handleNavigate('apps/app-settings');
   };
 
   const handleMoreAction = async (action: string, appId: string, appName: string) => {

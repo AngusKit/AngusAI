@@ -129,7 +129,7 @@ export function RecentApplications({ onNavigate }: { onNavigate?: (page: string)
     toast.info(`${t('recentApps.openingEditor')} ${app.name}...`);
     setSelectedApp(null);
     setTimeout(() => {
-      onNavigate?.('individual-app-settings');
+      onNavigate?.('apps/app-settings');
     }, 300);
   };
 
