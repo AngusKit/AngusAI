@@ -168,7 +168,7 @@ export const enUS = {
     nav: {
       dashboard: 'Dashboard',
       chat: 'AI Chat',
-      apps: 'Applications',
+      myApps: 'Applications',
       workflow: 'Workflow',
       knowledge: 'Knowledge Base',
       dataset: 'Dataset',

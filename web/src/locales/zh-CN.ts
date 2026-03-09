@@ -167,7 +167,7 @@ export const zhCN = {
     nav: {
       dashboard: '工作台',
       chat: 'AI对话',
-      apps: '应用',
+      myApps: '我的应用',
       workflow: '工作流',
       knowledge: '知识库',
       dataset: '数据集',
