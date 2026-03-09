@@ -3,8 +3,8 @@ package cloud.xcan.angus.core.ai.infra.agent.provider;
 import cloud.xcan.agentx.core.vectorstore.VectorStoreConfigDefinition;
 import cloud.xcan.agentx.core.vectorstore.VectorStoreConfigProvider;
 import cloud.xcan.agentx.core.vectorstore.VectorStoreType;
+import cloud.xcan.angus.core.ai.application.converter.VectorStoreConverter;
 import cloud.xcan.angus.core.ai.application.query.vector.VectorStoreQuery;
-import cloud.xcan.angus.core.ai.domain.vector.VectorStore;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -23,7 +23,7 @@ public class VectorStoreConfigProviderImpl implements VectorStoreConfigProvider 
   @Override
   public List<VectorStoreConfigDefinition> loadAll() {
     return vectorStoreQuery.findVectorStoresForConfig(null).stream()
-        .map(this::toConfigDefinition)
+        .map(VectorStoreConverter::toConfigDefinition)
         .filter(Optional::isPresent)
         .map(Optional::get)
         .collect(Collectors.toList());
@@ -36,7 +36,8 @@ public class VectorStoreConfigProviderImpl implements VectorStoreConfigProvider 
     }
     try {
       Long id = Long.parseLong(configId.trim());
-      return vectorStoreQuery.findById(id).flatMap(this::toConfigDefinition);
+      return vectorStoreQuery.findById(id)
+          .flatMap(VectorStoreConverter::toConfigDefinition);
     } catch (NumberFormatException e) {
       return Optional.empty();
     }
@@ -67,43 +68,10 @@ public class VectorStoreConfigProviderImpl implements VectorStoreConfigProvider 
   @Override
   public List<VectorStoreConfigDefinition> loadByTenant(String tenantId) {
     return vectorStoreQuery.findVectorStoresForConfig(tenantId).stream()
-        .map(this::toConfigDefinition)
+        .map(VectorStoreConverter::toConfigDefinition)
         .filter(Optional::isPresent)
         .map(Optional::get)
         .collect(Collectors.toList());
   }
 
-  private Optional<VectorStoreConfigDefinition> toConfigDefinition(VectorStore store) {
-    if (store == null || store.getConfig() == null) {
-      return Optional.empty();
-    }
-    VectorStoreConfigDefinition src = store.getConfig();
-    VectorStoreType type = store.getType() != null ? store.getType() : src.getType();
-    if (type == null) {
-      return Optional.empty();
-    }
-    VectorStoreConfigDefinition config = VectorStoreConfigDefinition.builder()
-        .id(String.valueOf(store.getId()))
-        .type(type)
-        .url(src.getUrl())
-        .endpoint(src.getEndpoint())
-        .apiKey(src.getApiKey())
-        .host(src.getHost())
-        .port(src.getPort())
-        .database(src.getDatabase())
-        .collectionName(src.getCollectionName())
-        .username(src.getUsername())
-        .password(src.getPassword())
-        .dimension(src.getDimension())
-        .timeout(src.getTimeout())
-        .sslEnabled(src.getSslEnabled())
-        .maxConnections(src.getMaxConnections())
-        .namespace(src.getNamespace())
-        .defaultConfig(src.isDefaultConfig())
-        .tenantId(
-            store.getTenantId() != null ? String.valueOf(store.getTenantId()) : src.getTenantId())
-        .extraProperties(src.getExtraProperties())
-        .build();
-    return Optional.of(config);
-  }
 }

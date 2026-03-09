@@ -3,8 +3,8 @@ package cloud.xcan.angus.core.ai.infra.agent.provider;
 import cloud.xcan.agentx.core.model.ModelConfigDefinition;
 import cloud.xcan.agentx.core.model.ModelConfigProvider;
 import cloud.xcan.agentx.core.model.ModelProvider;
+import cloud.xcan.angus.core.ai.application.converter.ModelConverter;
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
-import cloud.xcan.angus.core.ai.domain.model.Model;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -24,7 +24,7 @@ public class ModelConfigProviderImpl implements ModelConfigProvider {
   @Override
   public List<ModelConfigDefinition> loadAll() {
     return modelQuery.findModelsForConfig(null).stream()
-        .map(this::toConfigDefinition)
+        .map(ModelConverter::toConfigDefinition)
         .filter(Optional::isPresent)
         .map(Optional::get)
         .collect(Collectors.toList());
@@ -37,7 +37,7 @@ public class ModelConfigProviderImpl implements ModelConfigProvider {
     }
     try {
       Long id = Long.parseLong(configId.trim());
-      return modelQuery.findById(id).flatMap(this::toConfigDefinition);
+      return modelQuery.findById(id).flatMap(ModelConverter::toConfigDefinition);
     } catch (NumberFormatException e) {
       return Optional.empty();
     }
@@ -68,33 +68,10 @@ public class ModelConfigProviderImpl implements ModelConfigProvider {
   @Override
   public List<ModelConfigDefinition> loadByTenant(String tenantId) {
     return modelQuery.findModelsForConfig(tenantId).stream()
-        .map(this::toConfigDefinition)
+        .map(ModelConverter::toConfigDefinition)
         .filter(Optional::isPresent)
         .map(Optional::get)
         .collect(Collectors.toList());
   }
 
-  private Optional<ModelConfigDefinition> toConfigDefinition(Model model) {
-    if (model == null || model.getConfig() == null) {
-      return Optional.empty();
-    }
-    ModelConfigDefinition src = model.getConfig();
-    ModelConfigDefinition config = ModelConfigDefinition.builder()
-        .id(String.valueOf(model.getId()))
-        .provider(src.getProvider())
-        .type(src.getType())
-        .modelName(src.getModelName())
-        .apiKey(src.getApiKey())
-        .baseUrl(src.getBaseUrl())
-        .temperature(src.getTemperature())
-        .maxTokens(src.getMaxTokens())
-        .embeddingModelName(src.getEmbeddingModelName())
-        .defaultConfig(src.isDefaultConfig())
-        .priority(src.getPriority())
-        .tenantId(
-            model.getTenantId() != null ? String.valueOf(model.getTenantId()) : src.getTenantId())
-        .extraProperties(src.getExtraProperties())
-        .build();
-    return Optional.of(config);
-  }
 }
