@@ -208,8 +208,7 @@ export function MyApplications() {
   };
 
   const handleSettings = (app: Application) => {
-    setSelectedApp(app);
-    handleNavigate('apps/app-settings');
+    navigate(`/apps/${app.id}/settings`);
   };
 
   const handleMoreAction = async (action: string, appId: string, appName: string) => {

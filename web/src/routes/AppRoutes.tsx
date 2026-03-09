@@ -41,7 +41,7 @@ export function AppRoutes() {
         <Route path='apps/create' element={<CreateApplication />} />
         <Route path='apps/:id' element={<ApplicationDetailPage />} />
         <Route path='apps/:id/edit' element={<EditApplicationPage />} />
-        <Route path='apps/app-settings' element={<AppSettingsPage />} />
+        <Route path='apps/:id/settings' element={<AppSettingsPage />} />
         <Route path='create-app' element={<CreateApplication />} />
         <Route path='workflow' element={<Workflow />} />
         <Route path='workflow/:id' element={<WorkflowDetailPage />} />

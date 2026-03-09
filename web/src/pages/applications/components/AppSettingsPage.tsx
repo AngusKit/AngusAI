@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useLanguage } from '@/components/LanguageProvider.tsx';
+import { useState, useEffect, useCallback } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Settings, Info, Puzzle, Shield, Key, Rocket, Save, Image as ImageIcon, Globe, Mic, Paperclip, Code, Lock, ArrowLeft, MessageSquare, } from 'lucide-react';
 import { Button } from '@/components/ui/button.tsx';
 import { Badge } from '@/components/ui/badge.tsx';
@@ -12,70 +12,102 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx';
 import { Separator } from '@/components/ui/separator.tsx';
 import { toast } from 'sonner';
-import { copyToClipboard } from '@/lib/clipboard.ts';
-import { useNavigate } from 'react-router-dom';
 import { getTagColor } from '../utils.ts';
-
-interface APIKey {
-  id: number;
-  name: string;
-  key: string;
-  created: string;
-  lastUsed: string;
-  status: 'active' | 'inactive';
-}
+import Applications from '@/services/Applications.ts';
+import { ApplicationStatusEnum } from '@/enums/enums.ts';
 
 export function AppSettingsPage() {
-  const { t } = useLanguage();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const handleBack = () => {
-    navigate('/apps');
-  };
+  const [loading, setLoading] = useState(true);
+
   // 基本信息
-  const [name, setName] = useState('智能客服助手');
-  const [description, setDescription] = useState('基于AI的智能客服应用，提供24/7在线服务');
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
   const [tagInput, setTagInput] = useState('');
   const [tags, setTags] = useState<string[]>([]);
+
+  // 配置更新需要保留的 agentIds
+  const [agentIds, setAgentIds] = useState<string[]>([]);
+  const [defaultAgentId, setDefaultAgentId] = useState<string | undefined>();
 
   // 功能设置
   const [enableFileUpload, setEnableFileUpload] = useState(true);
   const [enableVoiceInput, setEnableVoiceInput] = useState(true);
   const [enableImageInput, setEnableImageInput] = useState(false);
   const [enableSuggestions, setEnableSuggestions] = useState(true);
-  const [enableHistory, setEnableHistory] = useState(true);
-  const [maxHistoryLength, setMaxHistoryLength] = useState('50');
 
   // 安全与隐私
   const [enableContentFilter, setEnableContentFilter] = useState(true);
   const [enableDataEncryption, setEnableDataEncryption] = useState(true);
   const [dataRetentionDays, setDataRetentionDays] = useState('30');
-  const [enableAnonymization, setEnableAnonymization] = useState(false);
-
-  // API密钥
-  const [apiKeys, setApiKeys] = useState<APIKey[]>([
-    {
-      id: 1,
-      name: '生产环境',
-      key: 'sk-prod-abc123***********',
-      created: '2024-01-15',
-      lastUsed: '2分钟前',
-      status: 'active',
-    },
-    {
-      id: 2,
-      name: '测试环境',
-      key: 'sk-test-xyz789***********',
-      created: '2024-02-20',
-      lastUsed: '3天前',
-      status: 'active',
-    },
-  ]);
 
   // 发布设置
-  const [publishStatus, setPublishStatus] = useState<'draft' | 'published'>('published');
+  const [publishStatus, setPublishStatus] = useState<'draft' | 'published' | 'paused'>('published');
   const [publicAccess, setPublicAccess] = useState(false);
   const [embedEnabled, setEmbedEnabled] = useState(true);
   const [apiEnabled, setApiEnabled] = useState(true);
+
+  const [savingBasic, setSavingBasic] = useState(false);
+  const [savingFeatures, setSavingFeatures] = useState(false);
+  const [savingSecurity, setSavingSecurity] = useState(false);
+  const [savingPublish, setSavingPublish] = useState(false);
+
+  const loadDetail = useCallback(async () => {
+    if (!id) return;
+    setLoading(true);
+    try {
+      const res: any = await Applications.getApplicationDetail(id);
+      const d = res?.data ?? res;
+      if (!d?.id && !d?.name) {
+        toast.error('应用不存在');
+        navigate('/apps');
+        return;
+      }
+      setName(d.name ?? '');
+      setDescription(d.description ?? '');
+      setTags(d.tags ?? []);
+      const agents = d.config?.agents ?? d.agents ?? [];
+      const ids = agents.map((a: any) => String(a.id)).filter(Boolean);
+      setAgentIds(ids.length > 0 ? ids : []);
+      const def = d.config?.defaultAgent ?? d.defaultAgent;
+      setDefaultAgentId(def?.id != null ? String(def.id) : ids[0]);
+      const f = d.config?.features;
+      if (f) {
+        setEnableFileUpload(f.enableFileUpload ?? true);
+        setEnableVoiceInput(f.enableVoiceInput ?? true);
+        setEnableImageInput(f.enableImageInput ?? false);
+        setEnableSuggestions(f.enableSuggestions ?? true);
+      }
+      const s = d.config?.security;
+      if (s) {
+        setEnableContentFilter(s.enableContentFilter ?? true);
+        setEnableDataEncryption(s.enableDataEncryption ?? true);
+        setDataRetentionDays(String(s.dataRetentionDays ?? 30));
+      }
+      const p = d.config?.publish;
+      if (p) {
+        setPublicAccess(p.publicAccess ?? false);
+        setEmbedEnabled(p.embedEnabled ?? true);
+        setApiEnabled(p.apiEnabled ?? true);
+      }
+      const status = d.status;
+      setPublishStatus(
+        status === 'PUBLISHED' ? 'published' : status === 'DRAFT' ? 'draft' : status === 'PAUSED' ? 'paused' : 'published'
+      );
+    } catch (err: any) {
+      toast.error(err?.message || err?.data?.message || '加载失败');
+      navigate('/apps');
+    } finally {
+      setLoading(false);
+    }
+  }, [id, navigate]);
+
+  useEffect(() => {
+    loadDetail();
+  }, [loadDetail]);
+
+  const handleBack = () => navigate(id ? `/apps/${id}` : '/apps');
 
   const addTag = () => {
     const t = tagInput.trim().slice(0, 40);
@@ -87,34 +119,121 @@ export function AppSettingsPage() {
 
   const removeTag = (idx: number) => setTags(tags.filter((_, i) => i !== idx));
 
-  const handleSaveBasicInfo = () => {
-    toast.success('基本信息已保存');
+  const handleSaveBasicInfo = async () => {
+    if (!id) return;
+    if (!name.trim()) {
+      toast.error('请输入应用名称');
+      return;
+    }
+    setSavingBasic(true);
+    try {
+      await Applications.updateApplication(id, {
+        name: name.trim(),
+        description: description.trim() || undefined,
+        tags: tags.length > 0 ? tags : undefined,
+      });
+      toast.success('基本信息已保存');
+    } catch (err: any) {
+      toast.error(err?.data?.message ?? err?.message ?? '保存失败');
+    } finally {
+      setSavingBasic(false);
+    }
   };
 
-  const handleSaveFeatures = () => {
-    toast.success('功能设置已保存');
+  const saveConfig = async (
+    payload: { features?: object; security?: object; publish?: object },
+    setSaving: (v: boolean) => void,
+    successMsg: string
+  ) => {
+    if (!id) return;
+    if (agentIds.length === 0) {
+      toast.error('应用未绑定智能体，请先在编辑页绑定');
+      return;
+    }
+    setSaving(true);
+    try {
+      await Applications.updateApplicationConfig(id, {
+        agentIds,
+        defaultAgentId,
+        ...payload,
+      } as any);
+      toast.success(successMsg);
+    } catch (err: any) {
+      toast.error(err?.data?.message ?? err?.message ?? '保存失败');
+    } finally {
+      setSaving(false);
+    }
   };
+
+  const handleSaveFeatures = () =>
+    saveConfig(
+      {
+        features: {
+          enableFileUpload,
+          enableVoiceInput,
+          enableImageInput,
+          enableSuggestions,
+        },
+      },
+      setSavingFeatures,
+      '功能设置已保存'
+    );
 
   const handleSaveSecurity = () => {
-    toast.success('安全设置已保存');
+    const days = parseInt(String(dataRetentionDays), 10);
+    if (isNaN(days) || days < 1) {
+      toast.error('数据保留天数须大于 0');
+      return;
+    }
+    saveConfig(
+      {
+        security: {
+          enableContentFilter,
+          enableDataEncryption,
+          dataRetentionDays: days,
+        },
+      },
+      setSavingSecurity,
+      '安全设置已保存'
+    );
   };
 
-  const handleSavePublish = () => {
-    toast.success('发布设置已保存');
+  const handleSavePublish = async () => {
+    if (!id) return;
+    if (agentIds.length === 0) {
+      toast.error('应用未绑定智能体，请先在编辑页绑定');
+      return;
+    }
+    setSavingPublish(true);
+    try {
+      await Applications.updateApplicationConfig(id, {
+        agentIds,
+        defaultAgentId,
+        publish: { publicAccess, embedEnabled, apiEnabled },
+      } as any);
+      const targetStatus =
+        publishStatus === 'published'
+          ? ApplicationStatusEnum.PUBLISHED
+          : publishStatus === 'paused'
+            ? ApplicationStatusEnum.PAUSED
+            : ApplicationStatusEnum.DRAFT;
+      await Applications.modifyApplicationStatus(id, { status: targetStatus });
+      toast.success('发布设置已保存');
+    } catch (err: any) {
+      toast.error(err?.data?.message ?? err?.message ?? '保存失败');
+    } finally {
+      setSavingPublish(false);
+    }
   };
 
-  const handleCopyKey = (key: string) => {
-    copyToClipboard(key);
-  };
-
-  const handleGenerateNewKey = () => {
-    toast.success('新密钥已生成');
-  };
-
-  const handleRevokeKey = (id: number) => {
-    setApiKeys(prev => prev.map(key => (key.id === id ? { ...key, status: 'inactive' as const } : key)));
-    toast.success('密钥已撤销');
-  };
+  if (loading) {
+    return (
+      <div className='flex flex-col items-center justify-center py-24'>
+        <div className='w-10 h-10 border-2 border-gray-300 dark:border-gray-600 border-t-blue-500 rounded-full animate-spin' />
+        <p className='text-sm text-gray-500 dark:text-gray-400 mt-3'>加载中...</p>
+      </div>
+    );
+  }
 
   return (
     <div className='space-y-6'>
@@ -222,16 +341,20 @@ export function AppSettingsPage() {
               </div>
 
               <div className='flex justify-end pt-4'>
-                <Button onClick={handleSaveBasicInfo} className='dark:bg-blue-600 dark:hover:bg-blue-700'>
+                <Button
+                  onClick={handleSaveBasicInfo}
+                  disabled={savingBasic}
+                  className='dark:bg-blue-600 dark:hover:bg-blue-700'
+                >
                   <Save className='w-4 h-4 mr-2' />
-                  保存基本信息
+                  {savingBasic ? '保存中...' : '保存基本信息'}
                 </Button>
               </div>
             </div>
           </Card>
         </TabsContent>
 
-        {/* 对话设置 */}
+        {/* 功能设置 */}
         {/* 功能设置 */}
         <TabsContent value='features' className='space-y-4 mt-4'>
           <Card className='p-6 dark:bg-gray-800 dark:border-gray-700'>
@@ -287,9 +410,13 @@ export function AppSettingsPage() {
               </div>
 
               <div className='flex justify-end pt-4'>
-                <Button onClick={handleSaveFeatures} className='dark:bg-blue-600 dark:hover:bg-blue-700'>
+                <Button
+                  onClick={handleSaveFeatures}
+                  disabled={savingFeatures}
+                  className='dark:bg-blue-600 dark:hover:bg-blue-700'
+                >
                   <Save className='w-4 h-4 mr-2' />
-                  保存功能设置
+                  {savingFeatures ? '保存中...' : '保存功能设置'}
                 </Button>
               </div>
             </div>
@@ -337,9 +464,13 @@ export function AppSettingsPage() {
               </div>
 
               <div className='flex justify-end pt-4'>
-                <Button onClick={handleSaveSecurity} className='dark:bg-blue-600 dark:hover:bg-blue-700'>
+                <Button
+                  onClick={handleSaveSecurity}
+                  disabled={savingSecurity}
+                  className='dark:bg-blue-600 dark:hover:bg-blue-700'
+                >
                   <Save className='w-4 h-4 mr-2' />
-                  保存安全设置
+                  {savingSecurity ? '保存中...' : '保存安全设置'}
                 </Button>
               </div>
             </div>
@@ -352,13 +483,17 @@ export function AppSettingsPage() {
             <div className='space-y-4'>
               <div>
                 <Label className='dark:text-gray-200'>发布状态</Label>
-                <Select value={publishStatus} onValueChange={(v: 'draft' | 'published') => setPublishStatus(v)}>
+                <Select
+                  value={publishStatus}
+                  onValueChange={(v: 'draft' | 'published' | 'paused') => setPublishStatus(v)}
+                >
                   <SelectTrigger className='mt-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white'>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
                     <SelectItem value='draft'>草稿</SelectItem>
                     <SelectItem value='published'>已发布</SelectItem>
+                    <SelectItem value='paused'>已暂停</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -403,9 +538,13 @@ export function AppSettingsPage() {
               </div>
 
               <div className='flex justify-end pt-4'>
-                <Button onClick={handleSavePublish} className='dark:bg-blue-600 dark:hover:bg-blue-700'>
+                <Button
+                  onClick={handleSavePublish}
+                  disabled={savingPublish}
+                  className='dark:bg-blue-600 dark:hover:bg-blue-700'
+                >
                   <Save className='w-4 h-4 mr-2' />
-                  保存发布设置
+                  {savingPublish ? '保存中...' : '保存发布设置'}
                 </Button>
               </div>
             </div>

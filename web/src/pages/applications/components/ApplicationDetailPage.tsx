@@ -64,6 +64,7 @@ export function ApplicationDetailPage() {
 
   const onBack = () => navigate('/apps');
   const onEdit = () => navigate(`/apps/${id}/edit`);
+  const onSettings = () => navigate(`/apps/${id}/settings`);
 
   const handleToggleStatus = async () => {
     if (!id || !detail?.status) return;
@@ -200,6 +201,10 @@ export function ApplicationDetailPage() {
           <Button variant="outline" size="sm" onClick={onEdit} className="dark:bg-gray-800 dark:border-gray-700">
             <Edit className="w-4 h-4 mr-1.5" />
             编辑
+          </Button>
+          <Button variant="outline" size="sm" onClick={onSettings} className="dark:bg-gray-800 dark:border-gray-700">
+            <Settings2 className="w-4 h-4 mr-1.5" />
+            设置
           </Button>
           <Button variant="outline" size="sm" onClick={() => setShareDialogOpen(true)}>
             <Share2 className="w-4 h-4 mr-1.5" />

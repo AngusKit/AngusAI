@@ -154,9 +154,8 @@ public class ApplicationAssembler {
     // Build the final filters
     Set<SearchCriteria> filters = new SearchCriteriaBuilder<>(dto)
         .rangeSearchFields("id", "createdDate", "modifiedDate")
-        .orderByFields("id", "createdDate", "modifiedDate", "apiCalls", "status",
-            "name")
-        .matchSearchFields("name", "description")
+        .orderByFields("id", "createdDate", "modifiedDate", "apiCalls", "status", "name")
+        .matchSearchFields("name", "description", "tags")
         .inAndNotFields("status", "createdBy")
         .build();
     return new GenericSpecification<>(filters);

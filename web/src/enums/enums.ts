@@ -252,14 +252,6 @@ export enum DatasourceTypeEnum {
   DM = 'DM',
 }
 
-/** 应用分类 */
-export enum ApplicationCategoryEnum {
-  CHATBOT = 'CHATBOT',
-  CONTENT_CREATION = 'CONTENT_CREATION',
-  KNOWLEDGE_QA = 'KNOWLEDGE_QA',
-  AGENT_PROXY = 'AGENT_PROXY',
-}
-
 /** 应用状态 */
 export enum ApplicationStatusEnum {
   DRAFT = 'DRAFT',
@@ -521,7 +513,6 @@ export const enumNamespaceMap = new Map<any, string>([
   [KnowledgeBaseDocStatusEnum, 'enum.KnowledgeBaseDocStatusEnum'],
   [DatasetTypeEnum, 'enum.DatasetTypeEnum'],
   [DatasourceTypeEnum, 'enum.DatasourceTypeEnum'],
-  [ApplicationCategoryEnum, 'enum.ApplicationCategoryEnum'],
   [ApplicationStatusEnum, 'enum.ApplicationStatusEnum'],
   [AgentStatusEnum, 'enum.AgentStatusEnum'],
   [InteractionModeEnum, 'enum.InteractionModeEnum'],
