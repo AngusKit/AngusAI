@@ -1,11 +1,10 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, Database, Zap, Code2, Check, Search, Link2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Dialog,
   DialogContent,
@@ -14,6 +13,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
+import { useDebounce } from '@/hooks/useDebounce';
 import KnowledgeBases from '@/services/KnowledgeBases';
 import Datasets from '@/services/Datasets';
 import Workflows from '@/services/Workflows';
@@ -24,6 +24,9 @@ import type { WorkflowListVo } from '@/services/WorkflowsTypes';
 import type { ApiCollectionListVo } from '@/services/ApiCollectionsTypes';
 import { WorkflowStatusEnum } from '@/enums/enums';
 import { AGENT_MAX_API_COLLECTION, AGENT_MAX_DATASET, AGENT_MAX_KNOWLEDGE_BASE } from './constants';
+
+const PAGE_SIZE = 10;
+const DIALOG_MIN_HEIGHT = 480;
 
 export interface AgentResourcesFormValue {
   knowledgeBaseIds: string[];
@@ -37,56 +40,207 @@ interface AgentResourcesSectionProps {
   onChange: (v: AgentResourcesFormValue) => void;
 }
 
-function filterByKeyword<T extends { name?: string }>(items: T[], keyword: string): T[] {
-  if (!keyword.trim()) return items;
-  const k = keyword.trim().toLowerCase();
-  return items.filter((i) => (i.name ?? '').toLowerCase().includes(k));
-}
-
 type ResourceType = 'knowledgeBase' | 'dataset' | 'workflow' | 'apiCollection';
 
-export function AgentResourcesSection({ value, onChange }: AgentResourcesSectionProps) {
-  const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeBaseListVo[]>([]);
-  const [datasets, setDatasets] = useState<DatasetListVo[]>([]);
-  const [workflows, setWorkflows] = useState<WorkflowListVo[]>([]);
-  const [apiCollections, setApiCollections] = useState<ApiCollectionListVo[]>([]);
+interface ResourceItem {
+  id?: string;
+  name?: string;
+  description?: string;
+}
+
+type FetchResourceFn = (pageNo: number, keyword: string) => Promise<{ list: ResourceItem[]; total: number }>;
+
+interface ResourceSelectDialogProps {
+  title: string;
+  icon: React.ElementType;
+  fetchFn: FetchResourceFn;
+  selectedIds?: string[];
+  selectedSingle?: string | null;
+  maxCount?: number;
+  accent: { selected: string; border: string; hover: string; bg: string };
+  onToggle: (id: string) => void;
+  emptyLink: string;
+  emptyText: string;
+  open: boolean;
+  search: string;
+  onSearchChange: (v: string) => void;
+  debouncedSearch: string;
+  onClose: () => void;
+}
+
+function ResourceSelectDialog({
+  title,
+  icon: Icon,
+  fetchFn,
+  selectedIds,
+  selectedSingle,
+  maxCount,
+  accent,
+  onToggle,
+  emptyLink,
+  emptyText,
+  open,
+  search,
+  onSearchChange,
+  debouncedSearch,
+  onClose,
+}: ResourceSelectDialogProps) {
+  const [items, setItems] = useState<ResourceItem[]>([]);
+  const [total, setTotal] = useState(0);
+  const [pageNo, setPageNo] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [dialogOpen, setDialogOpen] = useState<ResourceType | null>(null);
-  const [dialogSearch, setDialogSearch] = useState('');
+  const [loadMore, setLoadMore] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const loadingRef = useRef(false);
 
-  const loadAll = useCallback(async () => {
-    setLoading(true);
-    try {
-      const [kbRes, dsRes, wfRes, apiRes] = await Promise.all([
-        KnowledgeBases.getKnowledgeBaseList({ pageNo: 1, pageSize: 100 }),
-        Datasets.getDatasetList({ pageNo: 1, pageSize: 100 }),
-        Workflows.getWorkflowList({ pageNo: 1, pageSize: 100 }),
-        ApiCollections.apiCollectionList({ pageNo: 1, pageSize: 100 }),
-      ]);
-      const kbData = (kbRes as any)?.data;
-      const dsData = (dsRes as any)?.data;
-      const wfData = (wfRes as any)?.data;
-      const apiData = (apiRes as any)?.data;
+  const load = useCallback(
+    async (p: number, append: boolean) => {
+      if (loadingRef.current) return;
+      loadingRef.current = true;
+      if (append) setLoadMore(true);
+      else setLoading(true);
+      try {
+        const { list, total: t } = await fetchFn(p, debouncedSearch);
+        if (append) {
+          setItems((prev) => {
+            const seen = new Set(prev.map((i) => i.id));
+            return [...prev, ...list.filter((i) => i.id && !seen.has(i.id))];
+          });
+        } else {
+          setItems(list.filter((i): i is ResourceItem & { id: string } => i != null && i.id != null && i.id !== ''));
+        }
+        setTotal(t);
+      } catch (e) {
+        console.error('Failed to load resources:', e);
+        toast.error('加载失败');
+      } finally {
+        loadingRef.current = false;
+        setLoading(false);
+        setLoadMore(false);
+      }
+    },
+    [fetchFn, debouncedSearch]
+  );
 
-      const kbList = (kbData?.list ?? []) as KnowledgeBaseListVo[];
-      const dsList = (dsData?.list ?? []) as DatasetListVo[];
-      const wfList = (wfData?.list ?? []) as WorkflowListVo[];
-      const apiList = (apiData?.list ?? []) as ApiCollectionListVo[];
-      setKnowledgeBases(kbList.filter((i): i is KnowledgeBaseListVo => i != null && i.id != null));
-      setDatasets(dsList.filter((i): i is DatasetListVo => i != null && i.id != null));
-      setWorkflows(wfList.filter((i): i is WorkflowListVo => i != null && i.id != null));
-      setApiCollections(apiList.filter((i): i is ApiCollectionListVo => i != null && i.id != null));
-    } catch (e) {
-      console.error('Failed to load resources:', e);
-      toast.error('加载资源失败');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const loadRef = useRef(load);
+  loadRef.current = load;
 
   useEffect(() => {
-    loadAll();
-  }, [loadAll]);
+    if (!open) return;
+    setPageNo(1);
+    loadRef.current(1, false);
+  }, [open, debouncedSearch]);
+
+  const loadMoreIfNeeded = useCallback(() => {
+    if (loading || loadMore || items.length >= total) return;
+    const nextPage = pageNo + 1;
+    setPageNo(nextPage);
+    load(nextPage, true);
+  }, [loading, loadMore, items.length, total, pageNo, load]);
+
+  useEffect(() => {
+    if (!open || !scrollRef.current || !sentinelRef.current) return;
+    const ob = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) loadMoreIfNeeded();
+      },
+      { root: scrollRef.current, rootMargin: '100px', threshold: 0 }
+    );
+    ob.observe(sentinelRef.current);
+    return () => ob.disconnect();
+  }, [open, loadMoreIfNeeded]);
+
+  return (
+    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent
+        className="sm:max-w-lg dark:bg-gray-800 dark:border-gray-700 flex flex-col"
+        style={{ minHeight: DIALOG_MIN_HEIGHT, height: DIALOG_MIN_HEIGHT }}
+      >
+        <DialogHeader className="shrink-0">
+          <DialogTitle className="flex items-center gap-2 dark:text-white">
+            <Icon className={accent.selected} />
+            {title}
+            {maxCount != null && selectedIds && (
+              <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
+                （已选 {selectedIds.length}/{maxCount}）
+              </span>
+            )}
+            {selectedSingle != null && selectedSingle !== '' && (
+              <span className="text-sm font-normal text-gray-500 dark:text-gray-400">（已选 1 个）</span>
+            )}
+          </DialogTitle>
+        </DialogHeader>
+        <div className="relative shrink-0 mt-2">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Input
+            placeholder="搜索关键字..."
+            value={search}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="pl-9 dark:bg-gray-900 dark:border-gray-700"
+          />
+        </div>
+        <div
+          ref={scrollRef}
+          className="flex-1 min-h-0 overflow-y-auto pr-2 -mx-2 mt-2"
+          style={{ height: 320 }}
+        >
+          {loading ? (
+            <p className="text-sm text-gray-500 dark:text-gray-400 py-8">加载中...</p>
+          ) : items.length === 0 ? (
+            <p className="text-sm text-gray-500 dark:text-gray-400 py-4">
+              {debouncedSearch.trim() ? '无匹配结果' : (
+                <>
+                  {emptyText}
+                  <Link to={emptyLink} className="text-blue-500 hover:underline ml-1" onClick={onClose}>
+                    去创建
+                  </Link>
+                </>
+              )}
+            </p>
+          ) : (
+            <div className="space-y-2 pr-2 pb-4">
+              {items
+                .filter((item): item is ResourceItem & { id: string } => item.id != null && item.id !== '')
+                .map((item) => {
+                  const isSelected = selectedIds?.includes(item.id) ?? selectedSingle === item.id;
+                  return (
+                    <Card
+                      key={item.id}
+                      onClick={() => onToggle(item.id)}
+                      className={`p-3 cursor-pointer transition-all select-none hover:shadow-sm ${
+                        isSelected
+                          ? `border-2 ${accent.border} ${accent.bg}`
+                          : `border border-gray-200 dark:border-gray-700 ${accent.hover}`
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="dark:text-white truncate">{item.name ?? '--'}</span>
+                        {isSelected && <Check className={`w-4 h-4 ${accent.selected} shrink-0`} />}
+                      </div>
+                      {item.description && (
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">{item.description}</p>
+                      )}
+                    </Card>
+                  );
+                })}
+              <div ref={sentinelRef} className="h-1" />
+              {loadMore && <p className="text-sm text-gray-500 dark:text-gray-400 py-2">加载更多...</p>}
+            </div>
+          )}
+        </div>
+        <DialogFooter className="shrink-0">
+          <Button onClick={onClose}>确定</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+export function AgentResourcesSection({ value, onChange }: AgentResourcesSectionProps) {
+  const [dialogOpen, setDialogOpen] = useState<ResourceType | null>(null);
+  const [dialogSearch, setDialogSearch] = useState('');
+  const debouncedSearch = useDebounce(dialogSearch, 400);
 
   const openDialog = (type: ResourceType) => {
     setDialogSearch('');
@@ -174,119 +328,56 @@ export function AgentResourcesSection({ value, onChange }: AgentResourcesSection
     </div>
   );
 
-  const ResourceSelectDialog = ({
-    type,
-    title,
-    icon: Icon,
-    items,
-    selectedIds,
-    selectedSingle,
-    maxCount,
-    accent,
-    onToggle,
-    emptyLink,
-    emptyText,
-  }: {
-    type: ResourceType;
-    title: string;
-    icon: React.ElementType;
-    items: { id?: string; name?: string; description?: string }[];
-    selectedIds?: string[];
-    selectedSingle?: string | null;
-    maxCount?: number;
-    accent: { selected: string; border: string; hover: string; bg: string };
-    onToggle: (id: string) => void;
-    emptyLink: string;
-    emptyText: string;
-  }) => {
-    const filtered = useMemo(() => filterByKeyword(items, dialogSearch), [items, dialogSearch]);
-    const open = dialogOpen === type;
-
-    return (
-      <Dialog open={open} onOpenChange={(v) => !v && closeDialog()}>
-        <DialogContent className="sm:max-w-lg dark:bg-gray-800 dark:border-gray-700">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 dark:text-white">
-              <Icon className={accent.selected} />
-              {title}
-              {maxCount != null && selectedIds && (
-                <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                  （已选 {selectedIds.length}/{maxCount}）
-                </span>
-              )}
-              {selectedSingle != null && selectedSingle !== '' && (
-                <span className="text-sm font-normal text-gray-500 dark:text-gray-400">（已选 1 个）</span>
-              )}
-            </DialogTitle>
-          </DialogHeader>
-          {items.length === 0 ? (
-            <p className="text-sm text-gray-500 dark:text-gray-400 py-4">
-              {emptyText}
-              <Link to={emptyLink} className="text-blue-500 hover:underline ml-1" onClick={closeDialog}>
-                去创建
-              </Link>
-            </p>
-          ) : (
-            <>
-              <div className="relative">
-                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <Input
-                  placeholder="搜索..."
-                  value={dialogSearch}
-                  onChange={(e) => setDialogSearch(e.target.value)}
-                  className="pl-8 dark:bg-gray-900 dark:border-gray-700"
-                />
-              </div>
-              <ScrollArea className="h-[320px] pr-2 -mx-2">
-                <div className="space-y-2 pr-2">
-                  {filtered
-                    .filter((item): item is typeof item & { id: string } => item.id != null && item.id !== '')
-                    .map((item) => {
-                      const isSelected = selectedIds?.includes(item.id) ?? selectedSingle === item.id;
-                      return (
-                        <Card
-                          key={item.id}
-                          onClick={() => onToggle(item.id)}
-                          className={`p-3 cursor-pointer transition-all select-none hover:shadow-sm ${
-                            isSelected
-                              ? `border-2 ${accent.border} ${accent.bg}`
-                              : `border border-gray-200 dark:border-gray-700 ${accent.hover}`
-                          }`}
-                        >
-                          <div className="flex items-center justify-between gap-2">
-                            <span className="dark:text-white truncate">{item.name ?? '--'}</span>
-                            {isSelected && <Check className={`w-4 h-4 ${accent.selected} shrink-0`} />}
-                          </div>
-                          {item.description && (
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">{item.description}</p>
-                          )}
-                        </Card>
-                      );
-                    })}
-                  {filtered.length === 0 && (
-                    <p className="text-sm text-gray-500 dark:text-gray-400 py-4">
-                      {dialogSearch.trim() ? '无匹配结果' : emptyText}
-                    </p>
-                  )}
-                </div>
-              </ScrollArea>
-              <DialogFooter>
-                <Button onClick={closeDialog}>确定</Button>
-              </DialogFooter>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+  const fetchKnowledgeBases: FetchResourceFn = useCallback(async (pageNo, keyword) => {
+    const res = await KnowledgeBases.getKnowledgeBaseList({
+      pageNo,
+      pageSize: PAGE_SIZE,
+      keyword: keyword.trim() || undefined,
+    });
+    const data = (res as any)?.data;
+    const list = ((data?.list ?? []) as KnowledgeBaseListVo[]).filter(
+      (i): i is KnowledgeBaseListVo => i != null && i.id != null
     );
-  };
+    return { list, total: data?.total ?? 0 };
+  }, []);
 
-  if (loading) {
-    return (
-      <Card className="p-6 dark:bg-gray-800 dark:border-gray-700">
-        <p className="text-sm text-gray-500 dark:text-gray-400">加载关联资源中...</p>
-      </Card>
+  const fetchDatasets: FetchResourceFn = useCallback(async (pageNo, keyword) => {
+    const res = await Datasets.getDatasetList({
+      pageNo,
+      pageSize: PAGE_SIZE,
+      keyword: keyword.trim() || undefined,
+    });
+    const data = (res as any)?.data;
+    const list = ((data?.list ?? []) as DatasetListVo[]).filter((i): i is DatasetListVo => i != null && i.id != null);
+    return { list, total: data?.total ?? 0 };
+  }, []);
+
+  const fetchWorkflows: FetchResourceFn = useCallback(async (pageNo, keyword) => {
+    const res = await Workflows.getWorkflowList({
+      pageNo,
+      pageSize: PAGE_SIZE,
+      name: keyword.trim() || undefined,
+      status: WorkflowStatusEnum.RUNNING,
+    });
+    const data = (res as any)?.data;
+    const list = ((data?.list ?? []) as WorkflowListVo[]).filter(
+      (i): i is WorkflowListVo => i != null && i.id != null
     );
-  }
+    return { list, total: data?.total ?? 0 };
+  }, []);
+
+  const fetchApiCollections: FetchResourceFn = useCallback(async (pageNo, keyword) => {
+    const res = await ApiCollections.apiCollectionList({
+      pageNo,
+      pageSize: PAGE_SIZE,
+      keyword: keyword.trim() || undefined,
+    });
+    const data = (res as any)?.data;
+    const list = ((data?.list ?? []) as ApiCollectionListVo[]).filter(
+      (i): i is ApiCollectionListVo => i != null && i.id != null
+    );
+    return { list, total: data?.total ?? 0 };
+  }, []);
 
   return (
     <>
@@ -333,10 +424,9 @@ export function AgentResourcesSection({ value, onChange }: AgentResourcesSection
       </Card>
 
       <ResourceSelectDialog
-        type="knowledgeBase"
         title="选择知识库"
         icon={BookOpen}
-        items={knowledgeBases}
+        fetchFn={fetchKnowledgeBases}
         selectedIds={value.knowledgeBaseIds}
         maxCount={AGENT_MAX_KNOWLEDGE_BASE}
         accent={{
@@ -348,12 +438,16 @@ export function AgentResourcesSection({ value, onChange }: AgentResourcesSection
         onToggle={toggleKnowledgeBase}
         emptyLink="/knowledge"
         emptyText="暂无知识库，"
+        open={dialogOpen === 'knowledgeBase'}
+        search={dialogSearch}
+        onSearchChange={setDialogSearch}
+        debouncedSearch={debouncedSearch}
+        onClose={closeDialog}
       />
       <ResourceSelectDialog
-        type="dataset"
         title="选择数据集"
         icon={Database}
-        items={datasets}
+        fetchFn={fetchDatasets}
         selectedIds={value.datasetIds}
         maxCount={AGENT_MAX_DATASET}
         accent={{
@@ -365,12 +459,16 @@ export function AgentResourcesSection({ value, onChange }: AgentResourcesSection
         onToggle={toggleDataset}
         emptyLink="/dataset"
         emptyText="暂无数据集，"
+        open={dialogOpen === 'dataset'}
+        search={dialogSearch}
+        onSearchChange={setDialogSearch}
+        debouncedSearch={debouncedSearch}
+        onClose={closeDialog}
       />
       <ResourceSelectDialog
-        type="workflow"
         title="选择工作流"
         icon={Zap}
-        items={workflows}
+        fetchFn={fetchWorkflows}
         selectedSingle={value.workflowId}
         accent={{
           selected: 'text-purple-500',
@@ -381,12 +479,16 @@ export function AgentResourcesSection({ value, onChange }: AgentResourcesSection
         onToggle={selectWorkflow}
         emptyLink="/workflow"
         emptyText="暂无工作流，"
+        open={dialogOpen === 'workflow'}
+        search={dialogSearch}
+        onSearchChange={setDialogSearch}
+        debouncedSearch={debouncedSearch}
+        onClose={closeDialog}
       />
       <ResourceSelectDialog
-        type="apiCollection"
         title="选择接口集"
         icon={Code2}
-        items={apiCollections}
+        fetchFn={fetchApiCollections}
         selectedIds={value.apiCollectionIds}
         maxCount={AGENT_MAX_API_COLLECTION}
         accent={{
@@ -398,6 +500,11 @@ export function AgentResourcesSection({ value, onChange }: AgentResourcesSection
         onToggle={toggleApiCollection}
         emptyLink="/api-collection"
         emptyText="暂无接口集，"
+        open={dialogOpen === 'apiCollection'}
+        search={dialogSearch}
+        onSearchChange={setDialogSearch}
+        debouncedSearch={debouncedSearch}
+        onClose={closeDialog}
       />
     </>
   );
