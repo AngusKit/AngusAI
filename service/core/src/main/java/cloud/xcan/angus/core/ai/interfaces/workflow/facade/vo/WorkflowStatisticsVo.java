@@ -8,14 +8,14 @@ import lombok.Data;
 public class WorkflowStatisticsVo {
 
   @Schema(description = "总工作流数")
-  private Object totalWorkflows;
+  private Long totalWorkflows;
 
   @Schema(description = "运行中的工作流数")
-  private Object runningWorkflows;
+  private Long runningWorkflows;
 
   @Schema(description = "今日调用次数")
-  private Object todayCalls;
+  private Long todayCalls;
 
-  @Schema(description = "成功率")
-  private Object successRate;
+  @Schema(description = "成功率（0-100）")
+  private Double successRate;
 }

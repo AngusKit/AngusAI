@@ -169,10 +169,10 @@ export function getStatsFromStatistics(stats: WorkflowStatisticsVo | null): {
       successRate: '--',
     };
   }
-  const total = (stats.totalWorkflows as number) ?? 0;
-  const running = (stats.runningWorkflows as number) ?? 0;
-  const today = (stats.todayCalls as number) ?? 0;
-  const rate = (stats.successRate as number) ?? 0;
+  const total = stats.totalWorkflows ?? 0;
+  const running = stats.runningWorkflows ?? 0;
+  const today = stats.todayCalls ?? 0;
+  const rate = stats.successRate ?? 0;
   return {
     totalWorkflows: String(total),
     runningWorkflows: String(running),

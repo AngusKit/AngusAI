@@ -209,13 +209,13 @@ export type WorkflowListResult = ApiLocaleResult & {
 /** 工作流统计响应 */
 export interface WorkflowStatisticsVo {
   /** 总工作流数 */
-  totalWorkflows?: object;
+  totalWorkflows?: number;
   /** 运行中的工作流数 */
-  runningWorkflows?: object;
+  runningWorkflows?: number;
   /** 今日调用次数 */
-  todayCalls?: object;
-  /** 成功率 */
-  successRate?: object;
+  todayCalls?: number;
+  /** 成功率（0-100） */
+  successRate?: number;
 }
 
 /** The API response result of supporting international message. */
