@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { WorkflowStatusEnum } from '@/enums/enums';
 import type { WorkflowDisplayItem } from '../utils';
+import { WorkflowListEmpty } from './WorkflowListEmpty';
 
 /** 工作流操作处理器 */
 export interface WorkflowActions {
@@ -22,15 +23,20 @@ interface WorkflowGridViewProps {
   workflows: WorkflowDisplayItem[];
   loading: boolean;
   actions: WorkflowActions;
+  /** 是否有搜索/筛选条件（用于空状态文案） */
+  hasFilter?: boolean;
+  searchQuery?: string;
+  onCreateClick?: () => void;
 }
 
-export function WorkflowGridView({ workflows, loading, actions }: WorkflowGridViewProps) {
+export function WorkflowGridView({ workflows, loading, actions, hasFilter = false, searchQuery, onCreateClick }: WorkflowGridViewProps) {
   const displayList = loading ? [] : workflows;
 
   return (
     <>
-      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4'>
-        {displayList.map(w => (
+      {displayList.length > 0 && (
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4'>
+          {displayList.map(w => (
           <Card
             key={w.id}
             className='p-5 dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-all'
@@ -118,12 +124,17 @@ export function WorkflowGridView({ workflows, loading, actions }: WorkflowGridVi
               <span>{w.successRate}</span>
             </div>
           </Card>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {loading && <div className='text-center py-12 text-gray-500 dark:text-gray-400'>加载中...</div>}
       {!loading && workflows.length === 0 && (
-        <div className='text-center py-12 text-gray-500 dark:text-gray-400'>暂无工作流，点击「新建工作流」创建</div>
+        <WorkflowListEmpty
+          hasFilter={hasFilter}
+          searchQuery={searchQuery}
+          onCreateClick={onCreateClick ?? (() => {})}
+        />
       )}
     </>
   );

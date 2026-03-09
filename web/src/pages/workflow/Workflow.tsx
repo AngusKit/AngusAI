@@ -129,7 +129,14 @@ export function Workflow() {
 
         {viewMode === 'grid' && (
           <>
-            <WorkflowGridView workflows={workflows} loading={loading} actions={workflowActions} />
+            <WorkflowGridView
+              workflows={workflows}
+              loading={loading}
+              actions={workflowActions}
+              hasFilter={!!(searchQuery.trim() || statusFilter !== 'all')}
+              searchQuery={searchQuery.trim() || undefined}
+              onCreateClick={() => setCreateDialogOpen(true)}
+            />
             <WorkflowPagination
               currentPage={currentPage}
               totalPages={totalPages}
@@ -140,7 +147,14 @@ export function Workflow() {
 
         {viewMode === 'table' && (
           <>
-            <WorkflowTableView workflows={workflows} loading={loading} actions={workflowActions} />
+            <WorkflowTableView
+              workflows={workflows}
+              loading={loading}
+              actions={workflowActions}
+              hasFilter={!!(searchQuery.trim() || statusFilter !== 'all')}
+              searchQuery={searchQuery.trim() || undefined}
+              onCreateClick={() => setCreateDialogOpen(true)}
+            />
             <WorkflowPagination
               currentPage={currentPage}
               totalPages={totalPages}
