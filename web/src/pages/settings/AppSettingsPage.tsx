@@ -129,15 +129,6 @@ export function AppSettingsPage() {
   const [systemPrompt, setSystemPrompt] = useState('你是一个专业的客服助手，请礼貌、专业地回答用户的问题。');
   const [contextPrompt, setContextPrompt] = useState('');
 
-  // 对话设置
-  const [welcomeMessage, setWelcomeMessage] = useState('您好！我是智能客服助手，有什么可以帮您？');
-  const [openingQuestions, setOpeningQuestions] = useState([
-    '如何查询订单状态？',
-    '退换货政策是什么？',
-    '如何联系人工客服？',
-  ]);
-  const [newQuestion, setNewQuestion] = useState('');
-
   // 功能设置
   const [enableFileUpload, setEnableFileUpload] = useState(true);
   const [enableVoiceInput, setEnableVoiceInput] = useState(true);
@@ -194,10 +185,6 @@ export function AppSettingsPage() {
     toast.success('提示词设置已保存');
   };
 
-  const handleSaveConversation = () => {
-    toast.success('对话设置已保存');
-  };
-
   const handleSaveFeatures = () => {
     toast.success('功能设置已保存');
   };
@@ -222,16 +209,6 @@ export function AppSettingsPage() {
     setWorkflows(prev => prev.map(wf => (wf.id === id ? { ...wf, enabled: !wf.enabled } : wf)));
   };
 
-  const handleAddQuestion = () => {
-    if (newQuestion.trim()) {
-      setOpeningQuestions([...openingQuestions, newQuestion]);
-      setNewQuestion('');
-    }
-  };
-
-  const handleRemoveQuestion = (index: number) => {
-    setOpeningQuestions(openingQuestions.filter((_, i) => i !== index));
-  };
 
   const handleCopyKey = (key: string) => {
     copyToClipboard(key);
@@ -284,10 +261,6 @@ export function AppSettingsPage() {
           <TabsTrigger value='prompt' className='dark:data-[state=active]:bg-gray-700'>
             <MessageSquare className='w-4 h-4 mr-1' />
             提示词
-          </TabsTrigger>
-          <TabsTrigger value='conversation' className='dark:data-[state=active]:bg-gray-700'>
-            <MessageCircle className='w-4 h-4 mr-1' />
-            对话设置
           </TabsTrigger>
           <TabsTrigger value='features' className='dark:data-[state=active]:bg-gray-700'>
             <Puzzle className='w-4 h-4 mr-1' />
@@ -544,68 +517,6 @@ export function AppSettingsPage() {
         </TabsContent>
 
         {/* 对话设置 */}
-        <TabsContent value='conversation' className='space-y-4 mt-4'>
-          <Card className='p-6 dark:bg-gray-800 dark:border-gray-700'>
-            <div className='space-y-4'>
-              <div>
-                <Label className='dark:text-gray-200'>欢迎消息</Label>
-                <Input
-                  value={welcomeMessage}
-                  onChange={e => setWelcomeMessage(e.target.value)}
-                  placeholder='输入欢迎消息'
-                  className='mt-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white'
-                />
-              </div>
-
-              <div>
-                <Label className='dark:text-gray-200'>开场问题</Label>
-                <div className='space-y-2 mt-2'>
-                  {openingQuestions.map((question, index) => (
-                    <div key={index} className='flex items-center gap-2'>
-                      <Input
-                        value={question}
-                        readOnly
-                        className='dark:bg-gray-700 dark:border-gray-600 dark:text-white'
-                      />
-                      <Button
-                        variant='ghost'
-                        size='sm'
-                        onClick={() => handleRemoveQuestion(index)}
-                        className='dark:text-gray-400 dark:hover:text-gray-200'
-                      >
-                        <X className='w-4 h-4' />
-                      </Button>
-                    </div>
-                  ))}
-                  <div className='flex items-center gap-2'>
-                    <Input
-                      value={newQuestion}
-                      onChange={e => setNewQuestion(e.target.value)}
-                      placeholder='添加新问题'
-                      className='dark:bg-gray-700 dark:border-gray-600 dark:text-white'
-                      onKeyDown={e => {
-                        if (e.key === 'Enter') {
-                          handleAddQuestion();
-                        }
-                      }}
-                    />
-                    <Button onClick={handleAddQuestion} size='sm' className='dark:bg-blue-600'>
-                      <Plus className='w-4 h-4' />
-                    </Button>
-                  </div>
-                </div>
-              </div>
-
-              <div className='flex justify-end pt-4'>
-                <Button onClick={handleSaveConversation} className='dark:bg-blue-600 dark:hover:bg-blue-700'>
-                  <Save className='w-4 h-4 mr-2' />
-                  保存对话设置
-                </Button>
-              </div>
-            </div>
-          </Card>
-        </TabsContent>
-
         {/* 功能设置 */}
         <TabsContent value='features' className='space-y-4 mt-4'>
           <Card className='p-6 dark:bg-gray-800 dark:border-gray-700'>

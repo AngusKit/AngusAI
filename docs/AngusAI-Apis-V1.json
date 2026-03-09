@@ -15282,10 +15282,6 @@
                         "$ref": "#/components/schemas/PromptsConfigVo",
                         "description": "提示词配置"
                     },
-                    "conversation": {
-                        "$ref": "#/components/schemas/ConversationConfigVo",
-                        "description": "对话设置"
-                    },
                     "features": {
                         "$ref": "#/components/schemas/FeaturesConfigVo",
                         "description": "功能设置"
@@ -15460,28 +15456,6 @@
                     }
                 }
             },
-            "ConversationConfigVo": {
-                "type": "object",
-                "description": "对话设置",
-                "properties": {
-                    "welcomeMessage": {
-                        "type": "string",
-                        "description": "欢迎消息"
-                    },
-                    "openingQuestions": {
-                        "type": "array",
-                        "description": "开场问题列表",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    "maxHistoryLength": {
-                        "type": "integer",
-                        "format": "int32",
-                        "description": "最大历史长度"
-                    }
-                }
-            },
             "FeaturesConfigVo": {
                 "type": "object",
                 "description": "功能设置",
@@ -15651,10 +15625,6 @@
                         "$ref": "#/components/schemas/PromptsConfig",
                         "description": "提示词配置"
                     },
-                    "conversation": {
-                        "$ref": "#/components/schemas/ConversationConfig",
-                        "description": "对话设置"
-                    },
                     "features": {
                         "$ref": "#/components/schemas/FeaturesConfig",
                         "description": "功能设置"
@@ -15672,29 +15642,6 @@
                     "model",
                     "prompts"
                 ]
-            },
-            "ConversationConfig": {
-                "type": "object",
-                "description": "对话设置",
-                "properties": {
-                    "welcomeMessage": {
-                        "type": "string",
-                        "description": "欢迎消息"
-                    },
-                    "openingQuestions": {
-                        "type": "array",
-                        "description": "开场问题列表",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    "maxHistoryLength": {
-                        "type": "integer",
-                        "format": "int32",
-                        "description": "最大历史长度",
-                        "example": 10
-                    }
-                }
             },
             "FeaturesConfig": {
                 "type": "object",

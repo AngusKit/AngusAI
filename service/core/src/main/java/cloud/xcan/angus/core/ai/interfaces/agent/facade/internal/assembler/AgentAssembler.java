@@ -106,6 +106,14 @@ public class AgentAssembler {
     agent.setVariables(nullSafe(dto.getVariables(), emptyMap()));
   }
 
+  public static AgentDetailVo toDetailVo(Agent agent, AgentDetailVo.AgentResourcesVo resources) {
+    AgentDetailVo vo = toDetailVo(agent);
+    if (resources != null) {
+      vo.setResources(resources);
+    }
+    return vo;
+  }
+
   public static AgentDetailVo toDetailVo(Agent agent) {
     AgentDetailVo vo = new AgentDetailVo();
     vo.setId(agent.getId());

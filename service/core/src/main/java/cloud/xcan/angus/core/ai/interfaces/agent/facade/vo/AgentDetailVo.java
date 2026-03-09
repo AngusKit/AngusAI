@@ -9,8 +9,10 @@ import cloud.xcan.angus.remote.vo.TenantAuditingVo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.Map;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -88,4 +90,39 @@ public class AgentDetailVo extends TenantAuditingVo {
 
   @Schema(description = "变量")
   private Map<String, String> variables;
+
+  @Schema(description = "关联资源（含ID和名称）")
+  private AgentResourcesVo resources;
+
+  @Data
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @Schema(description = "智能体关联资源")
+  public static class AgentResourcesVo {
+
+    @Schema(description = "知识库列表")
+    private List<ResourceInfoVo> knowledgeBases;
+
+    @Schema(description = "数据集列表")
+    private List<ResourceInfoVo> datasets;
+
+    @Schema(description = "工作流")
+    private ResourceInfoVo workflow;
+
+    @Schema(description = "接口集列表")
+    private List<ResourceInfoVo> apiCollections;
+  }
+
+  @Data
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @Schema(description = "资源信息")
+  public static class ResourceInfoVo {
+
+    @Schema(description = "资源ID")
+    private Long id;
+
+    @Schema(description = "资源名称")
+    private String name;
+  }
 }

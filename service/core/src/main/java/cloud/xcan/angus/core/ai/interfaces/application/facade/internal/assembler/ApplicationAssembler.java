@@ -12,7 +12,6 @@ import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDeta
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.ApplicationShareVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.ApplicationStatsVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.ResourceInfoVo;
-import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.ResourcesConfigVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationListVo;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder;
@@ -85,7 +84,7 @@ public class ApplicationAssembler {
   }
 
   public static ApplicationDetailVo toDetailVo(AIApplication application,
-      ResourcesConfigVo resourcesConfigVo, List<ApplicationDetailVo.ResourceInfoVo> agents,
+      List<ApplicationDetailVo.ResourceInfoVo> agents,
       ApplicationDetailVo.ResourceInfoVo defaultAgent) {
     ApplicationDetailVo vo = new ApplicationDetailVo();
     vo.setId(application.getId());
@@ -103,14 +102,13 @@ public class ApplicationAssembler {
     vo.setModifiedBy(application.getModifiedBy());
     vo.setModifiedDate(application.getModifiedDate());
 
-    // 设置配置信息（agents、defaultAgent、conversation、features、security、publish）
+    // 设置配置信息（agents、defaultAgent、features、security、publish）
     ApplicationConfigVo configVo = new ApplicationConfigVo();
     if (application.getConfig() != null) {
       configVo.setAgents(agents != null ? agents : java.util.List.of());
       configVo.setDefaultAgent(defaultAgent);
       CoreUtils.copyProperties(application.getConfig(), configVo);
     }
-    configVo.setResources(resourcesConfigVo);
     vo.setConfig(configVo);
 
     // 设置分享信息

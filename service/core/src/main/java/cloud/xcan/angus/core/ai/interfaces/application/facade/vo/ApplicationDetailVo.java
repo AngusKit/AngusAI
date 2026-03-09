@@ -56,9 +56,6 @@ public class ApplicationDetailVo extends TenantAuditingVo {
     @Schema(description = "默认智能体（用于对话）")
     private ResourceInfoVo defaultAgent;
 
-    @Schema(description = "对话设置")
-    private ConversationConfigVo conversation;
-
     @Schema(description = "功能设置")
     private FeaturesConfigVo features;
 
@@ -67,26 +64,6 @@ public class ApplicationDetailVo extends TenantAuditingVo {
 
     @Schema(description = "发布设置")
     private PublishConfigVo publish;
-
-    @Schema(description = "关联资源（来自绑定的智能体）")
-    private ResourcesConfigVo resources;
-  }
-
-  @Data
-  @Schema(description = "关联资源配置")
-  public static class ResourcesConfigVo {
-
-    @Schema(description = "关联的知识库")
-    private List<ResourceInfoVo> knowledgeBases;
-
-    @Schema(description = "关联的数据集")
-    private List<ResourceInfoVo> datasets;
-
-    @Schema(description = "关联的接口集")
-    private List<ResourceInfoVo> apiCollections;
-
-    @Schema(description = "关联的工作流")
-    private ResourceInfoVo workflow;
   }
 
   @Data
@@ -100,20 +77,6 @@ public class ApplicationDetailVo extends TenantAuditingVo {
 
     @Schema(description = "资源名称")
     private String name;
-  }
-
-  @Data
-  @Schema(description = "对话设置")
-  public static class ConversationConfigVo {
-
-    @Schema(description = "欢迎消息")
-    private String welcomeMessage;
-
-    @Schema(description = "开场问题列表")
-    private List<String> openingQuestions;
-
-    @Schema(description = "最大历史长度")
-    private Integer maxHistoryLength;
   }
 
   @Data

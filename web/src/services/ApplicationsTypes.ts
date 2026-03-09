@@ -62,12 +62,8 @@ export interface ApplicationConfigVo {
   defaultAgent?: ResourceInfoVo;
   /** 模型配置 */
   model?: ModelConfigVo;
-  /** 关联资源 */
-  resources?: ResourcesConfigVo;
   /** 提示词配置 */
   prompts?: PromptsConfigVo;
-  /** 对话设置 */
-  conversation?: ConversationConfigVo;
   /** 功能设置 */
   features?: FeaturesConfigVo;
   /** 安全设置 */
@@ -142,19 +138,6 @@ export interface PromptsConfigVo {
   context?: string;
 }
 
-/** 对话设置 */
-export interface ConversationConfigVo {
-  /** 欢迎消息 */
-  welcomeMessage?: string;
-  /** 开场问题列表 */
-  openingQuestions?: string[];
-  /**
-   * 最大历史长度
-   * @format int32
-   */
-  maxHistoryLength?: number;
-}
-
 /** 功能设置 */
 export interface FeaturesConfigVo {
   /** 启用文件上传 */
@@ -208,20 +191,6 @@ export interface ApplicationShareInfoVo {
    * @example 24
    */
   expiresIn?: number;
-}
-
-/** 对话设置 */
-export interface ConversationConfig {
-  /** 欢迎消息 */
-  welcomeMessage?: string;
-  /** 开场问题列表 */
-  openingQuestions?: string[];
-  /**
-   * 最大历史长度
-   * @format int32
-   * @example 10
-   */
-  maxHistoryLength?: number;
 }
 
 /** 功能设置 */
@@ -346,8 +315,6 @@ export interface ApplicationConfig {
   resources?: ResourcesConfig;
   /** 提示词配置 */
   prompts: PromptsConfig;
-  /** 对话设置 */
-  conversation?: ConversationConfig;
   /** 功能设置 */
   features?: FeaturesConfig;
   /** 安全设置 */

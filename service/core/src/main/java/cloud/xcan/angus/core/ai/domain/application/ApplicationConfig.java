@@ -20,9 +20,6 @@ public class ApplicationConfig {
   @Schema(description = "默认智能体ID（用于对话，不传则取 agentIds 第一个）")
   private Long defaultAgentId;
 
-  @Schema(description = "对话设置")
-  private ConversationConfig conversation;
-
   @Schema(description = "功能设置")
   private FeaturesConfig features;
 
@@ -31,21 +28,6 @@ public class ApplicationConfig {
 
   @Schema(description = "发布设置")
   private PublishConfig publish;
-
-  @Data
-  @Schema(description = "对话设置")
-  public static class ConversationConfig {
-
-    @Schema(description = "欢迎消息")
-    private String welcomeMessage;
-
-    @Schema(description = "开场问题列表")
-    private List<String> openingQuestions;
-
-    @Min(value = 1, message = "最大历史长度不能小于1")
-    @Schema(description = "最大历史长度", example = "10")
-    private Integer maxHistoryLength;
-  }
 
   @Data
   @Schema(description = "功能设置")

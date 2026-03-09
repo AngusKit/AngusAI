@@ -21,12 +21,8 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import Agents from '@/services/Agents';
 import Models from '@/services/Models';
-import KnowledgeBases from '@/services/KnowledgeBases';
-import Datasets from '@/services/Datasets';
-import Workflows from '@/services/Workflows';
-import ApiCollections from '@/services/ApiCollections';
 import type { AgentDetailVo } from '@/services/AgentsTypes';
-import { AgentStatusEnum, WorkflowStatusEnum } from '@/enums/enums';
+import { AgentStatusEnum } from '@/enums/enums';
 import {
   InteractionModeEnum,
   ReasoningStrategyEnum,
@@ -35,25 +31,12 @@ import {
 } from '@/enums/enums';
 import { getEnumDescription } from '@/enums/utils';
 
-interface ResourceNames {
-  knowledgeBases: Record<string, string>;
-  datasets: Record<string, string>;
-  workflow: string | null;
-  apiCollections: Record<string, string>;
-}
-
 export function AgentDetailPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [loading, setLoading] = useState(true);
   const [detail, setDetail] = useState<AgentDetailVo | null>(null);
   const [modelName, setModelName] = useState<string | null>(null);
-  const [resourceNames, setResourceNames] = useState<ResourceNames>({
-    knowledgeBases: {},
-    datasets: {},
-    workflow: null,
-    apiCollections: {},
-  });
 
   const loadDetail = useCallback(async () => {
     if (!id) return;
@@ -80,48 +63,19 @@ export function AgentDetailPage() {
   }, [loadDetail]);
 
   useEffect(() => {
-    if (!detail?.id) return;
-    const kbIds = detail.knowledgeBaseIds ?? [];
-    const dsIds = detail.datasetIds ?? [];
-    const wfId = detail.workflowId;
-    const apiIds = detail.apiCollectionIds ?? [];
-
-    const fetchNames = async () => {
+    if (!detail?.id || !detail.defaultModelId) return;
+    const loadModelName = async () => {
       try {
-        const [kbRes, dsRes, wfRes, apiRes, modelRes] = await Promise.all([
-          kbIds.length ? KnowledgeBases.getKnowledgeBaseList({ pageNo: 1, pageSize: 100 }) : null,
-          dsIds.length ? Datasets.getDatasetList({ pageNo: 1, pageSize: 100 }) : null,
-          wfId ? Workflows.getWorkflowList({ pageNo: 1, pageSize: 100, status: WorkflowStatusEnum.RUNNING }) : null,
-          apiIds.length ? ApiCollections.apiCollectionList({ pageNo: 1, pageSize: 100 }) : null,
-          detail.defaultModelId ? Models.getModelList({ pageNo: 1, pageSize: 500 }) : null,
-        ]);
-
-        const toMap = (list: { id?: string; name?: string }[], ids: string[]) =>
-          Object.fromEntries(
-            (list ?? []).filter((i) => i?.id && ids.includes(i.id) && i.name).map((i) => [i.id!, i.name!])
-          );
-
-        const kbList = (kbRes as any)?.data?.list ?? [];
-        const dsList = (dsRes as any)?.data?.list ?? [];
-        const wfList = (wfRes as any)?.data?.list ?? [];
-        const apiList = (apiRes as any)?.data?.list ?? [];
-        const modelList = (modelRes as any)?.data?.list ?? [];
-
-        const model = modelList.find((m: { id?: string }) => String(m?.id) === String(detail.defaultModelId));
+        const res = await Models.getModelList({ pageNo: 1, pageSize: 500 });
+        const list = (res as any)?.data?.list ?? [];
+        const model = list.find((m: { id?: string }) => String(m?.id) === String(detail.defaultModelId));
         setModelName(model?.name ?? null);
-
-        setResourceNames({
-          knowledgeBases: toMap(kbList, kbIds),
-          datasets: toMap(dsList, dsIds),
-          workflow: wfId ? wfList.find((i: { id?: string }) => i?.id === wfId)?.name ?? null : null,
-          apiCollections: toMap(apiList, apiIds),
-        });
       } catch {
         // ignore
       }
     };
-    fetchNames();
-  }, [detail]);
+    loadModelName();
+  }, [detail?.id, detail?.defaultModelId]);
 
   const onBack = () => navigate('/agents');
   const onEdit = () => navigate(`/agents/${id}/edit`);
@@ -324,46 +278,78 @@ export function AgentDetailPage() {
         )}
       </Card>
 
-      {/* 关联资源 */}
+      {/* 关联资源（优先使用后端返回的 resources，含 id+name） */}
       <Card className="p-6 dark:bg-gray-800 dark:border-gray-700">
         <h3 className="flex items-center gap-2 text-gray-900 dark:text-white mb-4">
           <Settings2 className="w-4 h-4" />
           关联资源
         </h3>
-        {(detail.knowledgeBaseIds?.length ?? 0) > 0 ||
+        {(detail.resources?.knowledgeBases?.length ?? 0) > 0 ||
+        (detail.resources?.datasets?.length ?? 0) > 0 ||
+        detail.resources?.workflow != null ||
+        (detail.resources?.apiCollections?.length ?? 0) > 0 ||
+        (detail.knowledgeBaseIds?.length ?? 0) > 0 ||
         (detail.datasetIds?.length ?? 0) > 0 ||
         detail.workflowId != null ||
         (detail.apiCollectionIds?.length ?? 0) > 0 ? (
           <div className="space-y-4 pl-6">
-            {detail.knowledgeBaseIds && detail.knowledgeBaseIds.length > 0 && (
+            {detail.resources?.knowledgeBases && detail.resources.knowledgeBases.length > 0 ? (
               <ResourceSection
                 icon={<BookOpen className="w-4 h-4 text-blue-500" />}
                 title="知识库"
-                items={detail.knowledgeBaseIds.map((id) => resourceNames.knowledgeBases[id] ?? id)}
+                items={detail.resources.knowledgeBases.map((r) => r.name ?? String(r.id))}
+                baseLink="/knowledge"
+              />
+            ) : detail.knowledgeBaseIds && detail.knowledgeBaseIds.length > 0 && (
+              <ResourceSection
+                icon={<BookOpen className="w-4 h-4 text-blue-500" />}
+                title="知识库"
+                items={detail.knowledgeBaseIds.map((id) => String(id))}
                 baseLink="/knowledge"
               />
             )}
-            {detail.datasetIds && detail.datasetIds.length > 0 && (
+            {detail.resources?.datasets && detail.resources.datasets.length > 0 ? (
               <ResourceSection
                 icon={<Database className="w-4 h-4 text-green-500" />}
                 title="数据集"
-                items={detail.datasetIds.map((id) => resourceNames.datasets[id] ?? id)}
+                items={detail.resources.datasets.map((r) => r.name ?? String(r.id))}
+                baseLink="/dataset"
+              />
+            ) : detail.datasetIds && detail.datasetIds.length > 0 && (
+              <ResourceSection
+                icon={<Database className="w-4 h-4 text-green-500" />}
+                title="数据集"
+                items={detail.datasetIds.map((id) => String(id))}
                 baseLink="/dataset"
               />
             )}
-            {detail.workflowId != null && (
+            {detail.resources?.workflow ? (
               <ResourceSection
                 icon={<Zap className="w-4 h-4 text-purple-500" />}
                 title="工作流"
-                items={resourceNames.workflow ? [resourceNames.workflow] : [String(detail.workflowId)]}
+                items={[detail.resources.workflow.name ?? String(detail.resources.workflow.id)]}
+                baseLink="/workflow"
+              />
+            ) : detail.workflowId != null && (
+              <ResourceSection
+                icon={<Zap className="w-4 h-4 text-purple-500" />}
+                title="工作流"
+                items={[String(detail.workflowId)]}
                 baseLink="/workflow"
               />
             )}
-            {detail.apiCollectionIds && detail.apiCollectionIds.length > 0 && (
+            {detail.resources?.apiCollections && detail.resources.apiCollections.length > 0 ? (
               <ResourceSection
                 icon={<Code2 className="w-4 h-4 text-orange-500" />}
                 title="接口集"
-                items={detail.apiCollectionIds.map((id) => resourceNames.apiCollections[id] ?? id)}
+                items={detail.resources.apiCollections.map((r) => r.name ?? String(r.id))}
+                baseLink="/api-collection"
+              />
+            ) : detail.apiCollectionIds && detail.apiCollectionIds.length > 0 && (
+              <ResourceSection
+                icon={<Code2 className="w-4 h-4 text-orange-500" />}
+                title="接口集"
+                items={detail.apiCollectionIds.map((id) => String(id))}
                 baseLink="/api-collection"
               />
             )}

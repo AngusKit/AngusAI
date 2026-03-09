@@ -57,6 +57,22 @@ export interface AgentDetailVo extends TenantAuditingVo {
   outputGuardrailIds?: string[];
   /** 变量注入 */
   variables?: Record<string, string>;
+  /** 关联资源（含ID和名称，由后端返回） */
+  resources?: AgentResourcesVo;
+}
+
+/** 资源信息（id+name） */
+export interface AgentResourceInfoVo {
+  id?: number;
+  name?: string;
+}
+
+/** 智能体关联资源 */
+export interface AgentResourcesVo {
+  knowledgeBases?: AgentResourceInfoVo[];
+  datasets?: AgentResourceInfoVo[];
+  workflow?: AgentResourceInfoVo;
+  apiCollections?: AgentResourceInfoVo[];
 }
 
 /** 智能体列表项 */
