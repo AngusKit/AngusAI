@@ -122,12 +122,13 @@ public class MessageQueryImpl implements MessageQuery {
 
   @Override
   public Map<String, Message> findLastMessageMapBySessionIds(List<String> sessionIds) {
-    if (sessionIds == null || sessionIds.isEmpty()) {
-      return new HashMap<>();
-    }
     return new BizTemplate<Map<String, Message>>() {
       @Override
       protected Map<String, Message> process() {
+        if (sessionIds == null || sessionIds.isEmpty()) {
+          return new HashMap<>();
+        }
+
         Map<String, Message> result = new HashMap<>();
         for (String sid : sessionIds) {
           if (sid != null && !sid.isBlank()) {
