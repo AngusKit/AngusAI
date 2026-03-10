@@ -77,6 +77,31 @@ public interface Constants {
    */
   long AGENT_CHAT_SYNC_TIMEOUT_MS = 60_000L;
 
+  /**
+   * 对话默认温度 0-2
+   */
+  double CHAT_DEFAULT_TEMPERATURE = 0.7;
+
+  /**
+   * 对话默认最大 Token 数
+   */
+  int CHAT_DEFAULT_MAX_TOKENS = 4096;
+
+  /**
+   * 对话默认 Top-p 0-1
+   */
+  double CHAT_DEFAULT_TOP_P = 0.9;
+
+  /**
+   * 对话默认频率惩罚 0-2
+   */
+  double CHAT_DEFAULT_FREQUENCY_PENALTY = 0.0;
+
+  /**
+   * 对话默认存在惩罚 0-2
+   */
+  double CHAT_DEFAULT_PRESENCE_PENALTY = 0.0;
+
   // ==================== 知识库常量 ====================
 
   String KNOWLEDGE_DOC_UPLOAD_BIZ_KEY = "angusAIKnowledgeBaseDocs";

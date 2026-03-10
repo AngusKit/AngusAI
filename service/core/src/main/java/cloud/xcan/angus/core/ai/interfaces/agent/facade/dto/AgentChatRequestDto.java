@@ -1,5 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.agent.facade.dto;
 
+import cloud.xcan.angus.core.ai.domain.agent.AgentChatConfig;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -22,5 +23,8 @@ public class AgentChatRequestDto {
 
   @Schema(description = "超时时间（毫秒），不传则使用默认值。流式对话默认 120000ms，同步对话默认 60000ms", example = "120000")
   private Long timeoutMs;
+
+  @Schema(description = "对话配置覆盖，可选；优先级高于会话与智能体配置")
+  private AgentChatConfig config;
 
 }

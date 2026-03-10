@@ -1,6 +1,7 @@
 package cloud.xcan.angus.core.ai.application.query.chat;
 
 import cloud.xcan.angus.core.ai.domain.chat.Message;
+import cloud.xcan.angus.core.ai.domain.chat.MessageRole;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.ChatStatisticsVo.UsageTrend;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import java.util.List;
@@ -50,8 +51,7 @@ public interface MessageQuery {
   /**
    * 根据会话ID(UUID)和角色查询消息
    */
-  List<Message> findBySessionIdAndRole(String sessionId,
-      cloud.xcan.angus.core.ai.domain.chat.MessageRole role);
+  List<Message> findBySessionIdAndRole(String sessionId, MessageRole role);
 
   /**
    * 查询正在流式生成的消息

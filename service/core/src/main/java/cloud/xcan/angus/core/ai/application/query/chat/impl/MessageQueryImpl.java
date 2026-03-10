@@ -45,7 +45,7 @@ public class MessageQueryImpl implements MessageQuery {
   }
 
   @Override
-  public List<Message> findBySessionId(Long sessionId) {
+  public List<Message> findBySessionId(String sessionId) {
     return new BizTemplate<List<Message>>() {
       @Override
       protected List<Message> process() {
@@ -55,7 +55,7 @@ public class MessageQueryImpl implements MessageQuery {
   }
 
   @Override
-  public Page<Message> findBySessionId(Long sessionId, PageRequest pageable) {
+  public Page<Message> findBySessionId(String sessionId, PageRequest pageable) {
     return new BizTemplate<Page<Message>>() {
       @Override
       protected Page<Message> process() {
@@ -95,7 +95,7 @@ public class MessageQueryImpl implements MessageQuery {
   }
 
   @Override
-  public List<Message> findBySessionIdAndRole(Long sessionId, MessageRole role) {
+  public List<Message> findBySessionIdAndRole(String sessionId, MessageRole role) {
     return new BizTemplate<List<Message>>() {
       @Override
       protected List<Message> process() {
@@ -105,7 +105,7 @@ public class MessageQueryImpl implements MessageQuery {
   }
 
   @Override
-  public List<Message> findStreamingMessages(Long sessionId) {
+  public List<Message> findStreamingMessages(String sessionId) {
     return new BizTemplate<List<Message>>() {
       @Override
       protected List<Message> process() {
@@ -125,7 +125,7 @@ public class MessageQueryImpl implements MessageQuery {
   }
 
   @Override
-  public List<Message> findRecentBySessionId(Long sessionId, int limit) {
+  public List<Message> findRecentBySessionId(String sessionId, int limit) {
     return new BizTemplate<List<Message>>() {
       @Override
       protected List<Message> process() {

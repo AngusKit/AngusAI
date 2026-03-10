@@ -3,16 +3,21 @@ package cloud.xcan.angus.core.ai.application.cmd.agent.impl;
 import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_CHAT_SSE_TIMEOUT_MS;
 
 import cloud.xcan.agentx.core.agent.AgentRegistry;
+import cloud.xcan.agentx.core.agent.ChatConfigOverride;
 import cloud.xcan.angus.core.ai.application.cmd.agent.AgentChatCmd;
 import cloud.xcan.angus.core.ai.application.cmd.agent.AgentChatResult;
 import cloud.xcan.angus.core.ai.application.cmd.chat.MessageCmd;
 import cloud.xcan.angus.core.ai.application.cmd.chat.SessionCmd;
+import cloud.xcan.angus.core.ai.infra.agent.utils.ChatConfigMergeUtils;
 import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
 import cloud.xcan.angus.core.ai.application.query.chat.MessageQuery;
 import cloud.xcan.angus.core.ai.application.query.chat.SessionQuery;
+import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.domain.agent.Agent;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRole;
 import cloud.xcan.angus.core.ai.domain.chat.Session;
+import cloud.xcan.angus.core.ai.domain.model.Model;
+import cloud.xcan.angus.core.ai.domain.agent.AgentChatConfig;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import dev.langchain4j.service.TokenStream;
 import jakarta.annotation.Resource;
@@ -52,11 +57,15 @@ public class AgentChatCmdImpl implements AgentChatCmd {
   private SessionCmd sessionCmd;
 
   @Resource
+  private ModelQuery modelQuery;
+
+  @Resource
   @Qualifier("sseEmitterChatExecutor")
   private Executor sseEmitterChatExecutor;
 
   @Override
-  public AgentChatResult chat(Long agentId, String sessionId, String message) {
+  public AgentChatResult chat(Long agentId, String sessionId, String message,
+      AgentChatConfig config) {
     return new BizTemplate<AgentChatResult>() {
       Agent agent;
       Session session;
@@ -76,7 +85,17 @@ public class AgentChatCmdImpl implements AgentChatCmd {
         if (session != null) {
           messageCmd.create(effectiveSessionId, MessageRole.USER, message);
         }
-        String reply = agentRegistry.chat(String.valueOf(agentId), effectiveSessionId, message);
+        Model model = agent.getDefaultModelId() != null
+            ? modelQuery.findById(agent.getDefaultModelId()).orElse(null) : null;
+        AgentChatConfig merged = ChatConfigMergeUtils.merge(config, session, agent, model);
+        ChatConfigOverride override = toChatConfigOverride(merged);
+        String reply;
+        if (override != null && agent.getDefaultModelId() != null) {
+          reply = agentRegistry.chat(String.valueOf(agentId), effectiveSessionId, message,
+              String.valueOf(agent.getDefaultModelId()), override);
+        } else {
+          reply = agentRegistry.chat(String.valueOf(agentId), effectiveSessionId, message);
+        }
         if (session != null) {
           messageCmd.create(effectiveSessionId, MessageRole.ASSISTANT, reply);
         }
@@ -86,11 +105,12 @@ public class AgentChatCmdImpl implements AgentChatCmd {
   }
 
   @Override
-  public SseEmitter chatStream(Long agentId, String sessionId, String message, Long timeoutMs) {
+  public SseEmitter chatStream(Long agentId, String sessionId, String message, Long timeoutMs,
+      AgentChatConfig config) {
     long effectiveTimeout = timeoutMs != null && timeoutMs > 0 ? timeoutMs : AGENT_CHAT_SSE_TIMEOUT_MS;
 
     return new BizTemplate<SseEmitter>() {
-      SseEmitter emitter = new SseEmitter(effectiveTimeout);
+      final SseEmitter emitter = new SseEmitter(effectiveTimeout);
       Long assistantMessageId = null;
       Agent agent;
       Session session;
@@ -114,11 +134,18 @@ public class AgentChatCmdImpl implements AgentChatCmd {
           messageCmd.setStreaming(assistantMessageId, true);
         }
 
+        Model model = agent.getDefaultModelId() != null
+            ? modelQuery.findById(agent.getDefaultModelId()).orElse(null) : null;
+        AgentChatConfig merged = ChatConfigMergeUtils.merge(config, session, agent, model);
+        ChatConfigOverride override = toChatConfigOverride(merged);
+
         sseEmitterChatExecutor.execute(() -> {
           StringBuilder fullContent = new StringBuilder();
           try {
-            TokenStream stream =
-                agentRegistry.chatStream(String.valueOf(agentId), effectiveSessionId, message);
+            TokenStream stream = override != null && agent.getDefaultModelId() != null
+                ? agentRegistry.chatStream(String.valueOf(agentId), effectiveSessionId, message,
+                String.valueOf(agent.getDefaultModelId()), override)
+                : agentRegistry.chatStream(String.valueOf(agentId), effectiveSessionId, message);
             stream.onPartialResponse(token -> {
                   fullContent.append(token);
                   try {
@@ -152,5 +179,19 @@ public class AgentChatCmdImpl implements AgentChatCmd {
         return emitter;
       }
     }.execute();
+  }
+
+  private static ChatConfigOverride toChatConfigOverride(AgentChatConfig dto) {
+    if (dto == null) {
+      return null;
+    }
+    return ChatConfigOverride.builder()
+        .temperature(dto.getTemperature())
+        .maxTokens(dto.getMaxTokens())
+        .topP(dto.getTopP())
+        .frequencyPenalty(dto.getFrequencyPenalty())
+        .presencePenalty(dto.getPresencePenalty())
+        .systemPrompt(dto.getSystemPrompt())
+        .build();
   }
 }

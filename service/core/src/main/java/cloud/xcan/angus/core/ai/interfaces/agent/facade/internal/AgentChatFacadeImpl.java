@@ -20,7 +20,7 @@ public class AgentChatFacadeImpl implements AgentChatFacade {
   public AgentChatResponseVo chat(AgentChatRequestDto dto) {
     long start = System.currentTimeMillis();
     var result = agentChatCmd.chat(
-        dto.getAgentId(), dto.getSessionId(), dto.getMessage());
+        dto.getAgentId(), dto.getSessionId(), dto.getMessage(), dto.getConfig());
     long latencyMs = System.currentTimeMillis() - start;
     return toAgentChatResponseVo(dto, result.getSessionId(), result.getReply(), latencyMs);
   }
@@ -28,6 +28,7 @@ public class AgentChatFacadeImpl implements AgentChatFacade {
   @Override
   public SseEmitter chatStream(AgentChatRequestDto dto) {
     return agentChatCmd.chatStream(
-        dto.getAgentId(), dto.getSessionId(), dto.getMessage(), dto.getTimeoutMs());
+        dto.getAgentId(), dto.getSessionId(), dto.getMessage(), dto.getTimeoutMs(),
+        dto.getConfig());
   }
 }
