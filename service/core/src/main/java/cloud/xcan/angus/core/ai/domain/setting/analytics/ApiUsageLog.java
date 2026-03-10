@@ -29,10 +29,16 @@ public class ApiUsageLog extends TenantEntity<ApiUsageLog, Long> {
   @Column(name = "model_id")
   private Long modelId;
 
+  /**
+   * 会话ID(UUID)，关联对话
+   */
+  @Column(name = "session_id", length = 36)
+  private String sessionId;
+
   @Column(name = "user_id")
   private Long userId;
 
-  @Column(name = "endpoint", nullable = false, length = 400)
+  @Column(name = "endpoint", nullable = false, length = 200)
   private String endpoint;
 
   @Column(name = "method", nullable = false, length = 10)

@@ -2,6 +2,8 @@ package cloud.xcan.angus.core.ai.application.cmd.agent.impl;
 
 import static cloud.xcan.angus.core.ai.application.converter.AgentConverter.toChatConfigOverride;
 import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_CHAT_SSE_TIMEOUT_MS;
+import static cloud.xcan.angus.spec.principal.PrincipalContext.getUserId;
+import static cloud.xcan.angus.spec.utils.ObjectUtils.lengthSafe;
 
 import cloud.xcan.agentx.core.agent.AgentRegistry;
 import cloud.xcan.agentx.core.agent.ChatConfigOverride;
@@ -9,8 +11,8 @@ import cloud.xcan.angus.core.ai.application.cmd.agent.AgentChatCmd;
 import cloud.xcan.angus.core.ai.application.cmd.agent.AgentCmd;
 import cloud.xcan.angus.core.ai.application.cmd.chat.MessageCmd;
 import cloud.xcan.angus.core.ai.application.cmd.chat.SessionCmd;
+import cloud.xcan.angus.core.ai.application.cmd.setting.ApiUsageLogCmd;
 import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
-import cloud.xcan.angus.core.ai.application.query.chat.MessageQuery;
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.domain.agent.Agent;
 import cloud.xcan.angus.core.ai.domain.agent.AgentChatConfig;
@@ -19,6 +21,7 @@ import cloud.xcan.angus.core.ai.domain.chat.Message;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRole;
 import cloud.xcan.angus.core.ai.domain.chat.Session;
 import cloud.xcan.angus.core.ai.domain.model.Model;
+import cloud.xcan.angus.core.ai.domain.setting.analytics.ApiUsageLog;
 import cloud.xcan.angus.core.ai.infra.agent.utils.ChatConfigMergeUtils;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.remote.message.SysException;
@@ -57,13 +60,13 @@ public class AgentChatCmdImpl implements AgentChatCmd {
   private MessageCmd messageCmd;
 
   @Resource
-  private MessageQuery messageQuery;
-
-  @Resource
   private SessionCmd sessionCmd;
 
   @Resource
   private ModelQuery modelQuery;
+
+  @Resource
+  private ApiUsageLogCmd apiUsageLogCmd;
 
   /**
    * 同步对话专用线程池，用于超时控制
@@ -106,7 +109,9 @@ public class AgentChatCmdImpl implements AgentChatCmd {
             ? String.valueOf(agent.getDefaultModelId()) : null;
 
         // 执行对话请求
+        long startMs = System.currentTimeMillis();
         String reply;
+        Exception chatError = null;
         try {
           // 异步执行 LLM 调用，带超时；有 override 时指定模型与配置
           reply = syncChatExecutor
@@ -119,7 +124,11 @@ public class AgentChatCmdImpl implements AgentChatCmd {
               })
               .get();
         } catch (Exception e) {
+          chatError = e;
           throw SysException.of(e.getMessage());
+        } finally {
+          saveApiUsageLog(agent, session, "agent/chat", startMs, chatError == null,
+              chatError != null ? chatError.getMessage() : null, null, null, null);
         }
 
         // 落库助手回复
@@ -165,6 +174,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
         // 异步执行流式调用，通过 SSE 推送 token
         sseEmitterChatExecutor.execute(() -> {
           StringBuilder fullContent = new StringBuilder();
+          long streamStartMs = System.currentTimeMillis();
           try {
 
             TokenStream stream = override != null && agent.getDefaultModelId() != null
@@ -180,19 +190,25 @@ public class AgentChatCmdImpl implements AgentChatCmd {
                     emitter.completeWithError(e);
                   }
                 })
-                // 流结束：用完整内容覆盖占位消息，关闭流式标记
+                // 流结束：用完整内容覆盖占位消息，关闭流式标记，记录 ApiUsageLog
                 .onCompleteResponse(r -> {
                   assistantMessage.setContent(fullContent.toString());
                   messageCmd.setStreaming(assistantMessage, false);
+                  saveApiUsageLog(agent, session, "agent/chatStream", streamStartMs, true, null,
+                      null, null, null);
                   emitter.complete();
                 })
                 .onError(e -> {
                   messageCmd.setStreaming(assistantMessage, false);
+                  saveApiUsageLog(agent, session, "agent/chatStream", streamStartMs, false,
+                      e.getMessage(), null, null, null);
                   emitter.completeWithError(e);
                 });
             stream.start();
           } catch (Exception e) {
             messageCmd.setStreaming(assistantMessage, false);
+            saveApiUsageLog(agent, session, "agent/chatStream", streamStartMs, false,
+                e.getMessage(), null, null, null);
             emitter.completeWithError(e);
           }
         });
@@ -211,6 +227,35 @@ public class AgentChatCmdImpl implements AgentChatCmd {
     AgentChatConfig merged = ChatConfigMergeUtils.merge(config, requestTimeoutMs, session, agent,
         model);
     return toChatConfigOverride(merged);
+  }
+
+  /**
+   * 保存 API 使用日志，关联对话
+   */
+  private void saveApiUsageLog(Agent agent, Session session, String endpoint,
+      long startMs, boolean isSuccessful, String errorMessage,
+      Integer inputTokens, Integer outputTokens, Integer totalTokens) {
+    try {
+      int responseTimeMs = (int) (System.currentTimeMillis() - startMs);
+      ApiUsageLog log = new ApiUsageLog()
+          .setAppId(session != null ? session.getAppId() : null)
+          .setAgentId(agent != null ? agent.getId() : null)
+          .setModelId(agent != null ? agent.getDefaultModelId() : null)
+          .setUserId(getUserId())
+          .setEndpoint(endpoint)
+          .setMethod("POST")
+          .setStatusCode(isSuccessful ? 200 : 500)
+          .setResponseTimeMs(responseTimeMs)
+          .setInputTokens(inputTokens)
+          .setOutputTokens(outputTokens)
+          .setTotalTokens(totalTokens)
+          .setIsSuccessful(isSuccessful)
+          .setErrorMessage(lengthSafe(errorMessage, 1000))
+          .setSessionId(session != null ? session.getSessionId() : null);
+      apiUsageLogCmd.create(log);
+    } catch (Exception e) {
+      // 日志记录失败不影响主流程
+    }
   }
 
 }

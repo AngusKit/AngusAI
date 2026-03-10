@@ -15,6 +15,7 @@ import lombok.experimental.Accessors;
 /**
  * 使用统计聚合实体(按天/周聚合)
  */
+@Deprecated // TODO 改成实时计算
 @Entity
 @Table(name = "ai_usage_statistics")
 @Setter
@@ -43,6 +44,12 @@ public class UsageStatistics extends TenantAuditingEntity<UsageStatistics, Long>
    */
   @Column(name = "app_id")
   private Long appId;
+
+  /**
+   * 智能体ID
+   */
+  @Column(name = "agent_id")
+  private Long agentId;
 
   /**
    * 模型ID
