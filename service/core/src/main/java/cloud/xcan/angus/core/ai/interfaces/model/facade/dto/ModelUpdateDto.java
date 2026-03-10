@@ -1,6 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.model.facade.dto;
 
-import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_DESC_LENGTH;
+import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_DESC_LENGTH_X4;
 import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_KEY_LENGTH;
 import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_PARAM_VALUE_LENGTH;
 import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_URL_LENGTH_X2;
@@ -21,7 +21,7 @@ public class ModelUpdateDto {
   @Schema(description = "模型名称", example = "GPT-4")
   private String name;
 
-  @Length(max = MAX_DESC_LENGTH)
+  @Length(max = MAX_DESC_LENGTH_X4)
   @Schema(description = "模型描述", example = "OpenAI GPT-4 语言模型")
   private String description;
 

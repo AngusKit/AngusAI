@@ -1,4 +1,5 @@
 import { useLanguage } from '@/components/LanguageProvider.tsx';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -35,9 +36,11 @@ export function ModelDetailsDialog({ open, onOpenChange, selectedModel, onEdit }
                 })()}
               </div>
               <div className='flex-1'>
-                <h3 className='text-xl mb-1 dark:text-white'>{selectedModel.name}</h3>
-                <p className='text-sm text-gray-600 dark:text-gray-400 mb-2'>{selectedModel.description}</p>
-                <Badge className={`text-xs ${selectedModel.statusColor} border-0`}>{selectedModel.status}</Badge>
+                <div className='flex items-center gap-2 mb-1'>
+                  <h3 className='text-xl dark:text-white'>{selectedModel.name}</h3>
+                  <Badge className={`text-xs ${selectedModel.statusColor} border-0`}>{selectedModel.status}</Badge>
+                </div>
+                <p className='text-sm text-gray-600 dark:text-gray-400'>{selectedModel.description}</p>
               </div>
             </div>
 
