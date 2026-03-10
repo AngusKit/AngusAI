@@ -62,10 +62,12 @@ public class AgentChatCmdImpl implements AgentChatCmd {
   @Resource
   private ModelQuery modelQuery;
 
+  /** 同步对话专用线程池，用于超时控制 */
   @Resource
   @Qualifier("syncChatExecutor")
   private ExecutorService syncChatExecutor;
 
+  /** 流式 SSE 专用线程池 */
   @Resource
   @Qualifier("sseEmitterChatExecutor")
   private Executor sseEmitterChatExecutor;
@@ -73,6 +75,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
   @Override
   public AgentChatResult chat(Long agentId, String sessionId, String message, Long timeoutMs,
       AgentChatConfig config) {
+    // 请求超时优先使用入参，否则使用默认常量
     final long effectiveTimeout = timeoutMs != null && timeoutMs > 0
         ? timeoutMs : AGENT_CHAT_SYNC_TIMEOUT_MS;
     final Long requestTimeoutMs = timeoutMs;
@@ -83,6 +86,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
 
       @Override
       protected void checkParams() {
+        // 校验智能体并获取会话：有 sessionId 则复用，无则新建
         agent = agentQuery.findAndCheckValid(agentId);
         session = sessionCmd.createOrGetForAgentChat(agent, sessionId);
         effectiveSessionId = session != null ? session.getSessionId()
@@ -91,13 +95,16 @@ public class AgentChatCmdImpl implements AgentChatCmd {
 
       @Override
       protected AgentChatResult process() {
+        // 有会话时先落库用户消息
         if (session != null) {
           messageCmd.create(effectiveSessionId, MessageRole.USER, message);
         }
+        // 合并请求/会话/智能体/模型配置，得到最终覆盖参数
         ChatConfigOverride override = getChatConfigOverride(agent, config, session,
             requestTimeoutMs);
         String reply;
         try {
+          // 异步执行 LLM 调用，带超时；有 override 时指定模型与配置
           reply = syncChatExecutor
               .submit(() -> {
                 if (override != null && agent.getDefaultModelId() != null) {
@@ -110,6 +117,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
         } catch (Exception e) {
           throw new RuntimeException("Chat timeout or error: " + e.getMessage(), e);
         }
+        // 落库助手回复
         if (session != null) {
           messageCmd.create(effectiveSessionId, MessageRole.ASSISTANT, reply);
         }
@@ -141,6 +149,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
 
       @Override
       protected SseEmitter process() {
+        // 有会话时：落库用户消息，预创建占位助手消息并标记为流式
         if (session != null) {
           messageCmd.create(effectiveSessionId, MessageRole.USER, message);
           assistantMessageId = messageCmd.create(effectiveSessionId, MessageRole.ASSISTANT,
@@ -151,6 +160,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
         ChatConfigOverride override = getChatConfigOverride(agent, config, session,
             requestTimeoutMs);
 
+        // 异步执行流式调用，通过 SSE 推送 token
         sseEmitterChatExecutor.execute(() -> {
           StringBuilder fullContent = new StringBuilder();
           try {
@@ -158,6 +168,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
                 ? agentRegistry.chatStream(String.valueOf(agentId), effectiveSessionId, message,
                 String.valueOf(agent.getDefaultModelId()), override)
                 : agentRegistry.chatStream(String.valueOf(agentId), effectiveSessionId, message);
+            // 每收到 token：累积内容并推送前端
             stream.onPartialResponse(token -> {
                   fullContent.append(token);
                   try {
@@ -166,6 +177,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
                     emitter.completeWithError(e);
                   }
                 })
+                // 流结束：用完整内容覆盖占位消息，关闭流式标记
                 .onCompleteResponse(r -> {
                   if (assistantMessageId != null) {
                     messageQuery.updateContent(assistantMessageId, fullContent.toString());
@@ -193,6 +205,10 @@ public class AgentChatCmdImpl implements AgentChatCmd {
     }.execute();
   }
 
+  /**
+   * 合并请求/会话/智能体/模型配置，生成 ChatConfigOverride。
+   * 合并优先级：请求 config > 会话 config > 智能体 config > 模型 config。
+   */
   private ChatConfigOverride getChatConfigOverride(Agent agent, AgentChatConfig config,
       Session session, Long requestTimeoutMs) {
     Model model = agent.getDefaultModelId() != null
