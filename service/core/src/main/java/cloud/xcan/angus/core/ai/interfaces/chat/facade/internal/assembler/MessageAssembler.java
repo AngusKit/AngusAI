@@ -15,7 +15,7 @@ public class MessageAssembler {
   /**
    * MessageSendDto -> Message (用户消息)
    */
-  public static Message toUserMessage(MessageSendDto dto, Long sessionId) {
+  public static Message toUserMessage(MessageSendDto dto, String sessionId) {
     Message message = new Message();
     message.setSessionId(sessionId);
     message.setRole(MessageRole.USER);
@@ -32,7 +32,7 @@ public class MessageAssembler {
   /**
    * 创建AI助手消息
    */
-  public static Message createAssistantMessage(Long sessionId, String content) {
+  public static Message createAssistantMessage(String sessionId, String content) {
     Message message = new Message();
     message.setSessionId(sessionId);
     message.setRole(MessageRole.ASSISTANT);

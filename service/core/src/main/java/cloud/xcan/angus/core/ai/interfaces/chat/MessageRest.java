@@ -3,23 +3,18 @@ package cloud.xcan.angus.core.ai.interfaces.chat;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.MessageFacade;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.MessageFeedbackDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.MessageFindDto;
-import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.MessageSendDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.AttachmentUploadVo;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.ChatStatisticsVo;
-import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.MessageSendVo;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.MessageVo;
 import cloud.xcan.angus.remote.ApiLocaleResult;
 import cloud.xcan.angus.remote.PageResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,9 +26,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-@Tag(name = "ChatMessages", description = "对话消息管理 - 消息发送、接收、历史查询、反馈等功能")
+@Tag(name = "ChatMessages", description = "对话消息管理 - 消息文件解析、对话反馈、历史查询、反馈等功能")
 @Validated
 @RestController
 @RequestMapping("/api/v1/chat/sessions")
@@ -42,29 +36,6 @@ public class MessageRest {
   @Resource
   private MessageFacade messageFacade;
 
-  @Operation(operationId = "sendMessage", summary = "发送消息", description = "发送消息并获取AI响应")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "201", description = "消息发送成功")
-  })
-  @ResponseStatus(HttpStatus.CREATED)
-  @PostMapping("/{sessionId}/messages")
-  public ApiLocaleResult<MessageSendVo> sendMessage(
-      @Parameter(description = "会话ID(UUID)") @PathVariable String sessionId,
-      @Valid @RequestBody MessageSendDto dto) {
-    return ApiLocaleResult.success(messageFacade.sendMessage(sessionId, dto));
-  }
-
-  @Operation(operationId = "sendMessageStream", summary = "发送消息（流式）", description = "发送消息并获取流式AI响应（Server-Sent Events）")
-  @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "SSE流式响应")
-  })
-  @PostMapping(value = "/{sessionId}/messages/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-  public SseEmitter sendMessageStream(
-      @PathVariable @Parameter(description = "会话ID(UUID)") String sessionId,
-      @Valid @RequestBody MessageSendDto dto) {
-    return messageFacade.sendMessageStream(sessionId, dto);
-  }
-
   @Operation(operationId = "uploadAttachment", summary = "上传附件", description = "上传消息附件")
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping("/attachments")
@@ -72,15 +43,6 @@ public class MessageRest {
       @Parameter(description = "文件") @RequestParam("file") MultipartFile file,
       @Parameter(description = "关联会话ID(UUID)") @RequestParam(required = false) String sessionId) {
     return ApiLocaleResult.success(messageFacade.uploadAttachment(file, sessionId));
-  }
-
-  @Operation(operationId = "regenerateMessage", summary = "重新生成", description = "重新生成AI响应")
-  @ResponseStatus(HttpStatus.CREATED)
-  @PostMapping("/{sessionId}/messages/{messageId}/regenerate")
-  public ApiLocaleResult<MessageVo> regenerate(
-      @Parameter(description = "会话ID(UUID)") @PathVariable String sessionId,
-      @Parameter(description = "消息ID") @PathVariable Long messageId) {
-    return ApiLocaleResult.success(messageFacade.regenerateMessage(sessionId, messageId));
   }
 
   @Operation(operationId = "feedbackMessage", summary = "消息反馈", description = "对AI消息进行反馈（点赞/点踩）")

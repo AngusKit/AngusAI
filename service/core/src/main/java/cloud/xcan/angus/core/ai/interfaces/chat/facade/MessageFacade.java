@@ -2,15 +2,11 @@ package cloud.xcan.angus.core.ai.interfaces.chat.facade;
 
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.MessageFeedbackDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.MessageFindDto;
-import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.MessageSendDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.AttachmentUploadVo;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.ChatStatisticsVo;
-import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.MessageSendVo;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.MessageVo;
 import cloud.xcan.angus.remote.PageResult;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-// import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
  * 消息Facade接口
@@ -18,24 +14,9 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public interface MessageFacade {
 
   /**
-   * 发送消息
-   */
-  MessageSendVo sendMessage(String sessionId, MessageSendDto dto);
-
-  /**
-   * 发送消息（流式）
-   */
-  SseEmitter sendMessageStream(String sessionId, MessageSendDto dto);
-
-  /**
    * 上传附件
    */
   AttachmentUploadVo uploadAttachment(MultipartFile file, String sessionId);
-
-  /**
-   * 重新生成消息
-   */
-  MessageVo regenerateMessage(String sessionId, Long messageId);
 
   /**
    * 消息反馈

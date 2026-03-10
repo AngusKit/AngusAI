@@ -19,7 +19,7 @@ public class MessageVo {
   private Long id;
 
   @Schema(description = "会话ID")
-  private Long sessionId;
+  private String sessionId;
 
   @Schema(description = "消息角色")
   private MessageRole role;

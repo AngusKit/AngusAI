@@ -2,24 +2,18 @@ package cloud.xcan.angus.core.ai.interfaces.chat.facade.internal;
 
 import cloud.xcan.angus.core.ai.application.cmd.chat.MessageCmd;
 import cloud.xcan.angus.core.ai.application.cmd.chat.SessionCmd;
-import cloud.xcan.angus.core.ai.application.query.application.ApplicationQuery;
 import cloud.xcan.angus.core.ai.application.query.chat.MessageQuery;
 import cloud.xcan.angus.core.ai.application.query.chat.SessionQuery;
-import cloud.xcan.angus.core.ai.domain.application.AIApplication;
 import cloud.xcan.angus.core.ai.domain.chat.Message;
-import cloud.xcan.angus.core.ai.domain.chat.MessageRole;
 import cloud.xcan.angus.core.ai.domain.chat.Session;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.MessageFacade;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.MessageFeedbackDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.MessageFindDto;
-import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.MessageSendDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.internal.assembler.MessageAssembler;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.AttachmentUploadVo;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.ChatStatisticsVo;
-import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.MessageSendVo;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.MessageVo;
 import cloud.xcan.angus.remote.PageResult;
-import cloud.xcan.angus.remote.message.ProtocolException;
 import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,7 +21,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
  * Message Facade实现
@@ -46,103 +39,6 @@ public class MessageFacadeImpl implements MessageFacade {
 
   @Resource
   private SessionQuery sessionQuery;
-
-  @Resource
-  private ApplicationQuery applicationQuery;
-
-  @Resource
-  private cloud.xcan.agentx.core.agent.AgentRegistry agentRegistry;
-
-  @Override
-  public MessageSendVo sendMessage(String sessionId, MessageSendDto dto) {
-    Session session = sessionQuery.findAndCheckBySessionId(sessionId);
-    // 1. 创建用户消息
-    Long userMessageId = messageCmd.createWithAttachments(
-        sessionId,
-        MessageRole.USER,
-        dto.getContent(),
-        dto.getAttachments()
-    );
-
-    // 2. Session → Application → agentId → AgentRegistry.chat
-    AIApplication application = applicationQuery.findAndCheck(session.getAppId());
-    Long defaultAgentId = applicationQuery.getDefaultAgentId(session.getAppId());
-    if (defaultAgentId == null) {
-      throw ProtocolException.of("应用未绑定智能体，无法进行对话");
-    }
-    String agentIdStr = String.valueOf(defaultAgentId);
-    String aiResponse = agentRegistry.chat(agentIdStr, sessionId, dto.getContent());
-
-    // 3. 创建助手消息
-    Long assistantMessageId = messageCmd.create(sessionId, MessageRole.ASSISTANT, aiResponse);
-
-    // 4. 构建返回结果
-    MessageSendVo vo = new MessageSendVo();
-    Message userMsg = messageQuery.findById(userMessageId);
-    Message assistantMsg = messageQuery.findById(assistantMessageId);
-    vo.setUserMsg(MessageAssembler.toMessageVo(userMsg));
-    vo.setAssistantMsg(MessageAssembler.toMessageVo(assistantMsg));
-    return vo;
-  }
-
-  private static final String STREAMING_PLACEHOLDER = ".";
-
-  @Override
-  public SseEmitter sendMessageStream(String sessionId, MessageSendDto dto) {
-    Session session = sessionQuery.findAndCheckBySessionId(sessionId);
-    // 1. 创建用户消息
-    messageCmd.createWithAttachments(
-        sessionId,
-        MessageRole.USER,
-        dto.getContent(),
-        dto.getAttachments()
-    );
-
-    // 2. Session → Application → agentId → AgentRegistry.chatStream
-    AIApplication application = applicationQuery.findAndCheck(session.getAppId());
-    Long defaultAgentId = applicationQuery.getDefaultAgentId(session.getAppId());
-    if (defaultAgentId == null) {
-      throw ProtocolException.of("应用未绑定智能体，无法进行对话");
-    }
-    String agentIdStr = String.valueOf(defaultAgentId);
-
-    // 3. 创建占位助手消息用于流式更新
-    Long assistantMessageId = messageCmd.create(sessionId, MessageRole.ASSISTANT, STREAMING_PLACEHOLDER);
-    messageCmd.setStreaming(assistantMessageId, true);
-
-    // 4. 流式调用 AgentRegistry.chatStream
-    SseEmitter emitter = new SseEmitter(120_000L);
-    new Thread(() -> {
-      try {
-        dev.langchain4j.service.TokenStream stream = agentRegistry.chatStream(
-            agentIdStr, sessionId, dto.getContent());
-        StringBuilder fullContent = new StringBuilder();
-        stream.onPartialResponse(token -> {
-              fullContent.append(token);
-              try {
-                emitter.send(SseEmitter.event().data(token));
-              } catch (Exception e) {
-                emitter.completeWithError(e);
-              }
-            })
-            .onCompleteResponse(r -> {
-              messageQuery.updateContent(assistantMessageId, fullContent.toString());
-              messageCmd.setStreaming(assistantMessageId, false);
-              emitter.complete();
-            })
-            .onError(e -> {
-              messageCmd.setStreaming(assistantMessageId, false);
-              emitter.completeWithError(e);
-            });
-        stream.start();
-      } catch (Exception e) {
-        messageCmd.setStreaming(assistantMessageId, false);
-        emitter.completeWithError(e);
-      }
-    }).start();
-
-    return emitter;
-  }
 
   @Override
   public AttachmentUploadVo uploadAttachment(MultipartFile file, String sessionId) {
@@ -167,22 +63,6 @@ public class MessageFacadeImpl implements MessageFacade {
   }
 
   @Override
-  public MessageVo regenerateMessage(String sessionId, Long messageId) {
-    // 1. 获取原消息
-    //Message originalMessage = messageQuery.findAndCheck(messageId);
-
-    // 2. 重新调用AI生成
-    //String newContent = callAIService(sessionId, originalMessage.getContent(), null);
-
-    // 3. 重新生成消息
-    //Long newMessageId = messageCmd.regenerateMessage(messageId, newContent);
-
-    // 4. 返回新消息
-    Message newMessage = messageQuery.findById(/*newMessageId*/-1L);
-    return MessageAssembler.toMessageVo(newMessage);
-  }
-
-  @Override
   public MessageVo feedbackMessage(String sessionId, Long messageId, MessageFeedbackDto dto) {
     // 添加消息反馈
     messageCmd.addFeedback(messageId, dto.getFeedbackType(), dto.getComment());
@@ -194,22 +74,18 @@ public class MessageFacadeImpl implements MessageFacade {
 
   @Override
   public MessageVo stopGeneration(String sessionId) {
-    // 1. 查找正在流式生成的消息
+    // 查找正在流式生成的消息
     List<Message> streamingMessages = messageQuery.findStreamingMessages(sessionId);
 
     if (!streamingMessages.isEmpty()) {
       Message message = streamingMessages.get(0);
 
-      // 2. 停止AI服务流式生成
-      // aiService.stopGeneration(message.getId());
+      // 停止流式生成
+      messageCmd.setStreaming(message, false);
 
-      // 3. 停止流式生成
-      messageCmd.setStreaming(message.getId(), false);
-
-      // 4. 返回当前消息状态
+      // 返回当前消息状态
       return MessageAssembler.toMessageVo(message);
     }
-
     return new MessageVo();
   }
 

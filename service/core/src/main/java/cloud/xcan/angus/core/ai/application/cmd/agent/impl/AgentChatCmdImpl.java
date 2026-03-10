@@ -2,8 +2,6 @@ package cloud.xcan.angus.core.ai.application.cmd.agent.impl;
 
 import static cloud.xcan.angus.core.ai.application.converter.AgentConverter.toChatConfigOverride;
 import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_CHAT_SSE_TIMEOUT_MS;
-import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_CHAT_SYNC_TIMEOUT_MS;
-import static java.util.UUID.randomUUID;
 
 import cloud.xcan.agentx.core.agent.AgentRegistry;
 import cloud.xcan.agentx.core.agent.ChatConfigOverride;
@@ -16,16 +14,17 @@ import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.domain.agent.Agent;
 import cloud.xcan.angus.core.ai.domain.agent.AgentChatConfig;
 import cloud.xcan.angus.core.ai.domain.agent.AgentChatResult;
+import cloud.xcan.angus.core.ai.domain.chat.Message;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRole;
 import cloud.xcan.angus.core.ai.domain.chat.Session;
 import cloud.xcan.angus.core.ai.domain.model.Model;
 import cloud.xcan.angus.core.ai.infra.agent.utils.ChatConfigMergeUtils;
 import cloud.xcan.angus.core.biz.BizTemplate;
+import cloud.xcan.angus.remote.message.SysException;
 import dev.langchain4j.service.TokenStream;
 import jakarta.annotation.Resource;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -80,53 +79,47 @@ public class AgentChatCmdImpl implements AgentChatCmd {
   public AgentChatResult chat(Long agentId, String sessionId, String message, Long timeoutMs,
       AgentChatConfig config) {
     return new BizTemplate<AgentChatResult>() {
-      // 请求超时优先使用入参，否则使用默认常量
-      final long effectiveTimeout = timeoutMs != null && timeoutMs > 0
-          ? timeoutMs : AGENT_CHAT_SYNC_TIMEOUT_MS;
-      final Long requestTimeoutMs = timeoutMs;
-
       Agent agent;
       Session session;
-      String effectiveSessionId;
 
       @Override
       protected void checkParams() {
         // 校验智能体并获取会话：有 sessionId 则复用，无则新建
         agent = agentQuery.findAndCheckValid(agentId);
         session = sessionCmd.createOrGetForAgentChat(agent, sessionId);
-        effectiveSessionId = session != null ? session.getSessionId()
-            : (sessionId != null && !sessionId.isBlank() ? sessionId : randomUUID().toString());
       }
 
       @Override
       protected AgentChatResult process() {
         // 有会话时先落库用户消息
-        if (session != null) {
-          messageCmd.create(effectiveSessionId, MessageRole.USER, message);
-        }
+        messageCmd.create0(session, MessageRole.USER, message);
+
         // 合并请求/会话/智能体/模型配置，得到最终覆盖参数
-        ChatConfigOverride override = getChatConfigOverride(agent, config, session,
-            requestTimeoutMs);
+        ChatConfigOverride override = getChatConfigOverride(agent, config, session, timeoutMs);
+        String agentIdStr = String.valueOf(agentId);
+        String defaultModelIdStr = agent.getDefaultModelId() != null
+            ? String.valueOf(agent.getDefaultModelId()) : null;
+
+        // 执行对话请求
         String reply;
         try {
           // 异步执行 LLM 调用，带超时；有 override 时指定模型与配置
           reply = syncChatExecutor
               .submit(() -> {
                 if (override != null && agent.getDefaultModelId() != null) {
-                  return agentRegistry.chat(String.valueOf(agentId), effectiveSessionId, message,
-                      String.valueOf(agent.getDefaultModelId()), override);
+                  return agentRegistry.chat(agentIdStr, session.getSessionId(),
+                      message, defaultModelIdStr, override);
                 }
-                return agentRegistry.chat(String.valueOf(agentId), effectiveSessionId, message);
+                return agentRegistry.chat(agentIdStr, session.getSessionId(), message);
               })
-              .get(effectiveTimeout, TimeUnit.MILLISECONDS);
+              .get();
         } catch (Exception e) {
-          throw new RuntimeException("Chat timeout or error: " + e.getMessage(), e);
+          throw SysException.of(e.getMessage());
         }
+
         // 落库助手回复
-        if (session != null) {
-          messageCmd.create(effectiveSessionId, MessageRole.ASSISTANT, reply);
-        }
-        return new AgentChatResult(reply, effectiveSessionId);
+        messageCmd.create0(session, MessageRole.ASSISTANT, reply);
+        return new AgentChatResult(reply, session.getSessionId());
       }
     }.execute();
   }
@@ -135,44 +128,44 @@ public class AgentChatCmdImpl implements AgentChatCmd {
   public SseEmitter chatStream(Long agentId, String sessionId, String message, Long timeoutMs,
       AgentChatConfig config) {
     return new BizTemplate<SseEmitter>() {
-      final Long requestTimeoutMs = timeoutMs;
       final long effectiveTimeout = timeoutMs != null && timeoutMs > 0
           ? timeoutMs : AGENT_CHAT_SSE_TIMEOUT_MS;
       final SseEmitter emitter = new SseEmitter(effectiveTimeout);
-      Long assistantMessageId = null;
       Agent agent;
       Session session;
-      String effectiveSessionId;
+      Message assistantMessage;
 
       @Override
       protected void checkParams() {
         agent = agentQuery.findAndCheckValid(agentId);
         session = sessionCmd.createOrGetForAgentChat(agent, sessionId);
-        effectiveSessionId = session != null ? session.getSessionId()
-            : (sessionId != null && !sessionId.isBlank() ? sessionId : randomUUID().toString());
       }
 
       @Override
       protected SseEmitter process() {
-        // 有会话时：落库用户消息，预创建占位助手消息并标记为流式
-        if (session != null) {
-          messageCmd.create(effectiveSessionId, MessageRole.USER, message);
-          assistantMessageId = messageCmd.create(effectiveSessionId, MessageRole.ASSISTANT,
-              STREAMING_PLACEHOLDER);
-          messageCmd.setStreaming(assistantMessageId, true);
-        }
+        // 落库用户消息
+        messageCmd.create0(session, MessageRole.USER, message);
 
+        // 预创建占位助手消息并标记为流式
+        assistantMessage = messageCmd.create0(session, MessageRole.ASSISTANT,
+            STREAMING_PLACEHOLDER);
+        messageCmd.setStreaming(assistantMessage, true);
+
+        // 合并配置，得到最终覆盖参数
         ChatConfigOverride override = getChatConfigOverride(agent, config, session,
-            requestTimeoutMs);
+            effectiveTimeout);
+        String agentIdStr = String.valueOf(agentId);
+        Long assistantMessageId = assistantMessage.getId();
 
         // 异步执行流式调用，通过 SSE 推送 token
         sseEmitterChatExecutor.execute(() -> {
           StringBuilder fullContent = new StringBuilder();
           try {
+
             TokenStream stream = override != null && agent.getDefaultModelId() != null
-                ? agentRegistry.chatStream(String.valueOf(agentId), effectiveSessionId, message,
+                ? agentRegistry.chatStream(agentIdStr, session.getSessionId(), message,
                 String.valueOf(agent.getDefaultModelId()), override)
-                : agentRegistry.chatStream(String.valueOf(agentId), effectiveSessionId, message);
+                : agentRegistry.chatStream(agentIdStr, session.getSessionId(), message);
             // 每收到 token：累积内容并推送前端
             stream.onPartialResponse(token -> {
                   fullContent.append(token);
@@ -184,27 +177,20 @@ public class AgentChatCmdImpl implements AgentChatCmd {
                 })
                 // 流结束：用完整内容覆盖占位消息，关闭流式标记
                 .onCompleteResponse(r -> {
-                  if (assistantMessageId != null) {
-                    messageQuery.updateContent(assistantMessageId, fullContent.toString());
-                    messageCmd.setStreaming(assistantMessageId, false);
-                  }
+                  messageQuery.updateContent(assistantMessageId, fullContent.toString());
+                  messageCmd.setStreaming(assistantMessage, false);
                   emitter.complete();
                 })
                 .onError(e -> {
-                  if (assistantMessageId != null) {
-                    messageCmd.setStreaming(assistantMessageId, false);
-                  }
+                  messageCmd.setStreaming(assistantMessage, false);
                   emitter.completeWithError(e);
                 });
             stream.start();
           } catch (Exception e) {
-            if (assistantMessageId != null) {
-              messageCmd.setStreaming(assistantMessageId, false);
-            }
+            messageCmd.setStreaming(assistantMessage, false);
             emitter.completeWithError(e);
           }
         });
-
         return emitter;
       }
     }.execute();
