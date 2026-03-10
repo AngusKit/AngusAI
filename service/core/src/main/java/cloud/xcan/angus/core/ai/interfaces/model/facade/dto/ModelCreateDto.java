@@ -63,6 +63,12 @@ public class ModelCreateDto {
   @Schema(description = "优先级 — 数值越大优先级越高；无默认模型时选择优先级最高的", example = "0")
   private Integer priority = 0;
 
+  @Schema(description = "每百万Tokens输入价格（美元）", example = "2.5")
+  private Double inputPricePerMillionTokens;
+
+  @Schema(description = "每百万Tokens输出价格（美元）", example = "10.0")
+  private Double outputPricePerMillionTokens;
+
   @Schema(description = "扩展参数")
   private Map<String, Object> extraProperties;
 

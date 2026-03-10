@@ -40,6 +40,8 @@ public class ModelAssembler {
         .defaultConfig(dto.isDefaultConfig())
         .priority(nullSafe(dto.getPriority(), 0))
         .tenantId(String.valueOf(getOptTenantId()))
+        .inputPricePerMillionTokens(dto.getInputPricePerMillionTokens())
+        .outputPricePerMillionTokens(dto.getOutputPricePerMillionTokens())
         .extraProperties(dto.getExtraProperties())
         .build();
     model.setConfig(config);
@@ -66,6 +68,8 @@ public class ModelAssembler {
         .defaultConfig(dto.isDefaultConfig())
         .priority(nullSafe(dto.getPriority(), 0))
         .tenantId(String.valueOf(getOptTenantId()))
+        .inputPricePerMillionTokens(dto.getInputPricePerMillionTokens())
+        .outputPricePerMillionTokens(dto.getOutputPricePerMillionTokens())
         .extraProperties(dto.getExtraProperties())
         .build();
     model.setConfig(config);

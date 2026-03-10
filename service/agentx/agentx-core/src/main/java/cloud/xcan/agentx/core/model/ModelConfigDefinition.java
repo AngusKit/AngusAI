@@ -70,6 +70,12 @@ public class ModelConfigDefinition {
   @Schema(description = "租户 ID（null 为全局）")
   private String tenantId;
 
+  @Schema(description = "每百万Tokens输入价格（美元）", example = "2.5")
+  private Double inputPricePerMillionTokens;
+
+  @Schema(description = "每百万Tokens输出价格（美元）", example = "10.0")
+  private Double outputPricePerMillionTokens;
+
   @Schema(description = "扩展参数")
   private Map<String, Object> extraProperties;
 }
