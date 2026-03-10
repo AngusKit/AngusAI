@@ -12,6 +12,6 @@ public interface DatasetRepoPostgres extends DatasetRepo {
    */
   @Override
   @Query(value = "SELECT COUNT(DISTINCT d.id) FROM ai_dataset d " +
-      "JOIN ai_application app ON CAST(d.id AS string) = ANY(CAST(app.dataset_id AS text[]))", nativeQuery = true)
+      "JOIN ai_agent agent ON CAST(d.id AS string) = ANY(CAST(agent.dataset_id AS text[]))", nativeQuery = true)
   Long countActiveDatasets();
 }
