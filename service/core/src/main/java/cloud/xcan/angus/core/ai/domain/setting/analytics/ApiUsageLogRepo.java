@@ -77,8 +77,8 @@ public interface ApiUsageLogRepo extends BaseRepository<ApiUsageLog, Long> {
   /**
    * 按模型分组统计
    */
-  @Query("SELECT l.modelId, l.modelName, COUNT(l), SUM(l.totalTokens) " +
-      "FROM ApiUsageLog l WHERE l.requestTime BETWEEN :start AND :end GROUP BY l.modelId, l.modelName ORDER BY COUNT(l) DESC")
+  @Query("SELECT l.modelId, COUNT(l), SUM(l.totalTokens) " +
+      "FROM ApiUsageLog l WHERE l.requestTime BETWEEN :start AND :end GROUP BY l.modelId ORDER BY COUNT(l) DESC")
   List<Object[]> groupByModel(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
   /**

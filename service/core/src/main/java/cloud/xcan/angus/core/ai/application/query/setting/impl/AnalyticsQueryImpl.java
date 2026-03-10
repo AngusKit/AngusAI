@@ -258,11 +258,10 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
         for (Object[] result : results) {
           Map<String, Object> item = new HashMap<>();
           item.put("modelId", result[0]);
-          item.put("modelName", result[1]);
-          item.put("calls", result[2]);
-          item.put("tokens", result[3]);
-          item.put("percentage",
-              total > 0 ? (((Number) result[2]).doubleValue() / total * 100) : 0.0);
+          item.put("calls", result[1]);
+          item.put("tokens", result[2]);
+          item.put("percentage", total > 0
+              ? (((Number) result[1]).doubleValue() / total * 100) : 0.0);
 
           distribution.add(item);
         }
