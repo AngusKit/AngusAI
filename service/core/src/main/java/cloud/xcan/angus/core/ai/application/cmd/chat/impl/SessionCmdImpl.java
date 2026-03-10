@@ -112,7 +112,6 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
     session.setAgentId(agent.getId());
     session.setTitle("新对话");
     SessionConfig config = new SessionConfig();
-    config.setSystemPrompt("You are a helpful assistant.");
     session.setConfig(config);
     return self.create(session);
   }
