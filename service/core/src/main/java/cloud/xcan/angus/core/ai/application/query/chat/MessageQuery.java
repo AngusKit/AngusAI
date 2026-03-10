@@ -1,9 +1,7 @@
 package cloud.xcan.angus.core.ai.application.query.chat;
 
 import cloud.xcan.angus.core.ai.domain.chat.Message;
-import cloud.xcan.angus.core.ai.domain.chat.MessageRole;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.ChatStatisticsVo.UsageTrend;
-import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,54 +22,14 @@ public interface MessageQuery {
   Message findAndCheck(Long id);
 
   /**
-   * 根据会话ID(UUID)查询消息列表
-   */
-  List<Message> findBySessionId(String sessionId);
-
-  /**
    * 根据会话ID(UUID)分页查询消息
    */
   Page<Message> findBySessionId(String sessionId, PageRequest pageable);
 
   /**
-   * 查询会话的最后一条消息
-   */
-  Message findLastMessageBySessionId(String sessionId);
-
-  /**
-   * 统计会话的消息数量
-   */
-  long countBySessionId(String sessionId);
-
-  /**
-   * 根据条件查询消息
-   */
-  Page<Message> find(GenericSpecification<Message> spec, PageRequest pageable);
-
-  /**
-   * 根据会话ID(UUID)和角色查询消息
-   */
-  List<Message> findBySessionIdAndRole(String sessionId, MessageRole role);
-
-  /**
    * 查询正在流式生成的消息
    */
   List<Message> findStreamingMessages(String sessionId);
-
-  /**
-   * 根据父消息ID查询子消息
-   */
-  List<Message> findByParentMessageId(Long parentMessageId);
-
-  /**
-   * 查询最近的消息历史（用于AI上下文）
-   */
-  List<Message> findRecentBySessionId(String sessionId, int limit);
-
-  /**
-   * 更新消息内容
-   */
-  void updateContent(Long messageId, String content);
 
   /**
    * 获取使用趋势

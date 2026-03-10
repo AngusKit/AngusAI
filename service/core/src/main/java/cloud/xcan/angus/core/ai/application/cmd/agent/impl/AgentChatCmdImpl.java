@@ -177,7 +177,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
                 })
                 // 流结束：用完整内容覆盖占位消息，关闭流式标记
                 .onCompleteResponse(r -> {
-                  messageQuery.updateContent(assistantMessageId, fullContent.toString());
+                  assistantMessage.setContent(fullContent.toString());
                   messageCmd.setStreaming(assistantMessage, false);
                   emitter.complete();
                 })

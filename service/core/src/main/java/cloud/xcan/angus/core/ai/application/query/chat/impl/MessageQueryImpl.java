@@ -45,16 +45,6 @@ public class MessageQueryImpl implements MessageQuery {
   }
 
   @Override
-  public List<Message> findBySessionId(String sessionId) {
-    return new BizTemplate<List<Message>>() {
-      @Override
-      protected List<Message> process() {
-        return messageRepo.findBySessionIdOrderByCreatedDateAsc(sessionId);
-      }
-    }.execute();
-  }
-
-  @Override
   public Page<Message> findBySessionId(String sessionId, PageRequest pageable) {
     return new BizTemplate<Page<Message>>() {
       @Override
@@ -65,86 +55,11 @@ public class MessageQueryImpl implements MessageQuery {
   }
 
   @Override
-  public Message findLastMessageBySessionId(String sessionId) {
-    return new BizTemplate<Message>() {
-      @Override
-      protected Message process() {
-        return messageRepo.findFirstBySessionIdOrderByCreatedDateDesc(sessionId);
-      }
-    }.execute();
-  }
-
-  @Override
-  public long countBySessionId(String sessionId) {
-    return new BizTemplate<Long>() {
-      @Override
-      protected Long process() {
-        return messageRepo.countBySessionId(sessionId);
-      }
-    }.execute();
-  }
-
-  @Override
-  public Page<Message> find(GenericSpecification<Message> spec, PageRequest pageable) {
-    return new BizTemplate<Page<Message>>() {
-      @Override
-      protected Page<Message> process() {
-        return messageRepo.findAll(spec, pageable);
-      }
-    }.execute();
-  }
-
-  @Override
-  public List<Message> findBySessionIdAndRole(String sessionId, MessageRole role) {
-    return new BizTemplate<List<Message>>() {
-      @Override
-      protected List<Message> process() {
-        return messageRepo.findBySessionIdAndRole(sessionId, role);
-      }
-    }.execute();
-  }
-
-  @Override
   public List<Message> findStreamingMessages(String sessionId) {
     return new BizTemplate<List<Message>>() {
       @Override
       protected List<Message> process() {
         return messageRepo.findBySessionIdAndIsStreamingTrue(sessionId);
-      }
-    }.execute();
-  }
-
-  @Override
-  public List<Message> findByParentMessageId(Long parentMessageId) {
-    return new BizTemplate<List<Message>>() {
-      @Override
-      protected List<Message> process() {
-        return messageRepo.findByParentMessageId(parentMessageId);
-      }
-    }.execute();
-  }
-
-  @Override
-  public List<Message> findRecentBySessionId(String sessionId, int limit) {
-    return new BizTemplate<List<Message>>() {
-      @Override
-      protected List<Message> process() {
-        return messageRepo.findBySessionIdOrderByCreatedDateDesc(sessionId,
-            PageRequest.of(0, limit)).getContent();
-      }
-    }.execute();
-  }
-
-  @Override
-  public void updateContent(Long messageId, String content) {
-    new BizTemplate<Void>() {
-      @Override
-      protected Void process() {
-        Message message = messageRepo.findById(messageId)
-            .orElseThrow(() -> ResourceNotFound.of("消息不存在", new Object[]{}));
-        message.setContent(content);
-        messageRepo.save(message);
-        return null;
       }
     }.execute();
   }

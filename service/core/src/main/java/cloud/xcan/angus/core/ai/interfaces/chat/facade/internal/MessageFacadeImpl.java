@@ -105,11 +105,9 @@ public class MessageFacadeImpl implements MessageFacade {
   public PageResult<MessageVo> listMessages(String sessionId, MessageFindDto dto) {
     PageRequest pageable = PageRequest.of(dto.getPageNo() - 1, dto.getPageSize());
     Page<Message> page = messageQuery.findBySessionId(sessionId, pageable);
-
     List<MessageVo> content = page.getContent().stream()
         .map(MessageAssembler::toMessageVo)
         .collect(Collectors.toList());
-
     return PageResult.of(page.getTotalElements(), content);
   }
 
