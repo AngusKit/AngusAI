@@ -2,7 +2,7 @@
  * 模型表单字段组件
  */
 
-import { Info, Settings, Sliders } from 'lucide-react';
+import { DollarSign, Info, Settings, Sliders } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -207,7 +207,17 @@ export function ModelFormFields({
               className='dark:bg-gray-700 dark:border-gray-600'
             />
           </div>
+        </div>
+      </div>
 
+      {/* 成本定价 */}
+      <div className='space-y-3 pt-4 border-t border-gray-200 dark:border-gray-700'>
+        <h3 className='text-sm dark:text-white flex items-center gap-2'>
+          <DollarSign className='w-4 h-4 text-amber-500' />
+          {t('models.formFields.pricing')}
+        </h3>
+
+        <div className='grid grid-cols-2 gap-3'>
           <div className='space-y-2'>
             <Label htmlFor={isEdit ? 'edit-model-inputPrice' : 'model-inputPrice'} className='dark:text-gray-300'>
               {t('models.formFields.inputPricePerMillionTokens')}

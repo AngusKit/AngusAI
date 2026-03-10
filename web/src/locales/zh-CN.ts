@@ -1120,6 +1120,7 @@ export const zhCN = {
       apiKey: 'API密钥',
       leaveBlankToKeepUnchanged: '留空则不修改',
       modelParameters: '模型参数',
+      pricing: '成本定价',
       maxTokens: '最大Tokens',
       temperature: '温度',
       inputPricePerMillionTokens: '每百万Tokens输入（美元）',

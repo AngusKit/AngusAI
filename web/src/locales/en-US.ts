@@ -807,6 +807,7 @@ export const enUS = {
       apiKey: 'API Key',
       leaveBlankToKeepUnchanged: 'Leave blank to keep unchanged',
       modelParameters: 'Model Parameters',
+      pricing: 'Pricing',
       maxTokens: 'Max Tokens',
       temperature: 'Temperature',
       inputPricePerMillionTokens: 'Input per million tokens (USD)',
