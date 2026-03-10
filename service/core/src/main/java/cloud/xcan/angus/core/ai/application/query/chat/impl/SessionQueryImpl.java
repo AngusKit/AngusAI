@@ -1,5 +1,9 @@
 package cloud.xcan.angus.core.ai.application.query.chat.impl;
 
+import static cloud.xcan.angus.core.ai.domain.Constants.SESSION_QUOTA_PER_APP_TOTAL;
+import static cloud.xcan.angus.core.ai.domain.Constants.SESSION_QUOTA_PER_USER_APP;
+import static cloud.xcan.angus.spec.principal.PrincipalContext.getUserId;
+
 import cloud.xcan.angus.core.ai.application.query.chat.SessionQuery;
 import cloud.xcan.angus.core.ai.domain.chat.Session;
 import cloud.xcan.angus.core.ai.domain.chat.SessionRepo;
@@ -8,12 +12,12 @@ import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.ChatStatisticsVo.TopAp
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.ChatStatisticsVo.TopModel;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
+import cloud.xcan.angus.remote.message.ProtocolException;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import jakarta.annotation.Resource;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -83,41 +87,26 @@ public class SessionQueryImpl implements SessionQuery {
     }.execute();
   }
 
+  /**
+   * 会话配额校验：每个用户每应用不超过上限，应用总会话不超过上限。 无登录用户时仅校验应用总会话。
+   */
   @Override
-  public List<Session> findByAppId(Long appId) {
-    return sessionRepo.findByAppId(appId);
-  }
-
-  @Override
-  public List<Session> findByModelId(Long modelId) {
-    return sessionRepo.findByModelId(modelId);
-  }
-
-  @Override
-  public List<Session> findRecentSessions(Long userId, int limit) {
-    Pageable pageable = PageRequest.of(0, limit);
-    return sessionRepo.findByCreatedByOrderByCreatedDateDesc(userId, pageable).getContent();
-  }
-
-  @Override
-  public List<Session> findRecentActiveSessions(Long userId, int limit) {
-    Pageable pageable = PageRequest.of(0, limit);
-    return sessionRepo.findByCreatedByOrderByModifiedDateDesc(userId, pageable).getContent();
-  }
-
-  @Override
-  public long countByCreatedBy(Long createdBy) {
-    return sessionRepo.countByCreatedBy(createdBy);
-  }
-
-  @Override
-  public long countByAppId(Long appId) {
-    return sessionRepo.countByAppId(appId);
-  }
-
-  @Override
-  public long countByModelId(Long modelId) {
-    return sessionRepo.countByModelId(modelId);
+  public void checkSessionQuota(Long appId) {
+    // 应用总会话校验
+    long appTotal = sessionRepo.countByAppId(appId);
+    if (appTotal >= SESSION_QUOTA_PER_APP_TOTAL) {
+      throw ProtocolException.of("应用会话数已达上限「{0}」，请先删除部分会话",
+          new Object[]{SESSION_QUOTA_PER_APP_TOTAL});
+    }
+    // 用户级配额校验（需登录上下文）
+    Long userId = getUserId();
+    if (userId != null) {
+      long userAppCount = sessionRepo.countByCreatedByAndAppId(userId, appId);
+      if (userAppCount >= SESSION_QUOTA_PER_USER_APP) {
+        throw ProtocolException.of("您在该应用下的会话数已达上限「{0}」，请先删除部分会话",
+            new Object[]{SESSION_QUOTA_PER_USER_APP});
+      }
+    }
   }
 
   @Override

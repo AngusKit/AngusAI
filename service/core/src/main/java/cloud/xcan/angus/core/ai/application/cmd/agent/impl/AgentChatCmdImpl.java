@@ -1,8 +1,8 @@
 package cloud.xcan.angus.core.ai.application.cmd.agent.impl;
 
 import static cloud.xcan.angus.core.ai.application.converter.AgentConverter.toChatConfigOverride;
-import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_CHAT_SYNC_TIMEOUT_MS;
 import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_CHAT_SSE_TIMEOUT_MS;
+import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_CHAT_SYNC_TIMEOUT_MS;
 import static java.util.UUID.randomUUID;
 
 import cloud.xcan.agentx.core.agent.AgentRegistry;
@@ -62,12 +62,16 @@ public class AgentChatCmdImpl implements AgentChatCmd {
   @Resource
   private ModelQuery modelQuery;
 
-  /** 同步对话专用线程池，用于超时控制 */
+  /**
+   * 同步对话专用线程池，用于超时控制
+   */
   @Resource
   @Qualifier("syncChatExecutor")
   private ExecutorService syncChatExecutor;
 
-  /** 流式 SSE 专用线程池 */
+  /**
+   * 流式 SSE 专用线程池
+   */
   @Resource
   @Qualifier("sseEmitterChatExecutor")
   private Executor sseEmitterChatExecutor;
@@ -75,11 +79,12 @@ public class AgentChatCmdImpl implements AgentChatCmd {
   @Override
   public AgentChatResult chat(Long agentId, String sessionId, String message, Long timeoutMs,
       AgentChatConfig config) {
-    // 请求超时优先使用入参，否则使用默认常量
-    final long effectiveTimeout = timeoutMs != null && timeoutMs > 0
-        ? timeoutMs : AGENT_CHAT_SYNC_TIMEOUT_MS;
-    final Long requestTimeoutMs = timeoutMs;
     return new BizTemplate<AgentChatResult>() {
+      // 请求超时优先使用入参，否则使用默认常量
+      final long effectiveTimeout = timeoutMs != null && timeoutMs > 0
+          ? timeoutMs : AGENT_CHAT_SYNC_TIMEOUT_MS;
+      final Long requestTimeoutMs = timeoutMs;
+
       Agent agent;
       Session session;
       String effectiveSessionId;
@@ -129,8 +134,8 @@ public class AgentChatCmdImpl implements AgentChatCmd {
   @Override
   public SseEmitter chatStream(Long agentId, String sessionId, String message, Long timeoutMs,
       AgentChatConfig config) {
-    final Long requestTimeoutMs = timeoutMs;
     return new BizTemplate<SseEmitter>() {
+      final Long requestTimeoutMs = timeoutMs;
       final long effectiveTimeout = timeoutMs != null && timeoutMs > 0
           ? timeoutMs : AGENT_CHAT_SSE_TIMEOUT_MS;
       final SseEmitter emitter = new SseEmitter(effectiveTimeout);
@@ -206,8 +211,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
   }
 
   /**
-   * 合并请求/会话/智能体/模型配置，生成 ChatConfigOverride。
-   * 合并优先级：请求 config > 会话 config > 智能体 config > 模型 config。
+   * 合并请求/会话/智能体/模型配置，生成 ChatConfigOverride。 合并优先级：请求 config > 会话 config > 智能体 config > 模型 config。
    */
   private ChatConfigOverride getChatConfigOverride(Agent agent, AgentChatConfig config,
       Session session, Long requestTimeoutMs) {

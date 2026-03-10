@@ -40,39 +40,9 @@ public interface SessionQuery {
       boolean fullTextSearch, String[] match);
 
   /**
-   * 根据应用ID查询会话列表
+   * 检查会话配额
    */
-  List<Session> findByAppId(Long appId);
-
-  /**
-   * 根据模型ID查询会话列表
-   */
-  List<Session> findByModelId(Long modelId);
-
-  /**
-   * 查询最近创建的会话
-   */
-  List<Session> findRecentSessions(Long userId, int limit);
-
-  /**
-   * 查询最近活跃的会话
-   */
-  List<Session> findRecentActiveSessions(Long userId, int limit);
-
-  /**
-   * 统计用户的会话数量
-   */
-  long countByCreatedBy(Long createdBy);
-
-  /**
-   * 统计应用的使用次数
-   */
-  long countByAppId(Long appId);
-
-  /**
-   * 统计模型的使用次数
-   */
-  long countByModelId(Long modelId);
+  void checkSessionQuota(Long appId);
 
   /**
    * 获取Top应用

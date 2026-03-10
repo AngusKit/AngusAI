@@ -107,6 +107,18 @@ public interface Constants {
    */
   long CHAT_DEFAULT_TIMEOUT_MS = 60_000L;
 
+  // ==================== 会话配额常量 ====================
+
+  /**
+   * 每个用户在每个应用下的会话数上限
+   */
+  int SESSION_QUOTA_PER_USER_APP = 500;
+
+  /**
+   * 每个应用总会话数上限
+   */
+  int SESSION_QUOTA_PER_APP_TOTAL = 10_000;
+
   // ==================== 知识库常量 ====================
 
   String KNOWLEDGE_DOC_UPLOAD_BIZ_KEY = "angusAIKnowledgeBaseDocs";

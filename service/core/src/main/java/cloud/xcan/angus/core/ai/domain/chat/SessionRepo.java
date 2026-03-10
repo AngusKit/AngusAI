@@ -43,6 +43,11 @@ public interface SessionRepo extends BaseRepository<Session, Long> {
   long countByCreatedBy(Long createdBy);
 
   /**
+   * 统计某用户在某应用下的会话数量（用于配额校验）
+   */
+  long countByCreatedByAndAppId(Long createdBy, Long appId);
+
+  /**
    * 统计应用的使用次数
    */
   long countByAppId(Long appId);

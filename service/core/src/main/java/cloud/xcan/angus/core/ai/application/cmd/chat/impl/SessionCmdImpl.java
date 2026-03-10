@@ -47,6 +47,9 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
   @Resource
   private AgentQuery agentQuery;
 
+  @Resource
+  private SessionCmd self;
+
   @Override
   @Transactional
   public Session create(Session session) {
@@ -61,7 +64,8 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
         application = applicationQuery.findAndCheck(session.getAppId(), session.getModelId());
         currentModel = application.getCurrentUseMode();
         agent = agentQuery.findAndCheck(applicationQuery.getDefaultAgentId(application.getId()));
-        // TODO 检查会话配额，默认每个用户应用会话数不超过500，应用总会话不超过10000
+        // 会话配额校验
+        sessionQuery.checkSessionQuota(session.getAppId());
       }
 
       @Override
@@ -95,34 +99,22 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
   }
 
   @Override
-  @Transactional
   public Session createOrGetForAgentChat(Agent agent, String sessionId) {
-    return new BizTemplate<Session>() {
-      String effectiveSessionId;
-
-      @Override
-      protected void checkParams() {
-        effectiveSessionId = (sessionId != null && !sessionId.isBlank())
-            ? sessionId : UUID.randomUUID().toString();
-      }
-
-      @Override
-      protected Session process() {
-        Session existing = sessionQuery.findBySessionId(effectiveSessionId);
-        if (existing != null) {
-          return existing;
-        }
-        Session session = new Session();
-        session.setSessionId(effectiveSessionId);
-        session.setAppId(agent.getId());
-        session.setAgentId(agent.getId());
-        session.setTitle("新对话");
-        SessionConfig config = new SessionConfig();
-        config.setSystemPrompt("You are a helpful assistant.");
-        session.setConfig(config);
-        return create(session);
-      }
-    }.execute();
+    String effectiveSessionId = (sessionId != null && !sessionId.isBlank())
+        ? sessionId : UUID.randomUUID().toString();
+    Session existing = sessionQuery.findBySessionId(effectiveSessionId);
+    if (existing != null) {
+      return existing;
+    }
+    Session session = new Session();
+    session.setSessionId(effectiveSessionId);
+    session.setAppId(agent.getId());
+    session.setAgentId(agent.getId());
+    session.setTitle("新对话");
+    SessionConfig config = new SessionConfig();
+    config.setSystemPrompt("You are a helpful assistant.");
+    session.setConfig(config);
+    return self.create(session);
   }
 
   @Override
@@ -135,8 +127,6 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
       protected void checkParams() {
         // 查找并检查会话是否存在
         sessionDb = sessionQuery.findAndCheck(session.getId());
-
-        // TODO 检查会话配额，默认每个用户应用会话数不超过500，应用总会话不超过10000
       }
 
       @Override
