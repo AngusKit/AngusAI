@@ -15,6 +15,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { toast } from 'sonner';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { cn } from '@/components/ui/utils';
+import { Skeleton } from '@/components/ui/skeleton';
 import { copyToClipboard } from '@/lib/clipboard';
 import ApiSettingService from '@/services/ApiSetting';
 import { API_EXTENSION_KEYS } from '@/types/openapi-types';
@@ -48,6 +49,7 @@ export function APICollection() {
     endpointSearchQuery,
     setEndpointSearchQuery,
     collections,
+    collectionsLoading,
     collectionsTotal,
     collectionsPage,
     selectedCollectionId,
@@ -827,7 +829,32 @@ export function APICollection() {
             </div>
             <ScrollArea className='h-[600px]'>
               <div className='p-2 space-y-2'>
-                {collections.map(collection => (
+                {collectionsLoading ? (
+                  Array.from({ length: 6 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className='w-full p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800'
+                    >
+                      <div className='flex items-start justify-between mb-2'>
+                        <div className='flex items-center gap-2'>
+                          <Skeleton className='w-4 h-4 rounded dark:bg-gray-700' />
+                          <Skeleton className='h-4 w-28 dark:bg-gray-700' />
+                        </div>
+                        <div className='flex items-center gap-1'>
+                          <Skeleton className='h-5 w-14 rounded dark:bg-gray-700' />
+                          <Skeleton className='w-4 h-4 dark:bg-gray-700' />
+                        </div>
+                      </div>
+                      <Skeleton className='h-3 w-full mb-1 dark:bg-gray-700' />
+                      <Skeleton className='h-3 w-3/4 mb-3 dark:bg-gray-700' />
+                      <div className='flex items-center justify-between'>
+                        <Skeleton className='h-3 w-16 dark:bg-gray-700' />
+                        <Skeleton className='h-5 w-20 rounded dark:bg-gray-700' />
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  collections.map(collection => (
                   <button
                     key={collection.id}
                     onClick={() => setSelectedCollectionId(collection.id)}
@@ -876,7 +903,8 @@ export function APICollection() {
                       </Badge>
                     </div>
                   </button>
-                ))}
+                  ))
+                )}
               </div>
             </ScrollArea>
           </div>
