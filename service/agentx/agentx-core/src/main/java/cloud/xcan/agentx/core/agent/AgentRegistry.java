@@ -43,6 +43,15 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class AgentRegistry {
 
+  private static final String WORKFLOW_MODE_BEFORE = "BEFORE_CHAT";
+  private static final String WORKFLOW_MODE_AFTER = "AFTER_CHAT";
+  private static final String WORKFLOW_MODE_INSTEAD = "INSTEAD_OF_CHAT";
+  private static final String SESSION_DEFAULT = "default";
+  private static final int RAG_TOP_K = 5;
+  private static final String GUARDRAIL_PREFIX = "[Guardrail] ";
+
+  private record GuardrailApplyResult(boolean passed, String result) {}
+
   private final Map<String, AgentInstance> agents = new ConcurrentHashMap<>();
   private final ToolRegistry toolRegistry;
   private final MemoryFactory memoryFactory;
@@ -129,23 +138,12 @@ public class AgentRegistry {
         && !definition.getKnowledgeBaseIds().isEmpty()) {
       ModelProvider embeddingProvider = defModel != null && defModel.getProvider() != null
           ? defModel.getProvider() : ModelProvider.DEEPSEEK;
-      int topK = 5;
       contentRetrieverFactory.createContentRetriever(
-              definition.getKnowledgeBaseIds(), embeddingProvider, topK)
+              definition.getKnowledgeBaseIds(), embeddingProvider, RAG_TOP_K)
           .ifPresent(syncBuilder::contentRetriever);
     }
 
-    // 系统消息：当有技能时追加技能提示
-    String systemPrompt = definition.getSystemPrompt();
-    if (definition.getSkillIds() != null && !definition.getSkillIds().isEmpty()) {
-      String skillsHint = skillRegistry.formatAvailableSkills(definition.getSkillIds());
-      if (!skillsHint.isEmpty()) {
-        String skillsInstruction = "\n\nYou have access to the following skills:\n" + skillsHint
-            + "\nWhen the user's request relates to one of these skills, activate it first using the `activate_skill` tool before proceeding.";
-        systemPrompt = (systemPrompt != null ? systemPrompt : "") + skillsInstruction;
-      }
-    }
-    systemPrompt = PromptVariableResolver.resolve(systemPrompt, definition.getVariables());
+    String systemPrompt = resolveSystemPromptWithSkills(definition, null);
     if (systemPrompt != null && !systemPrompt.isBlank()) {
       final String finalPrompt = systemPrompt;
       syncBuilder.systemMessageProvider(memoryId -> finalPrompt);
@@ -163,7 +161,7 @@ public class AgentRegistry {
         ModelProvider embProvider = defModel != null && defModel.getProvider() != null
             ? defModel.getProvider() : ModelProvider.DEEPSEEK;
         contentRetrieverFactory.createContentRetriever(
-                definition.getKnowledgeBaseIds(), embProvider, 5)
+                definition.getKnowledgeBaseIds(), embProvider, RAG_TOP_K)
             .ifPresent(streamBuilder::contentRetriever);
       }
       if (!toolObjects.isEmpty()) {
@@ -215,33 +213,20 @@ public class AgentRegistry {
     }
     instance.recordInvocation();
 
-    String inputToUse = message;
-    if (guardrailChain != null) {
-      var guardrails = instance.getDefinition().getGuardrails();
-      if (guardrails != null && guardrails.getInputGuardrailIds() != null
-          && !guardrails.getInputGuardrailIds().isEmpty()) {
-        GuardrailResult inputResult = guardrailChain.checkInput(message,
-            guardrails.getInputGuardrailIds());
-        if (!inputResult.isPassed()) {
-          return "[Guardrail] " + (inputResult.getReason() != null ? inputResult.getReason()
-              : "Input blocked");
-        }
-        if (inputResult.getSanitizedContent() != null) {
-          inputToUse = inputResult.getSanitizedContent();
-        }
-      }
+    GuardrailApplyResult inputGuard = applyInputGuardrail(instance, message);
+    if (!inputGuard.passed()) {
+      return inputGuard.result();
     }
+    String inputToUse = inputGuard.result();
 
-    Object memoryId = sessionId != null && !sessionId.isBlank() ? sessionId : "default";
-    String sessionIdStr = sessionId != null && !sessionId.isBlank() ? sessionId : "default";
+    Object memoryId = normalizeSessionId(sessionId);
+    String sessionIdStr = (String) memoryId;
     var definition = instance.getDefinition();
-
-    var trigger = definition.getWorkflowTrigger();
-    String wfMode = trigger != null && trigger.getMode() != null ? trigger.getMode() : "AFTER_CHAT";
-    if (definition.getWorkflowId() != null && "BEFORE_CHAT".equals(wfMode)) {
+    String wfMode = getWorkflowMode(definition);
+    if (definition.getWorkflowId() != null && WORKFLOW_MODE_BEFORE.equals(wfMode)) {
       runWorkflowIfConfigured(definition, Map.of("message", inputToUse, "sessionId", sessionIdStr));
     }
-    if (definition.getWorkflowId() != null && "INSTEAD_OF_CHAT".equals(wfMode)) {
+    if (definition.getWorkflowId() != null && WORKFLOW_MODE_INSTEAD.equals(wfMode)) {
       String wfResponse = runWorkflowIfConfigured(definition,
           Map.of("message", inputToUse, "sessionId", sessionIdStr));
       return wfResponse != null ? wfResponse : "";
@@ -257,27 +242,16 @@ public class AgentRegistry {
     AgentChatService service = buildChatService(definition, chatModel, systemPromptOverride);
     String response = service.chat(memoryId, inputToUse);
 
-    if (definition.getWorkflowId() != null && "AFTER_CHAT".equals(wfMode)) {
+    if (definition.getWorkflowId() != null && WORKFLOW_MODE_AFTER.equals(wfMode)) {
       runWorkflowIfConfigured(definition,
           Map.of("message", inputToUse, "response", response, "sessionId", sessionIdStr));
     }
 
-    if (guardrailChain != null) {
-      var guardrails = instance.getDefinition().getGuardrails();
-      if (guardrails != null && guardrails.getOutputGuardrailIds() != null
-          && !guardrails.getOutputGuardrailIds().isEmpty()) {
-        GuardrailResult outputResult = guardrailChain.checkOutput(response,
-            guardrails.getOutputGuardrailIds());
-        if (!outputResult.isPassed()) {
-          return "[Guardrail] " + (outputResult.getReason() != null ? outputResult.getReason()
-              : "Output blocked");
-        }
-        if (outputResult.getSanitizedContent() != null) {
-          response = outputResult.getSanitizedContent();
-        }
-      }
+    GuardrailApplyResult outputGuard = applyOutputGuardrail(instance, response);
+    if (!outputGuard.passed()) {
+      return outputGuard.result();
     }
-    return response;
+    return outputGuard.result();
   }
 
   private ModelConfigDefinition applyOverride(ModelConfigDefinition base,
@@ -296,21 +270,18 @@ public class AgentRegistry {
         .defaultConfig(base.isDefaultConfig())
         .priority(base.getPriority())
         .tenantId(base.getTenantId());
-    b.temperature(override.getTemperature() != null ? override.getTemperature()
-        : (base.getTemperature() != null ? base.getTemperature() : 0.7));
-    b.maxTokens(override.getMaxTokens() != null ? override.getMaxTokens()
-        : (base.getMaxTokens() != null ? base.getMaxTokens() : 4096));
-    // 请求级 timeoutMs 优先于模型级 timeoutSeconds
+    b.temperature(orDefault(override.getTemperature(), base.getTemperature(), 0.7));
+    b.maxTokens(orDefault(override.getMaxTokens(), base.getMaxTokens(), 4096));
     if (override.getTimeoutMs() != null && override.getTimeoutMs() > 0) {
       b.timeoutSeconds((int) Math.max(1, override.getTimeoutMs() / 1000));
     } else if (base.getTimeoutSeconds() != null) {
       b.timeoutSeconds(base.getTimeoutSeconds());
     }
-    b.topP(override.getTopP() != null ? override.getTopP() : base.getTopP());
-    b.frequencyPenalty(override.getFrequencyPenalty() != null ? override.getFrequencyPenalty()
-        : base.getFrequencyPenalty());
-    b.presencePenalty(override.getPresencePenalty() != null ? override.getPresencePenalty()
-        : base.getPresencePenalty());
+    b.topP(orDefault(override.getTopP(), base.getTopP(), null));
+    b.frequencyPenalty(orDefault(override.getFrequencyPenalty(), base.getFrequencyPenalty(), null));
+    b.presencePenalty(orDefault(override.getPresencePenalty(), base.getPresencePenalty(), null));
+    b.inputPricePerMillionTokens(base.getInputPricePerMillionTokens());
+    b.outputPricePerMillionTokens(base.getOutputPricePerMillionTokens());
     b.extraProperties(base.getExtraProperties());
     return b.build();
   }
@@ -340,20 +311,10 @@ public class AgentRegistry {
       ModelProvider embeddingProvider = defModel != null && defModel.getProvider() != null
           ? defModel.getProvider() : ModelProvider.DEEPSEEK;
       contentRetrieverFactory.createContentRetriever(
-              definition.getKnowledgeBaseIds(), embeddingProvider, 5)
+              definition.getKnowledgeBaseIds(), embeddingProvider, RAG_TOP_K)
           .ifPresent(syncBuilder::contentRetriever);
     }
-    String systemPrompt = systemPromptOverride != null && !systemPromptOverride.isBlank()
-        ? systemPromptOverride : definition.getSystemPrompt();
-    if (definition.getSkillIds() != null && !definition.getSkillIds().isEmpty()) {
-      String skillsHint = skillRegistry.formatAvailableSkills(definition.getSkillIds());
-      if (!skillsHint.isEmpty()) {
-        String skillsInstruction = "\n\nYou have access to the following skills:\n" + skillsHint
-            + "\nWhen the user's request relates to one of these skills, activate it first using the `activate_skill` tool before proceeding.";
-        systemPrompt = (systemPrompt != null ? systemPrompt : "") + skillsInstruction;
-      }
-    }
-    systemPrompt = PromptVariableResolver.resolve(systemPrompt, definition.getVariables());
+    String systemPrompt = resolveSystemPromptWithSkills(definition, systemPromptOverride);
     if (systemPrompt != null && !systemPrompt.isBlank()) {
       final String finalPrompt = systemPrompt;
       syncBuilder.systemMessageProvider(memoryId -> finalPrompt);
@@ -368,37 +329,21 @@ public class AgentRegistry {
     }
     instance.recordInvocation();
 
-    // 输入护栏
-    String inputToUse = message;
-    if (guardrailChain != null) {
-      var guardrails = instance.getDefinition().getGuardrails();
-      if (guardrails != null && guardrails.getInputGuardrailIds() != null
-          && !guardrails.getInputGuardrailIds().isEmpty()) {
-        GuardrailResult inputResult = guardrailChain.checkInput(message,
-            guardrails.getInputGuardrailIds());
-        if (!inputResult.isPassed()) {
-          return "[Guardrail] " + (inputResult.getReason() != null ? inputResult.getReason()
-              : "Input blocked");
-        }
-        if (inputResult.getSanitizedContent() != null) {
-          inputToUse = inputResult.getSanitizedContent();
-        }
-      }
+    GuardrailApplyResult inputGuard = applyInputGuardrail(instance, message);
+    if (!inputGuard.passed()) {
+      return inputGuard.result();
     }
+    String inputToUse = inputGuard.result();
 
-    Object memoryId = sessionId != null && !sessionId.isBlank() ? sessionId : "default";
-    String sessionIdStr = sessionId != null && !sessionId.isBlank() ? sessionId : "default";
+    Object memoryId = normalizeSessionId(sessionId);
+    String sessionIdStr = (String) memoryId;
     var definition = instance.getDefinition();
-    var trigger = definition.getWorkflowTrigger();
-    String wfMode = trigger != null && trigger.getMode() != null ? trigger.getMode() : "AFTER_CHAT";
-
-    // BEFORE_CHAT：LLM 前执行工作流（输出可合并到上下文，当前仅执行）
-    if (definition.getWorkflowId() != null && "BEFORE_CHAT".equals(wfMode)) {
+    String wfMode = getWorkflowMode(definition);
+    if (definition.getWorkflowId() != null && WORKFLOW_MODE_BEFORE.equals(wfMode)) {
       runWorkflowIfConfigured(definition, Map.of("message", inputToUse, "sessionId", sessionIdStr));
     }
 
-    // INSTEAD_OF_CHAT：直接执行工作流并返回输出，不调用 LLM
-    if (definition.getWorkflowId() != null && "INSTEAD_OF_CHAT".equals(wfMode)) {
+    if (definition.getWorkflowId() != null && WORKFLOW_MODE_INSTEAD.equals(wfMode)) {
       String wfResponse = runWorkflowIfConfigured(definition,
           Map.of("message", inputToUse, "sessionId", sessionIdStr));
       return wfResponse != null ? wfResponse : "";
@@ -408,28 +353,16 @@ public class AgentRegistry {
     String response = service.chat(memoryId, inputToUse);
 
     // AFTER_CHAT：LLM 后执行工作流（通知、记录等）
-    if (definition.getWorkflowId() != null && "AFTER_CHAT".equals(wfMode)) {
+    if (definition.getWorkflowId() != null && WORKFLOW_MODE_AFTER.equals(wfMode)) {
       runWorkflowIfConfigured(definition,
           Map.of("message", inputToUse, "response", response, "sessionId", sessionIdStr));
     }
 
-    // 输出护栏
-    if (guardrailChain != null) {
-      var guardrails = instance.getDefinition().getGuardrails();
-      if (guardrails != null && guardrails.getOutputGuardrailIds() != null
-          && !guardrails.getOutputGuardrailIds().isEmpty()) {
-        GuardrailResult outputResult = guardrailChain.checkOutput(response,
-            guardrails.getOutputGuardrailIds());
-        if (!outputResult.isPassed()) {
-          return "[Guardrail] " + (outputResult.getReason() != null ? outputResult.getReason()
-              : "Output blocked");
-        }
-        if (outputResult.getSanitizedContent() != null) {
-          response = outputResult.getSanitizedContent();
-        }
-      }
+    GuardrailApplyResult outputGuard = applyOutputGuardrail(instance, response);
+    if (!outputGuard.passed()) {
+      return outputGuard.result();
     }
-    return response;
+    return outputGuard.result();
   }
 
   /**
@@ -449,25 +382,13 @@ public class AgentRegistry {
     }
     instance.recordInvocation();
 
-    String inputToUse = message;
-    if (guardrailChain != null) {
-      var guardrails = instance.getDefinition().getGuardrails();
-      if (guardrails != null && guardrails.getInputGuardrailIds() != null
-          && !guardrails.getInputGuardrailIds().isEmpty()) {
-        GuardrailResult inputResult = guardrailChain.checkInput(message,
-            guardrails.getInputGuardrailIds());
-        if (!inputResult.isPassed()) {
-          throw new IllegalStateException(
-              "[Guardrail] " + (inputResult.getReason() != null ? inputResult.getReason()
-                  : "Input blocked"));
-        }
-        if (inputResult.getSanitizedContent() != null) {
-          inputToUse = inputResult.getSanitizedContent();
-        }
-      }
+    GuardrailApplyResult inputGuard = applyInputGuardrail(instance, message);
+    if (!inputGuard.passed()) {
+      throw new IllegalStateException(inputGuard.result());
     }
+    String inputToUse = inputGuard.result();
 
-    Object memoryId = sessionId != null && !sessionId.isBlank() ? sessionId : "default";
+    Object memoryId = normalizeSessionId(sessionId);
     var definition = instance.getDefinition();
     ModelConfigDefinition baseConfig = modelRegistry.loadConfigById(defaultModelId)
         .orElseThrow(
@@ -507,20 +428,10 @@ public class AgentRegistry {
       ModelProvider embProvider = defModel != null && defModel.getProvider() != null
           ? defModel.getProvider() : ModelProvider.DEEPSEEK;
       contentRetrieverFactory.createContentRetriever(
-              definition.getKnowledgeBaseIds(), embProvider, 5)
+              definition.getKnowledgeBaseIds(), embProvider, RAG_TOP_K)
           .ifPresent(streamBuilder::contentRetriever);
     }
-    String systemPrompt = systemPromptOverride != null && !systemPromptOverride.isBlank()
-        ? systemPromptOverride : definition.getSystemPrompt();
-    if (definition.getSkillIds() != null && !definition.getSkillIds().isEmpty()) {
-      String skillsHint = skillRegistry.formatAvailableSkills(definition.getSkillIds());
-      if (!skillsHint.isEmpty()) {
-        String skillsInstruction = "\n\nYou have access to the following skills:\n" + skillsHint
-            + "\nWhen the user's request relates to one of these skills, activate it first using the `activate_skill` tool before proceeding.";
-        systemPrompt = (systemPrompt != null ? systemPrompt : "") + skillsInstruction;
-      }
-    }
-    systemPrompt = PromptVariableResolver.resolve(systemPrompt, definition.getVariables());
+    String systemPrompt = resolveSystemPromptWithSkills(definition, systemPromptOverride);
     if (systemPrompt != null && !systemPrompt.isBlank()) {
       final String finalPrompt = systemPrompt;
       streamBuilder.systemMessageProvider(memoryId -> finalPrompt);
@@ -542,26 +453,13 @@ public class AgentRegistry {
     }
     instance.recordInvocation();
 
-    // 输入护栏（输出护栏需先缓冲完整响应，流式场景下不执行）
-    String inputToUse = message;
-    if (guardrailChain != null) {
-      var guardrails = instance.getDefinition().getGuardrails();
-      if (guardrails != null && guardrails.getInputGuardrailIds() != null
-          && !guardrails.getInputGuardrailIds().isEmpty()) {
-        GuardrailResult inputResult = guardrailChain.checkInput(message,
-            guardrails.getInputGuardrailIds());
-        if (!inputResult.isPassed()) {
-          throw new IllegalStateException(
-              "[Guardrail] " + (inputResult.getReason() != null ? inputResult.getReason()
-                  : "Input blocked"));
-        }
-        if (inputResult.getSanitizedContent() != null) {
-          inputToUse = inputResult.getSanitizedContent();
-        }
-      }
+    GuardrailApplyResult inputGuard = applyInputGuardrail(instance, message);
+    if (!inputGuard.passed()) {
+      throw new IllegalStateException(inputGuard.result());
     }
+    String inputToUse = inputGuard.result();
 
-    Object memoryId = sessionId != null && !sessionId.isBlank() ? sessionId : "default";
+    Object memoryId = normalizeSessionId(sessionId);
     AgentStreamingChatService service = (AgentStreamingChatService) instance.getStreamingServiceProxy();
     return service.chatStream(memoryId, inputToUse);
   }
@@ -618,5 +516,71 @@ public class AgentRegistry {
       log.error("Workflow execution failed for workflowId {}: {}", workflowId, e.getMessage(), e);
       return null;
     }
+  }
+
+  private static String normalizeSessionId(String sessionId) {
+    return sessionId != null && !sessionId.isBlank() ? sessionId : SESSION_DEFAULT;
+  }
+
+  private static String getWorkflowMode(AgentDefinition definition) {
+    var trigger = definition.getWorkflowTrigger();
+    return trigger != null && trigger.getMode() != null ? trigger.getMode() : WORKFLOW_MODE_AFTER;
+  }
+
+  private static <T> T orDefault(T override, T base, T defaultValue) {
+    return override != null ? override : (base != null ? base : defaultValue);
+  }
+
+  private GuardrailApplyResult applyInputGuardrail(AgentInstance instance, String message) {
+    if (guardrailChain == null) {
+      return new GuardrailApplyResult(true, message);
+    }
+    var guardrails = instance.getDefinition().getGuardrails();
+    if (guardrails == null || guardrails.getInputGuardrailIds() == null
+        || guardrails.getInputGuardrailIds().isEmpty()) {
+      return new GuardrailApplyResult(true, message);
+    }
+    GuardrailResult r = guardrailChain.checkInput(message, guardrails.getInputGuardrailIds());
+    if (!r.isPassed()) {
+      return new GuardrailApplyResult(false,
+          GUARDRAIL_PREFIX + (r.getReason() != null ? r.getReason() : "Input blocked"));
+    }
+    return new GuardrailApplyResult(true,
+        r.getSanitizedContent() != null ? r.getSanitizedContent() : message);
+  }
+
+  private GuardrailApplyResult applyOutputGuardrail(AgentInstance instance, String response) {
+    if (guardrailChain == null) {
+      return new GuardrailApplyResult(true, response);
+    }
+    var guardrails = instance.getDefinition().getGuardrails();
+    if (guardrails == null || guardrails.getOutputGuardrailIds() == null
+        || guardrails.getOutputGuardrailIds().isEmpty()) {
+      return new GuardrailApplyResult(true, response);
+    }
+    GuardrailResult r = guardrailChain.checkOutput(response, guardrails.getOutputGuardrailIds());
+    if (!r.isPassed()) {
+      return new GuardrailApplyResult(false,
+          GUARDRAIL_PREFIX + (r.getReason() != null ? r.getReason() : "Output blocked"));
+    }
+    return new GuardrailApplyResult(true,
+        r.getSanitizedContent() != null ? r.getSanitizedContent() : response);
+  }
+
+  /**
+   * 解析系统提示词（含技能指令），用于同步/流式服务构建
+   */
+  private String resolveSystemPromptWithSkills(AgentDefinition definition, String systemPromptOverride) {
+    String systemPrompt = systemPromptOverride != null && !systemPromptOverride.isBlank()
+        ? systemPromptOverride : definition.getSystemPrompt();
+    if (definition.getSkillIds() != null && !definition.getSkillIds().isEmpty()) {
+      String skillsHint = skillRegistry.formatAvailableSkills(definition.getSkillIds());
+      if (!skillsHint.isEmpty()) {
+        String skillsInstruction = "\n\nYou have access to the following skills:\n" + skillsHint
+            + "\nWhen the user's request relates to one of these skills, activate it first using the `activate_skill` tool before proceeding.";
+        systemPrompt = (systemPrompt != null ? systemPrompt : "") + skillsInstruction;
+      }
+    }
+    return PromptVariableResolver.resolve(systemPrompt, definition.getVariables());
   }
 }
