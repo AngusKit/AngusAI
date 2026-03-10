@@ -366,7 +366,7 @@ export const useModelManagement = (): UseModelManagementReturn => {
       return;
     }
 
-    if (!editFormData.name.trim() || !editFormData.provider) {
+    if (!editFormData.name.trim() || !editFormData.provider || !editFormData.type) {
       toast.error(t('models.validation.requiredFields'));
       return;
     }

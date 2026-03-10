@@ -76,34 +76,32 @@ export function ModelFormFields({
         </div>
 
         <div className='grid grid-cols-2 gap-3'>
-          {!isEdit && (
-            <div className='space-y-2'>
-              <Label htmlFor='model-type' className='dark:text-gray-300'>
-                {t('models.formFields.modelType')} <span className='text-red-500'>*</span>
-              </Label>
-              <Select
-                value={formData.type}
-                onValueChange={value => updateField('type', value as ModelTypeEnum)}
-              >
-                <SelectTrigger id='model-type' className='dark:bg-gray-700 dark:border-gray-600'>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
-                  {modelTypeOptions.map(option => {
-                    const Icon = option.icon;
-                    return (
-                      <SelectItem key={option.value} value={option.value} className='dark:text-gray-300'>
-                        <div className='flex items-center gap-2'>
-                          <Icon className='w-4 h-4' />
-                          {option.label}
-                        </div>
-                      </SelectItem>
-                    );
-                  })}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
+          <div className='space-y-2'>
+            <Label htmlFor={isEdit ? 'edit-model-type' : 'model-type'} className='dark:text-gray-300'>
+              {t('models.formFields.modelType')} <span className='text-red-500'>*</span>
+            </Label>
+            <Select
+              value={formData.type}
+              onValueChange={value => updateField('type', value as ModelTypeEnum)}
+            >
+              <SelectTrigger id={isEdit ? 'edit-model-type' : 'model-type'} className='dark:bg-gray-700 dark:border-gray-600'>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
+                {modelTypeOptions.map(option => {
+                  const Icon = option.icon;
+                  return (
+                    <SelectItem key={option.value} value={option.value} className='dark:text-gray-300'>
+                      <div className='flex items-center gap-2'>
+                        <Icon className='w-4 h-4' />
+                        {option.label}
+                      </div>
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+          </div>
 
           <div className='space-y-2'>
             <Label htmlFor={isEdit ? 'edit-model-provider' : 'model-provider'} className='dark:text-gray-300'>

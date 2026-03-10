@@ -352,6 +352,10 @@ export function ModelManagement() {
                               <span className='dark:text-white'>{model.provider}</span>
                             </div>
                             <div className='flex items-center justify-between'>
+                              <span className='text-gray-500 dark:text-gray-400'>{t('models.table.type')}</span>
+                              <span className='dark:text-white'>{model.type}</span>
+                            </div>
+                            <div className='flex items-center justify-between'>
                               <span className='text-gray-500 dark:text-gray-400'>{t('models.table.latency')}</span>
                               <span className='dark:text-white'>{model.performance.latency}</span>
                             </div>
@@ -450,8 +454,8 @@ export function ModelManagement() {
                     <thead className='bg-gray-50 dark:bg-gray-900'>
                       <tr>
                         <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>{t('models.table.model')}</th>
-                        <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>{t('models.table.type')}</th>
                         <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>{t('models.table.status')}</th>
+                        <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>{t('models.table.type')}</th>
                         <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>{t('models.table.performance')}</th>
                         <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>{t('models.table.callsCost')}</th>
                         <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>{t('models.table.actions')}</th>
@@ -477,10 +481,10 @@ export function ModelManagement() {
                                 </div>
                               </div>
                             </td>
-                            <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{model.type}</td>
                             <td className='px-6 py-4'>
                               <Badge className={`text-xs ${model.statusColor} border-0`}>{model.status}</Badge>
                             </td>
+                            <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{model.type}</td>
                             <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>
                               <div>{model.performance.latency}</div>
                               <div className='text-xs'>{model.performance.accuracy}</div>

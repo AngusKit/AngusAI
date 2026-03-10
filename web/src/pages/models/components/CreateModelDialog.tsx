@@ -47,7 +47,7 @@ export function CreateModelDialog({
     await onSubmit();
   };
 
-  const isFormValid = formData.name.trim() && formData.provider;
+  const isFormValid = formData.name.trim() && formData.provider && formData.type;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
