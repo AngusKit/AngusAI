@@ -1,6 +1,7 @@
 import { Bot, Search, Filter, Grid3x3, List, Edit, Trash2, MoreHorizontal, Play, Pause, Plus, Cpu, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -90,12 +91,57 @@ export function AgentManagement() {
         </div>
       </div>
 
-      {/* 加载中 */}
+      {/* 加载中：Skeleton 骨架屏 */}
       {agentsLoading ? (
-        <Card className="p-12 text-center dark:bg-gray-800 dark:border-gray-700">
-          <Bot className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg mb-2 dark:text-white">加载中...</h3>
-        </Card>
+        viewMode === 'grid' ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <Card key={i} className="p-5 dark:bg-gray-800 dark:border-gray-700">
+                <div className="flex items-start justify-between mb-2">
+                  <Skeleton className="w-8 h-8 rounded-lg dark:bg-gray-700" />
+                  <Skeleton className="w-8 h-8 rounded-lg dark:bg-gray-700" />
+                </div>
+                <div className="flex items-start gap-3">
+                  <Skeleton className="w-12 h-12 rounded-lg dark:bg-gray-700 shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-5 w-24 dark:bg-gray-700" />
+                    <Skeleton className="h-4 w-16 dark:bg-gray-700" />
+                  </div>
+                </div>
+                <Skeleton className="h-4 w-full mt-3 mb-2 dark:bg-gray-700" />
+                <Skeleton className="h-4 w-3/4 mb-3 dark:bg-gray-700" />
+                <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-700">
+                  <Skeleton className="h-4 w-20 dark:bg-gray-700" />
+                  <Skeleton className="h-4 w-16 dark:bg-gray-700" />
+                </div>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div
+                key={i}
+                className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3"
+              >
+                <div className="flex items-center gap-4">
+                  <Skeleton className="w-10 h-10 rounded-lg dark:bg-gray-700 shrink-0" />
+                  <div className="flex-1 space-y-2 min-w-0">
+                    <Skeleton className="h-4 w-32 dark:bg-gray-700" />
+                    <Skeleton className="h-3 w-full dark:bg-gray-700" />
+                  </div>
+                  <div className="flex items-center gap-4 shrink-0">
+                    <Skeleton className="h-4 w-20 dark:bg-gray-700" />
+                    <Skeleton className="h-4 w-24 dark:bg-gray-700" />
+                    <Skeleton className="h-5 w-14 dark:bg-gray-700" />
+                    <Skeleton className="h-8 w-8 rounded dark:bg-gray-700" />
+                    <Skeleton className="h-8 w-8 rounded dark:bg-gray-700" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )
       ) : agents.length === 0 ? (
         /* 空状态 */
         <Card className="py-16 px-8 text-center dark:bg-gray-800 dark:border-gray-700 border-2 border-dashed border-gray-200 dark:border-gray-600">
