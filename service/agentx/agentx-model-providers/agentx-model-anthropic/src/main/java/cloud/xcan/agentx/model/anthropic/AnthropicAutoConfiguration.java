@@ -36,6 +36,9 @@ public class AnthropicAutoConfiguration {
           .modelName(config.getModelName())
           .temperature(config.getTemperature())
           .maxTokens(config.getMaxTokens() != null ? config.getMaxTokens() : 4096);
+      if (config.getTopP() != null) {
+        builder.topP(config.getTopP());
+      }
       if (config.getTimeoutSeconds() != null && config.getTimeoutSeconds() > 0) {
         builder.timeout(Duration.ofSeconds(config.getTimeoutSeconds()));
       }
@@ -50,6 +53,9 @@ public class AnthropicAutoConfiguration {
           .modelName(config.getModelName())
           .temperature(config.getTemperature())
           .maxTokens(config.getMaxTokens() != null ? config.getMaxTokens() : 4096);
+      if (config.getTopP() != null) {
+        streamBuilder.topP(config.getTopP());
+      }
       if (config.getTimeoutSeconds() != null && config.getTimeoutSeconds() > 0) {
         streamBuilder.timeout(Duration.ofSeconds(config.getTimeoutSeconds()));
       }

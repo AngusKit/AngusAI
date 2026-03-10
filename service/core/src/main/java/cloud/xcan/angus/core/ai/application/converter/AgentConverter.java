@@ -85,18 +85,18 @@ public class AgentConverter {
         .build();
   }
 
-  public static ChatConfigOverride toChatConfigOverride(AgentChatConfig dto) {
-    if (dto == null) {
+  public static ChatConfigOverride toChatConfigOverride(AgentChatConfig config) {
+    if (config == null) {
       return null;
     }
     return ChatConfigOverride.builder()
-        .temperature(dto.getTemperature())
-        .maxTokens(dto.getMaxTokens())
-        .topP(dto.getTopP())
-        .frequencyPenalty(dto.getFrequencyPenalty())
-        .presencePenalty(dto.getPresencePenalty())
-        .systemPrompt(dto.getSystemPrompt())
-        .timeoutMs(dto.getTimeoutMs())
+        .temperature(config.getTemperature())
+        .maxTokens(config.getMaxTokens())
+        .topP(config.getTopP())
+        .frequencyPenalty(config.getFrequencyPenalty())
+        .presencePenalty(config.getPresencePenalty())
+        .systemPrompt(config.getSystemPrompt())
+        .timeoutMs(config.getTimeoutMs())
         .build();
   }
 

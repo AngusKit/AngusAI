@@ -20,7 +20,6 @@ import cloud.xcan.angus.core.ai.domain.Constants;
 @Data
 public class AgentChatConfig implements Serializable {
 
-
   @Schema(description = "温度参数 0-2，控制随机性", example = "0.7")
   @Range(min = 0, max = 2)
   private Double temperature;

@@ -37,6 +37,9 @@ public class OllamaAutoConfiguration {
           .baseUrl(baseUrl)
           .modelName(config.getModelName())
           .temperature(config.getTemperature());
+      if (config.getTopP() != null) {
+        builder.topP(config.getTopP());
+      }
       if (config.getTimeoutSeconds() != null && config.getTimeoutSeconds() > 0) {
         builder.timeout(Duration.ofSeconds(config.getTimeoutSeconds()));
       }
@@ -51,6 +54,9 @@ public class OllamaAutoConfiguration {
           .baseUrl(baseUrl)
           .modelName(config.getModelName())
           .temperature(config.getTemperature());
+      if (config.getTopP() != null) {
+        streamBuilder.topP(config.getTopP());
+      }
       if (config.getTimeoutSeconds() != null && config.getTimeoutSeconds() > 0) {
         streamBuilder.timeout(Duration.ofSeconds(config.getTimeoutSeconds()));
       }

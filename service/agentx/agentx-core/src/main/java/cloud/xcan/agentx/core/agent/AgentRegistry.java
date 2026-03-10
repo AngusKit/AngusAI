@@ -307,18 +307,12 @@ public class AgentRegistry {
     } else if (base.getTimeoutSeconds() != null) {
       b.timeoutSeconds(base.getTimeoutSeconds());
     }
-    Map<String, Object> extra = base.getExtraProperties() != null
-        ? new HashMap<>(base.getExtraProperties()) : new HashMap<>();
-    if (override.getTopP() != null) {
-      extra.put("topP", override.getTopP());
-    }
-    if (override.getFrequencyPenalty() != null) {
-      extra.put("frequencyPenalty", override.getFrequencyPenalty());
-    }
-    if (override.getPresencePenalty() != null) {
-      extra.put("presencePenalty", override.getPresencePenalty());
-    }
-    b.extraProperties(extra);
+    b.topP(override.getTopP() != null ? override.getTopP() : base.getTopP());
+    b.frequencyPenalty(override.getFrequencyPenalty() != null ? override.getFrequencyPenalty()
+        : base.getFrequencyPenalty());
+    b.presencePenalty(override.getPresencePenalty() != null ? override.getPresencePenalty()
+        : base.getPresencePenalty());
+    b.extraProperties(base.getExtraProperties());
     return b.build();
   }
 

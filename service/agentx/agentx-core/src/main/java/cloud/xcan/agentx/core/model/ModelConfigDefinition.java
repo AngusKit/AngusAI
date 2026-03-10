@@ -44,6 +44,15 @@ public class ModelConfigDefinition {
   @Builder.Default
   private Integer maxTokens = 4096;
 
+  @Schema(description = "Top-p 采样 0-1", example = "0.9")
+  private Double topP;
+
+  @Schema(description = "频率惩罚 0-2", example = "0.0")
+  private Double frequencyPenalty;
+
+  @Schema(description = "存在惩罚 0-2", example = "0.0")
+  private Double presencePenalty;
+
   @Schema(description = "请求超时（秒），模型级默认，请求级可覆盖", example = "60")
   private Integer timeoutSeconds;
 
