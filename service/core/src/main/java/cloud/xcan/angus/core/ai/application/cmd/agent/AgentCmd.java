@@ -25,4 +25,9 @@ public interface AgentCmd {
    */
   void delete(Long id);
 
+  /**
+   * 确保智能体已注册到 AgentRegistry，未注册则先注册
+   */
+  void ensureRegistered(Agent agent);
+
 }

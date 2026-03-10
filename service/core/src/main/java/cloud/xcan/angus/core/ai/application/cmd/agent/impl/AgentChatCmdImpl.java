@@ -6,6 +6,7 @@ import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_CHAT_SSE_TIMEOUT_M
 import cloud.xcan.agentx.core.agent.AgentRegistry;
 import cloud.xcan.agentx.core.agent.ChatConfigOverride;
 import cloud.xcan.angus.core.ai.application.cmd.agent.AgentChatCmd;
+import cloud.xcan.angus.core.ai.application.cmd.agent.AgentCmd;
 import cloud.xcan.angus.core.ai.application.cmd.chat.MessageCmd;
 import cloud.xcan.angus.core.ai.application.cmd.chat.SessionCmd;
 import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
@@ -42,6 +43,9 @@ public class AgentChatCmdImpl implements AgentChatCmd {
    * 流式助手消息占位内容，用于满足 MessageCmd 非空校验，最终由 updateContent 覆盖
    */
   private static final String STREAMING_PLACEHOLDER = ".";
+
+  @Resource
+  private AgentCmd agentCmd;
 
   @Resource
   private AgentQuery agentQuery;
@@ -91,6 +95,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
 
       @Override
       protected AgentChatResult process() {
+        agentCmd.ensureRegistered(agent);
         // 有会话时先落库用户消息
         messageCmd.create0(session, MessageRole.USER, message);
 
@@ -143,6 +148,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
 
       @Override
       protected SseEmitter process() {
+        agentCmd.ensureRegistered(agent);
         // 落库用户消息
         messageCmd.create0(session, MessageRole.USER, message);
 
@@ -155,7 +161,6 @@ public class AgentChatCmdImpl implements AgentChatCmd {
         ChatConfigOverride override = getChatConfigOverride(agent, config, session,
             effectiveTimeout);
         String agentIdStr = String.valueOf(agentId);
-        Long assistantMessageId = assistantMessage.getId();
 
         // 异步执行流式调用，通过 SSE 推送 token
         sseEmitterChatExecutor.execute(() -> {
