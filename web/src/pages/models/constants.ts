@@ -3,7 +3,7 @@
  */
 
 import { Brain, Image as ImageIcon, FileText, Cpu, Activity } from 'lucide-react';
-import { ModelTypeEnum, ModelStatusEnum, ModelProviderEnum } from '@/enums/enums';
+import { ModelTypeEnum, ModelStatusEnum } from '@/enums/enums';
 import { getEnumDescription } from '@/enums/utils'
 
 /**

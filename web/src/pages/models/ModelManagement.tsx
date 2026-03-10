@@ -1,648 +1,65 @@
-import { useCallback, useEffect, useMemo, useState, type ElementType } from 'react';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
-import { Database, Search, Filter, TrendingUp, Activity, Grid3x3, List, Eye, Edit, Trash2, MoreHorizontal, Play, Pause, Zap } from 'lucide-react';
+import { Database, Search, Filter, Grid3x3, List, Eye, Edit, Trash2, MoreHorizontal, Play, Pause } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { XcanPagination } from '@/components/ui/pagination';
-import { toast } from 'sonner';
-import { useDebounce } from '@/hooks/useDebounce';
-import ModelsService from '@/services/Models';
-import { GetModelListParamsOrderByEnum, ModelDetailVo, ModelListVo, ModelStatisticsVo, ModelUpdateDto, ModelCreateDto, } from '@/services/ModelsTypes';
-import { ModelProviderEnum, ModelStatusEnum, ModelTypeEnum } from '@/enums/enums';
-import { enumToMessages, getEnumDescription } from '@/enums/utils';
 import { CreateModelDialog } from './components/CreateModelDialog';
 import { EditModelDialog } from './components/EditModelDialog';
-import { MODEL_TYPE_CONFIG, DEFAULT_MODEL_TYPE_CONFIG, MODEL_STATUS_CONFIG, DEFAULT_MODEL_STATUS_CONFIG } from './constants';
-
-interface ModelListItem {
-  id: string;
-  name: string;
-  description: string;
-  type: string;
-  typeEnum?: ModelTypeEnum;
-  icon: ElementType;
-  iconBg: string;
-  iconColor: string;
-  provider: string;
-  providerEnum?: ModelProviderEnum;
-  status: string;
-  statusEnum?: ModelStatusEnum;
-  statusColor: string;
-  performance: {
-    latency: string;
-    throughput: string;
-    accuracy: string;
-  };
-  resources: {
-    cpu: string;
-    memory: string;
-    gpu: string;
-  };
-  calls: string;
-  cost: string;
-  tokens?: string;
-  deployed: string;
-  detail?: ModelDetailVo;
-}
-
-type SortOption = 'default' | 'name' | 'provider' | 'status' | 'createdDate';
-
-const formatNumber = (value?: number | null) => {
-  if (value === null || value === undefined || Number.isNaN(value)) {
-    return '--';
-  }
-  return Number(value).toLocaleString();
-};
-
-const formatCurrency = (value?: number | null, language: string = 'zh-CN') => {
-  if (value === null || value === undefined || Number.isNaN(value)) {
-    return '--';
-  }
-  try {
-    return new Intl.NumberFormat(language === 'zh-CN' ? 'zh-CN' : 'en-US', {
-      style: 'currency',
-      currency: language === 'zh-CN' ? 'CNY' : 'USD',
-      maximumFractionDigits: 2,
-    }).format(value);
-  } catch {
-    return Number(value).toFixed(2);
-  }
-};
-
-const formatLatency = (performance?: ModelDetailVo['performance']) => {
-  if (!performance) {
-    return '--';
-  }
-  if (performance.latency) {
-    return performance.latency;
-  }
-  if (performance.latencyMs !== undefined && performance.latencyMs !== null) {
-    return `${performance.latencyMs}ms`;
-  }
-  return '--';
-};
-
-const formatThroughput = (performance?: ModelDetailVo['performance']) => {
-  if (!performance) {
-    return '--';
-  }
-  if (performance.throughput) {
-    return performance.throughput;
-  }
-  if (performance.throughputRaw !== undefined && performance.throughputRaw !== null) {
-    return `${performance.throughputRaw} req/s`;
-  }
-  return '--';
-};
-
-const formatAccuracy = (performance?: ModelDetailVo['performance']) => {
-  if (!performance) {
-    return '--';
-  }
-  if (performance.accuracy) {
-    return performance.accuracy;
-  }
-  if (performance.accuracyPercent !== undefined && performance.accuracyPercent !== null) {
-    return `${performance.accuracyPercent.toFixed(1)}%`;
-  }
-  return '--';
-};
-
-const mapTypeToConfig = (type?: ModelTypeEnum | string) => {
-  switch (type) {
-    case ModelTypeEnum.CHAT:
-      return MODEL_TYPE_CONFIG[ModelTypeEnum.CHAT];
-    case ModelTypeEnum.IMAGE:
-      return MODEL_TYPE_CONFIG[ModelTypeEnum.IMAGE];
-    case ModelTypeEnum.AUDIO:
-      return MODEL_TYPE_CONFIG[ModelTypeEnum.AUDIO];
-    case ModelTypeEnum.EMBEDDING:
-      return MODEL_TYPE_CONFIG[ModelTypeEnum.EMBEDDING];
-    case ModelTypeEnum.MODERATION:
-      return MODEL_TYPE_CONFIG[ModelTypeEnum.MODERATION];
-    default:
-      return DEFAULT_MODEL_TYPE_CONFIG;
-  }
-};
-
-const mapStatusToConfig = (status?: ModelStatusEnum | string) => {
-  switch (status) {
-    case ModelStatusEnum.ACTIVE:
-      return MODEL_STATUS_CONFIG[ModelStatusEnum.ACTIVE];
-    case ModelStatusEnum.DISABLED:
-      return MODEL_STATUS_CONFIG[ModelStatusEnum.DISABLED];
-    default:
-      return DEFAULT_MODEL_STATUS_CONFIG;
-  }
-};
+import { useModelManagement, type SortOption } from './hooks/useModelManagement';
+import { ModelStatusEnum, ModelTypeEnum } from '@/enums/enums';
+import { PAGINATION_CONFIG } from './constants';
 
 export function ModelManagement() {
-  const { language, t } = useLanguage();
-  const [searchQuery, setSearchQuery] = useState('');
-  const debouncedSearchQuery = useDebounce(searchQuery, 500);
-  const [typeFilter, setTypeFilter] = useState<'all' | ModelTypeEnum>('all');
-  const [statusFilter, setStatusFilter] = useState<'all' | ModelStatusEnum>('all');
-  const [sortBy, setSortBy] = useState<SortOption>('default');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [addModelDialogOpen, setAddModelDialogOpen] = useState(false);
-  const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [selectedModel, setSelectedModel] = useState<ModelListItem | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
+  const { t } = useLanguage();
 
-  const [models, setModels] = useState<ModelListItem[]>([]);
-  const [modelsLoading, setModelsLoading] = useState(false);
-  const [modelsTotal, setModelsTotal] = useState(0);
-  const [stats, setStats] = useState<ModelStatisticsVo | null>(null);
-
-  const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    type: ModelTypeEnum.CHAT,
-    provider: '',
-    apiKey: '',
-    endpoint: '',
-    maxTokens: '',
-    temperature: '0.7',
-  });
-
-  const [editFormData, setEditFormData] = useState({
-    name: '',
-    description: '',
-    type: ModelTypeEnum.CHAT,
-    provider: '',
-    apiKey: '',
-    endpoint: '',
-    maxTokens: '',
-    temperature: '0.7',
-  });
-
-  const providerOptions = enumToMessages(ModelProviderEnum).map(({value, message}) => ({
-    value,
-    label: message,
-  }));
-
-  const modelTypeOptions = enumToMessages(ModelTypeEnum).map(({value, message}) => {
-    return {
-      value,
-      label: message,
-      icon: mapTypeToConfig(value).icon,
-    }
-  });
-
-  const resolveOrderBy = useCallback((value: SortOption): GetModelListParamsOrderByEnum | undefined => {
-    switch (value) {
-      case 'name':
-        return GetModelListParamsOrderByEnum.Name;
-      case 'provider':
-        return GetModelListParamsOrderByEnum.Provider;
-      case 'status':
-        return GetModelListParamsOrderByEnum.Status;
-      case 'createdDate':
-        return GetModelListParamsOrderByEnum.CreatedDate;
-      default:
-        return undefined;
-    }
-  }, []);
-
-  const statsCards = useMemo(() => {
-    const today = stats?.todayGrowthTrend;
-    const lastMonth = stats?.lastMonthGrowthTrend;
-    const averageLatency = stats?.averageLatencyMs;
-
-    const totalModelsValue = formatNumber(stats?.totalModels);
-    const totalCostValue = stats?.totalCost !== undefined ? formatCurrency(stats?.totalCost, language) : '--';
-    const totalCallsValue = formatNumber(stats?.totalCalls);
-    const latencyValue = averageLatency !== undefined && averageLatency !== null ? `${averageLatency}ms` : '--';
-
-    return [
-      {
-        key: 'totalModels',
-        label: t('models.stats.totalModels'),
-        value: totalModelsValue,
-        subtext:
-          today?.addedModels !== undefined
-            ? t('models.stats.addedToday', { value: formatNumber(today.addedModels) })
-            : t('models.stats.noDailyData'),
-        icon: Database,
-        iconBg: 'bg-blue-500',
-        trend: lastMonth?.addedModels !== undefined ? `+${formatNumber(lastMonth.addedModels)}` : undefined,
-        trendUp: (lastMonth?.addedModels ?? 0) >= 0,
-      },
-      {
-        key: 'totalCost',
-        label: t('models.stats.totalCost'),
-        value: totalCostValue,
-        subtext:
-          today?.addedCost !== undefined
-            ? t('models.stats.addedToday', { value: formatCurrency(today.addedCost, language) })
-            : t('models.stats.noDailyData'),
-        icon: Activity,
-        iconBg: 'bg-green-500',
-        trend: lastMonth?.addedCost !== undefined ? `+${formatCurrency(lastMonth.addedCost, language)}` : undefined,
-        trendUp: (lastMonth?.addedCost ?? 0) >= 0,
-      },
-      {
-        key: 'totalCalls',
-        label: t('models.stats.totalCalls'),
-        value: totalCallsValue,
-        subtext:
-          today?.addedCalls !== undefined
-            ? t('models.stats.addedToday', { value: formatNumber(today.addedCalls) })
-            : t('models.stats.noDailyData'),
-        icon: TrendingUp,
-        iconBg: 'bg-orange-500',
-        trend: lastMonth?.addedCalls !== undefined ? `+${formatNumber(lastMonth.addedCalls)}` : undefined,
-        trendUp: (lastMonth?.addedCalls ?? 0) >= 0,
-      },
-      {
-        key: 'latency',
-        label: t('models.stats.avgLatency'),
-        value: latencyValue,
-        subtext:
-          today?.latencyDecreaseFromYesterdayMs !== undefined
-            ? t('models.stats.improvedVsYesterday', { value: today.latencyDecreaseFromYesterdayMs })
-            : t('models.stats.noData'),
-        icon: Zap,
-        iconBg: 'bg-purple-500',
-        trend:
-          today?.latencyDecreaseFromYesterdayMs !== undefined
-            ? `-${today.latencyDecreaseFromYesterdayMs}ms`
-            : undefined,
-        trendUp: true,
-      },
-    ];
-  }, [language, stats, t]);
-
-  const buildModelItem = useCallback(
-    (item: ModelListVo, detail?: ModelDetailVo): ModelListItem | null => {
-      const id = item.id !== undefined && item.id !== null ? String(item.id) : '';
-      if (!id) {
-        return null;
-      }
-
-      const typeConfig = mapTypeToConfig(item.type);
-      const statusConfig = mapStatusToConfig(item.status);
-      const providerLabel = getEnumDescription(ModelProviderEnum, item.provider ?? detail?.provider ?? '');
-      const detailStats = detail?.stats;
-      const performance = detail?.performance;
-      const tokens = detailStats?.totalTokensConsumed ?? detailStats?.totalTokens;
-      const createdDate = detail?.createdDate ?? item.createdDate;
-      let deployed = '--';
-      if (createdDate) {
-        const date = new Date(createdDate);
-        if (!Number.isNaN(date.getTime())) {
-          deployed = date.toLocaleDateString(language === 'zh-CN' ? 'zh-CN' : 'en-US');
-        }
-      }
-
-      return {
-        id,
-        name: item.name ?? detail?.name ?? '--',
-        description: item.description ?? detail?.description ?? '--',
-        type: typeConfig.label,
-        typeEnum: item.type as ModelTypeEnum | undefined,
-        icon: typeConfig.icon,
-        iconBg: typeConfig.iconBg,
-        iconColor: typeConfig.iconColor,
-        provider: providerLabel,
-        providerEnum: item.provider as ModelProviderEnum | undefined,
-        status: statusConfig.label,
-        statusEnum: item.status as ModelStatusEnum | undefined,
-        statusColor: statusConfig.color,
-        performance: {
-          latency: formatLatency(performance),
-          throughput: formatThroughput(performance),
-          accuracy: formatAccuracy(performance),
-        },
-        resources: {
-          cpu: '--',
-          memory: '--',
-          gpu: '--',
-        },
-        calls: formatNumber(detailStats?.totalCalls),
-        cost: detailStats?.totalCost !== undefined ? formatCurrency(detailStats.totalCost, language) : '--',
-        tokens: tokens !== undefined ? formatNumber(tokens) : undefined,
-        deployed,
-        detail,
-      };
-    },
-    [language]
-  );
-
-  const loadStatistics = useCallback(async () => {
-    try {
-      const response = await ModelsService.getModelStatistics();
-      const responseData = (response as any)?.data;
-      setStats(responseData ?? null);
-    } catch (error: any) {
-      console.error('Failed to load model statistics:', error);
-      toast.error(error?.message || t('models.messages.loadStatisticsFailed'));
-    }
-  }, [t]);
-
-  const loadModels = useCallback(async () => {
-    setModelsLoading(true);
-    try {
-      const response = await ModelsService.getModelList({
-        keyword: debouncedSearchQuery.trim() || undefined,
-        pageNo: currentPage,
-        pageSize: itemsPerPage,
-        type: typeFilter === 'all' ? undefined : typeFilter,
-        status: statusFilter === 'all' ? undefined : statusFilter,
-        orderBy: resolveOrderBy(sortBy),
-      });
-
-      const responseData = (response as any).data;
-      let listData: ModelListVo[] | undefined;
-      if (responseData) {
-        listData = responseData.list;
-      }
-
-      setModelsTotal(responseData?.total ?? listData?.length ?? 0);
-
-      const normalized = await Promise.all(
-        (listData ?? []).map(async item => {
-          const itemId = item.id !== undefined && item.id !== null ? String(item.id) : '';
-          let detail: ModelDetailVo | undefined;
-          if (itemId) {
-            try {
-              const detailResponse = await ModelsService.getModelDetail(itemId);
-              detail = (detailResponse as any)?.data;
-            } catch (detailError) {
-              console.error('Failed to load model detail:', detailError);
-            }
-          }
-          return buildModelItem(item, detail);
-        })
-      );
-
-      setModels(normalized.filter(Boolean) as ModelListItem[]);
-    } catch (error: any) {
-      console.error('Failed to load models:', error);
-      toast.error(error?.message || t('models.messages.loadModelsFailed'));
-    } finally {
-      setModelsLoading(false);
-    }
-  }, [
-    buildModelItem,
+  const {
+    models,
+    modelsLoading,
+    modelsTotal,
     currentPage,
-    debouncedSearchQuery,
-    itemsPerPage,
-    resolveOrderBy,
-    sortBy,
-    statusFilter,
+    searchQuery,
     typeFilter,
-    t,
-  ]);
+    statusFilter,
+    sortBy,
+    viewMode,
+    addModelDialogOpen,
+    detailsDialogOpen,
+    editDialogOpen,
+    selectedModel,
+    formData,
+    editFormData,
+    providerOptions,
+    setCurrentPage,
+    setSearchQuery,
+    setTypeFilter,
+    setStatusFilter,
+    setSortBy,
+    setViewMode,
+    setAddModelDialogOpen,
+    setDetailsDialogOpen,
+    setEditDialogOpen,
+    handleToggleStatus,
+    handleViewDetails,
+    handleOpenEdit,
+    handleSaveEdit,
+    handleDeleteModel,
+    handleAddModel,
+    handleFormDataChange,
+    handleEditFormDataChange,
+    resetForm,
+    resetEditForm,
+    statsCards,
+    shouldShowPagination,
+    modelTypeOptions,
+  } = useModelManagement();
 
-  useEffect(() => {
-    loadStatistics();
-  }, [loadStatistics]);
-
-  useEffect(() => {
-    loadModels();
-  }, [loadModels]);
-
-  const shouldShowPagination = useMemo(() => {
-    return modelsTotal > itemsPerPage;
-  }, [modelsTotal, itemsPerPage]);
-
-  const fetchModelDetail = useCallback(async (modelId: string) => {
-    try {
-      const response = await ModelsService.getModelDetail(modelId);
-      return (response as any)?.data as ModelDetailVo | undefined;
-    } catch (error: any) {
-      console.error('Failed to fetch model detail:', error);
-      throw error;
-    }
-  }, []);
-
-  const handleToggleStatus = useCallback(
-    async (model: ModelListItem) => {
-      if (!model.id || !model.statusEnum) {
-        return;
-      }
-
-      const newStatus = model.statusEnum === ModelStatusEnum.ACTIVE ? ModelStatusEnum.DISABLED : ModelStatusEnum.ACTIVE;
-      try {
-        await ModelsService.updateModelStatus(model.id, { status: newStatus });
-        toast.success(newStatus === ModelStatusEnum.ACTIVE ? t('models.messages.modelActivated', { name: model.name }) : t('models.messages.modelDisabled', { name: model.name }));
-        const statusConfig = mapStatusToConfig(newStatus);
-        setModels(prev =>
-          prev.map(item =>
-            item.id === model.id ? { ...item, statusEnum: newStatus, status: statusConfig.label, statusColor: statusConfig.color } : item
-          )
-        );
-        setSelectedModel(prev =>
-          prev && prev.id === model.id ? { ...prev, statusEnum: newStatus, status: statusConfig.label, statusColor: statusConfig.color } : prev
-        );
-      } catch (error: any) {
-        console.error('Failed to toggle model status:', error);
-        toast.error(error?.message || t('models.messages.updateStatusFailed'));
-      }
-    },
-    [t]
-  );
-
-  const handleViewDetails = useCallback(
-    async (model: ModelListItem) => {
-      setSelectedModel(model);
-      setDetailsDialogOpen(true);
-
-      if (model.detail) {
-        return;
-      }
-
-      try {
-        const detail = await fetchModelDetail(model.id);
-        if (detail) {
-          setModels(prev => prev.map(item => (item.id === model.id ? { ...item, detail } : item)));
-          setSelectedModel(prev => (prev && prev.id === model.id ? { ...prev, detail } : prev));
-        }
-      } catch (error: any) {
-        toast.error(error?.message || t('models.messages.getDetailFailed'));
-      }
-    },
-    [fetchModelDetail, t]
-  );
-
-  const handleOpenEdit = useCallback(
-    async (model: ModelListItem) => {
-      setSelectedModel(model);
-      let detail = model.detail;
-
-      if (!detail) {
-        try {
-          detail = await fetchModelDetail(model.id);
-          if (detail) {
-            setModels(prev => prev.map(item => (item.id === model.id ? { ...item, detail } : item)));
-            setSelectedModel(prev => (prev && prev.id === model.id ? { ...prev, detail } : prev));
-          }
-        } catch (error: any) {
-          toast.error(error?.message || t('models.messages.getDetailFailed'));
-          return;
-        }
-      }
-      const providerValue = detail?.provider ?? model.providerEnum ?? ModelProviderEnum.OTHER;
-
-      setEditFormData({
-        name: detail?.name ?? model.name ?? '',
-        description: detail?.description ?? model.description ?? '',
-        type: detail?.type ?? model.typeEnum ?? ModelTypeEnum.CHAT,
-        provider: providerValue,
-        apiKey: detail?.config?.apiKey ?? '',
-        endpoint: detail?.config?.baseUrl ?? '',
-        maxTokens: detail?.config?.maxTokens !== undefined ? String(detail.config.maxTokens) : '',
-        temperature: detail?.config?.temperature !== undefined ? String(detail.config.temperature) : '0.7',
-      });
-      setEditDialogOpen(true);
-    },
-    [fetchModelDetail]
-  );
-
-  const handleSaveEdit = useCallback(async () => {
-    if (!selectedModel) {
-      toast.error(t('models.messages.noModelSelected'));
-      return;
-    }
-
-    if (!editFormData.name.trim() || !editFormData.provider) {
-      toast.error(t('models.validation.requiredFields'));
-      return;
-    }
-
-    const parsedMaxTokens = editFormData.maxTokens ? parseInt(editFormData.maxTokens, 10) : undefined;
-    const maxTokens = Number.isFinite(parsedMaxTokens ?? 0) ? parsedMaxTokens : undefined;
-    const parsedTemperature = editFormData.temperature ? parseFloat(editFormData.temperature) : undefined;
-    const temperature = Number.isFinite(parsedTemperature ?? 0) ? parsedTemperature : undefined;
-
-    const payload: ModelUpdateDto = {
-      name: editFormData.name.trim(),
-      description: editFormData.description.trim() || undefined,
-      provider: editFormData.provider as ModelProviderEnum,
-      type: editFormData.type,
-      baseUrl: editFormData.endpoint.trim() || undefined,
-      apiKey: editFormData.apiKey.trim() || undefined,
-      maxTokens,
-      temperature,
-    };
-
-    try {
-      await ModelsService.updateModel(selectedModel.id, payload);
-      toast.success(t('models.messages.updateSuccess', { name: editFormData.name }));
-      setEditDialogOpen(false);
-      await loadModels();
-      await loadStatistics();
-    } catch (error: any) {
-      console.error('Failed to update model:', error);
-      toast.error(error?.message || t('models.messages.updateFailed'));
-    }
-  }, [editFormData, loadModels, loadStatistics, selectedModel, t]);
-
-  const handleDeleteModel = useCallback(
-    async (model: ModelListItem) => {
-      if (!model.id) {
-        return;
-      }
-      try {
-        await ModelsService.deleteModel(model.id);
-        toast.success(t('models.messages.deleteSuccess', { name: model.name }));
-        await loadModels();
-        await loadStatistics();
-      } catch (error: any) {
-        console.error('Failed to delete model:', error);
-        toast.error(error?.message || t('models.messages.deleteFailed'));
-      }
-    },
-    [loadModels, loadStatistics, t]
-  );
-
-  const handleAddModel = useCallback(async () => {
-    if (!formData.name.trim() || !formData.provider) {
-      toast.error(t('models.validation.requiredFields'));
-      return;
-    }
-
-    const parsedMaxTokens = formData.maxTokens ? parseInt(formData.maxTokens, 10) : undefined;
-    const maxTokens = Number.isFinite(parsedMaxTokens ?? 0) ? parsedMaxTokens : undefined;
-    const parsedTemperature = formData.temperature ? parseFloat(formData.temperature) : undefined;
-    const temperature = Number.isFinite(parsedTemperature ?? 0) ? parsedTemperature : undefined;
-
-    const payload: ModelCreateDto = {
-      name: formData.name.trim(),
-      description: formData.description.trim() || formData.name.trim(),
-      type: formData.type,
-      provider: formData.provider as ModelProviderEnum,
-      baseUrl: formData.endpoint.trim() || undefined,
-      apiKey: formData.apiKey.trim() || undefined,
-      maxTokens,
-      temperature,
-    };
-
-    try {
-      await ModelsService.createModel(payload);
-      toast.success(t('models.messages.createSuccess', { name: formData.name }));
-      setAddModelDialogOpen(false);
-      setFormData({
-        name: '',
-        description: '',
-        type: ModelTypeEnum.CHAT,
-        provider: '',
-        apiKey: '',
-        endpoint: '',
-        maxTokens: '',
-        temperature: '0.7',
-      });
-      setCurrentPage(1);
-      await loadModels();
-      await loadStatistics();
-    } catch (error: any) {
-      console.error('Failed to add model:', error);
-      toast.error(error?.message || t('models.messages.createFailed'));
-    }
-  }, [formData, loadModels, loadStatistics, t]);
-
-  const handleFormDataChange = (data: Partial<typeof formData>) => {
-    setFormData(prev => ({ ...prev, ...data }));
-  };
-
-  const handleEditFormDataChange = (data: Partial<typeof editFormData>) => {
-    setEditFormData(prev => ({ ...prev, ...data }));
-  };
-
-  const resetForm = () => {
-    setFormData({
-      name: '',
-      description: '',
-      type: ModelTypeEnum.CHAT,
-      provider: '',
-      apiKey: '',
-      endpoint: '',
-      maxTokens: '',
-      temperature: '0.7',
-    });
-  };
-
-  const resetEditForm = () => {
-    setEditFormData({
-      name: '',
-      description: '',
-      type: ModelTypeEnum.CHAT,
-      provider: '',
-      apiKey: '',
-      endpoint: '',
-      maxTokens: '',
-      temperature: '0.7',
-    });
-  };
+  const itemsPerPage = PAGINATION_CONFIG.DEFAULT_PAGE_SIZE;
 
   return (
     <div className='space-y-6'>
@@ -1143,7 +560,10 @@ export function ModelManagement() {
                 <div
                   className={`${selectedModel.iconBg} w-16 h-16 rounded-lg flex items-center justify-center flex-shrink-0`}
                 >
-                  {selectedModel.icon && <selectedModel.icon className={`w-8 h-8 ${selectedModel.iconColor}`} />}
+                  {(() => {
+                  const Icon = selectedModel.icon;
+                  return Icon ? <Icon className={`w-8 h-8 ${selectedModel.iconColor}`} /> : null;
+                })()}
                 </div>
                 <div className='flex-1'>
                   <h3 className='text-xl mb-1 dark:text-white'>{selectedModel.name}</h3>

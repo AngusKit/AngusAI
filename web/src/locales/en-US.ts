@@ -830,7 +830,7 @@ export const enUS = {
     actions: {
       viewDetails: 'View Details',
       editConfig: 'Edit Configuration',
-      delete: 'Delete',
+      delete: 'Delete Model',
       close: 'Close',
     },
     stats: {

@@ -6,10 +6,10 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { useDebounce } from '@/hooks/useDebounce';
 import ModelsService from '@/services/Models';
-import { GetModelListParamsOrderByEnum, ModelDetailVo, ModelListVo, ModelStatisticsVo } from '@/services/ModelsTypes';
+import { ModelDetailVo, ModelListVo, ModelStatisticsVo, ModelUpdateDto, ModelCreateDto } from '@/services/ModelsTypes';
 import { ModelProviderEnum, ModelStatusEnum, ModelTypeEnum } from '@/enums/enums';
 import { Database, Activity, TrendingUp, Zap } from 'lucide-react';
-import { PAGINATION_CONFIG, SEARCH_DEBOUNCE_MS } from '../constants';
+import { PAGINATION_CONFIG, SEARCH_DEBOUNCE_MS, DEFAULT_FORM_DATA } from '../constants';
 import {
   formatNumber,
   formatCurrency,
@@ -19,12 +19,14 @@ import {
   formatDate,
   getModelTypeConfig,
   getModelStatusConfig,
+  resolveSortOrderBy,
 } from '../utils';
-import { ModelListItem } from '../types.ts';
-import { getEnumDescription } from '@/enums/utils';
+import type { SortOption } from '../utils';
+import { ModelListItem, ModelFormData } from '../types';
+import { enumToMessages, getEnumDescription, isEnumValue } from '@/enums/utils';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
 
-export type SortOption = 'default' | 'name' | 'provider' | 'status' | 'createdDate';
+export type { SortOption } from '../utils';
 
 interface UseModelManagementReturn {
   // State
@@ -38,6 +40,13 @@ interface UseModelManagementReturn {
   statusFilter: 'all' | ModelStatusEnum;
   sortBy: SortOption;
   viewMode: 'grid' | 'list';
+  addModelDialogOpen: boolean;
+  detailsDialogOpen: boolean;
+  editDialogOpen: boolean;
+  selectedModel: ModelListItem | null;
+  formData: ModelFormData;
+  editFormData: ModelFormData;
+  providerOptions: Array<{ value: string; label: string }>;
 
   // Actions
   setCurrentPage: (page: number) => void;
@@ -46,11 +55,24 @@ interface UseModelManagementReturn {
   setStatusFilter: (filter: 'all' | ModelStatusEnum) => void;
   setSortBy: (sort: SortOption) => void;
   setViewMode: (mode: 'grid' | 'list') => void;
+  setAddModelDialogOpen: (open: boolean) => void;
+  setDetailsDialogOpen: (open: boolean) => void;
+  setEditDialogOpen: (open: boolean) => void;
+  setSelectedModel: (model: ModelListItem | null) => void;
 
   // Methods
   loadModels: () => Promise<void>;
   loadStatistics: () => Promise<void>;
   handleToggleStatus: (model: ModelListItem) => Promise<void>;
+  handleViewDetails: (model: ModelListItem) => Promise<void>;
+  handleOpenEdit: (model: ModelListItem) => Promise<void>;
+  handleSaveEdit: () => Promise<void>;
+  handleDeleteModel: (model: ModelListItem) => Promise<void>;
+  handleAddModel: () => Promise<void>;
+  handleFormDataChange: (data: Partial<ModelFormData>) => void;
+  handleEditFormDataChange: (data: Partial<ModelFormData>) => void;
+  resetForm: () => void;
+  resetEditForm: () => void;
   fetchModelDetail: (modelId: string) => Promise<ModelDetailVo | undefined>;
 
   // Computed
@@ -65,6 +87,7 @@ interface UseModelManagementReturn {
     trendUp: boolean;
   }>;
   shouldShowPagination: boolean;
+  modelTypeOptions: Array<{ value: string; label: string; icon: any }>;
 }
 
 export const useModelManagement = (): UseModelManagementReturn => {
@@ -83,21 +106,50 @@ export const useModelManagement = (): UseModelManagementReturn => {
   const [modelsTotal, setModelsTotal] = useState(0);
   const [stats, setStats] = useState<ModelStatisticsVo | null>(null);
 
+  const [addModelDialogOpen, setAddModelDialogOpen] = useState(false);
+  const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedModel, setSelectedModel] = useState<ModelListItem | null>(null);
 
-  const resolveOrderBy = useCallback((value: SortOption): GetModelListParamsOrderByEnum | undefined => {
-    switch (value) {
-      case 'name':
-        return GetModelListParamsOrderByEnum.Name;
-      case 'provider':
-        return GetModelListParamsOrderByEnum.Provider;
-      case 'status':
-        return GetModelListParamsOrderByEnum.Status;
-      case 'createdDate':
-        return GetModelListParamsOrderByEnum.CreatedDate;
-      default:
-        return undefined;
+  const [formData, setFormData] = useState<ModelFormData>({ ...DEFAULT_FORM_DATA });
+  const [editFormData, setEditFormData] = useState<ModelFormData>({ ...DEFAULT_FORM_DATA });
+
+  const [providerOptions, setProviderOptions] = useState<Array<{ value: string; label: string }>>(
+    () => enumToMessages(ModelProviderEnum).map(({ value, message }) => ({ value, label: message }))
+  );
+
+  const loadSupportedProviders = useCallback(async () => {
+    try {
+      const response = await ModelsService.getSupportedProviders();
+      const providers = (response as any)?.data as string[] | undefined;
+      if (providers && Array.isArray(providers) && providers.length > 0) {
+        setProviderOptions(
+          providers.map((p: string) => ({
+            value: p,
+            label: isEnumValue(ModelProviderEnum, p)
+              ? getEnumDescription(ModelProviderEnum, p)
+              : String(p).toLowerCase(),
+          }))
+        );
+      }
+    } catch {
+      // 接口失败时保持使用枚举 fallback
     }
   }, []);
+
+  useEffect(() => {
+    loadSupportedProviders();
+  }, [loadSupportedProviders]);
+
+  const modelTypeOptions = useMemo(
+    () =>
+      enumToMessages(ModelTypeEnum).map(({ value, message }) => ({
+        value,
+        label: message,
+        icon: getModelTypeConfig(value).icon,
+      })),
+    []
+  );
 
   const buildModelListItem = useCallback(
     (item: ModelListVo, detail?: ModelDetailVo): ModelListItem | null => {
@@ -169,7 +221,7 @@ export const useModelManagement = (): UseModelManagementReturn => {
         pageSize: itemsPerPage,
         type: typeFilter === 'all' ? undefined : typeFilter,
         status: statusFilter === 'all' ? undefined : statusFilter,
-        orderBy: resolveOrderBy(sortBy),
+        orderBy: resolveSortOrderBy(sortBy),
       });
 
       const responseData = (response as any).data;
@@ -208,7 +260,6 @@ export const useModelManagement = (): UseModelManagementReturn => {
     currentPage,
     debouncedSearchQuery,
     itemsPerPage,
-    resolveOrderBy,
     sortBy,
     statusFilter,
     typeFilter,
@@ -232,19 +283,191 @@ export const useModelManagement = (): UseModelManagementReturn => {
         return;
       }
 
+      const newStatus = model.statusEnum === ModelStatusEnum.ACTIVE ? ModelStatusEnum.DISABLED : ModelStatusEnum.ACTIVE;
       try {
-        const newStatus = model.statusEnum === ModelStatusEnum.ACTIVE ? ModelStatusEnum.DISABLED : ModelStatusEnum.ACTIVE;
         await ModelsService.updateModelStatus(model.id, { status: newStatus });
         toast.success(newStatus === ModelStatusEnum.ACTIVE ? t('models.messages.modelActivated', { name: model.name }) : t('models.messages.modelDisabled', { name: model.name }));
-        await loadModels();
-        await loadStatistics();
+        const statusConfig = getModelStatusConfig(newStatus);
+        setModels(prev =>
+          prev.map(item =>
+            item.id === model.id ? { ...item, statusEnum: newStatus, status: statusConfig.label, statusColor: statusConfig.color } : item
+          )
+        );
+        setSelectedModel(prev =>
+          prev && prev.id === model.id ? { ...prev, statusEnum: newStatus, status: statusConfig.label, statusColor: statusConfig.color } : prev
+        );
       } catch (error: any) {
         console.error('Failed to toggle model status:', error);
         toast.error(error?.message || t('models.messages.updateStatusFailed'));
       }
     },
+    [t]
+  );
+
+  const handleViewDetails = useCallback(
+    async (model: ModelListItem) => {
+      setSelectedModel(model);
+      setDetailsDialogOpen(true);
+
+      if (model.detail) {
+        return;
+      }
+
+      try {
+        const detail = await fetchModelDetail(model.id);
+        if (detail) {
+          setModels(prev => prev.map(item => (item.id === model.id ? { ...item, detail } : item)));
+          setSelectedModel(prev => (prev && prev.id === model.id ? { ...prev, detail } : prev));
+        }
+      } catch (error: any) {
+        toast.error(error?.message || t('models.messages.getDetailFailed'));
+      }
+    },
+    [fetchModelDetail, t]
+  );
+
+  const handleOpenEdit = useCallback(
+    async (model: ModelListItem) => {
+      setSelectedModel(model);
+      let detail = model.detail;
+
+      if (!detail) {
+        try {
+          detail = await fetchModelDetail(model.id);
+          if (detail) {
+            setModels(prev => prev.map(item => (item.id === model.id ? { ...item, detail } : item)));
+            setSelectedModel(prev => (prev && prev.id === model.id ? { ...prev, detail } : prev));
+          }
+        } catch (error: any) {
+          toast.error(error?.message || t('models.messages.getDetailFailed'));
+          return;
+        }
+      }
+      const providerValue = detail?.provider ?? model.providerEnum ?? ModelProviderEnum.OTHER;
+
+      setEditFormData({
+        name: detail?.name ?? model.name ?? '',
+        description: detail?.description ?? model.description ?? '',
+        type: detail?.type ?? model.typeEnum ?? ModelTypeEnum.CHAT,
+        provider: providerValue,
+        apiKey: detail?.config?.apiKey ?? '',
+        endpoint: detail?.config?.baseUrl ?? '',
+        maxTokens: detail?.config?.maxTokens !== undefined ? String(detail.config.maxTokens) : '',
+        temperature: detail?.config?.temperature !== undefined ? String(detail.config.temperature) : '0.7',
+      });
+      setEditDialogOpen(true);
+    },
+    [fetchModelDetail]
+  );
+
+  const handleSaveEdit = useCallback(async () => {
+    if (!selectedModel) {
+      toast.error(t('models.messages.noModelSelected'));
+      return;
+    }
+
+    if (!editFormData.name.trim() || !editFormData.provider) {
+      toast.error(t('models.validation.requiredFields'));
+      return;
+    }
+
+    const parsedMaxTokens = editFormData.maxTokens ? parseInt(editFormData.maxTokens, 10) : undefined;
+    const maxTokens = Number.isFinite(parsedMaxTokens ?? 0) ? parsedMaxTokens : undefined;
+    const parsedTemperature = editFormData.temperature ? parseFloat(editFormData.temperature) : undefined;
+    const temperature = Number.isFinite(parsedTemperature ?? 0) ? parsedTemperature : undefined;
+
+    const payload: ModelUpdateDto = {
+      name: editFormData.name.trim(),
+      description: editFormData.description.trim() || undefined,
+      provider: editFormData.provider as ModelProviderEnum,
+      type: editFormData.type,
+      baseUrl: editFormData.endpoint.trim() || undefined,
+      apiKey: editFormData.apiKey.trim() || undefined,
+      maxTokens,
+      temperature,
+    };
+
+    try {
+      await ModelsService.updateModel(selectedModel.id, payload);
+      toast.success(t('models.messages.updateSuccess', { name: editFormData.name }));
+      setEditDialogOpen(false);
+      await loadModels();
+      await loadStatistics();
+    } catch (error: any) {
+      console.error('Failed to update model:', error);
+      toast.error(error?.message || t('models.messages.updateFailed'));
+    }
+  }, [editFormData, loadModels, loadStatistics, selectedModel, t]);
+
+  const handleDeleteModel = useCallback(
+    async (model: ModelListItem) => {
+      if (!model.id) {
+        return;
+      }
+      try {
+        await ModelsService.deleteModel(model.id);
+        toast.success(t('models.messages.deleteSuccess', { name: model.name }));
+        await loadModels();
+        await loadStatistics();
+      } catch (error: any) {
+        console.error('Failed to delete model:', error);
+        toast.error(error?.message || t('models.messages.deleteFailed'));
+      }
+    },
     [loadModels, loadStatistics, t]
   );
+
+  const handleAddModel = useCallback(async () => {
+    if (!formData.name.trim() || !formData.provider) {
+      toast.error(t('models.validation.requiredFields'));
+      return;
+    }
+
+    const parsedMaxTokens = formData.maxTokens ? parseInt(formData.maxTokens, 10) : undefined;
+    const maxTokens = Number.isFinite(parsedMaxTokens ?? 0) ? parsedMaxTokens : undefined;
+    const parsedTemperature = formData.temperature ? parseFloat(formData.temperature) : undefined;
+    const temperature = Number.isFinite(parsedTemperature ?? 0) ? parsedTemperature : undefined;
+
+    const payload: ModelCreateDto = {
+      name: formData.name.trim(),
+      description: formData.description.trim() || formData.name.trim(),
+      type: formData.type,
+      provider: formData.provider as ModelProviderEnum,
+      baseUrl: formData.endpoint.trim() || undefined,
+      apiKey: formData.apiKey.trim() || undefined,
+      maxTokens,
+      temperature,
+    };
+
+    try {
+      await ModelsService.createModel(payload);
+      toast.success(t('models.messages.createSuccess', { name: formData.name }));
+      setAddModelDialogOpen(false);
+      setFormData({ ...DEFAULT_FORM_DATA });
+      setCurrentPage(PAGINATION_CONFIG.DEFAULT_PAGE);
+      await loadModels();
+      await loadStatistics();
+    } catch (error: any) {
+      console.error('Failed to add model:', error);
+      toast.error(error?.message || t('models.messages.createFailed'));
+    }
+  }, [formData, loadModels, loadStatistics, t]);
+
+  const handleFormDataChange = useCallback((data: Partial<ModelFormData>) => {
+    setFormData(prev => ({ ...prev, ...data }));
+  }, []);
+
+  const handleEditFormDataChange = useCallback((data: Partial<ModelFormData>) => {
+    setEditFormData(prev => ({ ...prev, ...data }));
+  }, []);
+
+  const resetForm = useCallback(() => {
+    setFormData({ ...DEFAULT_FORM_DATA });
+  }, []);
+
+  const resetEditForm = useCallback(() => {
+    setEditFormData({ ...DEFAULT_FORM_DATA });
+  }, []);
 
   const statsCards = useMemo(() => {
     const today = stats?.todayGrowthTrend;
@@ -338,18 +561,39 @@ export const useModelManagement = (): UseModelManagementReturn => {
     statusFilter,
     sortBy,
     viewMode,
+    addModelDialogOpen,
+    detailsDialogOpen,
+    editDialogOpen,
+    selectedModel,
+    formData,
+    editFormData,
+    providerOptions,
     setCurrentPage,
     setSearchQuery,
     setTypeFilter,
     setStatusFilter,
     setSortBy,
     setViewMode,
+    setAddModelDialogOpen,
+    setDetailsDialogOpen,
+    setEditDialogOpen,
+    setSelectedModel,
     loadModels,
     loadStatistics,
     handleToggleStatus,
+    handleViewDetails,
+    handleOpenEdit,
+    handleSaveEdit,
+    handleDeleteModel,
+    handleAddModel,
+    handleFormDataChange,
+    handleEditFormDataChange,
+    resetForm,
+    resetEditForm,
     fetchModelDetail,
     statsCards,
     shouldShowPagination,
+    modelTypeOptions,
   };
 };
 

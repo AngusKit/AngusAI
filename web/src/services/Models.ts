@@ -165,7 +165,7 @@ export class Models<SecurityDataType = unknown> {
   updateModel = (id: string, data: ModelUpdateDto, params: RequestParams = {}) =>
     this.http.request<ModelDetailResult>({
       path: `${AI}/models/${id}`,
-      method: 'PATCH',
+      method: 'PUT',
       body: data,
       secure: true,
       type: ContentType.Json,

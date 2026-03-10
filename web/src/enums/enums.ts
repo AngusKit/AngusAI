@@ -177,13 +177,15 @@ export enum ModelProviderEnum {
   MICROSOFT_FOUNDRY = 'MICROSOFT_FOUNDRY',
   MISTRAL_AI = 'MISTRAL_AI',
   WATSONX = 'WATSONX',
-  OTHER = 'OTHER',
+
+  /** DeepSeek */
+  DEEPSEEK = 'DEEPSEEK',
   /** 通义千问（阿里） */
   QWEN = 'QWEN',
   /** 智谱 GLM */
   ZHIPU = 'ZHIPU',
-  /** DeepSeek */
-  DEEPSEEK = 'DEEPSEEK',
+
+  OTHER = 'OTHER',
 }
 
 export enum ModelFeaturesEnum {

@@ -3,6 +3,7 @@
  */
 
 import type { ModelDetailVo } from '@/services/ModelsTypes';
+import { GetModelListParamsOrderByEnum } from '@/services/ModelsTypes';
 import {
   MODEL_TYPE_CONFIG,
   DEFAULT_MODEL_TYPE_CONFIG,
@@ -141,5 +142,28 @@ export const createProviderLabelMap = (providerOptions: Array<{ value: string; l
     map.set(option.value, option.label);
   });
   return map;
+};
+
+/** 排序选项类型 */
+export type SortOption = 'default' | 'name' | 'provider' | 'status' | 'createdDate';
+
+/**
+ * 解析排序选项为 API 排序枚举
+ */
+export const resolveSortOrderBy = (
+  value: SortOption
+): GetModelListParamsOrderByEnum | undefined => {
+  switch (value) {
+    case 'name':
+      return GetModelListParamsOrderByEnum.Name;
+    case 'provider':
+      return GetModelListParamsOrderByEnum.Provider;
+    case 'status':
+      return GetModelListParamsOrderByEnum.Status;
+    case 'createdDate':
+      return GetModelListParamsOrderByEnum.CreatedDate;
+    default:
+      return undefined;
+  }
 };
 

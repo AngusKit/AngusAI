@@ -1143,7 +1143,7 @@ export const zhCN = {
     actions: {
       viewDetails: '查看详情',
       editConfig: '编辑配置',
-      delete: '删除',
+      delete: '删除模型',
       close: '关闭',
     },
     stats: {
