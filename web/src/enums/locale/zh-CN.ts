@@ -119,10 +119,13 @@ export const enumTranslations = {
   },
   ModelTypeEnum: {
     CHAT: '对话',
-    IMAGE: '图像',
-    AUDIO: '音频',
     EMBEDDING: '嵌入向量',
+    IMAGE_GENERATION: '图像生成',
+    AUDIO_TRANSCRIPTION: '语音转文字',
+    AUDIO_GENERATION: '文字转语音',
     MODERATION: '内容审核',
+    SCORING: '评分/重排序',
+    OTHER: '其他',
   },
   ModelProviderEnum: {
     OPEN_AI: 'OpenAI',

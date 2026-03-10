@@ -152,13 +152,16 @@ export enum PluginTypeEnum {
   THEME = 'THEME',
 }
 
-/** 模型类型 */
+/** 模型类型 — 与后端 ModelType 枚举一致 */
 export enum ModelTypeEnum {
   CHAT = 'CHAT',
-  IMAGE = 'IMAGE',
-  AUDIO = 'AUDIO',
   EMBEDDING = 'EMBEDDING',
+  IMAGE_GENERATION = 'IMAGE_GENERATION',
+  AUDIO_TRANSCRIPTION = 'AUDIO_TRANSCRIPTION',
+  AUDIO_GENERATION = 'AUDIO_GENERATION',
   MODERATION = 'MODERATION',
+  SCORING = 'SCORING',
+  OTHER = 'OTHER',
 }
 
 /** 模型提供商 — 与后端 ModelProvider 枚举值一致 */
