@@ -4,10 +4,16 @@ import cloud.xcan.angus.core.ai.domain.application.AIApplication;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 public interface ApplicationQuery {
+
+  /**
+   * 根据ID查询应用（不存在时返回空）
+   */
+  Optional<AIApplication> findById(Long id);
 
   /**
    * 查询应用并检查是否存在

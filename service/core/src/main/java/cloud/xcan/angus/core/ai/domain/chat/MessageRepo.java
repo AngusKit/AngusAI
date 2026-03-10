@@ -1,6 +1,7 @@
 package cloud.xcan.angus.core.ai.domain.chat;
 
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,6 +13,11 @@ import org.springframework.data.repository.NoRepositoryBean;
  */
 @NoRepositoryBean
 public interface MessageRepo extends BaseRepository<Message, Long> {
+
+  /**
+   * 统计创建时间在指定范围内的消息数
+   */
+  long countByCreatedDateBetween(LocalDateTime start, LocalDateTime end);
 
   /**
    * 根据会话ID(UUID)和角色查询消息

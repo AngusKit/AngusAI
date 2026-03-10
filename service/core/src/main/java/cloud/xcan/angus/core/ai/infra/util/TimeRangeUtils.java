@@ -109,6 +109,23 @@ public class TimeRangeUtils {
     };
   }
 
+  /** 解析 period 为天数，支持 "7"、"30"、"7d"、"30d" 等格式，默认 7 */
+  public static int parsePeriodDays(String period) {
+    if (period == null || period.isBlank()) {
+      return 7;
+    }
+    String s = period.trim().toLowerCase().replaceAll("[^0-9]", "");
+    if (s.isEmpty()) {
+      return 7;
+    }
+    try {
+      int days = Integer.parseInt(s);
+      return Math.min(Math.max(days, 1), 90);
+    } catch (NumberFormatException e) {
+      return 7;
+    }
+  }
+
   /**
    * 时间范围内部类
    */

@@ -23,6 +23,7 @@ import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.lang.Nullable;
@@ -45,6 +46,16 @@ public class ApplicationQueryImpl implements ApplicationQuery {
 
   @Resource
   private AgentQuery agentQuery;
+
+  @Override
+  public Optional<AIApplication> findById(Long id) {
+    return new BizTemplate<Optional<AIApplication>>() {
+      @Override
+      protected Optional<AIApplication> process() {
+        return applicationRepo.findById(id);
+      }
+    }.execute();
+  }
 
   @Override
   public AIApplication findAndCheck(Long id) {

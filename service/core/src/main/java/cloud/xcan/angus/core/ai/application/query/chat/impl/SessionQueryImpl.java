@@ -4,10 +4,16 @@ import static cloud.xcan.angus.core.ai.domain.Constants.SESSION_QUOTA_PER_APP_TO
 import static cloud.xcan.angus.core.ai.domain.Constants.SESSION_QUOTA_PER_USER_APP;
 import static cloud.xcan.angus.spec.principal.PrincipalContext.getUserId;
 
+import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
+import cloud.xcan.angus.core.ai.application.query.application.ApplicationQuery;
 import cloud.xcan.angus.core.ai.application.query.chat.SessionQuery;
+import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
+import cloud.xcan.angus.core.ai.domain.agent.Agent;
+import cloud.xcan.angus.core.ai.domain.application.AIApplication;
 import cloud.xcan.angus.core.ai.domain.chat.Session;
 import cloud.xcan.angus.core.ai.domain.chat.SessionRepo;
 import cloud.xcan.angus.core.ai.domain.chat.SessionSearchRepo;
+import cloud.xcan.angus.core.ai.domain.model.Model;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.ChatStatisticsVo.TopApp;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.ChatStatisticsVo.TopModel;
 import cloud.xcan.angus.core.biz.BizTemplate;
@@ -15,6 +21,9 @@ import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.message.ProtocolException;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import jakarta.annotation.Resource;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -31,6 +40,15 @@ public class SessionQueryImpl implements SessionQuery {
 
   @Resource
   private SessionSearchRepo sessionSearchRepo;
+
+  @Resource
+  private ApplicationQuery applicationQuery;
+
+  @Resource
+  private ModelQuery modelQuery;
+
+  @Resource
+  private AgentQuery agentQuery;
 
   @Override
   public Session findById(Long id) {
@@ -111,21 +129,84 @@ public class SessionQueryImpl implements SessionQuery {
 
   @Override
   public List<TopApp> getTopApps(int limit) {
-    return List.of();
+    return new BizTemplate<List<TopApp>>() {
+      @Override
+      protected List<TopApp> process() {
+        List<Object[]> rows = sessionRepo.countMessagesByAppId(PageRequest.of(0, limit));
+        if (rows.isEmpty()) {
+          return List.of();
+        }
+        long totalMessages = rows.stream()
+            .mapToLong(r -> ((Number) r[1]).longValue())
+            .sum();
+        List<TopApp> result = new ArrayList<>();
+        for (Object[] row : rows) {
+          Long appId = ((Number) row[0]).longValue();
+          long messageCount = ((Number) row[1]).longValue();
+          String appName = applicationQuery.findById(appId)
+              .map(AIApplication::getName)
+              .orElseGet(() -> agentQuery.findByIds(List.of(appId)).stream()
+                  .findFirst()
+                  .map(Agent::getName)
+                  .orElse("应用#" + appId));
+          TopApp top = new TopApp();
+          top.setAppId(appId);
+          top.setAppName(appName);
+          top.setMessageCount(messageCount);
+          top.setPercentage(totalMessages > 0 ? (double) messageCount / totalMessages : 0.0);
+          result.add(top);
+        }
+        return result;
+      }
+    }.execute();
   }
 
   @Override
   public List<TopModel> getTopModels(int limit) {
-    return List.of();
+    return new BizTemplate<List<TopModel>>() {
+      @Override
+      protected List<TopModel> process() {
+        List<Object[]> rows = sessionRepo.countMessagesByModelId(PageRequest.of(0, limit));
+        if (rows.isEmpty()) {
+          return List.of();
+        }
+        List<TopModel> result = new ArrayList<>();
+        for (Object[] row : rows) {
+          Long modelId = ((Number) row[0]).longValue();
+          long messageCount = ((Number) row[1]).longValue();
+          String modelName = modelQuery.findById(modelId)
+              .map(Model::getName)
+              .orElse("模型#" + modelId);
+          TopModel top = new TopModel();
+          top.setModelId(modelId);
+          top.setModelName(modelName);
+          top.setMessageCount(messageCount);
+          result.add(top);
+        }
+        return result;
+      }
+    }.execute();
   }
 
   @Override
   public Long countAll() {
-    return 0L;
+    return new BizTemplate<Long>() {
+      @Override
+      protected Long process() {
+        return sessionRepo.count();
+      }
+    }.execute();
   }
 
   @Override
   public Long countToday() {
-    return 0L;
+    return new BizTemplate<Long>() {
+      @Override
+      protected Long process() {
+        LocalDateTime start = LocalDate.now().atStartOfDay();
+        LocalDateTime end = LocalDateTime.now();
+        return sessionRepo.countByCreatedDateBetween(start, end);
+      }
+    }.execute();
   }
 }

@@ -1,5 +1,7 @@
 package cloud.xcan.angus.core.ai.interfaces.chat.facade.internal;
 
+import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.parsePeriodDays;
+
 import cloud.xcan.angus.core.ai.application.cmd.chat.MessageCmd;
 import cloud.xcan.angus.core.ai.application.cmd.chat.SessionCmd;
 import cloud.xcan.angus.core.ai.application.query.chat.MessageQuery;
@@ -125,17 +127,16 @@ public class MessageFacadeImpl implements MessageFacade {
     todayStats.setMessages(messageQuery.countToday());
     vo.setTodayStats(todayStats);
 
-    // 3. 使用趋势（最近7天）
-    List<ChatStatisticsVo.UsageTrend> trends = messageQuery.getUsageTrend(7);
-    vo.setUsageTrend(trends);
+    // 3. 使用趋势，period 格式：7、30 或 7d、30d，默认 7 天
+    int trendDays = parsePeriodDays(period);
+    vo.setUsageTrend(messageQuery.getUsageTrend(trendDays));
 
     // 4. Top应用
-    List<ChatStatisticsVo.TopApp> topApps = sessionQuery.getTopApps(5);
-    vo.setTopApps(topApps);
+    vo.setTopApps(sessionQuery.getTopApps(5));
 
     // 5. Top模型
-    List<ChatStatisticsVo.TopModel> topModels = sessionQuery.getTopModels(5);
-    vo.setTopModels(topModels);
+    vo.setTopModels(sessionQuery.getTopModels(5));
     return vo;
   }
+
 }

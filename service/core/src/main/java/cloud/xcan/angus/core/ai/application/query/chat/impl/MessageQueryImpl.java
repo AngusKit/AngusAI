@@ -3,10 +3,15 @@ package cloud.xcan.angus.core.ai.application.query.chat.impl;
 import cloud.xcan.angus.core.ai.application.query.chat.MessageQuery;
 import cloud.xcan.angus.core.ai.domain.chat.Message;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRepo;
+import cloud.xcan.angus.core.ai.domain.chat.SessionRepo;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.ChatStatisticsVo.UsageTrend;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import jakarta.annotation.Resource;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +25,9 @@ public class MessageQueryImpl implements MessageQuery {
 
   @Resource
   private MessageRepo messageRepo;
+
+  @Resource
+  private SessionRepo sessionRepo;
 
   @Override
   public Message findById(Long id) {
@@ -64,16 +72,49 @@ public class MessageQueryImpl implements MessageQuery {
 
   @Override
   public List<UsageTrend> getUsageTrend(int days) {
-    return List.of();
+    final int trendDays = days;
+    return new BizTemplate<List<UsageTrend>>() {
+      @Override
+      protected List<UsageTrend> process() {
+        List<UsageTrend> trends = new ArrayList<>();
+        DateTimeFormatter fmt = DateTimeFormatter.ISO_LOCAL_DATE;
+        for (int i = trendDays - 1; i >= 0; i--) {
+          LocalDate day = LocalDate.now().minusDays(i);
+          LocalDateTime start = day.atStartOfDay();
+          LocalDateTime end = day.atTime(23, 59, 59, 999_999_999);
+          long sessionCount = sessionRepo.countByCreatedDateBetween(start, end);
+          long messageCount = messageRepo.countByCreatedDateBetween(start, end);
+          UsageTrend t = new UsageTrend();
+          t.setDate(day.format(fmt));
+          t.setSessions(sessionCount);
+          t.setMessages(messageCount);
+          t.setTokens(null);
+          trends.add(t);
+        }
+        return trends;
+      }
+    }.execute();
   }
 
   @Override
   public Long countAll() {
-    return 0L;
+    return new BizTemplate<Long>() {
+      @Override
+      protected Long process() {
+        return messageRepo.count();
+      }
+    }.execute();
   }
 
   @Override
   public Long countToday() {
-    return 0L;
+    return new BizTemplate<Long>() {
+      @Override
+      protected Long process() {
+        LocalDateTime start = LocalDate.now().atStartOfDay();
+        LocalDateTime end = LocalDateTime.now();
+        return messageRepo.countByCreatedDateBetween(start, end);
+      }
+    }.execute();
   }
 }
