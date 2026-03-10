@@ -54,7 +54,8 @@ public class MessageFacadeImpl implements MessageFacade {
   private cloud.xcan.agentx.core.agent.AgentRegistry agentRegistry;
 
   @Override
-  public MessageSendVo sendMessage(Long sessionId, MessageSendDto dto) {
+  public MessageSendVo sendMessage(String sessionId, MessageSendDto dto) {
+    Session session = sessionQuery.findAndCheckBySessionId(sessionId);
     // 1. 创建用户消息
     Long userMessageId = messageCmd.createWithAttachments(
         sessionId,
@@ -64,15 +65,13 @@ public class MessageFacadeImpl implements MessageFacade {
     );
 
     // 2. Session → Application → agentId → AgentRegistry.chat
-    Session session = sessionQuery.findAndCheck(sessionId);
     AIApplication application = applicationQuery.findAndCheck(session.getAppId());
     Long defaultAgentId = applicationQuery.getDefaultAgentId(session.getAppId());
     if (defaultAgentId == null) {
       throw ProtocolException.of("应用未绑定智能体，无法进行对话");
     }
     String agentIdStr = String.valueOf(defaultAgentId);
-    String sessionIdStr = String.valueOf(sessionId);
-    String aiResponse = agentRegistry.chat(agentIdStr, sessionIdStr, dto.getContent());
+    String aiResponse = agentRegistry.chat(agentIdStr, sessionId, dto.getContent());
 
     // 3. 创建助手消息
     Long assistantMessageId = messageCmd.create(sessionId, MessageRole.ASSISTANT, aiResponse);
@@ -86,8 +85,11 @@ public class MessageFacadeImpl implements MessageFacade {
     return vo;
   }
 
+  private static final String STREAMING_PLACEHOLDER = ".";
+
   @Override
-  public SseEmitter sendMessageStream(Long sessionId, MessageSendDto dto) {
+  public SseEmitter sendMessageStream(String sessionId, MessageSendDto dto) {
+    Session session = sessionQuery.findAndCheckBySessionId(sessionId);
     // 1. 创建用户消息
     messageCmd.createWithAttachments(
         sessionId,
@@ -97,17 +99,15 @@ public class MessageFacadeImpl implements MessageFacade {
     );
 
     // 2. Session → Application → agentId → AgentRegistry.chatStream
-    Session session = sessionQuery.findAndCheck(sessionId);
     AIApplication application = applicationQuery.findAndCheck(session.getAppId());
     Long defaultAgentId = applicationQuery.getDefaultAgentId(session.getAppId());
     if (defaultAgentId == null) {
       throw ProtocolException.of("应用未绑定智能体，无法进行对话");
     }
     String agentIdStr = String.valueOf(defaultAgentId);
-    String sessionIdStr = String.valueOf(sessionId);
 
-    // 3. 创建空的助手消息用于流式更新
-    Long assistantMessageId = messageCmd.create(sessionId, MessageRole.ASSISTANT, "");
+    // 3. 创建占位助手消息用于流式更新
+    Long assistantMessageId = messageCmd.create(sessionId, MessageRole.ASSISTANT, STREAMING_PLACEHOLDER);
     messageCmd.setStreaming(assistantMessageId, true);
 
     // 4. 流式调用 AgentRegistry.chatStream
@@ -115,7 +115,7 @@ public class MessageFacadeImpl implements MessageFacade {
     new Thread(() -> {
       try {
         dev.langchain4j.service.TokenStream stream = agentRegistry.chatStream(
-            agentIdStr, sessionIdStr, dto.getContent());
+            agentIdStr, sessionId, dto.getContent());
         StringBuilder fullContent = new StringBuilder();
         stream.onPartialResponse(token -> {
               fullContent.append(token);
@@ -145,7 +145,7 @@ public class MessageFacadeImpl implements MessageFacade {
   }
 
   @Override
-  public AttachmentUploadVo uploadAttachment(MultipartFile file, Long sessionId) {
+  public AttachmentUploadVo uploadAttachment(MultipartFile file, String sessionId) {
 //    // 1. 验证文件类型
 //    if (!fileStorageService.isValidFileType(file.getContentType())) {
 //      throw new IllegalArgumentException("不支持的文件类型: " + file.getContentType());
@@ -167,7 +167,7 @@ public class MessageFacadeImpl implements MessageFacade {
   }
 
   @Override
-  public MessageVo regenerateMessage(Long sessionId, Long messageId) {
+  public MessageVo regenerateMessage(String sessionId, Long messageId) {
     // 1. 获取原消息
     //Message originalMessage = messageQuery.findAndCheck(messageId);
 
@@ -183,7 +183,7 @@ public class MessageFacadeImpl implements MessageFacade {
   }
 
   @Override
-  public MessageVo feedbackMessage(Long sessionId, Long messageId, MessageFeedbackDto dto) {
+  public MessageVo feedbackMessage(String sessionId, Long messageId, MessageFeedbackDto dto) {
     // 添加消息反馈
     messageCmd.addFeedback(messageId, dto.getFeedbackType(), dto.getComment());
 
@@ -193,7 +193,7 @@ public class MessageFacadeImpl implements MessageFacade {
   }
 
   @Override
-  public MessageVo stopGeneration(Long sessionId) {
+  public MessageVo stopGeneration(String sessionId) {
     // 1. 查找正在流式生成的消息
     List<Message> streamingMessages = messageQuery.findStreamingMessages(sessionId);
 
@@ -214,8 +214,9 @@ public class MessageFacadeImpl implements MessageFacade {
   }
 
   @Override
-  public Integer clearSessionMessages(Long sessionId) {
-    return sessionCmd.clearMessages(sessionId);
+  public Integer clearSessionMessages(String sessionId) {
+    Session session = sessionQuery.findAndCheckBySessionId(sessionId);
+    return sessionCmd.clearMessages(session.getId());
   }
 
   @Override
@@ -225,7 +226,7 @@ public class MessageFacadeImpl implements MessageFacade {
   }
 
   @Override
-  public PageResult<MessageVo> listMessages(Long sessionId, MessageFindDto dto) {
+  public PageResult<MessageVo> listMessages(String sessionId, MessageFindDto dto) {
     PageRequest pageable = PageRequest.of(dto.getPageNo() - 1, dto.getPageSize());
     Page<Message> page = messageQuery.findBySessionId(sessionId, pageable);
 

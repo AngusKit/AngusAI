@@ -23,24 +23,24 @@ public interface MessageQuery {
   Message findAndCheck(Long id);
 
   /**
-   * 根据会话ID查询消息列表
+   * 根据会话ID(UUID)查询消息列表
    */
-  List<Message> findBySessionId(Long sessionId);
+  List<Message> findBySessionId(String sessionId);
 
   /**
-   * 根据会话ID分页查询消息
+   * 根据会话ID(UUID)分页查询消息
    */
-  Page<Message> findBySessionId(Long sessionId, PageRequest pageable);
+  Page<Message> findBySessionId(String sessionId, PageRequest pageable);
 
   /**
    * 查询会话的最后一条消息
    */
-  Message findLastMessageBySessionId(Long sessionId);
+  Message findLastMessageBySessionId(String sessionId);
 
   /**
    * 统计会话的消息数量
    */
-  long countBySessionId(Long sessionId);
+  long countBySessionId(String sessionId);
 
   /**
    * 根据条件查询消息
@@ -48,15 +48,15 @@ public interface MessageQuery {
   Page<Message> find(GenericSpecification<Message> spec, PageRequest pageable);
 
   /**
-   * 根据会话ID和角色查询消息
+   * 根据会话ID(UUID)和角色查询消息
    */
-  List<Message> findBySessionIdAndRole(Long sessionId,
+  List<Message> findBySessionIdAndRole(String sessionId,
       cloud.xcan.angus.core.ai.domain.chat.MessageRole role);
 
   /**
    * 查询正在流式生成的消息
    */
-  List<Message> findStreamingMessages(Long sessionId);
+  List<Message> findStreamingMessages(String sessionId);
 
   /**
    * 根据父消息ID查询子消息
@@ -66,7 +66,7 @@ public interface MessageQuery {
   /**
    * 查询最近的消息历史（用于AI上下文）
    */
-  List<Message> findRecentBySessionId(Long sessionId, int limit);
+  List<Message> findRecentBySessionId(String sessionId, int limit);
 
   /**
    * 更新消息内容

@@ -26,11 +26,20 @@ public class Session extends TenantAuditingEntity<Session, Long> {
   @Id
   private Long id;
 
+  /**
+   * 会话业务标识，UUID 格式，对话、Session、Message 统一使用此字段关联
+   */
+  @Column(name = "session_id", unique = true, length = 36)
+  private String sessionId;
+
   @Column(nullable = false, length = 200)
   private String title;
 
   @Column(name = "app_id", nullable = false)
   private Long appId;
+
+  @Column(name = "agent_id", nullable = false)
+  private Long agentId;
 
   @Column(name = "model_id", nullable = false)
   private Long modelId;

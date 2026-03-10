@@ -13,6 +13,11 @@ import org.springframework.data.repository.NoRepositoryBean;
 public interface SessionRepo extends BaseRepository<Session, Long> {
 
   /**
+   * 根据会话ID(UUID)查询
+   */
+  java.util.Optional<Session> findBySessionId(String sessionId);
+
+  /**
    * 根据应用ID查询会话列表
    */
   List<Session> findByAppId(Long appId);

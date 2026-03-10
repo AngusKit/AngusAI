@@ -3,6 +3,7 @@ package cloud.xcan.angus.core.ai.application.query.application;
 import cloud.xcan.angus.core.ai.domain.application.AIApplication;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -87,6 +88,6 @@ public interface ApplicationQuery {
   /**
    * 获取应用绑定的所有智能体ID列表（按 sortOrder 排序）
    */
-  java.util.List<Long> getAgentIds(Long applicationId);
+  List<Long> getAgentIds(Long applicationId);
 
 }

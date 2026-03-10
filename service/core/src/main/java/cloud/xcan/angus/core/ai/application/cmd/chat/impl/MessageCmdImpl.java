@@ -2,6 +2,7 @@ package cloud.xcan.angus.core.ai.application.cmd.chat.impl;
 
 import cloud.xcan.angus.core.ai.application.cmd.chat.MessageCmd;
 import cloud.xcan.angus.core.ai.application.cmd.chat.SessionCmd;
+import cloud.xcan.angus.core.ai.application.query.chat.SessionQuery;
 import cloud.xcan.angus.core.ai.domain.chat.Message;
 import cloud.xcan.angus.core.ai.domain.chat.MessageAttachment;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRepo;
@@ -27,13 +28,18 @@ public class MessageCmdImpl extends CommCmd<Message, Long> implements MessageCmd
   @Resource
   private SessionCmd sessionCmd;
 
+  @Resource
+  private SessionQuery sessionQuery;
+
   @Override
   @Transactional
-  public Long create(Long sessionId, MessageRole role, String content) {
+  public Long create(String sessionId, MessageRole role, String content) {
     return new BizTemplate<Long>() {
+      cloud.xcan.angus.core.ai.domain.chat.Session session;
+
       @Override
       protected void checkParams() {
-        if (sessionId == null) {
+        if (sessionId == null || sessionId.isBlank()) {
           throw new IllegalArgumentException("会话ID不能为空");
         }
         if (role == null) {
@@ -42,21 +48,22 @@ public class MessageCmdImpl extends CommCmd<Message, Long> implements MessageCmd
         if (content == null || content.trim().isEmpty()) {
           throw new IllegalArgumentException("消息内容不能为空");
         }
+        session = sessionQuery.findAndCheckBySessionId(sessionId);
       }
 
       @Override
       protected Long process() {
         Message message = new Message();
-        message.setSessionId(sessionId);
+        message.setSessionEntityId(session.getId());
+        message.setSessionId(session.getSessionId());
         message.setRole(role);
         message.setContent(content);
         message.setIsStreaming(false);
 
         Message savedMessage = messageRepo.save(message);
 
-        // 更新会话统计
-        sessionCmd.incrementMessageCount(sessionId);
-        sessionCmd.updateLastMessage(sessionId, content, role);
+        sessionCmd.incrementMessageCount(session.getId());
+        sessionCmd.updateLastMessage(session.getId(), content, role);
 
         return savedMessage.getId();
       }
@@ -65,12 +72,14 @@ public class MessageCmdImpl extends CommCmd<Message, Long> implements MessageCmd
 
   @Override
   @Transactional
-  public Long createWithAttachments(Long sessionId, MessageRole role, String content,
+  public Long createWithAttachments(String sessionId, MessageRole role, String content,
       List<MessageAttachment> attachments) {
     return new BizTemplate<Long>() {
+      cloud.xcan.angus.core.ai.domain.chat.Session session;
+
       @Override
       protected void checkParams() {
-        if (sessionId == null) {
+        if (sessionId == null || sessionId.isBlank()) {
           throw new IllegalArgumentException("会话ID不能为空");
         }
         if (role == null) {
@@ -79,12 +88,14 @@ public class MessageCmdImpl extends CommCmd<Message, Long> implements MessageCmd
         if (content == null || content.trim().isEmpty()) {
           throw new IllegalArgumentException("消息内容不能为空");
         }
+        session = sessionQuery.findAndCheckBySessionId(sessionId);
       }
 
       @Override
       protected Long process() {
         Message message = new Message();
-        message.setSessionId(sessionId);
+        message.setSessionEntityId(session.getId());
+        message.setSessionId(session.getSessionId());
         message.setRole(role);
         message.setContent(content);
         message.setAttachments(attachments);
@@ -92,9 +103,8 @@ public class MessageCmdImpl extends CommCmd<Message, Long> implements MessageCmd
 
         Message savedMessage = messageRepo.save(message);
 
-        // 更新会话统计
-        sessionCmd.incrementMessageCount(sessionId);
-        sessionCmd.updateLastMessage(sessionId, content, role);
+        sessionCmd.incrementMessageCount(session.getId());
+        sessionCmd.updateLastMessage(session.getId(), content, role);
 
         return savedMessage.getId();
       }

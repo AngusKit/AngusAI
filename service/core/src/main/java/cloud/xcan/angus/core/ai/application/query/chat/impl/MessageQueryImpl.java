@@ -65,7 +65,7 @@ public class MessageQueryImpl implements MessageQuery {
   }
 
   @Override
-  public Message findLastMessageBySessionId(Long sessionId) {
+  public Message findLastMessageBySessionId(String sessionId) {
     return new BizTemplate<Message>() {
       @Override
       protected Message process() {
@@ -75,7 +75,7 @@ public class MessageQueryImpl implements MessageQuery {
   }
 
   @Override
-  public long countBySessionId(Long sessionId) {
+  public long countBySessionId(String sessionId) {
     return new BizTemplate<Long>() {
       @Override
       protected Long process() {

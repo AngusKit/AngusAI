@@ -7,7 +7,6 @@ import cloud.xcan.angus.core.ai.interfaces.agent.facade.AgentChatFacade;
 import cloud.xcan.angus.core.ai.interfaces.agent.facade.dto.AgentChatRequestDto;
 import cloud.xcan.angus.core.ai.interfaces.agent.facade.vo.AgentChatResponseVo;
 import jakarta.annotation.Resource;
-import java.util.UUID;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -20,18 +19,15 @@ public class AgentChatFacadeImpl implements AgentChatFacade {
   @Override
   public AgentChatResponseVo chat(AgentChatRequestDto dto) {
     long start = System.currentTimeMillis();
-    String sessionId = dto.getSessionId() != null
-        ? dto.getSessionId() : UUID.randomUUID().toString();
-    String reply = agentChatCmd.chat(dto.getAgentId(), sessionId, dto.getMessage());
+    var result = agentChatCmd.chat(
+        dto.getAgentId(), dto.getSessionId(), dto.getMessage());
     long latencyMs = System.currentTimeMillis() - start;
-    return toAgentChatResponseVo(dto, sessionId, reply, latencyMs);
+    return toAgentChatResponseVo(dto, result.getSessionId(), result.getReply(), latencyMs);
   }
 
   @Override
   public SseEmitter chatStream(AgentChatRequestDto dto) {
-    String sessionId = dto.getSessionId() != null
-        ? dto.getSessionId() : UUID.randomUUID().toString();
     return agentChatCmd.chatStream(
-        dto.getAgentId(), sessionId, dto.getMessage(), dto.getTimeoutMs());
+        dto.getAgentId(), dto.getSessionId(), dto.getMessage(), dto.getTimeoutMs());
   }
 }

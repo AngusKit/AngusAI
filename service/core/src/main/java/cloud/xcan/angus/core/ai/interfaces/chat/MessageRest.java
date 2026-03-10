@@ -49,7 +49,7 @@ public class MessageRest {
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping("/{sessionId}/messages")
   public ApiLocaleResult<MessageSendVo> sendMessage(
-      @Parameter(description = "会话ID") @PathVariable Long sessionId,
+      @Parameter(description = "会话ID(UUID)") @PathVariable String sessionId,
       @Valid @RequestBody MessageSendDto dto) {
     return ApiLocaleResult.success(messageFacade.sendMessage(sessionId, dto));
   }
@@ -60,7 +60,7 @@ public class MessageRest {
   })
   @PostMapping(value = "/{sessionId}/messages/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
   public SseEmitter sendMessageStream(
-      @PathVariable @Parameter(description = "会话ID") Long sessionId,
+      @PathVariable @Parameter(description = "会话ID(UUID)") String sessionId,
       @Valid @RequestBody MessageSendDto dto) {
     return messageFacade.sendMessageStream(sessionId, dto);
   }
@@ -70,7 +70,7 @@ public class MessageRest {
   @PostMapping("/attachments")
   public ApiLocaleResult<AttachmentUploadVo> uploadAttachment(
       @Parameter(description = "文件") @RequestParam("file") MultipartFile file,
-      @Parameter(description = "关联会话ID") @RequestParam(required = false) Long sessionId) {
+      @Parameter(description = "关联会话ID(UUID)") @RequestParam(required = false) String sessionId) {
     return ApiLocaleResult.success(messageFacade.uploadAttachment(file, sessionId));
   }
 
@@ -78,7 +78,7 @@ public class MessageRest {
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping("/{sessionId}/messages/{messageId}/regenerate")
   public ApiLocaleResult<MessageVo> regenerate(
-      @Parameter(description = "会话ID") @PathVariable Long sessionId,
+      @Parameter(description = "会话ID(UUID)") @PathVariable String sessionId,
       @Parameter(description = "消息ID") @PathVariable Long messageId) {
     return ApiLocaleResult.success(messageFacade.regenerateMessage(sessionId, messageId));
   }
@@ -86,7 +86,7 @@ public class MessageRest {
   @Operation(operationId = "feedbackMessage", summary = "消息反馈", description = "对AI消息进行反馈（点赞/点踩）")
   @PostMapping("/{sessionId}/messages/{messageId}/feedback")
   public ApiLocaleResult<MessageVo> feedback(
-      @Parameter(description = "会话ID") @PathVariable Long sessionId,
+      @Parameter(description = "会话ID(UUID)") @PathVariable String sessionId,
       @Parameter(description = "消息ID") @PathVariable Long messageId,
       @Valid @RequestBody MessageFeedbackDto dto) {
     return ApiLocaleResult.success(messageFacade.feedbackMessage(sessionId, messageId, dto));
@@ -95,14 +95,14 @@ public class MessageRest {
   @Operation(operationId = "stopGeneration", summary = "停止生成", description = "停止当前正在生成的消息")
   @PostMapping("/{sessionId}/stop")
   public ApiLocaleResult<MessageVo> stop(
-      @Parameter(description = "会话ID") @PathVariable Long sessionId) {
+      @Parameter(description = "会话ID(UUID)") @PathVariable String sessionId) {
     return ApiLocaleResult.success(messageFacade.stopGeneration(sessionId));
   }
 
   @Operation(operationId = "clearMessages", summary = "清空当前对话", description = "清空指定会话的所有消息")
   @DeleteMapping("/{sessionId}/messages")
   public ApiLocaleResult<Integer> clearMessages(
-      @Parameter(description = "会话ID") @PathVariable Long sessionId) {
+      @Parameter(description = "会话ID(UUID)") @PathVariable String sessionId) {
     return ApiLocaleResult.success(messageFacade.clearSessionMessages(sessionId));
   }
 
@@ -116,7 +116,7 @@ public class MessageRest {
   @Operation(operationId = "getMessageHistory", summary = "获取消息历史", description = "获取会话的消息历史")
   @GetMapping("/{sessionId}/messages")
   public ApiLocaleResult<PageResult<MessageVo>> getMessages(
-      @Parameter(description = "会话ID") @PathVariable Long sessionId,
+      @Parameter(description = "会话ID(UUID)") @PathVariable String sessionId,
       @Valid @ParameterObject MessageFindDto dto) {
     return ApiLocaleResult.success(messageFacade.listMessages(sessionId, dto));
   }

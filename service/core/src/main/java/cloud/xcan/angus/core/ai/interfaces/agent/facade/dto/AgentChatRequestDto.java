@@ -13,7 +13,7 @@ public class AgentChatRequestDto {
   @Schema(description = "智能体ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
   private Long agentId;
 
-  @Schema(description = "会话ID，用于多轮对话记忆，不传则使用 default", example = "session-123")
+  @Schema(description = "会话ID(UUID)，用于多轮对话记忆与 Session/Message 关联，不传则由业务层初始化", example = "550e8400-e29b-41d4-a716-446655440000")
   private String sessionId;
 
   @NotBlank

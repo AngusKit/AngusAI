@@ -1,7 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.agent;
 
 import cloud.xcan.angus.core.ai.interfaces.agent.facade.AgentChatFacade;
-import cloud.xcan.angus.core.ai.interfaces.agent.facade.AgentFacade;
 import cloud.xcan.angus.core.ai.interfaces.agent.facade.dto.AgentChatRequestDto;
 import cloud.xcan.angus.core.ai.interfaces.agent.facade.vo.AgentChatResponseVo;
 import cloud.xcan.angus.remote.ApiLocaleResult;

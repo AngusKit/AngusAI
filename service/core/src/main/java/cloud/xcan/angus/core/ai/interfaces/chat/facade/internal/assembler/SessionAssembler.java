@@ -47,8 +47,8 @@ public class SessionAssembler {
     }
 
     SessionDetailVo vo = new SessionDetailVo();
-    // Note: 这些getter方法由BaseEntity提供
     vo.setId(session.identity());
+    vo.setSessionId(session.getSessionId());
     vo.setTitle(session.getTitle());
     vo.setAppId(session.getAppId());
     vo.setModelId(session.getModelId());
@@ -85,6 +85,7 @@ public class SessionAssembler {
 
     SessionListVo vo = new SessionListVo();
     vo.setId(session.identity());
+    vo.setSessionId(session.getSessionId());
     vo.setTitle(session.getTitle());
     vo.setAppId(session.getAppId());
     vo.setModelId(session.getModelId());

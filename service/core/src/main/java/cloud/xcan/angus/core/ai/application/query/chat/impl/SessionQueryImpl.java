@@ -39,12 +39,33 @@ public class SessionQueryImpl implements SessionQuery {
   }
 
   @Override
+  public Session findBySessionId(String sessionId) {
+    return new BizTemplate<Session>() {
+      @Override
+      protected Session process() {
+        return sessionRepo.findBySessionId(sessionId).orElse(null);
+      }
+    }.execute();
+  }
+
+  @Override
   public Session findAndCheck(Long id) {
     return new BizTemplate<Session>() {
       @Override
       protected Session process() {
         return sessionRepo.findById(id)
             .orElseThrow(() -> ResourceNotFound.of("会话「{0}」不存在", new Object[]{id}));
+      }
+    }.execute();
+  }
+
+  @Override
+  public Session findAndCheckBySessionId(String sessionId) {
+    return new BizTemplate<Session>() {
+      @Override
+      protected Session process() {
+        return sessionRepo.findBySessionId(sessionId)
+            .orElseThrow(() -> ResourceNotFound.of("会话「{0}」不存在", new Object[]{sessionId}));
       }
     }.execute();
   }

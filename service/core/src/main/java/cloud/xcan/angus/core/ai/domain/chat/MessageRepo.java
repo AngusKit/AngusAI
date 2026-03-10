@@ -14,29 +14,29 @@ import org.springframework.data.repository.NoRepositoryBean;
 public interface MessageRepo extends BaseRepository<Message, Long> {
 
   /**
-   * 根据会话ID查询消息列表
+   * 根据会话实体ID查询消息列表
    */
-  List<Message> findBySessionIdOrderByCreatedDateAsc(Long sessionId);
+  List<Message> findBySessionEntityIdOrderByCreatedDateAsc(Long sessionEntityId);
 
   /**
-   * 根据会话ID分页查询消息
+   * 根据会话实体ID分页查询消息
    */
-  Page<Message> findBySessionIdOrderByCreatedDateDesc(Long sessionId, Pageable pageable);
+  Page<Message> findBySessionEntityIdOrderByCreatedDateDesc(Long sessionEntityId, Pageable pageable);
 
   /**
-   * 查询会话的最后一条消息
+   * 查询会话的最后一条消息（按实体ID）
    */
-  Message findFirstBySessionIdOrderByCreatedDateDesc(Long sessionId);
+  Message findFirstBySessionEntityIdOrderByCreatedDateDesc(Long sessionEntityId);
 
   /**
-   * 根据会话ID和角色查询消息
+   * 根据会话ID(UUID)和角色查询消息
    */
-  List<Message> findBySessionIdAndRole(Long sessionId, MessageRole role);
+  List<Message> findBySessionIdAndRole(String sessionId, MessageRole role);
 
   /**
-   * 查询正在流式生成的消息
+   * 查询正在流式生成的消息（按会话ID UUID）
    */
-  List<Message> findBySessionIdAndIsStreamingTrue(Long sessionId);
+  List<Message> findBySessionIdAndIsStreamingTrue(String sessionId);
 
   /**
    * 根据父消息ID查询子消息
@@ -44,20 +44,46 @@ public interface MessageRepo extends BaseRepository<Message, Long> {
   List<Message> findByParentMessageId(Long parentMessageId);
 
   /**
-   * 统计会话的消息数量
+   * 根据会话ID(UUID)统计消息数量
    */
-  long countBySessionId(Long sessionId);
+  long countBySessionId(String sessionId);
 
   /**
-   * 删除会话的所有消息
+   * 根据会话实体ID统计消息数量
+   */
+  long countBySessionEntityId(Long sessionEntityId);
+
+  /**
+   * 根据会话实体ID删除消息
    */
   @Modifying
-  int deleteBySessionId(Long sessionId);
+  int deleteBySessionEntityId(Long sessionEntityId);
+
+  /**
+   * 根据会话ID(UUID)删除消息
+   */
+  @Modifying
+  int deleteBySessionId(String sessionId);
 
   /**
    * 批量删除会话的所有消息
    */
   @Modifying
-  int deleteBySessionIdIn(List<Long> ids);
+  int deleteBySessionEntityIdIn(List<Long> ids);
+
+  /**
+   * 根据会话ID(UUID)查询消息列表
+   */
+  List<Message> findBySessionIdOrderByCreatedDateAsc(String sessionId);
+
+  /**
+   * 根据会话ID(UUID)分页查询消息
+   */
+  Page<Message> findBySessionIdOrderByCreatedDateDesc(String sessionId, Pageable pageable);
+
+  /**
+   * 查询会话的最后一条消息（按会话ID UUID）
+   */
+  Message findFirstBySessionIdOrderByCreatedDateDesc(String sessionId);
 
 }

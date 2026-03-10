@@ -20,37 +20,37 @@ public interface MessageFacade {
   /**
    * 发送消息
    */
-  MessageSendVo sendMessage(Long sessionId, MessageSendDto dto);
+  MessageSendVo sendMessage(String sessionId, MessageSendDto dto);
 
   /**
    * 发送消息（流式）
    */
-  SseEmitter sendMessageStream(Long sessionId, MessageSendDto dto);
+  SseEmitter sendMessageStream(String sessionId, MessageSendDto dto);
 
   /**
    * 上传附件
    */
-  AttachmentUploadVo uploadAttachment(MultipartFile file, Long sessionId);
+  AttachmentUploadVo uploadAttachment(MultipartFile file, String sessionId);
 
   /**
    * 重新生成消息
    */
-  MessageVo regenerateMessage(Long sessionId, Long messageId);
+  MessageVo regenerateMessage(String sessionId, Long messageId);
 
   /**
    * 消息反馈
    */
-  MessageVo feedbackMessage(Long sessionId, Long messageId, MessageFeedbackDto dto);
+  MessageVo feedbackMessage(String sessionId, Long messageId, MessageFeedbackDto dto);
 
   /**
    * 停止生成
    */
-  MessageVo stopGeneration(Long sessionId);
+  MessageVo stopGeneration(String sessionId);
 
   /**
    * 清空会话消息
    */
-  Integer clearSessionMessages(Long sessionId);
+  Integer clearSessionMessages(String sessionId);
 
   /**
    * 删除附件
@@ -60,7 +60,7 @@ public interface MessageFacade {
   /**
    * 获取消息历史
    */
-  PageResult<MessageVo> listMessages(Long sessionId, MessageFindDto dto);
+  PageResult<MessageVo> listMessages(String sessionId, MessageFindDto dto);
 
   /**
    * 获取对话统计

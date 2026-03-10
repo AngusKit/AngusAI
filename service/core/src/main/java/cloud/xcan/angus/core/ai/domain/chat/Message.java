@@ -26,10 +26,16 @@ public class Message extends TenantAuditingEntity<Message, Long> {
   private Long id;
 
   /**
-   * 所属会话ID
+   * 所属会话实体 ID（FK，对应 Session.id）
    */
   @Column(name = "session_id", nullable = false)
-  private Long sessionId;
+  private Long sessionEntityId;
+
+  /**
+   * 所属会话业务标识 UUID，与 Session.sessionId 统一，便于按 sessionId 关联查询
+   */
+  @Column(name = "session_id_uuid", length = 36)
+  private String sessionId;
 
   /**
    * 父消息ID（用于重新生成）

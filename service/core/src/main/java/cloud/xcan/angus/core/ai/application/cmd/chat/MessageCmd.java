@@ -11,13 +11,17 @@ public interface MessageCmd {
 
   /**
    * 创建消息
+   *
+   * @param sessionId 会话ID（UUID），与 Session.sessionId 统一
    */
-  Long create(Long sessionId, MessageRole role, String content);
+  Long create(String sessionId, MessageRole role, String content);
 
   /**
    * 创建带附件的消息
+   *
+   * @param sessionId 会话ID（UUID）
    */
-  Long createWithAttachments(Long sessionId, MessageRole role, String content,
+  Long createWithAttachments(String sessionId, MessageRole role, String content,
       List<MessageAttachment> attachments);
 
   /**

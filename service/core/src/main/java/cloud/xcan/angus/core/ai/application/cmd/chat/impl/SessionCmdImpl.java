@@ -23,6 +23,7 @@ import cloud.xcan.angus.core.utils.CoreUtils;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 /**
@@ -65,6 +66,7 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
 
       @Override
       protected Session process() {
+        session.setSessionId(nullSafe(session.getSessionId(), UUID.randomUUID().toString()));
         session.setTitle(nullSafe(session.getTitle(), "新对话"));
         // 会话默认使用应用绑定的 Agent 的模型
         if (session.getModelId() == null) {
@@ -88,6 +90,37 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
 
         insert0(session);
         return session;
+      }
+    }.execute();
+  }
+
+  @Override
+  @Transactional
+  public Session createOrGetForAgentChat(Agent agent, String sessionId) {
+    return new BizTemplate<Session>() {
+      String effectiveSessionId;
+
+      @Override
+      protected void checkParams() {
+        effectiveSessionId = (sessionId != null && !sessionId.isBlank())
+            ? sessionId : UUID.randomUUID().toString();
+      }
+
+      @Override
+      protected Session process() {
+        Session existing = sessionQuery.findBySessionId(effectiveSessionId);
+        if (existing != null) {
+          return existing;
+        }
+        Session session = new Session();
+        session.setSessionId(effectiveSessionId);
+        session.setAppId(agent.getId());
+        session.setAgentId(agent.getId());
+        session.setTitle("新对话");
+        SessionConfig config = new SessionConfig();
+        config.setSystemPrompt("You are a helpful assistant.");
+        session.setConfig(config);
+        return create(session);
       }
     }.execute();
   }
@@ -196,7 +229,7 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
       @Override
       protected Void process() {
         // 删除会话的所有消息
-        messageRepo.deleteBySessionId(id);
+        messageRepo.deleteBySessionEntityId(id);
         // 删除会话
         sessionRepo.deleteById(id);
         return null;
@@ -211,7 +244,7 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
       @Override
       protected Integer process() {
         // 删除会话的所有消息
-        messageRepo.deleteBySessionIdIn(sessionIds);
+        messageRepo.deleteBySessionEntityIdIn(sessionIds);
         // 删除会话
         return sessionRepo.deleteByIdIn(sessionIds);
       }
@@ -232,7 +265,7 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
 
       @Override
       protected Integer process() {
-        long count = messageRepo.deleteBySessionId(id);
+        long count = messageRepo.deleteBySessionEntityId(id);
 
         // 更新会话消息计数
         session.setMessageCount(0);

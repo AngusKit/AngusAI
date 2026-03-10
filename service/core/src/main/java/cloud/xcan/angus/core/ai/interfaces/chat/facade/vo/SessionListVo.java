@@ -12,8 +12,11 @@ import lombok.Data;
 @Schema(description = "会话列表视图")
 public class SessionListVo {
 
-  @Schema(description = "会话ID")
+  @Schema(description = "会话实体ID")
   private Long id;
+
+  @Schema(description = "会话ID(UUID)，对话/消息 API 使用此标识")
+  private String sessionId;
 
   @Schema(description = "会话标题")
   private String title;
