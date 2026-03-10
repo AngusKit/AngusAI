@@ -24,27 +24,27 @@ public interface SessionFacade {
   /**
    * 更新会话
    */
-  SessionDetailVo updateSession(Long id, SessionUpdateDto dto);
+  SessionDetailVo updateSession(String sessionId, SessionUpdateDto dto);
 
   /**
    * 切换应用
    */
-  SessionDetailVo switchApp(Long sessionId, SessionSwitchAppDto dto);
+  SessionDetailVo switchApp(String sessionId, SessionSwitchAppDto dto);
 
   /**
    * 切换模型
    */
-  SessionDetailVo switchModel(Long sessionId, SessionSwitchModelDto dto);
+  SessionDetailVo switchModel(String sessionId, SessionSwitchModelDto dto);
 
   /**
    * 收藏/取消收藏会话
    */
-  SessionDetailVo starSession(Long sessionId, SessionStarDto dto);
+  SessionDetailVo starSession(String sessionId, SessionStarDto dto);
 
   /**
    * 删除会话
    */
-  void deleteSession(Long id);
+  void deleteSession(String sessionId);
 
   /**
    * 批量删除会话
@@ -54,7 +54,7 @@ public interface SessionFacade {
   /**
    * 获取会话详情
    */
-  SessionDetailVo getSessionDetail(Long id);
+  SessionDetailVo getSessionDetail(String sessionId);
 
   /**
    * 获取会话列表

@@ -1,8 +1,11 @@
 package cloud.xcan.angus.core.ai.domain.model;
 
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
+import cloud.xcan.angus.core.jpa.repository.NameJoinRepository;
+import org.springframework.data.repository.NoRepositoryBean;
 
-public interface ModelRepo extends BaseRepository<Model, Long> {
+@NoRepositoryBean
+public interface ModelRepo extends NameJoinRepository<Model, Long>, BaseRepository<Model, Long> {
 
   /**
    * 检查模型名称是否存在

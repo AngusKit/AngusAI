@@ -1,5 +1,7 @@
 package cloud.xcan.angus.core.ai.interfaces.chat.facade.dto;
 
+import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_NAME_LENGTH;
+
 import cloud.xcan.angus.core.ai.domain.chat.SessionConfig;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
@@ -11,7 +13,7 @@ import org.hibernate.validator.constraints.Length;
 @Schema(description = "创建会话请求")
 public class SessionCreateDto {
 
-  @Length(max = 200)
+  @Length(max = MAX_NAME_LENGTH)
   @Schema(description = "会话标题", example = "新对话")
   private String title;
 

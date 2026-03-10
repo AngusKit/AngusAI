@@ -1,9 +1,13 @@
 package cloud.xcan.angus.core.ai.interfaces.chat.facade.internal;
 
+import static cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder.getMatchSearchFields;
 import static cloud.xcan.angus.core.utils.CoreUtils.buildVoPageResult;
+import static cloud.xcan.angus.spec.utils.ObjectUtils.isNotEmpty;
 
 import cloud.xcan.angus.core.ai.application.cmd.chat.SessionCmd;
+import cloud.xcan.angus.core.ai.application.query.chat.MessageQuery;
 import cloud.xcan.angus.core.ai.application.query.chat.SessionQuery;
+import cloud.xcan.angus.core.ai.domain.chat.Message;
 import cloud.xcan.angus.core.ai.domain.chat.Session;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.SessionFacade;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.SessionBatchDeleteDto;
@@ -20,8 +24,10 @@ import cloud.xcan.angus.core.biz.NameJoin;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.PageResult;
 import jakarta.annotation.Resource;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 /**
@@ -36,6 +42,9 @@ public class SessionFacadeImpl implements SessionFacade {
   @Resource
   private SessionQuery sessionQuery;
 
+  @Resource
+  private MessageQuery messageQuery;
+
   @Override
   public SessionDetailVo createSession(SessionCreateDto dto) {
     Session saved = sessionCmd.create(SessionAssembler.toDomain(dto));
@@ -43,46 +52,55 @@ public class SessionFacadeImpl implements SessionFacade {
   }
 
   @Override
-  public SessionDetailVo updateSession(Long id, SessionUpdateDto dto) {
-    Session session = sessionCmd.update(SessionAssembler.updateDomain(id, dto));
+  public SessionDetailVo updateSession(String sessionId, SessionUpdateDto dto) {
+    Session existing = sessionQuery.findAndCheckBySessionId(sessionId);
+    Session session = sessionCmd.update(SessionAssembler.updateDomain(existing.getId(), dto));
+    setLastMessage(List.of(session));
     return SessionAssembler.toDetailVo(session);
   }
 
   @Override
-  public SessionDetailVo switchApp(Long sessionId, SessionSwitchAppDto dto) {
-    sessionCmd.switchApp(sessionId, dto.getAppId());
-    Session session = sessionQuery.findAndCheck(sessionId);
-    return SessionAssembler.toDetailVo(session);
+  public SessionDetailVo switchApp(String sessionId, SessionSwitchAppDto dto) {
+    Session session = sessionQuery.findAndCheckBySessionId(sessionId);
+    sessionCmd.switchApp(session.getId(), dto.getAppId());
+    setLastMessage(List.of(session));
+    return SessionAssembler.toDetailVo(sessionQuery.findAndCheck(session.getId()));
   }
 
   @Override
-  public SessionDetailVo switchModel(Long sessionId, SessionSwitchModelDto dto) {
-    sessionCmd.switchModel(sessionId, dto.getModelId());
-    Session session = sessionQuery.findAndCheck(sessionId);
-    return SessionAssembler.toDetailVo(session);
+  public SessionDetailVo switchModel(String sessionId, SessionSwitchModelDto dto) {
+    Session session = sessionQuery.findAndCheckBySessionId(sessionId);
+    sessionCmd.switchModel(session.getId(), dto.getModelId());
+    setLastMessage(List.of(session));
+    return SessionAssembler.toDetailVo(sessionQuery.findAndCheck(session.getId()));
   }
 
   @Override
-  public SessionDetailVo starSession(Long sessionId, SessionStarDto dto) {
-    sessionCmd.star(sessionId, dto.getIsStarred());
-    Session session = sessionQuery.findAndCheck(sessionId);
-    return SessionAssembler.toDetailVo(session);
+  public SessionDetailVo starSession(String sessionId, SessionStarDto dto) {
+    Session session = sessionQuery.findAndCheckBySessionId(sessionId);
+    sessionCmd.star(session.getId(), dto.getIsStarred());
+    setLastMessage(List.of(session));
+    return SessionAssembler.toDetailVo(sessionQuery.findAndCheck(session.getId()));
   }
 
   @Override
-  public void deleteSession(Long id) {
-    sessionCmd.delete(id);
+  public void deleteSession(String sessionId) {
+    Session session = sessionQuery.findAndCheckBySessionId(sessionId);
+    sessionCmd.delete(session.getId());
   }
 
   @Override
   public Integer batchDeleteSessions(SessionBatchDeleteDto dto) {
-    return sessionCmd.batchDelete(dto.getSessionIds());
+    List<Session> sessions = sessionQuery.findBySessionIdIn(dto.getSessionIds());
+    List<Long> ids = sessions.stream().map(Session::getId).toList();
+    return sessionCmd.batchDelete(ids);
   }
 
   @NameJoin
   @Override
-  public SessionDetailVo getSessionDetail(Long id) {
-    Session session = sessionQuery.findAndCheck(id);
+  public SessionDetailVo getSessionDetail(String sessionId) {
+    Session session = sessionQuery.findAndCheckBySessionId(sessionId);
+    setLastMessage(List.of(session));
     return SessionAssembler.toDetailVo(session);
   }
 
@@ -90,8 +108,19 @@ public class SessionFacadeImpl implements SessionFacade {
   @Override
   public PageResult<SessionListVo> listSessions(SessionFindDto dto) {
     GenericSpecification<Session> spec = SessionAssembler.getSpecification(dto);
-    PageRequest pageRequest = PageRequest.of(dto.getPageNo() - 1, dto.getPageSize());
-    Page<Session> page = sessionQuery.find(spec, pageRequest, false, null);
+    Page<Session> page = sessionQuery.find(spec, dto.tranPage(), dto.fullTextSearch,
+        getMatchSearchFields(dto.getClass()));
+    setLastMessage(page.getContent());
     return buildVoPageResult(page, SessionAssembler::toListVo);
+  }
+
+  private void setLastMessage(List<Session> sessions) {
+    if (isNotEmpty(sessions)) {
+      Map<Long, Message> lastMessageMap = messageQuery.findLastMessageMapById(
+          sessions.stream().collect(Collectors.toMap(Message::getId, x -> x)));
+      for (Session session : sessions) {
+        session.setLastMessage(lastMessageMap.get(session.getId()));
+      }
+    }
   }
 }

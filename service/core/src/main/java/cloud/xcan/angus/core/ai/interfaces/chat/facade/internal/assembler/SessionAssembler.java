@@ -10,8 +10,11 @@ import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.SessionUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.SessionDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.SessionListVo;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
+import cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder;
+import cloud.xcan.angus.remote.search.SearchCriteria;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.Set;
 import org.springframework.util.StringUtils;
 
 public class SessionAssembler {
@@ -27,6 +30,8 @@ public class SessionAssembler {
     // 初始化计数和标志
     session.setMessageCount(0);
     session.setIsStarred(false);
+    session.setIsPinned(false);
+    session.setIsArchived(false);
     return session;
   }
 
@@ -38,9 +43,6 @@ public class SessionAssembler {
     return session;
   }
 
-  /**
-   * Session -> SessionDetailVo
-   */
   public static SessionDetailVo toDetailVo(Session session) {
     if (session == null) {
       return null;
@@ -54,30 +56,30 @@ public class SessionAssembler {
     vo.setModelId(session.getModelId());
     vo.setMessageCount(session.getMessageCount());
     vo.setIsStarred(session.getIsStarred());
+    vo.setIsArchived(session.getIsArchived());
+    vo.setIsPinned(session.getIsPinned());
 
-    // 审计字段从TenantAuditingEntity继承
-    if (session.getCreatedBy() != null) {
-      vo.setCreatedBy(session.getCreatedBy());
-    }
-    if (session.getCreatedDate() != null) {
-      vo.setCreatedDate(
-          Date.from(session.getCreatedDate().atZone(ZoneId.systemDefault()).toInstant()));
-    }
-    if (session.getModifiedDate() != null) {
-      vo.setModifiedDate(
-          Date.from(session.getModifiedDate().atZone(ZoneId.systemDefault()).toInstant()));
+    // 设置配置参数
+    vo.setConfig(session.getConfig());
+
+    // 最后一条消息
+    if (session.getLastMessage() != null) {
+      SessionListVo.LastMessage lastMessage = new SessionListVo.LastMessage();
+      lastMessage.setContent(session.getLastMessage().getContent());
+      lastMessage.setRole(session.getLastMessage().getRole());
+      lastMessage.setDatetime(session.getLastMessage().getCreatedDate());
+      vo.setLastMessage(lastMessage);
     }
 
-    // 转换配置
-    if (session.getConfig() != null) {
-      vo.setConfig(session.getConfig());
-    }
+    // 设置审计字段
+    vo.setCreatedBy(session.getCreatedBy());
+    vo.setCreatedDate(session.getCreatedDate());
+    vo.setModifiedBy(session.getModifiedBy());
+    vo.setModifiedDate(session.getModifiedDate());
+
     return vo;
   }
 
-  /**
-   * Session -> SessionListVo
-   */
   public static SessionListVo toListVo(Session session) {
     if (session == null) {
       return null;
@@ -91,38 +93,36 @@ public class SessionAssembler {
     vo.setModelId(session.getModelId());
     vo.setMessageCount(session.getMessageCount());
     vo.setIsStarred(session.getIsStarred());
+    vo.setIsArchived(session.getIsArchived());
+    vo.setIsPinned(session.getIsPinned());
 
-    if (session.getCreatedDate() != null) {
-      vo.setCreatedDate(
-          Date.from(session.getCreatedDate().atZone(ZoneId.systemDefault()).toInstant()));
-    }
-    if (session.getModifiedDate() != null) {
-      vo.setModifiedDate(
-          Date.from(session.getModifiedDate().atZone(ZoneId.systemDefault()).toInstant()));
-    }
+    // 设置配置参数
+    vo.setConfig(session.getConfig());
 
     // 最后一条消息
-    if (StringUtils.hasText(session.getLastMessageContent())) {
+    if (session.getLastMessage() != null) {
       SessionListVo.LastMessage lastMessage = new SessionListVo.LastMessage();
-      lastMessage.setContent(session.getLastMessageContent());
-      lastMessage.setRole(session.getLastMessageRole());
-      if (session.getLastMessageTime() != null) {
-        lastMessage.setDatetime(session.getLastMessageTime());
-      }
+      lastMessage.setContent(session.getLastMessage().getContent());
+      lastMessage.setRole(session.getLastMessage().getRole());
+      lastMessage.setDatetime(session.getLastMessage().getCreatedDate());
       vo.setLastMessage(lastMessage);
     }
 
+    // 设置审计字段
+    vo.setCreatedBy(session.getCreatedBy());
+    vo.setCreatedDate(session.getCreatedDate());
+    vo.setModifiedBy(session.getModifiedBy());
+    vo.setModifiedDate(session.getModifiedDate());
     return vo;
   }
 
-  /**
-   * SessionFindDto -> GenericSpecification
-   */
   public static GenericSpecification<Session> getSpecification(SessionFindDto dto) {
-    // TODO: 实现查询条件构建
-    // 由于SearchCriteria的使用方式复杂，暂时返回空的GenericSpecification
-    // 在实际项目中，应该根据具体的查询需求来实现
-    return new GenericSpecification<>();
+    Set<SearchCriteria> filters = new SearchCriteriaBuilder<>(dto)
+        .rangeSearchFields("id", "createdDate", "modifiedDate")
+        .orderByFields("id", "title", "createdDate", "modifiedDate")
+        .matchSearchFields("title")
+        .build();
+    return new GenericSpecification<>(filters);
   }
 
 }

@@ -1,6 +1,5 @@
 package cloud.xcan.angus.core.ai.application.cmd.chat.impl;
 
-import static cloud.xcan.angus.spec.utils.ObjectUtils.lengthSafe;
 import static cloud.xcan.angus.spec.utils.ObjectUtils.nullSafe;
 import static java.util.Objects.nonNull;
 
@@ -11,7 +10,6 @@ import cloud.xcan.angus.core.ai.application.query.chat.SessionQuery;
 import cloud.xcan.angus.core.ai.domain.agent.Agent;
 import cloud.xcan.angus.core.ai.domain.application.AIApplication;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRepo;
-import cloud.xcan.angus.core.ai.domain.chat.MessageRole;
 import cloud.xcan.angus.core.ai.domain.chat.Session;
 import cloud.xcan.angus.core.ai.domain.chat.SessionConfig;
 import cloud.xcan.angus.core.ai.domain.chat.SessionRepo;
@@ -258,24 +256,10 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
 
         // 更新会话消息计数
         session.setMessageCount(0);
-        session.setLastMessageContent(null);
-        session.setLastMessageRole(null);
-        session.setLastMessageTime(null);
         sessionRepo.save(session);
         return (int) count;
       }
     }.execute();
-  }
-
-  @Override
-  @Transactional
-  public void updateLastMessage(Long sessionId, String content, MessageRole role) {
-    Session session = sessionRepo.findById(sessionId).orElse(null);
-    if (session != null) {
-      session.setLastMessageContent(lengthSafe(content, 60000));
-      session.setLastMessageRole(role);
-      sessionRepo.save(session);
-    }
   }
 
   @Override

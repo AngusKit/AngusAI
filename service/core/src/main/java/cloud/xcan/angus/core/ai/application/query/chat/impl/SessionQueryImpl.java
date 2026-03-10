@@ -51,16 +51,6 @@ public class SessionQueryImpl implements SessionQuery {
   private AgentQuery agentQuery;
 
   @Override
-  public Session findById(Long id) {
-    return new BizTemplate<Session>() {
-      @Override
-      protected Session process() {
-        return sessionRepo.findById(id).orElse(null);
-      }
-    }.execute();
-  }
-
-  @Override
   public Session findBySessionId(String sessionId) {
     return new BizTemplate<Session>() {
       @Override
@@ -90,6 +80,14 @@ public class SessionQueryImpl implements SessionQuery {
             .orElseThrow(() -> ResourceNotFound.of("会话「{0}」不存在", new Object[]{sessionId}));
       }
     }.execute();
+  }
+
+  @Override
+  public List<Session> findBySessionIdIn(List<String> sessionIds) {
+    if (sessionIds == null || sessionIds.isEmpty()) {
+      return new ArrayList<>();
+    }
+    return sessionRepo.findBySessionIdIn(sessionIds);
   }
 
   @Override

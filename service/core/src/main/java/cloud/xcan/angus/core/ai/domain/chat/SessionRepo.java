@@ -19,6 +19,11 @@ public interface SessionRepo extends BaseRepository<Session, Long> {
   Optional<Session> findBySessionId(String sessionId);
 
   /**
+   * 根据会话ID(UUID)列表批量查询（用于 batchDelete 等）
+   */
+  List<Session> findBySessionIdIn(List<String> sessionIds);
+
+  /**
    * 统计某用户在某应用下的会话数量（用于配额校验）
    */
   long countByCreatedByAndAppId(Long createdBy, Long appId);

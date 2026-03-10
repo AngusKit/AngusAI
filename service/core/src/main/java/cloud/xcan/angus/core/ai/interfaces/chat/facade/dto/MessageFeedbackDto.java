@@ -1,7 +1,8 @@
 package cloud.xcan.angus.core.ai.interfaces.chat.facade.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
+import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
@@ -12,8 +13,8 @@ import lombok.Data;
 @Schema(description = "消息反馈请求")
 public class MessageFeedbackDto {
 
-  @Schema(description = "反馈类型：like或dislike", required = true)
-  @NotBlank(message = "反馈类型不能为空")
+  @NotNull
+  @Schema(description = "反馈类型：like或dislike", requiredMode = RequiredMode.REQUIRED)
   @Pattern(regexp = "^(like|dislike)$", message = "反馈类型只能是like或dislike")
   private String feedbackType;
 

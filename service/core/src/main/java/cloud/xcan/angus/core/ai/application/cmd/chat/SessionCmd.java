@@ -44,11 +44,6 @@ public interface SessionCmd {
   void star(Long id, Boolean isStarred);
 
   /**
-   * 更新会话的最后消息信息
-   */
-  void updateLastMessage(Long sessionId, String content, MessageRole role);
-
-  /**
    * 增加消息计数
    */
   void incrementMessageCount(Long sessionId);

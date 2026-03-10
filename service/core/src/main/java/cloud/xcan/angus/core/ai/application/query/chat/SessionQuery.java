@@ -14,11 +14,6 @@ import org.springframework.data.domain.PageRequest;
 public interface SessionQuery {
 
   /**
-   * 根据ID查找会话
-   */
-  Session findById(Long id);
-
-  /**
    * 根据会话ID(UUID)查找
    */
   Session findBySessionId(String sessionId);
@@ -32,6 +27,11 @@ public interface SessionQuery {
    * 根据会话ID(UUID)查找并检查
    */
   Session findAndCheckBySessionId(String sessionId);
+
+  /**
+   * 根据会话ID(UUID)列表批量查找
+   */
+  List<Session> findBySessionIdIn(List<String> sessionIds);
 
   /**
    * 根据条件查询会话（支持全文搜索）

@@ -41,8 +41,6 @@ public class MessageCmdImpl extends CommCmd<Message, Long> implements MessageCmd
 
     Message savedMessage = messageRepo.save(message);
     sessionCmd.incrementMessageCount(session.getId());
-    sessionCmd.updateLastMessage(session.getId(), content, role);
-
     return savedMessage;
   }
 

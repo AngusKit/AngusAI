@@ -1,6 +1,7 @@
 package cloud.xcan.angus.core.ai.interfaces.chat.facade.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -8,7 +9,7 @@ import lombok.Data;
 @Schema(description = "切换应用请求")
 public class SessionSwitchAppDto {
 
-  @Schema(description = "新应用ID", required = true)
-  @NotNull(message = "应用ID不能为空")
+  @NotNull
+  @Schema(description = "新应用ID", requiredMode = RequiredMode.REQUIRED)
   private Long appId;
 }

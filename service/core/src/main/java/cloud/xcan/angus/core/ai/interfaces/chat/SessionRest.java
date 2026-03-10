@@ -56,17 +56,17 @@ public class SessionRest {
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "更新成功")
   })
-  @PatchMapping("/{id}")
+  @PatchMapping("/{sessionId}")
   public ApiLocaleResult<SessionDetailVo> update(
-      @Parameter(description = "会话ID") @PathVariable Long id,
+      @Parameter(description = "会话ID(UUID)") @PathVariable String sessionId,
       @Valid @RequestBody SessionUpdateDto dto) {
-    return ApiLocaleResult.success(sessionFacade.updateSession(id, dto));
+    return ApiLocaleResult.success(sessionFacade.updateSession(sessionId, dto));
   }
 
   @Operation(operationId = "switchApp", summary = "切换应用", description = "切换会话使用的应用")
   @PatchMapping("/{sessionId}/switch-app")
   public ApiLocaleResult<SessionDetailVo> switchApp(
-      @Parameter(description = "会话ID") @PathVariable Long sessionId,
+      @Parameter(description = "会话ID(UUID)") @PathVariable String sessionId,
       @Valid @RequestBody SessionSwitchAppDto dto) {
     return ApiLocaleResult.success(sessionFacade.switchApp(sessionId, dto));
   }
@@ -74,7 +74,7 @@ public class SessionRest {
   @Operation(operationId = "switchModel", summary = "切换模型", description = "切换会话使用的AI模型")
   @PatchMapping("/{sessionId}/switch-model")
   public ApiLocaleResult<SessionDetailVo> switchModel(
-      @Parameter(description = "会话ID") @PathVariable Long sessionId,
+      @Parameter(description = "会话ID(UUID)") @PathVariable String sessionId,
       @Valid @RequestBody SessionSwitchModelDto dto) {
     return ApiLocaleResult.success(sessionFacade.switchModel(sessionId, dto));
   }
@@ -82,7 +82,7 @@ public class SessionRest {
   @Operation(operationId = "starSession", summary = "收藏/取消收藏会话", description = "收藏或取消收藏会话（前端显示为星标）")
   @PatchMapping("/{sessionId}/star")
   public ApiLocaleResult<SessionDetailVo> star(
-      @Parameter(description = "会话ID") @PathVariable Long sessionId,
+      @Parameter(description = "会话ID(UUID)") @PathVariable String sessionId,
       @Valid @RequestBody SessionStarDto dto) {
     return ApiLocaleResult.success(sessionFacade.starSession(sessionId, dto));
   }
@@ -92,9 +92,9 @@ public class SessionRest {
       @ApiResponse(responseCode = "204", description = "删除成功")
   })
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  @DeleteMapping("/{id}")
-  public void delete(@Parameter(description = "会话ID") @PathVariable Long id) {
-    sessionFacade.deleteSession(id);
+  @DeleteMapping("/{sessionId}")
+  public void delete(@Parameter(description = "会话ID(UUID)") @PathVariable String sessionId) {
+    sessionFacade.deleteSession(sessionId);
   }
 
   @Operation(operationId = "batchDeleteSessions", summary = "批量删除会话", description = "批量删除会话")
@@ -108,10 +108,10 @@ public class SessionRest {
       @ApiResponse(responseCode = "200", description = "会话详情获取成功"),
       @ApiResponse(responseCode = "404", description = "会话不存在")
   })
-  @GetMapping("/{id}")
+  @GetMapping("/{sessionId}")
   public ApiLocaleResult<SessionDetailVo> getDetail(
-      @Parameter(description = "会话ID") @PathVariable Long id) {
-    return ApiLocaleResult.success(sessionFacade.getSessionDetail(id));
+      @Parameter(description = "会话ID(UUID)") @PathVariable String sessionId) {
+    return ApiLocaleResult.success(sessionFacade.getSessionDetail(sessionId));
   }
 
   @Operation(operationId = "getSessionList", summary = "获取会话列表", description = "获取用户的对话会话列表，支持分页、搜索和筛选")
@@ -127,7 +127,7 @@ public class SessionRest {
   @Operation(operationId = "exportSession", summary = "导出会话", description = "导出会话内容")
   @GetMapping("/{sessionId}/export")
   public void export(
-      @Parameter(description = "会话ID") @PathVariable Long sessionId,
+      @Parameter(description = "会话ID(UUID)") @PathVariable String sessionId,
       @Parameter(description = "导出格式") @RequestParam(required = false, defaultValue = "json") String format) {
     // TODO: 实现导出逻辑
   }
