@@ -123,5 +123,7 @@ export const DEFAULT_FORM_DATA = {
   endpoint: '',
   maxTokens: '',
   temperature: '0.7',
+  inputPricePerMillionTokens: '',
+  outputPricePerMillionTokens: '',
 } as const;
 

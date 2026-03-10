@@ -245,6 +245,16 @@ export interface ModelCreateDto {
    * @format int32
    */
   maxTokens?: number;
+  /**
+   * 每百万Tokens输入价格（美元）
+   * @format double
+   */
+  inputPricePerMillionTokens?: number;
+  /**
+   * 每百万Tokens输出价格（美元）
+   * @format double
+   */
+  outputPricePerMillionTokens?: number;
 }
 
 /** 测试模型请求参数 */
@@ -289,6 +299,16 @@ export interface ModelUpdateDto {
    * @format int32
    */
   maxTokens?: number;
+  /**
+   * 每百万Tokens输入价格（美元）
+   * @format double
+   */
+  inputPricePerMillionTokens?: number;
+  /**
+   * 每百万Tokens输出价格（美元）
+   * @format double
+   */
+  outputPricePerMillionTokens?: number;
 }
 
 /** 修改模型状态请求参数 */

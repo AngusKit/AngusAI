@@ -193,7 +193,7 @@ export function ModelFormFields({
 
           <div className='space-y-2'>
             <Label htmlFor={isEdit ? 'edit-model-temperature' : 'model-temperature'} className='dark:text-gray-300'>
-              Temperature
+              {t('models.formFields.temperature')}
             </Label>
             <Input
               id={isEdit ? 'edit-model-temperature' : 'model-temperature'}
@@ -204,6 +204,38 @@ export function ModelFormFields({
               placeholder='0.7'
               value={formData.temperature}
               onChange={e => updateField('temperature', e.target.value)}
+              className='dark:bg-gray-700 dark:border-gray-600'
+            />
+          </div>
+
+          <div className='space-y-2'>
+            <Label htmlFor={isEdit ? 'edit-model-inputPrice' : 'model-inputPrice'} className='dark:text-gray-300'>
+              {t('models.formFields.inputPricePerMillionTokens')}
+            </Label>
+            <Input
+              id={isEdit ? 'edit-model-inputPrice' : 'model-inputPrice'}
+              type='number'
+              step='0.01'
+              min='0'
+              placeholder='2.5'
+              value={formData.inputPricePerMillionTokens}
+              onChange={e => updateField('inputPricePerMillionTokens', e.target.value)}
+              className='dark:bg-gray-700 dark:border-gray-600'
+            />
+          </div>
+
+          <div className='space-y-2'>
+            <Label htmlFor={isEdit ? 'edit-model-outputPrice' : 'model-outputPrice'} className='dark:text-gray-300'>
+              {t('models.formFields.outputPricePerMillionTokens')}
+            </Label>
+            <Input
+              id={isEdit ? 'edit-model-outputPrice' : 'model-outputPrice'}
+              type='number'
+              step='0.01'
+              min='0'
+              placeholder='10'
+              value={formData.outputPricePerMillionTokens}
+              onChange={e => updateField('outputPricePerMillionTokens', e.target.value)}
               className='dark:bg-gray-700 dark:border-gray-600'
             />
           </div>

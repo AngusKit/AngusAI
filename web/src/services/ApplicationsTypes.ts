@@ -295,6 +295,16 @@ export interface ModelConfigDefinition {
   priority?: number;
   /** 租户 ID（null 为全局） */
   tenantId?: string;
+  /**
+   * 每百万Tokens输入价格（美元）
+   * @format double
+   */
+  inputPricePerMillionTokens?: number;
+  /**
+   * 每百万Tokens输出价格（美元）
+   * @format double
+   */
+  outputPricePerMillionTokens?: number;
   /** 扩展参数 */
   extraProperties?: Record<string, object>;
 }

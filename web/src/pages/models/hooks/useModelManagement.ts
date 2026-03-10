@@ -358,6 +358,10 @@ export const useModelManagement = (): UseModelManagementReturn => {
         endpoint: detail?.config?.baseUrl ?? '',
         maxTokens: detail?.config?.maxTokens !== undefined ? String(detail.config.maxTokens) : '',
         temperature: detail?.config?.temperature !== undefined ? String(detail.config.temperature) : '0.7',
+        inputPricePerMillionTokens:
+          detail?.config?.inputPricePerMillionTokens != null ? String(detail.config.inputPricePerMillionTokens) : '',
+        outputPricePerMillionTokens:
+          detail?.config?.outputPricePerMillionTokens != null ? String(detail.config.outputPricePerMillionTokens) : '',
       });
       setEditDialogOpen(true);
     },
@@ -379,6 +383,10 @@ export const useModelManagement = (): UseModelManagementReturn => {
     const maxTokens = Number.isFinite(parsedMaxTokens ?? 0) ? parsedMaxTokens : undefined;
     const parsedTemperature = editFormData.temperature ? parseFloat(editFormData.temperature) : undefined;
     const temperature = Number.isFinite(parsedTemperature ?? 0) ? parsedTemperature : undefined;
+    const parsedInputPrice = editFormData.inputPricePerMillionTokens ? parseFloat(editFormData.inputPricePerMillionTokens) : undefined;
+    const inputPricePerMillionTokens = Number.isFinite(parsedInputPrice ?? 0) ? parsedInputPrice : undefined;
+    const parsedOutputPrice = editFormData.outputPricePerMillionTokens ? parseFloat(editFormData.outputPricePerMillionTokens) : undefined;
+    const outputPricePerMillionTokens = Number.isFinite(parsedOutputPrice ?? 0) ? parsedOutputPrice : undefined;
 
     const payload: ModelUpdateDto = {
       name: editFormData.name.trim(),
@@ -389,6 +397,8 @@ export const useModelManagement = (): UseModelManagementReturn => {
       apiKey: editFormData.apiKey.trim() || undefined,
       maxTokens,
       temperature,
+      inputPricePerMillionTokens,
+      outputPricePerMillionTokens,
     };
 
     try {
@@ -431,6 +441,10 @@ export const useModelManagement = (): UseModelManagementReturn => {
     const maxTokens = Number.isFinite(parsedMaxTokens ?? 0) ? parsedMaxTokens : undefined;
     const parsedTemperature = formData.temperature ? parseFloat(formData.temperature) : undefined;
     const temperature = Number.isFinite(parsedTemperature ?? 0) ? parsedTemperature : undefined;
+    const parsedInputPrice = formData.inputPricePerMillionTokens ? parseFloat(formData.inputPricePerMillionTokens) : undefined;
+    const inputPricePerMillionTokens = Number.isFinite(parsedInputPrice ?? 0) ? parsedInputPrice : undefined;
+    const parsedOutputPrice = formData.outputPricePerMillionTokens ? parseFloat(formData.outputPricePerMillionTokens) : undefined;
+    const outputPricePerMillionTokens = Number.isFinite(parsedOutputPrice ?? 0) ? parsedOutputPrice : undefined;
 
     const payload: ModelCreateDto = {
       name: formData.name.trim(),
@@ -441,6 +455,8 @@ export const useModelManagement = (): UseModelManagementReturn => {
       apiKey: formData.apiKey.trim() || undefined,
       maxTokens,
       temperature,
+      inputPricePerMillionTokens,
+      outputPricePerMillionTokens,
     };
 
     try {

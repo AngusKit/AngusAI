@@ -808,6 +808,9 @@ export const enUS = {
       leaveBlankToKeepUnchanged: 'Leave blank to keep unchanged',
       modelParameters: 'Model Parameters',
       maxTokens: 'Max Tokens',
+      temperature: 'Temperature',
+      inputPricePerMillionTokens: 'Input per million tokens (USD)',
+      outputPricePerMillionTokens: 'Output per million tokens (USD)',
     },
     validation: {
       requiredFields: 'Please fill in required fields',

@@ -1121,6 +1121,9 @@ export const zhCN = {
       leaveBlankToKeepUnchanged: '留空则不修改',
       modelParameters: '模型参数',
       maxTokens: '最大Tokens',
+      temperature: '温度',
+      inputPricePerMillionTokens: '每百万Tokens输入（美元）',
+      outputPricePerMillionTokens: '每百万Tokens输出（美元）',
     },
     validation: {
       requiredFields: '请填写必填字段',

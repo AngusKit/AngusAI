@@ -59,6 +59,28 @@ export function ModelDetailsDialog({ open, onOpenChange, selectedModel, onEdit }
                 <div className='dark:text-white'>{selectedModel.maxTokens ?? '--'}</div>
               </div>
               <div className='space-y-1'>
+                <div className='text-xs text-gray-500 dark:text-gray-400'>{t('models.formFields.temperature')}</div>
+                <div className='dark:text-white'>
+                  {selectedModel.detail?.config?.temperature != null ? String(selectedModel.detail.config.temperature) : '--'}
+                </div>
+              </div>
+              <div className='space-y-1'>
+                <div className='text-xs text-gray-500 dark:text-gray-400'>{t('models.formFields.inputPricePerMillionTokens')}</div>
+                <div className='dark:text-white'>
+                  {selectedModel.detail?.config?.inputPricePerMillionTokens != null
+                    ? `$${selectedModel.detail.config.inputPricePerMillionTokens}`
+                    : '--'}
+                </div>
+              </div>
+              <div className='space-y-1'>
+                <div className='text-xs text-gray-500 dark:text-gray-400'>{t('models.formFields.outputPricePerMillionTokens')}</div>
+                <div className='dark:text-white'>
+                  {selectedModel.detail?.config?.outputPricePerMillionTokens != null
+                    ? `$${selectedModel.detail.config.outputPricePerMillionTokens}`
+                    : '--'}
+                </div>
+              </div>
+              <div className='space-y-1'>
                 <div className='text-xs text-gray-500 dark:text-gray-400'>{t('models.details.addedAt')}</div>
                 <div className='dark:text-white'>{selectedModel.deployed}</div>
               </div>

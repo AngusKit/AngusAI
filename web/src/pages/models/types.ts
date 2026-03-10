@@ -34,6 +34,9 @@ export interface ModelListItem {
   cost: string;
   tokens?: string;
   maxTokens?: string;
+  temperature?: string;
+  inputPricePerMillionTokens?: string;
+  outputPricePerMillionTokens?: string;
   deployed: string;
   detail?: ModelDetailVo;
 }
@@ -47,5 +50,7 @@ export interface ModelFormData {
   endpoint: string;
   maxTokens: string;
   temperature: string;
+  inputPricePerMillionTokens: string;
+  outputPricePerMillionTokens: string;
 }
 
