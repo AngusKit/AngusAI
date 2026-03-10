@@ -31,6 +31,7 @@ public class AgentChatFacadeImpl implements AgentChatFacade {
   public SseEmitter chatStream(AgentChatRequestDto dto) {
     String sessionId = dto.getSessionId() != null
         ? dto.getSessionId() : UUID.randomUUID().toString();
-    return agentChatCmd.chatStream(dto.getAgentId(), sessionId, dto.getMessage());
+    return agentChatCmd.chatStream(
+        dto.getAgentId(), sessionId, dto.getMessage(), dto.getTimeoutMs());
   }
 }
