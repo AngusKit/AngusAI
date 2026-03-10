@@ -1,8 +1,8 @@
 package cloud.xcan.agentx.core.workflow.validation;
 
-import cloud.xcan.agentx.core.workflow.enums.NodeType;
 import cloud.xcan.agentx.core.workflow.dsl.NodeDefinition;
 import cloud.xcan.agentx.core.workflow.dsl.WorkflowDefinition;
+import cloud.xcan.agentx.core.workflow.enums.NodeType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;

@@ -1,12 +1,9 @@
 package cloud.xcan.angus.core.ai.domain.apis;
 
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
-import io.swagger.v3.oas.models.servers.Server;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.NoRepositoryBean;
 
 @NoRepositoryBean

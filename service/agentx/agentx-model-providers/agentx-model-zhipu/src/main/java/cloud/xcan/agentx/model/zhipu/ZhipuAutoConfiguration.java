@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * 智谱 AI (Zhipu) 模块自动配置 — 通过 OpenAI 兼容接口实现。
  */
-public class  ZhipuAutoConfiguration {
+public class ZhipuAutoConfiguration {
 
   private static final String DEFAULT_BASE_URL = "https://open.bigmodel.cn/api/paas/v4";
 

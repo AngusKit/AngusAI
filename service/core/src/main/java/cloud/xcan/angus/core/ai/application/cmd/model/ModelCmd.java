@@ -1,7 +1,7 @@
 package cloud.xcan.angus.core.ai.application.cmd.model;
 
-import cloud.xcan.angus.core.ai.domain.model.Model;
 import cloud.xcan.agentx.core.model.ModelConfigDefinition;
+import cloud.xcan.angus.core.ai.domain.model.Model;
 
 public interface ModelCmd {
 

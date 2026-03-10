@@ -13,7 +13,6 @@ import cloud.xcan.angus.core.jpa.repository.BaseRepository;
 import cloud.xcan.angus.remote.message.http.ResourceExisted;
 import io.swagger.v3.oas.models.PathItem.HttpMethod;
 import jakarta.annotation.Resource;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;

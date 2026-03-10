@@ -39,7 +39,8 @@ public class VectorStoreRegistry {
           .orElseThrow(() -> new IllegalArgumentException("VectorStore config not found: " + id));
       String typeKey = config.getType() != null ? config.getType().getKey() : null;
       if (typeKey == null) {
-        throw new IllegalArgumentException("VectorStore config type is required: " + config.getId());
+        throw new IllegalArgumentException(
+            "VectorStore config type is required: " + config.getId());
       }
       return getFactory(typeKey).createEmbeddingStore(config);
     });
@@ -54,7 +55,8 @@ public class VectorStoreRegistry {
             id -> {
               String tk = config.getType() != null ? config.getType().getKey() : null;
               if (tk == null) {
-                throw new IllegalArgumentException("VectorStore config type is required: " + config.getId());
+                throw new IllegalArgumentException(
+                    "VectorStore config type is required: " + config.getId());
               }
               return getFactory(tk).createEmbeddingStore(config);
             }));

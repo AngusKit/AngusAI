@@ -24,7 +24,8 @@ public class ChromaAutoConfiguration {
           config.getCollectionName());
 
       String collection = config.getEffectiveCollectionName();
-      String baseUrl = config.getEffectiveUrl() != null ? config.getEffectiveUrl() : "http://localhost:8000";
+      String baseUrl =
+          config.getEffectiveUrl() != null ? config.getEffectiveUrl() : "http://localhost:8000";
 
       return ChromaEmbeddingStore.builder()
           .baseUrl(baseUrl)

@@ -5,8 +5,8 @@ import static java.util.Objects.nonNull;
 
 import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
 import cloud.xcan.angus.core.ai.application.query.application.ApplicationQuery;
-import cloud.xcan.angus.core.ai.domain.agent.Agent;
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
+import cloud.xcan.angus.core.ai.domain.agent.Agent;
 import cloud.xcan.angus.core.ai.domain.application.AIApplication;
 import cloud.xcan.angus.core.ai.domain.application.AIApplicationRepo;
 import cloud.xcan.angus.core.ai.domain.application.AIApplicationSearchRepo;
@@ -75,7 +75,8 @@ public class ApplicationQueryImpl implements ApplicationQuery {
             .findFirst()
             .map(ApplicationAgent::getAgentId)
             .orElseGet(() -> {
-              List<ApplicationAgent> list = applicationAgentRepo.findByApplicationIdOrderBySortOrderAsc(id);
+              List<ApplicationAgent> list = applicationAgentRepo.findByApplicationIdOrderBySortOrderAsc(
+                  id);
               return list.isEmpty() ? null : list.get(0).getAgentId();
             });
         if (defaultAgentId == null) {

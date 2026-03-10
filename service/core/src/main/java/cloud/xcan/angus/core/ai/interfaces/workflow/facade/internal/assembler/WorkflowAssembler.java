@@ -121,7 +121,7 @@ public class WorkflowAssembler {
     Set<SearchCriteria> filters = new SearchCriteriaBuilder<>(dto)
         .rangeSearchFields("id", "createdDate")
         .orderByFields("id", "createdDate", "name", "type", "status")
-        .matchSearchFields( "name", "description")
+        .matchSearchFields("name", "description")
         .inAndNotFields("type")
         .build();
     return new GenericSpecification<>(filters);

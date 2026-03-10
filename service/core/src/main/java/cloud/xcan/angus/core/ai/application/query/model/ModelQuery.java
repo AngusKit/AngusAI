@@ -39,7 +39,7 @@ public interface ModelQuery {
    * 检查模型名称是否存在（排除指定ID）
    */
   boolean existsByNameAndIdNot(String name, Long id);
-  
+
   /**
    * 根据ID查询模型（不存在时返回空）
    */

@@ -80,7 +80,8 @@ public class ApiComponentCmdImpl extends CommCmd<ApiComponent, Long> implements 
   }
 
   @Override
-  public void replaceSecuritiesComponent(Long collectionId, Map<String, SecurityScheme> securities) {
+  public void replaceSecuritiesComponent(Long collectionId,
+      Map<String, SecurityScheme> securities) {
     apiComponentRepo.deleteByCollectionIdAndType(collectionId, ApiComponentType.securitySchemes);
     // Convert OpenAPI components to service components
     List<ApiComponent> openApiComps = ApiSchemaConverter.toCollectionSecurityComp(

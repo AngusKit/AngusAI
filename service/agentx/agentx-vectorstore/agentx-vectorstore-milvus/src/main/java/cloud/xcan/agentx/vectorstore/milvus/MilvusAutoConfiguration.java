@@ -29,7 +29,8 @@ public class MilvusAutoConfiguration {
       Map<String, Object> extra = config.getExtraProperties();
 
       var builder = MilvusEmbeddingStore.builder()
-          .uri(config.getEffectiveUrl() != null ? config.getEffectiveUrl() : "http://localhost:19530")
+          .uri(config.getEffectiveUrl() != null ? config.getEffectiveUrl()
+              : "http://localhost:19530")
           .collectionName(collection)
           .dimension(dimension);
 

@@ -11,7 +11,7 @@ public enum ApiComponentType implements EnumMessage<String> {
   examples, requestBodies, headers,
   securitySchemes, links, callbacks, extensions, pathItems;
 
-  public boolean isSecuritySchemes(){
+  public boolean isSecuritySchemes() {
     return this.equals(securitySchemes);
   }
 

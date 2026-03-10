@@ -7,19 +7,33 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * 向量存储类型枚举 — 与 VectorStoreFactory 实现支持的类型一致。
  */
 public enum VectorStoreType {
-  /** PostgreSQL pgvector 扩展 */
+  /**
+   * PostgreSQL pgvector 扩展
+   */
   PGVECTOR,
-  /** Milvus 向量数据库 */
+  /**
+   * Milvus 向量数据库
+   */
   MILVUS,
-  /** Qdrant 向量数据库 */
+  /**
+   * Qdrant 向量数据库
+   */
   QDRANT,
-  /** Chroma 向量数据库 */
+  /**
+   * Chroma 向量数据库
+   */
   CHROMA,
-  /** Elasticsearch */
+  /**
+   * Elasticsearch
+   */
   ELASTICSEARCH,
-  /** Weaviate 向量数据库 */
+  /**
+   * Weaviate 向量数据库
+   */
   WEAVIATE,
-  /** MariaDB 向量扩展 */
+  /**
+   * MariaDB 向量扩展
+   */
   MARIADB;
 
   /**

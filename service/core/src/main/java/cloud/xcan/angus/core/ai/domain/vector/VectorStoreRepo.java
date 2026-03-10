@@ -1,11 +1,9 @@
 package cloud.xcan.angus.core.ai.domain.vector;
 
-import cloud.xcan.angus.core.ai.domain.ConnectionStatus;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
 import java.util.List;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.NoRepositoryBean;
-import org.springframework.data.repository.query.Param;
 
 @NoRepositoryBean
 public interface VectorStoreRepo extends BaseRepository<VectorStore, Long> {

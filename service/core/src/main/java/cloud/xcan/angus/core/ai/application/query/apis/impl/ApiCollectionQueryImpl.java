@@ -92,7 +92,7 @@ public class ApiCollectionQueryImpl implements ApiCollectionQuery {
 
     // Merge apis and project component servers
     ApiSchema schemaDb = apiSchemaQuery.findByCollectionId(id);
-    if (schemaDb == null){
+    if (schemaDb == null) {
       throw BizException.of("接口集中接口未定义为空，请先导入接口");
     }
 

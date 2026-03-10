@@ -5,12 +5,12 @@ import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.parseStartDate;
 
 import cloud.xcan.angus.core.ai.application.query.model.ModelCallRecordQuery;
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
+import cloud.xcan.angus.core.ai.domain.model.LastMonthGrowthTrend;
 import cloud.xcan.angus.core.ai.domain.model.Model;
 import cloud.xcan.angus.core.ai.domain.model.ModelCallRecord;
 import cloud.xcan.angus.core.ai.domain.model.ModelRepo;
 import cloud.xcan.angus.core.ai.domain.model.ModelSearchRepo;
 import cloud.xcan.angus.core.ai.domain.model.ModelStatus;
-import cloud.xcan.angus.core.ai.domain.model.LastMonthGrowthTrend;
 import cloud.xcan.angus.core.ai.domain.model.TodayGrowthTrend;
 import cloud.xcan.angus.core.ai.domain.plugin.LongTotalView;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelStatisticsVo;
@@ -230,6 +230,7 @@ public class ModelQueryImpl implements ModelQuery {
 
   @Getter
   public static class DoubleTotalView {
+
     private final Double total;
 
     public DoubleTotalView(Double total) {

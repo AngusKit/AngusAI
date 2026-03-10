@@ -3,8 +3,6 @@ package cloud.xcan.angus.core.ai.domain.chat;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.repository.NoRepositoryBean;
 

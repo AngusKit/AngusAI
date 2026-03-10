@@ -2,7 +2,6 @@ package cloud.xcan.angus.core.ai.application.cmd.chat.impl;
 
 import cloud.xcan.angus.core.ai.application.cmd.chat.MessageCmd;
 import cloud.xcan.angus.core.ai.application.cmd.chat.SessionCmd;
-import cloud.xcan.angus.core.ai.application.query.chat.SessionQuery;
 import cloud.xcan.angus.core.ai.domain.chat.Message;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRepo;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRole;

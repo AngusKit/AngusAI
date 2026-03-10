@@ -1,8 +1,8 @@
 package cloud.xcan.angus.core.ai.domain.vector;
 
 import cloud.xcan.agentx.core.vectorstore.VectorStoreConfigDefinition;
-import cloud.xcan.angus.core.ai.domain.ConnectionStatus;
 import cloud.xcan.agentx.core.vectorstore.VectorStoreType;
+import cloud.xcan.angus.core.ai.domain.ConnectionStatus;
 import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.Column;

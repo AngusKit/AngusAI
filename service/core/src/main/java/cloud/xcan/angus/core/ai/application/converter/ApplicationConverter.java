@@ -1,9 +1,6 @@
 package cloud.xcan.angus.core.ai.application.converter;
 
 import cloud.xcan.angus.core.ai.domain.application.AIApplication;
-import cloud.xcan.angus.core.ai.domain.application.ApplicationAgent;
-import cloud.xcan.angus.core.ai.domain.application.ApplicationAgentRepo;
-import cloud.xcan.angus.core.ai.domain.application.ApplicationConfig;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationShare;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
 import java.util.ArrayList;
@@ -12,7 +9,8 @@ import java.util.UUID;
 
 public class ApplicationConverter {
 
-  public static AIApplication toDuplicateApplication(String newName, AIApplication sourceApplication) {
+  public static AIApplication toDuplicateApplication(String newName,
+      AIApplication sourceApplication) {
     AIApplication newApplication = new AIApplication()
         .setName(newName)
         .setStatus(ApplicationStatus.DRAFT)

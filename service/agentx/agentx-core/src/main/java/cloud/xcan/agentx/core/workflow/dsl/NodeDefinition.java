@@ -1,7 +1,7 @@
 package cloud.xcan.agentx.core.workflow.dsl;
 
-import cloud.xcan.agentx.core.workflow.enums.NodeType;
 import cloud.xcan.agentx.core.workflow.enums.FailureStrategy;
+import cloud.xcan.agentx.core.workflow.enums.NodeType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.Map;

@@ -7,9 +7,9 @@ import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_MEMORY_DEFAULT_MAX
 import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_MEMORY_DEFAULT_WINDOW_SIZE;
 import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_SKILL_IDS_MAX_SIZE;
 import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_SUGGESTED_QUESTIONS_MAX_SIZE;
-import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_TOOL_IDS_MAX_SIZE;
 import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_SUMMARY_PROMPT_MAX_LENGTH;
 import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_SYSTEM_PROMPT_MAX_LENGTH;
+import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_TOOL_IDS_MAX_SIZE;
 import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_WELCOME_MESSAGE_MAX_LENGTH;
 import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_DESC_LENGTH_X4;
 import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_NAME_LENGTH;
@@ -21,7 +21,6 @@ import cloud.xcan.agentx.core.memory.enums.MemoryStrategy;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.List;
 import java.util.Map;

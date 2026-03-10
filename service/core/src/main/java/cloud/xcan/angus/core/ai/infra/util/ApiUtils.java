@@ -21,6 +21,7 @@ import java.io.File;
 import java.util.List;
 
 public class ApiUtils {
+
   /**
    * Detail OpenApi validation
    * <p>
@@ -81,6 +82,7 @@ public class ApiUtils {
    * <p>
    * Handles both directory and file path creation based on the provided file name.
    * <p>
+   *
    * @param fileName optional file name to include in the path
    * @return the created temporary path for export operations
    */

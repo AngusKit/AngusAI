@@ -3,14 +3,15 @@ package cloud.xcan.angus.core.ai.infra.agent.utils;
 import static cloud.xcan.angus.core.ai.domain.Constants.CHAT_DEFAULT_FREQUENCY_PENALTY;
 import static cloud.xcan.angus.core.ai.domain.Constants.CHAT_DEFAULT_MAX_TOKENS;
 import static cloud.xcan.angus.core.ai.domain.Constants.CHAT_DEFAULT_PRESENCE_PENALTY;
-import static cloud.xcan.angus.core.ai.domain.Constants.CHAT_DEFAULT_TIMEOUT_MS;
 import static cloud.xcan.angus.core.ai.domain.Constants.CHAT_DEFAULT_TEMPERATURE;
+import static cloud.xcan.angus.core.ai.domain.Constants.CHAT_DEFAULT_TIMEOUT_MS;
 import static cloud.xcan.angus.core.ai.domain.Constants.CHAT_DEFAULT_TOP_P;
+
 import cloud.xcan.angus.core.ai.domain.agent.Agent;
+import cloud.xcan.angus.core.ai.domain.agent.AgentChatConfig;
 import cloud.xcan.angus.core.ai.domain.chat.Session;
 import cloud.xcan.angus.core.ai.domain.chat.SessionConfig;
 import cloud.xcan.angus.core.ai.domain.model.Model;
-import cloud.xcan.angus.core.ai.domain.agent.AgentChatConfig;
 
 /**
  * 对话配置合并工具
@@ -20,16 +21,17 @@ import cloud.xcan.angus.core.ai.domain.agent.AgentChatConfig;
  */
 public final class ChatConfigMergeUtils {
 
-  private ChatConfigMergeUtils() {}
+  private ChatConfigMergeUtils() {
+  }
 
   /**
    * 合并对话配置
    *
-   * @param requestConfig     请求层配置（可选）
-   * @param requestTimeoutMs  请求顶层超时（dto.timeoutMs），当 config 无 timeoutMs 时使用
-   * @param session           会话（含 config，可选）
-   * @param agent             智能体（含 systemPrompt）
-   * @param model             智能体默认模型（含 temperature、maxTokens、timeoutSeconds 等，可选）
+   * @param requestConfig    请求层配置（可选）
+   * @param requestTimeoutMs 请求顶层超时（dto.timeoutMs），当 config 无 timeoutMs 时使用
+   * @param session          会话（含 config，可选）
+   * @param agent            智能体（含 systemPrompt）
+   * @param model            智能体默认模型（含 temperature、maxTokens、timeoutSeconds 等，可选）
    * @return 合并后的配置
    */
   public static AgentChatConfig merge(AgentChatConfig requestConfig, Long requestTimeoutMs,

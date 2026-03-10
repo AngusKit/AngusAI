@@ -1,9 +1,9 @@
 package cloud.xcan.angus.core.ai.domain.model;
 
-import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
-import cloud.xcan.angus.core.jpa.multitenancy.TenantListener;
 import cloud.xcan.agentx.core.model.ModelConfigDefinition;
 import cloud.xcan.agentx.core.model.ModelProvider;
+import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
+import cloud.xcan.angus.core.jpa.multitenancy.TenantListener;
 import dev.langchain4j.model.catalog.ModelType;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.Column;

@@ -2,7 +2,6 @@ package cloud.xcan.angus.core.ai.application.query.apis;
 
 import cloud.xcan.angus.core.ai.domain.apis.ApiEndpoint;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import org.springframework.data.domain.Page;

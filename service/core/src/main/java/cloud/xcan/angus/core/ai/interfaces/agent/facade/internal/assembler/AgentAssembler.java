@@ -45,8 +45,10 @@ public class AgentAssembler {
     }
     if (dto.getMemory() != null) {
       agent.setMemoryStrategy(nullSafe(dto.getMemory().getStrategy(), MemoryStrategy.TOKEN_WINDOW));
-      agent.setMemoryWindowSize(nullSafe(dto.getMemory().getWindowSize(), AGENT_MEMORY_DEFAULT_WINDOW_SIZE));
-      agent.setMemoryMaxTokens(nullSafe(dto.getMemory().getMaxTokens(), AGENT_MEMORY_DEFAULT_MAX_TOKENS));
+      agent.setMemoryWindowSize(
+          nullSafe(dto.getMemory().getWindowSize(), AGENT_MEMORY_DEFAULT_WINDOW_SIZE));
+      agent.setMemoryMaxTokens(
+          nullSafe(dto.getMemory().getMaxTokens(), AGENT_MEMORY_DEFAULT_MAX_TOKENS));
       agent.setMemorySummaryPrompt(dto.getMemory().getSummaryPrompt());
     }
     if (dto.getGuardrails() != null) {
@@ -86,8 +88,10 @@ public class AgentAssembler {
     }
     if (dto.getMemory() != null) {
       agent.setMemoryStrategy(nullSafe(dto.getMemory().getStrategy(), MemoryStrategy.TOKEN_WINDOW));
-      agent.setMemoryWindowSize(nullSafe(dto.getMemory().getWindowSize(), AGENT_MEMORY_DEFAULT_WINDOW_SIZE));
-      agent.setMemoryMaxTokens(nullSafe(dto.getMemory().getMaxTokens(), AGENT_MEMORY_DEFAULT_MAX_TOKENS));
+      agent.setMemoryWindowSize(
+          nullSafe(dto.getMemory().getWindowSize(), AGENT_MEMORY_DEFAULT_WINDOW_SIZE));
+      agent.setMemoryMaxTokens(
+          nullSafe(dto.getMemory().getMaxTokens(), AGENT_MEMORY_DEFAULT_MAX_TOKENS));
       agent.setMemorySummaryPrompt(dto.getMemory().getSummaryPrompt());
     } else {
       agent.setMemoryStrategy(MemoryStrategy.TOKEN_WINDOW);

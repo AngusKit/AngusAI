@@ -11,9 +11,6 @@ import cloud.xcan.angus.core.ai.domain.application.AIApplication;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationAgent;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationConfig;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
-import cloud.xcan.angus.core.ai.domain.dataset.Dataset;
-import cloud.xcan.angus.core.ai.domain.knowledgebase.KnowledgeBase;
-import cloud.xcan.angus.core.ai.domain.workflow.Workflow;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.ApplicationFacade;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.dto.ApplicationCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.dto.ApplicationDuplicateDto;
@@ -52,39 +49,45 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
   public ApplicationDetailVo create(ApplicationCreateDto dto) {
     AIApplication application = ApplicationAssembler.toCreateDomain(dto);
     AIApplication saved = applicationCmd.create(application);
-    return ApplicationAssembler.toDetailVo(saved, getAgentsVo(saved.getId()), getDefaultAgentVo(saved.getId()));
+    return ApplicationAssembler.toDetailVo(saved, getAgentsVo(saved.getId()),
+        getDefaultAgentVo(saved.getId()));
   }
 
   @Override
   public ApplicationDetailVo duplicate(Long id, ApplicationDuplicateDto dto) {
     AIApplication saved = applicationCmd.duplicate(id, dto.getName());
-    return ApplicationAssembler.toDetailVo(saved, getAgentsVo(saved.getId()), getDefaultAgentVo(saved.getId()));
+    return ApplicationAssembler.toDetailVo(saved, getAgentsVo(saved.getId()),
+        getDefaultAgentVo(saved.getId()));
   }
 
   @Override
   public ApplicationDetailVo update(Long id, ApplicationUpdateDto dto) {
     AIApplication application = ApplicationAssembler.toUpdateDomain(id, dto);
     AIApplication saved = applicationCmd.update(application);
-    return ApplicationAssembler.toDetailVo(saved, getAgentsVo(saved.getId()), getDefaultAgentVo(saved.getId()));
+    return ApplicationAssembler.toDetailVo(saved, getAgentsVo(saved.getId()),
+        getDefaultAgentVo(saved.getId()));
   }
 
   @Override
   public ApplicationDetailVo updateConfig(Long id, ApplicationConfig config) {
     AIApplication saved = applicationCmd.updateConfig(id, config);
-    return ApplicationAssembler.toDetailVo(saved, getAgentsVo(saved.getId()), getDefaultAgentVo(saved.getId()));
+    return ApplicationAssembler.toDetailVo(saved, getAgentsVo(saved.getId()),
+        getDefaultAgentVo(saved.getId()));
   }
 
   @Override
   public ApplicationDetailVo modifyStatus(Long id, ApplicationStatus status) {
     AIApplication saved = applicationCmd.modifyStatus(id, status);
-    return ApplicationAssembler.toDetailVo(saved, getAgentsVo(saved.getId()), getDefaultAgentVo(saved.getId()));
+    return ApplicationAssembler.toDetailVo(saved, getAgentsVo(saved.getId()),
+        getDefaultAgentVo(saved.getId()));
   }
 
   @Override
   public ApplicationDetailVo share(Long id, ApplicationShareDto dto) {
     AIApplication application = ApplicationAssembler.shareDomain(id, dto);
     AIApplication saved = applicationCmd.share(application);
-    return ApplicationAssembler.toDetailVo(saved, getAgentsVo(saved.getId()), getDefaultAgentVo(saved.getId()));
+    return ApplicationAssembler.toDetailVo(saved, getAgentsVo(saved.getId()),
+        getDefaultAgentVo(saved.getId()));
   }
 
   @Override

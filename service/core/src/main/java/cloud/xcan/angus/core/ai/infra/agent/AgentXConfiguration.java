@@ -18,7 +18,7 @@ public class AgentXConfiguration {
   }
 
   @Bean
-  public VectorStoreConfigProvider vectorStoreConfigProvider(VectorStoreQuery vectorStoreQuery){
+  public VectorStoreConfigProvider vectorStoreConfigProvider(VectorStoreQuery vectorStoreQuery) {
     return new VectorStoreConfigProviderImpl(vectorStoreQuery);
   }
 }

@@ -17,8 +17,8 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * 向量存储配置定义 — 统一的向量库连接配置，用于 API 入参、实体存储、工厂构建。
  * <p>
- * 支持两种连接方式：1) 完整 URL（url/endpoint）；2) host+port+database 分字段。
- * 工厂实现优先使用 url，若为空则根据 host/port/database 构建。
+ * 支持两种连接方式：1) 完整 URL（url/endpoint）；2) host+port+database 分字段。 工厂实现优先使用 url，若为空则根据
+ * host/port/database 构建。
  * </p>
  */
 @Data
@@ -172,7 +172,8 @@ public class VectorStoreConfigDefinition {
     }
     if (u.startsWith("jdbc:postgresql://") || u.startsWith("jdbc:mariadb://")) {
       try {
-        java.net.URI uri = java.net.URI.create(u.replace("jdbc:postgresql://", "http://").replace("jdbc:mariadb://", "http://"));
+        java.net.URI uri = java.net.URI.create(
+            u.replace("jdbc:postgresql://", "http://").replace("jdbc:mariadb://", "http://"));
         return uri.getHost() != null ? uri.getHost() : "localhost";
       } catch (Exception ignored) {
         return "localhost";
@@ -205,7 +206,8 @@ public class VectorStoreConfigDefinition {
       }
       if (u.startsWith("jdbc:postgresql://") || u.startsWith("jdbc:mariadb://")) {
         try {
-          String httpLike = u.replace("jdbc:postgresql://", "http://").replace("jdbc:mariadb://", "http://");
+          String httpLike = u.replace("jdbc:postgresql://", "http://")
+              .replace("jdbc:mariadb://", "http://");
           java.net.URI uri = java.net.URI.create(httpLike);
           return uri.getPort() > 0 ? uri.getPort() : defaultPort;
         } catch (Exception ignored) {

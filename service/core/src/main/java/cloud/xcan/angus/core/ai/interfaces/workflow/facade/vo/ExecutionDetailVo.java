@@ -1,9 +1,8 @@
 package cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-
 import java.time.LocalDateTime;
+import lombok.Data;
 
 @Data
 @Schema(description = "执行详情响应")

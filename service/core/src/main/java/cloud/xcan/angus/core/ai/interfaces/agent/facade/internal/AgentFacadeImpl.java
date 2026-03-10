@@ -88,7 +88,8 @@ public class AgentFacadeImpl implements AgentFacade {
   @Override
   public AgentDetailVo updateStatus(Long id, AgentStatus status) {
     Agent updated = agentCmd.updateStatus(id, status);
-    return AgentAssembler.toDetailVo(updated, getAgentResourcesVo(updated), getDefaultModelVo(updated));
+    return AgentAssembler.toDetailVo(updated, getAgentResourcesVo(updated),
+        getDefaultModelVo(updated));
   }
 
   @Override

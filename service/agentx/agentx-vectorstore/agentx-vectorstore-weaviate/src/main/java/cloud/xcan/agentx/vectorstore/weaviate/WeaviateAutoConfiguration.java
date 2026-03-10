@@ -38,7 +38,8 @@ public class WeaviateAutoConfiguration {
           .host(host)
           .objectClass(collection);
 
-      String apiKey = config.getApiKey() != null ? config.getApiKey() : config.getExtra("apiKey", String.class);
+      String apiKey =
+          config.getApiKey() != null ? config.getApiKey() : config.getExtra("apiKey", String.class);
       if (apiKey != null) {
         builder.apiKey(apiKey);
       }

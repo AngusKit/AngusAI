@@ -15,7 +15,6 @@ import static io.swagger.v3.oas.models.PathItem.HttpMethod.PATCH;
 import static io.swagger.v3.oas.models.PathItem.HttpMethod.POST;
 import static io.swagger.v3.oas.models.PathItem.HttpMethod.PUT;
 import static io.swagger.v3.oas.models.PathItem.HttpMethod.TRACE;
-import static io.swagger.v3.oas.models.PathItem.HttpMethod.valueOf;
 import static java.util.Objects.nonNull;
 
 import cloud.xcan.angus.core.ai.domain.apis.ApiEndpoint;
@@ -57,7 +56,8 @@ public class ApiEndpointConverter {
         .setDescription(openApis.getDescription())
         //.setExternalDocs(openApis.getExternalDocs())
         .setOperationId(openApis.getOperationId())
-        .setDeprecated(isNull(apisDb.getDeprecated()) ? nullSafe(openApis.getDeprecated(), false) : apisDb.getDeprecated())
+        .setDeprecated(isNull(apisDb.getDeprecated()) ? nullSafe(openApis.getDeprecated(), false)
+            : apisDb.getDeprecated())
         .setParameters(openApis.getParameters())
         .setRequestBody(openApis.getRequestBody())
         .setResponses(openApis.getResponses())

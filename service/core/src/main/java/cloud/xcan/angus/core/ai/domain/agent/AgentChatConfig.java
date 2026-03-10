@@ -1,5 +1,6 @@
 package cloud.xcan.angus.core.ai.domain.agent;
 
+import cloud.xcan.angus.core.ai.domain.Constants;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -7,8 +8,6 @@ import java.io.Serializable;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
-
-import cloud.xcan.angus.core.ai.domain.Constants;
 
 /**
  * 智能体对话配置（可选覆盖参数）
