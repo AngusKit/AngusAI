@@ -82,7 +82,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleBack = () => {
-    onBack ? onBack() : navigate('/home');
+    onBack ? onBack() : navigate('/dashboard');
   };
 
   // Settings state

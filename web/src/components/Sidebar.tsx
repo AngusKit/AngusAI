@@ -18,7 +18,7 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
   const location = useLocation();
 
   const mainMenuItems = [
-    { id: 'home', icon: Home, label: t('sidebar.nav.dashboard') },
+    { id: 'dashboard', icon: Home, label: t('sidebar.nav.dashboard') },
     { id: 'chat', icon: MessageSquare, label: t('sidebar.nav.chat') },
     { id: 'apps', icon: FileText, label: t('sidebar.nav.myApps'), badge: '12' },
     { id: 'agents', icon: Bot, label: t('sidebar.nav.agents') },

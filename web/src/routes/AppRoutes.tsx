@@ -1,7 +1,7 @@
 import { MainLayout } from '@/components/layout/MainLayout';
 import { ChatLayout } from '@/components/layout/ChatLayout';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { Home } from '@/pages/dashboard/Dashboard.tsx';
+import { Dashboard } from '@/pages/dashboard/Dashboard.tsx';
 import { CreateApplication } from '@/pages/applications/components/CreateApplication.tsx';
 import { MyApplications } from '@/pages/applications/MyApplications';
 import { ApplicationDetailPage } from '@/pages/applications/components/ApplicationDetailPage.tsx';
@@ -36,9 +36,9 @@ import { NotFoundPage } from '@/components/NotFoundPage';
 export function AppRoutes() {
   return (
     <Routes>
-      <Route path='/' element={<Navigate to='/home' replace />} />
+      <Route path='/' element={<Navigate to='/dashboard' replace />} />
       <Route path='/' element={<MainLayout />}>
-        <Route path='home' element={<Home />} />
+        <Route path='dashboard' element={<Dashboard />} />
         <Route path='apps' element={<MyApplications />} />
         <Route path='apps/create' element={<CreateApplication />} />
         <Route path='apps/:id' element={<ApplicationDetailPage />} />
@@ -68,7 +68,7 @@ export function AppRoutes() {
         <Route path='usage-analytics' element={<UsageAnalytics />} />
         <Route path='api-keys' element={<APIKeys />} />
         <Route path='billing' element={<BillingSubscription />} />
-        <Route path='*' element={<NotFoundPage homePath='/home' />} />
+        <Route path='*' element={<NotFoundPage homePath='/dashboard' />} />
       </Route>
       <Route path='/' element={<ChatLayout />}>
         <Route path='chat' element={<Chat />} />

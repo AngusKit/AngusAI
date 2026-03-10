@@ -7,7 +7,7 @@ import { UsageDetails } from '@/pages/dashboard/UsageDetails.tsx';
 import { Card } from '@/components/ui/card.tsx';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
 
-export function Home() {
+export function Dashboard() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
 

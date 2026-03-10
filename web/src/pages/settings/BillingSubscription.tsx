@@ -668,31 +668,31 @@ export function BillingSubscription() {
 
       {/* Current Plan */}
       {isLoading ? (
-        <Card className='p-6 dark:bg-gray-800 dark:border-gray-700'>
-          <div className='flex items-start justify-between mb-6'>
-            <div className='flex items-center gap-4'>
-              <Skeleton className='w-14 h-14 rounded-xl dark:bg-gray-700' />
+        <>
+          <Card className='p-6 dark:bg-gray-800 dark:border-gray-700'>
+            <div className='flex items-start justify-between mb-6'>
+              <div className='flex items-center gap-4'>
+                <Skeleton className='w-14 h-14 rounded-xl dark:bg-gray-700' />
+                <div>
+                  <Skeleton className='h-6 w-40 mb-2 dark:bg-gray-700' />
+                  <Skeleton className='h-4 w-48 dark:bg-gray-700' />
+                </div>
+              </div>
+              <Skeleton className='h-9 w-24 dark:bg-gray-700' />
+            </div>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
               <div>
-                <Skeleton className='h-6 w-40 mb-2 dark:bg-gray-700' />
-                <Skeleton className='h-4 w-48 dark:bg-gray-700' />
+                <Skeleton className='h-4 w-24 mb-2 dark:bg-gray-700' />
+                <Skeleton className='h-2 w-full rounded dark:bg-gray-700' />
+                <Skeleton className='h-3 w-32 mt-2 dark:bg-gray-700' />
+              </div>
+              <div>
+                <Skeleton className='h-4 w-24 mb-2 dark:bg-gray-700' />
+                <Skeleton className='h-2 w-full rounded dark:bg-gray-700' />
+                <Skeleton className='h-3 w-32 mt-2 dark:bg-gray-700' />
               </div>
             </div>
-            <Skeleton className='h-9 w-24 dark:bg-gray-700' />
-          </div>
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-            <div>
-              <Skeleton className='h-4 w-24 mb-2 dark:bg-gray-700' />
-              <Skeleton className='h-2 w-full rounded dark:bg-gray-700' />
-              <Skeleton className='h-3 w-32 mt-2 dark:bg-gray-700' />
-            </div>
-            <div>
-              <Skeleton className='h-4 w-24 mb-2 dark:bg-gray-700' />
-              <Skeleton className='h-2 w-full rounded dark:bg-gray-700' />
-              <Skeleton className='h-3 w-32 mt-2 dark:bg-gray-700' />
-            </div>
-          </div>
-        </Card>
-        <>
+          </Card>
           <Skeleton className='h-7 w-48 mb-6 dark:bg-gray-700' />
           <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
             {[1, 2, 3].map(i => (
