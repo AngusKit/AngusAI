@@ -113,7 +113,8 @@ public class AgentChatCmdImpl implements AgentChatCmd {
         String reply;
         Exception chatError = null;
         try {
-          // 异步执行 LLM 调用，带超时；有 override 时指定模型与配置
+          // 异步执行 LLM 调用，有 override 时指定模型与配置
+          // 注意：可以改为在主线程直接调用 agentRegistry.chat()，但建议保留 executor，便于控制 LLM 并发。若需要 Java 层超时，可改用 future.get(timeout, unit)
           reply = syncChatExecutor
               .submit(() -> {
                 if (override != null && agent.getDefaultModelId() != null) {
@@ -172,6 +173,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
         String agentIdStr = String.valueOf(agentId);
 
         // 异步执行流式调用，通过 SSE 推送 token
+        // 注意：必须保持使用 sseEmitterChatExecutor，否则会破坏 SSE 的流式模型和整体稳定性
         sseEmitterChatExecutor.execute(() -> {
           StringBuilder fullContent = new StringBuilder();
           long streamStartMs = System.currentTimeMillis();
