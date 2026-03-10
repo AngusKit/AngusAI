@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { ModelFormFields } from './ModelFormFields';
+import { MODEL_NAME_MAX_LENGTH, MODEL_DESCRIPTION_MAX_LENGTH } from '../constants';
 import type { ModelFormData } from '../types';
 
 interface CreateModelDialogProps {
@@ -47,7 +48,12 @@ export function CreateModelDialog({
     await onSubmit();
   };
 
-  const isFormValid = formData.name.trim() && formData.provider && formData.type;
+  const isFormValid =
+    formData.name.trim() &&
+    formData.name.length <= MODEL_NAME_MAX_LENGTH &&
+    formData.description.length <= MODEL_DESCRIPTION_MAX_LENGTH &&
+    formData.provider &&
+    formData.type;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

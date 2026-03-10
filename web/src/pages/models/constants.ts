@@ -105,6 +105,12 @@ export const PAGINATION_CONFIG = {
  */
 export const SEARCH_DEBOUNCE_MS = 500;
 
+/** 模型名称最大字符数 */
+export const MODEL_NAME_MAX_LENGTH = 100;
+
+/** 模型描述最大字符数 */
+export const MODEL_DESCRIPTION_MAX_LENGTH = 800;
+
 /**
  * 表单默认值
  */

@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ModelTypeEnum } from '@/enums/enums';
-import { MODEL_TYPE_CONFIG } from '../constants';
+import { MODEL_TYPE_CONFIG, MODEL_NAME_MAX_LENGTH, MODEL_DESCRIPTION_MAX_LENGTH } from '../constants';
 import { enumToMessages } from '@/enums/utils';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
 import type { ModelFormData } from '../types';
@@ -58,8 +58,12 @@ export function ModelFormFields({
             placeholder={t('models.formFields.namePlaceholder')}
             value={formData.name}
             onChange={e => updateField('name', e.target.value)}
+            maxLength={MODEL_NAME_MAX_LENGTH}
             className='dark:bg-gray-700 dark:border-gray-600'
           />
+          <div className='text-xs text-gray-500 dark:text-gray-400 text-right'>
+            {formData.name.length}/{MODEL_NAME_MAX_LENGTH}
+          </div>
         </div>
 
         <div className='space-y-2'>
@@ -71,8 +75,12 @@ export function ModelFormFields({
             placeholder={t('models.formFields.descriptionPlaceholder')}
             value={formData.description}
             onChange={e => updateField('description', e.target.value)}
+            maxLength={MODEL_DESCRIPTION_MAX_LENGTH}
             className='dark:bg-gray-700 dark:border-gray-600 min-h-[80px]'
           />
+          <div className='text-xs text-gray-500 dark:text-gray-400 text-right'>
+            {formData.description.length}/{MODEL_DESCRIPTION_MAX_LENGTH}
+          </div>
         </div>
 
         <div className='grid grid-cols-2 gap-3'>
