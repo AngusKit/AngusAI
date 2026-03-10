@@ -3,6 +3,7 @@ import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { Share2, Search, Filter, Workflow, Database, Zap, FileText, Users, Lock, Unlock, Eye, Edit, Trash2, MoreHorizontal, TrendingUp, Clock, Shield, CheckCircle, Globe, UserCheck, Plus, } from 'lucide-react';
 import { Button } from '@/components/ui/button.tsx';
 import { Card } from '@/components/ui/card.tsx';
+import { Skeleton } from '@/components/ui/skeleton.tsx';
 import { Badge } from '@/components/ui/badge.tsx';
 import { Input } from '@/components/ui/input.tsx';
 import { XcanPagination } from '@/components/ui/pagination.tsx';
@@ -491,7 +492,66 @@ export function ResourceSharing() {
 
       {/* Resources Table */}
       <Card className='dark:bg-gray-800 dark:border-gray-700'>
-        {currentResources.length === 0 ? (
+        {isLoading ? (
+          <div className='overflow-x-auto'>
+            <table className='w-full'>
+              <thead className='bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700'>
+                <tr>
+                  <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400' />
+                  <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400' />
+                  <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400' />
+                  <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400' />
+                  <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400' />
+                  <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400' />
+                  <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400' />
+                  <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400' />
+                </tr>
+              </thead>
+              <tbody className='divide-y divide-gray-200 dark:divide-gray-700'>
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <tr key={i} className='border-b border-gray-200 dark:border-gray-700'>
+                    <td className='px-6 py-4'>
+                      <div className='flex items-center gap-3'>
+                        <Skeleton className='w-10 h-10 rounded-lg dark:bg-gray-700 shrink-0' />
+                        <div className='space-y-2'>
+                          <Skeleton className='h-4 w-32 dark:bg-gray-700' />
+                          <Skeleton className='h-3 w-24 dark:bg-gray-700' />
+                        </div>
+                      </div>
+                    </td>
+                    <td className='px-6 py-4'>
+                      <Skeleton className='h-5 w-14 rounded dark:bg-gray-700' />
+                    </td>
+                    <td className='px-6 py-4'>
+                      <Skeleton className='h-4 w-20 dark:bg-gray-700' />
+                    </td>
+                    <td className='px-6 py-4'>
+                      <div className='flex items-center gap-2'>
+                        <Skeleton className='w-4 h-4 dark:bg-gray-700' />
+                        <Skeleton className='h-4 w-24 dark:bg-gray-700' />
+                      </div>
+                    </td>
+                    <td className='px-6 py-4'>
+                      <Skeleton className='h-5 w-12 rounded dark:bg-gray-700' />
+                    </td>
+                    <td className='px-6 py-4'>
+                      <div className='space-y-1'>
+                        <Skeleton className='h-3 w-16 dark:bg-gray-700' />
+                        <Skeleton className='h-3 w-14 dark:bg-gray-700' />
+                      </div>
+                    </td>
+                    <td className='px-6 py-4'>
+                      <Skeleton className='h-4 w-12 dark:bg-gray-700' />
+                    </td>
+                    <td className='px-6 py-4'>
+                      <Skeleton className='w-8 h-8 rounded dark:bg-gray-700' />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : currentResources.length === 0 ? (
           <div className='p-12 text-center'>
             <Share2 className='w-12 h-12 text-gray-400 mx-auto mb-4' />
             <h3 className='text-lg mb-2 dark:text-white'>未找到共享资源</h3>
@@ -625,7 +685,7 @@ export function ResourceSharing() {
         )}
 
         {/* Pagination */}
-        {shouldShowPagination && (
+        {!isLoading && shouldShowPagination && (
           <div className='flex items-center justify-center px-6 py-4 border-t border-gray-200 dark:border-gray-700'>
             <XcanPagination total={totalCount} pageNo={currentPage} pageSize={itemsPerPage} onChange={({pageNo}) => setCurrentPage(pageNo)} />
           </div>

@@ -4,6 +4,7 @@
  */
 import { Workflow as WorkflowIcon, Play, Edit, Trash2, MoreHorizontal, Copy } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { WorkflowStatusEnum } from '@/enums/enums';
@@ -34,7 +35,34 @@ export function WorkflowGridView({ workflows, loading, actions, hasFilter = fals
 
   return (
     <>
-      {displayList.length > 0 && (
+      {loading ? (
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4'>
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Card key={i} className='p-5 dark:bg-gray-800 dark:border-gray-700'>
+              <div className='flex items-start justify-between mb-4'>
+                <div className='flex items-center gap-3'>
+                  <Skeleton className='w-10 h-10 rounded-lg dark:bg-gray-700' />
+                  <Skeleton className='w-10 h-10 rounded-lg dark:bg-gray-700' />
+                </div>
+                <Skeleton className='w-10 h-10 rounded-lg dark:bg-gray-700' />
+              </div>
+              <div className='flex items-start gap-3 mb-3'>
+                <Skeleton className='w-12 h-12 rounded-lg dark:bg-gray-700 shrink-0' />
+                <div className='flex-1 space-y-2'>
+                  <Skeleton className='h-4 w-28 dark:bg-gray-700' />
+                  <Skeleton className='h-5 w-16 rounded dark:bg-gray-700' />
+                </div>
+              </div>
+              <Skeleton className='h-4 w-full mb-2 dark:bg-gray-700' />
+              <Skeleton className='h-4 w-3/4 mb-4 dark:bg-gray-700' />
+              <div className='flex items-center justify-between'>
+                <Skeleton className='h-4 w-12 dark:bg-gray-700' />
+                <Skeleton className='h-4 w-16 dark:bg-gray-700' />
+              </div>
+            </Card>
+          ))}
+        </div>
+      ) : displayList.length > 0 ? (
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4'>
           {displayList.map(w => (
           <Card
@@ -126,9 +154,8 @@ export function WorkflowGridView({ workflows, loading, actions, hasFilter = fals
           </Card>
           ))}
         </div>
-      )}
+      ) : null}
 
-      {loading && <div className='text-center py-12 text-gray-500 dark:text-gray-400'>加载中...</div>}
       {!loading && workflows.length === 0 && (
         <div style={{ marginTop: 100 }}>
           <WorkflowListEmpty

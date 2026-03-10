@@ -1,5 +1,4 @@
 import {
-  Loader2,
   Users,
   MoreHorizontal,
   Trash2,
@@ -16,6 +15,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { XcanPagination } from '@/components/ui/pagination';
+import { Skeleton } from '@/components/ui/skeleton';
 import { RoleNamesDisplay } from './RoleNamesDisplay';
 import type { TeamMember } from '../types';
 import { getStatusBadge } from '../utils';
@@ -54,8 +54,41 @@ export function MemberTable({
   if (loading) {
     return (
       <Card className='dark:bg-gray-800 dark:border-gray-700'>
-        <div className='p-12 flex items-center justify-center'>
-          <Loader2 className='w-8 h-8 animate-spin text-gray-400' />
+        <div className='overflow-x-auto'>
+          <table className='w-full'>
+            <thead className='bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700'>
+              <tr>
+                <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>成员</th>
+                <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>角色</th>
+                <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>状态</th>
+                <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>资源统计</th>
+                <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>最后活跃</th>
+                <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>加入时间</th>
+                <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>操作</th>
+              </tr>
+            </thead>
+            <tbody className='divide-y divide-gray-200 dark:divide-gray-700'>
+              {[1, 2, 3, 4, 5].map(i => (
+                <tr key={i}>
+                  <td className='px-6 py-4'>
+                    <div className='flex items-center gap-3'>
+                      <Skeleton className='w-10 h-10 rounded-full dark:bg-gray-700' />
+                      <div>
+                        <Skeleton className='h-4 w-24 mb-1 dark:bg-gray-700' />
+                        <Skeleton className='h-3 w-36 dark:bg-gray-700' />
+                      </div>
+                    </div>
+                  </td>
+                  <td className='px-6 py-4'><Skeleton className='h-5 w-20 dark:bg-gray-700' /></td>
+                  <td className='px-6 py-4'><Skeleton className='h-6 w-16 rounded dark:bg-gray-700' /></td>
+                  <td className='px-6 py-4'><Skeleton className='h-8 w-16 dark:bg-gray-700' /></td>
+                  <td className='px-6 py-4'><Skeleton className='h-4 w-20 dark:bg-gray-700' /></td>
+                  <td className='px-6 py-4'><Skeleton className='h-4 w-20 dark:bg-gray-700' /></td>
+                  <td className='px-6 py-4'><Skeleton className='h-8 w-8 rounded dark:bg-gray-700' /></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </Card>
     );

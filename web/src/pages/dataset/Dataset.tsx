@@ -1,6 +1,7 @@
 import { Check, Database, Download, Edit, Eye, Files, FileText, Filter, FolderOpen, Grid3x3, List, MoreHorizontal, Plus, RefreshCw, Search, Trash2, Upload, X, } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
@@ -955,12 +956,91 @@ export function Dataset() {
           </div>
         </div>
 
-        {/* Loading State */}
+        {/* Loading State: Skeleton 骨架屏 */}
         {isLoading && (
-          <div className='text-center py-12'>
-            <div className='w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-3' />
-            <p className='text-gray-600 dark:text-gray-400'>{t('common.messages.loading')}</p>
-          </div>
+          viewMode === 'grid' ? (
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+              {Array.from({ length: 6 }).map((_, i) => (
+                <Card key={i} className='p-5 dark:bg-gray-800 dark:border-gray-700'>
+                  <div className='flex items-start justify-between mb-4'>
+                    <div className='flex items-center gap-3'>
+                      <Skeleton className='w-12 h-12 rounded-lg dark:bg-gray-700 shrink-0' />
+                      <div className='flex-1 space-y-2'>
+                        <div className='flex items-center gap-2'>
+                          <Skeleton className='h-5 w-28 dark:bg-gray-700' />
+                          <Skeleton className='h-5 w-9 rounded-full dark:bg-gray-700' />
+                        </div>
+                        <Skeleton className='h-5 w-20 rounded dark:bg-gray-700' />
+                      </div>
+                    </div>
+                    <Skeleton className='w-8 h-8 rounded dark:bg-gray-700' />
+                  </div>
+                  <Skeleton className='h-4 w-full mb-2 dark:bg-gray-700' />
+                  <Skeleton className='h-4 w-3/4 mb-3 dark:bg-gray-700' />
+                  <div className='flex gap-2 mb-3'>
+                    <Skeleton className='h-5 w-12 rounded dark:bg-gray-700' />
+                    <Skeleton className='h-5 w-14 rounded dark:bg-gray-700' />
+                  </div>
+                  <div className='grid grid-cols-2 gap-4 pt-2 border-t border-gray-100 dark:border-gray-700'>
+                    <div><Skeleton className='h-3 w-14 mb-1 dark:bg-gray-700' /><Skeleton className='h-4 w-8 dark:bg-gray-700' /></div>
+                    <div><Skeleton className='h-3 w-10 mb-1 dark:bg-gray-700' /><Skeleton className='h-4 w-12 dark:bg-gray-700' /></div>
+                  </div>
+                  <div className='mt-3 pt-3 border-t border-gray-100 dark:border-gray-700 flex justify-between'>
+                    <Skeleton className='h-3 w-20 dark:bg-gray-700' />
+                    <Skeleton className='h-3 w-16 dark:bg-gray-700' />
+                  </div>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <Card className='dark:bg-gray-800 dark:border-gray-700'>
+              <div className='overflow-x-auto'>
+                <table className='w-full'>
+                  <thead className='bg-gray-50 dark:bg-gray-900'>
+                    <tr>
+                      <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400' />
+                      <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400' />
+                      <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400' />
+                      <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400' />
+                      <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400' />
+                      <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400' />
+                    </tr>
+                  </thead>
+                  <tbody className='divide-y divide-gray-200 dark:divide-gray-700'>
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <tr key={i} className='border-b border-gray-200 dark:border-gray-700'>
+                        <td className='px-6 py-4'>
+                          <div className='flex items-center gap-3'>
+                            <Skeleton className='w-10 h-10 rounded-lg dark:bg-gray-700 shrink-0' />
+                            <div className='space-y-2 flex-1'>
+                              <div className='flex gap-2'><Skeleton className='h-4 w-32 dark:bg-gray-700' /><Skeleton className='h-5 w-16 rounded dark:bg-gray-700' /></div>
+                              <Skeleton className='h-3 w-48 dark:bg-gray-700' />
+                            </div>
+                          </div>
+                        </td>
+                        <td className='px-6 py-4'><Skeleton className='h-4 w-16 dark:bg-gray-700' /></td>
+                        <td className='px-6 py-4'><Skeleton className='h-4 w-8 dark:bg-gray-700' /></td>
+                        <td className='px-6 py-4'>
+                          <div className='flex items-center gap-2'>
+                            <Skeleton className='h-5 w-14 rounded dark:bg-gray-700' />
+                            <Skeleton className='h-5 w-9 rounded dark:bg-gray-700' />
+                          </div>
+                        </td>
+                        <td className='px-6 py-4'><Skeleton className='h-4 w-16 dark:bg-gray-700' /></td>
+                        <td className='px-6 py-4'>
+                          <div className='flex gap-2'>
+                            <Skeleton className='w-8 h-8 rounded dark:bg-gray-700' />
+                            <Skeleton className='w-8 h-8 rounded dark:bg-gray-700' />
+                            <Skeleton className='w-8 h-8 rounded dark:bg-gray-700' />
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+          )
         )}
 
         {/* Empty State */}

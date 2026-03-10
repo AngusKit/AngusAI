@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Key, Plus, Copy, Eye, EyeOff, Trash2, MoreVertical, CheckCircle, XCircle, AlertCircle, Clock, Shield, Code, RefreshCw, Settings, Zap, GitBranch, Database, BookOpen, Package, Bot, } from 'lucide-react';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -115,6 +116,13 @@ export function APIKeys() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [selectedKeyId, setSelectedKeyId] = useState<number | null>(null);
   const [visibleKeys, setVisibleKeys] = useState<Set<number>>(new Set());
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 400);
+    return () => clearTimeout(timer);
+  }, []);
+
   const [newKeyData, setNewKeyData] = useState({
     name: '',
     expiresIn: '365',
@@ -309,7 +317,40 @@ export function APIKeys() {
 
       {/* API Keys List */}
       <div className='space-y-4'>
-        {apiKeys.map(key => (
+        {isLoading ? (
+          <>
+            {[1, 2, 3].map(i => (
+              <Card key={i} className='p-6 dark:bg-gray-800 dark:border-gray-700'>
+                <div className='space-y-4'>
+                  <div className='flex items-start justify-between'>
+                    <div className='flex items-center gap-3'>
+                      <Skeleton className='w-9 h-9 rounded-lg dark:bg-gray-700' />
+                      <div>
+                        <Skeleton className='h-5 w-32 mb-2 dark:bg-gray-700' />
+                        <Skeleton className='h-5 w-16 dark:bg-gray-700' />
+                      </div>
+                    </div>
+                    <Skeleton className='w-8 h-8 rounded dark:bg-gray-700' />
+                  </div>
+                  <Skeleton className='h-12 w-full rounded-lg dark:bg-gray-700' />
+                  <div className='grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700'>
+                    {[1, 2, 3, 4].map(j => (
+                      <div key={j}>
+                        <Skeleton className='h-3 w-16 mb-2 dark:bg-gray-700' />
+                        <Skeleton className='h-4 w-24 dark:bg-gray-700' />
+                      </div>
+                    ))}
+                  </div>
+                  <div className='pt-4 border-t border-gray-200 dark:border-gray-700 flex gap-2'>
+                    <Skeleton className='h-6 w-24 dark:bg-gray-700' />
+                    <Skeleton className='h-6 w-24 dark:bg-gray-700' />
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </>
+        ) : (
+          apiKeys.map(key => (
           <Card key={key.id} className='p-6 dark:bg-gray-800 dark:border-gray-700'>
             <div className='space-y-4'>
               {/* Header */}
@@ -437,7 +478,8 @@ export function APIKeys() {
               </div>
             </div>
           </Card>
-        ))}
+        ))
+        )}
       </div>
 
       {/* API Documentation */}

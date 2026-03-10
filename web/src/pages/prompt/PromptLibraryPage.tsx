@@ -2,6 +2,7 @@ import { Search, Star, Copy, Plus, Trash2, Edit, Sparkles, BookOpen, Shield, Fol
 import { XcanPagination } from '@/components/ui/pagination';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -535,8 +536,14 @@ export function PromptLibraryPage() {
         <div className='w-[300px] shrink-0 h-full'>
           <div className='bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 overflow-y-auto h-full pb-4 scrollbar-hide'>
             {isLoadingCategories ? (
-              <div className='text-center py-8'>
-                <p className='text-sm text-gray-500 dark:text-gray-400'>{t('prompts.loading')}</p>
+              <div className='space-y-2'>
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className='flex items-center gap-2 px-3 py-2 rounded-lg'>
+                    <Skeleton className='w-4 h-4 rounded dark:bg-gray-700 shrink-0' />
+                    <Skeleton className='h-4 flex-1 max-w-[120px] dark:bg-gray-700' />
+                    <Skeleton className='h-5 w-8 rounded dark:bg-gray-700 shrink-0' />
+                  </div>
+                ))}
               </div>
             ) : (
               <div className='space-y-1'>
@@ -603,10 +610,38 @@ export function PromptLibraryPage() {
           <ScrollArea className='h-[calc(100vh-280px)]'>
             <div className='space-y-4'>
               {isLoadingPrompts ? (
-                <div className='text-center py-20 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg'>
-                  <Sparkles className='w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600 animate-pulse' />
-                  <p className='text-gray-500 dark:text-gray-400'>{t('prompts.loading')}</p>
-                </div>
+                <>
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className='p-5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg'
+                    >
+                      <div className='flex items-start justify-between mb-3'>
+                        <div className='flex-1 space-y-2'>
+                          <div className='flex items-center gap-2'>
+                            <Skeleton className='h-5 w-40 dark:bg-gray-700' />
+                            <Skeleton className='h-5 w-14 rounded dark:bg-gray-700' />
+                            <Skeleton className='h-5 w-20 rounded dark:bg-gray-700' />
+                          </div>
+                          <div className='flex flex-wrap gap-1.5'>
+                            <Skeleton className='h-5 w-12 rounded dark:bg-gray-700' />
+                            <Skeleton className='h-5 w-14 rounded dark:bg-gray-700' />
+                            <Skeleton className='h-5 w-16 rounded dark:bg-gray-700' />
+                          </div>
+                        </div>
+                        <Skeleton className='w-8 h-8 rounded dark:bg-gray-700 shrink-0' />
+                      </div>
+                      <Skeleton className='h-4 w-full mb-2 dark:bg-gray-700' />
+                      <Skeleton className='h-4 w-3/4 mb-4 dark:bg-gray-700' />
+                      <div className='flex items-center gap-2'>
+                        <Skeleton className='h-8 w-24 dark:bg-gray-700' />
+                        <Skeleton className='h-8 w-20 dark:bg-gray-700' />
+                        <Skeleton className='h-8 w-24 dark:bg-gray-700' />
+                        <Skeleton className='h-8 w-8 rounded dark:bg-gray-700' />
+                      </div>
+                    </div>
+                  ))}
+                </>
               ) : prompts.length === 0 ? (
                 <div className='text-center py-20 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg'>
                   <Sparkles className='w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600' />
@@ -708,7 +743,7 @@ export function PromptLibraryPage() {
             </div>
           </ScrollArea>
 
-          {pageParam.total > pageParam.pageSize && <XcanPagination {...pageParam} onChange={handlePageChange} />}
+          {!isLoadingPrompts && pageParam.total > pageParam.pageSize && <XcanPagination {...pageParam} onChange={handlePageChange} />}
         </div>
       </div>
 

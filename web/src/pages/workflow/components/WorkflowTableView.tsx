@@ -4,6 +4,7 @@
  */
 import { Workflow as WorkflowIcon, Play, Edit, Trash2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { WorkflowStatusEnum } from '@/enums/enums';
 import type { WorkflowDisplayItem } from '../utils';
@@ -31,7 +32,54 @@ export function WorkflowTableView({
 
   return (
     <>
-      {displayList.length > 0 && (
+      {loading ? (
+        <Card className='dark:bg-gray-800 dark:border-gray-700 mb-4'>
+          <div className='overflow-x-auto'>
+            <table className='w-full'>
+              <thead className='bg-gray-50 dark:bg-gray-900'>
+                <tr>
+                  <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400' />
+                  <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400' />
+                  <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400' />
+                  <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400' />
+                  <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400' />
+                </tr>
+              </thead>
+              <tbody className='divide-y divide-gray-200 dark:divide-gray-700'>
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <tr key={i} className='border-b border-gray-200 dark:border-gray-700'>
+                    <td className='px-6 py-4'>
+                      <div className='flex items-center gap-3'>
+                        <Skeleton className='w-10 h-10 rounded-lg dark:bg-gray-700 shrink-0' />
+                        <div className='space-y-2'>
+                          <Skeleton className='h-4 w-32 dark:bg-gray-700' />
+                          <Skeleton className='h-3 w-48 dark:bg-gray-700' />
+                        </div>
+                      </div>
+                    </td>
+                    <td className='px-6 py-4'>
+                      <Skeleton className='h-5 w-14 rounded dark:bg-gray-700' />
+                    </td>
+                    <td className='px-6 py-4'>
+                      <Skeleton className='h-4 w-10 dark:bg-gray-700' />
+                    </td>
+                    <td className='px-6 py-4'>
+                      <Skeleton className='h-4 w-12 dark:bg-gray-700' />
+                    </td>
+                    <td className='px-6 py-4'>
+                      <div className='flex gap-2'>
+                        <Skeleton className='w-8 h-8 rounded dark:bg-gray-700' />
+                        <Skeleton className='w-8 h-8 rounded dark:bg-gray-700' />
+                        <Skeleton className='w-8 h-8 rounded dark:bg-gray-700' />
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      ) : displayList.length > 0 ? (
         <Card className='dark:bg-gray-800 dark:border-gray-700 mb-4'>
           <div className='overflow-x-auto'>
             <table className='w-full'>
@@ -108,9 +156,8 @@ export function WorkflowTableView({
             </table>
           </div>
         </Card>
-      )}
+      ) : null}
 
-      {loading && <div className='text-center py-6 text-gray-500 dark:text-gray-400'>加载中...</div>}
       {!loading && workflows.length === 0 && (
         <div style={{ marginTop: 100 }}>
           <WorkflowListEmpty

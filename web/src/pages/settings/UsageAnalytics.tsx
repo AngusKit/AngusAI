@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BarChart3, TrendingUp, TrendingDown, Activity, Users, MessageSquare, Zap, Clock, Calendar, Filter, ChevronDown, } from 'lucide-react';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { Card } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -12,6 +13,12 @@ export function UsageAnalytics() {
   const { t } = useLanguage();
   const [timeRange, setTimeRange] = useState('7days');
   const [selectedApp, setSelectedApp] = useState('all');
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 400);
+    return () => clearTimeout(timer);
+  }, []);
 
   // API调用趋势数据
   const apiCallsData = [
@@ -170,7 +177,21 @@ export function UsageAnalytics() {
 
       {/* Stats Cards */}
       <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4'>
-        {stats.map((stat, index) => (
+        {isLoading ? (
+          <>
+            {[1, 2, 3, 4].map(i => (
+              <Card key={i} className='p-5 dark:bg-gray-800 dark:border-gray-700'>
+                <div className='flex items-center justify-between mb-3'>
+                  <Skeleton className='w-9 h-9 rounded-lg dark:bg-gray-700' />
+                  <Skeleton className='h-5 w-14 rounded dark:bg-gray-700' />
+                </div>
+                <Skeleton className='h-8 w-20 mb-1 dark:bg-gray-700' />
+                <Skeleton className='h-4 w-32 dark:bg-gray-700' />
+              </Card>
+            ))}
+          </>
+        ) : (
+          stats.map((stat, index) => (
           <Card key={index} className='p-5 dark:bg-gray-800 dark:border-gray-700'>
             <div className='flex items-center justify-between mb-3'>
               <div className={`p-2 rounded-lg bg-${stat.color}-100 dark:bg-${stat.color}-900/30`}>
@@ -194,10 +215,25 @@ export function UsageAnalytics() {
             <div className='text-2xl dark:text-white mb-1'>{stat.value}</div>
             <div className='text-sm text-gray-600 dark:text-gray-400'>{stat.label}</div>
           </Card>
-        ))}
+        ))
+        )}
       </div>
 
       {/* Charts */}
+      {isLoading ? (
+        <Card className='p-6 dark:bg-gray-800 dark:border-gray-700'>
+          <div className='mb-6'>
+            <Skeleton className='h-6 w-40 mb-2 dark:bg-gray-700' />
+            <Skeleton className='h-4 w-64 dark:bg-gray-700' />
+          </div>
+          <Skeleton className='h-[350px] w-full rounded dark:bg-gray-700' />
+          <div className='mt-6 space-y-4'>
+            {[1, 2, 3, 4].map(i => (
+              <Skeleton key={i} className='h-16 w-full rounded-lg dark:bg-gray-700' />
+            ))}
+          </div>
+        </Card>
+      ) : (
       <Tabs defaultValue='api-calls' className='space-y-6'>
         <TabsList className='grid w-full grid-cols-3 h-auto p-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700'>
           <TabsTrigger
@@ -462,6 +498,7 @@ export function UsageAnalytics() {
           </Card>
         </TabsContent>
       </Tabs>
+      )}
     </div>
   );
 }

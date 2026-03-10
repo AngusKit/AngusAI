@@ -3,6 +3,7 @@ import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { CreditCard, Download, Calendar, TrendingUp, Check, Zap, Crown, Rocket, ChevronRight, AlertCircle, FileText, DollarSign, Clock, Package, RefreshCw, Settings, Building2, Users, Plus, Smartphone, X, CheckCircle2, Loader2, QrCode, XCircle, } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -96,6 +97,12 @@ export function BillingSubscription() {
 
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 400);
+    return () => clearTimeout(timer);
+  }, []);
 
   // 清理定时器
   useEffect(() => {
@@ -660,7 +667,87 @@ export function BillingSubscription() {
       </div>
 
       {/* Current Plan */}
-      <Card className='p-6 dark:bg-gray-800 dark:border-gray-700'>
+      {isLoading ? (
+        <Card className='p-6 dark:bg-gray-800 dark:border-gray-700'>
+          <div className='flex items-start justify-between mb-6'>
+            <div className='flex items-center gap-4'>
+              <Skeleton className='w-14 h-14 rounded-xl dark:bg-gray-700' />
+              <div>
+                <Skeleton className='h-6 w-40 mb-2 dark:bg-gray-700' />
+                <Skeleton className='h-4 w-48 dark:bg-gray-700' />
+              </div>
+            </div>
+            <Skeleton className='h-9 w-24 dark:bg-gray-700' />
+          </div>
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+            <div>
+              <Skeleton className='h-4 w-24 mb-2 dark:bg-gray-700' />
+              <Skeleton className='h-2 w-full rounded dark:bg-gray-700' />
+              <Skeleton className='h-3 w-32 mt-2 dark:bg-gray-700' />
+            </div>
+            <div>
+              <Skeleton className='h-4 w-24 mb-2 dark:bg-gray-700' />
+              <Skeleton className='h-2 w-full rounded dark:bg-gray-700' />
+              <Skeleton className='h-3 w-32 mt-2 dark:bg-gray-700' />
+            </div>
+          </div>
+        </Card>
+        <>
+          <Skeleton className='h-7 w-48 mb-6 dark:bg-gray-700' />
+          <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+            {[1, 2, 3].map(i => (
+              <Card key={i} className='p-6 dark:bg-gray-800 dark:border-gray-700'>
+                <Skeleton className='w-14 h-14 rounded-xl mx-auto mb-4 dark:bg-gray-700' />
+                <Skeleton className='h-6 w-24 mx-auto mb-2 dark:bg-gray-700' />
+                <Skeleton className='h-8 w-16 mx-auto mb-4 dark:bg-gray-700' />
+                <Skeleton className='h-4 w-full mb-2 dark:bg-gray-700' />
+                <Skeleton className='h-4 w-full mb-6 dark:bg-gray-700' />
+                <div className='space-y-3 mb-6'>
+                  {[1, 2, 3].map(j => (
+                    <Skeleton key={j} className='h-4 w-full dark:bg-gray-700' />
+                  ))}
+                </div>
+                <Skeleton className='h-10 w-full rounded dark:bg-gray-700' />
+              </Card>
+            ))}
+          </div>
+          <Card className='p-6 dark:bg-gray-800 dark:border-gray-700 mt-6'>
+            <div className='flex items-center justify-between mb-6'>
+              <div className='flex items-center gap-3'>
+                <Skeleton className='w-9 h-9 rounded-lg dark:bg-gray-700' />
+                <div>
+                  <Skeleton className='h-5 w-24 mb-1 dark:bg-gray-700' />
+                  <Skeleton className='h-4 w-40 dark:bg-gray-700' />
+                </div>
+              </div>
+              <Skeleton className='h-9 w-20 dark:bg-gray-700' />
+            </div>
+            <div className='space-y-4'>
+              {[1, 2].map(i => (
+                <Skeleton key={i} className='h-16 w-full rounded-lg dark:bg-gray-700' />
+              ))}
+            </div>
+          </Card>
+          <Card className='p-6 dark:bg-gray-800 dark:border-gray-700 mt-6'>
+            <div className='flex items-center justify-between mb-6'>
+              <div className='flex items-center gap-3'>
+                <Skeleton className='w-9 h-9 rounded-lg dark:bg-gray-700' />
+                <div>
+                  <Skeleton className='h-5 w-24 mb-1 dark:bg-gray-700' />
+                  <Skeleton className='h-4 w-40 dark:bg-gray-700' />
+                </div>
+              </div>
+            </div>
+            <div className='space-y-3'>
+              {[1, 2, 3, 4].map(i => (
+                <Skeleton key={i} className='h-16 w-full rounded-lg dark:bg-gray-700' />
+              ))}
+            </div>
+          </Card>
+        </>
+      ) : (
+        <>
+        <Card className='p-6 dark:bg-gray-800 dark:border-gray-700'>
         <div className='flex items-start justify-between mb-6'>
           <div className='flex items-center gap-4'>
             <div className='p-3 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600'>
@@ -893,6 +980,8 @@ export function BillingSubscription() {
           ))}
         </div>
       </Card>
+        </>
+      )}
 
       {/* Downgrade Dialog */}
       <Dialog open={showUpgradeDialog} onOpenChange={setShowUpgradeDialog}>

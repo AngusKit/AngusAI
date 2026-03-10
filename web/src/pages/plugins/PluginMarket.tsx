@@ -3,6 +3,7 @@ import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { Package, Search, Filter, Download, Star, TrendingUp, Clock, Grid3x3, List, Eye, CheckCircle, ChevronRight, Zap, Shield, Code, Palette, MessageSquare, FileText, BarChart3, Image as ImageIcon, Music, Video, Upload, Edit, X, User, Calendar, ThumbsUp, ThumbsDown, Plus, Minus, Activity, AlertCircle, AlertTriangle, FileCode2, Archive, } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -82,6 +83,7 @@ export function PluginMarket() {
     content: string;
   } | null>(null);
   const itemsPerPage = 6;
+  const [pluginsLoading, setPluginsLoading] = useState(true);
 
   // 表单状态
   const [formTags, setFormTags] = useState<string[]>([]);
@@ -95,6 +97,12 @@ export function PluginMarket() {
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, categoryFilter, sortBy]);
+
+  // 模拟插件列表加载（后续接入 API 时可替换为实际请求）
+  useEffect(() => {
+    const t = setTimeout(() => setPluginsLoading(false), 400);
+    return () => clearTimeout(t);
+  }, []);
 
   // 统计数据
   const stats = [
@@ -1023,12 +1031,55 @@ export function PluginMarket() {
           {/* Grid View */}
           {viewMode === 'grid' && (
             <>
-              <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
-                {getPaginatedPlugins(getFilteredPlugins('all')).map(plugin => renderPluginCard(plugin))}
-              </div>
+              {pluginsLoading ? (
+                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <Card key={i} className='p-4 dark:bg-gray-800 dark:border-gray-700'>
+                      <div className='flex items-start gap-3 mb-3'>
+                        <Skeleton className='w-12 h-12 rounded-lg dark:bg-gray-700 shrink-0' />
+                        <div className='flex-1 space-y-2 min-w-0'>
+                          <div className='flex items-center gap-2'>
+                            <Skeleton className='h-4 w-28 dark:bg-gray-700' />
+                            <Skeleton className='h-5 w-14 rounded dark:bg-gray-700' />
+                          </div>
+                          <Skeleton className='h-3 w-20 dark:bg-gray-700' />
+                        </div>
+                      </div>
+                      <Skeleton className='h-4 w-full mb-2 dark:bg-gray-700' />
+                      <Skeleton className='h-4 w-3/4 mb-3 dark:bg-gray-700' />
+                      <div className='flex gap-2 mb-3'>
+                        <Skeleton className='h-5 w-14 rounded dark:bg-gray-700' />
+                        <Skeleton className='h-5 w-12 rounded dark:bg-gray-700' />
+                        <Skeleton className='h-5 w-10 rounded dark:bg-gray-700' />
+                      </div>
+                      <div className='flex items-center justify-between mb-3'>
+                        <div className='flex gap-1'>
+                          <Skeleton className='h-3 w-8 dark:bg-gray-700' />
+                          <Skeleton className='h-3 w-12 dark:bg-gray-700' />
+                        </div>
+                        <div className='flex gap-1'>
+                          <Skeleton className='h-3 w-10 dark:bg-gray-700' />
+                          <Skeleton className='h-3 w-8 dark:bg-gray-700' />
+                        </div>
+                      </div>
+                      <div className='flex items-center justify-between pt-3 border-t border-gray-200 dark:border-gray-700'>
+                        <Skeleton className='h-4 w-16 dark:bg-gray-700' />
+                        <div className='flex gap-2'>
+                          <Skeleton className='h-8 w-14 dark:bg-gray-700' />
+                          <Skeleton className='h-8 w-8 dark:bg-gray-700' />
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <>
+                  <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+                    {getPaginatedPlugins(getFilteredPlugins('all')).map(plugin => renderPluginCard(plugin))}
+                  </div>
 
-              {/* Pagination */}
-              {getTotalPages(getFilteredPlugins('all')) > 1 && (
+                  {/* Pagination */}
+                  {getTotalPages(getFilteredPlugins('all')) > 1 && (
                 <div className='flex items-center justify-center mt-4'>
                   <Pagination>
                     <PaginationContent>
@@ -1068,6 +1119,8 @@ export function PluginMarket() {
                     </PaginationContent>
                   </Pagination>
                 </div>
+                  )}
+                </>
               )}
             </>
           )}
@@ -1075,6 +1128,65 @@ export function PluginMarket() {
           {/* List View */}
           {viewMode === 'list' && (
             <>
+              {pluginsLoading ? (
+                <Card className='dark:bg-gray-800 dark:border-gray-700'>
+                  <div className='overflow-x-auto'>
+                    <table className='w-full'>
+                      <thead className='bg-gray-50 dark:bg-gray-900'>
+                        <tr>
+                          <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400' />
+                          <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400' />
+                          <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400' />
+                          <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400' />
+                          <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400' />
+                          <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400' />
+                          <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400' />
+                        </tr>
+                      </thead>
+                      <tbody className='divide-y divide-gray-200 dark:divide-gray-700'>
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <tr key={i} className='border-b border-gray-200 dark:border-gray-700'>
+                            <td className='px-6 py-4'>
+                              <div className='flex items-center gap-3'>
+                                <Skeleton className='w-10 h-10 rounded-lg dark:bg-gray-700 shrink-0' />
+                                <div className='space-y-2'>
+                                  <Skeleton className='h-4 w-32 dark:bg-gray-700' />
+                                  <Skeleton className='h-3 w-20 dark:bg-gray-700' />
+                                </div>
+                              </div>
+                            </td>
+                            <td className='px-6 py-4'>
+                              <Skeleton className='h-5 w-16 rounded dark:bg-gray-700' />
+                            </td>
+                            <td className='px-6 py-4'>
+                              <div className='flex gap-1'>
+                                <Skeleton className='h-4 w-8 dark:bg-gray-700' />
+                                <Skeleton className='h-3 w-12 dark:bg-gray-700' />
+                              </div>
+                            </td>
+                            <td className='px-6 py-4'>
+                              <Skeleton className='h-4 w-10 dark:bg-gray-700' />
+                            </td>
+                            <td className='px-6 py-4'>
+                              <Skeleton className='h-4 w-12 dark:bg-gray-700' />
+                            </td>
+                            <td className='px-6 py-4'>
+                              <Skeleton className='h-5 w-14 rounded dark:bg-gray-700' />
+                            </td>
+                            <td className='px-6 py-4'>
+                              <div className='flex gap-2'>
+                                <Skeleton className='h-8 w-14 dark:bg-gray-700' />
+                                <Skeleton className='h-8 w-8 dark:bg-gray-700' />
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </Card>
+              ) : (
+                <>
               <Card className='dark:bg-gray-800 dark:border-gray-700'>
                 <div className='overflow-x-auto'>
                   <table className='w-full'>
@@ -1194,8 +1306,8 @@ export function PluginMarket() {
                 </div>
               </Card>
 
-              {/* Pagination */}
-              {getTotalPages(getFilteredPlugins('all')) > 1 && (
+              {/* Pagination - List View */}
+              {!pluginsLoading && getTotalPages(getFilteredPlugins('all')) > 1 && (
                 <div className='flex items-center justify-center mt-4'>
                   <Pagination>
                     <PaginationContent>
@@ -1236,17 +1348,38 @@ export function PluginMarket() {
                   </Pagination>
                 </div>
               )}
+                </>
+              )}
             </>
           )}
         </TabsContent>
 
         <TabsContent value='installed' className='mt-0'>
           <div className='space-y-4'>
+            {pluginsLoading ? (
+              <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <Card key={i} className='p-4 dark:bg-gray-800 dark:border-gray-700'>
+                    <div className='flex items-start gap-3 mb-3'>
+                      <Skeleton className='w-12 h-12 rounded-lg dark:bg-gray-700 shrink-0' />
+                      <div className='flex-1 space-y-2'><Skeleton className='h-4 w-28 dark:bg-gray-700' /><Skeleton className='h-3 w-20 dark:bg-gray-700' /></div>
+                    </div>
+                    <Skeleton className='h-4 w-full mb-3 dark:bg-gray-700' />
+                    <div className='flex gap-2 mb-3'><Skeleton className='h-5 w-14 rounded dark:bg-gray-700' /><Skeleton className='h-5 w-12 rounded dark:bg-gray-700' /></div>
+                    <div className='flex justify-between pt-3 border-t border-gray-200 dark:border-gray-700'>
+                      <Skeleton className='h-4 w-16 dark:bg-gray-700' />
+                      <Skeleton className='h-8 w-14 dark:bg-gray-700' />
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            ) : (
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
               {getPaginatedPlugins(getFilteredPlugins('installed')).map(plugin => renderPluginCard(plugin))}
             </div>
+            )}
 
-            {getTotalPages(getFilteredPlugins('installed')) > 1 && (
+            {!pluginsLoading && getTotalPages(getFilteredPlugins('installed')) > 1 && (
               <div className='flex items-center justify-center mt-4'>
                 <Pagination>
                   <PaginationContent>
@@ -1297,11 +1430,30 @@ export function PluginMarket() {
 
         <TabsContent value='popular' className='mt-0'>
           <div className='space-y-4'>
+            {pluginsLoading ? (
+              <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <Card key={i} className='p-4 dark:bg-gray-800 dark:border-gray-700'>
+                    <div className='flex items-start gap-3 mb-3'>
+                      <Skeleton className='w-12 h-12 rounded-lg dark:bg-gray-700 shrink-0' />
+                      <div className='flex-1 space-y-2'><Skeleton className='h-4 w-28 dark:bg-gray-700' /><Skeleton className='h-3 w-20 dark:bg-gray-700' /></div>
+                    </div>
+                    <Skeleton className='h-4 w-full mb-3 dark:bg-gray-700' />
+                    <div className='flex gap-2 mb-3'><Skeleton className='h-5 w-14 rounded dark:bg-gray-700' /><Skeleton className='h-5 w-12 rounded dark:bg-gray-700' /></div>
+                    <div className='flex justify-between pt-3 border-t border-gray-200 dark:border-gray-700'>
+                      <Skeleton className='h-4 w-16 dark:bg-gray-700' />
+                      <Skeleton className='h-8 w-14 dark:bg-gray-700' />
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            ) : (
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
               {getPaginatedPlugins(getFilteredPlugins('popular')).map(plugin => renderPluginCard(plugin))}
             </div>
+            )}
 
-            {getTotalPages(getFilteredPlugins('popular')) > 1 && (
+            {!pluginsLoading && getTotalPages(getFilteredPlugins('popular')) > 1 && (
               <div className='flex items-center justify-center mt-4'>
                 <Pagination>
                   <PaginationContent>
@@ -1347,11 +1499,30 @@ export function PluginMarket() {
 
         <TabsContent value='new' className='mt-0'>
           <div className='space-y-4'>
+            {pluginsLoading ? (
+              <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <Card key={i} className='p-4 dark:bg-gray-800 dark:border-gray-700'>
+                    <div className='flex items-start gap-3 mb-3'>
+                      <Skeleton className='w-12 h-12 rounded-lg dark:bg-gray-700 shrink-0' />
+                      <div className='flex-1 space-y-2'><Skeleton className='h-4 w-28 dark:bg-gray-700' /><Skeleton className='h-3 w-20 dark:bg-gray-700' /></div>
+                    </div>
+                    <Skeleton className='h-4 w-full mb-3 dark:bg-gray-700' />
+                    <div className='flex gap-2 mb-3'><Skeleton className='h-5 w-14 rounded dark:bg-gray-700' /><Skeleton className='h-5 w-12 rounded dark:bg-gray-700' /></div>
+                    <div className='flex justify-between pt-3 border-t border-gray-200 dark:border-gray-700'>
+                      <Skeleton className='h-4 w-16 dark:bg-gray-700' />
+                      <Skeleton className='h-8 w-14 dark:bg-gray-700' />
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            ) : (
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
               {getPaginatedPlugins(getFilteredPlugins('new')).map(plugin => renderPluginCard(plugin))}
             </div>
+            )}
 
-            {getTotalPages(getFilteredPlugins('new')) > 1 && (
+            {!pluginsLoading && getTotalPages(getFilteredPlugins('new')) > 1 && (
               <div className='flex items-center justify-center mt-4'>
                 <Pagination>
                   <PaginationContent>

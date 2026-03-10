@@ -56,6 +56,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import {Switch} from '@/components/ui/switch';
+import {Skeleton} from '@/components/ui/skeleton';
 import {useEffect, useRef, useState} from 'react';
 import {useLanguage} from '@/components/LanguageProvider.tsx';
 import {toast} from 'sonner';
@@ -126,7 +127,7 @@ export function KnowledgeBase() {
   const [deletingDocument, setDeletingDocument] = useState<any | null>(null);
   const [documentPage, setDocumentPage] = useState(1);
   const documentsPerPage = 6;
-  const [_isLoadingKnowledgeBases, setIsLoadingKnowledgeBases] = useState(false);
+  const [isLoadingKnowledgeBases, setIsLoadingKnowledgeBases] = useState(false);
   const [_isLoadingDocuments, setIsLoadingDocuments] = useState(false);
   const [statistics, setStatistics] = useState<KnowledgeBaseStatisticsVo | null>(null);
   const [_isLoadingStatistics, setIsLoadingStatistics] = useState(false);
@@ -1020,8 +1021,102 @@ export function KnowledgeBase() {
           </div>
         </div>
 
-        {/* Empty State */}
-        {filteredKnowledgeBases.length === 0 && (
+        {/* Loading: Skeleton 骨架屏 */}
+        {isLoadingKnowledgeBases ? (
+          viewMode === 'grid' ? (
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+              {Array.from({ length: 6 }).map((_, i) => (
+                <Card key={i} className='p-5 dark:bg-gray-800 dark:border-gray-700'>
+                  <div className='flex items-start justify-between mb-4'>
+                    <div className='flex items-center gap-3'>
+                      <Skeleton className='w-12 h-12 rounded-lg dark:bg-gray-700 shrink-0' />
+                      <div className='flex-1 space-y-2'>
+                        <div className='flex items-center gap-2'>
+                          <Skeleton className='h-5 w-28 dark:bg-gray-700' />
+                          <Skeleton className='h-5 w-9 rounded-full dark:bg-gray-700' />
+                        </div>
+                        <Skeleton className='h-5 w-16 dark:bg-gray-700' />
+                      </div>
+                    </div>
+                    <Skeleton className='w-8 h-8 rounded dark:bg-gray-700' />
+                  </div>
+                  <Skeleton className='h-4 w-full mb-2 dark:bg-gray-700' />
+                  <Skeleton className='h-4 w-3/4 mb-4 dark:bg-gray-700' />
+                  <div className='flex gap-2 mb-4'>
+                    <Skeleton className='h-5 w-12 rounded dark:bg-gray-700' />
+                    <Skeleton className='h-5 w-12 rounded dark:bg-gray-700' />
+                  </div>
+                  <div className='grid grid-cols-2 gap-4 pt-2 border-t border-gray-100 dark:border-gray-700'>
+                    <div>
+                      <Skeleton className='h-3 w-16 mb-1 dark:bg-gray-700' />
+                      <Skeleton className='h-4 w-8 dark:bg-gray-700' />
+                    </div>
+                    <div>
+                      <Skeleton className='h-3 w-16 mb-1 dark:bg-gray-700' />
+                      <Skeleton className='h-4 w-12 dark:bg-gray-700' />
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <Card className='dark:bg-gray-800 dark:border-gray-700'>
+              <div className='overflow-x-auto'>
+                <table className='w-full'>
+                  <thead className='border-b border-gray-200 dark:border-gray-700'>
+                    <tr>
+                      <th className='px-5 py-3 text-left text-xs text-gray-500 dark:text-gray-400' />
+                      <th className='px-5 py-3 text-left text-xs text-gray-500 dark:text-gray-400' />
+                      <th className='px-5 py-3 text-left text-xs text-gray-500 dark:text-gray-400' />
+                      <th className='px-5 py-3 text-left text-xs text-gray-500 dark:text-gray-400' />
+                      <th className='px-5 py-3 text-left text-xs text-gray-500 dark:text-gray-400' />
+                      <th className='px-5 py-3 text-left text-xs text-gray-500 dark:text-gray-400' />
+                      <th className='px-5 py-3 text-left text-xs text-gray-500 dark:text-gray-400' />
+                      <th className='px-5 py-3 text-left text-xs text-gray-500 dark:text-gray-400' />
+                    </tr>
+                  </thead>
+                  <tbody className='divide-y divide-gray-100 dark:divide-gray-700'>
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <tr key={i} className='border-b border-gray-100 dark:border-gray-700'>
+                        <td className='px-5 py-4'>
+                          <div className='flex items-center gap-3'>
+                            <Skeleton className='w-10 h-10 rounded-lg dark:bg-gray-700 shrink-0' />
+                            <div className='space-y-2'>
+                              <Skeleton className='h-4 w-32 dark:bg-gray-700' />
+                              <Skeleton className='h-5 w-20 dark:bg-gray-700' />
+                            </div>
+                          </div>
+                        </td>
+                        <td className='px-5 py-4'>
+                          <Skeleton className='h-4 w-48 dark:bg-gray-700' />
+                        </td>
+                        <td className='px-5 py-4'>
+                          <Skeleton className='h-4 w-8 dark:bg-gray-700' />
+                        </td>
+                        <td className='px-5 py-4'>
+                          <Skeleton className='h-4 w-12 dark:bg-gray-700' />
+                        </td>
+                        <td className='px-5 py-4'>
+                          <Skeleton className='h-5 w-14 rounded dark:bg-gray-700' />
+                        </td>
+                        <td className='px-5 py-4'>
+                          <Skeleton className='h-4 w-12 dark:bg-gray-700' />
+                        </td>
+                        <td className='px-5 py-4'>
+                          <Skeleton className='h-4 w-20 dark:bg-gray-700' />
+                        </td>
+                        <td className='px-5 py-4'>
+                          <Skeleton className='h-8 w-20 dark:bg-gray-700' />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+          )
+        ) : filteredKnowledgeBases.length === 0 ? (
+          /* Empty State */
           <div className='text-center py-12'>
             <Database className='w-12 h-12 text-gray-400 dark:text-gray-600 mx-auto mb-3' />
             <p className='text-gray-600 dark:text-gray-400'>{t('knowledge.empty.noMatch')}</p>
@@ -1029,10 +1124,8 @@ export function KnowledgeBase() {
               {searchQuery ? t('knowledge.empty.tryAnotherSearch') : t('knowledge.empty.noData')}
             </p>
           </div>
-        )}
-
-        {/* Grid View */}
-        {viewMode === 'grid' && filteredKnowledgeBases.length > 0 && (
+        ) : viewMode === 'grid' ? (
+          /* Grid View */
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
             {currentKnowledgeBases.map(kb => (
               <Card
@@ -1139,10 +1232,8 @@ export function KnowledgeBase() {
               </Card>
             ))}
           </div>
-        )}
-
-        {/* Table View */}
-        {viewMode === 'table' && filteredKnowledgeBases.length > 0 && (
+        ) : (
+          /* Table View */
           <Card className='dark:bg-gray-800 dark:border-gray-700'>
             <div className='overflow-x-auto'>
               <table className='w-full'>
@@ -1263,10 +1354,11 @@ export function KnowledgeBase() {
               </table>
             </div>
           </Card>
-        )}
+        )
+        }
 
-        {/* Pagination */}
-        {shouldShowPagination && (
+        {/* Pagination - 仅在有数据且非加载时显示 */}
+        {!isLoadingKnowledgeBases && shouldShowPagination && (
           <div className='flex justify-center mt-6'>
             <Pagination>
               <PaginationContent>
