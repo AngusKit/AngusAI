@@ -25,6 +25,8 @@ public class ModelConverter {
         .frequencyPenalty(src.getFrequencyPenalty())
         .presencePenalty(src.getPresencePenalty())
         .embeddingModelName(src.getEmbeddingModelName())
+        .inputPricePerMillionTokens(src.getInputPricePerMillionTokens())
+        .outputPricePerMillionTokens(src.getOutputPricePerMillionTokens())
         .defaultConfig(src.isDefaultConfig())
         .priority(src.getPriority())
         .tenantId(

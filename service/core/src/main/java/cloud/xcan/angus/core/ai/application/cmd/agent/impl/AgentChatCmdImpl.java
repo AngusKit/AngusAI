@@ -110,7 +110,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
 
         // 执行对话请求
         long startMs = System.currentTimeMillis();
-        String reply;
+        String reply = "";
         Exception chatError = null;
         try {
           // 异步执行 LLM 调用，有 override 时指定模型与配置
@@ -128,8 +128,11 @@ public class AgentChatCmdImpl implements AgentChatCmd {
           chatError = e;
           throw SysException.of(e.getMessage());
         } finally {
-          saveApiUsageLog(agent, session, "agent/chat", startMs, chatError == null,
-              chatError != null ? chatError.getMessage() : null, null, null, null);
+          int estInput = estimateTokens(message);
+          int estOutput = chatError == null ? estimateTokens(reply) : 0;
+          saveApiUsageLog(agent, session, "/api/v1/agents/chat", startMs, chatError == null,
+              chatError != null ? chatError.getMessage() : null, estInput, estOutput,
+              estInput + estOutput);
         }
 
         // 落库助手回复
@@ -178,7 +181,6 @@ public class AgentChatCmdImpl implements AgentChatCmd {
           StringBuilder fullContent = new StringBuilder();
           long streamStartMs = System.currentTimeMillis();
           try {
-
             TokenStream stream = override != null && agent.getDefaultModelId() != null
                 ? agentRegistry.chatStream(agentIdStr, session.getSessionId(), message,
                 String.valueOf(agent.getDefaultModelId()), override)
@@ -192,25 +194,37 @@ public class AgentChatCmdImpl implements AgentChatCmd {
                     emitter.completeWithError(e);
                   }
                 })
-                // 流结束：用完整内容覆盖占位消息，关闭流式标记，记录 ApiUsageLog
+                // 流结束：用完整内容覆盖占位消息，关闭流式标记，记录 ApiUsageLog（含 token 用量与成本）
                 .onCompleteResponse(r -> {
                   assistantMessage.setContent(fullContent.toString());
                   messageCmd.setStreaming(assistantMessage, false);
-                  saveApiUsageLog(agent, session, "agent/chatStream", streamStartMs, true, null,
-                      null, null, null);
+                  Integer inTokens = null;
+                  Integer outTokens = null;
+                  Integer total = null;
+                  if (r != null && r.tokenUsage() != null) {
+                    var usage = r.tokenUsage();
+                    inTokens = usage.inputTokenCount();
+                    outTokens = usage.outputTokenCount();
+                    total = usage.totalTokenCount();
+                  }
+                  if (total == null && (inTokens != null || outTokens != null)) {
+                    total = (inTokens != null ? inTokens : 0) + (outTokens != null ? outTokens : 0);
+                  }
+                  saveApiUsageLog(agent, session, "/api/v1/agents/chat/stream",
+                      streamStartMs, true, null, inTokens, outTokens, total);
                   emitter.complete();
                 })
                 .onError(e -> {
                   messageCmd.setStreaming(assistantMessage, false);
-                  saveApiUsageLog(agent, session, "agent/chatStream", streamStartMs, false,
-                      e.getMessage(), null, null, null);
+                  saveApiUsageLog(agent, session, "/api/v1/agents/chat/stream",
+                      streamStartMs, false, e.getMessage(), null, null, null);
                   emitter.completeWithError(e);
                 });
             stream.start();
           } catch (Exception e) {
             messageCmd.setStreaming(assistantMessage, false);
-            saveApiUsageLog(agent, session, "agent/chatStream", streamStartMs, false,
-                e.getMessage(), null, null, null);
+            saveApiUsageLog(agent, session, "/api/v1/agents/chat/stream",
+                streamStartMs, false, e.getMessage(), null, null, null);
             emitter.completeWithError(e);
           }
         });
@@ -239,6 +253,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
       Integer inputTokens, Integer outputTokens, Integer totalTokens) {
     try {
       int responseTimeMs = (int) (System.currentTimeMillis() - startMs);
+      Integer cost = calculateCost(agent, inputTokens, outputTokens);
       ApiUsageLog log = new ApiUsageLog()
           .setAppId(session != null ? session.getAppId() : null)
           .setAgentId(agent != null ? agent.getId() : null)
@@ -251,6 +266,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
           .setInputTokens(inputTokens)
           .setOutputTokens(outputTokens)
           .setTotalTokens(totalTokens)
+          .setCost(cost)
           .setIsSuccessful(isSuccessful)
           .setErrorMessage(lengthSafe(errorMessage, 1000))
           .setSessionId(session != null ? session.getSessionId() : null);
@@ -258,6 +274,50 @@ public class AgentChatCmdImpl implements AgentChatCmd {
     } catch (Exception e) {
       // 日志记录失败不影响主流程
     }
+  }
+
+  /**
+   * 根据模型定价计算费用（美元分，即 cents）
+   */
+  private Integer calculateCost(Agent agent, Integer inputTokens, Integer outputTokens) {
+    if (agent == null || agent.getDefaultModelId() == null || (inputTokens == null
+        && outputTokens == null)) {
+      return null;
+    }
+    return modelQuery.findById(agent.getDefaultModelId())
+        .map(model -> {
+          var config = model.getConfig();
+          if (config == null) {
+            return null;
+          }
+          Double inputPrice = config.getInputPricePerMillionTokens();
+          Double outputPrice = config.getOutputPricePerMillionTokens();
+          int in = inputTokens != null ? inputTokens : 0;
+          int out = outputTokens != null ? outputTokens : 0;
+          if ((inputPrice == null || inputPrice <= 0) && (outputPrice == null
+              || outputPrice <= 0)) {
+            return null;
+          }
+          double costUsd = 0;
+          if (inputPrice != null && inputPrice > 0) {
+            costUsd += (in / 1_000_000.0) * inputPrice;
+          }
+          if (outputPrice != null && outputPrice > 0) {
+            costUsd += (out / 1_000_000.0) * outputPrice;
+          }
+          return costUsd > 0 ? (int) Math.round(costUsd * 100) : null;
+        })
+        .orElse(null);
+  }
+
+  /**
+   * 粗略估算 token 数量（约 1 token ≈ 4 字符，适用于中英文混合）
+   */
+  private static int estimateTokens(String text) {
+    if (text == null || text.isEmpty()) {
+      return 0;
+    }
+    return Math.max(1, text.length() / 4);
   }
 
 }
