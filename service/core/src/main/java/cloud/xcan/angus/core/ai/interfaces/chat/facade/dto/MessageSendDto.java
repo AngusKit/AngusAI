@@ -11,9 +11,6 @@ import java.util.List;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
-/**
- * 发送消息DTO
- */
 @Data
 @Schema(description = "发送消息请求")
 public class MessageSendDto {

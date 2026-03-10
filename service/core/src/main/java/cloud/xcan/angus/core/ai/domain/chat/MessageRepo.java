@@ -14,21 +14,6 @@ import org.springframework.data.repository.NoRepositoryBean;
 public interface MessageRepo extends BaseRepository<Message, Long> {
 
   /**
-   * 根据会话实体ID查询消息列表
-   */
-  List<Message> findBySessionEntityIdOrderByCreatedDateAsc(Long sessionEntityId);
-
-  /**
-   * 根据会话实体ID分页查询消息
-   */
-  Page<Message> findBySessionEntityIdOrderByCreatedDateDesc(Long sessionEntityId, Pageable pageable);
-
-  /**
-   * 查询会话的最后一条消息（按实体ID）
-   */
-  Message findFirstBySessionEntityIdOrderByCreatedDateDesc(Long sessionEntityId);
-
-  /**
    * 根据会话ID(UUID)和角色查询消息
    */
   List<Message> findBySessionIdAndRole(String sessionId, MessageRole role);
@@ -49,29 +34,6 @@ public interface MessageRepo extends BaseRepository<Message, Long> {
   long countBySessionId(String sessionId);
 
   /**
-   * 根据会话实体ID统计消息数量
-   */
-  long countBySessionEntityId(Long sessionEntityId);
-
-  /**
-   * 根据会话实体ID删除消息
-   */
-  @Modifying
-  int deleteBySessionEntityId(Long sessionEntityId);
-
-  /**
-   * 根据会话ID(UUID)删除消息
-   */
-  @Modifying
-  int deleteBySessionId(String sessionId);
-
-  /**
-   * 批量删除会话的所有消息
-   */
-  @Modifying
-  int deleteBySessionEntityIdIn(List<Long> ids);
-
-  /**
    * 根据会话ID(UUID)查询消息列表
    */
   List<Message> findBySessionIdOrderByCreatedDateAsc(String sessionId);
@@ -86,4 +48,15 @@ public interface MessageRepo extends BaseRepository<Message, Long> {
    */
   Message findFirstBySessionIdOrderByCreatedDateDesc(String sessionId);
 
+  /**
+   * 根据会话实体ID删除消息
+   */
+  @Modifying
+  int deleteBySessionEntityId(Long sessionEntityId);
+
+  /**
+   * 批量删除会话的所有消息
+   */
+  @Modifying
+  int deleteBySessionEntityIdIn(List<Long> ids);
 }

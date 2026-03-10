@@ -4,9 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-/**
- * 切换模型DTO
- */
 @Data
 @Schema(description = "切换模型请求")
 public class SessionSwitchModelDto {

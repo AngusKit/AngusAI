@@ -5,9 +5,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
-/**
- * 更新会话DTO
- */
 @Data
 @Schema(description = "更新会话请求")
 public class SessionUpdateDto {

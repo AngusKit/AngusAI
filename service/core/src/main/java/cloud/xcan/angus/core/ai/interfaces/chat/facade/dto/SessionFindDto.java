@@ -3,9 +3,6 @@ package cloud.xcan.angus.core.ai.interfaces.chat.facade.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-/**
- * 查询会话DTO
- */
 @Data
 @Schema(description = "查询会话请求")
 public class SessionFindDto {

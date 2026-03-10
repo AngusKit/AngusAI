@@ -2,8 +2,10 @@ package cloud.xcan.angus.core.ai.domain.chat;
 
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.repository.NoRepositoryBean;
 
 /**
@@ -15,32 +17,7 @@ public interface SessionRepo extends BaseRepository<Session, Long> {
   /**
    * 根据会话ID(UUID)查询
    */
-  java.util.Optional<Session> findBySessionId(String sessionId);
-
-  /**
-   * 根据应用ID查询会话列表
-   */
-  List<Session> findByAppId(Long appId);
-
-  /**
-   * 根据模型ID查询会话列表
-   */
-  List<Session> findByModelId(Long modelId);
-
-  /**
-   * 查询用户最近创建的会话
-   */
-  Page<Session> findByCreatedByOrderByCreatedDateDesc(Long userId, Pageable pageable);
-
-  /**
-   * 查询用户最近活跃的会话
-   */
-  Page<Session> findByCreatedByOrderByModifiedDateDesc(Long userId, Pageable pageable);
-
-  /**
-   * 统计用户的会话数量
-   */
-  long countByCreatedBy(Long createdBy);
+  Optional<Session> findBySessionId(String sessionId);
 
   /**
    * 统计某用户在某应用下的会话数量（用于配额校验）
@@ -53,12 +30,8 @@ public interface SessionRepo extends BaseRepository<Session, Long> {
   long countByAppId(Long appId);
 
   /**
-   * 统计模型的使用次数
-   */
-  long countByModelId(Long modelId);
-
-  /**
    * 批量删除消息
    */
+  @Modifying
   int deleteByIdIn(List<Long> ids);
 }

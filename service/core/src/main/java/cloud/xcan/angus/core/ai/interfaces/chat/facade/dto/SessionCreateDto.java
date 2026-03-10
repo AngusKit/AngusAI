@@ -7,9 +7,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
-/**
- * 创建会话DTO
- */
 @Data
 @Schema(description = "创建会话请求")
 public class SessionCreateDto {

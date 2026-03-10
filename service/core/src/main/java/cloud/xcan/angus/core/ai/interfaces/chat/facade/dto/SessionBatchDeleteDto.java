@@ -4,9 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.Data;
 
-/**
- * 批量删除DTO
- */
 @Data
 @Schema(description = "批量删除会话请求")
 public class SessionBatchDeleteDto {
