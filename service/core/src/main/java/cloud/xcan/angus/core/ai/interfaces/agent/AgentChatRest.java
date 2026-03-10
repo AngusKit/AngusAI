@@ -1,10 +1,10 @@
 package cloud.xcan.angus.core.ai.interfaces.agent;
 
-import cloud.xcan.agentx.core.agent.AgentRegistry;
+import cloud.xcan.angus.core.ai.interfaces.agent.facade.AgentChatFacade;
+import cloud.xcan.angus.core.ai.interfaces.agent.facade.AgentFacade;
 import cloud.xcan.angus.core.ai.interfaces.agent.facade.dto.AgentChatRequestDto;
 import cloud.xcan.angus.core.ai.interfaces.agent.facade.vo.AgentChatResponseVo;
 import cloud.xcan.angus.remote.ApiLocaleResult;
-import dev.langchain4j.service.TokenStream;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -28,7 +28,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public class AgentChatRest {
 
   @Resource
-  private AgentRegistry agentRegistry;
+  private AgentChatFacade agentChatFacade;
 
   @Operation(operationId = "agentChat", summary = "同步对话", description = "与指定智能体进行同步对话")
   @ApiResponses(value = {
@@ -39,18 +39,7 @@ public class AgentChatRest {
   @ResponseStatus(HttpStatus.OK)
   @PostMapping("/chat")
   public ApiLocaleResult<AgentChatResponseVo> chat(@Valid @RequestBody AgentChatRequestDto dto) {
-    long start = System.currentTimeMillis();
-    String agentIdStr = String.valueOf(dto.getAgentId());
-    String sessionId = dto.getSessionId() != null ? dto.getSessionId() : "default";
-    String reply = agentRegistry.chat(agentIdStr, sessionId, dto.getMessage());
-    long latencyMs = System.currentTimeMillis() - start;
-
-    AgentChatResponseVo vo = new AgentChatResponseVo();
-    vo.setAgentId(dto.getAgentId());
-    vo.setSessionId(sessionId);
-    vo.setReply(reply);
-    vo.setLatencyMs(latencyMs);
-    return ApiLocaleResult.success(vo);
+    return ApiLocaleResult.success(agentChatFacade.chat(dto));
   }
 
   @Operation(operationId = "agentChatStream", summary = "流式对话", description = "与指定智能体进行流式对话，返回 SSE 事件流")
@@ -61,30 +50,6 @@ public class AgentChatRest {
   })
   @PostMapping(value = "/chat/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
   public SseEmitter chatStream(@Valid @RequestBody AgentChatRequestDto dto) {
-    String agentIdStr = String.valueOf(dto.getAgentId());
-    String sessionId = dto.getSessionId() != null ? dto.getSessionId() : "default";
-    String message = dto.getMessage();
-
-    SseEmitter emitter = new SseEmitter(120_000L);
-
-    new Thread(() -> {
-      try {
-        TokenStream stream = agentRegistry.chatStream(agentIdStr, sessionId, message);
-        stream.onPartialResponse(token -> {
-              try {
-                emitter.send(SseEmitter.event().data(token));
-              } catch (Exception e) {
-                emitter.completeWithError(e);
-              }
-            })
-            .onCompleteResponse(r -> emitter.complete())
-            .onError(emitter::completeWithError);
-        stream.start();
-      } catch (Exception e) {
-        emitter.completeWithError(e);
-      }
-    }).start();
-
-    return emitter;
+    return agentChatFacade.chatStream(dto);
   }
 }

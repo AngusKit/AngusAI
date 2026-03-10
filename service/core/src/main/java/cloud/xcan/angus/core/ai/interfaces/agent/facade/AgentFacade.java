@@ -24,6 +24,16 @@ public interface AgentFacade {
   AgentDetailVo update(Long id, AgentUpdateDto dto);
 
   /**
+   * 发布/下线智能体
+   */
+  AgentDetailVo updateStatus(Long id, AgentStatus status);
+
+  /**
+   * 删除智能体
+   */
+  void delete(Long id);
+
+  /**
    * 获取智能体详情
    */
   AgentDetailVo getDetail(Long id);
@@ -33,13 +43,4 @@ public interface AgentFacade {
    */
   PageResult<AgentListVo> list(AgentFindDto dto);
 
-  /**
-   * 删除智能体
-   */
-  void delete(Long id);
-
-  /**
-   * 发布/下线智能体
-   */
-  AgentDetailVo updateStatus(Long id, AgentStatus status);
 }

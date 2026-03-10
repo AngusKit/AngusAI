@@ -3,7 +3,10 @@ package cloud.xcan.angus.core.ai.interfaces.agent.facade.internal;
 
 import static cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder.getMatchSearchFields;
 import static cloud.xcan.angus.core.utils.CoreUtils.buildVoPageResult;
+import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 
+import cloud.xcan.agentx.core.agent.AgentRegistry;
 import cloud.xcan.angus.core.ai.application.cmd.agent.AgentCmd;
 import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
 import cloud.xcan.angus.core.ai.application.query.apis.ApiCollectionQuery;
@@ -12,11 +15,11 @@ import cloud.xcan.angus.core.ai.application.query.knowledgebase.KnowledgeBaseQue
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.application.query.workflow.WorkflowQuery;
 import cloud.xcan.angus.core.ai.domain.agent.Agent;
+import cloud.xcan.angus.core.ai.domain.agent.AgentStatus;
 import cloud.xcan.angus.core.ai.domain.apis.ApiCollection;
 import cloud.xcan.angus.core.ai.domain.dataset.Dataset;
 import cloud.xcan.angus.core.ai.domain.knowledgebase.KnowledgeBase;
 import cloud.xcan.angus.core.ai.domain.workflow.Workflow;
-import cloud.xcan.angus.core.ai.domain.agent.AgentStatus;
 import cloud.xcan.angus.core.ai.interfaces.agent.facade.AgentFacade;
 import cloud.xcan.angus.core.ai.interfaces.agent.facade.dto.AgentCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.agent.facade.dto.AgentFindDto;
@@ -26,16 +29,12 @@ import cloud.xcan.angus.core.ai.interfaces.agent.facade.vo.AgentDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.agent.facade.vo.AgentDetailVo.AgentResourcesVo;
 import cloud.xcan.angus.core.ai.interfaces.agent.facade.vo.AgentDetailVo.ResourceInfoVo;
 import cloud.xcan.angus.core.ai.interfaces.agent.facade.vo.AgentListVo;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static java.util.Objects.nonNull;
-import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import cloud.xcan.angus.core.biz.NameJoin;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.PageResult;
 import jakarta.annotation.Resource;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
@@ -64,6 +63,9 @@ public class AgentFacadeImpl implements AgentFacade {
 
   @Resource
   private ModelQuery modelQuery;
+
+  @Resource
+  private AgentRegistry agentRegistry;
 
   @NameJoin
   @Override
@@ -146,4 +148,5 @@ public class AgentFacadeImpl implements AgentFacade {
         dto.fullTextSearch, getMatchSearchFields(dto.getClass()));
     return buildVoPageResult(page, AgentAssembler::toListVo);
   }
+
 }
