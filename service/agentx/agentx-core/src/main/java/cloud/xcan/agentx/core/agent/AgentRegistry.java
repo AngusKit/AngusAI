@@ -1,20 +1,20 @@
 package cloud.xcan.agentx.core.agent;
 
-import cloud.xcan.agentx.core.knowledge.ContentRetrieverFactory;
-import cloud.xcan.agentx.core.prompt.PromptVariableResolver;
-import cloud.xcan.agentx.core.workflow.WorkflowDefinitionProvider;
 import cloud.xcan.agentx.core.agent.definition.AgentDefinition;
 import cloud.xcan.agentx.core.agent.runtime.AgentChatService;
-import cloud.xcan.agentx.core.model.ModelConfigDefinition;
 import cloud.xcan.agentx.core.agent.runtime.AgentInstance;
 import cloud.xcan.agentx.core.agent.runtime.AgentStreamingChatService;
 import cloud.xcan.agentx.core.guardrail.GuardrailChain;
 import cloud.xcan.agentx.core.guardrail.GuardrailResult;
+import cloud.xcan.agentx.core.knowledge.ContentRetrieverFactory;
 import cloud.xcan.agentx.core.memory.MemoryFactory;
+import cloud.xcan.agentx.core.model.ModelConfigDefinition;
 import cloud.xcan.agentx.core.model.ModelProvider;
 import cloud.xcan.agentx.core.model.ModelRegistry;
+import cloud.xcan.agentx.core.prompt.PromptVariableResolver;
 import cloud.xcan.agentx.core.skill.SkillRegistry;
 import cloud.xcan.agentx.core.tool.ToolRegistry;
+import cloud.xcan.agentx.core.workflow.WorkflowDefinitionProvider;
 import cloud.xcan.agentx.core.workflow.dsl.WorkflowDefinition;
 import cloud.xcan.agentx.core.workflow.engine.WorkflowEngine;
 import cloud.xcan.agentx.core.workflow.engine.WorkflowExecutionResult;
@@ -200,7 +200,7 @@ public class AgentRegistry {
    * 同步对话（支持配置覆盖）
    *
    * @param defaultModelId 智能体默认模型配置 ID，用于加载基础配置并与 override 合并
-   * @param override     配置覆盖，null 则使用 Agent 注册时的模型
+   * @param override       配置覆盖，null 则使用 Agent 注册时的模型
    */
   public String chat(String agentId, String sessionId, String message,
       String defaultModelId, ChatConfigOverride override) {
@@ -249,7 +249,8 @@ public class AgentRegistry {
     }
 
     ModelConfigDefinition baseConfig = modelRegistry.loadConfigById(defaultModelId)
-        .orElseThrow(() -> new IllegalArgumentException("Model config not found: " + defaultModelId));
+        .orElseThrow(
+            () -> new IllegalArgumentException("Model config not found: " + defaultModelId));
 
     ModelConfigDefinition mergedConfig = applyOverride(baseConfig, override);
     ChatModel chatModel = modelRegistry.createChatModelFromConfig(mergedConfig);
@@ -280,8 +281,9 @@ public class AgentRegistry {
     return response;
   }
 
-  private ModelConfigDefinition applyOverride(ModelConfigDefinition base, ChatConfigOverride o) {
-    if (o == null) {
+  private ModelConfigDefinition applyOverride(ModelConfigDefinition base,
+      ChatConfigOverride override) {
+    if (override == null) {
       return base;
     }
     ModelConfigDefinition.ModelConfigDefinitionBuilder b = ModelConfigDefinition.builder()
@@ -295,20 +297,20 @@ public class AgentRegistry {
         .defaultConfig(base.isDefaultConfig())
         .priority(base.getPriority())
         .tenantId(base.getTenantId());
-    b.temperature(o.getTemperature() != null ? o.getTemperature()
+    b.temperature(override.getTemperature() != null ? override.getTemperature()
         : (base.getTemperature() != null ? base.getTemperature() : 0.7));
-    b.maxTokens(o.getMaxTokens() != null ? o.getMaxTokens()
+    b.maxTokens(override.getMaxTokens() != null ? override.getMaxTokens()
         : (base.getMaxTokens() != null ? base.getMaxTokens() : 4096));
     Map<String, Object> extra = base.getExtraProperties() != null
         ? new HashMap<>(base.getExtraProperties()) : new HashMap<>();
-    if (o.getTopP() != null) {
-      extra.put("topP", o.getTopP());
+    if (override.getTopP() != null) {
+      extra.put("topP", override.getTopP());
     }
-    if (o.getFrequencyPenalty() != null) {
-      extra.put("frequencyPenalty", o.getFrequencyPenalty());
+    if (override.getFrequencyPenalty() != null) {
+      extra.put("frequencyPenalty", override.getFrequencyPenalty());
     }
-    if (o.getPresencePenalty() != null) {
-      extra.put("presencePenalty", o.getPresencePenalty());
+    if (override.getPresencePenalty() != null) {
+      extra.put("presencePenalty", override.getPresencePenalty());
     }
     b.extraProperties(extra);
     return b.build();
@@ -469,9 +471,11 @@ public class AgentRegistry {
     Object memoryId = sessionId != null && !sessionId.isBlank() ? sessionId : "default";
     var definition = instance.getDefinition();
     ModelConfigDefinition baseConfig = modelRegistry.loadConfigById(defaultModelId)
-        .orElseThrow(() -> new IllegalArgumentException("Model config not found: " + defaultModelId));
+        .orElseThrow(
+            () -> new IllegalArgumentException("Model config not found: " + defaultModelId));
     ModelConfigDefinition mergedConfig = applyOverride(baseConfig, override);
-    StreamingChatModel streamingModel = modelRegistry.createStreamingChatModelFromConfig(mergedConfig);
+    StreamingChatModel streamingModel = modelRegistry.createStreamingChatModelFromConfig(
+        mergedConfig);
     String systemPromptOverride = override.getSystemPrompt();
     AgentStreamingChatService service = buildStreamingChatService(definition, streamingModel,
         systemPromptOverride);

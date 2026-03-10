@@ -16,6 +16,11 @@ public interface AgentQuery {
   Agent findAndCheck(Long id);
 
   /**
+   * 查询智能体并检查是否存在且有效
+   */
+  Agent findAndCheckValid(Long id);
+
+  /**
    * 分页查询智能体列表
    */
   Page<Agent> find(GenericSpecification<Agent> spec, PageRequest pageable,

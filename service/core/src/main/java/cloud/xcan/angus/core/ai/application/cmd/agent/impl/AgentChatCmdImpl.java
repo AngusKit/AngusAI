@@ -73,7 +73,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
 
       @Override
       protected void checkParams() {
-        agent = agentQuery.findAndCheck(agentId);
+        agent = agentQuery.findAndCheckValid(agentId);
         session = sessionCmd.createOrGetForAgentChat(agent, sessionId);
         effectiveSessionId = session != null ? session.getSessionId()
             : (sessionId != null && !sessionId.isBlank() ? sessionId : randomUUID().toString());
@@ -103,10 +103,9 @@ public class AgentChatCmdImpl implements AgentChatCmd {
   @Override
   public SseEmitter chatStream(Long agentId, String sessionId, String message, Long timeoutMs,
       AgentChatConfig config) {
-    long effectiveTimeout =
-        timeoutMs != null && timeoutMs > 0 ? timeoutMs : AGENT_CHAT_SSE_TIMEOUT_MS;
-
     return new BizTemplate<SseEmitter>() {
+      final long effectiveTimeout = timeoutMs != null && timeoutMs > 0
+          ? timeoutMs : AGENT_CHAT_SSE_TIMEOUT_MS;
       final SseEmitter emitter = new SseEmitter(effectiveTimeout);
       Long assistantMessageId = null;
       Agent agent;
@@ -115,7 +114,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
 
       @Override
       protected void checkParams() {
-        agent = agentQuery.findAndCheck(agentId);
+        agent = agentQuery.findAndCheckValid(agentId);
         session = sessionCmd.createOrGetForAgentChat(agent, sessionId);
         effectiveSessionId = session != null ? session.getSessionId()
             : (sessionId != null && !sessionId.isBlank() ? sessionId : randomUUID().toString());

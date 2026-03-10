@@ -15,7 +15,7 @@ public interface Constants {
   /**
    * 智能体系统提示词最大长度（注意：这里允许100k字符，如果对于具体模型太长时在对应模型上手动截取安全长度字符）
    */
-  int AGENT_SYSTEM_PROMPT_MAX_LENGTH = 100000;
+  int AGENT_SYSTEM_PROMPT_MAX_LENGTH = 100_000;
 
   /**
    * 智能体欢迎消息最大长度
