@@ -12,7 +12,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -114,6 +116,28 @@ public class MessageQueryImpl implements MessageQuery {
         LocalDateTime start = LocalDate.now().atStartOfDay();
         LocalDateTime end = LocalDateTime.now();
         return messageRepo.countByCreatedDateBetween(start, end);
+      }
+    }.execute();
+  }
+
+  @Override
+  public Map<String, Message> findLastMessageMapBySessionIds(List<String> sessionIds) {
+    if (sessionIds == null || sessionIds.isEmpty()) {
+      return new HashMap<>();
+    }
+    return new BizTemplate<Map<String, Message>>() {
+      @Override
+      protected Map<String, Message> process() {
+        Map<String, Message> result = new HashMap<>();
+        for (String sid : sessionIds) {
+          if (sid != null && !sid.isBlank()) {
+            Message msg = messageRepo.findFirstBySessionIdOrderByCreatedDateDesc(sid);
+            if (msg != null) {
+              result.put(sid, msg);
+            }
+          }
+        }
+        return result;
       }
     }.execute();
   }

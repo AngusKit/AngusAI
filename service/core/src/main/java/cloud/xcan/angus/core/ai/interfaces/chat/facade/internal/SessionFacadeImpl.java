@@ -26,7 +26,6 @@ import cloud.xcan.angus.remote.PageResult;
 import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
@@ -116,10 +115,15 @@ public class SessionFacadeImpl implements SessionFacade {
 
   private void setLastMessage(List<Session> sessions) {
     if (isNotEmpty(sessions)) {
-      Map<Long, Message> lastMessageMap = messageQuery.findLastMessageMapById(
-          sessions.stream().collect(Collectors.toMap(Message::getId, x -> x)));
+      List<String> sessionIds = sessions.stream()
+          .map(Session::getSessionId)
+          .filter(id -> id != null && !id.isBlank())
+          .toList();
+      Map<String, Message> lastMessageMap = messageQuery.findLastMessageMapBySessionIds(sessionIds);
       for (Session session : sessions) {
-        session.setLastMessage(lastMessageMap.get(session.getId()));
+        if (session.getSessionId() != null) {
+          session.setLastMessage(lastMessageMap.get(session.getSessionId()));
+        }
       }
     }
   }

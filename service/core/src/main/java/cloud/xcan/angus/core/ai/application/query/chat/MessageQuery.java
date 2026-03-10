@@ -3,6 +3,7 @@ package cloud.xcan.angus.core.ai.application.query.chat;
 import cloud.xcan.angus.core.ai.domain.chat.Message;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.ChatStatisticsVo.UsageTrend;
 import java.util.List;
+import java.util.Map;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -45,4 +46,12 @@ public interface MessageQuery {
    * 统计今日消息数量
    */
   Long countToday();
+
+  /**
+   * 批量获取各会话的最后一条消息（按 sessionId UUID）
+   *
+   * @param sessionIds 会话ID(UUID)列表
+   * @return sessionId -> Message，仅包含有消息的会话
+   */
+  Map<String, Message> findLastMessageMapBySessionIds(List<String> sessionIds);
 }
