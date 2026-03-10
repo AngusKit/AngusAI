@@ -1,23 +1,24 @@
 package cloud.xcan.angus.core.ai.application.cmd.agent.impl;
 
+import static cloud.xcan.angus.core.ai.application.converter.AgentConverter.toChatConfigOverride;
 import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_CHAT_SSE_TIMEOUT_MS;
+import static java.util.UUID.randomUUID;
 
 import cloud.xcan.agentx.core.agent.AgentRegistry;
 import cloud.xcan.agentx.core.agent.ChatConfigOverride;
 import cloud.xcan.angus.core.ai.application.cmd.agent.AgentChatCmd;
-import cloud.xcan.angus.core.ai.application.cmd.agent.AgentChatResult;
 import cloud.xcan.angus.core.ai.application.cmd.chat.MessageCmd;
 import cloud.xcan.angus.core.ai.application.cmd.chat.SessionCmd;
-import cloud.xcan.angus.core.ai.infra.agent.utils.ChatConfigMergeUtils;
 import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
 import cloud.xcan.angus.core.ai.application.query.chat.MessageQuery;
-import cloud.xcan.angus.core.ai.application.query.chat.SessionQuery;
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.domain.agent.Agent;
+import cloud.xcan.angus.core.ai.domain.agent.AgentChatConfig;
+import cloud.xcan.angus.core.ai.domain.agent.AgentChatResult;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRole;
 import cloud.xcan.angus.core.ai.domain.chat.Session;
 import cloud.xcan.angus.core.ai.domain.model.Model;
-import cloud.xcan.angus.core.ai.domain.agent.AgentChatConfig;
+import cloud.xcan.angus.core.ai.infra.agent.utils.ChatConfigMergeUtils;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import dev.langchain4j.service.TokenStream;
 import jakarta.annotation.Resource;
@@ -35,7 +36,9 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @Service
 public class AgentChatCmdImpl implements AgentChatCmd {
 
-  /** 流式助手消息占位内容，用于满足 MessageCmd 非空校验，最终由 updateContent 覆盖 */
+  /**
+   * 流式助手消息占位内容，用于满足 MessageCmd 非空校验，最终由 updateContent 覆盖
+   */
   private static final String STREAMING_PLACEHOLDER = ".";
 
   @Resource
@@ -49,9 +52,6 @@ public class AgentChatCmdImpl implements AgentChatCmd {
 
   @Resource
   private MessageQuery messageQuery;
-
-  @Resource
-  private SessionQuery sessionQuery;
 
   @Resource
   private SessionCmd sessionCmd;
@@ -75,9 +75,8 @@ public class AgentChatCmdImpl implements AgentChatCmd {
       protected void checkParams() {
         agent = agentQuery.findAndCheck(agentId);
         session = sessionCmd.createOrGetForAgentChat(agent, sessionId);
-        effectiveSessionId = session != null
-            ? session.getSessionId()
-            : (sessionId != null && !sessionId.isBlank() ? sessionId : java.util.UUID.randomUUID().toString());
+        effectiveSessionId = session != null ? session.getSessionId()
+            : (sessionId != null && !sessionId.isBlank() ? sessionId : randomUUID().toString());
       }
 
       @Override
@@ -85,10 +84,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
         if (session != null) {
           messageCmd.create(effectiveSessionId, MessageRole.USER, message);
         }
-        Model model = agent.getDefaultModelId() != null
-            ? modelQuery.findById(agent.getDefaultModelId()).orElse(null) : null;
-        AgentChatConfig merged = ChatConfigMergeUtils.merge(config, session, agent, model);
-        ChatConfigOverride override = toChatConfigOverride(merged);
+        ChatConfigOverride override = getChatConfigOverride(agent, config, session);
         String reply;
         if (override != null && agent.getDefaultModelId() != null) {
           reply = agentRegistry.chat(String.valueOf(agentId), effectiveSessionId, message,
@@ -107,7 +103,8 @@ public class AgentChatCmdImpl implements AgentChatCmd {
   @Override
   public SseEmitter chatStream(Long agentId, String sessionId, String message, Long timeoutMs,
       AgentChatConfig config) {
-    long effectiveTimeout = timeoutMs != null && timeoutMs > 0 ? timeoutMs : AGENT_CHAT_SSE_TIMEOUT_MS;
+    long effectiveTimeout =
+        timeoutMs != null && timeoutMs > 0 ? timeoutMs : AGENT_CHAT_SSE_TIMEOUT_MS;
 
     return new BizTemplate<SseEmitter>() {
       final SseEmitter emitter = new SseEmitter(effectiveTimeout);
@@ -120,9 +117,8 @@ public class AgentChatCmdImpl implements AgentChatCmd {
       protected void checkParams() {
         agent = agentQuery.findAndCheck(agentId);
         session = sessionCmd.createOrGetForAgentChat(agent, sessionId);
-        effectiveSessionId = session != null
-            ? session.getSessionId()
-            : (sessionId != null && !sessionId.isBlank() ? sessionId : java.util.UUID.randomUUID().toString());
+        effectiveSessionId = session != null ? session.getSessionId()
+            : (sessionId != null && !sessionId.isBlank() ? sessionId : randomUUID().toString());
       }
 
       @Override
@@ -134,10 +130,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
           messageCmd.setStreaming(assistantMessageId, true);
         }
 
-        Model model = agent.getDefaultModelId() != null
-            ? modelQuery.findById(agent.getDefaultModelId()).orElse(null) : null;
-        AgentChatConfig merged = ChatConfigMergeUtils.merge(config, session, agent, model);
-        ChatConfigOverride override = toChatConfigOverride(merged);
+        ChatConfigOverride override = getChatConfigOverride(agent, config, session);
 
         sseEmitterChatExecutor.execute(() -> {
           StringBuilder fullContent = new StringBuilder();
@@ -181,17 +174,12 @@ public class AgentChatCmdImpl implements AgentChatCmd {
     }.execute();
   }
 
-  private static ChatConfigOverride toChatConfigOverride(AgentChatConfig dto) {
-    if (dto == null) {
-      return null;
-    }
-    return ChatConfigOverride.builder()
-        .temperature(dto.getTemperature())
-        .maxTokens(dto.getMaxTokens())
-        .topP(dto.getTopP())
-        .frequencyPenalty(dto.getFrequencyPenalty())
-        .presencePenalty(dto.getPresencePenalty())
-        .systemPrompt(dto.getSystemPrompt())
-        .build();
+  private ChatConfigOverride getChatConfigOverride(Agent agent, AgentChatConfig config,
+      Session session) {
+    Model model = agent.getDefaultModelId() != null
+        ? modelQuery.findById(agent.getDefaultModelId()).orElse(null) : null;
+    AgentChatConfig merged = ChatConfigMergeUtils.merge(config, session, agent, model);
+    return toChatConfigOverride(merged);
   }
+
 }

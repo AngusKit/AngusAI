@@ -7,7 +7,7 @@ import cloud.xcan.agentx.core.agent.enums.AutonomyLevel;
 import cloud.xcan.agentx.core.agent.enums.InteractionMode;
 import cloud.xcan.agentx.core.agent.enums.ReasoningStrategy;
 import cloud.xcan.agentx.core.memory.enums.MemoryStrategy;
-import cloud.xcan.angus.core.ai.application.converter.AgentDefinitionConverter;
+import cloud.xcan.angus.core.ai.application.converter.AgentConverter;
 import cloud.xcan.angus.core.ai.domain.Constants;
 import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
@@ -29,7 +29,7 @@ import org.hibernate.annotations.Type;
 /**
  * 智能体实体 — 用户可创建的智能体，持久化存储
  *
- * @see AgentDefinitionConverter
+ * @see AgentConverter
  */
 @Entity
 @Table(name = "ai_agent")

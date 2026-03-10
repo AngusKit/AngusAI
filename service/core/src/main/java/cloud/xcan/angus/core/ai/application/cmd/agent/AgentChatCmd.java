@@ -1,6 +1,7 @@
 package cloud.xcan.angus.core.ai.application.cmd.agent;
 
 import cloud.xcan.angus.core.ai.domain.agent.AgentChatConfig;
+import cloud.xcan.angus.core.ai.domain.agent.AgentChatResult;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 public interface AgentChatCmd {

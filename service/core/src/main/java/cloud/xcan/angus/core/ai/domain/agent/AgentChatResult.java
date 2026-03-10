@@ -1,4 +1,4 @@
-package cloud.xcan.angus.core.ai.application.cmd.agent;
+package cloud.xcan.angus.core.ai.domain.agent;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -4,10 +4,12 @@ import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_MEMORY_DEFAULT_MAX
 import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_MEMORY_DEFAULT_WINDOW_SIZE;
 import static cloud.xcan.angus.spec.utils.ObjectUtils.nullSafe;
 
+import cloud.xcan.agentx.core.agent.ChatConfigOverride;
 import cloud.xcan.agentx.core.agent.definition.AgentDefinition;
 import cloud.xcan.agentx.core.memory.enums.MemoryStrategy;
 import cloud.xcan.agentx.core.model.ModelProvider;
 import cloud.xcan.angus.core.ai.domain.agent.Agent;
+import cloud.xcan.angus.core.ai.domain.agent.AgentChatConfig;
 import cloud.xcan.angus.core.ai.domain.model.Model;
 import java.util.Collections;
 import java.util.List;
@@ -20,7 +22,7 @@ import java.util.stream.Collectors;
  * 否则 ModelRegistry.getChatModel 可能失败，需降级到 getDefaultChatModel(provider)
  * </p>
  */
-public class AgentDefinitionConverter {
+public class AgentConverter {
 
   public static AgentDefinition toDefinition(Agent agent, Model model) {
     AgentDefinition.ModelConfig modelConfig = AgentDefinition.ModelConfig.builder()
@@ -80,6 +82,20 @@ public class AgentDefinitionConverter {
         .guardrails(guardrailConfig)
         .variables(nullSafe(agent.getVariables()))
         .tenantId(String.valueOf(agent.getTenantId()))
+        .build();
+  }
+
+  public static ChatConfigOverride toChatConfigOverride(AgentChatConfig dto) {
+    if (dto == null) {
+      return null;
+    }
+    return ChatConfigOverride.builder()
+        .temperature(dto.getTemperature())
+        .maxTokens(dto.getMaxTokens())
+        .topP(dto.getTopP())
+        .frequencyPenalty(dto.getFrequencyPenalty())
+        .presencePenalty(dto.getPresencePenalty())
+        .systemPrompt(dto.getSystemPrompt())
         .build();
   }
 

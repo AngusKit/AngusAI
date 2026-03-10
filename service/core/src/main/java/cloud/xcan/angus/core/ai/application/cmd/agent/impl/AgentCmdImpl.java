@@ -14,7 +14,7 @@ import cloud.xcan.angus.core.ai.domain.agent.Agent;
 import cloud.xcan.angus.core.ai.domain.agent.AgentRepo;
 import cloud.xcan.angus.core.ai.domain.agent.AgentStatus;
 import cloud.xcan.angus.core.ai.domain.model.Model;
-import cloud.xcan.angus.core.ai.application.converter.AgentDefinitionConverter;
+import cloud.xcan.angus.core.ai.application.converter.AgentConverter;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
@@ -185,7 +185,7 @@ public class AgentCmdImpl extends CommCmd<Agent, Long> implements AgentCmd {
    */
   private void registerToRegistry(Agent agent) {
     Model model = modelQuery.findAndCheck(agent.getDefaultModelId());
-    AgentDefinition definition = AgentDefinitionConverter.toDefinition(agent, model);
+    AgentDefinition definition = AgentConverter.toDefinition(agent, model);
     String configId = String.valueOf(agent.getDefaultModelId());
     ChatModel chatModel;
     StreamingChatModel streamingModel;

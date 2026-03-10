@@ -199,11 +199,11 @@ public class AgentRegistry {
   /**
    * 同步对话（支持配置覆盖）
    *
-   * @param modelConfigId 智能体默认模型配置 ID，用于加载基础配置并与 override 合并
+   * @param defaultModelId 智能体默认模型配置 ID，用于加载基础配置并与 override 合并
    * @param override     配置覆盖，null 则使用 Agent 注册时的模型
    */
   public String chat(String agentId, String sessionId, String message,
-      String modelConfigId, ChatConfigOverride override) {
+      String defaultModelId, ChatConfigOverride override) {
     if (override == null) {
       return chat(agentId, sessionId, message);
     }
@@ -211,7 +211,7 @@ public class AgentRegistry {
     if (instance == null) {
       throw new IllegalArgumentException("Agent not found: " + agentId);
     }
-    if (modelConfigId == null || modelConfigId.isBlank()) {
+    if (defaultModelId == null || defaultModelId.isBlank()) {
       throw new IllegalArgumentException("modelConfigId required when override is provided");
     }
     instance.recordInvocation();
@@ -248,8 +248,8 @@ public class AgentRegistry {
       return wfResponse != null ? wfResponse : "";
     }
 
-    ModelConfigDefinition baseConfig = modelRegistry.loadConfigById(modelConfigId)
-        .orElseThrow(() -> new IllegalArgumentException("Model config not found: " + modelConfigId));
+    ModelConfigDefinition baseConfig = modelRegistry.loadConfigById(defaultModelId)
+        .orElseThrow(() -> new IllegalArgumentException("Model config not found: " + defaultModelId));
 
     ModelConfigDefinition mergedConfig = applyOverride(baseConfig, override);
     ChatModel chatModel = modelRegistry.createChatModelFromConfig(mergedConfig);
@@ -435,7 +435,7 @@ public class AgentRegistry {
    * 流式对话（支持配置覆盖）
    */
   public TokenStream chatStream(String agentId, String sessionId, String message,
-      String modelConfigId, ChatConfigOverride override) {
+      String defaultModelId, ChatConfigOverride override) {
     if (override == null) {
       return chatStream(agentId, sessionId, message);
     }
@@ -443,7 +443,7 @@ public class AgentRegistry {
     if (instance == null) {
       throw new IllegalArgumentException("Agent not found: " + agentId);
     }
-    if (modelConfigId == null || modelConfigId.isBlank()) {
+    if (defaultModelId == null || defaultModelId.isBlank()) {
       throw new IllegalArgumentException("modelConfigId required when override is provided");
     }
     instance.recordInvocation();
@@ -468,8 +468,8 @@ public class AgentRegistry {
 
     Object memoryId = sessionId != null && !sessionId.isBlank() ? sessionId : "default";
     var definition = instance.getDefinition();
-    ModelConfigDefinition baseConfig = modelRegistry.loadConfigById(modelConfigId)
-        .orElseThrow(() -> new IllegalArgumentException("Model config not found: " + modelConfigId));
+    ModelConfigDefinition baseConfig = modelRegistry.loadConfigById(defaultModelId)
+        .orElseThrow(() -> new IllegalArgumentException("Model config not found: " + defaultModelId));
     ModelConfigDefinition mergedConfig = applyOverride(baseConfig, override);
     StreamingChatModel streamingModel = modelRegistry.createStreamingChatModelFromConfig(mergedConfig);
     String systemPromptOverride = override.getSystemPrompt();
