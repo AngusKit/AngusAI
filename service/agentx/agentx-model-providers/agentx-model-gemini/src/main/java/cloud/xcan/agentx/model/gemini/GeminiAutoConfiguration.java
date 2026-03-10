@@ -8,6 +8,7 @@ import dev.langchain4j.model.chat.StreamingChatModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.googleai.GoogleAiGeminiChatModel;
 import dev.langchain4j.model.googleai.GoogleAiGeminiStreamingChatModel;
+import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -26,23 +27,29 @@ public class GeminiAutoConfiguration {
     @Override
     public ChatModel createChatModel(ModelConfigDefinition config) {
       log.info("Creating Gemini chat model: {}", config.getModelName());
-      return GoogleAiGeminiChatModel.builder()
+      var builder = GoogleAiGeminiChatModel.builder()
           .apiKey(config.getApiKey())
           .modelName(config.getModelName())
           .temperature(config.getTemperature())
-          .maxOutputTokens(config.getMaxTokens() != null ? config.getMaxTokens() : 4096)
-          .build();
+          .maxOutputTokens(config.getMaxTokens() != null ? config.getMaxTokens() : 4096);
+      if (config.getTimeoutSeconds() != null && config.getTimeoutSeconds() > 0) {
+        builder.timeout(Duration.ofSeconds(config.getTimeoutSeconds()));
+      }
+      return builder.build();
     }
 
     @Override
     public StreamingChatModel createStreamingChatModel(ModelConfigDefinition config) {
       log.info("Creating Gemini streaming chat model: {}", config.getModelName());
-      return GoogleAiGeminiStreamingChatModel.builder()
+      var streamBuilder = GoogleAiGeminiStreamingChatModel.builder()
           .apiKey(config.getApiKey())
           .modelName(config.getModelName())
           .temperature(config.getTemperature())
-          .maxOutputTokens(config.getMaxTokens() != null ? config.getMaxTokens() : 4096)
-          .build();
+          .maxOutputTokens(config.getMaxTokens() != null ? config.getMaxTokens() : 4096);
+      if (config.getTimeoutSeconds() != null && config.getTimeoutSeconds() > 0) {
+        streamBuilder.timeout(Duration.ofSeconds(config.getTimeoutSeconds()));
+      }
+      return streamBuilder.build();
     }
 
     @Override

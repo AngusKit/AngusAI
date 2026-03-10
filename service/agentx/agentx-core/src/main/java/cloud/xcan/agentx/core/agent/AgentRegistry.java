@@ -301,6 +301,12 @@ public class AgentRegistry {
         : (base.getTemperature() != null ? base.getTemperature() : 0.7));
     b.maxTokens(override.getMaxTokens() != null ? override.getMaxTokens()
         : (base.getMaxTokens() != null ? base.getMaxTokens() : 4096));
+    // 请求级 timeoutMs 优先于模型级 timeoutSeconds
+    if (override.getTimeoutMs() != null && override.getTimeoutMs() > 0) {
+      b.timeoutSeconds((int) Math.max(1, override.getTimeoutMs() / 1000));
+    } else if (base.getTimeoutSeconds() != null) {
+      b.timeoutSeconds(base.getTimeoutSeconds());
+    }
     Map<String, Object> extra = base.getExtraProperties() != null
         ? new HashMap<>(base.getExtraProperties()) : new HashMap<>();
     if (override.getTopP() != null) {

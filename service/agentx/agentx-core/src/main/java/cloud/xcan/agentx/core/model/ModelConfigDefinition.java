@@ -44,6 +44,9 @@ public class ModelConfigDefinition {
   @Builder.Default
   private Integer maxTokens = 4096;
 
+  @Schema(description = "请求超时（秒），模型级默认，请求级可覆盖", example = "60")
+  private Integer timeoutSeconds;
+
   @Schema(description = "Embedding 模型名称（用于 RAG 等场景）")
   private String embeddingModelName;
 

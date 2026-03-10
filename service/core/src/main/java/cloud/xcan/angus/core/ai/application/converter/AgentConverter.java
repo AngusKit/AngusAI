@@ -96,6 +96,7 @@ public class AgentConverter {
         .frequencyPenalty(dto.getFrequencyPenalty())
         .presencePenalty(dto.getPresencePenalty())
         .systemPrompt(dto.getSystemPrompt())
+        .timeoutMs(dto.getTimeoutMs())
         .build();
   }
 

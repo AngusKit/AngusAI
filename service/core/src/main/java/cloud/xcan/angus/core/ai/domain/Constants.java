@@ -102,6 +102,11 @@ public interface Constants {
    */
   double CHAT_DEFAULT_PRESENCE_PENALTY = 0.0;
 
+  /**
+   * 模型请求默认超时（毫秒），60 秒
+   */
+  long CHAT_DEFAULT_TIMEOUT_MS = 60_000L;
+
   // ==================== 知识库常量 ====================
 
   String KNOWLEDGE_DOC_UPLOAD_BIZ_KEY = "angusAIKnowledgeBaseDocs";

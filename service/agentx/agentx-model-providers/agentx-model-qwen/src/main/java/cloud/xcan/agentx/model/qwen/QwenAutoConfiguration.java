@@ -9,6 +9,7 @@ import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.model.openai.OpenAiEmbeddingModel;
 import dev.langchain4j.model.openai.OpenAiStreamingChatModel;
+import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -38,6 +39,9 @@ public class QwenAutoConfiguration {
       if (config.getMaxTokens() != null) {
         builder.maxTokens(config.getMaxTokens());
       }
+      if (config.getTimeoutSeconds() != null && config.getTimeoutSeconds() > 0) {
+        builder.timeout(Duration.ofSeconds(config.getTimeoutSeconds()));
+      }
       return builder.build();
     }
 
@@ -45,12 +49,15 @@ public class QwenAutoConfiguration {
     public StreamingChatModel createStreamingChatModel(ModelConfigDefinition config) {
       log.info("Creating Qwen streaming chat model: {}", config.getModelName());
       String baseUrl = config.getBaseUrl() != null ? config.getBaseUrl() : DEFAULT_BASE_URL;
-      return OpenAiStreamingChatModel.builder()
+      var streamBuilder = OpenAiStreamingChatModel.builder()
           .baseUrl(baseUrl)
           .apiKey(config.getApiKey())
           .modelName(config.getModelName())
-          .temperature(config.getTemperature())
-          .build();
+          .temperature(config.getTemperature());
+      if (config.getTimeoutSeconds() != null && config.getTimeoutSeconds() > 0) {
+        streamBuilder.timeout(Duration.ofSeconds(config.getTimeoutSeconds()));
+      }
+      return streamBuilder.build();
     }
 
     @Override

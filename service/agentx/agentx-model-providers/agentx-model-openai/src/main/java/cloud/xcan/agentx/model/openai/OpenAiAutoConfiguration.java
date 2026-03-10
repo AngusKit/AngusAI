@@ -11,6 +11,7 @@ import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.model.openai.OpenAiEmbeddingModel;
 import dev.langchain4j.model.openai.OpenAiStreamingChatModel;
+import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -46,20 +47,26 @@ public class OpenAiAutoConfiguration {
       if (config.getMaxTokens() != null) {
         builder.maxTokens(config.getMaxTokens());
       }
+      if (config.getTimeoutSeconds() != null && config.getTimeoutSeconds() > 0) {
+        builder.timeout(Duration.ofSeconds(config.getTimeoutSeconds()));
+      }
       return builder.build();
     }
 
     @Override
     public StreamingChatModel createStreamingChatModel(ModelConfigDefinition config) {
       log.info("Creating OpenAI streaming chat model: {}", config.getModelName());
-      var builder = OpenAiStreamingChatModel.builder()
+      var streamBuilder = OpenAiStreamingChatModel.builder()
           .apiKey(config.getApiKey())
           .modelName(config.getModelName())
           .temperature(config.getTemperature());
       if (config.getBaseUrl() != null) {
-        builder.baseUrl(config.getBaseUrl());
+        streamBuilder.baseUrl(config.getBaseUrl());
       }
-      return builder.build();
+      if (config.getTimeoutSeconds() != null && config.getTimeoutSeconds() > 0) {
+        streamBuilder.timeout(Duration.ofSeconds(config.getTimeoutSeconds()));
+      }
+      return streamBuilder.build();
     }
 
     @Override

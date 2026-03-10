@@ -10,6 +10,7 @@ import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.ollama.OllamaChatModel;
 import dev.langchain4j.model.ollama.OllamaEmbeddingModel;
 import dev.langchain4j.model.ollama.OllamaStreamingChatModel;
+import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -32,22 +33,28 @@ public class OllamaAutoConfiguration {
     public ChatModel createChatModel(ModelConfigDefinition config) {
       String baseUrl = config.getBaseUrl() != null ? config.getBaseUrl() : "http://localhost:11434";
       log.info("Creating Ollama chat model: {} at {}", config.getModelName(), baseUrl);
-      return OllamaChatModel.builder()
+      var builder = OllamaChatModel.builder()
           .baseUrl(baseUrl)
           .modelName(config.getModelName())
-          .temperature(config.getTemperature())
-          .build();
+          .temperature(config.getTemperature());
+      if (config.getTimeoutSeconds() != null && config.getTimeoutSeconds() > 0) {
+        builder.timeout(Duration.ofSeconds(config.getTimeoutSeconds()));
+      }
+      return builder.build();
     }
 
     @Override
     public StreamingChatModel createStreamingChatModel(ModelConfigDefinition config) {
       String baseUrl = config.getBaseUrl() != null ? config.getBaseUrl() : "http://localhost:11434";
       log.info("Creating Ollama streaming chat model: {} at {}", config.getModelName(), baseUrl);
-      return OllamaStreamingChatModel.builder()
+      var streamBuilder = OllamaStreamingChatModel.builder()
           .baseUrl(baseUrl)
           .modelName(config.getModelName())
-          .temperature(config.getTemperature())
-          .build();
+          .temperature(config.getTemperature());
+      if (config.getTimeoutSeconds() != null && config.getTimeoutSeconds() > 0) {
+        streamBuilder.timeout(Duration.ofSeconds(config.getTimeoutSeconds()));
+      }
+      return streamBuilder.build();
     }
 
     @Override

@@ -20,7 +20,8 @@ public class AgentChatFacadeImpl implements AgentChatFacade {
   public AgentChatResponseVo chat(AgentChatRequestDto dto) {
     long start = System.currentTimeMillis();
     var result = agentChatCmd.chat(
-        dto.getAgentId(), dto.getSessionId(), dto.getMessage(), dto.getConfig());
+        dto.getAgentId(), dto.getSessionId(), dto.getMessage(), dto.getTimeoutMs(),
+        dto.getConfig());
     long latencyMs = System.currentTimeMillis() - start;
     return toAgentChatResponseVo(dto, result.getSessionId(), result.getReply(), latencyMs);
   }

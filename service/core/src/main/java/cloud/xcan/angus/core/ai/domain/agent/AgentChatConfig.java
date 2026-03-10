@@ -45,4 +45,8 @@ public class AgentChatConfig implements Serializable {
   @Schema(description = "系统提示词覆盖", example = "You are a helpful assistant.")
   @Length(max = Constants.AGENT_SYSTEM_PROMPT_MAX_LENGTH)
   private String systemPrompt;
+
+  @Schema(description = "模型请求超时（毫秒），请求级，优先级高于模型配置", example = "60000")
+  @Min(1000)
+  private Long timeoutMs;
 }

@@ -9,6 +9,7 @@ import dev.langchain4j.model.anthropic.AnthropicStreamingChatModel;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.StreamingChatModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
+import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -30,23 +31,29 @@ public class AnthropicAutoConfiguration {
     @Override
     public ChatModel createChatModel(ModelConfigDefinition config) {
       log.info("Creating Anthropic chat model: {}", config.getModelName());
-      return AnthropicChatModel.builder()
+      var builder = AnthropicChatModel.builder()
           .apiKey(config.getApiKey())
           .modelName(config.getModelName())
           .temperature(config.getTemperature())
-          .maxTokens(config.getMaxTokens() != null ? config.getMaxTokens() : 4096)
-          .build();
+          .maxTokens(config.getMaxTokens() != null ? config.getMaxTokens() : 4096);
+      if (config.getTimeoutSeconds() != null && config.getTimeoutSeconds() > 0) {
+        builder.timeout(Duration.ofSeconds(config.getTimeoutSeconds()));
+      }
+      return builder.build();
     }
 
     @Override
     public StreamingChatModel createStreamingChatModel(ModelConfigDefinition config) {
       log.info("Creating Anthropic streaming chat model: {}", config.getModelName());
-      return AnthropicStreamingChatModel.builder()
+      var streamBuilder = AnthropicStreamingChatModel.builder()
           .apiKey(config.getApiKey())
           .modelName(config.getModelName())
           .temperature(config.getTemperature())
-          .maxTokens(config.getMaxTokens() != null ? config.getMaxTokens() : 4096)
-          .build();
+          .maxTokens(config.getMaxTokens() != null ? config.getMaxTokens() : 4096);
+      if (config.getTimeoutSeconds() != null && config.getTimeoutSeconds() > 0) {
+        streamBuilder.timeout(Duration.ofSeconds(config.getTimeoutSeconds()));
+      }
+      return streamBuilder.build();
     }
 
     @Override

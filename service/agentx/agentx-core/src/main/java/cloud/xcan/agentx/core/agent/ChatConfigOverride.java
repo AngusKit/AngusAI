@@ -23,4 +23,7 @@ public class ChatConfigOverride {
   private Double frequencyPenalty;
   private Double presencePenalty;
   private String systemPrompt;
+
+  /** 请求级超时（毫秒），优先级高于模型级 timeoutSeconds */
+  private Long timeoutMs;
 }

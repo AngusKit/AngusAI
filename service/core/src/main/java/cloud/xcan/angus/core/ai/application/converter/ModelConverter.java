@@ -20,6 +20,7 @@ public class ModelConverter {
         .baseUrl(src.getBaseUrl())
         .temperature(src.getTemperature())
         .maxTokens(src.getMaxTokens())
+        .timeoutSeconds(src.getTimeoutSeconds())
         .embeddingModelName(src.getEmbeddingModelName())
         .defaultConfig(src.isDefaultConfig())
         .priority(src.getPriority())

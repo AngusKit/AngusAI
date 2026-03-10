@@ -1,6 +1,7 @@
 package cloud.xcan.angus.core.ai.application.cmd.agent.impl;
 
 import static cloud.xcan.angus.core.ai.application.converter.AgentConverter.toChatConfigOverride;
+import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_CHAT_SYNC_TIMEOUT_MS;
 import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_CHAT_SSE_TIMEOUT_MS;
 import static java.util.UUID.randomUUID;
 
@@ -23,6 +24,8 @@ import cloud.xcan.angus.core.biz.BizTemplate;
 import dev.langchain4j.service.TokenStream;
 import jakarta.annotation.Resource;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -60,12 +63,19 @@ public class AgentChatCmdImpl implements AgentChatCmd {
   private ModelQuery modelQuery;
 
   @Resource
+  @Qualifier("syncChatExecutor")
+  private ExecutorService syncChatExecutor;
+
+  @Resource
   @Qualifier("sseEmitterChatExecutor")
   private Executor sseEmitterChatExecutor;
 
   @Override
-  public AgentChatResult chat(Long agentId, String sessionId, String message,
+  public AgentChatResult chat(Long agentId, String sessionId, String message, Long timeoutMs,
       AgentChatConfig config) {
+    final long effectiveTimeout = timeoutMs != null && timeoutMs > 0
+        ? timeoutMs : AGENT_CHAT_SYNC_TIMEOUT_MS;
+    final Long requestTimeoutMs = timeoutMs;
     return new BizTemplate<AgentChatResult>() {
       Agent agent;
       Session session;
@@ -84,13 +94,21 @@ public class AgentChatCmdImpl implements AgentChatCmd {
         if (session != null) {
           messageCmd.create(effectiveSessionId, MessageRole.USER, message);
         }
-        ChatConfigOverride override = getChatConfigOverride(agent, config, session);
+        ChatConfigOverride override = getChatConfigOverride(agent, config, session,
+            requestTimeoutMs);
         String reply;
-        if (override != null && agent.getDefaultModelId() != null) {
-          reply = agentRegistry.chat(String.valueOf(agentId), effectiveSessionId, message,
-              String.valueOf(agent.getDefaultModelId()), override);
-        } else {
-          reply = agentRegistry.chat(String.valueOf(agentId), effectiveSessionId, message);
+        try {
+          reply = syncChatExecutor
+              .submit(() -> {
+                if (override != null && agent.getDefaultModelId() != null) {
+                  return agentRegistry.chat(String.valueOf(agentId), effectiveSessionId, message,
+                      String.valueOf(agent.getDefaultModelId()), override);
+                }
+                return agentRegistry.chat(String.valueOf(agentId), effectiveSessionId, message);
+              })
+              .get(effectiveTimeout, TimeUnit.MILLISECONDS);
+        } catch (Exception e) {
+          throw new RuntimeException("Chat timeout or error: " + e.getMessage(), e);
         }
         if (session != null) {
           messageCmd.create(effectiveSessionId, MessageRole.ASSISTANT, reply);
@@ -103,6 +121,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
   @Override
   public SseEmitter chatStream(Long agentId, String sessionId, String message, Long timeoutMs,
       AgentChatConfig config) {
+    final Long requestTimeoutMs = timeoutMs;
     return new BizTemplate<SseEmitter>() {
       final long effectiveTimeout = timeoutMs != null && timeoutMs > 0
           ? timeoutMs : AGENT_CHAT_SSE_TIMEOUT_MS;
@@ -129,7 +148,8 @@ public class AgentChatCmdImpl implements AgentChatCmd {
           messageCmd.setStreaming(assistantMessageId, true);
         }
 
-        ChatConfigOverride override = getChatConfigOverride(agent, config, session);
+        ChatConfigOverride override = getChatConfigOverride(agent, config, session,
+            requestTimeoutMs);
 
         sseEmitterChatExecutor.execute(() -> {
           StringBuilder fullContent = new StringBuilder();
@@ -174,10 +194,11 @@ public class AgentChatCmdImpl implements AgentChatCmd {
   }
 
   private ChatConfigOverride getChatConfigOverride(Agent agent, AgentChatConfig config,
-      Session session) {
+      Session session, Long requestTimeoutMs) {
     Model model = agent.getDefaultModelId() != null
         ? modelQuery.findById(agent.getDefaultModelId()).orElse(null) : null;
-    AgentChatConfig merged = ChatConfigMergeUtils.merge(config, session, agent, model);
+    AgentChatConfig merged = ChatConfigMergeUtils.merge(config, requestTimeoutMs, session, agent,
+        model);
     return toChatConfigOverride(merged);
   }
 

@@ -1,6 +1,7 @@
 package cloud.xcan.angus.core.ai.infra.agent;
 
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -33,6 +34,22 @@ public class AgentChatSseEmitterConfiguration {
    * 线程名前缀
    */
   private static final String THREAD_NAME_PREFIX = "sse-chat-";
+
+  /**
+   * 同步对话超时执行用线程池（用于带超时的 submit + get）
+   */
+  @Bean(name = "syncChatExecutor")
+  public ExecutorService syncChatExecutor() {
+    ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+    executor.setCorePoolSize(8);
+    executor.setMaxPoolSize(32);
+    executor.setQueueCapacity(128);
+    executor.setThreadNamePrefix("sync-chat-");
+    executor.setWaitForTasksToCompleteOnShutdown(true);
+    executor.setAwaitTerminationSeconds(30);
+    executor.initialize();
+    return executor.getThreadPoolExecutor();
+  }
 
   /**
    * SseEmitter 对话专用线程池
