@@ -1,6 +1,8 @@
 package cloud.xcan.angus.core.ai.domain.chat;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import cloud.xcan.angus.core.ai.domain.Constants;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import java.io.Serializable;
@@ -55,7 +57,7 @@ public class SessionConfig implements Serializable {
    */
   @Schema(description = "系统提示词（system prompt），用于设定对话的系统角色或上下文，最大长度 60000 字符。")
   @NotBlank
-  @Length(max = 60000)
+  @Length(max = Constants.AGENT_SYSTEM_PROMPT_MAX_LENGTH)
   private String systemPrompt;
 
   /**

@@ -8,6 +8,8 @@ import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
 
+import cloud.xcan.angus.core.ai.domain.Constants;
+
 /**
  * 智能体对话配置（可选覆盖参数）
  * <p>
@@ -17,6 +19,7 @@ import org.hibernate.validator.constraints.Range;
 @Schema(description = "对话配置覆盖，可选；未设置使用默认（会话/智能体/系统默认）")
 @Data
 public class AgentChatConfig implements Serializable {
+
 
   @Schema(description = "温度参数 0-2，控制随机性", example = "0.7")
   @Range(min = 0, max = 2)
@@ -40,6 +43,6 @@ public class AgentChatConfig implements Serializable {
   private Double presencePenalty;
 
   @Schema(description = "系统提示词覆盖", example = "You are a helpful assistant.")
-  @Length(max = 60000)
+  @Length(max = Constants.AGENT_SYSTEM_PROMPT_MAX_LENGTH)
   private String systemPrompt;
 }
