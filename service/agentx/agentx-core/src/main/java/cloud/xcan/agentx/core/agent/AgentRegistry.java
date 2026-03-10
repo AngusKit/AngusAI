@@ -5,6 +5,7 @@ import cloud.xcan.agentx.core.prompt.PromptVariableResolver;
 import cloud.xcan.agentx.core.workflow.WorkflowDefinitionProvider;
 import cloud.xcan.agentx.core.agent.definition.AgentDefinition;
 import cloud.xcan.agentx.core.agent.runtime.AgentChatService;
+import cloud.xcan.agentx.core.model.ModelConfigDefinition;
 import cloud.xcan.agentx.core.agent.runtime.AgentInstance;
 import cloud.xcan.agentx.core.agent.runtime.AgentStreamingChatService;
 import cloud.xcan.agentx.core.guardrail.GuardrailChain;
@@ -25,6 +26,7 @@ import dev.langchain4j.service.AiServices;
 import dev.langchain4j.service.TokenStream;
 import dev.langchain4j.service.tool.ToolExecutor;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -194,6 +196,170 @@ public class AgentRegistry {
     return Optional.ofNullable(agents.get(agentId));
   }
 
+  /**
+   * 同步对话（支持配置覆盖）
+   *
+   * @param modelConfigId 智能体默认模型配置 ID，用于加载基础配置并与 override 合并
+   * @param override     配置覆盖，null 则使用 Agent 注册时的模型
+   */
+  public String chat(String agentId, String sessionId, String message,
+      String modelConfigId, ChatConfigOverride override) {
+    if (override == null) {
+      return chat(agentId, sessionId, message);
+    }
+    AgentInstance instance = agents.get(agentId);
+    if (instance == null) {
+      throw new IllegalArgumentException("Agent not found: " + agentId);
+    }
+    if (modelConfigId == null || modelConfigId.isBlank()) {
+      throw new IllegalArgumentException("modelConfigId required when override is provided");
+    }
+    instance.recordInvocation();
+
+    String inputToUse = message;
+    if (guardrailChain != null) {
+      var guardrails = instance.getDefinition().getGuardrails();
+      if (guardrails != null && guardrails.getInputGuardrailIds() != null
+          && !guardrails.getInputGuardrailIds().isEmpty()) {
+        GuardrailResult inputResult = guardrailChain.checkInput(message,
+            guardrails.getInputGuardrailIds());
+        if (!inputResult.isPassed()) {
+          return "[Guardrail] " + (inputResult.getReason() != null ? inputResult.getReason()
+              : "Input blocked");
+        }
+        if (inputResult.getSanitizedContent() != null) {
+          inputToUse = inputResult.getSanitizedContent();
+        }
+      }
+    }
+
+    Object memoryId = sessionId != null && !sessionId.isBlank() ? sessionId : "default";
+    String sessionIdStr = sessionId != null && !sessionId.isBlank() ? sessionId : "default";
+    var definition = instance.getDefinition();
+
+    var trigger = definition.getWorkflowTrigger();
+    String wfMode = trigger != null && trigger.getMode() != null ? trigger.getMode() : "AFTER_CHAT";
+    if (definition.getWorkflowId() != null && "BEFORE_CHAT".equals(wfMode)) {
+      runWorkflowIfConfigured(definition, Map.of("message", inputToUse, "sessionId", sessionIdStr));
+    }
+    if (definition.getWorkflowId() != null && "INSTEAD_OF_CHAT".equals(wfMode)) {
+      String wfResponse = runWorkflowIfConfigured(definition,
+          Map.of("message", inputToUse, "sessionId", sessionIdStr));
+      return wfResponse != null ? wfResponse : "";
+    }
+
+    ModelConfigDefinition baseConfig = modelRegistry.loadConfigById(modelConfigId)
+        .orElseThrow(() -> new IllegalArgumentException("Model config not found: " + modelConfigId));
+
+    ModelConfigDefinition mergedConfig = applyOverride(baseConfig, override);
+    ChatModel chatModel = modelRegistry.createChatModelFromConfig(mergedConfig);
+    String systemPromptOverride = override.getSystemPrompt();
+    AgentChatService service = buildChatService(definition, chatModel, systemPromptOverride);
+    String response = service.chat(memoryId, inputToUse);
+
+    if (definition.getWorkflowId() != null && "AFTER_CHAT".equals(wfMode)) {
+      runWorkflowIfConfigured(definition,
+          Map.of("message", inputToUse, "response", response, "sessionId", sessionIdStr));
+    }
+
+    if (guardrailChain != null) {
+      var guardrails = instance.getDefinition().getGuardrails();
+      if (guardrails != null && guardrails.getOutputGuardrailIds() != null
+          && !guardrails.getOutputGuardrailIds().isEmpty()) {
+        GuardrailResult outputResult = guardrailChain.checkOutput(response,
+            guardrails.getOutputGuardrailIds());
+        if (!outputResult.isPassed()) {
+          return "[Guardrail] " + (outputResult.getReason() != null ? outputResult.getReason()
+              : "Output blocked");
+        }
+        if (outputResult.getSanitizedContent() != null) {
+          response = outputResult.getSanitizedContent();
+        }
+      }
+    }
+    return response;
+  }
+
+  private ModelConfigDefinition applyOverride(ModelConfigDefinition base, ChatConfigOverride o) {
+    if (o == null) {
+      return base;
+    }
+    ModelConfigDefinition.ModelConfigDefinitionBuilder b = ModelConfigDefinition.builder()
+        .id(base.getId())
+        .provider(base.getProvider())
+        .type(base.getType())
+        .modelName(base.getModelName())
+        .apiKey(base.getApiKey())
+        .baseUrl(base.getBaseUrl())
+        .embeddingModelName(base.getEmbeddingModelName())
+        .defaultConfig(base.isDefaultConfig())
+        .priority(base.getPriority())
+        .tenantId(base.getTenantId());
+    b.temperature(o.getTemperature() != null ? o.getTemperature()
+        : (base.getTemperature() != null ? base.getTemperature() : 0.7));
+    b.maxTokens(o.getMaxTokens() != null ? o.getMaxTokens()
+        : (base.getMaxTokens() != null ? base.getMaxTokens() : 4096));
+    Map<String, Object> extra = base.getExtraProperties() != null
+        ? new HashMap<>(base.getExtraProperties()) : new HashMap<>();
+    if (o.getTopP() != null) {
+      extra.put("topP", o.getTopP());
+    }
+    if (o.getFrequencyPenalty() != null) {
+      extra.put("frequencyPenalty", o.getFrequencyPenalty());
+    }
+    if (o.getPresencePenalty() != null) {
+      extra.put("presencePenalty", o.getPresencePenalty());
+    }
+    b.extraProperties(extra);
+    return b.build();
+  }
+
+  private AgentChatService buildChatService(AgentDefinition definition, ChatModel chatModel,
+      String systemPromptOverride) {
+    var syncBuilder = AiServices.builder(AgentChatService.class).chatModel(chatModel);
+    List<String> allToolIds = definition.getToolIds() != null
+        ? new ArrayList<>(definition.getToolIds()) : new ArrayList<>();
+    List<Object> toolObjects = toolRegistry.getToolObjectsForIds(allToolIds);
+    Map<ToolSpecification, ToolExecutor> toolMap = toolRegistry.getToolMapForIds(allToolIds);
+    if (!toolObjects.isEmpty()) {
+      syncBuilder.tools(toolObjects);
+    }
+    if (!toolMap.isEmpty()) {
+      syncBuilder.tools(toolMap);
+    }
+    if (definition.getSkillIds() != null && !definition.getSkillIds().isEmpty()) {
+      skillRegistry.resolveSkillsToolProvider(definition.getSkillIds())
+          .ifPresent(syncBuilder::toolProvider);
+    }
+    ChatMemoryProvider memoryProvider = memoryFactory.create(definition.getMemory());
+    syncBuilder.chatMemoryProvider(memoryProvider);
+    AgentDefinition.ModelConfig defModel = definition.getModel();
+    if (contentRetrieverFactory != null && definition.getKnowledgeBaseIds() != null
+        && !definition.getKnowledgeBaseIds().isEmpty()) {
+      ModelProvider embeddingProvider = defModel != null && defModel.getProvider() != null
+          ? defModel.getProvider() : ModelProvider.DEEPSEEK;
+      contentRetrieverFactory.createContentRetriever(
+              definition.getKnowledgeBaseIds(), embeddingProvider, 5)
+          .ifPresent(syncBuilder::contentRetriever);
+    }
+    String systemPrompt = systemPromptOverride != null && !systemPromptOverride.isBlank()
+        ? systemPromptOverride : definition.getSystemPrompt();
+    if (definition.getSkillIds() != null && !definition.getSkillIds().isEmpty()) {
+      String skillsHint = skillRegistry.formatAvailableSkills(definition.getSkillIds());
+      if (!skillsHint.isEmpty()) {
+        String skillsInstruction = "\n\nYou have access to the following skills:\n" + skillsHint
+            + "\nWhen the user's request relates to one of these skills, activate it first using the `activate_skill` tool before proceeding.";
+        systemPrompt = (systemPrompt != null ? systemPrompt : "") + skillsInstruction;
+      }
+    }
+    systemPrompt = PromptVariableResolver.resolve(systemPrompt, definition.getVariables());
+    if (systemPrompt != null && !systemPrompt.isBlank()) {
+      final String finalPrompt = systemPrompt;
+      syncBuilder.systemMessageProvider(memoryId -> finalPrompt);
+    }
+    return syncBuilder.build();
+  }
+
   public String chat(String agentId, String sessionId, String message) {
     AgentInstance instance = agents.get(agentId);
     if (instance == null) {
@@ -263,6 +429,100 @@ public class AgentRegistry {
       }
     }
     return response;
+  }
+
+  /**
+   * 流式对话（支持配置覆盖）
+   */
+  public TokenStream chatStream(String agentId, String sessionId, String message,
+      String modelConfigId, ChatConfigOverride override) {
+    if (override == null) {
+      return chatStream(agentId, sessionId, message);
+    }
+    AgentInstance instance = agents.get(agentId);
+    if (instance == null) {
+      throw new IllegalArgumentException("Agent not found: " + agentId);
+    }
+    if (modelConfigId == null || modelConfigId.isBlank()) {
+      throw new IllegalArgumentException("modelConfigId required when override is provided");
+    }
+    instance.recordInvocation();
+
+    String inputToUse = message;
+    if (guardrailChain != null) {
+      var guardrails = instance.getDefinition().getGuardrails();
+      if (guardrails != null && guardrails.getInputGuardrailIds() != null
+          && !guardrails.getInputGuardrailIds().isEmpty()) {
+        GuardrailResult inputResult = guardrailChain.checkInput(message,
+            guardrails.getInputGuardrailIds());
+        if (!inputResult.isPassed()) {
+          throw new IllegalStateException(
+              "[Guardrail] " + (inputResult.getReason() != null ? inputResult.getReason()
+                  : "Input blocked"));
+        }
+        if (inputResult.getSanitizedContent() != null) {
+          inputToUse = inputResult.getSanitizedContent();
+        }
+      }
+    }
+
+    Object memoryId = sessionId != null && !sessionId.isBlank() ? sessionId : "default";
+    var definition = instance.getDefinition();
+    ModelConfigDefinition baseConfig = modelRegistry.loadConfigById(modelConfigId)
+        .orElseThrow(() -> new IllegalArgumentException("Model config not found: " + modelConfigId));
+    ModelConfigDefinition mergedConfig = applyOverride(baseConfig, override);
+    StreamingChatModel streamingModel = modelRegistry.createStreamingChatModelFromConfig(mergedConfig);
+    String systemPromptOverride = override.getSystemPrompt();
+    AgentStreamingChatService service = buildStreamingChatService(definition, streamingModel,
+        systemPromptOverride);
+    return service.chatStream(memoryId, inputToUse);
+  }
+
+  private AgentStreamingChatService buildStreamingChatService(AgentDefinition definition,
+      StreamingChatModel streamingModel, String systemPromptOverride) {
+    var streamBuilder = AiServices.builder(AgentStreamingChatService.class)
+        .streamingChatModel(streamingModel);
+    List<String> allToolIds = definition.getToolIds() != null
+        ? new ArrayList<>(definition.getToolIds()) : new ArrayList<>();
+    List<Object> toolObjects = toolRegistry.getToolObjectsForIds(allToolIds);
+    Map<ToolSpecification, ToolExecutor> toolMap = toolRegistry.getToolMapForIds(allToolIds);
+    if (!toolObjects.isEmpty()) {
+      streamBuilder.tools(toolObjects);
+    }
+    if (!toolMap.isEmpty()) {
+      streamBuilder.tools(toolMap);
+    }
+    if (definition.getSkillIds() != null && !definition.getSkillIds().isEmpty()) {
+      skillRegistry.resolveSkillsToolProvider(definition.getSkillIds())
+          .ifPresent(streamBuilder::toolProvider);
+    }
+    ChatMemoryProvider memoryProvider = memoryFactory.create(definition.getMemory());
+    streamBuilder.chatMemoryProvider(memoryProvider);
+    AgentDefinition.ModelConfig defModel = definition.getModel();
+    if (contentRetrieverFactory != null && definition.getKnowledgeBaseIds() != null
+        && !definition.getKnowledgeBaseIds().isEmpty()) {
+      ModelProvider embProvider = defModel != null && defModel.getProvider() != null
+          ? defModel.getProvider() : ModelProvider.DEEPSEEK;
+      contentRetrieverFactory.createContentRetriever(
+              definition.getKnowledgeBaseIds(), embProvider, 5)
+          .ifPresent(streamBuilder::contentRetriever);
+    }
+    String systemPrompt = systemPromptOverride != null && !systemPromptOverride.isBlank()
+        ? systemPromptOverride : definition.getSystemPrompt();
+    if (definition.getSkillIds() != null && !definition.getSkillIds().isEmpty()) {
+      String skillsHint = skillRegistry.formatAvailableSkills(definition.getSkillIds());
+      if (!skillsHint.isEmpty()) {
+        String skillsInstruction = "\n\nYou have access to the following skills:\n" + skillsHint
+            + "\nWhen the user's request relates to one of these skills, activate it first using the `activate_skill` tool before proceeding.";
+        systemPrompt = (systemPrompt != null ? systemPrompt : "") + skillsInstruction;
+      }
+    }
+    systemPrompt = PromptVariableResolver.resolve(systemPrompt, definition.getVariables());
+    if (systemPrompt != null && !systemPrompt.isBlank()) {
+      final String finalPrompt = systemPrompt;
+      streamBuilder.systemMessageProvider(memoryId -> finalPrompt);
+    }
+    return streamBuilder.build();
   }
 
   /**

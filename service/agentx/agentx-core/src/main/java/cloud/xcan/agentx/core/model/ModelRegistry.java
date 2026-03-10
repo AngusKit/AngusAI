@@ -34,6 +34,13 @@ public class ModelRegistry {
   }
 
   /**
+   * 根据配置 ID 加载模型配置（不创建实例）
+   */
+  public Optional<ModelConfigDefinition> loadConfigById(String configId) {
+    return configProvider.loadById(configId);
+  }
+
+  /**
    * 根据配置 ID 获取或创建 ChatModel
    */
   public ChatModel getChatModel(String configId) {
@@ -157,6 +164,26 @@ public class ModelRegistry {
     streamingModelCache.clear();
     embeddingModelCache.clear();
     log.info("Model cache cleared — will reload on next access");
+  }
+
+  /**
+   * 根据显式配置创建 ChatModel（不缓存，用于请求级覆盖）
+   */
+  public ChatModel createChatModelFromConfig(ModelConfigDefinition config) {
+    if (config == null || config.getProvider() == null) {
+      throw new IllegalArgumentException("Model config and provider required");
+    }
+    return getFactory(config.getProvider()).createChatModel(config);
+  }
+
+  /**
+   * 根据显式配置创建 StreamingChatModel（不缓存，用于请求级覆盖）
+   */
+  public StreamingChatModel createStreamingChatModelFromConfig(ModelConfigDefinition config) {
+    if (config == null || config.getProvider() == null) {
+      throw new IllegalArgumentException("Model config and provider required");
+    }
+    return getFactory(config.getProvider()).createStreamingChatModel(config);
   }
 
   /**
