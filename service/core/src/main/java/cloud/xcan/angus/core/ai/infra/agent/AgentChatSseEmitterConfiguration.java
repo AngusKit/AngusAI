@@ -1,4 +1,4 @@
-package cloud.xcan.angus.core.ai.infra.chat;
+package cloud.xcan.angus.core.ai.infra.agent;
 
 import java.util.concurrent.Executor;
 import org.springframework.context.annotation.Bean;
@@ -12,7 +12,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
  * </p>
  */
 @Configuration
-public class SseEmitterChatConfiguration {
+public class AgentChatSseEmitterConfiguration {
 
   /**
    * 线程池核心线程数，按并发对话量经验值
