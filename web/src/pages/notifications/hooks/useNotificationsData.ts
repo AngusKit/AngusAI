@@ -18,7 +18,7 @@ import {
 import {
   ITEMS_PER_PAGE,
   SEARCH_DEBOUNCE_DELAY
-} from '../notificationConstants';
+} from '../constants';
 
 /**
  * 通知数据管理 Hook

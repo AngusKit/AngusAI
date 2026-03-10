@@ -1,17 +1,17 @@
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { Button } from '@/components/ui/button.tsx';
+import { Input } from '@/components/ui/input.tsx';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, } from '@/components/ui/dialog.tsx';
+import { Label } from '@/components/ui/label.tsx';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.tsx';
+import { ScrollArea } from '@/components/ui/scroll-area.tsx';
 import { toast } from 'sonner';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
-import { cn } from '@/components/ui/utils';
-import PromptCategories from '../../services/PromptCategories';
-import { Category } from './types';
-import { AVAILABLE_ICONS, CATEGORY_COLORS, DEFAULT_VALUES } from './constants';
-import { useCategoryForm } from './hooks/useCategoryForm';
-import { validateCategoryName } from './utils';
+import { cn } from '@/components/ui/utils.ts';
+import PromptCategories from '../../../services/PromptCategories.ts';
+import { Category } from '../types.ts';
+import { AVAILABLE_ICONS, CATEGORY_COLORS, DEFAULT_VALUES } from '../constants.ts';
+import { useCategoryForm } from '../hooks/useCategoryForm.ts';
+import { validateCategoryName } from '../utils.ts';
 
 interface CategoryDialogProps {
   open: boolean;

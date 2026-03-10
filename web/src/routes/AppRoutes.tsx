@@ -1,7 +1,7 @@
 import { MainLayout } from '@/components/layout/MainLayout';
 import { ChatLayout } from '@/components/layout/ChatLayout';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { Home } from '@/pages/home';
+import { Home } from '@/pages/dashboard/Dashboard.tsx';
 import { CreateApplication } from '@/pages/applications/components/CreateApplication.tsx';
 import { MyApplications } from '@/pages/applications/MyApplications';
 import { ApplicationDetailPage } from '@/pages/applications/components/ApplicationDetailPage.tsx';
@@ -21,16 +21,16 @@ import { CreateAgentPage } from '@/pages/agents/components/CreateAgentPage.tsx';
 import { EditAgentPage } from '@/pages/agents/components/EditAgentPage.tsx';
 import { AgentDetailPage } from '@/pages/agents/components/AgentDetailPage.tsx';
 import { VectorStore } from '@/pages/vector/VectorStore';
-import { TeamMembersPage } from '@/pages/member/TeamMembersPage';
+import { Members } from '@/pages/member/Members.tsx';
 import { ResourceSharing } from '@/pages/sharding/ResourceSharing';
 import { AppSettingsPage } from '@/pages/applications/components/AppSettingsPage.tsx';
 import { UsageAnalytics } from '@/pages/settings/UsageAnalytics';
 import { APIKeys } from '@/pages/settings/APIKeys';
 import { BillingSubscription } from '@/pages/settings/BillingSubscription';
-import { PromptLibraryPage } from '@/pages/prompt/PromptLibraryPage';
+import { PromptLibrary } from '@/pages/prompt/PromptLibrary.tsx';
 import { Chat } from '@/pages/chat/Chat';
-import { ActivityLogPage } from '@/pages/activity/ActivityLogPage';
-import { NotificationsPage } from '@/pages/notifications/NotificationsPage';
+import { ActivityLog } from '@/pages/activity/ActivityLog.tsx';
+import { Notifications } from '@/pages/notifications/Notifications.tsx';
 import { NotFoundPage } from '@/components/NotFoundPage';
 
 export function AppRoutes() {
@@ -60,10 +60,10 @@ export function AppRoutes() {
         <Route path='agents/:id/edit' element={<EditAgentPage />} />
         <Route path='agents/:id' element={<AgentDetailPage />} />
         <Route path='vector-store' element={<VectorStore />} />
-        <Route path='prompts' element={<PromptLibraryPage />} />
-        <Route path='notifications' element={<NotificationsPage />} />
-        <Route path='team-members' element={<TeamMembersPage />} />
-        <Route path='activity-log' element={<ActivityLogPage />} />
+        <Route path='prompts' element={<PromptLibrary />} />
+        <Route path='notifications' element={<Notifications />} />
+        <Route path='team-members' element={<Members />} />
+        <Route path='activity-log' element={<ActivityLog />} />
         <Route path='resource-sharing' element={<ResourceSharing />} />
         <Route path='usage-analytics' element={<UsageAnalytics />} />
         <Route path='api-keys' element={<APIKeys />} />

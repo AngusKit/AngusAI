@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { RecentApplications } from '@/pages/dashboard/RecentApplications';
-import { WelcomeBanner } from '@/pages/dashboard/WelcomeBanner';
-import { StatsCards } from '@/pages/dashboard/StatsCards';
-import { UsageDetails } from '@/pages/dashboard/UsageDetails';
-import { Card } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
+import { RecentApplications } from '@/pages/dashboard/RecentApplications.tsx';
+import { WelcomeBanner } from '@/pages/dashboard/WelcomeBanner.tsx';
+import { StatsCards } from '@/pages/dashboard/StatsCards.tsx';
+import { UsageDetails } from '@/pages/dashboard/UsageDetails.tsx';
+import { Card } from '@/components/ui/card.tsx';
+import { Skeleton } from '@/components/ui/skeleton.tsx';
 
 export function Home() {
   const navigate = useNavigate();

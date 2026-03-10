@@ -1,13 +1,13 @@
 import { Database } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog.tsx';
+import { Button } from '@/components/ui/button.tsx';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
-import Datasets from '@/services/Datasets';
-import { useDataSourceForm } from './hooks/useDataSourceForm';
-import { DataSourceFormContent } from './components/DataSourceFormContent';
+import Datasets from '@/services/Datasets.ts';
+import { useDataSourceForm } from '../hooks/useDataSourceForm.ts';
+import { DataSourceFormContent } from './DataSourceFormContent.tsx';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
-import { DatasourceConnectionStatusEnum } from '@/enums/enums';
+import { DatasourceConnectionStatusEnum } from '@/enums/enums.ts';
 
 interface AddDataSourceDialogProps {
   open: boolean;

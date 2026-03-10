@@ -1,18 +1,18 @@
 import { Plus, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button.tsx';
+import { Input } from '@/components/ui/input.tsx';
+import { Textarea } from '@/components/ui/textarea.tsx';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, } from '@/components/ui/dialog.tsx';
+import { Label } from '@/components/ui/label.tsx';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.tsx';
 import { toast } from 'sonner';
-import { cn } from '@/components/ui/utils';
+import { cn } from '@/components/ui/utils.ts';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
-import Prompts from '../../services/Prompts';
-import { Category, Prompt } from './types';
-import { TAG_COLORS } from './constants';
-import { usePromptForm } from './hooks/usePromptForm';
-import { validatePromptForm, validateTag, isAvailableCategory, getTagColorByIndex } from './utils';
+import Prompts from '../../../services/Prompts.ts';
+import { Category, Prompt } from '../types.ts';
+import { TAG_COLORS } from '../constants.ts';
+import { usePromptForm } from '../hooks/usePromptForm.ts';
+import { validatePromptForm, validateTag, isAvailableCategory, getTagColorByIndex } from '../utils.ts';
 
 interface PromptDialogProps {
   open: boolean;

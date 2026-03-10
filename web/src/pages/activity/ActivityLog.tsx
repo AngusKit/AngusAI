@@ -9,7 +9,7 @@ import { ActivityFilters } from './components/ActivityFilters';
 import { ActivityList } from './components/ActivityList';
 import { ActivityDetailDialog } from './components/ActivityDetailDialog';
 
-export function ActivityLogPage() {
+export function ActivityLog() {
   const {
     language,
     searchQuery,

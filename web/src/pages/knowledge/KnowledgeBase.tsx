@@ -82,8 +82,8 @@ import {
   uploadFileWithProgress,
 } from '@/utils/UploadUtils';
 
-import {EditKnowledgeBaseDialog} from './EditKnowledgeBaseDialog';
-import {CreateKnowledgeBaseDialog} from './CreateKnowledgeBaseDialog';
+import {EditKnowledgeBaseDialog} from './components/EditKnowledgeBaseDialog.tsx';
+import {CreateKnowledgeBaseDialog} from './components/CreateKnowledgeBaseDialog.tsx';
 import { getEnumDescription } from '@/enums/utils';
 
 interface KnowledgeBaseItem {

@@ -13,7 +13,7 @@ import { PendingInvitationTable } from './components/PendingInvitationTable';
 import { InviteMemberDialog } from './components/InviteMemberDialog';
 import { RemoveMemberDialog } from './components/RemoveMemberDialog';
 
-export function TeamMembersPage() {
+export function Members() {
   const { t } = useLanguage();
   const {
     searchQuery,

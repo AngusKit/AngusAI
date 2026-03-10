@@ -1,16 +1,16 @@
 import { Check } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog.tsx';
+import { Button } from '@/components/ui/button.tsx';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import KnowledgeBases from '@/services/KnowledgeBases';
-import { VisibilityEnum } from '@/enums/enums';
-import { steps } from './constants';
+import KnowledgeBases from '@/services/KnowledgeBases.ts';
+import { VisibilityEnum } from '@/enums/enums.ts';
+import { steps } from '../constants.ts';
 import { ICON_OPTIONS } from '@/utils';
-import { useKnowledgeBaseForm } from './hooks/useKnowledgeBaseForm';
-import { BasicInfoStep, ConfigurationStep } from './components/KnowledgeBaseFormSteps';
+import { useKnowledgeBaseForm } from '../hooks/useKnowledgeBaseForm.ts';
+import { BasicInfoStep, ConfigurationStep } from './KnowledgeBaseFormSteps.tsx';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
-import { validateBasicInfo, validateConfiguration } from './utils';
+import { validateBasicInfo, validateConfiguration } from '../utils.ts';
 
 interface CreateKnowledgeBaseDialogProps {
   open: boolean;

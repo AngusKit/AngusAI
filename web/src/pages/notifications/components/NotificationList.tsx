@@ -12,7 +12,7 @@ import { LoadingState } from './LoadingState';
 import { EmptyState } from './EmptyState';
 import { NotificationItem } from './NotificationItem';
 import { Pagination } from '@/components/gm/Pagination';
-import { ITEMS_PER_PAGE } from '../notificationConstants';
+import { ITEMS_PER_PAGE } from '../constants';
 
 interface NotificationListProps {
   /** 搜索关键词 */

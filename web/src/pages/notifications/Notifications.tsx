@@ -10,7 +10,7 @@ import { NotificationList } from './components/NotificationList';
  * 通知页面主组件
  * 提供通知消息的查看、筛选、管理等功能
  */
-export function NotificationsPage () {
+export function Notifications () {
   const { t } = useLanguage();
   const {
     // 状态

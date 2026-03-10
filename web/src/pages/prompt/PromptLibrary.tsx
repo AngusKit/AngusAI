@@ -14,10 +14,10 @@ import { copyToClipboard } from '../../lib/clipboard';
 import Prompts from '../../services/Prompts';
 import PromptCategories from '../../services/PromptCategories';
 import { PromptListVo, PromptCategoryVo } from '../../services/PromptsTypes';
-import { PromptDialog } from './PromptDialog';
-import { CategoryDialog } from './CategoryDialog';
-import { DeletePromptDialog } from './DeletePromptDialog';
-import { DeleteCategoryDialog } from './DeleteCategoryDialog';
+import { PromptDialog } from './components/PromptDialog.tsx';
+import { CategoryDialog } from './components/CategoryDialog.tsx';
+import { DeletePromptDialog } from './components/DeletePromptDialog.tsx';
+import { DeleteCategoryDialog } from './components/DeleteCategoryDialog.tsx';
 import { Prompt, Category } from './types';
 import { ICON_MAP, SYSTEM_CATEGORY_IDS, LIMITS } from './constants';
 import { getTagColorByIndex, buildCategoryTree, getCategoryPath, getTopLevelCategories, getChildCategories, getDefaultCategoryId, } from './utils';
@@ -140,7 +140,7 @@ function CategoryItem({
   );
 }
 
-export function PromptLibraryPage() {
+export function PromptLibrary() {
   const { t, language } = useLanguage();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');

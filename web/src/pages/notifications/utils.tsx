@@ -93,21 +93,9 @@ export const formatTimestamp = (timestamp?: string) => {
 /**
  * 获取优先级显示文本
  * @param priority 优先级枚举值
- * @param t 翻译函数
  * @returns 优先级显示文本
  */
 export const getPriorityText = (priority?: NotificationPriorityEnum) => {
   if (!priority) return '';
   return getEnumDescription(NotificationPriorityEnum, priority as NotificationPriorityEnum);
-  // switch (priority) {
-  //   case NotificationPriorityEnum.HIGH:
-
-  //     return t('notifications.highPriority');
-  //   case NotificationPriorityEnum.MEDIUM:
-  //     return t('notifications.mediumPriority');
-  //   case NotificationPriorityEnum.LOW:
-  //     return t('notifications.lowPriority');
-  //   default:
-  //     return '';
-  // }
 };

@@ -1,19 +1,19 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog.tsx';
+import { Button } from '@/components/ui/button.tsx';
+import { Input } from '@/components/ui/input.tsx';
+import { Textarea } from '@/components/ui/textarea.tsx';
+import { Label } from '@/components/ui/label.tsx';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.tsx';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { Badge } from '@/components/ui/badge';
-import Datasets from '@/services/Datasets';
-import { DatasetUpdateDto } from '@/services/DatasetsTypes';
-import { VisibilityEnum, DatasetTypeEnum } from '@/enums/enums';
+import { Badge } from '@/components/ui/badge.tsx';
+import Datasets from '@/services/Datasets.ts';
+import { DatasetUpdateDto } from '@/services/DatasetsTypes.ts';
+import { VisibilityEnum, DatasetTypeEnum } from '@/enums/enums.ts';
 import { getTagColor, ICON_OPTIONS } from '@/utils';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
-import { getEnumDescription } from '@/enums/utils';
-import { validateTag } from './utils';
+import { getEnumDescription } from '@/enums/utils.ts';
+import { validateTag } from '../utils.ts';
 
 interface EditDatasetDialogProps {
   open: boolean;

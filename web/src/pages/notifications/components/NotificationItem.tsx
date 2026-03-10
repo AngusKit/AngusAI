@@ -9,7 +9,7 @@ import {
   getStatusBadge,
   formatTimestamp,
   getPriorityText
-} from '../notificationUtils';
+} from '../utils';
 
 interface NotificationItemProps {
   /** 通知对象 */
