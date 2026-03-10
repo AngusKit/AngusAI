@@ -1170,6 +1170,7 @@ export const zhCN = {
       model: '模型',
       type: '类型',
       status: '状态',
+      maxTokens: '最大Tokens',
       performance: '性能',
       callsCost: '调用/成本',
       actions: '操作',

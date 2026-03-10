@@ -194,6 +194,10 @@ export const useModelManagement = (): UseModelManagementReturn => {
         calls: formatNumber(detailStats?.totalCalls),
         cost: detailStats?.totalCost !== undefined ? formatCurrency(detailStats.totalCost, language) : '--',
         tokens: tokens !== undefined ? formatNumber(tokens) : undefined,
+        maxTokens:
+          detail?.config?.maxTokens !== undefined && detail.config.maxTokens != null
+            ? String(detail.config.maxTokens)
+            : undefined,
         deployed,
         detail,
       };

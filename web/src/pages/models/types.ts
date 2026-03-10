@@ -33,6 +33,7 @@ export interface ModelListItem {
   calls: string;
   cost: string;
   tokens?: string;
+  maxTokens?: string;
   deployed: string;
   detail?: ModelDetailVo;
 }

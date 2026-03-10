@@ -857,6 +857,7 @@ export const enUS = {
       model: 'Model',
       type: 'Type',
       status: 'Status',
+      maxTokens: 'Max Tokens',
       performance: 'Performance',
       callsCost: 'Calls/Cost',
       actions: 'Actions',
