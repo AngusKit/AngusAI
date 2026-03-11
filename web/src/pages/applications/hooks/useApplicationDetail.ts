@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
+import { refreshResourcesBadge } from '@/hooks/useResourcesBadge';
 import Applications from '@/services/Applications';
 import type { ApplicationDetailVo, ApplicationStatisticsVo } from '@/services/ApplicationsTypes';
 import { ApplicationStatusEnum } from '@/enums/enums';
@@ -99,6 +100,7 @@ export function useApplicationDetail() {
     try {
       await Applications.deleteApplication(id);
       toast.success('已删除');
+      refreshResourcesBadge();
       navigate('/apps');
     } catch (error: any) {
       toast.error(error?.data?.message ?? error?.message ?? '删除失败');

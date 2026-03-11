@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { toast } from 'sonner';
+import { refreshResourcesBadge } from '@/hooks/useResourcesBadge';
 import { ChatSidebar } from './ChatSidebar';
 import { ChatMessage } from './ChatMessage';
 import { PromptLibrary } from './PromptLibrary';
@@ -262,6 +263,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
       setCurrentSessionId(sessions[0].id);
     }
     toast.success('对话已删除');
+    refreshResourcesBadge();
   };
 
   const updateSessionApp = (appId: string) => {

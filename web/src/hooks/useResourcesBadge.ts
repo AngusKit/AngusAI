@@ -37,6 +37,13 @@ export function useResourcesBadge() {
     fetchBadge();
   }, [fetchBadge]);
 
+  /** 监听全局刷新事件：应用/对话/通知删除或变更后调用 refreshResourcesBadge() 以更新 badge */
+  useEffect(() => {
+    const handler = () => fetchBadge();
+    window.addEventListener('resources-badge-refresh', handler);
+    return () => window.removeEventListener('resources-badge-refresh', handler);
+  }, [fetchBadge]);
+
   /** 格式化badge显示：>99 显示 99+ */
   const formatBadge = (count?: number): string | undefined => {
     const n = count ?? 0;
@@ -52,4 +59,9 @@ export function useResourcesBadge() {
     isLoading,
     refresh: fetchBadge,
   };
+}
+
+/** 触发侧边栏 badge 刷新（应用/对话/通知删除或变更后调用） */
+export function refreshResourcesBadge() {
+  window.dispatchEvent(new CustomEvent('resources-badge-refresh'));
 }

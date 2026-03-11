@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { useDebounce } from '@/hooks/useDebounce';
 import { safeParseInt } from '@/utils/FormatUtils';
+import { refreshResourcesBadge } from '@/hooks/useResourcesBadge';
 import NotificationService from '@/services/Notification';
 import {
   NotificationDetailVo,
@@ -201,6 +202,7 @@ export function useNotificationsData () {
 
         // 刷新统计数据
         fetchStatistics();
+        refreshResourcesBadge();
       } catch (error: any) {
         toast.error(
           (error as Error)?.message || t('common.messages.updateFailed')
@@ -288,6 +290,7 @@ export function useNotificationsData () {
 
         // 刷新统计数据
         fetchStatistics();
+        refreshResourcesBadge();
 
         // 如果当前页没有数据了，回到上一页
         if (notifications.length === 1 && currentPage > 1) {
@@ -322,6 +325,7 @@ export function useNotificationsData () {
       // 刷新列表和统计数据
       fetchNotifications();
       fetchStatistics();
+      refreshResourcesBadge();
     } catch (error: any) {
       toast.error(
         (error as Error)?.message || t('notifications.operationFailed')

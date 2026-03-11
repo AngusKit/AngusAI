@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { refreshResourcesBadge } from '@/hooks/useResourcesBadge';
 import Applications from '@/services/Applications';
 import type { ApplicationCountVo, ApplicationListVo } from '@/services/ApplicationsTypes';
 import { ApplicationStatusEnum } from '@/enums/enums';
@@ -222,6 +223,7 @@ export function useApplicationList() {
       try {
         await Applications.deleteApplication(appId);
         toast.success(`${appName} 已删除`);
+        refreshResourcesBadge();
         // 延迟刷新，避免下拉关闭时 mouseup 落在卡片上触发导航
         await new Promise(resolve => setTimeout(resolve, 100));
         await Promise.all([loadApplications(), loadCounts()]);
