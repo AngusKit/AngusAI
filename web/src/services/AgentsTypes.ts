@@ -77,8 +77,8 @@ export interface AgentListVo {
   description?: string;
   /** 状态 */
   status?: AgentStatusEnum;
-  /** 模型ID */
-  modelId?: string;
+  /** 默认模型（含ID和名称，由后端返回） */
+  defaultModel?: AgentResourceInfoVo;
   /** 交互模式 */
   interactionMode?: InteractionModeEnum;
 }

@@ -2,8 +2,7 @@ import { useCallback, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import Agents from '@/services/Agents';
-import Models from '@/services/Models';
-import type { AgentListVo } from '@/services/AgentsTypes';
+import type { AgentListVo, AgentResourceInfoVo } from '@/services/AgentsTypes';
 import { AgentStatusEnum } from '@/enums/enums';
 import { useDebounce } from '@/hooks/useDebounce';
 import { AGENT_ITEMS_PER_PAGE } from '../constants';
@@ -16,12 +15,12 @@ export interface AgentListItem {
   status: string;
   statusEnum?: AgentStatusEnum;
   interactionMode?: string;
-  modelId?: string;
+  defaultModel?: AgentResourceInfoVo;
   modelName?: string;
 }
 
 /**
- * 智能体列表页 Hook：加载列表、模型映射、状态切换、删除
+ * 智能体列表页 Hook：加载列表、状态切换、删除（模型名称由后端 defaultModel 返回）
  */
 export function useAgentList() {
   const navigate = useNavigate();
@@ -33,22 +32,6 @@ export function useAgentList() {
   const [agents, setAgents] = useState<AgentListItem[]>([]);
   const [agentsLoading, setAgentsLoading] = useState(false);
   const [agentsTotal, setAgentsTotal] = useState(0);
-  const [modelMap, setModelMap] = useState<Record<string, string>>({});
-
-  /** 加载模型列表并构建 id->name 映射 */
-  const loadModels = useCallback(async () => {
-    try {
-      const res = await Models.getModelList({ pageNo: 1, pageSize: 500 });
-      const list = (res as any)?.data?.list ?? [];
-      const map: Record<string, string> = {};
-      for (const m of list) {
-        if (m?.id && m?.name) map[String(m.id)] = m.name;
-      }
-      setModelMap(map);
-    } catch {
-      // 忽略加载失败
-    }
-  }, []);
 
   /** 加载智能体列表 */
   const loadAgents = useCallback(async () => {
@@ -71,7 +54,8 @@ export function useAgentList() {
           status: item.status ?? 'INACTIVE',
           statusEnum: item.status as AgentStatusEnum | undefined,
           interactionMode: item.interactionMode,
-          modelId: (item as any).modelId ?? (item as any).defaultModelId,
+          defaultModel: item.defaultModel,
+          modelName: item.defaultModel?.name,
         }))
       );
     } catch (error: any) {
@@ -84,18 +68,8 @@ export function useAgentList() {
   }, [debouncedSearchQuery, statusFilter, currentPage]);
 
   useEffect(() => {
-    loadModels();
-  }, [loadModels]);
-
-  useEffect(() => {
     loadAgents();
   }, [loadAgents]);
-
-  /** 合并模型名称后的列表 */
-  const agentsWithModels = agents.map(a => ({
-    ...a,
-    modelName: a.modelId && modelMap[a.modelId] ? modelMap[a.modelId] : undefined,
-  }));
 
   /** 切换智能体发布/离线状态 */
   const handleToggleStatus = async (agent: AgentListItem) => {
@@ -142,7 +116,7 @@ export function useAgentList() {
     setViewMode,
     currentPage,
     setCurrentPage,
-    agents: agentsWithModels,
+    agents,
     agentsLoading,
     agentsTotal,
     loadAgents,
