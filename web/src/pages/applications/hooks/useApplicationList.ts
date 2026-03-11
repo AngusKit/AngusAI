@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import Applications from '@/services/Applications';
-import type { ApplicationDetailVo } from '@/services/ApplicationsTypes';
+import type { ApplicationCountVo, ApplicationDetailVo } from '@/services/ApplicationsTypes';
 import { ApplicationStatusEnum } from '@/enums/enums';
 import { useDebounce } from '@/hooks/useDebounce';
 import { ITEMS_PER_PAGE } from '../constants';
@@ -38,6 +38,32 @@ export function useApplicationList() {
   const [isLoading, setIsLoading] = useState(false);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+  const [counts, setCounts] = useState<ApplicationCountVo>({
+    total: 0,
+    draft: 0,
+    published: 0,
+    paused: 0,
+    starred: 0,
+  });
+
+  /** 加载Tab统计数量（getApplicationCounts） */
+  const loadCounts = async () => {
+    try {
+      const response = await Applications.getApplicationCounts();
+      const data = (response as { data?: ApplicationCountVo })?.data;
+      if (data) {
+        setCounts({
+          total: data.total ?? 0,
+          draft: data.draft ?? 0,
+          published: data.published ?? 0,
+          paused: data.paused ?? 0,
+          starred: data.starred ?? 0,
+        });
+      }
+    } catch {
+      // 静默失败，Tab 数量保持为 0
+    }
+  };
 
   /** 加载应用列表 */
   const loadApplications = async () => {
@@ -105,13 +131,17 @@ export function useApplicationList() {
     loadApplications();
   }, [currentPage, debouncedSearchQuery, activeTab]);
 
-  /** 根据分类计算数量 */
+  useEffect(() => {
+    loadCounts();
+  }, []);
+
+  /** 根据分类获取数量（来自 getApplicationCounts 接口） */
   const getCategoryCount = (category: string) => {
-    if (category === 'all') return totalCount;
-    if (category === 'published') return applications.filter(app => app.status === ApplicationStatusEnum.PUBLISHED).length;
-    if (category === 'paused') return applications.filter(app => app.status === ApplicationStatusEnum.PAUSED).length;
-    if (category === 'draft') return applications.filter(app => app.status === ApplicationStatusEnum.DRAFT).length;
-    if (category === 'starred') return applications.filter(app => app.isStarred).length;
+    if (category === 'all') return counts.total ?? 0;
+    if (category === 'published') return counts.published ?? 0;
+    if (category === 'paused') return counts.paused ?? 0;
+    if (category === 'draft') return counts.draft ?? 0;
+    if (category === 'starred') return counts.starred ?? 0;
     return 0;
   };
 
@@ -158,7 +188,7 @@ export function useApplicationList() {
       if (newStatus === ApplicationStatusEnum.PUBLISHED) msg = `${app?.name} 已发布`;
       else if (newStatus === ApplicationStatusEnum.PAUSED) msg = `${app?.name} 已暂停`;
       toast.success(msg);
-      await loadApplications();
+      await Promise.all([loadApplications(), loadCounts()]);
     } catch (error: any) {
       toast.error(error?.data?.message || error?.message || '修改状态失败');
     }
@@ -180,7 +210,7 @@ export function useApplicationList() {
       try {
         await Applications.duplicateApplication(appId, { name: `${appName} 副本` });
         toast.success(`${appName} 已复制`);
-        await loadApplications();
+        await Promise.all([loadApplications(), loadCounts()]);
       } catch (error: any) {
         toast.error(error?.data?.message || error?.message || '复制应用失败');
       }
@@ -190,7 +220,7 @@ export function useApplicationList() {
         toast.success(`${appName} 已删除`);
         // 延迟刷新，避免下拉关闭时 mouseup 落在卡片上触发导航
         await new Promise(resolve => setTimeout(resolve, 100));
-        await loadApplications();
+        await Promise.all([loadApplications(), loadCounts()]);
       } catch (error: any) {
         toast.error(error?.data?.message || error?.message || '删除应用失败');
       }
