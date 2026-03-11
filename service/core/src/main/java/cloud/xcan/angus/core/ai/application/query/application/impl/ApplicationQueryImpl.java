@@ -19,7 +19,7 @@ import cloud.xcan.angus.core.ai.domain.application.ApplicationCountsProjection;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStar;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStarRepo;
 import cloud.xcan.angus.core.ai.domain.model.Model;
-import cloud.xcan.angus.core.ai.domain.setting.analytics.ApiUsageLogRepo;
+import cloud.xcan.angus.core.ai.domain.analytics.ApiUsageLogRepo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationCountVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationStatisticsVo;
 import cloud.xcan.angus.core.biz.BizTemplate;

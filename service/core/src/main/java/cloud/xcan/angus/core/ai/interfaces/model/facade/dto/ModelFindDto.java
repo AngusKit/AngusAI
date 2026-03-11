@@ -17,7 +17,6 @@ public class ModelFindDto extends PageQuery {
   @Schema(description = "模型ID")
   private Long id;
 
-  @Length(max = 50)
   @Schema(description = "模型名称")
   private String name;
 

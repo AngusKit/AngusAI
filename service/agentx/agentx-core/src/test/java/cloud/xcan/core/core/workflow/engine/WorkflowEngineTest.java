@@ -266,7 +266,7 @@ class WorkflowEngineTest {
       WorkflowDefinition wf = WorkflowDefinition.builder()
           .id("wf-default")
           .name("Default")
-          // No settings → default STOP
+          // No analytics → default STOP
           .nodes(List.of(
               NodeDefinition.builder().id("start").type(NodeType.START).next("http").build(),
               NodeDefinition.builder().id("http").type(NodeType.HTTP).next("end").build(),

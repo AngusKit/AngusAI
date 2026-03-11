@@ -1,5 +1,7 @@
 package cloud.xcan.angus.core.ai.application.cmd.sharing.impl;
 
+import static cloud.xcan.angus.spec.principal.PrincipalContext.getUserId;
+
 import cloud.xcan.angus.core.ai.application.cmd.sharing.ResourceSharingCmd;
 import cloud.xcan.angus.core.ai.application.cmd.sharing.ResourceSharingMemberCmd;
 import cloud.xcan.angus.core.ai.application.query.sharing.ResourceSharingQuery;
@@ -54,6 +56,7 @@ public class ResourceSharingCmdImpl extends CommCmd<ResourceSharing, Long> imple
         // TODO 设置共享资源拥有者（资源创建人）
 
         // 保存共享
+        sharing.setOwnerId(getUserId());
         insert0(sharing);
 
         // 如果是指定成员共享,创建成员记录
@@ -80,7 +83,7 @@ public class ResourceSharingCmdImpl extends CommCmd<ResourceSharing, Long> imple
 
         // 权限检查：只有所有者可以更新
         // TODO 资源有管理权限也可以修改
-        if (!sharingDb.getOwnerId().equals(PrincipalContext.getUserId())) {
+        if (!sharingDb.getOwnerId().equals(getUserId())) {
           throw ProtocolException.of("无权限操作此共享");
         }
 
@@ -129,7 +132,7 @@ public class ResourceSharingCmdImpl extends CommCmd<ResourceSharing, Long> imple
 
         // 权限检查：只有所有者可以更新
         // TODO 资源有管理权限也可以修改
-        if (!sharingDb.getOwnerId().equals(PrincipalContext.getUserId())) {
+        if (!sharingDb.getOwnerId().equals(getUserId())) {
           throw ProtocolException.of("无权限操作此共享");
         }
       }
@@ -156,7 +159,7 @@ public class ResourceSharingCmdImpl extends CommCmd<ResourceSharing, Long> imple
 
         // 权限检查：只有所有者可以更新
         // TODO 资源有管理权限也可以修改
-        if (!sharingDb.getOwnerId().equals(PrincipalContext.getUserId())) {
+        if (!sharingDb.getOwnerId().equals(getUserId())) {
           throw ProtocolException.of("无权限操作此共享");
         }
       }
