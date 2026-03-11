@@ -459,3 +459,19 @@ export type ApiCallsTrendResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: ApiCallsTrendVo;
 };
+
+/** 关键资源badge统计 */
+export interface ResourcesBadgeVo {
+  /** 对话Session数 */
+  sessionCount?: number;
+  /** 我的应用数 */
+  applicationCount?: number;
+  /** 未读通知数 */
+  notificationCount?: number;
+}
+
+/** The API response result of supporting international message. */
+export type ResourcesBadgeResult = ApiLocaleResult & {
+  /** Actual response data or error details. */
+  data?: ResourcesBadgeVo;
+};

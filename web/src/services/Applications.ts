@@ -1,5 +1,5 @@
 import { ApiLocaleResult, PageQuery, AI } from '@xcan-angus/infra';
-import { ApplicationConfig, ApplicationCreateDto, ApplicationDetailResult, ApplicationDuplicateDto, ApplicationShareDto, ApplicationStatisticsResult, ApplicationUpdateDto, GetApplicationListOrderByEnum, } from './ApplicationsTypes.ts';
+import { ApplicationConfig, ApplicationCountResult, ApplicationCreateDto, ApplicationDetailResult, ApplicationDuplicateDto, ApplicationShareDto, ApplicationStatisticsResult, ApplicationUpdateDto, GetApplicationListOrderByEnum, } from './ApplicationsTypes.ts';
 import http, { ContentType, HttpClient, QueryParamsType, RequestParams } from './HttpClient.ts';
 import { ApplicationStatusEnum } from '@/enums/enums.ts';
 
@@ -192,6 +192,22 @@ export class Applications<SecurityDataType = unknown> {
       body: data,
       secure: true,
       type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * @description 获取应用的统计数量
+   *
+   * @tags Application
+   * @name GetApplicationCounts
+   * @summary 获取应用数量
+   * @request GET:/api/v1/applications/counts
+   * @secure
+   */
+  getApplicationCounts = (params: RequestParams = {}) =>
+    this.http.request<ApplicationCountResult>({
+      path: `${AI}/applications/counts`,
+      method: 'GET',
+      secure: true,
       ...params,
     });
   /**

@@ -1,5 +1,5 @@
 import { ApiLocaleResult, AI } from '@xcan-angus/infra';
-import { AnalyticsOverviewResult, ApiCallsTrendResult, AppDistributionResult, ErrorAnalysisResult, ModelDistributionResult, ResponseTimeAnalysisResult, TokenUsageTrendResult, TopEndpointsResult, } from './AnalyticsTypes.ts';
+import { AnalyticsOverviewResult, ApiCallsTrendResult, AppDistributionResult, ErrorAnalysisResult, ModelDistributionResult, ResourcesBadgeResult, ResponseTimeAnalysisResult, TokenUsageTrendResult, TopEndpointsResult, } from './AnalyticsTypes.ts';
 
 import http, { HttpClient, QueryParamsType, RequestParams } from './HttpClient.ts';
 import { GranularityEnum, TimeRangeEnum } from '@/enums/enums.ts';
@@ -256,6 +256,22 @@ export class Analytics<SecurityDataType = unknown> {
       path: `${AI}/analytics/app-distribution`,
       method: 'GET',
       query: query,
+      secure: true,
+      ...params,
+    });
+  /**
+   * @description 获取当前用户关键资源badge统计，包括对话Session数、我的应用数、通知数
+   *
+   * @tags Analytics
+   * @name GetResourcesBadge
+   * @summary 获取关键资源badge统计
+   * @request GET:/api/v1/analytics/resources/badge
+   * @secure
+   */
+  getResourcesBadge = (params: RequestParams = {}) =>
+    this.http.request<ResourcesBadgeResult>({
+      path: `${AI}/analytics/resources/badge`,
+      method: 'GET',
       secure: true,
       ...params,
     });

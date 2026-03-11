@@ -485,6 +485,26 @@ export interface TrendsStatsVo {
   responseTime?: TrendDataVo[];
 }
 
+/** 应用数量统计 */
+export interface ApplicationCountVo {
+  /** 应用总数 */
+  total?: number;
+  /** 草稿数 */
+  draft?: number;
+  /** 已发布数 */
+  published?: number;
+  /** 已暂停数 */
+  paused?: number;
+  /** 标星数 */
+  starred?: number;
+}
+
+/** The API response result of supporting international message. */
+export type ApplicationCountResult = ApiLocaleResult & {
+  /** Actual response data or error details. */
+  data?: ApplicationCountVo;
+};
+
 /** 应用统计数据 */
 export interface ApplicationStatisticsVo {
   /** 概览统计 */
