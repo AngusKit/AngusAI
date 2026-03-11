@@ -41,4 +41,9 @@ public interface ApplicationCmd {
    */
   void delete(Long id);
 
+  /**
+   * 标星/取消标星应用
+   */
+  AIApplication star(Long id, Boolean isStarred);
+
 }

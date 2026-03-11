@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bot } from 'lucide-react';
 import { toast } from 'sonner';
 import Applications from '@/services/Applications';
 import type { ApplicationDetailVo } from '@/services/ApplicationsTypes';
@@ -13,8 +12,8 @@ export interface ApplicationListItem {
   id: string;
   name: string;
   description: string;
-  icon: React.ComponentType<{ className?: string }>;
-  iconBgColor: string;
+  /** 应用图标 emoji，空时默认 🤖 */
+  icon: string;
   status: ApplicationStatusEnum;
   isStarred: boolean;
   tags: string[];
@@ -74,8 +73,7 @@ export function useApplicationList() {
           id: app.id ?? '',
           name: app.name ?? '',
           description: app.description ?? '',
-          icon: Bot,
-          iconBgColor: 'bg-blue-500',
+          icon: app.icon && /[\u{1F300}-\u{1F9FF}\u2600-\u26FF\u2700-\u27BF]/u.test(app.icon) ? app.icon : '🤖',
           status: (app.status as ApplicationStatusEnum) ?? ApplicationStatusEnum.DRAFT,
           isStarred: false,
           tags: app.tags ?? [],
@@ -190,6 +188,8 @@ export function useApplicationList() {
       try {
         await Applications.deleteApplication(appId);
         toast.success(`${appName} 已删除`);
+        // 延迟刷新，避免下拉关闭时 mouseup 落在卡片上触发导航
+        await new Promise(resolve => setTimeout(resolve, 100));
         await loadApplications();
       } catch (error: any) {
         toast.error(error?.data?.message || error?.message || '删除应用失败');

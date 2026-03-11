@@ -8,6 +8,7 @@ import cloud.xcan.angus.core.ai.interfaces.application.facade.dto.ApplicationDup
 import cloud.xcan.angus.core.ai.interfaces.application.facade.dto.ApplicationFindDto;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.dto.ApplicationShareDto;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.dto.ApplicationUpdateDto;
+import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationCountVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationListVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationStatisticsVo;
@@ -105,6 +106,18 @@ public class ApplicationRest {
     return ApiLocaleResult.success(applicationFacade.modifyStatus(id, status));
   }
 
+  @Operation(operationId = "starApplication", summary = "收藏/取消收藏应用", description = "收藏或取消收藏指定应用（前端显示为星标）")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "标星成功")
+  })
+  @ResponseStatus(HttpStatus.OK)
+  @PostMapping("/{id}/star")
+  public ApiLocaleResult<ApplicationDetailVo> star(
+      @Parameter(description = "应用ID") @PathVariable Long id,
+      @Parameter(description = "是否收藏") @RequestParam Boolean isStarred) {
+    return ApiLocaleResult.success(applicationFacade.star(id, isStarred));
+  }
+
   @Operation(operationId = "shareApplication", summary = "分享应用", description = "生成应用分享链接或邀请码")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "分享链接已生成")
@@ -149,6 +162,17 @@ public class ApplicationRest {
   public ApiLocaleResult<PageResult<ApplicationListVo>> list(
       @Valid @ParameterObject ApplicationFindDto dto) {
     return ApiLocaleResult.success(applicationFacade.list(dto));
+  }
+
+  // 应用数量统计：应用数、草稿数、已发布数、已暂停（禁用）数、标星数
+  @Operation(operationId = "getApplicationCounts", summary = "获取应用数量", description = "获取应用的统计数量")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "统计数据获取成功"),
+      @ApiResponse(responseCode = "404", description = "应用不存在")
+  })
+  @GetMapping("/counts")
+  public ApiLocaleResult<ApplicationCountVo> getCounts() {
+    return ApiLocaleResult.success(applicationFacade.getCounts());
   }
 
   @Operation(operationId = "getApplicationStatistics", summary = "获取应用统计", description = "获取应用的详细统计数据")

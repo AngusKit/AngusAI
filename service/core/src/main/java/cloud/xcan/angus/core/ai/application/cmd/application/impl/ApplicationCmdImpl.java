@@ -4,12 +4,16 @@ import static cloud.xcan.angus.core.ai.application.converter.ApplicationConverte
 import static cloud.xcan.angus.core.ai.application.converter.ApplicationConverter.toDuplicateApplication;
 import static cloud.xcan.angus.spec.utils.ObjectUtils.isNull;
 
+import static cloud.xcan.angus.spec.principal.PrincipalContext.getUserId;
+
 import cloud.xcan.angus.core.ai.application.cmd.application.ApplicationCmd;
 import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
 import cloud.xcan.angus.core.ai.application.query.application.ApplicationQuery;
 import cloud.xcan.angus.core.ai.domain.application.AIApplication;
 import cloud.xcan.angus.core.ai.domain.application.AIApplicationRepo;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationAgent;
+import cloud.xcan.angus.core.ai.domain.application.ApplicationStar;
+import cloud.xcan.angus.core.ai.domain.application.ApplicationStarRepo;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationAgentRepo;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationConfig;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
@@ -39,6 +43,9 @@ public class ApplicationCmdImpl extends CommCmd<AIApplication, Long> implements 
 
   @Resource
   private AgentQuery agentQuery;
+
+  @Resource
+  private ApplicationStarRepo applicationStarRepo;
 
   @Override
   @Transactional
@@ -229,11 +236,42 @@ public class ApplicationCmdImpl extends CommCmd<AIApplication, Long> implements 
 
   @Override
   @Transactional
+  public AIApplication star(Long id, Boolean isStarred) {
+    return new BizTemplate<AIApplication>() {
+      AIApplication applicationDb;
+
+      @Override
+      protected void checkParams() {
+        applicationDb = applicationQuery.findAndCheck(id);
+      }
+
+      @Override
+      protected AIApplication process() {
+        Long userId = getUserId();
+        if (Boolean.TRUE.equals(isStarred)) {
+          if (!applicationStarRepo.existsByApplicationIdAndUserId(id, userId)) {
+            ApplicationStar star = new ApplicationStar()
+                .setId(uidGenerator.getUID())
+                .setApplicationId(id)
+                .setUserId(userId);
+            applicationStarRepo.save(star);
+          }
+        } else {
+          applicationStarRepo.deleteByApplicationIdAndUserId(id, userId);
+        }
+        return applicationDb;
+      }
+    }.execute();
+  }
+
+  @Override
+  @Transactional
   public void delete(Long id) {
     new BizTemplate<Void>() {
       @Override
       protected Void process() {
         applicationAgentRepo.deleteByApplicationId(id);
+        applicationStarRepo.deleteByApplicationIdAndUserId(id, getUserId());
         applicationRepo.deleteById(id);
         return null;
       }

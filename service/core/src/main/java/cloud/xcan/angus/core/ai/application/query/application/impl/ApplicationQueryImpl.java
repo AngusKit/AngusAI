@@ -11,14 +11,18 @@ import cloud.xcan.angus.core.ai.domain.application.AIApplication;
 import cloud.xcan.angus.core.ai.domain.application.AIApplicationRepo;
 import cloud.xcan.angus.core.ai.domain.application.AIApplicationSearchRepo;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationAgent;
+import cloud.xcan.angus.core.ai.domain.application.ApplicationStarRepo;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationAgentRepo;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
+import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationCountVo;
 import cloud.xcan.angus.core.ai.domain.model.Model;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.message.ProtocolException;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import cloud.xcan.angus.remote.search.SearchCriteria;
+import static cloud.xcan.angus.spec.principal.PrincipalContext.getUserId;
+
 import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -46,6 +50,9 @@ public class ApplicationQueryImpl implements ApplicationQuery {
 
   @Resource
   private AgentQuery agentQuery;
+
+  @Resource
+  private ApplicationStarRepo applicationStarRepo;
 
   @Override
   public Optional<AIApplication> findById(Long id) {
@@ -135,11 +142,23 @@ public class ApplicationQueryImpl implements ApplicationQuery {
   }
 
   @Override
-  public AIApplication findByShareId(String shareId) {
-    return new BizTemplate<AIApplication>() {
+  public ApplicationCountVo getCounts() {
+    return new BizTemplate<ApplicationCountVo>() {
       @Override
-      protected AIApplication process() {
-        return applicationRepo.findByShareId(shareId).orElse(null);
+      protected ApplicationCountVo process() {
+        Long userId = getUserId();
+        long total = applicationRepo.countByCreatedBy(userId);
+        long draft = applicationRepo.countByCreatedByAndStatus(userId, ApplicationStatus.DRAFT);
+        long published = applicationRepo.countByCreatedByAndStatus(userId, ApplicationStatus.PUBLISHED);
+        long paused = applicationRepo.countByCreatedByAndStatus(userId, ApplicationStatus.PAUSED);
+        long starred = applicationStarRepo.countByUserId(userId);
+        return ApplicationCountVo.builder()
+            .total(total)
+            .draft(draft)
+            .published(published)
+            .paused(paused)
+            .starred(starred)
+            .build();
       }
     }.execute();
   }
@@ -152,52 +171,6 @@ public class ApplicationQueryImpl implements ApplicationQuery {
   @Override
   public boolean existsByNameAndIdNot(String name, Long id) {
     return applicationRepo.existsByNameAndIdNot(name, id);
-  }
-
-  @Override
-  public long countByCreatedBy(Long createdBy) {
-    return applicationRepo.countByCreatedBy(createdBy);
-  }
-
-  @Override
-  public long countByStatus(ApplicationStatus status) {
-    return applicationRepo.countByStatus(status);
-  }
-
-  @Override
-  public Page<AIApplication> findPublicApplications(PageRequest pageable) {
-    GenericSpecification<AIApplication> specification = new GenericSpecification<>(
-        SearchCriteria.criteria(SearchCriteria.equal("status", ApplicationStatus.PUBLISHED)));
-    return applicationRepo.findAll(specification, pageable);
-  }
-
-  @Override
-  public Page<AIApplication> findByTemplateId(Long templateId, PageRequest pageable) {
-    GenericSpecification<AIApplication> specification = new GenericSpecification<>(
-        SearchCriteria.criteria(SearchCriteria.equal("templateId", templateId)));
-    return applicationRepo.findAll(specification, pageable);
-  }
-
-  @Override
-  public Page<AIApplication> findExpiredShareApplications(PageRequest pageable) {
-    GenericSpecification<AIApplication> specification = new GenericSpecification<>(
-        SearchCriteria.criteria(SearchCriteria.isNotNull("shareExpiresAt"),
-            SearchCriteria.lessThanEqual("shareExpiresAt", LocalDateTime.now())));
-    return applicationRepo.findAll(specification, pageable);
-  }
-
-  @Override
-  public Page<AIApplication> findByKnowledgeBaseId(Long knowledgeBaseId, PageRequest pageable) {
-    GenericSpecification<AIApplication> specification = new GenericSpecification<>(
-        SearchCriteria.criteria(SearchCriteria.equal("knowledgeBaseId", knowledgeBaseId)));
-    return applicationRepo.findAll(specification, pageable);
-  }
-
-  @Override
-  public Page<AIApplication> findByDatasetId(Long datasetId, PageRequest pageable) {
-    GenericSpecification<AIApplication> specification = new GenericSpecification<>(
-        SearchCriteria.criteria(SearchCriteria.equal("datasetId", datasetId)));
-    return applicationRepo.findAll(specification, pageable);
   }
 
   @Override
@@ -221,10 +194,4 @@ public class ApplicationQueryImpl implements ApplicationQuery {
         .toList();
   }
 
-  @Override
-  public Page<AIApplication> findByWorkflowId(Long workflowId, PageRequest pageable) {
-    GenericSpecification<AIApplication> specification = new GenericSpecification<>(
-        SearchCriteria.criteria(SearchCriteria.equal("workflowId", workflowId)));
-    return applicationRepo.findAll(specification, pageable);
-  }
 }

@@ -70,7 +70,7 @@ export function ApplicationDetailPage() {
       {/* 应用头部：图标、名称、状态、操作按钮 */}
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-3xl flex-shrink-0">
+          <div className="w-14 h-14 rounded-xl flex items-center justify-center text-4xl flex-shrink-0">
             {detail.icon && /^[\u{1F300}-\u{1F9FF}]|[\u2600-\u26FF]|[\u2700-\u27BF]|[\u{1F600}-\u{1F64F}]$/u.test(detail.icon)
               ? detail.icon
               : '🤖'}

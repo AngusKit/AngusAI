@@ -133,7 +133,7 @@ export function useEditApplication() {
         defaultAgentId: defaultAgentId || selectedAgentIds[0],
       });
       toast.success('保存成功');
-      navigate(`/apps/${id}`);
+      navigate('/apps');
     } catch (error: any) {
       toast.error(error?.data?.message ?? error?.message ?? '保存失败');
     } finally {
@@ -166,6 +166,6 @@ export function useEditApplication() {
     toggleAgent,
     setAsDefault,
     handleSave,
-    handleBack: () => navigate(`/apps/${id}`),
+    handleBack: () => navigate('/apps'),
   };
 }

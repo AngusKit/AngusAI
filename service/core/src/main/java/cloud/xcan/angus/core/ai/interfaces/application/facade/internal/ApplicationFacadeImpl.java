@@ -18,6 +18,7 @@ import cloud.xcan.angus.core.ai.interfaces.application.facade.dto.ApplicationFin
 import cloud.xcan.angus.core.ai.interfaces.application.facade.dto.ApplicationShareDto;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.dto.ApplicationUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.internal.assembler.ApplicationAssembler;
+import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationCountVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.ResourceInfoVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationListVo;
@@ -45,6 +46,7 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
   @Resource
   private AgentQuery agentQuery;
 
+  @NameJoin
   @Override
   public ApplicationDetailVo create(ApplicationCreateDto dto) {
     AIApplication application = ApplicationAssembler.toCreateDomain(dto);
@@ -53,6 +55,7 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
         getDefaultAgentVo(saved.getId()));
   }
 
+  @NameJoin
   @Override
   public ApplicationDetailVo duplicate(Long id, ApplicationDuplicateDto dto) {
     AIApplication saved = applicationCmd.duplicate(id, dto.getName());
@@ -60,6 +63,7 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
         getDefaultAgentVo(saved.getId()));
   }
 
+  @NameJoin
   @Override
   public ApplicationDetailVo update(Long id, ApplicationUpdateDto dto) {
     AIApplication application = ApplicationAssembler.toUpdateDomain(id, dto);
@@ -68,6 +72,7 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
         getDefaultAgentVo(saved.getId()));
   }
 
+  @NameJoin
   @Override
   public ApplicationDetailVo updateConfig(Long id, ApplicationConfig config) {
     AIApplication saved = applicationCmd.updateConfig(id, config);
@@ -75,6 +80,7 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
         getDefaultAgentVo(saved.getId()));
   }
 
+  @NameJoin
   @Override
   public ApplicationDetailVo modifyStatus(Long id, ApplicationStatus status) {
     AIApplication saved = applicationCmd.modifyStatus(id, status);
@@ -82,12 +88,20 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
         getDefaultAgentVo(saved.getId()));
   }
 
+  @NameJoin
   @Override
   public ApplicationDetailVo share(Long id, ApplicationShareDto dto) {
     AIApplication application = ApplicationAssembler.shareDomain(id, dto);
     AIApplication saved = applicationCmd.share(application);
     return ApplicationAssembler.toDetailVo(saved, getAgentsVo(saved.getId()),
         getDefaultAgentVo(saved.getId()));
+  }
+
+  @NameJoin
+  @Override
+  public ApplicationDetailVo star(Long id, Boolean isStarred) {
+    AIApplication saved = applicationCmd.star(id, isStarred);
+    return ApplicationAssembler.toDetailVo(saved, getAgentsVo(id), getDefaultAgentVo(id));
   }
 
   @Override
@@ -117,6 +131,11 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
     return buildVoPageResult(page, app -> ApplicationAssembler.toListVo(app,
         batch.agentsMap.getOrDefault(app.getId(), List.of()),
         batch.defaultAgentMap.get(app.getId())));
+  }
+
+  @Override
+  public ApplicationCountVo getCounts() {
+    return applicationQuery.getCounts();
   }
 
   @Override

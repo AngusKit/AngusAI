@@ -7,6 +7,7 @@ import cloud.xcan.angus.core.ai.interfaces.application.facade.dto.ApplicationDup
 import cloud.xcan.angus.core.ai.interfaces.application.facade.dto.ApplicationFindDto;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.dto.ApplicationShareDto;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.dto.ApplicationUpdateDto;
+import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationCountVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationListVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationStatisticsVo;
@@ -40,6 +41,11 @@ public interface ApplicationFacade {
   ApplicationDetailVo modifyStatus(Long id, ApplicationStatus status);
 
   /**
+   * 收藏/取消收藏应用
+   */
+  ApplicationDetailVo star(Long id, Boolean isStarred);
+
+  /**
    * 分享应用
    */
   ApplicationDetailVo share(Long id, ApplicationShareDto dto);
@@ -58,6 +64,11 @@ public interface ApplicationFacade {
    * 获取应用列表
    */
   PageResult<ApplicationListVo> list(ApplicationFindDto dto);
+
+  /**
+   * 获取应用数量统计
+   */
+  ApplicationCountVo getCounts();
 
   /**
    * 获取应用统计

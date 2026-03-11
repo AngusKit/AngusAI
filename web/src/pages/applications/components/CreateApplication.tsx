@@ -8,7 +8,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { getTagColor } from '../utils';
 import { useCreateApplication } from '../hooks';
-import { ICON_OPTIONS, NAME_MAX_LENGTH, DESC_MAX_LENGTH, TAG_MAX_COUNT, TAG_MAX_LENGTH } from '../constants';
+import { EmojiIconSelector } from './EmojiIconSelector';
+import { NAME_MAX_LENGTH, DESC_MAX_LENGTH, TAG_MAX_COUNT, TAG_MAX_LENGTH } from '../constants';
 
 /** 步骤指示器：显示当前创建步骤 */
 function StepIndicator({ currentStep }: { currentStep: number }) {
@@ -97,24 +98,12 @@ export function CreateApplication() {
             </div>
             <div>
               <Label className="dark:text-gray-300">应用图标（emoji）</Label>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {ICON_OPTIONS.map(opt => (
-                  <button
-                    key={opt.emoji}
-                    type="button"
-                    onClick={() => setIcon(opt.emoji)}
-                    className={`w-10 h-10 rounded-lg flex items-center justify-center text-xl transition-all ${
-                      icon === opt.emoji ? 'ring-2 ring-blue-500 bg-blue-50 dark:bg-blue-900/30' : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600'
-                    }`}
-                    title={opt.label}
-                  >
-                    {opt.emoji}
-                  </button>
-                ))}
+              <div className="mt-2">
+                <EmojiIconSelector value={icon} onChange={setIcon} />
               </div>
             </div>
             <div>
-              <Label className="dark:text-gray-300">应用描述</Label>
+              <Label className="dark:text-gray-300">应用介绍</Label>
               <Textarea
                 value={description}
                 onChange={e => setDescription(e.target.value.slice(0, DESC_MAX_LENGTH))}

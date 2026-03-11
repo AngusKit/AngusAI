@@ -45,7 +45,7 @@ import { ShareApplicationDialog } from './components/ShareApplicationDialog';
 import { ApplicationStatusEnum } from '@/enums/enums';
 import { getEnumDescription } from '@/enums/utils';
 import { useApplicationList, type ApplicationListItem } from './hooks';
-import { getStatusBadgeColor, getStatusIcon, getTagColor } from './utils';
+import { getStatusBadgeColor, getTagColor } from './utils';
 
 /**
  * 应用列表主页面：展示所有应用，支持筛选、分页、操作
@@ -65,7 +65,6 @@ export function MyApplications() {
     applications,
     isLoading,
     totalPages,
-    totalCount,
     getCategoryCount,
     handleTabChange,
     handleSearchChange,
@@ -279,7 +278,6 @@ export function MyApplications() {
               toast.success(`正在打开 ${app.name} 对话...`);
             }}
             getStatusBadgeColor={getStatusBadgeColor}
-            getStatusIcon={getStatusIcon}
           />
             ))}
           </>
@@ -361,7 +359,6 @@ function ApplicationCard({
   onMoreAction,
   onNavigateChat,
   getStatusBadgeColor,
-  getStatusIcon,
 }: {
   app: ApplicationListItem;
   viewMode: 'grid' | 'list';
@@ -374,69 +371,65 @@ function ApplicationCard({
   onMoreAction: (action: string, appId: string, appName: string) => void;
   onNavigateChat: () => void;
   getStatusBadgeColor: (status: ApplicationStatusEnum) => string;
-  getStatusIcon: (status: ApplicationStatusEnum) => import('lucide-react').LucideIcon;
 }) {
-  const StatusIcon = getStatusIcon(app.status);
-  const Icon = app.icon;
-
   if (viewMode === 'list') {
     return (
       <div
         onClick={() => onAppClick(app)}
-        className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 hover:shadow-md dark:hover:shadow-gray-900/50 transition-shadow cursor-pointer group"
+        className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md dark:hover:shadow-gray-900/50 transition-shadow cursor-pointer group"
       >
-        <div className="flex items-center gap-4">
-          <div className={`${app.iconBgColor} w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0`}>
-            <Icon className="w-5 h-5 text-white" />
+        <div className="flex items-center gap-6">
+          <div className="w-11 h-11 rounded-lg flex items-center justify-center flex-shrink-0 text-2xl">
+            {app.icon}
           </div>
           <div className="flex-1 min-w-0">
             <h3 className="dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
               {app.name}
             </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-1">{app.description}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-1 mt-0.5">{app.description}</p>
+            <div className="flex items-center gap-4 mt-2 flex-wrap">
+              <div className="flex flex-wrap gap-1.5">
+                {app.tags.slice(0, 3).map((tag, index) => (
+                  <span key={index} className={`text-xs px-2 py-0.5 rounded-md border ${getTagColor(tag, index)}`}>
+                    {tag}
+                  </span>
+                ))}
+                {app.tags.length > 3 && (
+                  <span className="text-xs px-2 py-0.5 rounded-md bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400 border-0">
+                    +{app.tags.length - 3}
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+                <Clock className="w-3.5 h-3.5 shrink-0" />
+                <span>{app.visits || '暂无数据'}</span>
+              </div>
+              <Badge className={`text-xs ${getStatusBadgeColor(app.status)}`}>
+                {getEnumDescription(ApplicationStatusEnum, app.status)}
+              </Badge>
+            </div>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="flex flex-wrap gap-1.5">
-              {app.tags.slice(0, 2).map((tag, index) => (
-                <span key={index} className={`text-xs px-2 py-1 rounded-md border ${getTagColor(tag, index)}`}>
-                  {tag}
-                </span>
-              ))}
-              {app.tags.length > 2 && (
-                <span className="text-xs px-2 py-1 rounded-md bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400 border-0">
-                  +{app.tags.length - 2}
-                </span>
-              )}
-            </div>
-            <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 min-w-[80px]">
-              <Clock className="w-4 h-4" />
-              <span>{app.visits || '暂无数据'}</span>
-            </div>
-            <Badge className={`text-xs ${getStatusBadgeColor(app.status)}`}>
-              {getEnumDescription(ApplicationStatusEnum, app.status)}
-            </Badge>
-            <div className="flex items-center gap-2">
-              <Button size="sm" variant="outline" onClick={e => (e.stopPropagation(), onNavigateChat())} className="gap-2 h-8">
-                <MessageSquare className="w-3.5 h-3.5" />
-                进入对话
-              </Button>
-              <button
-                onClick={e => onStarToggle(e, app.id)}
-                className={`p-1 rounded transition-colors ${
-                  app.isStarred ? 'text-yellow-500 hover:text-yellow-600' : 'text-gray-400 hover:text-yellow-500 dark:text-gray-500 dark:hover:text-yellow-500'
-                }`}
-              >
-                <Star className={`w-4 h-4 ${app.isStarred ? 'fill-current' : ''}`} />
-              </button>
-              <AppDropdownMenu
-                app={app}
-                onStatusChange={onStatusChange}
-                onSettings={onSettings}
-                onEdit={onEdit}
-                onShare={onShare}
-                onMoreAction={onMoreAction}
-              />
-            </div>
+          <div className="flex items-center gap-3 shrink-0">
+            <Button size="sm" variant="outline" onClick={e => (e.stopPropagation(), onNavigateChat())} className="gap-2 h-8">
+              <MessageSquare className="w-3.5 h-3.5" />
+              进入对话
+            </Button>
+            <button
+              onClick={e => onStarToggle(e, app.id)}
+              className={`p-1.5 rounded transition-colors ${
+                app.isStarred ? 'text-yellow-500 hover:text-yellow-600' : 'text-gray-400 hover:text-yellow-500 dark:text-gray-500 dark:hover:text-yellow-500'
+              }`}
+            >
+              <Star className={`w-4 h-4 ${app.isStarred ? 'fill-current' : ''}`} />
+            </button>
+            <AppDropdownMenu
+              app={app}
+              onStatusChange={onStatusChange}
+              onSettings={onSettings}
+              onEdit={onEdit}
+              onShare={onShare}
+              onMoreAction={onMoreAction}
+            />
           </div>
         </div>
       </div>
@@ -451,8 +444,8 @@ function ApplicationCard({
     >
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-start gap-3">
-          <div className={`${app.iconBgColor} w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0`}>
-            <Icon className="w-6 h-6 text-white" />
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 text-3xl">
+            {app.icon}
           </div>
           <div className="flex-1 min-w-0">
             <h3 className="dark:text-white mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
@@ -597,7 +590,7 @@ function AppDropdownMenu({
         </DropdownMenuItem>
         <DropdownMenuSeparator className="dark:bg-gray-700" />
         <DropdownMenuItem
-          onClick={() => onMoreAction('删除', app.id, app.name)}
+          onClick={e => (e.stopPropagation(), onMoreAction('删除', app.id, app.name))}
           className="text-red-600 dark:text-red-400"
         >
           <Trash2 className="w-4 h-4 mr-2" />

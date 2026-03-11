@@ -34,4 +34,9 @@ public interface AIApplicationRepo extends NameJoinRepository<AIApplication, Lon
    */
   long countByStatus(ApplicationStatus status);
 
+  /**
+   * 统计指定创建者和状态的应用数量
+   */
+  long countByCreatedByAndStatus(Long createdBy, ApplicationStatus status);
+
 }
