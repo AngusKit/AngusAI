@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDashboardPageLoading } from './hooks/useDashboard.ts';
 import { RecentApplications } from '@/pages/dashboard/components/RecentApplications.tsx';
 import { WelcomeBanner } from '@/pages/dashboard/components/WelcomeBanner.tsx';
 import { StatsCards } from '@/pages/dashboard/components/StatsCards.tsx';
@@ -9,12 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton.tsx';
 
 export function Dashboard() {
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 400);
-    return () => clearTimeout(timer);
-  }, []);
+  const isLoading = useDashboardPageLoading();
 
   const handleNavigate = (page: string) => {
     navigate(`/${page}`);

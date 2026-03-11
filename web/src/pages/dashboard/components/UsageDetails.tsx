@@ -1,15 +1,7 @@
-import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card.tsx';
 import { Progress } from '@/components/ui/progress.tsx';
 import { Zap, Activity, DollarSign, Inbox } from 'lucide-react';
-import DashboardApi from '@/services/Dashboard.ts';
-import type {
-  UsageDetailsVo,
-  HotAppItemVo,
-  TopApiItemVo,
-  CostModelItemVo,
-} from '@/services/DashboardTypes.ts';
-import { TimeRangeEnum } from '@/enums/enums.ts';
+import { useUsageDetails } from '../hooks/useDashboard.ts';
 
 /** 根据占比返回进度条配色（使用 CSS 变量，确保在任何主题下生效） */
 const PROGRESS_COLORS = {
@@ -35,29 +27,7 @@ function getProgressIndicatorStyle(percentage: number): React.CSSProperties {
 }
 
 export function UsageDetails() {
-  const [hotApps, setHotApps] = useState<HotAppItemVo[]>([]);
-  const [topApis, setTopApis] = useState<TopApiItemVo[]>([]);
-  const [costModels, setCostModels] = useState<CostModelItemVo[]>([]);
-
-  useEffect(() => {
-    async function load() {
-      try {
-        const res = await DashboardApi.getUsageDetails({
-          timeRange: TimeRangeEnum.Value7Days,
-          limit: 5,
-        });
-        const data = (res as { data?: UsageDetailsVo })?.data;
-        setHotApps(data?.hotApps ?? []);
-        setTopApis(data?.topApis ?? []);
-        setCostModels(data?.costModels ?? []);
-      } catch {
-        setHotApps([]);
-        setTopApis([]);
-        setCostModels([]);
-      }
-    }
-    load();
-  }, []);
+  const { hotApps, topApis, costModels } = useUsageDetails();
 
   const emptyPlaceholder = (
     <div className="py-8 flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">

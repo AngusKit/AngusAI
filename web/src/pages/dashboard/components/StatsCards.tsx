@@ -1,72 +1,9 @@
-import { FileText, Zap, Coins, Users, TrendingUp, TrendingDown, BarChart3 } from 'lucide-react';
+import { TrendingUp, TrendingDown, BarChart3 } from 'lucide-react';
 import { Card } from '@/components/ui/card.tsx';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog.tsx';
-import { useState, useEffect } from 'react';
-import { useLanguage } from '@/components/LanguageProvider.tsx';
-import DashboardApi from '@/services/Dashboard.ts';
-import type { StatItemVo, StatsOverviewResult } from '@/services/DashboardTypes.ts';
-import { TimeRangeEnum } from '@/enums/enums.ts';
-
-const TYPE_TO_ICON = {
-  totalApps: FileText,
-  apiCalls: Zap,
-  tokenUsage: Coins,
-  activeUsers: Users,
-} as const;
-
-const TYPE_TO_ICON_BG: Record<string, string> = {
-  totalApps: 'bg-blue-500',
-  apiCalls: 'bg-emerald-500',
-  tokenUsage: 'bg-orange-500',
-  activeUsers: 'bg-purple-500',
-};
-
-function toStatData(
-  vo: StatItemVo,
-  t: (key: string) => string
-): StatData {
-  const type = vo.type ?? 'totalApps';
-  const Icon = TYPE_TO_ICON[type as keyof typeof TYPE_TO_ICON] ?? FileText;
-  // iconBg 由前端根据 type 配置（后端已删除该字段）
-  const iconBg = TYPE_TO_ICON_BG[type] ?? 'bg-blue-500';
-  // 后端返回 vo.label 为 i18n key，需翻译后展示；兼容 stats.xxx 与 dashboard.stats.xxx
-  const rawKey = vo.label || `dashboard.stats.${type}`;
-  const labelKey = rawKey.startsWith('stats.') && !rawKey.startsWith('dashboard.') ? `dashboard.${rawKey}` : rawKey;
-  const label = t(labelKey);
-  const details = vo.details ?? {};
-  return {
-    icon: Icon,
-    label,
-    value: vo.value ?? '-',
-    subtitle: vo.subtitle ?? '',
-    trend: vo.trend ?? '-',
-    trendUp: vo.trendUp ?? true,
-    iconBg,
-    details: {
-      thisWeek: details.thisWeek ?? '-',
-      lastWeek: details.lastWeek ?? '-',
-      thisMonth: details.thisMonth ?? '-',
-      lastMonth: details.lastMonth ?? '-',
-    },
-  };
-}
-
-interface StatData {
-  icon: any;
-  label: string;
-  value: string;
-  subtitle: string;
-  trend: string;
-  trendUp: boolean;
-  iconBg: string;
-  details: {
-    thisWeek: string;
-    lastWeek: string;
-    thisMonth: string;
-    lastMonth: string;
-  };
-}
+import { useState } from 'react';
+import { useStatsOverview, type StatData } from '../hooks/useDashboard.ts';
 
 function StatCardSkeleton() {
   return (
@@ -87,27 +24,8 @@ function StatCardSkeleton() {
 }
 
 export function StatsCards() {
-  const { t } = useLanguage();
   const [selectedStat, setSelectedStat] = useState<StatData | null>(null);
-  const [stats, setStats] = useState<StatData[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    async function load() {
-      try {
-        const res = await DashboardApi.getStatsOverview({
-          timeRange: TimeRangeEnum.Value7Days,
-        });
-        const data = (res as StatsOverviewResult)?.data ?? [];
-        setStats(data.map((vo: StatItemVo) => toStatData(vo, t)));
-      } catch {
-        setStats([]);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    load();
-  }, [t]);
+  const { stats, isLoading } = useStatsOverview();
 
   return (
     <>

@@ -1,53 +1,14 @@
-import { MessageSquare, FileText, Database, ExternalLink, Edit, Clock, BarChart, Settings, Layers } from 'lucide-react';
+import { MessageSquare, ExternalLink, Edit, Clock, BarChart, Settings, Layers } from 'lucide-react';
 import { Card } from '@/components/ui/card.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog.tsx';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { toast } from 'sonner';
 import { formatLastUsedDisplay } from '@/utils/FormatUtils.ts';
 import { getTagColor } from '@/pages/applications/utils.ts';
-import DashboardApi from '@/services/Dashboard.ts';
-import type { RecentApplicationItemVo } from '@/services/DashboardTypes.ts';
-
-const DEFAULT_ICONS = [MessageSquare, FileText, Database];
-/** iconBg 由前端根据应用索引配置（后端已删除该字段） */
-const DEFAULT_ICON_BGS = ['bg-blue-500', 'bg-purple-500', 'bg-green-500'] as const;
-
-function toApplication(vo: RecentApplicationItemVo, index: number): Application {
-  const Icon = DEFAULT_ICONS[index % DEFAULT_ICONS.length];
-  const iconBg = DEFAULT_ICON_BGS[index % DEFAULT_ICON_BGS.length] ?? 'bg-blue-500';
-  return {
-    id: vo.id ?? String(index),
-    icon: Icon,
-    name: vo.name ?? '未命名应用',
-    description: vo.description ?? '',
-    fullDescription: vo.fullDescription ?? vo.description ?? '',
-    tags: vo.tags ?? [],
-    usage: vo.usage ?? '',
-    iconBg,
-    createdAt: vo.createdAt ?? '',
-    lastUsed: vo.lastUsed ?? '',
-    totalCalls: vo.totalCalls ?? '-',
-    avgResponseTime: vo.avgResponseTime ?? '-',
-  };
-}
-
-interface Application {
-  id: string;
-  icon: any;
-  name: string;
-  description: string;
-  fullDescription: string;
-  tags: string[];
-  usage: string;
-  iconBg: string;
-  createdAt: string;
-  lastUsed: string;
-  totalCalls: string;
-  avgResponseTime: string;
-}
+import { useRecentApplications, type Application } from '../hooks/useDashboard.ts';
 
 function ApplicationSkeleton() {
   return (
@@ -78,25 +39,8 @@ function ApplicationSkeleton() {
 
 export function RecentApplications({ onNavigate }: { onNavigate?: (page: string) => void }) {
   const { t } = useLanguage();
-  const [applications, setApplications] = useState<Application[]>([]);
+  const { applications, isLoading } = useRecentApplications();
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    async function load() {
-      try {
-        const res = await DashboardApi.getRecentApplications({ limit: 6, offset: 0 });
-        const payload = (res as unknown as { data?: { items?: RecentApplicationItemVo[] } })?.data;
-        const items = payload?.items ?? [];
-        setApplications(items.map((vo: RecentApplicationItemVo, i: number) => toApplication(vo, i)));
-      } catch {
-        setApplications([]);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    load();
-  }, []);
 
   const handleCardClick = (app: Application) => {
     setSelectedApp(app);
