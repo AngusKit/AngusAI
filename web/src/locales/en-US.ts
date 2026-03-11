@@ -455,7 +455,7 @@ export const enUS = {
     },
     editDatasetDialog: {
       title: 'Edit Dataset',
-      description: 'Update the dataset configuration and settings',
+      description: 'Update the dataset configuration and analytics',
       datasetMissing: 'Dataset information is missing',
       nameRequired: 'Please enter the dataset name',
       descriptionRequired: 'Please enter the description',
@@ -915,7 +915,7 @@ export const enUS = {
     },
     sharing: {
       title: 'Resource Sharing',
-      subtitle: 'Manage team resource sharing settings',
+      subtitle: 'Manage team resource sharing analytics',
       shareResource: 'Share Resource',
       searchPlaceholder: 'Search resources...',
       filterByType: 'Filter by Type',

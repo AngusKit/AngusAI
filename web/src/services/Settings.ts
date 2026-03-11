@@ -15,7 +15,7 @@ export class Settings<SecurityDataType = unknown> {
    * @tags API Keys
    * @name ListApiKeys
    * @summary 获取API密钥列表
-   * @request GET:/api/v1/settings/api-keys
+   * @request GET:/api/v1/analytics/api-keys
    * @secure
    */
   listApiKeys = (params: RequestParams = {}) =>
@@ -31,7 +31,7 @@ export class Settings<SecurityDataType = unknown> {
    * @tags API Keys
    * @name CreateApiKey
    * @summary 创建API密钥
-   * @request POST:/api/v1/settings/api-keys
+   * @request POST:/api/v1/analytics/api-keys
    * @secure
    */
   createApiKey = (data: ApiKeyCreateDto, params: RequestParams = {}) =>
@@ -49,7 +49,7 @@ export class Settings<SecurityDataType = unknown> {
    * @tags API Keys
    * @name RevokeApiKey
    * @summary 吊销API密钥
-   * @request POST:/api/v1/settings/api-keys/{id}/revoke
+   * @request POST:/api/v1/analytics/api-keys/{id}/revoke
    * @secure
    */
   revokeApiKey = (id: string, data: ApiKeyRevokeDto, params: RequestParams = {}) =>
@@ -67,7 +67,7 @@ export class Settings<SecurityDataType = unknown> {
    * @tags API Keys
    * @name GetApiKeyDetail
    * @summary 获取API密钥详情
-   * @request GET:/api/v1/settings/api-keys/{id}
+   * @request GET:/api/v1/analytics/api-keys/{id}
    * @secure
    */
   getApiKeyDetail = (id: string, params: RequestParams = {}) =>
@@ -83,7 +83,7 @@ export class Settings<SecurityDataType = unknown> {
    * @tags API Keys
    * @name DeleteApiKey
    * @summary 删除API密钥
-   * @request DELETE:/api/v1/settings/api-keys/{id}
+   * @request DELETE:/api/v1/analytics/api-keys/{id}
    * @secure
    */
   deleteApiKey = (id: string, params: RequestParams = {}) =>

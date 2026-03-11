@@ -14,7 +14,7 @@ import {
   getResourceIconColor,
   formatDate,
   getPermissionBadge,
-} from '../utils/resourceSharingUtils.ts';
+} from '../utils.ts';
 
 /** 页面展示用的共享资源项（与接口字段映射后） */
 export interface SharedResource {

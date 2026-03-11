@@ -931,7 +931,7 @@ export function APICollection() {
                     </TabsTrigger>
                     <TabsTrigger value='settings' className='gap-2'>
                       <Settings className='w-4 h-4' />
-                      {t('apis.tabs.settings')}
+                      {t('apis.tabs.analytics')}
                     </TabsTrigger>
                   </TabsList>
                 </div>
@@ -1709,7 +1709,7 @@ export function APICollection() {
                 <TabsContent value='settings' className='p-6'>
                   <div className='space-y-6'>
                     <div>
-                      <Label>{t('apis.settings.collectionName')}</Label>
+                      <Label>{t('apis.analytics.collectionName')}</Label>
                       <Input
                         value={collectionDetail?.name}
                         readOnly
@@ -1727,7 +1727,7 @@ export function APICollection() {
                     </div>
 
                     <div>
-                      <Label>{t('apis.settings.visibility')}</Label>
+                      <Label>{t('apis.analytics.visibility')}</Label>
                       <Select value={collectionDetail?.visibility}>
                         <SelectTrigger className='dark:bg-gray-750 dark:border-gray-600 mt-2'>
                           <SelectValue />
@@ -1736,19 +1736,19 @@ export function APICollection() {
                           <SelectItem value='private'>
                             <div className='flex items-center gap-2'>
                               <Shield className='w-4 h-4' />
-                              {t('apis.settings.private')}
+                              {t('apis.analytics.private')}
                             </div>
                           </SelectItem>
                           <SelectItem value='team'>
                             <div className='flex items-center gap-2'>
                               <Eye className='w-4 h-4' />
-                              {t('apis.settings.team')}
+                              {t('apis.analytics.team')}
                             </div>
                           </SelectItem>
                           <SelectItem value='public'>
                             <div className='flex items-center gap-2'>
                               <Globe className='w-4 h-4' />
-                              {t('apis.settings.public')}
+                              {t('apis.analytics.public')}
                             </div>
                           </SelectItem>
                         </SelectContent>
@@ -1762,14 +1762,14 @@ export function APICollection() {
                         onClick={() => setShowImportSettingsDialog(true)}
                       >
                         <Upload className='w-4 h-4' />
-                        {t('apis.settings.importSpec')}
+                        {t('apis.analytics.importSpec')}
                       </Button>
                     </div>
 
                     <div className='flex gap-3'>
                       <Button variant='outline' className='flex-1 gap-2'>
                         <Download className='w-4 h-4' />
-                        {t('apis.settings.export')}
+                        {t('apis.analytics.export')}
                       </Button>
                       <Button variant='outline' className='flex-1 gap-2 text-red-600 hover:text-red-700'>
                         <Trash2 className='w-4 h-4' />

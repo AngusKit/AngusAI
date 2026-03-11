@@ -125,7 +125,7 @@ export const API_EXTENSION_KEYS = {
   statusKey: 'x-xc-status', // Data status
   contentEncoding: 'x-xc-contentEncoding', // Content encoding
   exportVariableKey: 'x-xc-exportVariable', // Whether to set as variable
-  requestSettingKey: 'x-xc-requestSetting', // Request settings like timeout, object
+  requestSettingKey: 'x-xc-requestSetting', // Request analytics like timeout, object
   serverNameKey: 'x-xc-serverName', // Server URL name
   serverSourceKey: 'x-xc-serverSource', // Server source
   securityApiKeyPrefix: 'x-xc-apiKey', // API key type extension

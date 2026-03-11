@@ -12,7 +12,7 @@ import type { ModelListVo } from '@/services/ModelsTypes.ts';
 import type { DatasetListVo } from '@/services/DatasetsTypes.ts';
 import { ResourceTypeEnum } from '@/enums/enums.ts';
 import { WorkflowStatusEnum } from '@/enums/enums.ts';
-import { getResourceIcon } from '../utils/resourceSharingUtils.ts';
+import { getResourceIcon } from '../utils.ts';
 
 /** 可共享资源项（用于弹窗选择） */
 export interface AvailableResourceItem {
