@@ -159,8 +159,13 @@ export interface RecentApplicationItemVo {
   avgResponseTime?: string;
 }
 
+/** 最近应用列表响应 */
+export interface RecentApplicationsVo {
+  items?: RecentApplicationItemVo[];
+}
+
 /** The API response result of supporting international message. */
 export type RecentApplicationsResult = ApiLocaleResult & {
   /** Actual response data or error details. */
-  data?: RecentApplicationItemVo[];
+  data?: RecentApplicationsVo;
 };

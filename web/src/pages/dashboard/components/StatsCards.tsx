@@ -2,8 +2,47 @@ import { FileText, Zap, Coins, Users, TrendingUp, TrendingDown } from 'lucide-re
 import { Card } from '@/components/ui/card.tsx';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog.tsx';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
+import DashboardApi from '@/services/Dashboard.ts';
+import type { StatItemVo, StatsOverviewResult } from '@/services/DashboardTypes.ts';
+import { TimeRangeEnum } from '@/enums/enums.ts';
+
+const TYPE_TO_ICON = {
+  totalApps: FileText,
+  apiCalls: Zap,
+  tokenUsage: Coins,
+  activeUsers: Users,
+} as const;
+
+const TYPE_TO_ICON_BG: Record<string, string> = {
+  totalApps: 'bg-blue-500',
+  apiCalls: 'bg-emerald-500',
+  tokenUsage: 'bg-orange-500',
+  activeUsers: 'bg-purple-500',
+};
+
+function toStatData(vo: StatItemVo, t: (key: string) => string): StatData {
+  const type = vo.type ?? 'totalApps';
+  const Icon = TYPE_TO_ICON[type as keyof typeof TYPE_TO_ICON] ?? FileText;
+  const iconBg = TYPE_TO_ICON_BG[type] ?? 'bg-blue-500';
+  const details = vo.details ?? {};
+  return {
+    icon: Icon,
+    label: vo.label ?? t(`stats.${type}`),
+    value: vo.value ?? '-',
+    subtitle: vo.subtitle ?? '',
+    trend: vo.trend ?? '-',
+    trendUp: vo.trendUp ?? true,
+    iconBg,
+    details: {
+      thisWeek: details.thisWeek ?? '-',
+      lastWeek: details.lastWeek ?? '-',
+      thisMonth: details.thisMonth ?? '-',
+      lastMonth: details.lastMonth ?? '-',
+    },
+  };
+}
 
 interface StatData {
   icon: any;
@@ -42,70 +81,25 @@ function StatCardSkeleton() {
 export function StatsCards() {
   const { t } = useLanguage();
   const [selectedStat, setSelectedStat] = useState<StatData | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [stats, setStats] = useState<StatData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const stats: StatData[] = [
-    {
-      icon: FileText,
-      label: t('stats.totalApps'),
-      value: '24',
-      subtitle: '较上周增加 3 个',
-      trend: '+12%',
-      trendUp: true,
-      iconBg: 'bg-blue-500',
-      details: {
-        thisWeek: '24',
-        lastWeek: '21',
-        thisMonth: '72',
-        lastMonth: '64',
-      },
-    },
-    {
-      icon: Zap,
-      label: t('stats.apiCalls'),
-      value: '156.8K',
-      subtitle: '本月累积调用 7.6M',
-      trend: '+28%',
-      trendUp: true,
-      iconBg: 'bg-emerald-500',
-      details: {
-        thisWeek: '156.8K',
-        lastWeek: '122.5K',
-        thisMonth: '7.6M',
-        lastMonth: '5.9M',
-      },
-    },
-    {
-      icon: Coins,
-      label: t('stats.tokenUsage'),
-      value: '2.4M',
-      subtitle: '较上周减少 7.6M',
-      trend: '-5%',
-      trendUp: false,
-      iconBg: 'bg-orange-500',
-      details: {
-        thisWeek: '2.4M',
-        lastWeek: '2.5M',
-        thisMonth: '9.8M',
-        lastMonth: '10.3M',
-      },
-    },
-    {
-      icon: Users,
-      label: t('stats.activeUsers'),
-      value: '1,248',
-      subtitle: '日均活跃 342 人',
-      trend: '+18%',
-      trendUp: true,
-      iconBg: 'bg-purple-500',
-      details: {
-        thisWeek: '1,248',
-        lastWeek: '1,058',
-        thisMonth: '4,892',
-        lastMonth: '4,145',
-      },
-    },
-  ];
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await DashboardApi.getStatsOverview({
+          timeRange: TimeRangeEnum.Value7Days,
+        });
+        const data = (res as StatsOverviewResult)?.data ?? [];
+        setStats(data.map((vo: StatItemVo) => toStatData(vo, t)));
+      } catch {
+        setStats([]);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    load();
+  }, [t]);
 
   return (
     <>
@@ -117,7 +111,7 @@ export function StatsCards() {
             <StatCardSkeleton />
             <StatCardSkeleton />
           </>
-        ) : (
+        ) : stats.length > 0 ? (
           stats.map((stat, index) => (
             <Card
               key={index}
@@ -144,6 +138,10 @@ export function StatsCards() {
               </div>
             </Card>
           ))
+        ) : (
+          <div className="col-span-full text-center text-gray-500 dark:text-gray-400 py-8">
+            暂无统计数据
+          </div>
         )}
       </div>
 

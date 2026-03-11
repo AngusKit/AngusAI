@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card.tsx';
 import { Progress } from '@/components/ui/progress.tsx';
 import { Zap, Activity, DollarSign } from 'lucide-react';
-import Analytics from '@/services/Analytics.ts';
+import DashboardApi from '@/services/Dashboard.ts';
 import type {
-  DistributionItemVo,
-  EndpointItemVo,
-} from '@/services/AnalyticsTypes.ts';
+  UsageDetailsVo,
+  HotAppItemVo,
+  TopApiItemVo,
+  CostModelItemVo,
+} from '@/services/DashboardTypes.ts';
 import { TimeRangeEnum } from '@/enums/enums.ts';
 
 /** 根据占比返回进度条配色（使用 CSS 变量，确保在任何主题下生效） */
@@ -32,119 +34,22 @@ function getProgressIndicatorStyle(percentage: number): React.CSSProperties {
   return { backgroundColor };
 }
 
-/** 热度应用项（使用频次占比 TOP5） */
-interface HotAppItem {
-  rank: number;
-  appName: string;
-  callCount: number;
-  percentage: number;
-}
-
-/** API 调用项（使用频次占比 TOP5） */
-interface TopApiItem {
-  rank: number;
-  endpoint: string;
-  method: string;
-  callCount: number;
-  percentage: number;
-}
-
-/** 费用成本项（费用占比 TOP5） */
-interface CostModelItem {
-  rank: number;
-  modelName: string;
-  cost: number;
-  costDisplay: string;
-  percentage: number;
-}
-
 export function UsageDetails() {
-  const [hotApps, setHotApps] = useState<HotAppItem[]>([]);
-  const [topApis, setTopApis] = useState<TopApiItem[]>([]);
-  const [costModels, setCostModels] = useState<CostModelItem[]>([]);
+  const [hotApps, setHotApps] = useState<HotAppItemVo[]>([]);
+  const [topApis, setTopApis] = useState<TopApiItemVo[]>([]);
+  const [costModels, setCostModels] = useState<CostModelItemVo[]>([]);
 
   useEffect(() => {
     async function load() {
       try {
-        const [appRes, endpointRes, modelRes] = await Promise.all([
-          Analytics.getAppDistribution({
-            timeRange: TimeRangeEnum.Value7Days,
-          }),
-          Analytics.getTopEndpoints({
-            timeRange: TimeRangeEnum.Value7Days,
-            limit: 5,
-            orderBy: 'calls',
-          }),
-          Analytics.getModelDistribution({
-            timeRange: TimeRangeEnum.Value7Days,
-          }),
-        ]);
-
-        const appData = (appRes as { data?: { items?: DistributionItemVo[] } })
-          ?.data?.items ?? [];
-        const totalAppCalls = appData.reduce((s, i) => s + (i.calls ?? 0), 0);
-
-        const endpointData = (endpointRes as { data?: { items?: EndpointItemVo[] } })
-          ?.data?.items ?? [];
-        const totalApiCalls = endpointData.reduce(
-          (s, i) => s + (i.calls ?? 0),
-          0
-        );
-
-        const modelData = (modelRes as { data?: { items?: DistributionItemVo[] } })
-          ?.data?.items ?? [];
-        const totalCost = modelData.reduce((s, i) => s + (i.cost ?? 0), 0);
-
-        setHotApps(
-          appData.slice(0, 5).map((item, idx) => ({
-            rank: idx + 1,
-            appName: (item as DistributionItemVo & { appName?: string }).appName ?? item.modelName ?? '未知应用',
-            callCount: item.calls ?? 0,
-            percentage:
-              totalAppCalls > 0
-                ? Math.round(
-                    ((item.calls ?? 0) / totalAppCalls) * 1000
-                  ) / 10
-                : 0,
-          }))
-        );
-
-        setTopApis(
-          endpointData.slice(0, 5).map((item, i) => ({
-            rank: i + 1,
-            endpoint: item.endpoint ?? '-',
-            method: item.method ?? 'GET',
-            callCount: item.calls ?? 0,
-            percentage:
-              totalApiCalls > 0
-                ? Math.round(
-                    ((item.calls ?? 0) / totalApiCalls) * 1000
-                  ) / 10
-                : 0,
-          }))
-        );
-
-        setCostModels(
-          modelData
-            .slice(0, 10)
-            .sort((a, b) => (b.cost ?? 0) - (a.cost ?? 0))
-            .slice(0, 5)
-            .map((item, i) => ({
-              rank: i + 1,
-              modelName: item.modelName ?? '未知模型',
-              cost: item.cost ?? 0,
-              costDisplay:
-                item.cost != null
-                  ? `¥${(item.cost / 100).toFixed(2)}`
-                  : '¥0.00',
-              percentage:
-                totalCost > 0
-                  ? Math.round(
-                      ((item.cost ?? 0) / totalCost) * 1000
-                    ) / 10
-                  : 0,
-            }))
-        );
+        const res = await DashboardApi.getUsageDetails({
+          timeRange: TimeRangeEnum.Value7Days,
+          limit: 5,
+        });
+        const data = (res as { data?: UsageDetailsVo })?.data;
+        setHotApps(data?.hotApps ?? []);
+        setTopApis(data?.topApis ?? []);
+        setCostModels(data?.costModels ?? []);
       } catch {
         setHotApps(MOCK_HOT_APPS);
         setTopApis(MOCK_TOP_APIS);
@@ -197,9 +102,9 @@ export function UsageDetails() {
                   </span>
                 </div>
                 <Progress
-                  value={item.percentage}
+                  value={item.percentage ?? 0}
                   className="h-2"
-                  indicatorStyle={getProgressIndicatorStyle(item.percentage)}
+                  indicatorStyle={getProgressIndicatorStyle(item.percentage ?? 0)}
                 />
               </div>
             ))}
@@ -237,9 +142,9 @@ export function UsageDetails() {
                   </span>
                 </div>
                 <Progress
-                  value={item.percentage}
+                  value={item.percentage ?? 0}
                   className="h-2"
-                  indicatorStyle={getProgressIndicatorStyle(item.percentage)}
+                  indicatorStyle={getProgressIndicatorStyle(item.percentage ?? 0)}
                 />
               </div>
             ))}
@@ -277,9 +182,9 @@ export function UsageDetails() {
                   </span>
                 </div>
                 <Progress
-                  value={item.percentage}
+                  value={item.percentage ?? 0}
                   className="h-2"
-                  indicatorStyle={getProgressIndicatorStyle(item.percentage)}
+                  indicatorStyle={getProgressIndicatorStyle(item.percentage ?? 0)}
                 />
               </div>
             ))}
@@ -291,7 +196,7 @@ export function UsageDetails() {
 }
 
 /** 默认模拟数据（接口失败或无数据时使用） */
-const MOCK_HOT_APPS: HotAppItem[] = [
+const MOCK_HOT_APPS: HotAppItemVo[] = [
   { rank: 1, appName: '智能客服', callCount: 12580, percentage: 32 },
   { rank: 2, appName: '内容创作', callCount: 9840, percentage: 25 },
   { rank: 3, appName: '知识问答', callCount: 7560, percentage: 19 },
@@ -299,7 +204,7 @@ const MOCK_HOT_APPS: HotAppItem[] = [
   { rank: 5, appName: '翻译助手', callCount: 3900, percentage: 11 },
 ];
 
-const MOCK_TOP_APIS: TopApiItem[] = [
+const MOCK_TOP_APIS: TopApiItemVo[] = [
   {
     rank: 1,
     endpoint: '/v1/chat/completions',
@@ -337,7 +242,7 @@ const MOCK_TOP_APIS: TopApiItem[] = [
   },
 ];
 
-const MOCK_COST_MODELS: CostModelItem[] = [
+const MOCK_COST_MODELS: CostModelItemVo[] = [
   {
     rank: 1,
     modelName: 'GPT-4',

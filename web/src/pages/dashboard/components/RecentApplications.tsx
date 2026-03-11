@@ -3,10 +3,36 @@ import { Card } from '@/components/ui/card.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog.tsx';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { toast } from 'sonner';
 import { formatLastUsedDisplay, getTagColor } from '@/utils/FormatUtils.ts';
+import DashboardApi from '@/services/Dashboard.ts';
+import type { RecentApplicationItemVo } from '@/services/DashboardTypes.ts';
+
+const DEFAULT_ICONS = [MessageSquare, FileText, Database];
+
+function toApplication(vo: RecentApplicationItemVo, index: number): Application {
+  const Icon = DEFAULT_ICONS[index % DEFAULT_ICONS.length];
+  const tags = (vo.tags ?? []).map((t) => {
+    const label = typeof t === 'object' ? (t.label ?? '') : String(t);
+    return { label, color: (typeof t === 'object' && t.color) ? t.color : getTagColor(label) };
+  });
+  return {
+    id: vo.id ?? String(index),
+    icon: Icon,
+    name: vo.name ?? '未命名应用',
+    description: vo.description ?? '',
+    fullDescription: vo.fullDescription ?? vo.description ?? '',
+    tags,
+    usage: vo.usage ?? '',
+    iconBg: vo.iconBg ?? 'bg-blue-500',
+    createdAt: vo.createdAt ?? '',
+    lastUsed: vo.lastUsed ?? '',
+    totalCalls: vo.totalCalls ?? '-',
+    avgResponseTime: vo.avgResponseTime ?? '-',
+  };
+}
 
 interface Tag {
   label: string;
@@ -57,62 +83,25 @@ function ApplicationSkeleton() {
 
 export function RecentApplications({ onNavigate }: { onNavigate?: (page: string) => void }) {
   const { t } = useLanguage();
-  const [applications] = useState<Application[]>([
-    {
-      id: '1',
-      icon: MessageSquare,
-      name: '智能助手',
-      description: '智能聊答问答机器人，可实现多轮对话支持场景',
-      fullDescription:
-        '智能聊答问答机器人，可实现多轮对话支持场景。基于先进的自然语言处理技术，能够理解用户意图，提供精准的回答。支持上下文记忆，多轮对话流畅自然。适用于客服、咨询、教育等多种场景。',
-      tags: [
-        { label: '聊天助手', color: 'bg-blue-100 text-blue-700' },
-        { label: '智能问答', color: 'bg-purple-100 text-purple-700' },
-      ],
-      usage: '已 1.2K 次调用',
-      iconBg: 'bg-blue-500',
-      createdAt: '2024-01-15',
-      lastUsed: '2小时前',
-      totalCalls: '1,248',
-      avgResponseTime: '0.8s',
-    },
-    {
-      id: '2',
-      icon: FileText,
-      name: '内容生成器',
-      description: 'AI 内容创作工具，自动生成高质量文章，广泛支持多种写作场景',
-      fullDescription:
-        'AI 内容创作工具，自动生成高质量文章。支持多种写作风格和场景，包括新闻稿、营销文案、技术文档等。采用GPT-4模型，生成内容流畅自然，符合SEO优化标准。提供多种模板和自定义选项。',
-      tags: [{ label: '内容创作', color: 'bg-green-100 text-green-700' }],
-      usage: '已 856 次调用',
-      iconBg: 'bg-purple-500',
-      createdAt: '2024-01-20',
-      lastUsed: '1天前',
-      totalCalls: '856',
-      avgResponseTime: '2.3s',
-    },
-    {
-      id: '3',
-      icon: Database,
-      name: '产品知识库',
-      description: '基于企业知识库的智能问答，支持多来源数据上下文搜索',
-      fullDescription:
-        '基于企业知识库的智能问答系统，支持多来源数据整合和上下文搜索。可以导入文档、网页、数据库等多种数据源，自动构建知识图谱。提供语义搜索和精准匹配，快速找到相关信息。适用于企业内部知识管理和客户服务。',
-      tags: [
-        { label: '知识问答', color: 'bg-orange-100 text-orange-700' },
-        { label: '智能检索', color: 'bg-pink-100 text-pink-700' },
-      ],
-      usage: '已 重运行',
-      iconBg: 'bg-green-500',
-      createdAt: '2024-02-01',
-      lastUsed: '3天前',
-      totalCalls: '542',
-      avgResponseTime: '1.2s',
-    },
-  ]);
-
+  const [applications, setApplications] = useState<Application[]>([]);
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await DashboardApi.getRecentApplications({ limit: 6, offset: 0 });
+        const payload = (res as unknown as { data?: { items?: RecentApplicationItemVo[] } })?.data;
+        const items = payload?.items ?? [];
+        setApplications(items.map((vo: RecentApplicationItemVo, i: number) => toApplication(vo, i)));
+      } catch {
+        setApplications([]);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    load();
+  }, []);
 
   const handleCardClick = (app: Application) => {
     setSelectedApp(app);
@@ -134,7 +123,7 @@ export function RecentApplications({ onNavigate }: { onNavigate?: (page: string)
     }, 300);
   };
 
-  const handleShareApp = (app: Application) => {
+  const handleShareApp = (_app: Application) => {
     toast.success(t('recentApps.shareLinkCopied'));
   };
 
@@ -157,7 +146,7 @@ export function RecentApplications({ onNavigate }: { onNavigate?: (page: string)
             <ApplicationSkeleton />
             <ApplicationSkeleton />
           </>
-        ) : (
+        ) : applications.length > 0 ? (
           applications.map(app => (
             <Card key={app.id} className='p-5 hover:shadow-lg transition-all group dark:bg-gray-800'>
               <div className='flex items-start justify-between mb-3'>
@@ -231,6 +220,10 @@ export function RecentApplications({ onNavigate }: { onNavigate?: (page: string)
               </div>
             </Card>
           ))
+        ) : (
+          <div className="col-span-full text-center text-gray-500 dark:text-gray-400 py-8">
+            暂无最近应用
+          </div>
         )}
       </div>
 
