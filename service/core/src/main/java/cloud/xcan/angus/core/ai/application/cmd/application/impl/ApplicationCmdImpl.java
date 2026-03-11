@@ -2,9 +2,8 @@ package cloud.xcan.angus.core.ai.application.cmd.application.impl;
 
 import static cloud.xcan.angus.core.ai.application.converter.ApplicationConverter.toApplicationShare;
 import static cloud.xcan.angus.core.ai.application.converter.ApplicationConverter.toDuplicateApplication;
-import static cloud.xcan.angus.spec.utils.ObjectUtils.isNull;
-
 import static cloud.xcan.angus.spec.principal.PrincipalContext.getUserId;
+import static cloud.xcan.angus.spec.utils.ObjectUtils.isNull;
 
 import cloud.xcan.angus.core.ai.application.cmd.application.ApplicationCmd;
 import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
@@ -12,10 +11,10 @@ import cloud.xcan.angus.core.ai.application.query.application.ApplicationQuery;
 import cloud.xcan.angus.core.ai.domain.application.AIApplication;
 import cloud.xcan.angus.core.ai.domain.application.AIApplicationRepo;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationAgent;
-import cloud.xcan.angus.core.ai.domain.application.ApplicationStar;
-import cloud.xcan.angus.core.ai.domain.application.ApplicationStarRepo;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationAgentRepo;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationConfig;
+import cloud.xcan.angus.core.ai.domain.application.ApplicationStar;
+import cloud.xcan.angus.core.ai.domain.application.ApplicationStarRepo;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;

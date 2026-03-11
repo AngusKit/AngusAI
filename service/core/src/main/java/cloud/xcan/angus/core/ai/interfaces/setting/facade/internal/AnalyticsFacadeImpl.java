@@ -17,8 +17,8 @@ import cloud.xcan.angus.core.ai.interfaces.setting.facade.vo.ApiCallsTrendVo;
 import cloud.xcan.angus.core.ai.interfaces.setting.facade.vo.AppDistributionVo;
 import cloud.xcan.angus.core.ai.interfaces.setting.facade.vo.ErrorAnalysisVo;
 import cloud.xcan.angus.core.ai.interfaces.setting.facade.vo.ModelDistributionVo;
-import cloud.xcan.angus.core.ai.interfaces.setting.facade.vo.ResponseTimeAnalysisVo;
 import cloud.xcan.angus.core.ai.interfaces.setting.facade.vo.ResourcesBadgeVo;
+import cloud.xcan.angus.core.ai.interfaces.setting.facade.vo.ResponseTimeAnalysisVo;
 import cloud.xcan.angus.core.ai.interfaces.setting.facade.vo.TokenUsageTrendVo;
 import cloud.xcan.angus.core.ai.interfaces.setting.facade.vo.TopEndpointsVo;
 import jakarta.annotation.Resource;
@@ -129,7 +129,8 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
     Long userId = getUserId();
     ResourcesBadgeVo vo = new ResourcesBadgeVo();
     vo.setSessionCount(sessionQuery.countByCreatedBy(userId));
-    vo.setApplicationCount(userId != null ? applicationQuery.getCurrentUserCounts().getTotal() : 0L);
+    vo.setApplicationCount(
+        userId != null ? applicationQuery.getCurrentUserCounts().getTotal() : 0L);
     vo.setNotificationCount(notificationQuery.countUnread(userId));
     return vo;
   }

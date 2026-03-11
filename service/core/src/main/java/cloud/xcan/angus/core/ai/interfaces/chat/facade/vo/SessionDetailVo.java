@@ -5,7 +5,6 @@ import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.SessionListVo.LastMess
 import cloud.xcan.angus.remote.NameJoinField;
 import cloud.xcan.angus.remote.vo.AuditingVo;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.Column;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

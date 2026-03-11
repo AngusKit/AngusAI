@@ -171,22 +171,22 @@ public class AgentCmdImpl extends CommCmd<Agent, Long> implements AgentCmd {
    * TODO: 确认 ModelConfigProvider.loadById(String.valueOf(modelId)) 是否支持按模型ID加载
    */
   private void registerToRegistry(Agent agent) {
-      Model model = modelQuery.findAndCheck(agent.getDefaultModelId());
-      AgentDefinition definition = AgentConverter.toDefinition(agent, model);
-      String configId = String.valueOf(agent.getDefaultModelId());
-      ChatModel chatModel;
-      StreamingChatModel streamingModel;
-      try {
-        chatModel = modelRegistry.getChatModel(configId);
-        streamingModel = modelRegistry.getStreamingChatModel(configId);
-      } catch (Exception e) {
-        log.warn("ModelRegistry.getChatModel({}) failed, fallback to provider default: {}", configId,
-            e.getMessage());
-        // 降级：使用 AgentDefinition 中的 provider 获取默认模型
-        agentRegistry.register(definition);
-        return;
-      }
-      agentRegistry.register(definition, chatModel, streamingModel);
+    Model model = modelQuery.findAndCheck(agent.getDefaultModelId());
+    AgentDefinition definition = AgentConverter.toDefinition(agent, model);
+    String configId = String.valueOf(agent.getDefaultModelId());
+    ChatModel chatModel;
+    StreamingChatModel streamingModel;
+    try {
+      chatModel = modelRegistry.getChatModel(configId);
+      streamingModel = modelRegistry.getStreamingChatModel(configId);
+    } catch (Exception e) {
+      log.warn("ModelRegistry.getChatModel({}) failed, fallback to provider default: {}", configId,
+          e.getMessage());
+      // 降级：使用 AgentDefinition 中的 provider 获取默认模型
+      agentRegistry.register(definition);
+      return;
+    }
+    agentRegistry.register(definition, chatModel, streamingModel);
   }
 
   /**

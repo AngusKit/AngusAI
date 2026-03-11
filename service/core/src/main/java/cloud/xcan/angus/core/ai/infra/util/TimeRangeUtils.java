@@ -109,7 +109,9 @@ public class TimeRangeUtils {
     };
   }
 
-  /** 解析 period 为天数，支持 "7"、"30"、"7d"、"30d" 等格式，默认 7 */
+  /**
+   * 解析 period 为天数，支持 "7"、"30"、"7d"、"30d" 等格式，默认 7
+   */
   public static int parsePeriodDays(String period) {
     if (period == null || period.isBlank()) {
       return 7;

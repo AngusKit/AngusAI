@@ -50,7 +50,9 @@ public class AgentRegistry {
   private static final int RAG_TOP_K = 5;
   private static final String GUARDRAIL_PREFIX = "[Guardrail] ";
 
-  private record GuardrailApplyResult(boolean passed, String result) {}
+  private record GuardrailApplyResult(boolean passed, String result) {
+
+  }
 
   private final Map<String, AgentInstance> agents = new ConcurrentHashMap<>();
   private final ToolRegistry toolRegistry;
@@ -570,7 +572,8 @@ public class AgentRegistry {
   /**
    * 解析系统提示词（含技能指令），用于同步/流式服务构建
    */
-  private String resolveSystemPromptWithSkills(AgentDefinition definition, String systemPromptOverride) {
+  private String resolveSystemPromptWithSkills(AgentDefinition definition,
+      String systemPromptOverride) {
     String systemPrompt = systemPromptOverride != null && !systemPromptOverride.isBlank()
         ? systemPromptOverride : definition.getSystemPrompt();
     if (definition.getSkillIds() != null && !definition.getSkillIds().isEmpty()) {

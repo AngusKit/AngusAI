@@ -100,8 +100,8 @@ public interface ApiUsageLogRepo extends BaseRepository<ApiUsageLog, Long> {
       @Param("end") LocalDateTime end);
 
   /**
-   * 应用概览统计（一次聚合：总调用、成功数、token、成本、平均响应时间）
-   * 返回 Object[]: [totalCalls, successfulCalls, totalTokens, totalCost, avgResponseTime]
+   * 应用概览统计（一次聚合：总调用、成功数、token、成本、平均响应时间） 返回 Object[]: [totalCalls, successfulCalls, totalTokens,
+   * totalCost, avgResponseTime]
    */
   @Query("SELECT COUNT(l), "
       + "SUM(CASE WHEN l.isSuccessful = true THEN 1 ELSE 0 END), "
@@ -113,9 +113,8 @@ public interface ApiUsageLogRepo extends BaseRepository<ApiUsageLog, Long> {
       @Param("end") LocalDateTime end);
 
   /**
-   * 应用趋势统计（按日聚合）
-   * 返回 List&lt;Object[]&gt;: [date, callCount, totalTokens, avgResponseTime]
-   * 使用 CAST 兼容 MySQL/PostgreSQL
+   * 应用趋势统计（按日聚合） 返回 List&lt;Object[]&gt;: [date, callCount, totalTokens, avgResponseTime] 使用 CAST
+   * 兼容 MySQL/PostgreSQL
    */
   @Query(value = "SELECT CAST(l.request_time AS date) AS d, COUNT(l), "
       + "COALESCE(SUM(l.total_tokens), 0), "
@@ -127,8 +126,7 @@ public interface ApiUsageLogRepo extends BaseRepository<ApiUsageLog, Long> {
       @Param("end") LocalDateTime end);
 
   /**
-   * 应用热门用户 TOP N（按调用次数排序）
-   * 返回 List&lt;Object[]&gt;: [userId, callCount]
+   * 应用热门用户 TOP N（按调用次数排序） 返回 List&lt;Object[]&gt;: [userId, callCount]
    */
   @Query("SELECT l.userId, COUNT(l) FROM ApiUsageLog l "
       + "WHERE l.appId = :appId AND l.requestTime BETWEEN :start AND :end AND l.userId IS NOT NULL "

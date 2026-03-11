@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.NoRepositoryBean;
+
 /**
  * 会话仓储接口
  */
@@ -44,16 +45,14 @@ public interface SessionRepo extends BaseRepository<Session, Long> {
   long countByAppId(Long appId);
 
   /**
-   * 按 appId 分组统计消息数（用于 Top 应用）
-   * 返回 List&lt;Object[]&gt;，[0]=appId, [1]=messageCount
+   * 按 appId 分组统计消息数（用于 Top 应用） 返回 List&lt;Object[]&gt;，[0]=appId, [1]=messageCount
    */
   @Query("SELECT s.appId, COUNT(m) FROM Message m, Session s WHERE m.sessionEntityId = s.id "
       + "GROUP BY s.appId ORDER BY COUNT(m) DESC")
   List<Object[]> countMessagesByAppId(org.springframework.data.domain.Pageable pageable);
 
   /**
-   * 按 modelId 分组统计消息数（用于 Top 模型）
-   * 返回 List&lt;Object[]&gt;，[0]=modelId, [1]=messageCount
+   * 按 modelId 分组统计消息数（用于 Top 模型） 返回 List&lt;Object[]&gt;，[0]=modelId, [1]=messageCount
    */
   @Query("SELECT s.modelId, COUNT(m) FROM Message m, Session s WHERE m.sessionEntityId = s.id "
       + "GROUP BY s.modelId ORDER BY COUNT(m) DESC")

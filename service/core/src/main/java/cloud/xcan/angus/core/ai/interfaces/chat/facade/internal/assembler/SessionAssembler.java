@@ -12,10 +12,7 @@ import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.SessionListVo;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder;
 import cloud.xcan.angus.remote.search.SearchCriteria;
-import java.time.ZoneId;
-import java.util.Date;
 import java.util.Set;
-import org.springframework.util.StringUtils;
 
 public class SessionAssembler {
 
