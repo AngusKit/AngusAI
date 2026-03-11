@@ -84,6 +84,7 @@ public class OpenAIChatFacadeImpl implements OpenAIChatFacade {
 
   private SseEmitter doChatCompletionsStream(OpenAIChatCompletionsRequest request, String sessionId,
       Long appId, Long agentId) {
+    // TODO model参数为模型名称或者AngusAI智能体名称，智能体名称必须以 `Agent_`开头
     String resolvedAgentId = resolveAgentId(request.getModel(), appId, agentId);
     boolean hasSession = sessionId != null && !sessionId.isBlank();
     String effectiveSessionId = hasSession ? sessionId : "openai-" + UUID.randomUUID();

@@ -26,7 +26,7 @@ public class OpenAIChatCompletionsRequest {
   @Schema(description = "消息列表", requiredMode = Schema.RequiredMode.REQUIRED)
   private List<ChatMessage> messages;
 
-  @Schema(description = "模型标识：agent_123 或 123 表示智能体；应用入口下可选，不传则用默认 Agent")
+  @Schema(description = "模型标识：模型名称或者AngusAI智能体名称，智能体名称必须以 `Agent_`开头，不传则用默认使用默认模型")
   private String model;
 
   @Schema(description = "是否流式返回", example = "false")
