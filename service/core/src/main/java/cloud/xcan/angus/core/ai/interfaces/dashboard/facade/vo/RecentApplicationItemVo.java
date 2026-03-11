@@ -24,13 +24,10 @@ public class RecentApplicationItemVo {
   private String fullDescription;
 
   @Schema(description = "标签列表")
-  private List<AppTagVo> tags;
+  private List<String> tags;
 
   @Schema(description = "使用说明（如 已 1.2K 次调用）")
   private String usage;
-
-  @Schema(description = "图标背景样式（如 bg-blue-500）")
-  private String iconBg;
 
   @Schema(description = "创建时间")
   private String createdAt;

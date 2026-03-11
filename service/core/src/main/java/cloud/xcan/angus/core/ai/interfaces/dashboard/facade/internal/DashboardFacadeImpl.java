@@ -1,4 +1,4 @@
-package cloud.xcan.angus.core.ai.interfaces.dashboard.facade.impl;
+package cloud.xcan.angus.core.ai.interfaces.dashboard.facade.internal;
 
 import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.toLong;
 import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.parseTimeRange;
@@ -13,8 +13,7 @@ import cloud.xcan.angus.core.ai.interfaces.dashboard.facade.DashboardFacade;
 import cloud.xcan.angus.core.ai.interfaces.dashboard.facade.dto.DashboardQueryDto;
 import cloud.xcan.angus.core.ai.interfaces.dashboard.facade.internal.assembler.DashboardAssembler;
 import cloud.xcan.angus.core.ai.interfaces.dashboard.facade.vo.RecentApplicationItemVo;
-import cloud.xcan.angus.core.ai.interfaces.dashboard.facade.vo.RecentApplicationsVo;
-import cloud.xcan.angus.core.ai.interfaces.dashboard.facade.vo.StatsOverviewVo;
+import cloud.xcan.angus.core.ai.interfaces.dashboard.facade.vo.StatItemVo;
 import cloud.xcan.angus.core.ai.interfaces.dashboard.facade.vo.UsageDetailsVo;
 import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
@@ -29,7 +28,6 @@ import org.springframework.stereotype.Component;
 public class DashboardFacadeImpl implements DashboardFacade {
 
   private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-  private static final String[] ICON_BGS = {"bg-blue-500", "bg-purple-500", "bg-green-500"};
 
   @Resource
   private AnalyticsQuery analyticsQuery;
@@ -83,7 +81,7 @@ public class DashboardFacadeImpl implements DashboardFacade {
   }
 
   @Override
-  public StatsOverviewVo getStatsOverview(DashboardQueryDto dto) {
+  public List<StatItemVo> getStatsOverview(DashboardQueryDto dto) {
     LocalDateTime now = LocalDateTime.now();
     LocalDateTime thisWeekStart = now.minusDays(7);
     LocalDateTime lastWeekStart = now.minusDays(14);
@@ -109,7 +107,7 @@ public class DashboardFacadeImpl implements DashboardFacade {
   }
 
   @Override
-  public RecentApplicationsVo getRecentApplications(DashboardQueryDto dto) {
+  public List<RecentApplicationItemVo> getRecentApplications(DashboardQueryDto dto) {
     int limit = dto.getLimit() != null && dto.getLimit() > 0 ? dto.getLimit() : 6;
     int offset = dto.getOffset() != null && dto.getOffset() >= 0 ? dto.getOffset() : 0;
     LocalDateTime since = LocalDateTime.now().minusDays(30);
@@ -138,14 +136,12 @@ public class DashboardFacadeImpl implements DashboardFacade {
           String createdAt = app.getCreatedDate() != null
               ? app.getCreatedDate().format(DATE_FMT)
               : null;
-          int colorIdx = Math.abs(appId.hashCode()) % ICON_BGS.length;
           return DashboardAssembler.toRecentApplicationItemVo(
               app.getId(),
               app.getName(),
               app.getDescription(),
               app.getTags(),
-              createdAt,
-              ICON_BGS[colorIdx]);
+              createdAt);
         })
         .filter(Objects::nonNull)
         .collect(Collectors.toList());

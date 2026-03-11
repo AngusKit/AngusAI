@@ -1,4 +1,4 @@
-import { ApiLocaleResult } from '@xcan-angus/infra';
+import {ApiLocaleResult} from '@xcan-angus/infra';
 
 /* ========== 使用详情（UsageDetails） ========== */
 
@@ -113,33 +113,17 @@ export interface StatItemVo {
   trend?: string;
   /** 趋势方向：true 上升，false 下降 */
   trendUp?: boolean;
-  /** 图标背景样式（如 bg-blue-500） */
-  iconBg?: string;
   /** 周期明细 */
   details?: StatPeriodDetailsVo;
-}
-
-/** 统计概览响应 */
-export interface StatsOverviewVo {
-  /** 统计项列表 */
-  stats?: StatItemVo[];
 }
 
 /** The API response result of supporting international message. */
 export type StatsOverviewResult = ApiLocaleResult & {
   /** Actual response data or error details. */
-  data?: StatsOverviewVo;
+  data?: StatItemVo[];
 };
 
 /* ========== 最近应用（RecentApplications） ========== */
-
-/** 标签项 */
-export interface AppTagVo {
-  /** 标签文本 */
-  label?: string;
-  /** 样式类名（如 bg-blue-100 text-blue-700） */
-  color?: string;
-}
 
 /** 最近应用列表项 */
 export interface RecentApplicationItemVo {
@@ -157,7 +141,7 @@ export interface RecentApplicationItemVo {
   /** 完整描述 */
   fullDescription?: string;
   /** 标签列表 */
-  tags?: AppTagVo[];
+  tags?: string[];
   /** 使用说明（如 已 1.2K 次调用） */
   usage?: string;
   /** 图标背景样式（如 bg-blue-500） */
@@ -175,14 +159,8 @@ export interface RecentApplicationItemVo {
   avgResponseTime?: string;
 }
 
-/** 最近应用列表响应 */
-export interface RecentApplicationsVo {
-  /** 应用列表 */
-  items?: RecentApplicationItemVo[];
-}
-
 /** The API response result of supporting international message. */
 export type RecentApplicationsResult = ApiLocaleResult & {
   /** Actual response data or error details. */
-  data?: RecentApplicationsVo;
+  data?: RecentApplicationItemVo[];
 };

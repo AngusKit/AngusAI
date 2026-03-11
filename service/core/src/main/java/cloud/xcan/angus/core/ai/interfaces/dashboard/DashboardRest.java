@@ -2,8 +2,8 @@ package cloud.xcan.angus.core.ai.interfaces.dashboard;
 
 import cloud.xcan.angus.core.ai.interfaces.dashboard.facade.DashboardFacade;
 import cloud.xcan.angus.core.ai.interfaces.dashboard.facade.dto.DashboardQueryDto;
-import cloud.xcan.angus.core.ai.interfaces.dashboard.facade.vo.RecentApplicationsVo;
-import cloud.xcan.angus.core.ai.interfaces.dashboard.facade.vo.StatsOverviewVo;
+import cloud.xcan.angus.core.ai.interfaces.dashboard.facade.vo.RecentApplicationItemVo;
+import cloud.xcan.angus.core.ai.interfaces.dashboard.facade.vo.StatItemVo;
 import cloud.xcan.angus.core.ai.interfaces.dashboard.facade.vo.UsageDetailsVo;
 import cloud.xcan.angus.remote.ApiLocaleResult;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import java.util.List;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -48,7 +49,7 @@ public class DashboardRest {
   })
   @ResponseStatus(HttpStatus.OK)
   @GetMapping("/stats-overview")
-  public ApiLocaleResult<StatsOverviewVo> getStatsOverview(
+  public ApiLocaleResult<List<StatItemVo>> getStatsOverview(
       @Valid @ParameterObject DashboardQueryDto dto) {
     return ApiLocaleResult.success(dashboardFacade.getStatsOverview(dto));
   }
@@ -60,7 +61,7 @@ public class DashboardRest {
   })
   @ResponseStatus(HttpStatus.OK)
   @GetMapping("/recent-applications")
-  public ApiLocaleResult<RecentApplicationsVo> getRecentApplications(
+  public ApiLocaleResult<List<RecentApplicationItemVo>> getRecentApplications(
       @Valid @ParameterObject DashboardQueryDto dto) {
     return ApiLocaleResult.success(dashboardFacade.getRecentApplications(dto));
   }

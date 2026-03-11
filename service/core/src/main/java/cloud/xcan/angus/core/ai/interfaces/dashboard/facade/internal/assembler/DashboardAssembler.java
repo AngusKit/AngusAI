@@ -7,14 +7,11 @@ import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.toDouble;
 import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.toLocalDateTime;
 import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.toLong;
 
-import cloud.xcan.angus.core.ai.interfaces.dashboard.facade.vo.AppTagVo;
 import cloud.xcan.angus.core.ai.interfaces.dashboard.facade.vo.CostModelItemVo;
 import cloud.xcan.angus.core.ai.interfaces.dashboard.facade.vo.HotAppItemVo;
 import cloud.xcan.angus.core.ai.interfaces.dashboard.facade.vo.RecentApplicationItemVo;
-import cloud.xcan.angus.core.ai.interfaces.dashboard.facade.vo.RecentApplicationsVo;
 import cloud.xcan.angus.core.ai.interfaces.dashboard.facade.vo.StatItemVo;
 import cloud.xcan.angus.core.ai.interfaces.dashboard.facade.vo.StatPeriodDetailsVo;
-import cloud.xcan.angus.core.ai.interfaces.dashboard.facade.vo.StatsOverviewVo;
 import cloud.xcan.angus.core.ai.interfaces.dashboard.facade.vo.TopApiItemVo;
 import cloud.xcan.angus.core.ai.interfaces.dashboard.facade.vo.UsageDetailsVo;
 import java.time.LocalDateTime;
@@ -22,7 +19,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Dashboard 数据组装器
@@ -97,13 +93,12 @@ public class DashboardAssembler {
    * @param lastMonth 上月统计数据
    * @param totalApps 当前应用总数（跨周期一致）
    */
-  public static StatsOverviewVo toStatsOverviewVo(
+  public static List<StatItemVo> toStatsOverviewVo(
       Map<String, Object> thisWeek,
       Map<String, Object> lastWeek,
       Map<String, Object> thisMonth,
       Map<String, Object> lastMonth,
       Long totalApps) {
-    StatsOverviewVo vo = new StatsOverviewVo();
     List<StatItemVo> stats = new ArrayList<>();
 
     String appsStr = formatNumber(totalApps != null ? totalApps : 0L);
@@ -190,9 +185,7 @@ public class DashboardAssembler {
         formatNumber(thisMonthUsers),
         formatNumber(lastMonthUsers)));
     stats.add(usersStat);
-
-    vo.setStats(stats);
-    return vo;
+    return stats;
   }
 
   private static StatPeriodDetailsVo buildPeriodDetails(String thisWeek, String lastWeek,
@@ -208,10 +201,9 @@ public class DashboardAssembler {
   /**
    * 组装最近应用 VO
    */
-  public static RecentApplicationsVo toRecentApplicationsVo(
+  public static List<RecentApplicationItemVo> toRecentApplicationsVo(
       List<Map<String, Object>> usageStats,
       List<RecentApplicationItemVo> appItems) {
-    RecentApplicationsVo vo = new RecentApplicationsVo();
     List<RecentApplicationItemVo> items = new ArrayList<>();
 
     for (Map<String, Object> usage : usageStats) {
@@ -237,34 +229,21 @@ public class DashboardAssembler {
       appItem.setUsage("已 " + formatLargeNumber(toLong(usage.get("totalCalls"), 0L)) + " 次调用");
       items.add(appItem);
     }
-    vo.setItems(items);
-    return vo;
+    return items;
   }
 
   /**
    * 将应用领域对象转为 RecentApplicationItemVo（基础字段）
    */
   public static RecentApplicationItemVo toRecentApplicationItemVo(
-      Long id,
-      String name,
-      String description,
-      List<String> tags,
-      String createdAt,
-      String iconBg) {
+      Long id, String name, String description, List<String> tags, String createdAt) {
     RecentApplicationItemVo vo = new RecentApplicationItemVo();
     vo.setId(id != null ? String.valueOf(id) : null);
     vo.setName(name);
     vo.setDescription(description);
     vo.setFullDescription(description);
-    vo.setIconBg(iconBg != null ? iconBg : "bg-blue-500");
     vo.setCreatedAt(createdAt);
-    if (tags != null && !tags.isEmpty()) {
-      vo.setTags(tags.stream().map(tag -> {
-        AppTagVo t = new AppTagVo();
-        t.setLabel(tag);
-        return t;
-      }).collect(Collectors.toList()));
-    }
+    vo.setTags(tags);
     return vo;
   }
 }

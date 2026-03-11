@@ -1,9 +1,10 @@
 package cloud.xcan.angus.core.ai.interfaces.dashboard.facade;
 
 import cloud.xcan.angus.core.ai.interfaces.dashboard.facade.dto.DashboardQueryDto;
-import cloud.xcan.angus.core.ai.interfaces.dashboard.facade.vo.RecentApplicationsVo;
-import cloud.xcan.angus.core.ai.interfaces.dashboard.facade.vo.StatsOverviewVo;
+import cloud.xcan.angus.core.ai.interfaces.dashboard.facade.vo.RecentApplicationItemVo;
+import cloud.xcan.angus.core.ai.interfaces.dashboard.facade.vo.StatItemVo;
 import cloud.xcan.angus.core.ai.interfaces.dashboard.facade.vo.UsageDetailsVo;
+import java.util.List;
 
 public interface DashboardFacade {
 
@@ -15,10 +16,10 @@ public interface DashboardFacade {
   /**
    * 获取统计概览（总应用数、API 调用、Token 消耗、活跃用户等）
    */
-  StatsOverviewVo getStatsOverview(DashboardQueryDto dto);
+  List<StatItemVo> getStatsOverview(DashboardQueryDto dto);
 
   /**
    * 获取最近使用的应用列表
    */
-  RecentApplicationsVo getRecentApplications(DashboardQueryDto dto);
+  List<RecentApplicationItemVo> getRecentApplications(DashboardQueryDto dto);
 }

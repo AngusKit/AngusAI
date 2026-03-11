@@ -26,11 +26,6 @@ export class Dashboard<SecurityDataType = unknown> {
   getUsageDetails = (
     query?: {
       /**
-       * 应用 ID 筛选
-       * @format int64
-       */
-      appId?: string;
-      /**
        * 时间范围
        * @example "7days"
        */
@@ -63,11 +58,6 @@ export class Dashboard<SecurityDataType = unknown> {
    */
   getStatsOverview = (
     query?: {
-      /**
-       * 应用 ID 筛选
-       * @format int64
-       */
-      appId?: string;
       /**
        * 时间范围
        * @example "7days"
