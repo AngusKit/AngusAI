@@ -122,22 +122,13 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
   @Override
   public PageResult<ApplicationListVo> list(ApplicationFindDto dto) {
     GenericSpecification<AIApplication> spec = ApplicationAssembler.getSpecification(dto);
-    if (Boolean.TRUE.equals(dto.getStarred())) {
-      Set<Long> starredIds = applicationQuery.findStarredApplicationIdsForCurrentUser();
-      if (starredIds.isEmpty()) {
-        Page<AIApplication> emptyPage = Page.empty(dto.tranPage());
-        return buildVoPageResult(emptyPage, (AIApplication app) ->
-            ApplicationAssembler.toListVo(app, List.of(), null, false));
-      }
-      spec.getCriteria().add(SearchCriteria.in("id", new java.util.ArrayList<>(starredIds)));
-    }
     Page<AIApplication> page = applicationQuery.find(spec, dto.tranPage(),
         dto.fullTextSearch, getMatchSearchFields(dto.getClass()));
-    List<AIApplication> content = page.getContent();
-    if (content.isEmpty()) {
-      return buildVoPageResult(page, app -> ApplicationAssembler.toListVo(app, List.of(), null, false));
+    if (page.getContent().isEmpty()) {
+      return buildVoPageResult(page, app
+          -> ApplicationAssembler.toListVo(app, List.of(), null, false));
     }
-    List<Long> appIds = content.stream().map(AIApplication::getId).toList();
+    List<Long> appIds = page.getContent().stream().map(AIApplication::getId).toList();
     AgentsBatchResult batch = batchLoadAgentsAndDefaultAgents(appIds);
     Set<Long> starredAppIds = applicationQuery.findStarredApplicationIds(appIds);
     return buildVoPageResult(page, app -> {

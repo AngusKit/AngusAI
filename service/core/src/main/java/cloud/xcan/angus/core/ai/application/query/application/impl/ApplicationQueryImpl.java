@@ -23,9 +23,11 @@ import cloud.xcan.angus.core.ai.domain.setting.analytics.ApiUsageLogRepo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationCountVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationStatisticsVo;
 import cloud.xcan.angus.core.biz.BizTemplate;
+import cloud.xcan.angus.core.jpa.criteria.CriteriaUtils;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.message.ProtocolException;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
+import cloud.xcan.angus.remote.search.SearchCriteria;
 import jakarta.annotation.Resource;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -147,6 +149,21 @@ public class ApplicationQueryImpl implements ApplicationQuery {
     return new BizTemplate<Page<AIApplication>>() {
       @Override
       protected Page<AIApplication> process() {
+        String starStr = CriteriaUtils.findFirstValueAndRemove(spec.getCriteria(), "starred");
+        if (starStr != null) {
+          boolean starred = Boolean.parseBoolean(starStr);
+          Set<Long> starredAppIds = applicationStarRepo.findByUserId(getUserId()).stream()
+              .map(ApplicationStar::getApplicationId)
+              .collect(Collectors.toSet());
+          if (starred && starredAppIds.isEmpty()) {
+            return Page.empty(pageable);
+          } else if (starred) {
+            spec.getCriteria().add(SearchCriteria.in("id", starredAppIds));
+          } else {
+            spec.getCriteria().add(SearchCriteria.notIn("id", starredAppIds));
+          }
+        }
+
         return fullTextSearch
             ? applicationSearchRepo.find(spec.getCriteria(), pageable, AIApplication.class, match)
             : applicationRepo.findAll(spec, pageable);
