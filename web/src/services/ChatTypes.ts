@@ -70,36 +70,36 @@ export interface SessionCreateDto {
 
 /** 会话详情视图 */
 export interface SessionDetailVo extends TenantAuditingVo {
-  /**
-   * 会话ID
-   * @format int64
-   */
+  /** 会话实体ID */
   id?: string;
+  /** 会话ID(UUID)，对话/消息 API 使用此标识 */
+  sessionId?: string;
   /** 会话标题 */
   title?: string;
-  /**
-   * 关联的应用ID
-   * @format int64
-   */
+  /** 关联的应用ID */
   appId?: number;
   /** 应用名称 */
   appName?: string;
-  /**
-   * 使用的模型ID
-   * @format int64
-   */
+  /** 使用的智能体ID */
+  agentId?: number;
+  /** 使用的智能体名称 */
+  agentName?: string;
+  /** 使用的模型ID */
   modelId?: number;
   /** 模型名称 */
   modelName?: string;
-  /** 会话配置 */
-  config?: SessionConfig;
-  /**
-   * 消息总数
-   * @format int32
-   */
+  /** 消息总数 */
   messageCount?: number;
   /** 是否收藏 */
   isStarred?: boolean;
+  /** 是否归档 */
+  isArchived?: boolean;
+  /** 是否置顶 */
+  isPinned?: boolean;
+  /** 会话配置 */
+  config?: SessionConfig;
+  /** 最后一条消息 */
+  lastMessage?: LastMessage;
 }
 
 /** The API response result of supporting international message. */
@@ -287,42 +287,43 @@ export interface LastMessage {
   content?: string;
   /**
    * 消息时间
-   * @format int64
+   * @format date-time
    */
-  datetime?: number;
+  datetime?: string;
 }
 
 /** 会话列表视图 */
 export interface SessionListVo extends TenantAuditingVo {
-  /**
-   * 会话ID(UUID)
-   */
+  /** 会话实体ID */
   id?: string;
+  /** 会话ID(UUID)，对话/消息 API 使用此标识 */
+  sessionId?: string;
   /** 会话标题 */
   title?: string;
-  /**
-   * 关联的应用ID
-   * @format int64
-   */
+  /** 关联的应用ID */
   appId?: number;
   /** 应用名称 */
   appName?: string;
-  /**
-   * 使用的模型ID
-   * @format int64
-   */
+  /** 使用的智能体ID */
+  agentId?: number;
+  /** 使用的智能体名称 */
+  agentName?: string;
+  /** 使用的模型ID */
   modelId?: number;
   /** 模型名称 */
   modelName?: string;
-  /** 最后一条消息 */
-  lastMessage?: LastMessage;
-  /**
-   * 消息总数
-   * @format int32
-   */
+  /** 消息总数 */
   messageCount?: number;
   /** 是否收藏 */
   isStarred?: boolean;
+  /** 是否归档 */
+  isArchived?: boolean;
+  /** 是否置顶 */
+  isPinned?: boolean;
+  /** 会话配置 */
+  config?: SessionConfig;
+  /** 最后一条消息 */
+  lastMessage?: LastMessage;
 }
 
 export interface PageSessionListVo {
