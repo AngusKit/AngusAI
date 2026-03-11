@@ -84,8 +84,7 @@ public class ApplicationAssembler {
   }
 
   public static ApplicationDetailVo toDetailVo(AIApplication application,
-      List<AgentInfoVo> agents,
-      AgentInfoVo defaultAgent) {
+      List<AgentInfoVo> agents, AgentInfoVo defaultAgent) {
     ApplicationDetailVo vo = new ApplicationDetailVo();
     vo.setId(application.getId());
     vo.setName(application.getName());

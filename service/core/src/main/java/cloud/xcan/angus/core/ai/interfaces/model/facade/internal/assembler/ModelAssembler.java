@@ -14,9 +14,46 @@ import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelListVo;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder;
 import cloud.xcan.angus.remote.search.SearchCriteria;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Set;
 
 public class ModelAssembler {
+
+  private static final String API_KEY_MASK = "**************";
+
+  /**
+   * 对 config 中的 apiKey 进行脱敏，返回脱敏后的副本（避免修改原对象）
+   */
+  public static ModelConfigDefinition maskApiKey(ModelConfigDefinition config) {
+    if (config == null) {
+      return null;
+    }
+    if (StringUtils.isBlank(config.getApiKey())) {
+      return config;
+    }
+    return ModelConfigDefinition.builder()
+        .id(config.getId())
+        .provider(config.getProvider())
+        .type(config.getType())
+        .modelName(config.getModelName())
+        .apiKey(API_KEY_MASK)
+        .baseUrl(config.getBaseUrl())
+        .temperature(config.getTemperature())
+        .maxTokens(config.getMaxTokens())
+        .topP(config.getTopP())
+        .frequencyPenalty(config.getFrequencyPenalty())
+        .presencePenalty(config.getPresencePenalty())
+        .timeoutSeconds(config.getTimeoutSeconds())
+        .embeddingModelName(config.getEmbeddingModelName())
+        .defaultConfig(config.isDefaultConfig())
+        .priority(config.getPriority())
+        .tenantId(config.getTenantId())
+        .inputPricePerMillionTokens(config.getInputPricePerMillionTokens())
+        .outputPricePerMillionTokens(config.getOutputPricePerMillionTokens())
+        .extraProperties(config.getExtraProperties())
+        .build();
+  }
 
   public static Model toDomain(ModelCreateDto dto) {
     Model model = new Model();
@@ -85,8 +122,8 @@ public class ModelAssembler {
     vo.setProvider(model.getProvider());
     vo.setStatus(model.getStatus());
 
-    // 设置模型配置
-    vo.setConfig(model.getConfig());
+    // 设置模型配置（apiKey 脱敏）
+    vo.setConfig(maskApiKey(model.getConfig()));
     // 设置访问限制
     vo.setAccessLimit(model.getAccessLimit());
 

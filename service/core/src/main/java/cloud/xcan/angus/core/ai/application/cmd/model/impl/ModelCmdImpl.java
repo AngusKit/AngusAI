@@ -3,6 +3,7 @@ package cloud.xcan.angus.core.ai.application.cmd.model.impl;
 import static cloud.xcan.angus.spec.utils.ObjectUtils.nullSafe;
 
 import cloud.xcan.agentx.core.model.ModelConfigDefinition;
+import org.apache.commons.lang3.StringUtils;
 import cloud.xcan.angus.core.ai.application.cmd.model.ModelCmd;
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.domain.model.Model;
@@ -68,6 +69,14 @@ public class ModelCmdImpl extends CommCmd<Model, Long> implements ModelCmd {
 
       @Override
       protected Model process() {
+        // apiKey 包含 * 时保留原值（不修改）
+        if (model.getConfig() != null
+            && StringUtils.isNotBlank(model.getConfig().getApiKey())
+            && model.getConfig().getApiKey().contains("*")
+            && modelDb.getConfig() != null
+            && modelDb.getConfig().getApiKey() != null) {
+          model.getConfig().setApiKey(modelDb.getConfig().getApiKey());
+        }
         update(model, modelDb);
         return modelDb;
       }
@@ -94,6 +103,13 @@ public class ModelCmdImpl extends CommCmd<Model, Long> implements ModelCmd {
 
       @Override
       protected Model process() {
+        // apiKey 包含 * 时使用原值（不修改）
+        if (StringUtils.isNotBlank(config.getApiKey())
+            && config.getApiKey().contains("*")
+            && modelDb.getConfig() != null
+            && modelDb.getConfig().getApiKey() != null) {
+          config.setApiKey(modelDb.getConfig().getApiKey());
+        }
         modelDb.setName(config.getModelName());
         modelDb.setType(config.getType());
         modelDb.setProvider(config.getProvider());
