@@ -23,6 +23,26 @@ import java.util.Map;
  */
 public class AnalyticsAssembler {
 
+  private static Long toLong(Object value, Long defaultValue) {
+    if (value == null) {
+      return defaultValue;
+    }
+    if (value instanceof Number) {
+      return ((Number) value).longValue();
+    }
+    return defaultValue;
+  }
+
+  private static Double toDouble(Object value, Double defaultValue) {
+    if (value == null) {
+      return defaultValue;
+    }
+    if (value instanceof Number) {
+      return ((Number) value).doubleValue();
+    }
+    return defaultValue;
+  }
+
   /**
    * 转换概览统计数据
    */
@@ -42,7 +62,7 @@ public class AnalyticsAssembler {
 
     // API总调用
     AnalyticsOverviewVo.MetricVo totalApiCalls = new AnalyticsOverviewVo.MetricVo();
-    Long calls = (Long) stats.getOrDefault("totalCalls", 0L);
+    Long calls = toLong(stats.get("totalCalls"), 0L);
     totalApiCalls.setValue(calls);
     totalApiCalls.setValueDisplay(formatNumber(calls));
     totalApiCalls.setChange(formatPercentage((Double) stats.get("callsChange")));
@@ -52,7 +72,7 @@ public class AnalyticsAssembler {
 
     // 活跃用户
     AnalyticsOverviewVo.MetricVo activeUsers = new AnalyticsOverviewVo.MetricVo();
-    Long users = (Long) stats.getOrDefault("activeUsers", 0L);
+    Long users = toLong(stats.get("activeUsers"), 0L);
     activeUsers.setValue(users);
     activeUsers.setValueDisplay(formatNumber(users));
     activeUsers.setChange(formatPercentage((Double) stats.get("usersChange")));
@@ -62,7 +82,7 @@ public class AnalyticsAssembler {
 
     // Token消耗
     AnalyticsOverviewVo.MetricVo tokenConsumption = new AnalyticsOverviewVo.MetricVo();
-    Long tokens = (Long) stats.getOrDefault("totalTokens", 0L);
+    Long tokens = toLong(stats.get("totalTokens"), 0L);
     tokenConsumption.setValue(tokens);
     tokenConsumption.setValueDisplay(formatLargeNumber(tokens));
     tokenConsumption.setChange(formatPercentage((Double) stats.get("tokensChange")));
@@ -72,7 +92,7 @@ public class AnalyticsAssembler {
 
     // 平均响应时间
     AnalyticsOverviewVo.MetricVo avgResponseTime = new AnalyticsOverviewVo.MetricVo();
-    Double responseTime = (Double) stats.getOrDefault("avgResponseTime", 0.0);
+    Double responseTime = toDouble(stats.get("avgResponseTime"), 0.0);
     avgResponseTime.setValue(responseTime.longValue());
     avgResponseTime.setValueDisplay(formatResponseTime(responseTime));
     avgResponseTime.setChange(formatPercentage((Double) stats.get("responseTimeChange")));
@@ -84,11 +104,11 @@ public class AnalyticsAssembler {
 
     // 成功率
     AnalyticsOverviewVo.SuccessRateVo successRate = new AnalyticsOverviewVo.SuccessRateVo();
-    Long total = (Long) stats.getOrDefault("totalCalls", 0L);
-    Long successful = (Long) stats.getOrDefault("successfulCalls", 0L);
+    Long total = toLong(stats.get("totalCalls"), 0L);
+    Long successful = toLong(stats.get("successfulCalls"), 0L);
     successRate.setTotal(total);
     successRate.setSuccessful(successful);
-    successRate.setFailed((Long) stats.getOrDefault("failedCalls", 0L));
+    successRate.setFailed(toLong(stats.get("failedCalls"), 0L));
     successRate.setValue(total > 0 ? (successful * 100.0 / total) : 0.0);
     vo.setSuccessRate(successRate);
 

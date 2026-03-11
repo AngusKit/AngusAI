@@ -22,6 +22,9 @@ public class CommonUtils {
    * 格式化数字(千位分隔)
    */
   public static String formatNumber(Long number) {
+    if (number == null) {
+      return "0";
+    }
     return NUMBER_FORMAT.format(number);
   }
 
@@ -29,6 +32,9 @@ public class CommonUtils {
    * 格式化大数字(使用K、M简化)
    */
   public static String formatLargeNumber(Long number) {
+    if (number == null) {
+      return "0";
+    }
     if (number >= 1_000_000) {
       return PERCENTAGE_FORMAT.format(number / 1_000_000.0) + "M";
     } else if (number >= 1_000) {
@@ -52,6 +58,9 @@ public class CommonUtils {
    * 格式化响应时间
    */
   public static String formatResponseTime(Double ms) {
+    if (ms == null) {
+      return "0ms";
+    }
     if (ms >= 1000) {
       return PERCENTAGE_FORMAT.format(ms / 1000.0) + "s";
     }
