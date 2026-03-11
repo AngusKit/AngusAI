@@ -33,6 +33,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -75,6 +76,20 @@ public class ApplicationQueryImpl implements ApplicationQuery {
       @Override
       protected Optional<AIApplication> process() {
         return applicationRepo.findById(id);
+      }
+    }.execute();
+  }
+
+  @Override
+  public List<AIApplication> findByIds(Collection<Long> ids) {
+
+    return new BizTemplate<List<AIApplication>>() {
+      @Override
+      protected List<AIApplication> process() {
+        if (ids == null || ids.isEmpty()) {
+          return List.of();
+        }
+        return applicationRepo.findAllById(ids);
       }
     }.execute();
   }

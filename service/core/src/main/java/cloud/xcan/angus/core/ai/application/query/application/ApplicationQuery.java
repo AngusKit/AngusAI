@@ -4,6 +4,7 @@ import cloud.xcan.angus.core.ai.domain.application.AIApplication;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationCountVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationStatisticsVo;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -16,6 +17,11 @@ public interface ApplicationQuery {
    * 根据ID查询应用（不存在时返回空）
    */
   Optional<AIApplication> findById(Long id);
+
+  /**
+   * 根据ID列表批量查询应用
+   */
+  List<AIApplication> findByIds(Collection<Long> ids);
 
   /**
    * 查询应用并检查是否存在

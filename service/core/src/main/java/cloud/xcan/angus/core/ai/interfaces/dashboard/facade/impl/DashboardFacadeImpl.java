@@ -18,11 +18,9 @@ import cloud.xcan.angus.core.ai.interfaces.dashboard.facade.vo.UsageDetailsVo;
 import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
@@ -45,7 +43,6 @@ public class DashboardFacadeImpl implements DashboardFacade {
   public UsageDetailsVo getUsageDetails(DashboardQueryDto dto) {
     var timeRange = parseTimeRange(dto.getTimeRange() != null ? dto.getTimeRange() : "7days");
     int limit = dto.getLimit() != null ? dto.getLimit() : 5;
-    Long appId = dto.getAppId();
 
     List<Map<String, Object>> appDist = analyticsQuery.getAppDistribution(
         timeRange.start, timeRange.end, limit);
@@ -54,15 +51,17 @@ public class DashboardFacadeImpl implements DashboardFacade {
     List<Map<String, Object>> costModels = analyticsQuery.getModelDistributionByCost(
         timeRange.start, timeRange.end, limit);
 
+    List<Long> appIds = appDist.stream()
+        .map(a -> toLong(a.get("appId"), null))
+        .filter(id -> id != null)
+        .distinct()
+        .collect(Collectors.toList());
+    Map<Long, String> appNames = appIds.isEmpty() ? Map.of()
+        : applicationQuery.findByIds(appIds).stream()
+            .collect(Collectors.toMap(AIApplication::getId, AIApplication::getName, (a, b) -> a));
     for (Map<String, Object> app : appDist) {
       Long aid = toLong(app.get("appId"), null);
-      if (aid != null) {
-        applicationQuery.findById(aid)
-            .ifPresent(a -> app.put("appName", a.getName()));
-      }
-      if (!app.containsKey("appName")) {
-        app.put("appName", "未知应用");
-      }
+      app.put("appName", aid != null ? appNames.getOrDefault(aid, "未知应用") : "未知应用");
     }
 
     List<Long> modelIds = costModels.stream()
@@ -90,12 +89,10 @@ public class DashboardFacadeImpl implements DashboardFacade {
     LocalDateTime thisMonthStart = now.minusDays(30);
     LocalDateTime lastMonthStart = now.minusDays(60);
 
-    Long appId = dto.getAppId();
-
-    Map<String, Object> thisWeek = analyticsQuery.getOverviewStatsForRange(thisWeekStart, now, appId);
-    Map<String, Object> lastWeek = analyticsQuery.getOverviewStatsForRange(lastWeekStart, thisWeekStart, appId);
-    Map<String, Object> thisMonth = analyticsQuery.getOverviewStatsForRange(thisMonthStart, now, appId);
-    Map<String, Object> lastMonth = analyticsQuery.getOverviewStatsForRange(lastMonthStart, thisMonthStart, appId);
+    Map<String, Object> thisWeek = analyticsQuery.getOverviewStatsForRange(thisWeekStart, now, null);
+    Map<String, Object> lastWeek = analyticsQuery.getOverviewStatsForRange(lastWeekStart, thisWeekStart, null);
+    Map<String, Object> thisMonth = analyticsQuery.getOverviewStatsForRange(thisMonthStart, now, null);
+    Map<String, Object> lastMonth = analyticsQuery.getOverviewStatsForRange(lastMonthStart, thisMonthStart, null);
 
     Long totalApps = 0L;
     if (getUserId() != null) {
@@ -115,30 +112,38 @@ public class DashboardFacadeImpl implements DashboardFacade {
     List<Map<String, Object>> usageStats = analyticsQuery.getRecentAppUsageStats(
         since, limit, offset);
 
-    List<RecentApplicationItemVo> appItems = new ArrayList<>();
-    for (Map<String, Object> usage : usageStats) {
-      Long appId = toLong(usage.get("appId"), null);
-      if (appId == null) {
-        continue;
-      }
-      Optional<AIApplication> appOpt = applicationQuery.findById(appId);
-      if (appOpt.isEmpty()) {
-        continue;
-      }
-      AIApplication app = appOpt.get();
-      String createdAt = app.getCreatedDate() != null
-          ? app.getCreatedDate().format(DATE_FMT)
-          : null;
-      int colorIdx = Math.abs(appId.hashCode()) % ICON_BGS.length;
-      RecentApplicationItemVo item = DashboardAssembler.toRecentApplicationItemVo(
-          app.getId(),
-          app.getName(),
-          app.getDescription(),
-          app.getTags(),
-          createdAt,
-          ICON_BGS[colorIdx]);
-      appItems.add(item);
-    }
+    List<Long> appIds = usageStats.stream()
+        .map(u -> toLong(u.get("appId"), null))
+        .filter(id -> id != null)
+        .distinct()
+        .collect(Collectors.toList());
+    Map<Long, AIApplication> appMap = applicationQuery.findByIds(appIds).stream()
+        .collect(Collectors.toMap(AIApplication::getId, a -> a, (a, b) -> a));
+
+    List<RecentApplicationItemVo> appItems = usageStats.stream()
+        .map(usage -> {
+          Long appId = toLong(usage.get("appId"), null);
+          if (appId == null) {
+            return null;
+          }
+          AIApplication app = appMap.get(appId);
+          if (app == null) {
+            return null;
+          }
+          String createdAt = app.getCreatedDate() != null
+              ? app.getCreatedDate().format(DATE_FMT)
+              : null;
+          int colorIdx = Math.abs(appId.hashCode()) % ICON_BGS.length;
+          return DashboardAssembler.toRecentApplicationItemVo(
+              app.getId(),
+              app.getName(),
+              app.getDescription(),
+              app.getTags(),
+              createdAt,
+              ICON_BGS[colorIdx]);
+        })
+        .filter(Objects::nonNull)
+        .collect(Collectors.toList());
 
     return DashboardAssembler.toRecentApplicationsVo(usageStats, appItems);
   }
