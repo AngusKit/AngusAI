@@ -25,9 +25,6 @@ public class StatItemVo {
   @Schema(description = "趋势方向：true 上升，false 下降")
   private Boolean trendUp;
 
-  @Schema(description = "图标背景样式（如 bg-blue-500）")
-  private String iconBg;
-
   @Schema(description = "周期明细")
   private StatPeriodDetailsVo details;
 }

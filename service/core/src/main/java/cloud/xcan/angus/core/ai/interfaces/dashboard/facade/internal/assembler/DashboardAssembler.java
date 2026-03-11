@@ -109,7 +109,6 @@ public class DashboardAssembler {
     totalAppsStat.setSubtitle("较上周");
     totalAppsStat.setTrend("+0%");
     totalAppsStat.setTrendUp(true);
-    totalAppsStat.setIconBg("bg-blue-500");
     totalAppsStat.setDetails(buildPeriodDetails(appsStr, appsStr, appsStr, appsStr));
     stats.add(totalAppsStat);
 
@@ -128,7 +127,6 @@ public class DashboardAssembler {
     apiCallsStat.setSubtitle("本月累积调用 " + formatLargeNumber(thisMonthCalls));
     apiCallsStat.setTrend((callsChange >= 0 ? "+" : "") + String.format("%.0f%%", callsChange));
     apiCallsStat.setTrendUp(callsChange >= 0);
-    apiCallsStat.setIconBg("bg-emerald-500");
     apiCallsStat.setDetails(buildPeriodDetails(
         formatLargeNumber(thisWeekCalls),
         formatLargeNumber(lastWeekCalls),
@@ -154,7 +152,6 @@ public class DashboardAssembler {
             Math.abs(thisWeekTokens - lastWeekTokens)));
     tokenStat.setTrend((tokensChange >= 0 ? "+" : "") + String.format("%.0f%%", tokensChange));
     tokenStat.setTrendUp(tokensChange >= 0);
-    tokenStat.setIconBg("bg-orange-500");
     tokenStat.setDetails(buildPeriodDetails(
         formatLargeNumber(thisWeekTokens),
         formatLargeNumber(lastWeekTokens),
@@ -178,7 +175,6 @@ public class DashboardAssembler {
     usersStat.setSubtitle("日均活跃 " + (thisWeekUsers > 0 ? thisWeekUsers / 7 : 0) + " 人");
     usersStat.setTrend((usersChange >= 0 ? "+" : "") + String.format("%.0f%%", usersChange));
     usersStat.setTrendUp(usersChange >= 0);
-    usersStat.setIconBg("bg-purple-500");
     usersStat.setDetails(buildPeriodDetails(
         formatNumber(thisWeekUsers),
         formatNumber(lastWeekUsers),

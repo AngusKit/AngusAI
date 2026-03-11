@@ -144,8 +144,6 @@ export interface RecentApplicationItemVo {
   tags?: string[];
   /** 使用说明（如 已 1.2K 次调用） */
   usage?: string;
-  /** 图标背景样式（如 bg-blue-500） */
-  iconBg?: string;
   /**
    * 创建时间
    * @format date-time
