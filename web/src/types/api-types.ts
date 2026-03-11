@@ -1,5 +1,6 @@
 // Re-export types from separate type files for backward compatibility
 export * from '../services/ActivityTypes.ts';
+export * from '../services/AgentChatTypes.ts';
 export * from '../services/AnalyticsTypes.ts';
 export * from '../services/ApiCollectionsTypes.ts';
 export * from '../services/ApplicationsTypes.ts';
