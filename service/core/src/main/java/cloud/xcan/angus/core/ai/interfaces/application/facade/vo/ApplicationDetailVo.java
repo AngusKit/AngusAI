@@ -1,7 +1,13 @@
 package cloud.xcan.angus.core.ai.interfaces.application.facade.vo;
 
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
+import cloud.xcan.angus.core.ai.domain.agent.AgentStatus;
+import cloud.xcan.angus.core.ai.domain.model.ModelStatus;
 import cloud.xcan.angus.remote.vo.TenantAuditingVo;
+import cloud.xcan.agentx.core.agent.enums.InteractionMode;
+import cloud.xcan.agentx.core.model.ModelConfigDefinition;
+import cloud.xcan.agentx.core.model.ModelProvider;
+import dev.langchain4j.model.catalog.ModelType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -46,20 +52,20 @@ public class ApplicationDetailVo extends TenantAuditingVo {
   private ApplicationStatsVo stats;
 
   @Schema(description = "绑定的智能体列表")
-  private List<ResourceInfoVo> agents;
+  private List<AgentInfoVo> agents;
 
   @Schema(description = "默认智能体（用于对话）")
-  private ResourceInfoVo defaultAgent;
+  private AgentInfoVo defaultAgent;
 
   @Data
   @Schema(description = "应用配置（模型/资源/提示词由绑定的智能体提供）")
   public static class ApplicationConfigVo {
 
     @Schema(description = "绑定的智能体列表")
-    private List<ResourceInfoVo> agents;
+    private List<AgentInfoVo> agents;
 
     @Schema(description = "默认智能体（用于对话）")
-    private ResourceInfoVo defaultAgent;
+    private AgentInfoVo defaultAgent;
 
     @Schema(description = "功能设置")
     private FeaturesConfigVo features;
@@ -82,6 +88,59 @@ public class ApplicationDetailVo extends TenantAuditingVo {
 
     @Schema(description = "资源名称")
     private String name;
+  }
+
+  @Data
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @Schema(description = "智能体信息")
+  public static class AgentInfoVo {
+
+    @Schema(description = "智能体ID")
+    private Long id;
+
+    @Schema(description = "名称")
+    private String name;
+
+    @Schema(description = "描述")
+    private String description;
+
+    @Schema(description = "状态")
+    private AgentStatus status;
+
+    @Schema(description = "交互模式")
+    private InteractionMode interactionMode;
+
+    @Schema(description = "默认模型（含ID和名称）")
+    private ModelInfoVo defaultModel;
+  }
+
+  @Data
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @Schema(description = "模型信息")
+  public static class ModelInfoVo {
+
+    @Schema(description = "模型ID")
+    private Long id;
+
+    @Schema(description = "模型名称")
+    private String name;
+
+    @Schema(description = "模型描述")
+    private String description;
+
+    @Schema(description = "模型类型")
+    private ModelType type;
+
+    @Schema(description = "模型提供商")
+    private ModelProvider provider;
+
+    @Schema(description = "模型状态")
+    private ModelStatus status;
+
+    @Schema(description = "配置信息")
+    private ModelConfigDefinition config;
   }
 
   @Data

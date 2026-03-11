@@ -1,5 +1,11 @@
 import { ApiLocaleResult, TenantAuditingVo } from '@xcan-angus/infra';
-import { ModelProviderEnum, ModelTypeEnum } from '@/enums/enums.ts';
+import {
+  AgentStatusEnum,
+  InteractionModeEnum,
+  ModelProviderEnum,
+  ModelStatusEnum,
+  ModelTypeEnum,
+} from '@/enums/enums.ts';
 
 /** 应用详情 */
 export interface ApplicationDetailVo extends TenantAuditingVo {
@@ -30,9 +36,9 @@ export interface ApplicationDetailVo extends TenantAuditingVo {
   /** 统计数据 */
   stats?: ApplicationStatsVo;
   /** 绑定的智能体列表 */
-  agents?: ResourceInfoVo[];
+  agents?: AgentInfoVo[];
   /** 默认智能体（用于对话） */
-  defaultAgent?: ResourceInfoVo;
+  defaultAgent?: AgentInfoVo;
 }
 
 /** The API response result of supporting international message. */
@@ -59,9 +65,9 @@ export interface ApplicationListVo extends TenantAuditingVo {
   /** 应用状态 */
   status?: string;
   /** 绑定的智能体列表 */
-  agents?: ResourceInfoVo[];
+  agents?: AgentInfoVo[];
   /** 默认智能体（用于对话） */
-  defaultAgent?: ResourceInfoVo;
+  defaultAgent?: AgentInfoVo;
   /** 是否公开访问 */
   publicAccess?: boolean;
   /** 是否启用嵌入 */
@@ -93,12 +99,46 @@ export interface ResourceInfoVo {
   name?: string;
 }
 
+/** 模型信息 */
+export interface ModelInfoVo {
+  /** 模型ID */
+  id?: string | number;
+  /** 模型名称 */
+  name?: string;
+  /** 模型描述 */
+  description?: string;
+  /** 模型类型 */
+  type?: ModelTypeEnum | string;
+  /** 模型提供商 */
+  provider?: ModelProviderEnum | string;
+  /** 模型状态 */
+  status?: ModelStatusEnum | string;
+  /** 配置信息 */
+  config?: ModelConfigDefinition;
+}
+
+/** 智能体信息 */
+export interface AgentInfoVo {
+  /** 智能体ID */
+  id?: string | number;
+  /** 名称 */
+  name?: string;
+  /** 描述 */
+  description?: string;
+  /** 状态 */
+  status?: AgentStatusEnum | string;
+  /** 交互模式 */
+  interactionMode?: InteractionModeEnum | string;
+  /** 默认模型（含ID和名称） */
+  defaultModel?: ModelInfoVo;
+}
+
 /** 应用配置（模型/资源/提示词由绑定的智能体提供） */
 export interface ApplicationConfigVo {
   /** 绑定的智能体列表 */
-  agents?: ResourceInfoVo[];
+  agents?: AgentInfoVo[];
   /** 默认智能体（用于对话） */
-  defaultAgent?: ResourceInfoVo;
+  defaultAgent?: AgentInfoVo;
   /** 功能设置 */
   features?: FeaturesConfigVo;
   /** 安全设置 */

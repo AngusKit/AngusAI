@@ -8,10 +8,10 @@ import cloud.xcan.angus.core.ai.interfaces.application.facade.dto.ApplicationFin
 import cloud.xcan.angus.core.ai.interfaces.application.facade.dto.ApplicationShareDto;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.dto.ApplicationUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo;
+import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.AgentInfoVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.ApplicationConfigVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.ApplicationShareVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.ApplicationStatsVo;
-import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.ResourceInfoVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationListVo;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder;
@@ -84,8 +84,8 @@ public class ApplicationAssembler {
   }
 
   public static ApplicationDetailVo toDetailVo(AIApplication application,
-      List<ApplicationDetailVo.ResourceInfoVo> agents,
-      ApplicationDetailVo.ResourceInfoVo defaultAgent) {
+      List<AgentInfoVo> agents,
+      AgentInfoVo defaultAgent) {
     ApplicationDetailVo vo = new ApplicationDetailVo();
     vo.setId(application.getId());
     vo.setName(application.getName());
@@ -127,7 +127,7 @@ public class ApplicationAssembler {
   }
 
   public static ApplicationListVo toListVo(AIApplication application,
-      List<ResourceInfoVo> agents, ApplicationDetailVo.ResourceInfoVo defaultAgent,
+      List<AgentInfoVo> agents, AgentInfoVo defaultAgent,
       boolean isStarred) {
     ApplicationListVo vo = new ApplicationListVo();
     vo.setId(application.getId());

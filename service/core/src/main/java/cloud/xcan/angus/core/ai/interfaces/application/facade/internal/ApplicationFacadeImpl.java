@@ -20,7 +20,7 @@ import cloud.xcan.angus.core.ai.interfaces.application.facade.dto.ApplicationUpd
 import cloud.xcan.angus.core.ai.interfaces.application.facade.internal.assembler.ApplicationAssembler;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationCountVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo;
-import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.ResourceInfoVo;
+import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.AgentInfoVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationListVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationStatisticsVo;
 import cloud.xcan.angus.core.biz.NameJoin;
@@ -166,7 +166,7 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
     List<Agent> agents = agentQuery.findByIds(agentIds);
     Map<Long, Agent> agentMap = agents.stream().collect(Collectors.toMap(Agent::getId, a -> a));
 
-    Map<Long, List<ResourceInfoVo>> agentsMap = bindings.stream()
+    Map<Long, List<AgentInfoVo>> agentsMap = bindings.stream()
         .collect(Collectors.groupingBy(ApplicationAgent::getApplicationId))
         .entrySet().stream()
         .collect(Collectors.toMap(Map.Entry::getKey, e -> {
@@ -174,18 +174,14 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
               .sorted(Comparator.comparingInt(ApplicationAgent::getSortOrder))
               .toList();
           return list.stream()
-              .map(b -> {
-                Agent agent = agentMap.get(b.getAgentId());
-                return agent != null ? new ResourceInfoVo(agent.getId(), agent.getName())
-                    : new ResourceInfoVo(b.getAgentId(), "Agent");
-              })
+              .map(b -> toAgentInfoVo(agentMap.get(b.getAgentId()), b.getAgentId()))
               .toList();
         }));
 
-    Map<Long, ResourceInfoVo> defaultAgentMap = new java.util.HashMap<>();
-    for (Map.Entry<Long, List<ResourceInfoVo>> e : agentsMap.entrySet()) {
+    Map<Long, AgentInfoVo> defaultAgentMap = new java.util.HashMap<>();
+    for (Map.Entry<Long, List<AgentInfoVo>> e : agentsMap.entrySet()) {
       Long appId = e.getKey();
-      List<ResourceInfoVo> agentsList = e.getValue();
+      List<AgentInfoVo> agentsList = e.getValue();
       if (!agentsList.isEmpty()) {
         ApplicationAgent defaultBinding = bindings.stream()
             .filter(b -> appId.equals(b.getApplicationId()))
@@ -196,7 +192,7 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
                 .min(Comparator.comparingInt(ApplicationAgent::getSortOrder))
                 .orElse(null));
         if (defaultBinding != null) {
-          ResourceInfoVo vo = agentsList.stream()
+          AgentInfoVo vo = agentsList.stream()
               .filter(a -> defaultBinding.getAgentId().equals(a.getId()))
               .findFirst()
               .orElse(agentsList.get(0));
@@ -207,32 +203,48 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
     return new AgentsBatchResult(agentsMap, defaultAgentMap);
   }
 
+  private static AgentInfoVo toAgentInfoVo(Agent agent, Long fallbackId) {
+    AgentInfoVo vo = new AgentInfoVo();
+    if (agent != null) {
+      vo.setId(agent.getId());
+      vo.setName(agent.getName());
+      vo.setDescription(agent.getDescription());
+      vo.setStatus(agent.getStatus());
+      vo.setInteractionMode(agent.getInteractionMode());
+      // defaultModel 由 Assembler 或后续实现填充
+    } else {
+      vo.setId(fallbackId);
+      vo.setName("Agent");
+    }
+    return vo;
+  }
+
   private static class AgentsBatchResult {
 
-    final Map<Long, List<ResourceInfoVo>> agentsMap;
-    final Map<Long, ResourceInfoVo> defaultAgentMap;
+    final Map<Long, List<AgentInfoVo>> agentsMap;
+    final Map<Long, AgentInfoVo> defaultAgentMap;
 
-    AgentsBatchResult(Map<Long, List<ResourceInfoVo>> agentsMap,
-        Map<Long, ResourceInfoVo> defaultAgentMap) {
+    AgentsBatchResult(Map<Long, List<AgentInfoVo>> agentsMap,
+        Map<Long, AgentInfoVo> defaultAgentMap) {
       this.agentsMap = agentsMap;
       this.defaultAgentMap = defaultAgentMap;
     }
   }
 
-  private ResourceInfoVo getDefaultAgentVo(Long applicationId) {
+  private AgentInfoVo getDefaultAgentVo(Long applicationId) {
     Long defaultAgentId = applicationQuery.getDefaultAgentId(applicationId);
     if (defaultAgentId == null) {
       return null;
     }
     try {
       Agent agent = agentQuery.findAndCheck(defaultAgentId);
-      return new ResourceInfoVo(agent.getId(), agent.getName());
+      return toAgentInfoVo(agent, defaultAgentId);
     } catch (Exception e) {
-      return new ResourceInfoVo(defaultAgentId, "Agent");
+      return toAgentInfoVo(null, defaultAgentId);
     }
   }
 
-  private List<ResourceInfoVo> getAgentsVo(Long applicationId) {
+  private List<AgentInfoVo> getAgentsVo(Long applicationId) {
     List<Long> agentIds = applicationQuery.getAgentIds(applicationId);
     if (agentIds == null || agentIds.isEmpty()) {
       return List.of();
@@ -240,11 +252,7 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
     List<Agent> agents = agentQuery.findByIds(agentIds);
     Map<Long, Agent> agentMap = agents.stream().collect(Collectors.toMap(Agent::getId, a -> a));
     return agentIds.stream()
-        .map(id -> {
-          Agent agent = agentMap.get(id);
-          return agent != null ? new ResourceInfoVo(agent.getId(), agent.getName())
-              : new ResourceInfoVo(id, "Agent");
-        })
+        .map(id -> toAgentInfoVo(agentMap.get(id), id))
         .collect(Collectors.toList());
   }
 
