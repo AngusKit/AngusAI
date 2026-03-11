@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card.tsx';
 import { Progress } from '@/components/ui/progress.tsx';
-import { Zap, Activity, DollarSign } from 'lucide-react';
+import { Zap, Activity, DollarSign, Inbox } from 'lucide-react';
 import DashboardApi from '@/services/Dashboard.ts';
 import type {
   UsageDetailsVo,
@@ -51,17 +51,20 @@ export function UsageDetails() {
         setTopApis(data?.topApis ?? []);
         setCostModels(data?.costModels ?? []);
       } catch {
-        setHotApps(MOCK_HOT_APPS);
-        setTopApis(MOCK_TOP_APIS);
-        setCostModels(MOCK_COST_MODELS);
+        setHotApps([]);
+        setTopApis([]);
+        setCostModels([]);
       }
     }
     load();
   }, []);
 
-  const hotAppsData = hotApps.length > 0 ? hotApps : MOCK_HOT_APPS;
-  const topApisData = topApis.length > 0 ? topApis : MOCK_TOP_APIS;
-  const costModelsData = costModels.length > 0 ? costModels : MOCK_COST_MODELS;
+  const emptyPlaceholder = (
+    <div className="py-8 flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
+      <Inbox className="w-8 h-8 mb-2 opacity-60" />
+      <span className="text-sm">暂无数据</span>
+    </div>
+  );
 
   return (
     <div>
@@ -91,7 +94,7 @@ export function UsageDetails() {
             使用频次占比最高的前 5 个应用
           </p>
           <div className="space-y-4">
-            {hotAppsData.map((item) => (
+            {hotApps.length > 0 ? hotApps.map((item) => (
               <div key={item.rank}>
                 <div className="flex justify-between text-sm mb-1.5">
                   <span className="dark:text-gray-300">
@@ -107,7 +110,7 @@ export function UsageDetails() {
                   indicatorStyle={getProgressIndicatorStyle(item.percentage ?? 0)}
                 />
               </div>
-            ))}
+            )) : emptyPlaceholder}
           </div>
         </Card>
 
@@ -131,7 +134,7 @@ export function UsageDetails() {
             使用频次占比最高的前 5 个接口
           </p>
           <div className="space-y-4">
-            {topApisData.map((item) => (
+            {topApis.length > 0 ? topApis.map((item) => (
               <div key={item.rank}>
                 <div className="flex justify-between text-sm mb-1.5">
                   <span className="dark:text-gray-300 truncate mr-2">
@@ -147,7 +150,7 @@ export function UsageDetails() {
                   indicatorStyle={getProgressIndicatorStyle(item.percentage ?? 0)}
                 />
               </div>
-            ))}
+            )) : emptyPlaceholder}
           </div>
         </Card>
 
@@ -171,7 +174,7 @@ export function UsageDetails() {
             费用占比最高的前 5 个模型
           </p>
           <div className="space-y-4">
-            {costModelsData.map((item) => (
+            {costModels.length > 0 ? costModels.map((item) => (
               <div key={item.rank}>
                 <div className="flex justify-between text-sm mb-1.5">
                   <span className="dark:text-gray-300">
@@ -187,95 +190,10 @@ export function UsageDetails() {
                   indicatorStyle={getProgressIndicatorStyle(item.percentage ?? 0)}
                 />
               </div>
-            ))}
+            )) : emptyPlaceholder}
           </div>
         </Card>
       </div>
     </div>
   );
 }
-
-/** 默认模拟数据（接口失败或无数据时使用） */
-const MOCK_HOT_APPS: HotAppItemVo[] = [
-  { rank: 1, appName: '智能客服', callCount: 12580, percentage: 32 },
-  { rank: 2, appName: '内容创作', callCount: 9840, percentage: 25 },
-  { rank: 3, appName: '知识问答', callCount: 7560, percentage: 19 },
-  { rank: 4, appName: '代码助手', callCount: 5120, percentage: 13 },
-  { rank: 5, appName: '翻译助手', callCount: 3900, percentage: 11 },
-];
-
-const MOCK_TOP_APIS: TopApiItemVo[] = [
-  {
-    rank: 1,
-    endpoint: '/v1/chat/completions',
-    method: 'POST',
-    callCount: 28500,
-    percentage: 42,
-  },
-  {
-    rank: 2,
-    endpoint: '/v1/embeddings',
-    method: 'POST',
-    callCount: 15600,
-    percentage: 23,
-  },
-  {
-    rank: 3,
-    endpoint: '/v1/completions',
-    method: 'POST',
-    callCount: 9800,
-    percentage: 14,
-  },
-  {
-    rank: 4,
-    endpoint: '/v1/images/generations',
-    method: 'POST',
-    callCount: 6700,
-    percentage: 10,
-  },
-  {
-    rank: 5,
-    endpoint: '/v1/moderations',
-    method: 'POST',
-    callCount: 5400,
-    percentage: 8,
-  },
-];
-
-const MOCK_COST_MODELS: CostModelItemVo[] = [
-  {
-    rank: 1,
-    modelName: 'GPT-4',
-    cost: 12580,
-    costDisplay: '¥125.80',
-    percentage: 38,
-  },
-  {
-    rank: 2,
-    modelName: 'Claude-3',
-    cost: 9240,
-    costDisplay: '¥92.40',
-    percentage: 28,
-  },
-  {
-    rank: 3,
-    modelName: 'Llama-3-70B',
-    cost: 5620,
-    costDisplay: '¥56.20',
-    percentage: 17,
-  },
-  {
-    rank: 4,
-    modelName: 'GPT-3.5',
-    cost: 3980,
-    costDisplay: '¥39.80',
-    percentage: 12,
-  },
-  {
-    rank: 5,
-    modelName: 'Gemini-Pro',
-    cost: 1680,
-    costDisplay: '¥16.80',
-    percentage: 5,
-  },
-];

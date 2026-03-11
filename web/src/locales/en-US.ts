@@ -278,18 +278,12 @@ export const enUS = {
     viewAllApps: 'View All Apps',
     exploreWorkflows: 'Explore Workflows',
     manageKnowledge: 'Manage Knowledge Base',
-  },
-
-  // Stats Cards
-  stats: {
-    totalApps: 'Total Apps',
-    apiCalls: 'API Calls',
-    tokenUsage: 'Token Usage',
-    activeUsers: 'Active Users',
-    successRate: 'Success Rate',
-    today: 'Today',
-    thisMonth: 'This Month',
-    compared: 'vs last week',
+    stats: {
+      totalApps: 'Total Apps',
+      apiCalls: 'API Calls',
+      tokenUsage: 'Token Usage',
+      activeUsers: 'Active Users',
+    },
   },
 
   // Usage Details

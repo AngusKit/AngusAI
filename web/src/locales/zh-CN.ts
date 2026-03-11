@@ -591,18 +591,12 @@ export const zhCN = {
     viewAllApps: '查看所有应用',
     exploreWorkflows: '探索工作流',
     manageKnowledge: '管理知识库',
-  },
-
-  // 统计卡片
-  stats: {
-    totalApps: '总应用数',
-    apiCalls: 'API调用',
-    tokenUsage: 'Token使用量',
-    activeUsers: '活跃用户',
-    successRate: '成功率',
-    today: '今日',
-    thisMonth: '本月',
-    compared: '较上周',
+    stats: {
+      totalApps: '总应用数',
+      apiCalls: 'API调用',
+      tokenUsage: 'Token使用量',
+      activeUsers: '活跃用户',
+    },
   },
 
   // 使用详情

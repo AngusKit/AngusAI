@@ -1,4 +1,4 @@
-import { MessageSquare, FileText, Database, ExternalLink, Edit, Clock, BarChart, Settings } from 'lucide-react';
+import { MessageSquare, FileText, Database, ExternalLink, Edit, Clock, BarChart, Settings, Layers } from 'lucide-react';
 import { Card } from '@/components/ui/card.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog.tsx';
@@ -216,9 +216,13 @@ export function RecentApplications({ onNavigate }: { onNavigate?: (page: string)
             </Card>
           ))
         ) : (
-          <div className="col-span-full text-center text-gray-500 dark:text-gray-400 py-8">
-            暂无最近应用
-          </div>
+          <Card className="col-span-full p-12 dark:bg-gray-800 dark:border-gray-700">
+            <div className="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
+              <Layers className="w-12 h-12 mb-3 opacity-50" />
+              <p className="text-sm font-medium mb-1">暂无最近应用</p>
+              <p className="text-xs">使用应用后将显示在此处</p>
+            </div>
+          </Card>
         )}
       </div>
 

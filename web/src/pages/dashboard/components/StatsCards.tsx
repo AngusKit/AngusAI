@@ -1,4 +1,4 @@
-import { FileText, Zap, Coins, Users, TrendingUp, TrendingDown } from 'lucide-react';
+import { FileText, Zap, Coins, Users, TrendingUp, TrendingDown, BarChart3 } from 'lucide-react';
 import { Card } from '@/components/ui/card.tsx';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog.tsx';
@@ -22,15 +22,22 @@ const TYPE_TO_ICON_BG: Record<string, string> = {
   activeUsers: 'bg-purple-500',
 };
 
-function toStatData(vo: StatItemVo, t: (key: string) => string): StatData {
+function toStatData(
+  vo: StatItemVo,
+  t: (key: string) => string
+): StatData {
   const type = vo.type ?? 'totalApps';
   const Icon = TYPE_TO_ICON[type as keyof typeof TYPE_TO_ICON] ?? FileText;
   // iconBg 由前端根据 type 配置（后端已删除该字段）
   const iconBg = TYPE_TO_ICON_BG[type] ?? 'bg-blue-500';
+  // 后端返回 vo.label 为 i18n key，需翻译后展示；兼容 stats.xxx 与 dashboard.stats.xxx
+  const rawKey = vo.label || `dashboard.stats.${type}`;
+  const labelKey = rawKey.startsWith('stats.') && !rawKey.startsWith('dashboard.') ? `dashboard.${rawKey}` : rawKey;
+  const label = t(labelKey);
   const details = vo.details ?? {};
   return {
     icon: Icon,
-    label: vo.label ?? t(`stats.${type}`),
+    label,
     value: vo.value ?? '-',
     subtitle: vo.subtitle ?? '',
     trend: vo.trend ?? '-',
@@ -63,7 +70,7 @@ interface StatData {
 
 function StatCardSkeleton() {
   return (
-    <Card className='p-5 dark:bg-gray-800'>
+    <Card className='px-5 py-[35px] dark:bg-gray-800'>
       <div className='flex items-start justify-between'>
         <div className='flex items-start gap-4'>
           <Skeleton className='w-12 h-12 rounded-xl dark:bg-gray-700 flex-shrink-0' />
@@ -116,17 +123,17 @@ export function StatsCards() {
           stats.map((stat, index) => (
             <Card
               key={index}
-              className='p-5 hover:shadow-lg transition-all cursor-pointer dark:bg-gray-800 dark:hover:bg-gray-750'
+              className='p-5 min-h-[140px] hover:shadow-lg transition-all cursor-pointer dark:bg-gray-800 dark:hover:bg-gray-750'
               onClick={() => setSelectedStat(stat)}
             >
               <div className='flex items-start justify-between'>
                 <div className='flex items-start gap-4'>
-                  <div className={`${stat.iconBg} w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0`}>
+                  <div className={`${stat.iconBg} w-12 h-12 mt-4 rounded-xl flex items-center justify-center flex-shrink-0`}>
                     <stat.icon className='w-6 h-6 text-white' />
                   </div>
-                  <div>
-                    <div className='text-gray-500 dark:text-gray-400 text-sm mb-0.5'>{stat.label}</div>
-                    <div className='text-3xl mb-0.5 dark:text-white'>{stat.value}</div>
+                  <div className='space-y-1.5'>
+                    <div className='text-gray-500 dark:text-gray-400 text-sm mb-2'>{stat.label}</div>
+                    <div className='text-3xl dark:text-white mb-2'>{stat.value}</div>
                     <div className='text-gray-400 dark:text-gray-500 text-xs'>{stat.subtitle}</div>
                   </div>
                 </div>
@@ -140,9 +147,13 @@ export function StatsCards() {
             </Card>
           ))
         ) : (
-          <div className="col-span-full text-center text-gray-500 dark:text-gray-400 py-8">
-            暂无统计数据
-          </div>
+          <Card className="col-span-full p-12 dark:bg-gray-800 dark:border-gray-700">
+            <div className="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
+              <BarChart3 className="w-12 h-12 mb-3 opacity-50" />
+              <p className="text-sm font-medium mb-1">暂无统计数据</p>
+              <p className="text-xs">接口异常或暂无数据时显示</p>
+            </div>
+          </Card>
         )}
       </div>
 

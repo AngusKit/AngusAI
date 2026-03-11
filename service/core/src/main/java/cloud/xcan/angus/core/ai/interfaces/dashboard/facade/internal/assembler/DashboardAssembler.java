@@ -104,7 +104,7 @@ public class DashboardAssembler {
     String appsStr = formatNumber(totalApps != null ? totalApps : 0L);
     StatItemVo totalAppsStat = new StatItemVo();
     totalAppsStat.setType("totalApps");
-    totalAppsStat.setLabel("stats.totalApps");
+    totalAppsStat.setLabel("dashboard.stats.totalApps");
     totalAppsStat.setValue(appsStr);
     totalAppsStat.setSubtitle("较上周");
     totalAppsStat.setTrend("+0%");
@@ -122,7 +122,7 @@ public class DashboardAssembler {
 
     StatItemVo apiCallsStat = new StatItemVo();
     apiCallsStat.setType("apiCalls");
-    apiCallsStat.setLabel("stats.apiCalls");
+    apiCallsStat.setLabel("dashboard.stats.apiCalls");
     apiCallsStat.setValue(formatLargeNumber(thisWeekCalls));
     apiCallsStat.setSubtitle("本月累积调用 " + formatLargeNumber(thisMonthCalls));
     apiCallsStat.setTrend((callsChange >= 0 ? "+" : "") + String.format("%.0f%%", callsChange));
@@ -145,7 +145,7 @@ public class DashboardAssembler {
 
     StatItemVo tokenStat = new StatItemVo();
     tokenStat.setType("tokenUsage");
-    tokenStat.setLabel("stats.tokenUsage");
+    tokenStat.setLabel("dashboard.stats.tokenUsage");
     tokenStat.setValue(formatLargeNumber(thisWeekTokens));
     tokenStat.setSubtitle(
         "较上周" + (tokensChange >= 0 ? "增加" : "减少") + formatLargeNumber(
@@ -170,7 +170,7 @@ public class DashboardAssembler {
 
     StatItemVo usersStat = new StatItemVo();
     usersStat.setType("activeUsers");
-    usersStat.setLabel("stats.activeUsers");
+    usersStat.setLabel("dashboard.stats.activeUsers");
     usersStat.setValue(formatNumber(thisWeekUsers));
     usersStat.setSubtitle("日均活跃 " + (thisWeekUsers > 0 ? thisWeekUsers / 7 : 0) + " 人");
     usersStat.setTrend((usersChange >= 0 ? "+" : "") + String.format("%.0f%%", usersChange));
