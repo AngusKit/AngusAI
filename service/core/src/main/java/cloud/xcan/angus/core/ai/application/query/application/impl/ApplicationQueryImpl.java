@@ -11,9 +11,9 @@ import cloud.xcan.angus.core.ai.domain.application.AIApplication;
 import cloud.xcan.angus.core.ai.domain.application.AIApplicationRepo;
 import cloud.xcan.angus.core.ai.domain.application.AIApplicationSearchRepo;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationAgent;
-import cloud.xcan.angus.core.ai.domain.application.ApplicationStarRepo;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationAgentRepo;
-import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
+import cloud.xcan.angus.core.ai.domain.application.ApplicationCountsProjection;
+import cloud.xcan.angus.core.ai.domain.application.ApplicationStarRepo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationCountVo;
 import cloud.xcan.angus.core.ai.domain.model.Model;
 import cloud.xcan.angus.core.biz.BizTemplate;
@@ -147,16 +147,14 @@ public class ApplicationQueryImpl implements ApplicationQuery {
       @Override
       protected ApplicationCountVo process() {
         Long userId = getUserId();
-        long total = applicationRepo.countByCreatedBy(userId);
-        long draft = applicationRepo.countByCreatedByAndStatus(userId, ApplicationStatus.DRAFT);
-        long published = applicationRepo.countByCreatedByAndStatus(userId, ApplicationStatus.PUBLISHED);
-        long paused = applicationRepo.countByCreatedByAndStatus(userId, ApplicationStatus.PAUSED);
+        // 一次聚合查询获取 total/draft/published/paused，减少 4 次 DB 往返为 1 次
+        ApplicationCountsProjection counts = applicationRepo.countByCreatedByGrouped(userId);
         long starred = applicationStarRepo.countByUserId(userId);
         return ApplicationCountVo.builder()
-            .total(total)
-            .draft(draft)
-            .published(published)
-            .paused(paused)
+            .total(counts != null ? counts.getTotal() : 0L)
+            .draft(counts != null ? counts.getDraft() : 0L)
+            .published(counts != null ? counts.getPublished() : 0L)
+            .paused(counts != null ? counts.getPaused() : 0L)
             .starred(starred)
             .build();
       }
