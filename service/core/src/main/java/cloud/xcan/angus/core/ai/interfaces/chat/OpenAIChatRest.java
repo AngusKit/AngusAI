@@ -40,7 +40,7 @@ public class OpenAIChatRest {
    * JSON 或 SSE 流
    */
   @Operation(operationId = "openaiChatCompletions", summary = "Chat Completions",
-      description = "OpenAI 标准对话接口，model 必填，支持 agent_123 或 123 指定智能体")
+      description = "OpenAI 标准对话接口，model 必填，支持 agent_123 或 123 指定智能体") // TODO 将智能体ID改成智能体编码，智能体增加编码字段
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "成功"),
       @ApiResponse(responseCode = "400", description = "请求参数无效")
