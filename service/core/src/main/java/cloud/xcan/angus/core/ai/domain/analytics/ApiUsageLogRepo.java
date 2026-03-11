@@ -82,6 +82,23 @@ public interface ApiUsageLogRepo extends BaseRepository<ApiUsageLog, Long> {
   List<Object[]> groupByModel(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
   /**
+   * 按模型分组统计（按费用降序，用于费用成本 TOP5）
+   */
+  @Query("SELECT l.modelId, COUNT(l), COALESCE(SUM(l.totalTokens), 0), COALESCE(SUM(l.cost), 0) " +
+      "FROM ApiUsageLog l WHERE l.requestTime BETWEEN :start AND :end GROUP BY l.modelId ORDER BY COALESCE(SUM(l.cost), 0) DESC")
+  List<Object[]> groupByModelOrderByCost(@Param("start") LocalDateTime start,
+      @Param("end") LocalDateTime end);
+
+  /**
+   * 最近使用的应用及使用统计（按最后使用时间降序）
+   */
+  @Query(value = "SELECT app_id, MAX(request_time) AS last_used, COUNT(*) AS total_calls, AVG(response_time_ms) AS avg_response_ms "
+      + "FROM ai_api_usage_log WHERE request_time >= :since AND app_id IS NOT NULL "
+      + "GROUP BY app_id ORDER BY MAX(request_time) DESC", nativeQuery = true)
+  List<Object[]> getRecentAppUsageStats(@Param("since") java.time.LocalDateTime since,
+      org.springframework.data.domain.Pageable pageable);
+
+  /**
    * 按接口分组统计
    */
   @Query("SELECT l.endpoint, l.method, COUNT(l), AVG(l.responseTimeMs), " +

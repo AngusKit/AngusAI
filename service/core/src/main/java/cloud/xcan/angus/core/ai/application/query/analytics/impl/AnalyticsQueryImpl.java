@@ -27,6 +27,29 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
   private ApiUsageLogRepo apiUsageLogRepo;
 
   @Override
+  public Map<String, Object> getOverviewStatsForRange(LocalDateTime start, LocalDateTime end,
+      Long appId) {
+    return new BizTemplate<Map<String, Object>>() {
+      @Override
+      protected Map<String, Object> process() {
+        Map<String, Object> stats = new HashMap<>();
+        Long totalCalls = appId != null
+            ? apiUsageLogRepo.countByAppIdAndTimeRange(appId, start, end)
+            : apiUsageLogRepo.countByTimeRange(start, end);
+        Long activeUsers = apiUsageLogRepo.countDistinctUsersByTimeRange(start, end);
+        Long totalTokens = apiUsageLogRepo.sumTokensByTimeRange(start, end);
+        Double avgResponseTime = apiUsageLogRepo.avgResponseTimeByTimeRange(start, end);
+
+        stats.put("totalCalls", totalCalls);
+        stats.put("activeUsers", activeUsers);
+        stats.put("totalTokens", totalTokens);
+        stats.put("avgResponseTime", avgResponseTime);
+        return stats;
+      }
+    }.execute();
+  }
+
+  @Override
   public Map<String, Object> getOverviewStats(LocalDateTime start, LocalDateTime end, Long appId) {
     return new BizTemplate<Map<String, Object>>() {
       @Override
@@ -271,6 +294,42 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
   }
 
   @Override
+  public List<Map<String, Object>> getModelDistributionByCost(LocalDateTime start,
+      LocalDateTime end, Integer limit) {
+    return new BizTemplate<List<Map<String, Object>>>() {
+      @Override
+      protected List<Map<String, Object>> process() {
+        List<Object[]> results = apiUsageLogRepo.groupByModelOrderByCost(start, end);
+        List<Map<String, Object>> distribution = new ArrayList<>();
+
+        long totalCost = results.stream()
+            .mapToLong(r -> ((Number) r[3]).longValue())
+            .sum();
+
+        int count = 0;
+        for (Object[] result : results) {
+          if (limit != null && count >= limit) {
+            break;
+          }
+          Map<String, Object> item = new HashMap<>();
+          item.put("modelId", result[0]);
+          item.put("calls", result[1]);
+          item.put("tokens", result[2] != null ? result[2] : 0L);
+          item.put("cost", result[3] != null ? result[3] : 0L);
+          item.put("percentage",
+              totalCost > 0
+                  ? (((Number) result[3]).longValue() * 100.0 / totalCost)
+                  : 0.0);
+
+          distribution.add(item);
+          count++;
+        }
+        return distribution;
+      }
+    }.execute();
+  }
+
+  @Override
   public List<Map<String, Object>> getTopEndpoints(LocalDateTime start, LocalDateTime end,
       Integer limit, String orderBy) {
     return new BizTemplate<List<Map<String, Object>>>() {
@@ -372,6 +431,33 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
   @Override
   public Double calculateAvgResponseTime(LocalDateTime start, LocalDateTime end, Long appId) {
     return apiUsageLogRepo.avgResponseTimeByTimeRange(start, end);
+  }
+
+  @Override
+  public List<Map<String, Object>> getRecentAppUsageStats(LocalDateTime since, Integer limit,
+      Integer offset) {
+    return new BizTemplate<List<Map<String, Object>>>() {
+      @Override
+      protected List<Map<String, Object>> process() {
+        int pageSize = limit != null && limit > 0 ? limit : 6;
+        int page = offset != null && offset > 0 ? offset / pageSize : 0;
+        org.springframework.data.domain.Pageable pageable =
+            org.springframework.data.domain.PageRequest.of(page, pageSize);
+
+        List<Object[]> results = apiUsageLogRepo.getRecentAppUsageStats(since, pageable);
+        List<Map<String, Object>> stats = new ArrayList<>();
+
+        for (Object[] result : results) {
+          Map<String, Object> item = new HashMap<>();
+          item.put("appId", result[0]);
+          item.put("lastUsed", result[1]);
+          item.put("totalCalls", result[2]);
+          item.put("avgResponseMs", result[3]);
+          stats.add(item);
+        }
+        return stats;
+      }
+    }.execute();
   }
 
   /**
