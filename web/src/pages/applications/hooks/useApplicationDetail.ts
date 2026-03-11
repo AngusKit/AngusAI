@@ -2,8 +2,20 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import Applications from '@/services/Applications';
-import type { ApplicationDetailVo } from '@/services/ApplicationsTypes';
+import type { ApplicationDetailVo, ApplicationStatisticsVo } from '@/services/ApplicationsTypes';
 import { ApplicationStatusEnum } from '@/enums/enums';
+
+/** 默认统计时间范围：最近7天 */
+function getDefaultStatsRange() {
+  const end = new Date();
+  const start = new Date();
+  start.setDate(start.getDate() - 7);
+  return {
+    startDate: start.toISOString().slice(0, 10),
+    endDate: end.toISOString().slice(0, 10),
+    period: 'DAY' as const,
+  };
+}
 
 /**
  * 应用详情页 Hook：加载详情、状态切换、复制、删除等
@@ -13,16 +25,18 @@ export function useApplicationDetail() {
   const { id } = useParams<{ id: string }>();
   const [loading, setLoading] = useState(true);
   const [detail, setDetail] = useState<ApplicationDetailVo | null>(null);
+  const [statistics, setStatistics] = useState<ApplicationStatisticsVo | null>(null);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
 
-  /** 加载应用详情与统计数据 */
+  /** 加载应用详情与完整统计数据（含 overview、trends、topUsers） */
   const loadDetail = useCallback(async () => {
     if (!id) return;
     setLoading(true);
     try {
+      const range = getDefaultStatsRange();
       const [detailRes, statsRes] = await Promise.all([
         Applications.getApplicationDetail(id),
-        Applications.getApplicationStatistics(id).catch(() => null),
+        Applications.getApplicationStatistics(id, range).catch(() => null),
       ]);
       const d = (detailRes as any)?.data ?? detailRes;
       if (!d?.id && !d?.name) {
@@ -30,8 +44,13 @@ export function useApplicationDetail() {
         navigate('/apps');
         return;
       }
-      const stats = (statsRes as any)?.data?.overview ?? (statsRes as any)?.data;
-      setDetail({ ...d, stats } as ApplicationDetailVo);
+      const statsData = (statsRes as any)?.data ?? statsRes;
+      const overview = statsData?.overview ?? statsData;
+      setDetail({
+        ...d,
+        stats: overview ? { ...d?.stats, ...overview } : d?.stats,
+      } as ApplicationDetailVo);
+      setStatistics(statsData);
     } catch (err: any) {
       toast.error(err?.message || err?.data?.message || '加载失败');
       navigate('/apps');
@@ -89,6 +108,7 @@ export function useApplicationDetail() {
   return {
     id,
     detail,
+    statistics,
     loading,
     shareDialogOpen,
     setShareDialogOpen,
