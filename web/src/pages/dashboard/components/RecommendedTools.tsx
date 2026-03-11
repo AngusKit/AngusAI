@@ -1,5 +1,5 @@
 import { MessageSquare, FileText, HelpCircle, User } from 'lucide-react';
-import { Card } from '@/components/ui/card';
+import { Card } from '@/components/ui/card.tsx';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
 
 export function RecommendedTools() {

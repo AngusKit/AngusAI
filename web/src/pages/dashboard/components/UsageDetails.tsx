@@ -1,6 +1,6 @@
-import { Card } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Progress } from '@/components/ui/progress';
+import { Card } from '@/components/ui/card.tsx';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx';
+import { Progress } from '@/components/ui/progress.tsx';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
 

@@ -1,5 +1,5 @@
 import { Sparkles } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/button.tsx';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
 
 export function WelcomeBanner() {

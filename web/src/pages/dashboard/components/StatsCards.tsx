@@ -1,7 +1,7 @@
 import { FileText, Zap, Coins, Users, TrendingUp, TrendingDown } from 'lucide-react';
-import { Card } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Card } from '@/components/ui/card.tsx';
+import { Skeleton } from '@/components/ui/skeleton.tsx';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog.tsx';
 import { useState } from 'react';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
 

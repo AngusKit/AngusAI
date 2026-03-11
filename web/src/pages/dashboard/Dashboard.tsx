@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { RecentApplications } from '@/pages/dashboard/RecentApplications.tsx';
-import { WelcomeBanner } from '@/pages/dashboard/WelcomeBanner.tsx';
-import { StatsCards } from '@/pages/dashboard/StatsCards.tsx';
-import { UsageDetails } from '@/pages/dashboard/UsageDetails.tsx';
+import { RecentApplications } from '@/pages/dashboard/components/RecentApplications.tsx';
+import { WelcomeBanner } from '@/pages/dashboard/components/WelcomeBanner.tsx';
+import { StatsCards } from '@/pages/dashboard/components/StatsCards.tsx';
+import { UsageDetails } from '@/pages/dashboard/components/UsageDetails.tsx';
 import { Card } from '@/components/ui/card.tsx';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
 
