@@ -6,11 +6,13 @@ import static cloud.xcan.angus.core.utils.CoreUtils.buildVoPageResult;
 import cloud.xcan.angus.core.ai.application.cmd.application.ApplicationCmd;
 import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
 import cloud.xcan.angus.core.ai.application.query.application.ApplicationQuery;
+import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.domain.agent.Agent;
 import cloud.xcan.angus.core.ai.domain.application.AIApplication;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationAgent;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationConfig;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
+import cloud.xcan.angus.core.ai.domain.model.Model;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.ApplicationFacade;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.dto.ApplicationCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.dto.ApplicationDuplicateDto;
@@ -21,6 +23,7 @@ import cloud.xcan.angus.core.ai.interfaces.application.facade.internal.assembler
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationCountVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.AgentInfoVo;
+import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.ModelInfoVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationListVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationStatisticsVo;
 import cloud.xcan.angus.core.biz.NameJoin;
@@ -46,6 +49,9 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
 
   @Resource
   private AgentQuery agentQuery;
+
+  @Resource
+  private ModelQuery modelQuery;
 
   @NameJoin
   @Override
@@ -151,7 +157,7 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
   }
 
   /**
-   * 批量加载应用的 agents 和 defaultAgent，仅 2 次数据库查询，避免 N+1
+   * 批量加载应用的 agents、defaultAgent 及智能体默认模型，一次性查询避免 N+1
    */
   private AgentsBatchResult batchLoadAgentsAndDefaultAgents(List<Long> applicationIds) {
     if (applicationIds == null || applicationIds.isEmpty()) {
@@ -166,6 +172,16 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
     List<Agent> agents = agentQuery.findByIds(agentIds);
     Map<Long, Agent> agentMap = agents.stream().collect(Collectors.toMap(Agent::getId, a -> a));
 
+    // 一次性查询所有智能体默认模型
+    List<Long> defaultModelIds = agents.stream()
+        .map(Agent::getDefaultModelId)
+        .filter(java.util.Objects::nonNull)
+        .distinct()
+        .toList();
+    Map<Long, Model> modelMap = defaultModelIds.isEmpty() ? Map.of()
+        : modelQuery.findByIds(defaultModelIds).stream()
+            .collect(Collectors.toMap(Model::getId, m -> m));
+
     Map<Long, List<AgentInfoVo>> agentsMap = bindings.stream()
         .collect(Collectors.groupingBy(ApplicationAgent::getApplicationId))
         .entrySet().stream()
@@ -174,7 +190,13 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
               .sorted(Comparator.comparingInt(ApplicationAgent::getSortOrder))
               .toList();
           return list.stream()
-              .map(b -> toAgentInfoVo(agentMap.get(b.getAgentId()), b.getAgentId()))
+              .map(b -> {
+                Agent agent = agentMap.get(b.getAgentId());
+                ModelInfoVo defaultModel = agent != null && agent.getDefaultModelId() != null
+                    ? ApplicationAssembler.toModelInfoVo(modelMap.get(agent.getDefaultModelId()))
+                    : null;
+                return toAgentInfoVo(agent, b.getAgentId(), defaultModel);
+              })
               .toList();
         }));
 
@@ -203,7 +225,7 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
     return new AgentsBatchResult(agentsMap, defaultAgentMap);
   }
 
-  private static AgentInfoVo toAgentInfoVo(Agent agent, Long fallbackId) {
+  private static AgentInfoVo toAgentInfoVo(Agent agent, Long fallbackId, ModelInfoVo defaultModel) {
     AgentInfoVo vo = new AgentInfoVo();
     if (agent != null) {
       vo.setId(agent.getId());
@@ -211,7 +233,7 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
       vo.setDescription(agent.getDescription());
       vo.setStatus(agent.getStatus());
       vo.setInteractionMode(agent.getInteractionMode());
-      // defaultModel 由 Assembler 或后续实现填充
+      vo.setDefaultModel(defaultModel);
     } else {
       vo.setId(fallbackId);
       vo.setName("Agent");
@@ -238,9 +260,13 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
     }
     try {
       Agent agent = agentQuery.findAndCheck(defaultAgentId);
-      return toAgentInfoVo(agent, defaultAgentId);
+      ModelInfoVo defaultModel = agent.getDefaultModelId() != null
+          ? ApplicationAssembler.toModelInfoVo(
+          modelQuery.findById(agent.getDefaultModelId()).orElse(null))
+          : null;
+      return toAgentInfoVo(agent, defaultAgentId, defaultModel);
     } catch (Exception e) {
-      return toAgentInfoVo(null, defaultAgentId);
+      return toAgentInfoVo(null, defaultAgentId, null);
     }
   }
 
@@ -251,8 +277,23 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
     }
     List<Agent> agents = agentQuery.findByIds(agentIds);
     Map<Long, Agent> agentMap = agents.stream().collect(Collectors.toMap(Agent::getId, a -> a));
+    // 一次性查询所有智能体默认模型
+    List<Long> defaultModelIds = agents.stream()
+        .map(Agent::getDefaultModelId)
+        .filter(java.util.Objects::nonNull)
+        .distinct()
+        .toList();
+    Map<Long, Model> modelMap = defaultModelIds.isEmpty() ? Map.of()
+        : modelQuery.findByIds(defaultModelIds).stream()
+            .collect(Collectors.toMap(Model::getId, m -> m));
     return agentIds.stream()
-        .map(id -> toAgentInfoVo(agentMap.get(id), id))
+        .map(id -> {
+          Agent agent = agentMap.get(id);
+          ModelInfoVo defaultModel = agent != null && agent.getDefaultModelId() != null
+              ? ApplicationAssembler.toModelInfoVo(modelMap.get(agent.getDefaultModelId()))
+              : null;
+          return toAgentInfoVo(agent, id, defaultModel);
+        })
         .collect(Collectors.toList());
   }
 

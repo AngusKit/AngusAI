@@ -2,6 +2,7 @@ package cloud.xcan.angus.core.ai.interfaces.application.facade.internal.assemble
 
 import cloud.xcan.angus.core.ai.domain.application.AIApplication;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationConfig;
+import cloud.xcan.angus.core.ai.domain.model.Model;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.dto.ApplicationCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.dto.ApplicationFindDto;
@@ -9,10 +10,12 @@ import cloud.xcan.angus.core.ai.interfaces.application.facade.dto.ApplicationSha
 import cloud.xcan.angus.core.ai.interfaces.application.facade.dto.ApplicationUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.AgentInfoVo;
+import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.ModelInfoVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.ApplicationConfigVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.ApplicationShareVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.ApplicationStatsVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationListVo;
+import cloud.xcan.angus.core.ai.interfaces.model.facade.internal.assembler.ModelAssembler;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder;
 import cloud.xcan.angus.core.utils.CoreUtils;
@@ -68,6 +71,24 @@ public class ApplicationAssembler {
       application.setConfig(config);
     }
     return application;
+  }
+
+  /**
+   * 将 Model 转为 ModelInfoVo（apiKey 已脱敏）
+   */
+  public static ModelInfoVo toModelInfoVo(Model model) {
+    if (model == null) {
+      return null;
+    }
+    ModelInfoVo vo = new ModelInfoVo();
+    vo.setId(model.getId());
+    vo.setName(model.getName());
+    vo.setDescription(model.getDescription());
+    vo.setType(model.getType());
+    vo.setProvider(model.getProvider());
+    vo.setStatus(model.getStatus());
+    vo.setConfig(ModelAssembler.maskApiKey(model.getConfig()));
+    return vo;
   }
 
   public static AIApplication shareDomain(Long id, ApplicationShareDto dto) {
