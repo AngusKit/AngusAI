@@ -1,5 +1,22 @@
-import { ApiLocaleResult, PageQuery, AI } from '@xcan-angus/infra';
-import { ChatStatisticsResult, MessageFeedbackDto, MessageResult, MessageSendDto, PageMessageResult, PageSessionListResult, SessionBatchDeleteDto, SessionCreateDto, SessionDetailResult, SessionStarDto, SessionSwitchAppDto, SessionSwitchModelDto, SessionUpdateDto, SseEmitter, } from './ChatTypes.ts';
+import { PageQuery, AI } from '@xcan-angus/infra';
+import {
+  AttachmentUploadResult,
+  BatchDeleteSessionsResult,
+  ChatStatisticsResult,
+  ClearMessagesResult,
+  MessageFeedbackDto,
+  MessageResult,
+  PageMessageResult,
+  PageSessionListResult,
+  SessionBatchDeleteDto,
+  SessionCreateDto,
+  SessionDetailResult,
+  SessionStarDto,
+  SessionSwitchAppDto,
+  SessionSwitchModelDto,
+  SessionUpdateDto,
+  VoiceToTextResult,
+} from './ChatTypes.ts';
 import http, { ContentType, HttpClient, QueryParamsType, RequestParams } from './HttpClient.ts';
 
 export class Chat<SecurityDataType = unknown> {
@@ -20,16 +37,18 @@ export class Chat<SecurityDataType = unknown> {
    */
   getSessionList = (
     query?: PageQuery & {
+      /** 会话标题（搜索） */
+      title?: string;
       /**
        * 筛选指定应用
        * @format int64
        */
-      appId?: string;
+      appId?: number;
       /**
-       * 筛选使用的模型
+       * 筛选使用的智能体
        * @format int64
        */
-      modelId?: string;
+      agentId?: number;
       /** 是否已归档 */
       isArchived?: boolean;
       /** 是否已收藏（星标） */
@@ -56,7 +75,7 @@ export class Chat<SecurityDataType = unknown> {
    * @secure
    */
   createSession = (data: SessionCreateDto, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResult>({
+    this.http.request<SessionDetailResult>({
       path: `${AI}/chat/sessions`,
       method: 'POST',
       body: data,
@@ -92,27 +111,13 @@ export class Chat<SecurityDataType = unknown> {
   getMessageHistory = (
     sessionId: string,
     query?: {
-      /**
-       * 页码
-       * @format int32
-       * @example 1
-       */
+      /** 页码，默认 1 */
       pageNo?: number;
-      /**
-       * 每页大小
-       * @format int32
-       * @example 20
-       */
+      /** 每页大小，默认 20 */
       pageSize?: number;
-      /**
-       * 获取指定消息之前的消息
-       * @format int64
-       */
+      /** 获取指定消息之前的消息 */
       beforeId?: string;
-      /**
-       * 获取指定消息之后的消息
-       * @format int64
-       */
+      /** 获取指定消息之后的消息 */
       afterId?: string;
     },
     params: RequestParams = {}
@@ -125,24 +130,6 @@ export class Chat<SecurityDataType = unknown> {
       ...params,
     });
   /**
-   * @description 发送消息并获取AI响应
-   *
-   * @tags 对话消息
-   * @name SendMessage
-   * @summary 发送消息
-   * @request POST:/api/v1/chat/sessions/{sessionId}/messages
-   * @secure
-   */
-  sendMessage = (sessionId: string, data: MessageSendDto, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResult>({
-      path: `${AI}/chat/sessions/${sessionId}/messages`,
-      method: 'POST',
-      body: data,
-      secure: true,
-      type: ContentType.Json,
-      ...params,
-    });
-  /**
    * @description 清空指定会话的所有消息
    *
    * @tags 对话消息
@@ -152,25 +139,9 @@ export class Chat<SecurityDataType = unknown> {
    * @secure
    */
   clearMessages = (sessionId: string, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResult>({
+    this.http.request<ClearMessagesResult>({
       path: `${AI}/chat/sessions/${sessionId}/messages`,
       method: 'DELETE',
-      secure: true,
-      ...params,
-    });
-  /**
-   * @description 重新生成AI响应
-   *
-   * @tags 对话消息
-   * @name RegenerateMessage
-   * @summary 重新生成
-   * @request POST:/api/v1/chat/sessions/{sessionId}/messages/{messageId}/regenerate
-   * @secure
-   */
-  regenerateMessage = (sessionId: string, messageId: string, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResult>({
-      path: `${AI}/chat/sessions/${sessionId}/messages/${messageId}/regenerate`,
-      method: 'POST',
       secure: true,
       ...params,
     });
@@ -193,24 +164,6 @@ export class Chat<SecurityDataType = unknown> {
       ...params,
     });
   /**
-   * @description 发送消息并获取流式AI响应（Server-Sent Events）
-   *
-   * @tags 对话消息
-   * @name SendMessageStream
-   * @summary 发送消息（流式）
-   * @request POST:/api/v1/chat/sessions/{sessionId}/messages/stream
-   * @secure
-   */
-  sendMessageStream = (sessionId: string, data: MessageSendDto, params: RequestParams = {}) =>
-    this.http.request<SseEmitter>({
-      path: `${AI}/chat/sessions/${sessionId}/messages/stream`,
-      method: 'POST',
-      body: data,
-      secure: true,
-      type: ContentType.Json,
-      ...params,
-    });
-  /**
    * @description 语音转文字
    *
    * @tags 对话消息
@@ -220,28 +173,26 @@ export class Chat<SecurityDataType = unknown> {
    * @secure
    */
   voiceToText = (
-    data: {
-      /**
-       * 音频文件
-       * @format binary
-       */
-      audio: File;
-    },
-    query?: {
-      /** 语言代码 */
-      language?: string;
-    },
+    data: FormData | { audio: File; language?: string },
     params: RequestParams = {}
-  ) =>
-    this.http.request<ApiLocaleResult>({
+  ) => {
+    const formData = data instanceof FormData
+      ? data
+      : (() => {
+          const fd = new FormData();
+          fd.append('audio', data.audio);
+          if (data.language) fd.append('language', data.language);
+          return fd;
+        })();
+    return this.http.request<VoiceToTextResult>({
       path: `${AI}/chat/sessions/voice-to-text`,
       method: 'POST',
-      query: query,
-      body: data,
+      body: formData,
       secure: true,
       type: ContentType.FormData,
       ...params,
     });
+  };
   /**
    * @description 批量删除会话
    *
@@ -252,7 +203,7 @@ export class Chat<SecurityDataType = unknown> {
    * @secure
    */
   batchDeleteSessions = (data: SessionBatchDeleteDto, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResult>({
+    this.http.request<BatchDeleteSessionsResult>({
       path: `${AI}/chat/sessions/batch-delete`,
       method: 'POST',
       body: data,
@@ -270,31 +221,22 @@ export class Chat<SecurityDataType = unknown> {
    * @secure
    */
   uploadAttachment = (
-    data: {
-      /**
-       * 文件
-       * @format binary
-       */
-      file: File;
-    },
-    query?: {
-      /**
-       * 关联会话ID
-       * @format int64
-       */
-      sessionId?: string;
-    },
+    file: File,
+    sessionId?: string,
     params: RequestParams = {}
-  ) =>
-    this.http.request<ApiLocaleResult>({
+  ) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.request<AttachmentUploadResult>({
       path: `${AI}/chat/sessions/attachments`,
       method: 'POST',
-      query: query,
-      body: data,
+      query: sessionId ? { sessionId } : undefined,
+      body: formData,
       secure: true,
       type: ContentType.FormData,
       ...params,
     });
+  };
   /**
    * @description 切换会话使用的AI模型
    *
@@ -375,7 +317,7 @@ export class Chat<SecurityDataType = unknown> {
    * @secure
    */
   deleteSession = (id: string, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResult>({
+    this.http.request<void>({
       path: `${AI}/chat/sessions/${id}`,
       method: 'DELETE',
       secure: true,
@@ -462,7 +404,7 @@ export class Chat<SecurityDataType = unknown> {
    * @secure
    */
   deleteAttachment = (id: string, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResult>({
+    this.http.request<void>({
       path: `${AI}/chat/sessions/attachments/${id}`,
       method: 'DELETE',
       secure: true,

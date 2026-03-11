@@ -58,12 +58,12 @@ export interface SessionCreateDto {
    * 关联的应用ID
    * @format int64
    */
-  appId: string;
+  appId: number;
   /**
    * 使用的模型ID
    * @format int64
    */
-  modelId?: string;
+  modelId?: number;
   /** 会话配置 */
   config?: SessionConfig;
 }
@@ -81,14 +81,14 @@ export interface SessionDetailVo extends TenantAuditingVo {
    * 关联的应用ID
    * @format int64
    */
-  appId?: string;
+  appId?: number;
   /** 应用名称 */
   appName?: string;
   /**
    * 使用的模型ID
    * @format int64
    */
-  modelId?: string;
+  modelId?: number;
   /** 模型名称 */
   modelName?: string;
   /** 会话配置 */
@@ -110,11 +110,11 @@ export type SessionDetailResult = ApiLocaleResult & {
 
 /** 消息附件 */
 export interface MessageAttachment {
-  /** @format int64 */
+  /** 附件ID */
   id?: string;
   name?: string;
   type?: string;
-  /** @format int64 */
+  /** 文件大小（字节） */
   size?: number;
   url?: string;
 }
@@ -132,14 +132,10 @@ export interface MessageUsage {
 
 /** 消息视图 */
 export interface MessageVo {
-  /**
-   * 消息ID
-   * @format int64
-   */
+  /** 消息ID */
   id?: string;
   /**
-   * 会话ID
-   * @format int64
+   * 会话ID(UUID)
    */
   sessionId?: string;
   /** 消息角色 */
@@ -197,11 +193,59 @@ export interface SseEmitter {
 /** 批量删除会话请求参数 */
 export interface SessionBatchDeleteDto {
   /**
-   * 会话ID列表
+   * 会话ID(UUID)列表
    * @uniqueItems true
    */
   sessionIds: string[];
 }
+
+/** 查询消息请求参数 */
+export interface MessageFindDto {
+  /** 页码，默认 1 */
+  pageNo?: number;
+  /** 每页大小，默认 20 */
+  pageSize?: number;
+  /** 获取指定消息之前的消息 */
+  beforeId?: string;
+  /** 获取指定消息之后的消息 */
+  afterId?: string;
+}
+
+/** 附件上传响应 */
+export interface AttachmentUploadVo {
+  /** 附件ID */
+  id?: string;
+  /** 文件名 */
+  name?: string;
+  /** MIME类型 */
+  type?: string;
+  /** 文件大小 */
+  size?: number;
+  /** 访问URL */
+  url?: string;
+  /** 上传时间 */
+  uploadedAt?: number;
+}
+
+/** 附件上传结果 */
+export type AttachmentUploadResult = ApiLocaleResult & {
+  data?: AttachmentUploadVo;
+};
+
+/** 语音转文字结果 */
+export type VoiceToTextResult = ApiLocaleResult & {
+  data?: string;
+};
+
+/** 清空消息结果 */
+export type ClearMessagesResult = ApiLocaleResult & {
+  data?: number;
+};
+
+/** 批量删除会话结果 */
+export type BatchDeleteSessionsResult = ApiLocaleResult & {
+  data?: number;
+};
 
 /** 切换模型请求 */
 export interface SessionSwitchModelDto {
@@ -209,7 +253,7 @@ export interface SessionSwitchModelDto {
    * 新模型ID
    * @format int64
    */
-  modelId: string;
+  modelId: number;
 }
 
 /** 切换应用请求 */
@@ -218,7 +262,7 @@ export interface SessionSwitchAppDto {
    * 新应用ID
    * @format int64
    */
-  appId: string;
+  appId: number;
 }
 
 /** 收藏会话请求 */
@@ -251,8 +295,7 @@ export interface LastMessage {
 /** 会话列表视图 */
 export interface SessionListVo extends TenantAuditingVo {
   /**
-   * 会话ID
-   * @format int64
+   * 会话ID(UUID)
    */
   id?: string;
   /** 会话标题 */
@@ -261,14 +304,14 @@ export interface SessionListVo extends TenantAuditingVo {
    * 关联的应用ID
    * @format int64
    */
-  appId?: string;
+  appId?: number;
   /** 应用名称 */
   appName?: string;
   /**
    * 使用的模型ID
    * @format int64
    */
-  modelId?: string;
+  modelId?: number;
   /** 模型名称 */
   modelName?: string;
   /** 最后一条消息 */
