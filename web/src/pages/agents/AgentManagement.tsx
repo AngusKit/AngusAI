@@ -1,12 +1,40 @@
-import { Bot, Search, Filter, Grid3x3, List, Edit, Trash2, MoreHorizontal, Play, Pause, Plus, Cpu, MessageSquare } from 'lucide-react';
+import {
+  Bot,
+  Search,
+  Filter,
+  Grid3x3,
+  List,
+  Edit,
+  Trash2,
+  MoreVertical,
+  Play,
+  Pause,
+  Plus,
+  X,
+  MessageSquare,
+  Cpu,
+  PlayCircle,
+  PauseCircle,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { XcanPagination } from '@/components/ui/pagination';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
 import { AgentStatusEnum } from '@/enums/enums';
 import { getEnumDescription } from '@/enums/utils';
 import { InteractionModeEnum } from '@/enums/enums';
@@ -14,12 +42,14 @@ import { useAgentList } from './hooks';
 import { getAgentStatusColor } from './utils';
 
 /**
- * 智能体列表主页面：展示所有智能体，支持搜索、筛选、分页、发布/删除
+ * 智能体列表主页面：与应用列表布局一致，支持 Tab、搜索、网格/列表视图、分页
  */
 export function AgentManagement() {
   const {
     searchQuery,
-    statusFilter,
+    activeTab,
+    handleTabChange,
+    getCategoryCount,
     viewMode,
     setViewMode,
     currentPage,
@@ -30,246 +60,325 @@ export function AgentManagement() {
     handleToggleStatus,
     handleDelete,
     handleSearchChange,
-    handleStatusFilterChange,
     navigate,
     itemsPerPage,
   } = useAgentList();
 
+  const totalPages = Math.max(1, Math.ceil(agentsTotal / itemsPerPage));
+
   return (
     <div className="space-y-6">
-      {/* 标题 */}
-      <div>
-        <h1 className="text-2xl mb-1 dark:text-white">智能体</h1>
-        <p className="text-sm text-gray-600 dark:text-gray-400">管理智能体，配置模型与能力</p>
+      {/* 标题区域：与应用列表一致 */}
+      <div className="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-gray-800 dark:to-gray-800 rounded-xl p-6 border border-orange-100 dark:border-gray-700">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-10 h-10 bg-orange-500 dark:bg-orange-600 rounded-lg flex items-center justify-center shrink-0">
+            <Bot className="w-5 h-5 text-white" />
+          </div>
+          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white">智能体</h1>
+        </div>
+        <p className="text-sm text-gray-600 dark:text-gray-400 ml-13">管理智能体，配置模型与能力</p>
       </div>
 
-      {/* 搜索与操作栏 */}
+      {/* Tab 分类：与应用列表一致 */}
+      <div className="border-b border-gray-200 dark:border-gray-700">
+        <div className="flex gap-4 overflow-x-auto">
+          <button
+            onClick={() => handleTabChange('all')}
+            className={`pb-3 px-1 border-b-2 text-sm whitespace-nowrap transition-colors ${
+              activeTab === 'all'
+                ? 'border-orange-500 text-orange-600 dark:text-orange-400'
+                : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300'
+            }`}
+          >
+            全部 ({getCategoryCount('all')})
+          </button>
+          <button
+            onClick={() => handleTabChange('published')}
+            className={`pb-3 px-1 border-b-2 text-sm whitespace-nowrap transition-colors ${
+              activeTab === 'published'
+                ? 'border-orange-500 text-orange-600 dark:text-orange-400'
+                : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300'
+            }`}
+          >
+            已发布 ({getCategoryCount('published')})
+          </button>
+          <button
+            onClick={() => handleTabChange('inactive')}
+            className={`pb-3 px-1 border-b-2 text-sm whitespace-nowrap transition-colors ${
+              activeTab === 'inactive'
+                ? 'border-orange-500 text-orange-600 dark:text-orange-400'
+                : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300'
+            }`}
+          >
+            离线 ({getCategoryCount('inactive')})
+          </button>
+        </div>
+      </div>
+
+      {/* 搜索与操作栏：与应用列表一致 */}
       <div className="flex items-center justify-between gap-3">
         <div className="relative w-[390px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
           <Input
-            placeholder="搜索智能体..."
+            type="text"
+            placeholder="搜索智能体名称、描述..."
             value={searchQuery}
             onChange={e => handleSearchChange(e.target.value)}
-            className="pl-9 dark:bg-gray-800 dark:border-gray-700"
+            className="pl-10 pr-10 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 focus-visible:border-orange-500 focus-visible:ring-orange-500/50"
           />
+          {searchQuery && (
+            <button
+              onClick={() => handleSearchChange('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
         </div>
-        <div className="flex items-center gap-2">
-          <Select value={statusFilter} onValueChange={v => handleStatusFilterChange(v as 'all' | AgentStatusEnum)}>
-            <SelectTrigger className="w-[140px] dark:bg-gray-800 dark:border-gray-700">
-              <Filter className="w-4 h-4 mr-2" />
-              <SelectValue placeholder="状态" />
-            </SelectTrigger>
-            <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-              <SelectItem value="all" className="dark:text-gray-300">全部状态</SelectItem>
-              <SelectItem value={AgentStatusEnum.ACTIVE} className="dark:text-gray-300">已发布</SelectItem>
-              <SelectItem value={AgentStatusEnum.INACTIVE} className="dark:text-gray-300">离线</SelectItem>
-            </SelectContent>
-          </Select>
+        <div className="flex items-center gap-3">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300">
+                <Filter className="w-4 h-4 mr-2" />
+                筛选
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="dark:bg-gray-800 dark:border-gray-700">
+              <DropdownMenuItem className="dark:text-gray-300">最近创建</DropdownMenuItem>
+              <DropdownMenuItem className="dark:text-gray-300">按名称排序</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <div className="flex items-center gap-1 border border-gray-200 dark:border-gray-700 rounded-lg p-1">
-            <Button
-              variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
-              size="sm"
+            <button
               onClick={() => setViewMode('grid')}
-              className="h-8 w-8 p-0"
+              className={`p-1.5 rounded ${
+                viewMode === 'grid'
+                  ? 'bg-orange-50 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400'
+                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+              }`}
             >
               <Grid3x3 className="w-4 h-4" />
-            </Button>
-            <Button
-              variant={viewMode === 'list' ? 'secondary' : 'ghost'}
-              size="sm"
+            </button>
+            <button
               onClick={() => setViewMode('list')}
-              className="h-8 w-8 p-0"
+              className={`p-1.5 rounded ${
+                viewMode === 'list'
+                  ? 'bg-orange-50 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400'
+                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+              }`}
             >
               <List className="w-4 h-4" />
-            </Button>
+            </button>
           </div>
-          <Button onClick={() => navigate('/agents/create')} className="bg-blue-500 hover:bg-blue-600">
+          <Button size="sm" className="bg-orange-500 hover:bg-orange-600 text-white" onClick={() => navigate('/agents/create')}>
             <Plus className="w-4 h-4 mr-2" />
             创建智能体
           </Button>
         </div>
       </div>
 
-      {/* 加载中：Skeleton 骨架屏 */}
-      {agentsLoading ? (
-        viewMode === 'grid' ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <Card key={i} className="p-5 dark:bg-gray-800 dark:border-gray-700">
-                <div className="flex items-start justify-between mb-2">
-                  <Skeleton className="w-8 h-8 rounded-lg dark:bg-gray-700" />
-                  <Skeleton className="w-8 h-8 rounded-lg dark:bg-gray-700" />
-                </div>
-                <div className="flex items-start gap-3">
-                  <Skeleton className="w-12 h-12 rounded-lg dark:bg-gray-700 shrink-0" />
-                  <div className="flex-1 space-y-2">
-                    <Skeleton className="h-5 w-24 dark:bg-gray-700" />
-                    <Skeleton className="h-4 w-16 dark:bg-gray-700" />
+      {/* 智能体列表：网格或列表视图 */}
+      <div
+        className={
+          viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-2.5' : 'space-y-3 mt-2.5'
+        }
+      >
+        {agentsLoading ? (
+          viewMode === 'grid' ? (
+            Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-start gap-3">
+                    <Skeleton className="w-12 h-12 rounded-xl dark:bg-gray-700" />
+                    <div className="flex-1 space-y-2">
+                      <Skeleton className="h-5 w-24 dark:bg-gray-700" />
+                      <Skeleton className="h-4 w-16 dark:bg-gray-700" />
+                    </div>
                   </div>
                 </div>
-                <Skeleton className="h-4 w-full mt-3 mb-2 dark:bg-gray-700" />
-                <Skeleton className="h-4 w-3/4 mb-3 dark:bg-gray-700" />
-                <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-700">
-                  <Skeleton className="h-4 w-20 dark:bg-gray-700" />
-                  <Skeleton className="h-4 w-16 dark:bg-gray-700" />
+                <Skeleton className="h-4 w-full mb-2 dark:bg-gray-700" />
+                <Skeleton className="h-4 w-3/4 mb-4 dark:bg-gray-700" />
+                <div className="flex gap-2 mb-4">
+                  <Skeleton className="h-6 w-14 rounded-md dark:bg-gray-700" />
+                  <Skeleton className="h-6 w-14 rounded-md dark:bg-gray-700" />
                 </div>
-              </Card>
-            ))}
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div
-                key={i}
-                className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3"
-              >
+                <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-700">
+                  <Skeleton className="h-4 w-16 dark:bg-gray-700" />
+                  <Skeleton className="h-8 w-20 dark:bg-gray-700" />
+                </div>
+              </div>
+            ))
+          ) : (
+            Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3">
                 <div className="flex items-center gap-4">
                   <Skeleton className="w-10 h-10 rounded-lg dark:bg-gray-700 shrink-0" />
-                  <div className="flex-1 space-y-2 min-w-0">
+                  <div className="flex-1 space-y-2">
                     <Skeleton className="h-4 w-32 dark:bg-gray-700" />
                     <Skeleton className="h-3 w-full dark:bg-gray-700" />
                   </div>
-                  <div className="flex items-center gap-4 shrink-0">
-                    <Skeleton className="h-4 w-20 dark:bg-gray-700" />
-                    <Skeleton className="h-4 w-24 dark:bg-gray-700" />
-                    <Skeleton className="h-5 w-14 dark:bg-gray-700" />
-                    <Skeleton className="h-8 w-8 rounded dark:bg-gray-700" />
-                    <Skeleton className="h-8 w-8 rounded dark:bg-gray-700" />
+                  <div className="flex items-center gap-4">
+                    <Skeleton className="h-6 w-16 dark:bg-gray-700" />
+                    <Skeleton className="h-5 w-12 dark:bg-gray-700" />
+                    <Skeleton className="h-8 w-20 dark:bg-gray-700" />
                   </div>
                 </div>
               </div>
+            ))
+          )
+        ) : (
+          <>
+            {agents.map(agent => (
+              <AgentCard
+                key={agent.id}
+                agent={agent}
+                viewMode={viewMode}
+                onAgentClick={() => navigate(`/agents/${agent.id}`)}
+                onToggleStatus={handleToggleStatus}
+                onEdit={() => navigate(`/agents/${agent.id}/edit`)}
+                onDelete={handleDelete}
+                getStatusColor={getAgentStatusColor}
+              />
             ))}
-          </div>
-        )
-      ) : agents.length === 0 ? (
-        /* 空状态 */
-        <Card className="py-16 px-8 text-center dark:bg-gray-800 dark:border-gray-700 border-2 border-dashed border-gray-200 dark:border-gray-600">
-          <div className="flex flex-col items-center max-w-md mx-auto">
-            <div className="bg-gradient-to-br from-orange-100 to-orange-50 dark:from-orange-900/30 dark:to-orange-800/20 w-20 h-20 rounded-2xl flex items-center justify-center mt-5 mb-6">
-              <Bot className="w-20 h-20 text-orange-500 dark:text-orange-400" />
-            </div>
-            <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">暂无智能体</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 leading-relaxed">
-              请先创建智能体，配置模型与能力，开启 AI 对话体验
-            </p>
-          </div>
-        </Card>
-      ) : viewMode === 'grid' ? (
-        /* 网格视图 */
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {agents.map(agent => (
-            <AgentCard
-              key={agent.id}
-              agent={agent}
-              variant="grid"
-              onToggleStatus={handleToggleStatus}
-              onDelete={handleDelete}
-              onNavigate={navigate}
-              getStatusColor={getAgentStatusColor}
-            />
-          ))}
-        </div>
-      ) : (
-        /* 列表视图 */
-        <div className="space-y-3">
-          {agents.map(agent => (
-            <AgentCard
-              key={agent.id}
-              agent={agent}
-              variant="list"
-              onToggleStatus={handleToggleStatus}
-              onDelete={handleDelete}
-              onNavigate={navigate}
-              getStatusColor={getAgentStatusColor}
-            />
-          ))}
+          </>
+        )}
+      </div>
+
+      {/* 分页：与应用列表一致 */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center mt-6">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                />
+              </PaginationItem>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                <PaginationItem key={page}>
+                  <PaginationLink
+                    onClick={() => setCurrentPage(page)}
+                    isActive={currentPage === page}
+                    className="cursor-pointer"
+                  >
+                    {page}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                  className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
         </div>
       )}
 
-      {/* 分页 */}
-      {agentsTotal > itemsPerPage && (
-        <XcanPagination
-          pageSize={itemsPerPage}
-          pageNo={currentPage}
-          total={agentsTotal}
-          onChange={({ pageNo }) => setCurrentPage(pageNo)}
-        />
+      {/* 空状态：与应用列表一致 */}
+      {!agentsLoading && agents.length === 0 && (
+        <div className="text-center py-12">
+          <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+            {searchQuery ? (
+              <Search className="w-8 h-8 text-gray-400 dark:text-gray-600" />
+            ) : (
+              <Bot className="w-8 h-8 text-gray-400 dark:text-gray-600" />
+            )}
+          </div>
+          <h3 className="text-gray-900 dark:text-white mb-2">{searchQuery ? '未找到相关智能体' : '暂无智能体'}</h3>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            {searchQuery ? `没有找到包含"${searchQuery}"的智能体` : '开始创建您的第一个智能体'}
+          </p>
+          {!searchQuery && (
+            <Button className="bg-orange-500 hover:bg-orange-600 text-white" onClick={() => navigate('/agents/create')}>
+              <Plus className="w-4 h-4 mr-2" />
+              创建智能体
+            </Button>
+          )}
+        </div>
       )}
     </div>
   );
 }
 
-/** 智能体卡片（网格/列表通用） */
+/** 智能体卡片（网格/列表通用，与应用列表 ApplicationCard 结构一致） */
 function AgentCard({
   agent,
-  variant,
+  viewMode,
+  onAgentClick,
   onToggleStatus,
+  onEdit,
   onDelete,
-  onNavigate,
   getStatusColor,
 }: {
-  agent: import('./hooks').AgentListItem & { modelName?: string };
-  variant: 'grid' | 'list';
+  agent: import('./hooks').AgentListItem;
+  viewMode: 'grid' | 'list';
+  onAgentClick: () => void;
   onToggleStatus: (agent: import('./hooks').AgentListItem) => void;
+  onEdit: () => void;
   onDelete: (agent: import('./hooks').AgentListItem) => void;
-  onNavigate: (path: string) => void;
   getStatusColor: (status?: string) => string;
 }) {
   const statusColor = getStatusColor(agent.statusEnum);
 
-  if (variant === 'list') {
+  if (viewMode === 'list') {
     return (
       <div
-        onClick={() => onNavigate(`/agents/${agent.id}`)}
-        className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 hover:shadow-md dark:hover:shadow-gray-900/50 transition-shadow cursor-pointer group"
+        onClick={onAgentClick}
+        className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md dark:hover:shadow-gray-900/50 transition-shadow cursor-pointer group"
       >
-        <div className="flex items-center gap-4">
-          <div className="bg-gradient-to-br from-orange-500 to-orange-600 w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0">
+        <div className="flex items-center gap-6">
+          <div className="w-11 h-11 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center flex-shrink-0">
             <Bot className="w-5 h-5 text-white" />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-blue-600 dark:text-blue-400 cursor-pointer" onClick={e => (e.stopPropagation(), onNavigate(`/agents/${agent.id}`))}>
+            <h3 className="dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
               {agent.name}
             </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-1">{agent.description}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-1 mt-0.5">{agent.description}</p>
+            <div className="flex items-center gap-4 mt-2 flex-wrap">
+              {agent.interactionMode && (
+                <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+                  <MessageSquare className="w-3.5 h-3.5 shrink-0" />
+                  <span>{getEnumDescription(InteractionModeEnum, agent.interactionMode as InteractionModeEnum)}</span>
+                </div>
+              )}
+              {agent.modelName && (
+                <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+                  <Cpu className="w-3.5 h-3.5 shrink-0" />
+                  <span className="truncate max-w-[120px]" title={agent.modelName}>{agent.modelName}</span>
+                </div>
+              )}
+              <Badge className={`text-xs ${statusColor} border-0`}>
+                {agent.statusEnum === AgentStatusEnum.ACTIVE ? '已发布' : '离线'}
+              </Badge>
+            </div>
           </div>
-          <div className="flex items-center gap-4 shrink-0">
-            <div className="text-sm text-gray-500 dark:text-gray-400 min-w-[100px]">
-              {agent.interactionMode ? getEnumDescription(InteractionModeEnum, agent.interactionMode as InteractionModeEnum) : '--'}
-            </div>
-            <div className="text-sm text-gray-500 dark:text-gray-400 min-w-[80px] truncate" title={agent.modelName}>
-              {agent.modelName ?? '--'}
-            </div>
-            <Badge className={`text-xs ${statusColor} border-0 shrink-0`}>
-              {agent.statusEnum === 'ACTIVE' ? '已发布' : '离线'}
-            </Badge>
-            <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
-              <button
-                onClick={() => onToggleStatus(agent)}
-                className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
-                disabled={!agent.statusEnum}
-              >
-                {agent.statusEnum === 'ACTIVE' ? <Pause className="w-4 h-4 text-orange-500" /> : <Play className="w-4 h-4 text-green-500" />}
-              </button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors opacity-0 group-hover:opacity-100">
-                    <MoreHorizontal className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="dark:bg-gray-800 dark:border-gray-700">
-                  <DropdownMenuItem onClick={e => (e.stopPropagation(), onNavigate(`/agents/${agent.id}/edit`))} className="dark:text-gray-300">
-                    <Edit className="w-4 h-4 mr-2" />
-                    编辑智能体
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={e => (e.stopPropagation(), onDelete(agent))} className="text-red-600 dark:text-red-400">
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    删除智能体
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+          <div className="flex items-center gap-3 shrink-0">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={e => (e.stopPropagation(), onEdit())}
+              className="gap-2 h-8 dark:border-gray-600 dark:hover:bg-gray-700"
+            >
+              <Edit className="w-3.5 h-3.5" />
+              编辑
+            </Button>
+            <button
+              onClick={e => (e.stopPropagation(), onToggleStatus(agent))}
+              className="p-1.5 rounded transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
+              disabled={!agent.statusEnum}
+              title={agent.statusEnum === AgentStatusEnum.ACTIVE ? '下线智能体' : '发布智能体'}
+            >
+              {agent.statusEnum === AgentStatusEnum.ACTIVE ? (
+                <Pause className="w-4 h-4 text-orange-500" />
+              ) : (
+                <Play className="w-4 h-4 text-green-500" />
+              )}
+            </button>
+            <AgentDropdownMenu agent={agent} onToggleStatus={onToggleStatus} onEdit={onEdit} onDelete={onDelete} />
           </div>
         </div>
       </div>
@@ -278,67 +387,106 @@ function AgentCard({
 
   // 网格视图
   return (
-    <Card className="p-5 dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow">
-      <div className="flex items-start justify-between mb-2">
+    <div
+      onClick={onAgentClick}
+      className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md dark:hover:shadow-gray-900/50 transition-shadow cursor-pointer group"
+    >
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex items-start gap-3">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center flex-shrink-0">
+            <Bot className="w-6 h-6 text-white" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="dark:text-white mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+              {agent.name}
+            </h3>
+            <Badge className={`text-xs ${statusColor} border-0`}>
+              {agent.statusEnum === AgentStatusEnum.ACTIVE ? '已发布' : '离线'}
+            </Badge>
+          </div>
+        </div>
+        <AgentDropdownMenu agent={agent} onToggleStatus={onToggleStatus} onEdit={onEdit} onDelete={onDelete} />
+      </div>
+      <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">{agent.description}</p>
+      <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-700 text-sm text-gray-500 dark:text-gray-400">
+        <span className="flex items-center gap-1">
+          <MessageSquare className="w-4 h-4 shrink-0" />
+          {agent.interactionMode
+            ? getEnumDescription(InteractionModeEnum, agent.interactionMode as InteractionModeEnum)
+            : '--'}
+        </span>
+        <span className="flex items-center gap-1 truncate max-w-[160px]" title={agent.modelName}>
+          <Cpu className="w-4 h-4 shrink-0" />
+          {agent.modelName ?? '未配置模型'}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/** 智能体卡片更多操作下拉菜单 */
+function AgentDropdownMenu({
+  agent,
+  onToggleStatus,
+  onEdit,
+  onDelete,
+}: {
+  agent: import('./hooks').AgentListItem;
+  onToggleStatus: (agent: import('./hooks').AgentListItem) => void;
+  onEdit: () => void;
+  onDelete: (agent: import('./hooks').AgentListItem) => void;
+}) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
         <button
-          onClick={e => (e.stopPropagation(), onToggleStatus(agent))}
-          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-          disabled={!agent.statusEnum}
+          onClick={e => e.stopPropagation()}
+          className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors opacity-0 group-hover:opacity-100"
         >
-          {agent.statusEnum === 'ACTIVE' ? (
-            <Pause className="w-4 h-4 text-orange-600 dark:text-orange-400" />
-          ) : (
-            <Play className="w-4 h-4 text-green-600 dark:text-green-400" />
-          )}
+          <MoreVertical className="w-4 h-4 text-gray-600 dark:text-gray-400" />
         </button>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild onClick={e => e.stopPropagation()}>
-            <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
-              <MoreHorizontal className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="dark:bg-gray-800 dark:border-gray-700">
-            <DropdownMenuItem onClick={e => (e.stopPropagation(), onNavigate(`/agents/${agent.id}/edit`))} className="dark:text-gray-300">
-              <Edit className="w-4 h-4 mr-2" />
-              编辑智能体
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="dark:bg-gray-800 dark:border-gray-700">
+        {agent.statusEnum === AgentStatusEnum.ACTIVE && (
+          <>
+            <DropdownMenuItem
+              onClick={e => {
+                e.stopPropagation();
+                onToggleStatus(agent);
+              }}
+              className="dark:text-gray-300"
+            >
+              <PauseCircle className="w-4 h-4 mr-2" />
+              下线智能体
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={e => (e.stopPropagation(), onDelete(agent))} className="text-red-600 dark:text-red-400">
-              <Trash2 className="w-4 h-4 mr-2" />
-              删除智能体
+            <DropdownMenuSeparator className="dark:bg-gray-700" />
+          </>
+        )}
+        {agent.statusEnum === AgentStatusEnum.INACTIVE && (
+          <>
+            <DropdownMenuItem
+              onClick={e => {
+                e.stopPropagation();
+                onToggleStatus(agent);
+              }}
+              className="dark:text-gray-300"
+            >
+              <PlayCircle className="w-4 h-4 mr-2" />
+              发布
             </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-      <div className="flex items-start gap-3">
-        <div className="bg-gradient-to-br from-orange-500 to-orange-600 w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0">
-          <Bot className="w-6 h-6 text-white" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <h3 className="mb-1 text-blue-600 dark:text-blue-400 cursor-pointer" onClick={() => onNavigate(`/agents/${agent.id}`)}>
-            {agent.name}
-          </h3>
-          <Badge className={`text-xs ${statusColor} border-0`}>
-            {agent.statusEnum === 'ACTIVE' ? '已发布' : '离线'}
-          </Badge>
-        </div>
-      </div>
-      <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-3">{agent.description}</p>
-      <div className="border-t border-gray-100 dark:border-gray-700 pt-3">
-        <div className="flex flex-wrap gap-2 text-xs text-gray-500 dark:text-gray-400">
-          {agent.interactionMode && (
-            <span className="flex items-center gap-1">
-              <MessageSquare className="w-3.5 h-3.5" />
-              {getEnumDescription(InteractionModeEnum, agent.interactionMode as InteractionModeEnum)}
-            </span>
-          )}
-          {agent.modelName && (
-            <span className="flex items-center gap-1 ml-auto">
-              <Cpu className="w-3.5 h-3.5" />
-              {agent.modelName}
-            </span>
-          )}
-        </div>
-      </div>
-    </Card>
+            <DropdownMenuSeparator className="dark:bg-gray-700" />
+          </>
+        )}
+        <DropdownMenuItem onClick={e => (e.stopPropagation(), onEdit())} className="dark:text-gray-300">
+          <Edit className="w-4 h-4 mr-2" />
+          编辑智能体
+        </DropdownMenuItem>
+        <DropdownMenuSeparator className="dark:bg-gray-700" />
+        <DropdownMenuItem onClick={e => (e.stopPropagation(), onDelete(agent))} className="text-red-600 dark:text-red-400">
+          <Trash2 className="w-4 h-4 mr-2" />
+          删除智能体
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

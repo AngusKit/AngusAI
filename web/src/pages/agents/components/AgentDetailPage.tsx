@@ -116,16 +116,16 @@ export function AgentDetailPage() {
                 className="dark:border-gray-600 dark:hover:bg-gray-700"
               >
                 {detail.status === 'ACTIVE' ? (
-                  <>
-                    <Pause className="w-4 h-4 mr-1.5" />
-                    下线
-                  </>
-                ) : (
-                  <>
-                    <Play className="w-4 h-4 mr-1.5" />
-                    发布
-                  </>
-                )}
+                    <>
+                      <Pause className="w-4 h-4 mr-1.5" />
+                      下线智能体
+                    </>
+                  ) : (
+                    <>
+                      <Play className="w-4 h-4 mr-1.5" />
+                      发布智能体
+                    </>
+                  )}
               </Button>
               <Button size="sm" onClick={() => navigate(`/agents/${id}/edit`)} className="bg-blue-500 hover:bg-blue-600">
                 <Edit className="w-4 h-4 mr-1.5" />
@@ -352,8 +352,8 @@ export function AgentDetailPage() {
 function ConfigItem({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-start gap-4">
-      <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-900/30 flex items-center justify-center shrink-0">
-        <Info className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+      <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: 'var(--muted)' }}>
+        <Info className="w-5 h-5 text-slate-600 dark:text-slate-300" />
       </div>
       <div className="flex-1">
         <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">{label}</div>

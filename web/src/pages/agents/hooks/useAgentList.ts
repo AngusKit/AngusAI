@@ -26,7 +26,9 @@ export function useAgentList() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
-  const [statusFilter, setStatusFilter] = useState<'all' | AgentStatusEnum>('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'published' | 'inactive'>('all');
+  const statusFilter: 'all' | AgentStatusEnum =
+    activeTab === 'published' ? AgentStatusEnum.ACTIVE : activeTab === 'inactive' ? AgentStatusEnum.INACTIVE : 'all';
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [currentPage, setCurrentPage] = useState(1);
   const [agents, setAgents] = useState<AgentListItem[]>([]);
@@ -103,15 +105,23 @@ export function useAgentList() {
     setCurrentPage(1);
   };
 
-  /** 状态筛选变更并重置页码 */
-  const handleStatusFilterChange = (v: 'all' | AgentStatusEnum) => {
-    setStatusFilter(v);
+  /** Tab 切换 */
+  const handleTabChange = (tab: 'all' | 'published' | 'inactive') => {
+    setActiveTab(tab);
     setCurrentPage(1);
+  };
+
+  /** 获取分类数量（当前 Tab 对应的总数） */
+  const getCategoryCount = (tab: 'all' | 'published' | 'inactive') => {
+    if (tab !== activeTab) return '-';
+    return agentsTotal;
   };
 
   return {
     searchQuery,
-    statusFilter,
+    activeTab,
+    handleTabChange,
+    getCategoryCount,
     viewMode,
     setViewMode,
     currentPage,
@@ -123,7 +133,6 @@ export function useAgentList() {
     handleToggleStatus,
     handleDelete,
     handleSearchChange,
-    handleStatusFilterChange,
     navigate,
     itemsPerPage: AGENT_ITEMS_PER_PAGE,
   };

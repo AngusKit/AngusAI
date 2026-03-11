@@ -239,7 +239,7 @@ export function ApplicationDetailPage() {
               <div className="grid grid-cols-2 gap-8">
                 <div className="space-y-6">
                   <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-900/30 flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: 'var(--muted)' }}>
                       <Info className="w-5 h-5 text-slate-600 dark:text-slate-400" />
                     </div>
                     <div className="flex-1">
