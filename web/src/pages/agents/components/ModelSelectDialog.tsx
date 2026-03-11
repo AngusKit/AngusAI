@@ -14,7 +14,7 @@ import {
 import { toast } from 'sonner';
 import { useDebounce } from '@/hooks/useDebounce.ts';
 import Models from '@/services/Models.ts';
-import { ModelStatusEnum } from '@/enums/enums.ts';
+import { ModelStatusEnum, ModelTypeEnum } from '@/enums/enums.ts';
 
 /** 模型选择弹窗每页条数 */
 const PAGE_SIZE = 10;
@@ -62,6 +62,7 @@ export function ModelSelectDialog({
       else setLoading(true);
       try {
         const res = await Models.getModelList({
+          type: ModelTypeEnum.CHAT,
           status: ModelStatusEnum.ACTIVE,
           pageNo: p,
           pageSize: PAGE_SIZE,
