@@ -62,10 +62,6 @@ export interface ApplicationListVo extends TenantAuditingVo {
   agents?: ResourceInfoVo[];
   /** 默认智能体（用于对话） */
   defaultAgent?: ResourceInfoVo;
-  /** 关联知识库数 */
-  knowledgeBaseCount?: number;
-  /** 关联工作流数 */
-  workflowCount?: number;
   /** 是否公开访问 */
   publicAccess?: boolean;
   /** 是否启用嵌入 */
