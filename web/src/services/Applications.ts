@@ -75,6 +75,8 @@ export class Applications<SecurityDataType = unknown> {
       apiEnabled?: boolean;
       /** 是否模板 */
       isTemplate?: boolean;
+      /** 是否仅查询已收藏（星标）的应用 */
+      starred?: boolean;
       /**
        * 排序字段
        * @example "modifiedDate"
@@ -192,6 +194,30 @@ export class Applications<SecurityDataType = unknown> {
       body: data,
       secure: true,
       type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * @description 收藏/取消收藏应用
+   *
+   * @tags Application
+   * @name StarApplication
+   * @summary 收藏/取消收藏应用
+   * @request POST:/api/v1/applications/{id}/star
+   * @secure
+   */
+  starApplication = (
+    id: string,
+    query: {
+      /** 是否收藏 */
+      isStarred: boolean;
+    },
+    params: RequestParams = {}
+  ) =>
+    this.http.request<ApplicationDetailResult>({
+      path: `${AI}/applications/${id}/star`,
+      method: 'POST',
+      query: query as unknown as QueryParamsType,
+      secure: true,
       ...params,
     });
   /**

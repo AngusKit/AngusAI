@@ -30,4 +30,7 @@ public class ApplicationFindDto extends PageQuery {
       "modifiedDate", "status", "name"})
   private String orderBy = "modifiedDate";
 
+  @Schema(description = "是否仅查询已收藏（星标）的应用")
+  private Boolean starred;
+
 }

@@ -125,7 +125,8 @@ public class ApplicationAssembler {
   }
 
   public static ApplicationListVo toListVo(AIApplication application,
-      List<ResourceInfoVo> agents, ApplicationDetailVo.ResourceInfoVo defaultAgent) {
+      List<ResourceInfoVo> agents, ApplicationDetailVo.ResourceInfoVo defaultAgent,
+      boolean isStarred) {
     ApplicationListVo vo = new ApplicationListVo();
     vo.setId(application.getId());
     vo.setName(application.getName());
@@ -140,6 +141,7 @@ public class ApplicationAssembler {
     vo.setEmbedEnabled(application.getEmbedEnabled());
     vo.setApiEnabled(application.getApiEnabled());
     vo.setPublishedDate(application.getPublishedDate());
+    vo.setIsStarred(isStarred);
 
     // 设置审计信息
     vo.setTenantId(application.getTenantId());

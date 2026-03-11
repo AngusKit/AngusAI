@@ -33,6 +33,8 @@ export interface ApplicationDetailVo extends TenantAuditingVo {
   /** 默认智能体（列表接口返回） */
   defaultAgent?: ResourceInfoVo;
 
+  /** 是否已收藏（星标） */
+  isStarred?: boolean;
   apiCalls?: number;
 }
 

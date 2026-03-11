@@ -77,6 +77,7 @@ export function useApplicationList() {
       if (activeTab === 'published') queryParams.status = ApplicationStatusEnum.PUBLISHED;
       else if (activeTab === 'paused') queryParams.status = ApplicationStatusEnum.PAUSED;
       else if (activeTab === 'draft') queryParams.status = ApplicationStatusEnum.DRAFT;
+      else if (activeTab === 'starred') queryParams.starred = true;
 
       const response = await Applications.getApplicationList(queryParams);
       const responseData = (response as any).data;
@@ -101,7 +102,7 @@ export function useApplicationList() {
           description: app.description ?? '',
           icon: app.icon && /[\u{1F300}-\u{1F9FF}\u2600-\u26FF\u2700-\u27BF]/u.test(app.icon) ? app.icon : '🤖',
           status: (app.status as ApplicationStatusEnum) ?? ApplicationStatusEnum.DRAFT,
-          isStarred: false,
+          isStarred: app.isStarred ?? false,
           tags: app.tags ?? [],
           visits: `${app.apiCalls ?? 0} 次调用`,
           agentIds:
@@ -166,14 +167,21 @@ export function useApplicationList() {
   /** 点击应用卡片进入详情 */
   const handleAppClick = (app: ApplicationListItem) => navigate(`/apps/${app.id}`);
 
-  /** 切换星标（仅本地状态，无后端） */
-  const handleStarToggle = (e: React.MouseEvent, appId: string) => {
+  /** 切换星标（调用后端 star 接口） */
+  const handleStarToggle = async (e: React.MouseEvent, appId: string) => {
     e.stopPropagation();
-    setApplications(prev =>
-      prev.map(app => (app.id === appId ? { ...app, isStarred: !app.isStarred } : app))
-    );
     const app = applications.find(a => a.id === appId);
-    toast.success(app?.isStarred ? '已取消星标' : '已添加星标');
+    const newStarred = !(app?.isStarred ?? false);
+    try {
+      await Applications.starApplication(appId, { isStarred: newStarred });
+      setApplications(prev =>
+        prev.map(a => (a.id === appId ? { ...a, isStarred: newStarred } : a))
+      );
+      await loadCounts();
+      toast.success(newStarred ? '已添加星标' : '已取消星标');
+    } catch (error: any) {
+      toast.error(error?.data?.message || error?.message || '操作失败');
+    }
   };
 
   /** 修改应用状态（发布/暂停） */

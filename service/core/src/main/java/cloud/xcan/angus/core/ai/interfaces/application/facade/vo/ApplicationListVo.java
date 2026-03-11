@@ -62,4 +62,7 @@ public class ApplicationListVo extends TenantAuditingVo {
   @Schema(description = "发布时间")
   private LocalDateTime publishedDate;
 
+  @Schema(description = "是否已收藏（星标）")
+  private Boolean isStarred;
+
 }

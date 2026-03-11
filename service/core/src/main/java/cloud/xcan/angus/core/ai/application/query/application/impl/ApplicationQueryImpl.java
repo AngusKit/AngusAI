@@ -16,6 +16,7 @@ import cloud.xcan.angus.core.ai.domain.application.AIApplicationSearchRepo;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationAgent;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationAgentRepo;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationCountsProjection;
+import cloud.xcan.angus.core.ai.domain.application.ApplicationStar;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStarRepo;
 import cloud.xcan.angus.core.ai.domain.model.Model;
 import cloud.xcan.angus.core.ai.domain.setting.analytics.ApiUsageLogRepo;
@@ -33,6 +34,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.lang.Nullable;
@@ -221,6 +224,25 @@ public class ApplicationQueryImpl implements ApplicationQuery {
     return applicationAgentRepo.findByApplicationIdOrderBySortOrderAsc(applicationId).stream()
         .map(ApplicationAgent::getAgentId)
         .toList();
+  }
+
+  @Override
+  public Set<Long> findStarredApplicationIds(List<Long> applicationIds) {
+    if (applicationIds == null || applicationIds.isEmpty()) {
+      return Set.of();
+    }
+    Long userId = getUserId();
+    return applicationStarRepo.findByUserIdAndApplicationIdIn(userId, applicationIds).stream()
+        .map(ApplicationStar::getApplicationId)
+        .collect(Collectors.toSet());
+  }
+
+  @Override
+  public Set<Long> findStarredApplicationIdsForCurrentUser() {
+    Long userId = getUserId();
+    return applicationStarRepo.findByUserId(userId).stream()
+        .map(ApplicationStar::getApplicationId)
+        .collect(Collectors.toSet());
   }
 
   private void buildOverview(ApplicationStatisticsVo vo, Long appId, LocalDateTime start,

@@ -6,6 +6,7 @@ import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationStat
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -61,5 +62,15 @@ public interface ApplicationQuery {
    * 获取应用绑定的所有智能体ID列表（按 sortOrder 排序）
    */
   List<Long> getAgentIds(Long applicationId);
+
+  /**
+   * 批量查询当前用户已收藏的应用ID集合
+   */
+  Set<Long> findStarredApplicationIds(List<Long> applicationIds);
+
+  /**
+   * 查询当前用户已收藏的所有应用ID集合（用于 starred 筛选）
+   */
+  Set<Long> findStarredApplicationIdsForCurrentUser();
 
 }
