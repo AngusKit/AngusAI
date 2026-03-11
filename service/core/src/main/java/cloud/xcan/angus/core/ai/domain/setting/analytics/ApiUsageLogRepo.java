@@ -99,4 +99,42 @@ public interface ApiUsageLogRepo extends BaseRepository<ApiUsageLog, Long> {
   List<Object[]> groupByStatusCode(@Param("start") LocalDateTime start,
       @Param("end") LocalDateTime end);
 
+  /**
+   * 应用概览统计（一次聚合：总调用、成功数、token、成本、平均响应时间）
+   * 返回 Object[]: [totalCalls, successfulCalls, totalTokens, totalCost, avgResponseTime]
+   */
+  @Query("SELECT COUNT(l), "
+      + "SUM(CASE WHEN l.isSuccessful = true THEN 1 ELSE 0 END), "
+      + "COALESCE(SUM(l.totalTokens), 0), "
+      + "COALESCE(SUM(l.cost), 0), "
+      + "AVG(l.responseTimeMs) "
+      + "FROM ApiUsageLog l WHERE l.appId = :appId AND l.requestTime BETWEEN :start AND :end")
+  Object[] getAppOverviewStats(@Param("appId") Long appId, @Param("start") LocalDateTime start,
+      @Param("end") LocalDateTime end);
+
+  /**
+   * 应用趋势统计（按日聚合）
+   * 返回 List&lt;Object[]&gt;: [date, callCount, totalTokens, avgResponseTime]
+   * 使用 CAST 兼容 MySQL/PostgreSQL
+   */
+  @Query(value = "SELECT CAST(l.request_time AS date) AS d, COUNT(l), "
+      + "COALESCE(SUM(l.total_tokens), 0), "
+      + "AVG(l.response_time_ms) "
+      + "FROM ai_api_usage_log l "
+      + "WHERE l.app_id = :appId AND l.request_time >= :start AND l.request_time <= :end "
+      + "GROUP BY CAST(l.request_time AS date) ORDER BY d ASC", nativeQuery = true)
+  List<Object[]> getAppTrendByDay(@Param("appId") Long appId, @Param("start") LocalDateTime start,
+      @Param("end") LocalDateTime end);
+
+  /**
+   * 应用热门用户 TOP N（按调用次数排序）
+   * 返回 List&lt;Object[]&gt;: [userId, callCount]
+   */
+  @Query("SELECT l.userId, COUNT(l) FROM ApiUsageLog l "
+      + "WHERE l.appId = :appId AND l.requestTime BETWEEN :start AND :end AND l.userId IS NOT NULL "
+      + "GROUP BY l.userId ORDER BY COUNT(l) DESC")
+  List<Object[]> getTopUsersByAppId(@Param("appId") Long appId, @Param("start") LocalDateTime start,
+      @Param("end") LocalDateTime end,
+      org.springframework.data.domain.Pageable pageable);
+
 }

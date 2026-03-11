@@ -2,7 +2,7 @@ package cloud.xcan.angus.core.ai.application.query.application;
 
 import cloud.xcan.angus.core.ai.domain.application.AIApplication;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationCountVo;
-import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
+import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationStatisticsVo;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +36,11 @@ public interface ApplicationQuery {
    * 获取应用数量统计（总数、草稿、已发布、已暂停、标星）
    */
   ApplicationCountVo getCounts();
+
+  /**
+   * 获取应用统计数据（概览、趋势、热门用户）
+   */
+  ApplicationStatisticsVo getStatistics(Long id, String startDate, String endDate, String period);
 
   /**
    * 检查应用名称是否存在

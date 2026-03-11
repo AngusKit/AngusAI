@@ -1,5 +1,7 @@
 package cloud.xcan.angus.core.ai.application.query.application.impl;
 
+import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.parseEndDate;
+import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.parseStartDate;
 import static cloud.xcan.angus.spec.utils.ObjectUtils.nullSafe;
 import static java.util.Objects.nonNull;
 
@@ -14,8 +16,10 @@ import cloud.xcan.angus.core.ai.domain.application.ApplicationAgent;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationAgentRepo;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationCountsProjection;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStarRepo;
-import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationCountVo;
 import cloud.xcan.angus.core.ai.domain.model.Model;
+import cloud.xcan.angus.core.ai.domain.setting.analytics.ApiUsageLogRepo;
+import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationCountVo;
+import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationStatisticsVo;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.message.ProtocolException;
@@ -24,7 +28,10 @@ import cloud.xcan.angus.remote.search.SearchCriteria;
 import static cloud.xcan.angus.spec.principal.PrincipalContext.getUserId;
 
 import jakarta.annotation.Resource;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -53,6 +60,11 @@ public class ApplicationQueryImpl implements ApplicationQuery {
 
   @Resource
   private ApplicationStarRepo applicationStarRepo;
+
+  @Resource
+  private ApiUsageLogRepo apiUsageLogRepo;
+
+  private static final int DEFAULT_TOP_USERS_LIMIT = 20;
 
   @Override
   public Optional<AIApplication> findById(Long id) {
@@ -162,6 +174,28 @@ public class ApplicationQueryImpl implements ApplicationQuery {
   }
 
   @Override
+  public ApplicationStatisticsVo getStatistics(Long id, String startDate, String endDate,
+      String period) {
+    return new BizTemplate<ApplicationStatisticsVo>() {
+      @Override
+      protected ApplicationStatisticsVo process() {
+        findAndCheck(id);
+        LocalDateTime start = parseStartDate(startDate);
+        LocalDateTime end = parseEndDate(endDate);
+        if (start.equals(LocalDateTime.of(1970, 1, 1, 0, 0))) {
+          start = LocalDateTime.now().minusDays(30).toLocalDate().atStartOfDay();
+        }
+
+        ApplicationStatisticsVo vo = new ApplicationStatisticsVo();
+        buildOverview(vo, id, start, end);
+        buildTrends(vo, id, start, end);
+        buildTopUsers(vo, id, start, end);
+        return vo;
+      }
+    }.execute();
+  }
+
+  @Override
   public boolean existsByName(String name) {
     return applicationRepo.existsByName(name);
   }
@@ -190,6 +224,96 @@ public class ApplicationQueryImpl implements ApplicationQuery {
     return applicationAgentRepo.findByApplicationIdOrderBySortOrderAsc(applicationId).stream()
         .map(ApplicationAgent::getAgentId)
         .toList();
+  }
+
+  private void buildOverview(ApplicationStatisticsVo vo, Long appId, LocalDateTime start,
+      LocalDateTime end) {
+    Object[] row = apiUsageLogRepo.getAppOverviewStats(appId, start, end);
+    ApplicationStatisticsVo.OverviewStatsVo overview = new ApplicationStatisticsVo.OverviewStatsVo();
+    if (row != null && row.length >= 5) {
+      long totalCalls = row[0] != null ? ((Number) row[0]).longValue() : 0;
+      long successfulCalls = row[1] != null ? ((Number) row[1]).longValue() : 0;
+      long totalTokens = row[2] != null ? ((Number) row[2]).longValue() : 0;
+      int costCents = row[3] != null ? ((Number) row[3]).intValue() : 0;
+      Double avgResponseTime = row[4] != null ? ((Number) row[4]).doubleValue() : null;
+
+      overview.setTotalCalls(totalCalls);
+      overview.setTotalTokens(totalTokens);
+      overview.setTotalCost(costCents / 100.0);
+      overview.setAvgResponseTime(avgResponseTime);
+      overview.setSuccessRate(totalCalls > 0 ? successfulCalls * 100.0 / totalCalls : 0.0);
+    } else {
+      overview.setTotalCalls(0L);
+      overview.setTotalTokens(0L);
+      overview.setTotalCost(0.0);
+      overview.setAvgResponseTime(0.0);
+      overview.setSuccessRate(0.0);
+    }
+    vo.setOverview(overview);
+  }
+
+  private void buildTrends(ApplicationStatisticsVo vo, Long appId, LocalDateTime start,
+      LocalDateTime end) {
+    List<Object[]> rows = apiUsageLogRepo.getAppTrendByDay(appId, start, end);
+    List<ApplicationStatisticsVo.TrendDataVo> calls = new ArrayList<>();
+    List<ApplicationStatisticsVo.TrendDataVo> tokens = new ArrayList<>();
+    List<ApplicationStatisticsVo.TrendDataVo> responseTime = new ArrayList<>();
+
+    if (rows != null) {
+      for (Object[] r : rows) {
+        Object dateObj = r[0];
+        long datetime = 0L;
+        if (dateObj != null) {
+          if (dateObj instanceof java.sql.Date sqlDate) {
+            datetime = sqlDate.toLocalDate().atStartOfDay(ZoneId.systemDefault())
+                .toInstant().toEpochMilli();
+          } else if (dateObj instanceof LocalDate localDate) {
+            datetime = localDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+          }
+        }
+        long callCount = r[1] != null ? ((Number) r[1]).longValue() : 0;
+        long tokenCount = r[2] != null ? ((Number) r[2]).longValue() : 0;
+        Double avgResp = r[3] != null ? ((Number) r[3]).doubleValue() : 0.0;
+
+        ApplicationStatisticsVo.TrendDataVo callPoint = new ApplicationStatisticsVo.TrendDataVo();
+        callPoint.setDatetime(datetime);
+        callPoint.setValue((double) callCount);
+        calls.add(callPoint);
+
+        ApplicationStatisticsVo.TrendDataVo tokenPoint = new ApplicationStatisticsVo.TrendDataVo();
+        tokenPoint.setDatetime(datetime);
+        tokenPoint.setValue((double) tokenCount);
+        tokens.add(tokenPoint);
+
+        ApplicationStatisticsVo.TrendDataVo respPoint = new ApplicationStatisticsVo.TrendDataVo();
+        respPoint.setDatetime(datetime);
+        respPoint.setValue(avgResp);
+        responseTime.add(respPoint);
+      }
+    }
+
+    ApplicationStatisticsVo.TrendsStatsVo trends = new ApplicationStatisticsVo.TrendsStatsVo();
+    trends.setCalls(calls);
+    trends.setTokens(tokens);
+    trends.setResponseTime(responseTime);
+    vo.setTrends(trends);
+  }
+
+  private void buildTopUsers(ApplicationStatisticsVo vo, Long appId, LocalDateTime start,
+      LocalDateTime end) {
+    List<Object[]> rows = apiUsageLogRepo.getTopUsersByAppId(appId, start, end,
+        PageRequest.of(0, DEFAULT_TOP_USERS_LIMIT));
+    List<ApplicationStatisticsVo.TopUserVo> topUsers = new ArrayList<>();
+    if (rows != null) {
+      for (Object[] r : rows) {
+        ApplicationStatisticsVo.TopUserVo u = new ApplicationStatisticsVo.TopUserVo();
+        u.setUserId(r[0] != null ? ((Number) r[0]).longValue() : null);
+        u.setUsername(null);
+        u.setCallCount(r[1] != null ? ((Number) r[1]).longValue() : 0L);
+        topUsers.add(u);
+      }
+    }
+    vo.setTopUsers(topUsers);
   }
 
 }

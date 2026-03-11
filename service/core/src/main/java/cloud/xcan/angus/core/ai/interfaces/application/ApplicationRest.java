@@ -164,7 +164,6 @@ public class ApplicationRest {
     return ApiLocaleResult.success(applicationFacade.list(dto));
   }
 
-  // 应用数量统计：应用数、草稿数、已发布数、已暂停（禁用）数、标星数
   @Operation(operationId = "getApplicationCounts", summary = "获取应用数量", description = "获取应用的统计数量")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "统计数据获取成功"),

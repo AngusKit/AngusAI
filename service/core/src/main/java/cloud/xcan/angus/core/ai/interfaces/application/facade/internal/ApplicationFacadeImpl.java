@@ -141,11 +141,7 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
   @Override
   public ApplicationStatisticsVo getStatistics(Long id, String startDate, String endDate,
       String period) {
-    // 这里应该调用统计服务获取详细数据
-    // 暂时返回模拟数据
-    ApplicationStatisticsVo statistics = new ApplicationStatisticsVo();
-    // TODO: 实现统计逻辑
-    return statistics;
+    return applicationQuery.getStatistics(id, startDate, endDate, period);
   }
 
   /**
