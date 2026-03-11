@@ -131,4 +131,12 @@ public class NotificationQueryImpl implements NotificationQuery {
     Long currentUserId = PrincipalContext.getUserId();
     return notificationRepo.findByTimeRange(currentUserId, startTime, endTime);
   }
+
+  @Override
+  public long countUnread(Long userId) {
+    if (userId == null) {
+      return 0L;
+    }
+    return notificationRepo.countUnread(userId);
+  }
 }

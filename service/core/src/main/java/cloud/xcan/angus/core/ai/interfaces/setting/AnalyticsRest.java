@@ -5,6 +5,7 @@ import cloud.xcan.angus.core.ai.interfaces.setting.facade.dto.AnalyticsQueryDto;
 import cloud.xcan.angus.core.ai.interfaces.setting.facade.vo.AnalyticsOverviewVo;
 import cloud.xcan.angus.core.ai.interfaces.setting.facade.vo.ApiCallsTrendVo;
 import cloud.xcan.angus.core.ai.interfaces.setting.facade.vo.AppDistributionVo;
+import cloud.xcan.angus.core.ai.interfaces.setting.facade.vo.ResourcesBadgeVo;
 import cloud.xcan.angus.core.ai.interfaces.setting.facade.vo.ErrorAnalysisVo;
 import cloud.xcan.angus.core.ai.interfaces.setting.facade.vo.ModelDistributionVo;
 import cloud.xcan.angus.core.ai.interfaces.setting.facade.vo.ResponseTimeAnalysisVo;
@@ -135,4 +136,14 @@ public class AnalyticsRest {
     return ApiLocaleResult.success(analyticsFacade.getErrorAnalysis(dto));
   }
 
+  @Operation(operationId = "getResourcesBadge", summary = "获取关键资源badge统计",
+      description = "获取当前用户关键资源badge统计，包括对话Session数、我的应用数、通知数")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "关键资源badge统计获取成功")
+  })
+  @ResponseStatus(HttpStatus.OK)
+  @GetMapping("/resources/badge")
+  public ApiLocaleResult<ResourcesBadgeVo> getResourcesBadge() {
+    return ApiLocaleResult.success(analyticsFacade.getResourcesBadge());
+  }
 }

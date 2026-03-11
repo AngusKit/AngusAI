@@ -24,6 +24,11 @@ public interface SessionRepo extends BaseRepository<Session, Long> {
   List<Session> findBySessionIdIn(List<String> sessionIds);
 
   /**
+   * 统计某用户创建的会话总数
+   */
+  long countByCreatedBy(Long createdBy);
+
+  /**
    * 统计某用户在某应用下的会话数量（用于配额校验）
    */
   long countByCreatedByAndAppId(Long createdBy, Long appId);

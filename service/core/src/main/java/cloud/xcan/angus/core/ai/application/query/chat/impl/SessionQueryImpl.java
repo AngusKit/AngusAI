@@ -207,4 +207,12 @@ public class SessionQueryImpl implements SessionQuery {
       }
     }.execute();
   }
+
+  @Override
+  public long countByCreatedBy(Long userId) {
+    if (userId == null) {
+      return 0L;
+    }
+    return sessionRepo.countByCreatedBy(userId);
+  }
 }

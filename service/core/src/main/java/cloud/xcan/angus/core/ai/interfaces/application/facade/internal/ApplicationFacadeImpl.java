@@ -135,7 +135,7 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
 
   @Override
   public ApplicationCountVo getCounts() {
-    return applicationQuery.getCounts();
+    return applicationQuery.getCurrentUserCounts();
   }
 
   @Override

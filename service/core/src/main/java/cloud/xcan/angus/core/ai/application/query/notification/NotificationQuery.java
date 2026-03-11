@@ -23,4 +23,9 @@ public interface NotificationQuery {
   NotificationStatisticsVo getStatistics();
 
   List<Notification> findByTimeRange(LocalDateTime startTime, LocalDateTime endTime);
+
+  /**
+   * 统计当前用户未读通知数
+   */
+  long countUnread(Long userId);
 }

@@ -35,7 +35,7 @@ public interface ApplicationQuery {
   /**
    * 获取应用数量统计（总数、草稿、已发布、已暂停、标星）
    */
-  ApplicationCountVo getCounts();
+  ApplicationCountVo getCurrentUserCounts();
 
   /**
    * 获取应用统计数据（概览、趋势、热门用户）

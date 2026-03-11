@@ -63,4 +63,9 @@ public interface SessionQuery {
    * 统计今日会话
    */
   Long countToday();
+
+  /**
+   * 统计当前用户创建的会话总数
+   */
+  long countByCreatedBy(Long userId);
 }

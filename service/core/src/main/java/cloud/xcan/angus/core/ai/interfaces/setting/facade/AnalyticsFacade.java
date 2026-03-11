@@ -4,6 +4,7 @@ import cloud.xcan.angus.core.ai.interfaces.setting.facade.dto.AnalyticsQueryDto;
 import cloud.xcan.angus.core.ai.interfaces.setting.facade.vo.AnalyticsOverviewVo;
 import cloud.xcan.angus.core.ai.interfaces.setting.facade.vo.ApiCallsTrendVo;
 import cloud.xcan.angus.core.ai.interfaces.setting.facade.vo.AppDistributionVo;
+import cloud.xcan.angus.core.ai.interfaces.setting.facade.vo.ResourcesBadgeVo;
 import cloud.xcan.angus.core.ai.interfaces.setting.facade.vo.ErrorAnalysisVo;
 import cloud.xcan.angus.core.ai.interfaces.setting.facade.vo.ModelDistributionVo;
 import cloud.xcan.angus.core.ai.interfaces.setting.facade.vo.ResponseTimeAnalysisVo;
@@ -51,5 +52,10 @@ public interface AnalyticsFacade {
    * 获取错误分析
    */
   ErrorAnalysisVo getErrorAnalysis(AnalyticsQueryDto dto);
+
+  /**
+   * 获取关键资源badge统计（对话Session数、我的应用数、未读通知数）
+   */
+  ResourcesBadgeVo getResourcesBadge();
 
 }

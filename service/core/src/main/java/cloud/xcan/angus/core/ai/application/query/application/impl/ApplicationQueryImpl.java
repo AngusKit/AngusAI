@@ -154,12 +154,11 @@ public class ApplicationQueryImpl implements ApplicationQuery {
   }
 
   @Override
-  public ApplicationCountVo getCounts() {
+  public ApplicationCountVo getCurrentUserCounts() {
     return new BizTemplate<ApplicationCountVo>() {
       @Override
       protected ApplicationCountVo process() {
         Long userId = getUserId();
-        // 一次聚合查询获取 total/draft/published/paused，减少 4 次 DB 往返为 1 次
         ApplicationCountsProjection counts = applicationRepo.countByCreatedByGrouped(userId);
         long starred = applicationStarRepo.countByUserId(userId);
         return ApplicationCountVo.builder()

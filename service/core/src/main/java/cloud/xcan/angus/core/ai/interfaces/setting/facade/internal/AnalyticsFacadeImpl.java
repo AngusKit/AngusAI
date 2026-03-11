@@ -2,7 +2,11 @@ package cloud.xcan.angus.core.ai.interfaces.setting.facade.internal;
 
 import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.determineGranularity;
 import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.parseTimeRange;
+import static cloud.xcan.angus.spec.principal.PrincipalContext.getUserId;
 
+import cloud.xcan.angus.core.ai.application.query.application.ApplicationQuery;
+import cloud.xcan.angus.core.ai.application.query.chat.SessionQuery;
+import cloud.xcan.angus.core.ai.application.query.notification.NotificationQuery;
 import cloud.xcan.angus.core.ai.application.query.setting.AnalyticsQuery;
 import cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.TimeRange;
 import cloud.xcan.angus.core.ai.interfaces.setting.facade.AnalyticsFacade;
@@ -14,6 +18,7 @@ import cloud.xcan.angus.core.ai.interfaces.setting.facade.vo.AppDistributionVo;
 import cloud.xcan.angus.core.ai.interfaces.setting.facade.vo.ErrorAnalysisVo;
 import cloud.xcan.angus.core.ai.interfaces.setting.facade.vo.ModelDistributionVo;
 import cloud.xcan.angus.core.ai.interfaces.setting.facade.vo.ResponseTimeAnalysisVo;
+import cloud.xcan.angus.core.ai.interfaces.setting.facade.vo.ResourcesBadgeVo;
 import cloud.xcan.angus.core.ai.interfaces.setting.facade.vo.TokenUsageTrendVo;
 import cloud.xcan.angus.core.ai.interfaces.setting.facade.vo.TopEndpointsVo;
 import jakarta.annotation.Resource;
@@ -27,6 +32,15 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
 
   @Resource
   private AnalyticsQuery analyticsQuery;
+
+  @Resource
+  private ApplicationQuery applicationQuery;
+
+  @Resource
+  private SessionQuery sessionQuery;
+
+  @Resource
+  private NotificationQuery notificationQuery;
 
   @Override
   public AnalyticsOverviewVo getOverview(AnalyticsQueryDto dto) {
@@ -108,6 +122,16 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
     Map<String, Object> analysisData = analyticsQuery.getErrorAnalysis(
         timeRange.start, timeRange.end, dto.getAppId());
     return AnalyticsAssembler.toErrorAnalysisVo(analysisData);
+  }
+
+  @Override
+  public ResourcesBadgeVo getResourcesBadge() {
+    Long userId = getUserId();
+    ResourcesBadgeVo vo = new ResourcesBadgeVo();
+    vo.setSessionCount(sessionQuery.countByCreatedBy(userId));
+    vo.setApplicationCount(userId != null ? applicationQuery.getCurrentUserCounts().getTotal() : 0L);
+    vo.setNotificationCount(notificationQuery.countUnread(userId));
+    return vo;
   }
 
 }
