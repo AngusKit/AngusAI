@@ -69,9 +69,9 @@ export function AgentManagement() {
   return (
     <div className="space-y-6">
       {/* 标题区域：与应用列表一致 */}
-      <div className="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-gray-800 dark:to-gray-800 rounded-xl p-6 border border-orange-100 dark:border-gray-700">
+      <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-800 rounded-xl p-6 border border-blue-100 dark:border-gray-700">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 bg-orange-500 dark:bg-orange-600 rounded-lg flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 bg-blue-500 dark:bg-blue-600 rounded-lg flex items-center justify-center shrink-0">
             <Bot className="w-5 h-5 text-white" />
           </div>
           <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white">智能体</h1>
@@ -86,7 +86,7 @@ export function AgentManagement() {
             onClick={() => handleTabChange('all')}
             className={`pb-3 px-1 border-b-2 text-sm whitespace-nowrap transition-colors ${
               activeTab === 'all'
-                ? 'border-orange-500 text-orange-600 dark:text-orange-400'
+                ? 'border-blue-500 text-blue-600 dark:text-blue-400'
                 : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300'
             }`}
           >
@@ -96,7 +96,7 @@ export function AgentManagement() {
             onClick={() => handleTabChange('published')}
             className={`pb-3 px-1 border-b-2 text-sm whitespace-nowrap transition-colors ${
               activeTab === 'published'
-                ? 'border-orange-500 text-orange-600 dark:text-orange-400'
+                ? 'border-blue-500 text-blue-600 dark:text-blue-400'
                 : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300'
             }`}
           >
@@ -106,7 +106,7 @@ export function AgentManagement() {
             onClick={() => handleTabChange('inactive')}
             className={`pb-3 px-1 border-b-2 text-sm whitespace-nowrap transition-colors ${
               activeTab === 'inactive'
-                ? 'border-orange-500 text-orange-600 dark:text-orange-400'
+                ? 'border-blue-500 text-blue-600 dark:text-blue-400'
                 : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300'
             }`}
           >
@@ -124,7 +124,7 @@ export function AgentManagement() {
             placeholder="搜索智能体名称、描述..."
             value={searchQuery}
             onChange={e => handleSearchChange(e.target.value)}
-            className="pl-10 pr-10 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 focus-visible:border-orange-500 focus-visible:ring-orange-500/50"
+            className="pl-10 pr-10 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 focus-visible:border-blue-500 focus-visible:ring-blue-500/50"
           />
           {searchQuery && (
             <button
@@ -153,7 +153,7 @@ export function AgentManagement() {
               onClick={() => setViewMode('grid')}
               className={`p-1.5 rounded ${
                 viewMode === 'grid'
-                  ? 'bg-orange-50 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400'
+                  ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
                   : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
               }`}
             >
@@ -163,14 +163,14 @@ export function AgentManagement() {
               onClick={() => setViewMode('list')}
               className={`p-1.5 rounded ${
                 viewMode === 'list'
-                  ? 'bg-orange-50 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400'
+                  ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
                   : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
               }`}
             >
               <List className="w-4 h-4" />
             </button>
           </div>
-          <Button size="sm" className="bg-orange-500 hover:bg-orange-600 text-white" onClick={() => navigate('/agents/create')}>
+          <Button size="sm" className="bg-blue-500 hover:bg-blue-600 text-white" onClick={() => navigate('/agents/create')}>
             <Plus className="w-4 h-4 mr-2" />
             创建智能体
           </Button>
@@ -292,7 +292,7 @@ export function AgentManagement() {
             {searchQuery ? `没有找到包含"${searchQuery}"的智能体` : '开始创建您的第一个智能体'}
           </p>
           {!searchQuery && (
-            <Button className="bg-orange-500 hover:bg-orange-600 text-white" onClick={() => navigate('/agents/create')}>
+            <Button className="bg-blue-500 hover:bg-blue-600 text-white" onClick={() => navigate('/agents/create')}>
               <Plus className="w-4 h-4 mr-2" />
               创建智能体
             </Button>
@@ -330,7 +330,7 @@ function AgentCard({
         className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md dark:hover:shadow-gray-900/50 transition-shadow cursor-pointer group"
       >
         <div className="flex items-center gap-6">
-          <div className="w-11 h-11 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center flex-shrink-0">
+          <div className="w-11 h-11 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0">
             <Bot className="w-5 h-5 text-white" />
           </div>
           <div className="flex-1 min-w-0">
@@ -373,7 +373,7 @@ function AgentCard({
               title={agent.statusEnum === AgentStatusEnum.ACTIVE ? '下线智能体' : '发布智能体'}
             >
               {agent.statusEnum === AgentStatusEnum.ACTIVE ? (
-                <Pause className="w-4 h-4 text-orange-500" />
+                <Pause className="w-4 h-4 text-blue-500" />
               ) : (
                 <Play className="w-4 h-4 text-green-500" />
               )}
@@ -393,7 +393,7 @@ function AgentCard({
     >
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-start gap-3">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center flex-shrink-0">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0">
             <Bot className="w-6 h-6 text-white" />
           </div>
           <div className="flex-1 min-w-0">

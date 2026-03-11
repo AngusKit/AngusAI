@@ -103,6 +103,21 @@ export type AgentListResult = ApiLocaleResult & {
   data?: PageResultAgentListVo;
 };
 
+/** 智能体数量统计 */
+export interface AgentCountVo {
+  /** 智能体总数 */
+  total?: number;
+  /** 已发布数 */
+  active?: number;
+  /** 离线数 */
+  inactive?: number;
+}
+
+/** 智能体数量统计结果 */
+export type AgentCountResult = ApiLocaleResult & {
+  data?: AgentCountVo;
+};
+
 /** 创建智能体请求 */
 export interface AgentCreateDto {
   /** 智能体名称（必填） */

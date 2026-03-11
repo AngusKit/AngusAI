@@ -1,5 +1,6 @@
 import { ApiLocaleResult, AI, PageQuery } from '@xcan-angus/infra';
 import {
+  AgentCountResult,
   AgentCreateDto,
   AgentDetailResult,
   AgentListResult,
@@ -14,6 +15,23 @@ export class Agents<SecurityDataType = unknown> {
   constructor(http: HttpClient<SecurityDataType>) {
     this.http = http;
   }
+
+  /**
+   * @description 获取智能体数量统计数据
+   *
+   * @tags Agent
+   * @name GetAgentCounts
+   * @summary 获取智能体数量统计
+   * @request GET:/api/v1/agents/counts
+   * @secure
+   */
+  getAgentCounts = (params: RequestParams = {}) =>
+    this.http.request<AgentCountResult>({
+      path: `${AI}/agents/counts`,
+      method: 'GET',
+      secure: true,
+      ...params,
+    });
 
   /**
    * @description 分页查询智能体列表，支持关键词、状态、交互模式筛选

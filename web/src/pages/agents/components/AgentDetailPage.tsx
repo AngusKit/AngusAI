@@ -84,7 +84,7 @@ export function AgentDetailPage() {
             {/* Left: 智能体信息 */}
             <div className="flex items-start gap-6">
               <div className="rounded-xl flex items-center justify-center flex-shrink-0">
-                <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center">
+                <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
                   <Bot className="w-10 h-10 text-white" />
                 </div>
               </div>
@@ -185,7 +185,7 @@ export function AgentDetailPage() {
                   )}
                   {resources?.apiCollections && resources.apiCollections.length > 0 && (
                     <ResourceSection
-                      icon={<Code2 className="w-4 h-4 text-orange-500" />}
+                      icon={<Code2 className="w-4 h-4 text-blue-500" />}
                       title="接口集"
                       items={resources.apiCollections.map(r => r.name ?? String(r.id))}
                       baseLink="/api-collection"

@@ -2,7 +2,7 @@ import { useCallback, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import Agents from '@/services/Agents';
-import type { AgentListVo, AgentResourceInfoVo } from '@/services/AgentsTypes';
+import type { AgentCountVo, AgentListVo, AgentResourceInfoVo } from '@/services/AgentsTypes';
 import { AgentStatusEnum } from '@/enums/enums';
 import { useDebounce } from '@/hooks/useDebounce';
 import { AGENT_ITEMS_PER_PAGE } from '../constants';
@@ -34,6 +34,28 @@ export function useAgentList() {
   const [agents, setAgents] = useState<AgentListItem[]>([]);
   const [agentsLoading, setAgentsLoading] = useState(false);
   const [agentsTotal, setAgentsTotal] = useState(0);
+  const [counts, setCounts] = useState<AgentCountVo>({
+    total: 0,
+    active: 0,
+    inactive: 0,
+  });
+
+  /** 加载 Tab 统计数量（getAgentCounts） */
+  const loadCounts = useCallback(async () => {
+    try {
+      const response = await Agents.getAgentCounts();
+      const data = (response as { data?: AgentCountVo })?.data;
+      if (data) {
+        setCounts({
+          total: data.total ?? 0,
+          active: data.active ?? 0,
+          inactive: data.inactive ?? 0,
+        });
+      }
+    } catch {
+      // 静默失败，Tab 数量保持为 0
+    }
+  }, []);
 
   /** 加载智能体列表 */
   const loadAgents = useCallback(async () => {
@@ -73,6 +95,10 @@ export function useAgentList() {
     loadAgents();
   }, [loadAgents]);
 
+  useEffect(() => {
+    loadCounts();
+  }, [loadCounts]);
+
   /** 切换智能体发布/离线状态 */
   const handleToggleStatus = async (agent: AgentListItem) => {
     if (!agent.id || !agent.statusEnum) return;
@@ -82,6 +108,7 @@ export function useAgentList() {
       await Agents.updateAgentStatus(agent.id, newStatus);
       toast.success(newStatus === AgentStatusEnum.ACTIVE ? '已发布' : '离线');
       loadAgents();
+      loadCounts();
     } catch (error: any) {
       toast.error(error?.message || '操作失败');
     }
@@ -94,6 +121,7 @@ export function useAgentList() {
       await Agents.deleteAgent(agent.id);
       toast.success('智能体已删除');
       loadAgents();
+      loadCounts();
     } catch (error: any) {
       toast.error(error?.message || '删除失败');
     }
@@ -111,10 +139,12 @@ export function useAgentList() {
     setCurrentPage(1);
   };
 
-  /** 获取分类数量（当前 Tab 对应的总数） */
+  /** 根据分类获取数量（来自 getAgentCounts 接口） */
   const getCategoryCount = (tab: 'all' | 'published' | 'inactive') => {
-    if (tab !== activeTab) return '-';
-    return agentsTotal;
+    if (tab === 'all') return counts.total ?? 0;
+    if (tab === 'published') return counts.active ?? 0;
+    if (tab === 'inactive') return counts.inactive ?? 0;
+    return 0;
   };
 
   return {

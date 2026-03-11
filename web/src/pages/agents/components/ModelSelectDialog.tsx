@@ -22,10 +22,10 @@ const PAGE_SIZE = 10;
 const DIALOG_MIN_HEIGHT = 480;
 /** 选中态配色（橙色系） */
 const ACCENT = {
-  selected: 'text-orange-500',
-  border: 'border-orange-500',
-  hover: 'hover:border-orange-200 dark:hover:border-orange-800',
-  bg: 'bg-orange-50 dark:bg-orange-900/20',
+  selected: 'text-blue-500',
+  border: 'border-blue-500',
+  hover: 'hover:border-blue-200 dark:hover:border-blue-800',
+  bg: 'bg-blue-50 dark:bg-blue-900/20',
 };
 
 interface ModelSelectDialogProps {
@@ -164,7 +164,7 @@ export function ModelSelectDialog({
         >
           {loading ? (
             <div className="flex flex-col items-center justify-center py-16">
-              <div className="w-10 h-10 border-2 border-gray-300 dark:border-gray-600 border-t-orange-500 dark:border-t-orange-400 rounded-full animate-spin" />
+              <div className="w-10 h-10 border-2 border-gray-300 dark:border-gray-600 border-t-blue-500 dark:border-t-blue-400 rounded-full animate-spin" />
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-3">加载中...</p>
             </div>
           ) : items.length === 0 ? (

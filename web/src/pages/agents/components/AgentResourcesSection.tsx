@@ -477,7 +477,7 @@ export function AgentResourcesSection({ value, onChange }: AgentResourcesSection
             selectedIds={value.apiCollectionIds}
             selectedNames={value.apiCollectionNames}
             maxCount={AGENT_MAX_API_COLLECTION}
-            accent="text-orange-500"
+            accent="text-blue-500"
           />
           <ResourceRow
             type="workflow"
@@ -539,10 +539,10 @@ export function AgentResourcesSection({ value, onChange }: AgentResourcesSection
         selectedIds={value.apiCollectionIds}
         maxCount={AGENT_MAX_API_COLLECTION}
         accent={{
-          selected: 'text-orange-500',
-          border: 'border-orange-500',
-          hover: 'hover:border-orange-200 dark:hover:border-orange-800',
-          bg: 'bg-orange-50 dark:bg-orange-900/20',
+          selected: 'text-blue-500',
+          border: 'border-blue-500',
+          hover: 'hover:border-blue-200 dark:hover:border-blue-800',
+          bg: 'bg-blue-50 dark:bg-blue-900/20',
         }}
         onToggle={toggleApiCollection}
         emptyLink="/api-collection"
