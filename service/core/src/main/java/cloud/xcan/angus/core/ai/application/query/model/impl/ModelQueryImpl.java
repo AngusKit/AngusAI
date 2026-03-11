@@ -22,6 +22,7 @@ import cloud.xcan.angus.remote.search.SearchCriteria;
 import jakarta.annotation.Resource;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -103,6 +104,11 @@ public class ModelQueryImpl implements ModelQuery {
   @Override
   public Optional<Model> findById(Long id) {
     return id == null ? Optional.empty() : modelRepo.findById(id);
+  }
+
+  @Override
+  public List<Model> findByIds(Collection<Long> ids) {
+    return modelRepo.findAllById(ids);
   }
 
   @Override

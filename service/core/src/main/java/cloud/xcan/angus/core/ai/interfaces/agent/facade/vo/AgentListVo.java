@@ -2,6 +2,7 @@ package cloud.xcan.angus.core.ai.interfaces.agent.facade.vo;
 
 import cloud.xcan.agentx.core.agent.enums.InteractionMode;
 import cloud.xcan.angus.core.ai.domain.agent.AgentStatus;
+import cloud.xcan.angus.core.ai.interfaces.agent.facade.vo.AgentDetailVo.ResourceInfoVo;
 import cloud.xcan.angus.remote.vo.TenantAuditingVo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -27,6 +28,6 @@ public class AgentListVo extends TenantAuditingVo {
   @Schema(description = "交互模式")
   private InteractionMode interactionMode;
 
-  @Schema(description = "默认模型ID")
-  private Long defaultModelId;
+  @Schema(description = "默认模型（含ID和名称）")
+  private ResourceInfoVo defaultModel;
 }

@@ -3,10 +3,11 @@ package cloud.xcan.angus.core.ai.interfaces.agent.facade.internal;
 
 import static cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder.getMatchSearchFields;
 import static cloud.xcan.angus.core.utils.CoreUtils.buildVoPageResult;
+import static java.util.Collections.emptyMap;
 import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 
-import cloud.xcan.agentx.core.agent.AgentRegistry;
 import cloud.xcan.angus.core.ai.application.cmd.agent.AgentCmd;
 import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
 import cloud.xcan.angus.core.ai.application.query.apis.ApiCollectionQuery;
@@ -19,6 +20,7 @@ import cloud.xcan.angus.core.ai.domain.agent.AgentStatus;
 import cloud.xcan.angus.core.ai.domain.apis.ApiCollection;
 import cloud.xcan.angus.core.ai.domain.dataset.Dataset;
 import cloud.xcan.angus.core.ai.domain.knowledgebase.KnowledgeBase;
+import cloud.xcan.angus.core.ai.domain.model.Model;
 import cloud.xcan.angus.core.ai.domain.workflow.Workflow;
 import cloud.xcan.angus.core.ai.interfaces.agent.facade.AgentFacade;
 import cloud.xcan.angus.core.ai.interfaces.agent.facade.dto.AgentCreateDto;
@@ -34,6 +36,9 @@ import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.PageResult;
 import jakarta.annotation.Resource;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -63,9 +68,6 @@ public class AgentFacadeImpl implements AgentFacade {
 
   @Resource
   private ModelQuery modelQuery;
-
-  @Resource
-  private AgentRegistry agentRegistry;
 
   @NameJoin
   @Override
@@ -104,6 +106,17 @@ public class AgentFacadeImpl implements AgentFacade {
     return AgentAssembler.toDetailVo(agent, getAgentResourcesVo(agent), getDefaultModelVo(agent));
   }
 
+  @NameJoin
+  @Override
+  public PageResult<AgentListVo> list(AgentFindDto dto) {
+    GenericSpecification<Agent> spec = AgentAssembler.getSpecification(dto);
+    Page<Agent> page = agentQuery.find(spec, dto.tranPage(),
+        dto.fullTextSearch, getMatchSearchFields(dto.getClass()));
+    Map<Long, ResourceInfoVo> defaultModelVos = getDefaultModelVos(page.getContent());
+    return buildVoPageResult(page,
+        x -> AgentAssembler.toListVo(x, defaultModelVos.get(x.getDefaultModelId())));
+  }
+
   private ResourceInfoVo getDefaultModelVo(Agent agent) {
     if (agent.getDefaultModelId() == null) {
       return null;
@@ -111,6 +124,19 @@ public class AgentFacadeImpl implements AgentFacade {
     return modelQuery.findById(agent.getDefaultModelId())
         .map(m -> new ResourceInfoVo(m.getId(), m.getName()))
         .orElse(null);
+  }
+
+  private Map<Long, ResourceInfoVo> getDefaultModelVos(List<Agent> agents) {
+    if (isEmpty(agents)) {
+      return emptyMap();
+    }
+    Set<Long> defaultModelIds = agents.stream().map(Agent::getDefaultModelId)
+        .filter(Objects::nonNull).collect(Collectors.toSet());
+    if (isEmpty(defaultModelIds)) {
+      return emptyMap();
+    }
+    return modelQuery.findByIds(defaultModelIds).stream()
+        .collect(Collectors.toMap(Model::getId, m -> new ResourceInfoVo(m.getId(), m.getName())));
   }
 
   private AgentResourcesVo getAgentResourcesVo(Agent agent) {
@@ -139,15 +165,6 @@ public class AgentFacadeImpl implements AgentFacade {
               .collect(Collectors.toList()));
     }
     return vo;
-  }
-
-  @NameJoin
-  @Override
-  public PageResult<AgentListVo> list(AgentFindDto dto) {
-    GenericSpecification<Agent> spec = AgentAssembler.getSpecification(dto);
-    Page<Agent> page = agentQuery.find(spec, dto.tranPage(),
-        dto.fullTextSearch, getMatchSearchFields(dto.getClass()));
-    return buildVoPageResult(page, AgentAssembler::toListVo);
   }
 
 }

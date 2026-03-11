@@ -15,6 +15,7 @@ import cloud.xcan.angus.core.ai.interfaces.agent.facade.dto.AgentCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.agent.facade.dto.AgentFindDto;
 import cloud.xcan.angus.core.ai.interfaces.agent.facade.dto.AgentUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.agent.facade.vo.AgentDetailVo;
+import cloud.xcan.angus.core.ai.interfaces.agent.facade.vo.AgentDetailVo.ResourceInfoVo;
 import cloud.xcan.angus.core.ai.interfaces.agent.facade.vo.AgentListVo;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder;
@@ -157,14 +158,14 @@ public class AgentAssembler {
     return vo;
   }
 
-  public static AgentListVo toListVo(Agent agent) {
+  public static AgentListVo toListVo(Agent agent, ResourceInfoVo defaultModel) {
     AgentListVo vo = new AgentListVo();
     vo.setId(agent.getId());
     vo.setName(agent.getName());
     vo.setDescription(agent.getDescription());
     vo.setStatus(agent.getStatus());
     vo.setInteractionMode(agent.getInteractionMode());
-    vo.setDefaultModelId(agent.getDefaultModelId());
+    vo.setDefaultModel(defaultModel);
 
     // 设置审计字段
     vo.setTenantId(agent.getTenantId());
