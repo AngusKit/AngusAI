@@ -6,37 +6,32 @@ import { Skeleton } from '@/components/ui/skeleton.tsx';
 import { useState, useEffect } from 'react';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { toast } from 'sonner';
-import { formatLastUsedDisplay, getTagColor } from '@/utils/FormatUtils.ts';
+import { formatLastUsedDisplay } from '@/utils/FormatUtils.ts';
+import { getTagColor } from '@/pages/applications/utils.ts';
 import DashboardApi from '@/services/Dashboard.ts';
 import type { RecentApplicationItemVo } from '@/services/DashboardTypes.ts';
 
 const DEFAULT_ICONS = [MessageSquare, FileText, Database];
+/** iconBg 由前端根据应用索引配置（后端已删除该字段） */
+const DEFAULT_ICON_BGS = ['bg-blue-500', 'bg-purple-500', 'bg-green-500'] as const;
 
 function toApplication(vo: RecentApplicationItemVo, index: number): Application {
   const Icon = DEFAULT_ICONS[index % DEFAULT_ICONS.length];
-  const tags = (vo.tags ?? []).map((t) => {
-    const label = typeof t === 'object' ? (t.label ?? '') : String(t);
-    return { label, color: (typeof t === 'object' && t.color) ? t.color : getTagColor(label) };
-  });
+  const iconBg = DEFAULT_ICON_BGS[index % DEFAULT_ICON_BGS.length] ?? 'bg-blue-500';
   return {
     id: vo.id ?? String(index),
     icon: Icon,
     name: vo.name ?? '未命名应用',
     description: vo.description ?? '',
     fullDescription: vo.fullDescription ?? vo.description ?? '',
-    tags,
+    tags: vo.tags ?? [],
     usage: vo.usage ?? '',
-    iconBg: vo.iconBg ?? 'bg-blue-500',
+    iconBg,
     createdAt: vo.createdAt ?? '',
     lastUsed: vo.lastUsed ?? '',
     totalCalls: vo.totalCalls ?? '-',
     avgResponseTime: vo.avgResponseTime ?? '-',
   };
-}
-
-interface Tag {
-  label: string;
-  color: string;
 }
 
 interface Application {
@@ -45,7 +40,7 @@ interface Application {
   name: string;
   description: string;
   fullDescription: string;
-  tags: Tag[];
+  tags: string[];
   usage: string;
   iconBg: string;
   createdAt: string;
@@ -204,9 +199,9 @@ export function RecentApplications({ onNavigate }: { onNavigate?: (page: string)
                   {app.tags.map((tag, tagIndex) => (
                     <span
                       key={tagIndex}
-                      className={`text-xs px-2 py-1 rounded-md ${tag.color ?? getTagColor(tag.label)}`}
+                      className={`text-xs px-2 py-1 rounded-md ${getTagColor(tag, tagIndex)}`}
                     >
-                      {tag.label}
+                      {tag}
                     </span>
                   ))}
                 </div>
@@ -243,9 +238,9 @@ export function RecentApplications({ onNavigate }: { onNavigate?: (page: string)
                       {selectedApp.tags.map((tag, index) => (
                         <span
                           key={index}
-                          className={`text-xs px-2 py-1 rounded-md ${tag.color ?? getTagColor(tag.label)}`}
+                          className={`text-xs px-2 py-1 rounded-md ${getTagColor(tag, index)}`}
                         >
-                          {tag.label}
+                          {tag}
                         </span>
                       ))}
                     </div>

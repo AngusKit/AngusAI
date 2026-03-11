@@ -25,6 +25,7 @@ const TYPE_TO_ICON_BG: Record<string, string> = {
 function toStatData(vo: StatItemVo, t: (key: string) => string): StatData {
   const type = vo.type ?? 'totalApps';
   const Icon = TYPE_TO_ICON[type as keyof typeof TYPE_TO_ICON] ?? FileText;
+  // iconBg 由前端根据 type 配置（后端已删除该字段）
   const iconBg = TYPE_TO_ICON_BG[type] ?? 'bg-blue-500';
   const details = vo.details ?? {};
   return {
