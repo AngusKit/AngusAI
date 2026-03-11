@@ -3,6 +3,9 @@ package cloud.xcan.angus.core.ai.interfaces.dashboard.facade.internal.assembler;
 import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatLargeNumber;
 import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatNumber;
 import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatResponseTime;
+import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.toDouble;
+import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.toLocalDateTime;
+import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.toLong;
 
 import cloud.xcan.angus.core.ai.interfaces.dashboard.facade.vo.AppTagVo;
 import cloud.xcan.angus.core.ai.interfaces.dashboard.facade.vo.CostModelItemVo;
@@ -14,11 +17,8 @@ import cloud.xcan.angus.core.ai.interfaces.dashboard.facade.vo.StatPeriodDetails
 import cloud.xcan.angus.core.ai.interfaces.dashboard.facade.vo.StatsOverviewVo;
 import cloud.xcan.angus.core.ai.interfaces.dashboard.facade.vo.TopApiItemVo;
 import cloud.xcan.angus.core.ai.interfaces.dashboard.facade.vo.UsageDetailsVo;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,34 +29,7 @@ import java.util.stream.Collectors;
  */
 public class DashboardAssembler {
 
-  private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-  private static final String[] TAG_COLORS = {
-      "bg-blue-100 text-blue-700",
-      "bg-purple-100 text-purple-700",
-      "bg-green-100 text-green-700",
-      "bg-orange-100 text-orange-700",
-      "bg-pink-100 text-pink-700"
-  };
-
-  private static Long toLong(Object value, Long defaultValue) {
-    if (value == null) {
-      return defaultValue;
-    }
-    if (value instanceof Number) {
-      return ((Number) value).longValue();
-    }
-    return defaultValue;
-  }
-
-  private static Double toDouble(Object value, Double defaultValue) {
-    if (value == null) {
-      return defaultValue;
-    }
-    if (value instanceof Number) {
-      return ((Number) value).doubleValue();
-    }
-    return defaultValue;
-  }
+  private static final DateTimeFormatter ISO_DATETIME = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
   /**
    * 组装使用详情 VO
@@ -150,7 +123,8 @@ public class DashboardAssembler {
     long lastWeekCalls = toLong(lastWeek.get("totalCalls"), 0L);
     long thisMonthCalls = toLong(thisMonth.get("totalCalls"), 0L);
     long lastMonthCalls = toLong(lastMonth.get("totalCalls"), 0L);
-    double callsChange = lastWeekCalls > 0 ? (thisWeekCalls - lastWeekCalls) * 100.0 / lastWeekCalls : 0;
+    double callsChange =
+        lastWeekCalls > 0 ? (thisWeekCalls - lastWeekCalls) * 100.0 / lastWeekCalls : 0;
 
     StatItemVo apiCallsStat = new StatItemVo();
     apiCallsStat.setType("apiCalls");
@@ -240,8 +214,7 @@ public class DashboardAssembler {
     RecentApplicationsVo vo = new RecentApplicationsVo();
     List<RecentApplicationItemVo> items = new ArrayList<>();
 
-    for (int i = 0; i < usageStats.size(); i++) {
-      Map<String, Object> usage = usageStats.get(i);
+    for (Map<String, Object> usage : usageStats) {
       Long appId = toLong(usage.get("appId"), null);
       if (appId == null) {
         continue;
@@ -259,48 +232,13 @@ public class DashboardAssembler {
       Object lastUsed = usage.get("lastUsed");
       if (lastUsed != null) {
         LocalDateTime ldt = toLocalDateTime(lastUsed);
-        appItem.setLastUsed(ldt != null ? formatRelativeTime(ldt) : String.valueOf(lastUsed));
+        appItem.setLastUsed(ldt != null ? ldt.format(ISO_DATETIME) : null);
       }
       appItem.setUsage("已 " + formatLargeNumber(toLong(usage.get("totalCalls"), 0L)) + " 次调用");
       items.add(appItem);
     }
     vo.setItems(items);
     return vo;
-  }
-
-  private static LocalDateTime toLocalDateTime(Object value) {
-    if (value == null) {
-      return null;
-    }
-    if (value instanceof LocalDateTime) {
-      return (LocalDateTime) value;
-    }
-    if (value instanceof Timestamp) {
-      return ((Timestamp) value).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-    }
-    if (value instanceof java.util.Date) {
-      return ((java.util.Date) value).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-    }
-    return null;
-  }
-
-  private static String formatRelativeTime(LocalDateTime time) {
-    if (time == null) {
-      return "";
-    }
-    long minutes = ChronoUnit.MINUTES.between(time, LocalDateTime.now());
-    if (minutes < 60) {
-      return minutes + "分钟前";
-    }
-    long hours = ChronoUnit.HOURS.between(time, LocalDateTime.now());
-    if (hours < 24) {
-      return hours + "小时前";
-    }
-    long days = ChronoUnit.DAYS.between(time, LocalDateTime.now());
-    if (days < 7) {
-      return days + "天前";
-    }
-    return time.atZone(ZoneId.systemDefault()).format(DATE_FMT);
   }
 
   /**
@@ -324,7 +262,6 @@ public class DashboardAssembler {
       vo.setTags(tags.stream().map(tag -> {
         AppTagVo t = new AppTagVo();
         t.setLabel(tag);
-        t.setColor(TAG_COLORS[Math.abs(tag.hashCode()) % TAG_COLORS.length]);
         return t;
       }).collect(Collectors.toList()));
     }

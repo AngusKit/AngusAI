@@ -1,5 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.dashboard.facade.impl;
 
+import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.toLong;
 import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.parseTimeRange;
 import static cloud.xcan.angus.spec.principal.PrincipalContext.getUserId;
 
@@ -53,7 +54,7 @@ public class DashboardFacadeImpl implements DashboardFacade {
 
     List<Long> appIds = appDist.stream()
         .map(a -> toLong(a.get("appId"), null))
-        .filter(id -> id != null)
+        .filter(Objects::nonNull)
         .distinct()
         .collect(Collectors.toList());
     Map<Long, String> appNames = appIds.isEmpty() ? Map.of()
@@ -66,7 +67,7 @@ public class DashboardFacadeImpl implements DashboardFacade {
 
     List<Long> modelIds = costModels.stream()
         .map(m -> toLong(m.get("modelId"), null))
-        .filter(id -> id != null)
+        .filter(Objects::nonNull)
         .distinct()
         .collect(Collectors.toList());
     if (!modelIds.isEmpty()) {
@@ -89,12 +90,16 @@ public class DashboardFacadeImpl implements DashboardFacade {
     LocalDateTime thisMonthStart = now.minusDays(30);
     LocalDateTime lastMonthStart = now.minusDays(60);
 
-    Map<String, Object> thisWeek = analyticsQuery.getOverviewStatsForRange(thisWeekStart, now, null);
-    Map<String, Object> lastWeek = analyticsQuery.getOverviewStatsForRange(lastWeekStart, thisWeekStart, null);
-    Map<String, Object> thisMonth = analyticsQuery.getOverviewStatsForRange(thisMonthStart, now, null);
-    Map<String, Object> lastMonth = analyticsQuery.getOverviewStatsForRange(lastMonthStart, thisMonthStart, null);
+    Map<String, Object> thisWeek = analyticsQuery.getOverviewStatsForRange(thisWeekStart, now,
+        null);
+    Map<String, Object> lastWeek = analyticsQuery.getOverviewStatsForRange(lastWeekStart,
+        thisWeekStart, null);
+    Map<String, Object> thisMonth = analyticsQuery.getOverviewStatsForRange(thisMonthStart, now,
+        null);
+    Map<String, Object> lastMonth = analyticsQuery.getOverviewStatsForRange(lastMonthStart,
+        thisMonthStart, null);
 
-    Long totalApps = 0L;
+    long totalApps = 0L;
     if (getUserId() != null) {
       totalApps = applicationQuery.getCurrentUserCounts().getTotal();
     }
@@ -114,7 +119,7 @@ public class DashboardFacadeImpl implements DashboardFacade {
 
     List<Long> appIds = usageStats.stream()
         .map(u -> toLong(u.get("appId"), null))
-        .filter(id -> id != null)
+        .filter(Objects::nonNull)
         .distinct()
         .collect(Collectors.toList());
     Map<Long, AIApplication> appMap = applicationQuery.findByIds(appIds).stream()
@@ -144,17 +149,7 @@ public class DashboardFacadeImpl implements DashboardFacade {
         })
         .filter(Objects::nonNull)
         .collect(Collectors.toList());
-
     return DashboardAssembler.toRecentApplicationsVo(usageStats, appItems);
   }
 
-  private static Long toLong(Object value, Long defaultValue) {
-    if (value == null) {
-      return defaultValue;
-    }
-    if (value instanceof Number) {
-      return ((Number) value).longValue();
-    }
-    return defaultValue;
-  }
 }

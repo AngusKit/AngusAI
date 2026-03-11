@@ -6,6 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton.tsx';
 import { useState } from 'react';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { toast } from 'sonner';
+import { formatLastUsedDisplay, getTagColor } from '@/utils/FormatUtils.ts';
 
 interface Tag {
   label: string;
@@ -212,7 +213,10 @@ export function RecentApplications({ onNavigate }: { onNavigate?: (page: string)
 
                 <div className='flex flex-wrap gap-2 mb-2'>
                   {app.tags.map((tag, tagIndex) => (
-                    <span key={tagIndex} className={`text-xs px-2 py-1 rounded-md ${tag.color}`}>
+                    <span
+                      key={tagIndex}
+                      className={`text-xs px-2 py-1 rounded-md ${tag.color ?? getTagColor(tag.label)}`}
+                    >
                       {tag.label}
                     </span>
                   ))}
@@ -221,7 +225,7 @@ export function RecentApplications({ onNavigate }: { onNavigate?: (page: string)
                 <div className='flex items-center justify-between text-xs text-gray-400 dark:text-gray-500'>
                   <span>{app.usage}</span>
                   <span>
-                    {t('recentApps.lastAccess')}：{app.lastUsed}
+                    {t('recentApps.lastAccess')}：{formatLastUsedDisplay(app.lastUsed)}
                   </span>
                 </div>
               </div>
@@ -244,7 +248,10 @@ export function RecentApplications({ onNavigate }: { onNavigate?: (page: string)
                     <DialogTitle className='text-2xl mb-2'>{selectedApp.name}</DialogTitle>
                     <div className='flex flex-wrap gap-2'>
                       {selectedApp.tags.map((tag, index) => (
-                        <span key={index} className={`text-xs px-2 py-1 rounded-md ${tag.color}`}>
+                        <span
+                          key={index}
+                          className={`text-xs px-2 py-1 rounded-md ${tag.color ?? getTagColor(tag.label)}`}
+                        >
                           {tag.label}
                         </span>
                       ))}
@@ -269,7 +276,7 @@ export function RecentApplications({ onNavigate }: { onNavigate?: (page: string)
                   <Clock className='w-5 h-5 text-blue-500' />
                   <div>
                     <div className='text-xs text-gray-500 dark:text-gray-400'>{t('recentApps.lastUsedTime')}</div>
-                    <div className='text-sm dark:text-gray-200'>{selectedApp.lastUsed}</div>
+                    <div className='text-sm dark:text-gray-200'>{formatLastUsedDisplay(selectedApp.lastUsed)}</div>
                   </div>
                 </div>
                 <div className='flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg'>

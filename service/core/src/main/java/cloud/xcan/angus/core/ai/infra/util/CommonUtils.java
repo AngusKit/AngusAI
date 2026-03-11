@@ -6,8 +6,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
@@ -41,6 +43,26 @@ public class CommonUtils {
       return PERCENTAGE_FORMAT.format(number / 1_000.0) + "K";
     }
     return NUMBER_FORMAT.format(number);
+  }
+
+  public static Long toLong(Object value, Long defaultValue) {
+    if (value == null) {
+      return defaultValue;
+    }
+    if (value instanceof Number) {
+      return ((Number) value).longValue();
+    }
+    return defaultValue;
+  }
+
+  public static Double toDouble(Object value, Double defaultValue) {
+    if (value == null) {
+      return defaultValue;
+    }
+    if (value instanceof Number) {
+      return ((Number) value).doubleValue();
+    }
+    return defaultValue;
   }
 
   /**
@@ -111,6 +133,23 @@ public class CommonUtils {
       return dateTime.format(DateTimeFormatter.ofPattern("MM/dd"));
     }
   }
+
+  public static LocalDateTime toLocalDateTime(Object value) {
+    if (value == null) {
+      return null;
+    }
+    if (value instanceof LocalDateTime) {
+      return (LocalDateTime) value;
+    }
+    if (value instanceof Timestamp) {
+      return ((Timestamp) value).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+    }
+    if (value instanceof java.util.Date) {
+      return ((java.util.Date) value).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+    }
+    return null;
+  }
+
 
   /**
    * 计算百分位数

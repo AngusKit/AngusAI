@@ -315,6 +315,41 @@ export const formatDateDisplay = (
   }
 };
 
+/** 标签预设颜色（用于 API 返回无 color 时由前端分配） */
+export const TAG_COLORS = [
+  'bg-blue-100 text-blue-700',
+  'bg-purple-100 text-purple-700',
+  'bg-green-100 text-green-700',
+  'bg-orange-100 text-orange-700',
+  'bg-pink-100 text-pink-700',
+] as const;
+
+/**
+ * 根据标签文本获取颜色类名（前端处理标签配色）
+ */
+export const getTagColor = (label: string): string => {
+  const hash = (label ?? '')
+    .split('')
+    .reduce((h, c) => ((h << 5) - h + c.charCodeAt(0)) | 0, 0);
+  const idx = Math.abs(hash) % TAG_COLORS.length;
+  return TAG_COLORS[Math.max(0, idx)] ?? TAG_COLORS[0];
+};
+
+/**
+ * 格式化最后使用时间显示
+ * - 若为 ISO 日期字符串则转为相对时间（如 2小时前）
+ * - 若已是格式化文本则原样返回
+ */
+export const formatLastUsedDisplay = (value?: string): string => {
+  if (!value) return '-';
+  const trimmed = value.trim();
+  if (!trimmed) return '-';
+  // ISO 格式包含 T 或为纯数字时间戳
+  const isIso = /^\d{4}-\d{2}-\d{2}(T|\s)/.test(trimmed) || /^\d+$/.test(trimmed);
+  if (isIso) return formatRelativeTimeShort(trimmed);
+  return trimmed;
+};
+
 /**
  * 根据活动级别获取颜色类名
  * @param level 活动级别（0-4）
