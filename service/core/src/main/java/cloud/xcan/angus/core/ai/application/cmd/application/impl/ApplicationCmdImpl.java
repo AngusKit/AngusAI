@@ -113,6 +113,7 @@ public class ApplicationCmdImpl extends CommCmd<AIApplication, Long> implements 
         }
 
         AIApplication newApplication = toDuplicateApplication(newName, applicationDb);
+        newApplication.setId(uidGenerator.getUID());
         AIApplication saved = applicationRepo.save(newApplication);
         // 复制智能体绑定
         for (ApplicationAgent src : applicationAgentRepo.findByApplicationIdOrderBySortOrderAsc(
