@@ -12,11 +12,6 @@ public interface AIApplicationRepo extends NameJoinRepository<AIApplication, Lon
     BaseRepository<AIApplication, Long> {
 
   /**
-   * 根据分享ID查询应用
-   */
-  Optional<AIApplication> findByShareId(String shareId);
-
-  /**
    * 检查应用名称是否已存在（同一租户下）
    */
   boolean existsByName(String name);
@@ -25,21 +20,6 @@ public interface AIApplicationRepo extends NameJoinRepository<AIApplication, Lon
    * 检查应用名称是否已存在（排除指定ID）
    */
   boolean existsByNameAndIdNot(String name, Long id);
-
-  /**
-   * 统计用户的应用程序数量
-   */
-  long countByCreatedBy(Long createdBy);
-
-  /**
-   * 统计指定状态的应用数量
-   */
-  long countByStatus(ApplicationStatus status);
-
-  /**
-   * 统计指定创建者和状态的应用数量
-   */
-  long countByCreatedByAndStatus(Long createdBy, ApplicationStatus status);
 
   /**
    * 一次性聚合查询用户的各类应用数量（total/draft/published/paused），减少数据库往返

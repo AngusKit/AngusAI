@@ -116,7 +116,7 @@ public interface ApiUsageLogRepo extends BaseRepository<ApiUsageLog, Long> {
    * 应用趋势统计（按日聚合） 返回 List&lt;Object[]&gt;: [date, callCount, totalTokens, avgResponseTime] 使用 CAST
    * 兼容 MySQL/PostgreSQL
    */
-  @Query(value = "SELECT CAST(l.request_time AS date) AS d, COUNT(l), "
+  @Query(value = "SELECT CAST(l.request_time AS date) AS d, COUNT(*), "
       + "COALESCE(SUM(l.total_tokens), 0), "
       + "AVG(l.response_time_ms) "
       + "FROM ai_api_usage_log l "
