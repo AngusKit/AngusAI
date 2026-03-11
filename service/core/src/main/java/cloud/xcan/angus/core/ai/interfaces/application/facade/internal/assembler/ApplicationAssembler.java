@@ -121,6 +121,8 @@ public class ApplicationAssembler {
     statsVo.setAvgResponseTime(application.getAvgResponseTime());
     statsVo.setSuccessRate(application.getSuccessRate());
     vo.setStats(statsVo);
+    vo.setAgents(agents != null ? agents : java.util.List.of());
+    vo.setDefaultAgent(defaultAgent);
     return vo;
   }
 

@@ -26,7 +26,6 @@ import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationStat
 import cloud.xcan.angus.core.biz.NameJoin;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.PageResult;
-import cloud.xcan.angus.remote.search.SearchCriteria;
 import jakarta.annotation.Resource;
 import java.util.Comparator;
 import java.util.List;

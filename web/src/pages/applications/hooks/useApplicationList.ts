@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import Applications from '@/services/Applications';
-import type { ApplicationCountVo, ApplicationDetailVo } from '@/services/ApplicationsTypes';
+import type { ApplicationCountVo, ApplicationListVo } from '@/services/ApplicationsTypes';
 import { ApplicationStatusEnum } from '@/enums/enums';
 import { useDebounce } from '@/hooks/useDebounce';
 import { ITEMS_PER_PAGE } from '../constants';
@@ -81,7 +81,7 @@ export function useApplicationList() {
 
       const response = await Applications.getApplicationList(queryParams);
       const responseData = (response as any).data;
-      let listData: ApplicationDetailVo[] | undefined;
+      let listData: ApplicationListVo[] | undefined;
 
       if (responseData) {
         if (responseData.list) {
@@ -96,7 +96,7 @@ export function useApplicationList() {
       }
 
       if (Array.isArray(listData)) {
-        const mappedList: ApplicationListItem[] = listData.map((app: ApplicationDetailVo) => ({
+        const mappedList: ApplicationListItem[] = listData.map((app: ApplicationListVo) => ({
           id: app.id ?? '',
           name: app.name ?? '',
           description: app.description ?? '',
@@ -105,12 +105,8 @@ export function useApplicationList() {
           isStarred: app.isStarred ?? false,
           tags: app.tags ?? [],
           visits: `${app.apiCalls ?? 0} 次调用`,
-          agentIds:
-            app.agents?.map(a => a.id).filter((id): id is string => !!id) ??
-            (app as any).agentIds ??
-            app.config?.agents?.map(a => a.id).filter((id): id is string => !!id) ??
-            [],
-          defaultAgentId: app.defaultAgent?.id ?? (app as any).defaultAgentId ?? app.config?.defaultAgent?.id,
+          agentIds: app.agents?.map(a => (a.id != null ? String(a.id) : undefined)).filter((id): id is string => !!id) ?? [],
+          defaultAgentId: app.defaultAgent?.id != null ? String(app.defaultAgent.id) : undefined,
         }));
         setApplications(mappedList);
       } else {

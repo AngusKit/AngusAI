@@ -1,5 +1,5 @@
 import { ApiLocaleResult, PageQuery, AI } from '@xcan-angus/infra';
-import { ApplicationConfig, ApplicationCountResult, ApplicationCreateDto, ApplicationDetailResult, ApplicationDuplicateDto, ApplicationShareDto, ApplicationStatisticsResult, ApplicationUpdateDto, GetApplicationListOrderByEnum, } from './ApplicationsTypes.ts';
+import { ApplicationConfig, ApplicationCountResult, ApplicationCreateDto, ApplicationDetailResult, ApplicationDuplicateDto, ApplicationListResult, ApplicationShareDto, ApplicationStatisticsResult, ApplicationUpdateDto, GetApplicationListOrderByEnum, } from './ApplicationsTypes.ts';
 import http, { ContentType, HttpClient, QueryParamsType, RequestParams } from './HttpClient.ts';
 import { ApplicationStatusEnum } from '@/enums/enums.ts';
 
@@ -85,7 +85,7 @@ export class Applications<SecurityDataType = unknown> {
     },
     params: RequestParams = {}
   ) =>
-    this.http.request<ApiLocaleResult>({
+    this.http.request<ApplicationListResult>({
       path: `${AI}/applications`,
       method: 'GET',
       query: query as unknown as QueryParamsType,
@@ -102,7 +102,7 @@ export class Applications<SecurityDataType = unknown> {
    * @secure
    */
   createApplication = (data: ApplicationCreateDto, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResult>({
+    this.http.request<ApplicationDetailResult>({
       path: `${AI}/applications`,
       method: 'POST',
       body: data,
@@ -156,7 +156,7 @@ export class Applications<SecurityDataType = unknown> {
    * @secure
    */
   getApplicationDetail = (id: string, params: RequestParams = {}) =>
-    this.http.request<ApiLocaleResult>({
+    this.http.request<ApplicationDetailResult>({
       path: `${AI}/applications/${id}`,
       method: 'GET',
       secure: true,

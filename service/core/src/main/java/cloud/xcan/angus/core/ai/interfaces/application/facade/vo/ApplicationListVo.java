@@ -38,9 +38,6 @@ public class ApplicationListVo extends TenantAuditingVo {
   @Schema(description = "默认智能体（用于对话）")
   private ResourceInfoVo defaultAgent;
 
-  @Schema(description = "使用的模型")
-  private String model;
-
   @Schema(description = "关联知识库数")
   private Integer knowledgeBaseCount;
 

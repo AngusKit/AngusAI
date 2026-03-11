@@ -25,17 +25,14 @@ export interface ApplicationDetailVo extends TenantAuditingVo {
   publishedDate?: string;
   /** 详细配置 */
   config?: ApplicationConfigVo;
-  /** 分享信息 */
-  shareInfo?: ApplicationShareInfoVo;
-
-  /** 绑定的智能体列表（列表接口返回） */
+  /** 分享信息（由后端返回） */
+  share?: ApplicationShareVo;
+  /** 统计数据 */
+  stats?: ApplicationStatsVo;
+  /** 绑定的智能体列表 */
   agents?: ResourceInfoVo[];
-  /** 默认智能体（列表接口返回） */
+  /** 默认智能体（用于对话） */
   defaultAgent?: ResourceInfoVo;
-
-  /** 是否已收藏（星标） */
-  isStarred?: boolean;
-  apiCalls?: number;
 }
 
 /** The API response result of supporting international message. */
@@ -44,28 +41,68 @@ export type ApplicationDetailResult = ApiLocaleResult & {
   data?: ApplicationDetailVo;
 };
 
+/** 应用列表项 */
+export interface ApplicationListVo extends TenantAuditingVo {
+  /**
+   * 应用ID
+   * @format int64
+   */
+  id?: string;
+  /** 应用名称 */
+  name?: string;
+  /** 应用图标 */
+  icon?: string;
+  /** 应用描述 */
+  description?: string;
+  /** 应用标签（最多5个） */
+  tags?: string[];
+  /** 应用状态 */
+  status?: string;
+  /** 绑定的智能体列表 */
+  agents?: ResourceInfoVo[];
+  /** 默认智能体（用于对话） */
+  defaultAgent?: ResourceInfoVo;
+  /** 关联知识库数 */
+  knowledgeBaseCount?: number;
+  /** 关联工作流数 */
+  workflowCount?: number;
+  /** 是否公开访问 */
+  publicAccess?: boolean;
+  /** 是否启用嵌入 */
+  embedEnabled?: boolean;
+  /** 是否启用API */
+  apiEnabled?: boolean;
+  /** API调用次数 */
+  apiCalls?: number;
+  /**
+   * 发布时间
+   * @format date-time
+   */
+  publishedDate?: string;
+  /** 是否已收藏（星标） */
+  isStarred?: boolean;
+}
+
+/** The API response result of supporting international message. */
+export type ApplicationListResult = ApiLocaleResult & {
+  /** Actual response data or error details. */
+  data?: ApplicationListVo[];
+};
+
 /** 资源信息（id + name） */
 export interface ResourceInfoVo {
-  /** 资源ID */
-  id?: string;
+  /** 资源ID（后端 Long，序列化为 number） */
+  id?: string | number;
   /** 资源名称 */
   name?: string;
 }
 
-/** 应用配置 */
+/** 应用配置（模型/资源/提示词由绑定的智能体提供） */
 export interface ApplicationConfigVo {
-  /**
-   * 绑定的智能体列表
-   */
+  /** 绑定的智能体列表 */
   agents?: ResourceInfoVo[];
-  /**
-   * 默认智能体（用于对话）
-   */
+  /** 默认智能体（用于对话） */
   defaultAgent?: ResourceInfoVo;
-  /** 模型配置 */
-  model?: ModelConfigVo;
-  /** 提示词配置 */
-  prompts?: PromptsConfigVo;
   /** 功能设置 */
   features?: FeaturesConfigVo;
   /** 安全设置 */
@@ -179,20 +216,39 @@ export interface PublishConfigVo {
   apiEnabled?: boolean;
 }
 
-/** 应用分享信息 */
-export interface ApplicationShareInfoVo {
+/** 应用分享信息（响应，由后端返回） */
+export interface ApplicationShareVo {
   /** 公开访问：允许任何人通过链接访问应用 */
   publicAccess?: boolean;
   /** 匿名访问：允许未登录用户访问应用 */
   anonymousAccess?: boolean;
   /** 授权访问：只有授权用户才可访问 */
   authorizationRequired?: boolean;
+  /** 分享ID */
+  shareId?: string;
+  /** 分享链接 */
+  shareUrl?: string;
+  /** 邀请码 */
+  inviteCode?: string;
+  /** 二维码图片URL */
+  qrCode?: string;
   /**
-   * 有效期（小时），0表示永久
-   * @format int32
-   * @example 24
+   * 过期时间
+   * @format date-time
    */
-  expiresIn?: number;
+  expiresAt?: string;
+}
+
+/** 应用统计（响应，由后端返回） */
+export interface ApplicationStatsVo {
+  /** 总API调用次数 */
+  totalApiCalls?: number;
+  /** 总token数 */
+  totalTokens?: number;
+  /** 平均响应时间 */
+  avgResponseTime?: number;
+  /** 成功率 */
+  successRate?: number;
 }
 
 /** 功能设置 */
@@ -453,7 +509,7 @@ export interface TopUserVo {
    * 用户ID
    * @format int64
    */
-  userId?: string;
+  userId?: number;
   /** 用户名 */
   username?: string;
   /**
