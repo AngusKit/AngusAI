@@ -32,7 +32,7 @@ import { NAME_MAX_LENGTH, DESC_MAX_LENGTH, TAG_MAX_COUNT, TAG_MAX_LENGTH } from 
 /**
  * 应用设置页：基本信息、功能、安全、发布配置
  */
-export function AppSettingsPage() {
+export function ApplicationSettingsPage() {
   const hook = useAppSettings();
 
   if (hook.loading) {

@@ -23,7 +23,7 @@ import { AgentDetailPage } from '@/pages/agents/components/AgentDetailPage.tsx';
 import { VectorStore } from '@/pages/vector/VectorStore';
 import { Members } from '@/pages/member/Members.tsx';
 import { ResourceSharing } from '@/pages/sharding/ResourceSharing';
-import { AppSettingsPage } from '@/pages/applications/components/AppSettingsPage.tsx';
+import { ApplicationSettingsPage } from '@/pages/applications/components/ApplicationSettingsPage.tsx';
 import { UsageAnalytics } from '@/pages/settings/UsageAnalytics';
 import { APIKeys } from '@/pages/settings/APIKeys';
 import { BillingSubscription } from '@/pages/settings/BillingSubscription';
@@ -43,7 +43,7 @@ export function AppRoutes() {
         <Route path='apps/create' element={<CreateApplication />} />
         <Route path='apps/:id' element={<ApplicationDetailPage />} />
         <Route path='apps/:id/edit' element={<EditApplicationPage />} />
-        <Route path='apps/:id/settings' element={<AppSettingsPage />} />
+        <Route path='apps/:id/settings' element={<ApplicationSettingsPage />} />
         <Route path='create-app' element={<CreateApplication />} />
         <Route path='workflow' element={<Workflow />} />
         <Route path='workflow/create' element={<CreateWorkflowPage />} />
