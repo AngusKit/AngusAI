@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge.tsx';
 import { AppNavigator } from './AppNavigator.tsx';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip.tsx';
+import { useResourcesBadge } from '@/hooks/useResourcesBadge.ts';
 
 interface SidebarProps {
   /** 侧边栏是否收起 */
@@ -16,11 +17,19 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
+  const { formatBadge, sessionCount, applicationCount, notificationCount } = useResourcesBadge();
 
-  const mainMenuItems = [
+  type MenuItem = {
+    id: string;
+    icon: React.ComponentType<{ className?: string }>;
+    label: string;
+    badge?: string;
+  };
+
+  const mainMenuItems: MenuItem[] = [
     { id: 'dashboard', icon: Home, label: t('sidebar.nav.dashboard') },
-    { id: 'chat', icon: MessageSquare, label: t('sidebar.nav.chat') },
-    { id: 'apps', icon: FileText, label: t('sidebar.nav.myApps'), badge: '12' },
+    { id: 'chat', icon: MessageSquare, label: t('sidebar.nav.chat'), badge: formatBadge(sessionCount) },
+    { id: 'apps', icon: FileText, label: t('sidebar.nav.myApps'), badge: formatBadge(applicationCount) },
     { id: 'agents', icon: Bot, label: t('sidebar.nav.agents') },
     { id: 'workflow', icon: Workflow, label: t('sidebar.nav.workflow') },
     { id: 'knowledge', icon: BookOpen, label: t('sidebar.nav.knowledge') },
@@ -29,14 +38,14 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
     { id: 'prompts', icon: Sparkles, label: t('sidebar.nav.prompts') },
   ];
 
-  const teamMenuItems = [
+  const teamMenuItems: MenuItem[] = [
     { id: 'team-members', icon: Users, label: t('sidebar.nav.members') },
     { id: 'resource-sharing', icon: Share2, label: t('sidebar.nav.sharing') },
-    { id: 'notifications', icon: Bell, label: t('sidebar.nav.notifications') },
+    { id: 'notifications', icon: Bell, label: t('sidebar.nav.notifications'), badge: formatBadge(notificationCount) },
     { id: 'activity-log', icon: Activity, label: t('sidebar.nav.activityLog') },
   ];
 
-  const systemMenuItems = [
+  const systemMenuItems: MenuItem[] = [
     { id: 'usage-analytics', icon: BarChart3, label: t('analytics.title') },
     { id: 'plugins', icon: Package, label: t('sidebar.nav.plugins') },
     { id: 'models', icon: Settings, label: t('sidebar.nav.models') },
@@ -53,12 +62,7 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
     return location.pathname === path;
   };
 
-  const renderMenuItem = (item: {
-    id: string;
-    icon: React.ComponentType<{ className?: string }>;
-    label: string;
-    badge?: string;
-  }) => {
+  const renderMenuItem = (item: MenuItem) => {
     const isActive = getIsActive(item.id);
     const path = `/${item.id}`;
     return (
@@ -93,7 +97,7 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
     );
   };
 
-  const allMenuItems = [...mainMenuItems, ...teamMenuItems, ...systemMenuItems];
+  const allMenuItems: MenuItem[] = [...mainMenuItems, ...teamMenuItems, ...systemMenuItems];
 
   return (
     <aside
@@ -110,8 +114,9 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
             allMenuItems.map((item) => {
               const isActive = getIsActive(item.id);
               const path = `/${item.id}`;
+              const tooltipText = item.badge ? `${item.label} (${item.badge})` : item.label;
               return (
-                <div key={item.id}>
+                <div key={item.id} className="relative">
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
@@ -123,8 +128,16 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
                         <item.icon className="w-5 h-5" />
                       </Button>
                     </TooltipTrigger>
-                    <TooltipContent side="right">{item.label}</TooltipContent>
+                    <TooltipContent side="right">{tooltipText}</TooltipContent>
                   </Tooltip>
+                  {item.badge && (
+                    <span
+                      className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 flex items-center justify-center text-[10px] font-medium rounded-full bg-red-500 text-white leading-none"
+                      aria-hidden
+                    >
+                      {item.badge}
+                    </span>
+                  )}
                 </div>
               );
             })
