@@ -5,6 +5,7 @@ import cloud.xcan.angus.core.ai.interfaces.agent.facade.AgentFacade;
 import cloud.xcan.angus.core.ai.interfaces.agent.facade.dto.AgentCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.agent.facade.dto.AgentFindDto;
 import cloud.xcan.angus.core.ai.interfaces.agent.facade.dto.AgentUpdateDto;
+import cloud.xcan.angus.core.ai.interfaces.agent.facade.vo.AgentCountVo;
 import cloud.xcan.angus.core.ai.interfaces.agent.facade.vo.AgentDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.agent.facade.vo.AgentListVo;
 import cloud.xcan.angus.remote.ApiLocaleResult;
@@ -95,5 +96,13 @@ public class AgentRest {
   public ApiLocaleResult<PageResult<AgentListVo>> list(
       @Valid @ParameterObject AgentFindDto dto) {
     return ApiLocaleResult.success(agentFacade.list(dto));
+  }
+
+  @Operation(operationId = "getAgentCounts", summary = "获取智能体数量统计数据")
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "获取成功")})
+  @ResponseStatus(HttpStatus.OK)
+  @GetMapping("/counts")
+  public ApiLocaleResult<AgentCountVo> getCounts() {
+    return ApiLocaleResult.success(agentFacade.getCounts());
   }
 }

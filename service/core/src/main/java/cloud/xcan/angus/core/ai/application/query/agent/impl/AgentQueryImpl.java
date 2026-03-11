@@ -1,12 +1,16 @@
 package cloud.xcan.angus.core.ai.application.query.agent.impl;
 
+import static cloud.xcan.angus.spec.principal.PrincipalContext.getUserId;
+
 import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
 import cloud.xcan.angus.core.ai.domain.agent.Agent;
+import cloud.xcan.angus.core.ai.domain.agent.AgentCountsProjection;
 import cloud.xcan.angus.core.ai.domain.agent.AgentRepo;
 import cloud.xcan.angus.core.ai.domain.agent.AgentSearchRepo;
 import cloud.xcan.angus.core.ai.domain.agent.AgentStatus;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationAgent;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationAgentRepo;
+import cloud.xcan.angus.core.ai.interfaces.agent.facade.vo.AgentCountVo;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.message.ProtocolException;
@@ -64,6 +68,22 @@ public class AgentQueryImpl implements AgentQuery {
         return fullTextSearch
             ? agentSearchRepo.find(spec.getCriteria(), pageable, Agent.class, match)
             : agentRepo.findAll(spec, pageable);
+      }
+    }.execute();
+  }
+
+  @Override
+  public AgentCountVo getCurrentUserCounts() {
+    return new BizTemplate<AgentCountVo>() {
+      @Override
+      protected AgentCountVo process() {
+        Long userId = getUserId();
+        AgentCountsProjection counts = agentRepo.countByCreatedByGrouped(userId);
+        return AgentCountVo.builder()
+            .total(counts != null ? counts.getTotal() : 0L)
+            .active(counts != null ? counts.getActive() : 0L)
+            .inactive(counts != null ? counts.getInactive() : 0L)
+            .build();
       }
     }.execute();
   }

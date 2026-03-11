@@ -4,6 +4,7 @@ import cloud.xcan.angus.core.ai.domain.agent.AgentStatus;
 import cloud.xcan.angus.core.ai.interfaces.agent.facade.dto.AgentCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.agent.facade.dto.AgentFindDto;
 import cloud.xcan.angus.core.ai.interfaces.agent.facade.dto.AgentUpdateDto;
+import cloud.xcan.angus.core.ai.interfaces.agent.facade.vo.AgentCountVo;
 import cloud.xcan.angus.core.ai.interfaces.agent.facade.vo.AgentDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.agent.facade.vo.AgentListVo;
 import cloud.xcan.angus.remote.PageResult;
@@ -42,5 +43,10 @@ public interface AgentFacade {
    * 分页查询智能体列表
    */
   PageResult<AgentListVo> list(AgentFindDto dto);
+
+  /**
+   * 获取智能体数量统计
+   */
+  AgentCountVo getCounts();
 
 }

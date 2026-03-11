@@ -3,6 +3,7 @@ package cloud.xcan.angus.core.ai.application.query.agent;
 import cloud.xcan.angus.core.ai.domain.agent.Agent;
 import cloud.xcan.angus.core.ai.domain.agent.AgentStatus;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationAgent;
+import cloud.xcan.angus.core.ai.interfaces.agent.facade.vo.AgentCountVo;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import java.util.List;
 import org.springframework.data.domain.Page;
@@ -25,6 +26,11 @@ public interface AgentQuery {
    */
   Page<Agent> find(GenericSpecification<Agent> spec, PageRequest pageable,
       boolean fullTextSearch, String[] match);
+
+  /**
+   * 获取当前用户的智能体数量统计（总数、已发布、离线）
+   */
+  AgentCountVo getCurrentUserCounts();
 
   /**
    * 批量根据ID查询智能体（用于性能优化，不存在的ID将不会出现在结果中）

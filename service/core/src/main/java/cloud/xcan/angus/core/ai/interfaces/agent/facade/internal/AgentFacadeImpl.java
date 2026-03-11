@@ -27,6 +27,7 @@ import cloud.xcan.angus.core.ai.interfaces.agent.facade.dto.AgentCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.agent.facade.dto.AgentFindDto;
 import cloud.xcan.angus.core.ai.interfaces.agent.facade.dto.AgentUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.agent.facade.internal.assembler.AgentAssembler;
+import cloud.xcan.angus.core.ai.interfaces.agent.facade.vo.AgentCountVo;
 import cloud.xcan.angus.core.ai.interfaces.agent.facade.vo.AgentDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.agent.facade.vo.AgentDetailVo.AgentResourcesVo;
 import cloud.xcan.angus.core.ai.interfaces.agent.facade.vo.AgentDetailVo.ResourceInfoVo;
@@ -115,6 +116,11 @@ public class AgentFacadeImpl implements AgentFacade {
     Map<Long, ResourceInfoVo> defaultModelVos = getDefaultModelVos(page.getContent());
     return buildVoPageResult(page,
         x -> AgentAssembler.toListVo(x, defaultModelVos.get(x.getDefaultModelId())));
+  }
+
+  @Override
+  public AgentCountVo getCounts() {
+    return agentQuery.getCurrentUserCounts();
   }
 
   private ResourceInfoVo getDefaultModelVo(Agent agent) {
