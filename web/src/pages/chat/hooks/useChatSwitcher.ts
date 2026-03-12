@@ -159,30 +159,33 @@ export function useChatSwitcher({ selection, onSelectionChange }: UseChatSwitche
     }
   }, [modelOpen, debouncedModelKw, loadModels]);
 
-  // 应用列表加载完成后，若有数据且未选中应用，则默认选中第一个
+  // 进入对话页面后，应用列表加载完成时自动选中第一个应用（无选中 或 有 appId 但无 app 对象无法展示时）
+  const needAutoSelect =
+    !appLoading &&
+    apps.length > 0 &&
+    (!selection.appId || !selection.app || !apps.some((a) => String(a.id) === selection.appId));
   useEffect(() => {
-    if (!appLoading && apps.length > 0 && !selection.appId) {
-      const app = apps[0];
-      if (!app) return;
-      const agentsList = app.agents ?? [];
-      const defAgent = app.defaultAgent;
-      const firstActive = agentsList.find((a) => a.status === AgentStatusEnum.ACTIVE);
-      const agent =
-        defAgent && agentsList.some((a) => a?.id === defAgent?.id)
-          ? defAgent
-          : firstActive ?? agentsList[0];
-      const model = agent?.defaultModel;
-      onSelectionChange({
-        appId: String(app.id ?? ''),
-        agentId: agent ? String(agent.id ?? '') : '',
-        modelId: model ? String(model.id ?? '') : '',
-        app,
-        agent: agent ?? undefined,
-        model: model as ModelListVo | undefined,
-      });
-      setAppOpen(false);
-    }
-  }, [appLoading, apps, selection.appId, onSelectionChange]);
+    if (!needAutoSelect) return;
+    const app = apps.find((a) => String(a.id) === selection.appId) ?? apps[0];
+    if (!app) return;
+    const agentsList = app.agents ?? [];
+    const defAgent = app.defaultAgent;
+    const firstActive = agentsList.find((a) => a.status === AgentStatusEnum.ACTIVE);
+    const agent =
+      defAgent && agentsList.some((a) => a?.id === defAgent?.id)
+        ? defAgent
+        : firstActive ?? agentsList[0];
+    const model = agent?.defaultModel;
+    onSelectionChange({
+      appId: String(app.id ?? ''),
+      agentId: agent ? String(agent.id ?? '') : '',
+      modelId: model ? String(model.id ?? '') : '',
+      app,
+      agent: agent ?? undefined,
+      model: model as ModelListVo | undefined,
+    });
+    setAppOpen(false);
+  }, [needAutoSelect, apps, selection.appId, onSelectionChange]);
 
   const handleAppScroll = useCallback(() => {
     const el = appScrollRef.current;
