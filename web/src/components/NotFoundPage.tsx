@@ -7,7 +7,7 @@ interface NotFoundPageProps {
   homePath?: string;
 }
 
-export function NotFoundPage({ homePath = '/workbench' }: NotFoundPageProps) {
+export function NotFoundPage({ homePath = '/dashboard' }: NotFoundPageProps) {
   const { t } = useLanguage();
 
   return (
