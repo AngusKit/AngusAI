@@ -59,15 +59,4 @@ public class SessionConfig implements Serializable {
   @Length(max = Constants.AGENT_SYSTEM_PROMPT_MAX_LENGTH)
   private String systemPrompt;
 
-  /**
-   * 是否启用流式响应，为null时自动根据接口类型判断
-   */
-  @Schema(description = "是否启用流式响应（stream response）；为 null 时自动根据接口类型判断。", example = "true")
-  private Boolean streamResponse;
-
-  /**
-   * 是否保存历史记录
-   */
-  @Schema(description = "是否保存历史记录（save history），默认 true。", example = "true")
-  private Boolean saveHistory = true;
 }

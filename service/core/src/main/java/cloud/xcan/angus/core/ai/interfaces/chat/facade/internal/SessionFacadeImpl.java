@@ -53,7 +53,8 @@ public class SessionFacadeImpl implements SessionFacade {
   @Override
   public SessionDetailVo updateSession(String sessionId, SessionUpdateDto dto) {
     Session existing = sessionQuery.findAndCheckBySessionId(sessionId);
-    Session session = sessionCmd.update(SessionAssembler.updateDomain(existing.getId(), dto));
+    Session updated = SessionAssembler.updateDomain(existing.getId(), dto);
+    Session session = sessionCmd.update(updated);
     setLastMessage(List.of(session));
     return SessionAssembler.toDetailVo(session);
   }

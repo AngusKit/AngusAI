@@ -71,7 +71,7 @@ export function AppRoutes() {
         <Route path='*' element={<NotFoundPage homePath='/dashboard' />} />
       </Route>
       <Route path='/' element={<ChatLayout />}>
-        <Route path='chat' element={<Chat />} />
+        <Route path='chat/:sessionId?' element={<Chat />} />
       </Route>
     </Routes>
   );

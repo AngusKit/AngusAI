@@ -160,7 +160,7 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
         if (nonNull(session.getConfig())) {
           CoreUtils.copyPropertiesIgnoreNull(session.getConfig(), sessionDb.getConfig());
         }
-        update(session, sessionDb);
+        sessionRepo.save(sessionDb);
         return sessionDb;
       }
     }.execute();

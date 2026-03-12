@@ -13,6 +13,7 @@ import {
   Download,
   Share2,
   Palette,
+  Trash2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button.tsx';
 import { Textarea } from '@/components/ui/textarea.tsx';
@@ -143,7 +144,8 @@ export function ChatMainArea({
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={onClearChat} className='text-red-600 dark:text-red-400'>
-                清空当前对话
+                <Trash2 className='w-4 h-4 mr-2' />
+                清空对话
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

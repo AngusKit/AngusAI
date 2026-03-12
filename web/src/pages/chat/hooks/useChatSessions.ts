@@ -79,7 +79,7 @@ function messageVoToMessage(vo: MessageVo): Message {
 
 const SESSION_PAGE_SIZE = 10;
 
-export function useChatSessions(initialAppId?: string, initialModelId?: string) {
+export function useChatSessions(initialAppId?: string, initialModelId?: string, initialSessionId?: string) {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [currentSessionId, setCurrentSessionId] = useState<string>('');
   const [sessionMessages, setSessionMessages] = useState<Record<string, Message[]>>({});
@@ -94,6 +94,8 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string) 
   const [sessionsLoadMore, setSessionsLoadMore] = useState(false);
   const sessionsLoadingRef = useRef(false);
   const initialSelectedRef = useRef(false);
+  const initialSessionIdRef = useRef(initialSessionId);
+  initialSessionIdRef.current = initialSessionId; // 仅用于首次加载时优先选中，避免 URL 变化触发 loadSessions 重建导致重复请求
 
   const loadSessions = useCallback(
     async (page: number, append: boolean) => {
@@ -123,8 +125,13 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string) 
           setSessionPage(1);
           if (mapped.length > 0 && !initialSelectedRef.current) {
             initialSelectedRef.current = true;
+            const sid = initialSessionIdRef.current;
+            const target = sid
+              ? mapped.find((s) => s.sessionId === sid || s.id === sid)
+              : null;
             const first = mapped[0];
-            if (first) setCurrentSessionId(first.sessionId);
+            if (target) setCurrentSessionId(target.sessionId);
+            else if (!sid && first) setCurrentSessionId(first.sessionId);
           }
         }
         setSessionPage(page);
@@ -330,6 +337,32 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string) 
     }
   }, []);
 
+  /** 通过 URL 直接进入会话时，若会话不在列表中则拉取详情并加入列表 */
+  const ensureSessionLoaded = useCallback(
+    async (sessionId: string): Promise<Session | null> => {
+      const existing = sessions.find((s) => s.sessionId === sessionId || s.id === sessionId);
+      if (existing) return existing;
+      try {
+        const res = await Chat.getSessionDetail(sessionId);
+        const data = (res as any)?.data as SessionDetailVo;
+        if (!data) return null;
+        const session = voToSession(data);
+        setSessions((prev) => {
+          const seen = new Set(prev.map((s) => s.sessionId));
+          if (seen.has(session.sessionId)) return prev;
+          return [session, ...prev].sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+        });
+        setSessionTotal((prev) => Math.max(prev, sessions.length + 1));
+        return session;
+      } catch (e) {
+        console.error('Fetch session detail failed:', e);
+        toast.error('会话不存在或已删除');
+        return null;
+      }
+    },
+    [sessions]
+  );
+
   return {
     sessions,
     currentSessionId,
@@ -353,6 +386,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string) 
     updateSessionInList,
     refreshSessions,
     clearSessionMessages,
+    ensureSessionLoaded,
     sessionKeyword,
     setSessionKeyword,
   };

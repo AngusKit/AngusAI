@@ -9,7 +9,7 @@ import { PromptLibrary } from './components/PromptLibrary.tsx';
 import { ChatSwitcher, type ChatSwitcherSelection } from './components/ChatSwitcher.tsx';
 import { SettingsDialog } from './components/SettingsDialog.tsx';
 import { ThemeDialog, CHAT_TEMPLATES, type TemplateType } from './components/ThemeDialog.tsx';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { AgentChatConfig } from '@/services/AgentChatTypes';
 import { DEFAULT_CHAT_SETTINGS } from './constants';
 
@@ -21,6 +21,7 @@ interface ChatProps {
 export function Chat({ content = '', onBack }: ChatProps = {}) {
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const { sessionId: sessionIdFromUrl } = useParams<{ sessionId?: string }>();
   const {
     sessions,
     currentSessionId,
@@ -36,12 +37,13 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     renameSession,
     toggleStar,
     selectSession,
+    ensureSessionLoaded,
     appendMessages,
     updateSessionInList,
     clearSessionMessages,
     sessionKeyword,
     setSessionKeyword,
-  } = useChatSessions();
+  } = useChatSessions(undefined, undefined, sessionIdFromUrl);
   const [sessionSelections, setSessionSelections] = useState<Record<string, ChatSwitcherSelection>>({});
   const defaultContent = content || sessionStorage.getItem('chatContent') || '';
   const [input, setInput] = useState(defaultContent);
@@ -66,6 +68,31 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
 
   const selectedTemplateObj = CHAT_TEMPLATES.find(t => t.id === selectedTemplate) || CHAT_TEMPLATES[0];
 
+  // 用 ref 存储最新回调，避免 ensureSessionLoaded/selectSession 变化导致 effect 反复执行
+  const ensureSessionLoadedRef = useRef(ensureSessionLoaded);
+  const selectSessionRef = useRef(selectSession);
+  ensureSessionLoadedRef.current = ensureSessionLoaded;
+  selectSessionRef.current = selectSession;
+
+  // URL -> state: 根据 URL 中的 sessionId 加载并选中会话
+  useEffect(() => {
+    if (!sessionIdFromUrl || sessionIdFromUrl === currentSessionId) return;
+    let cancelled = false;
+    ensureSessionLoadedRef.current(sessionIdFromUrl).then((session) => {
+      if (cancelled) return;
+      if (session) selectSessionRef.current(session.sessionId);
+      else navigate('/chat', { replace: true });
+    });
+    return () => { cancelled = true; };
+  }, [sessionIdFromUrl, currentSessionId, navigate]);
+
+  // State -> URL: 仅当有选中会话且 URL 无 sessionId 时同步（避免覆盖点击切换时的 navigate）
+  useEffect(() => {
+    if (!currentSessionId) return;
+    if (sessionIdFromUrl) return; // URL 已有 sessionId，可能正在从 URL 同步，不覆盖
+    navigate(`/chat/${currentSessionId}`, { replace: true });
+  }, [currentSessionId, sessionIdFromUrl, navigate]);
+
   // Auto-resize textarea
   useEffect(() => {
     if (textareaRef.current) {
@@ -73,6 +100,11 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
       textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px';
     }
   }, [input]);
+
+  const handleSessionSelect = (sessionId: string) => {
+    selectSession(sessionId);
+    navigate(`/chat/${sessionId}`);
+  };
 
   const handleSendMessage = async () => {
     if (!input.trim() && attachments.length === 0) return;
@@ -160,6 +192,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     const newSession = await createSession(appId, sel.modelId || undefined, sel.agentId || undefined);
     if (newSession && appId) {
       setSessionSelections(prev => ({ ...prev, [newSession.sessionId]: sel }));
+      navigate(`/chat/${newSession.sessionId}`);
     }
   };
 
@@ -178,6 +211,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
       createSession(s.appId, s.modelId || undefined, s.agentId || undefined).then((newSession) => {
         if (newSession) {
           setSessionSelections((prev) => ({ ...prev, [newSession.sessionId]: s }));
+          navigate(`/chat/${newSession.sessionId}`);
         }
       });
       return;
@@ -229,7 +263,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
       <ChatSidebar
         sessions={sessions}
         currentSessionId={currentSessionId}
-        onSessionSelect={selectSession}
+        onSessionSelect={handleSessionSelect}
         onNewSession={createNewSession}
         onDeleteSession={handleDeleteSession}
         onRenameSession={renameSession}
