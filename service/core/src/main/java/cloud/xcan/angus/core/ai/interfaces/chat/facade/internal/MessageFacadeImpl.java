@@ -81,10 +81,8 @@ public class MessageFacadeImpl implements MessageFacade {
 
     if (!streamingMessages.isEmpty()) {
       Message message = streamingMessages.get(0);
-
       // 停止流式生成
       messageCmd.setStreaming(message, false);
-
       // 返回当前消息状态
       return MessageAssembler.toMessageVo(message);
     }

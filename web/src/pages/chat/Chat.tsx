@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { refreshResourcesBadge } from '@/hooks/useResourcesBadge';
 import { ChatSidebar } from './ChatSidebar';
 import { ChatMessage } from './ChatMessage';
+import { useChatSessions, type Message } from './hooks/useChatSessions';
 import { PromptLibrary } from './PromptLibrary';
 import {
   ChatSwitcher,
@@ -24,33 +25,6 @@ import { useNavigate } from 'react-router-dom';
 
 type TemplateType = 'modern-blue' | 'minimal-gray' | 'elegant-purple' | 'warm-orange';
 
-interface Message {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp: Date;
-  attachments?: Array<{
-    id: string;
-    name: string;
-    type: string;
-    size: number;
-    url: string;
-  }>;
-  isStreaming?: boolean;
-}
-
-interface Session {
-  id: string;
-  title: string;
-  appId: string;
-  agentId: string;
-  modelId: string;
-  messages: Message[];
-  createdAt: Date;
-  updatedAt: Date;
-  isStarred?: boolean;
-}
-
 interface ChatProps {
   content?: string;
   onBack?: () => void;
@@ -59,19 +33,21 @@ interface ChatProps {
 export function Chat({ content = '', onBack }: ChatProps = {}) {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const [sessions, setSessions] = useState<Session[]>([
-    {
-      id: '1',
-      title: '新对话',
-      appId: '',
-      agentId: '',
-      modelId: '',
-      messages: [],
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-  ]);
-  const [currentSessionId, setCurrentSessionId] = useState('1');
+  const {
+    sessions,
+    currentSessionId,
+    currentSession,
+    currentMessages,
+    sessionsLoading,
+    createSession,
+    deleteSession,
+    renameSession,
+    toggleStar,
+    selectSession,
+    appendMessages,
+    updateSessionInList,
+    clearSessionMessages,
+  } = useChatSessions();
   const [sessionSelections, setSessionSelections] = useState<Record<string, ChatSwitcherSelection>>({});
   const defaultContent = content || sessionStorage.getItem('chatContent') || '';
   const [input, setInput] = useState(defaultContent);
@@ -145,12 +121,10 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
 
   const selectedTemplateObj = templates.find(t => t.id === selectedTemplate) || templates[0];
 
-  const currentSession = sessions.find(s => s.id === currentSessionId);
-
   // Auto-scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [currentSession?.messages]);
+  }, [currentMessages]);
 
   // Auto-resize textarea
   useEffect(() => {
@@ -177,23 +151,11 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
       })),
     };
 
-    // Add user message
-    setSessions(prev =>
-      prev.map(s =>
-        s.id === currentSessionId
-          ? {
-              ...s,
-              messages: [...s.messages, newMessage],
-              updatedAt: new Date(),
-            }
-          : s
-      )
-    );
-
+    appendMessages(currentSessionId, [newMessage]);
     setInput('');
     setAttachments([]);
 
-    // Simulate AI response
+    // Simulate AI response (实际应用中会调用 AI API)
     setTimeout(() => {
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -203,18 +165,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
         timestamp: new Date(),
         isStreaming: false,
       };
-
-      setSessions(prev =>
-        prev.map(s =>
-          s.id === currentSessionId
-            ? {
-                ...s,
-                messages: [...s.messages, aiMessage],
-                updatedAt: new Date(),
-              }
-            : s
-        )
-      );
+      appendMessages(currentSessionId, [aiMessage]);
     }, 1000);
   };
 
@@ -244,37 +195,21 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     }
   };
 
-  const createNewSession = () => {
+  const createNewSession = async () => {
     const currentSel = currentSessionId ? sessionSelections[currentSessionId] : undefined;
-    const newSession: Session = {
-      id: Date.now().toString(),
-      title: '新对话',
-      appId: currentSel?.appId ?? currentSession?.appId ?? '',
-      agentId: currentSel?.agentId ?? currentSession?.agentId ?? '',
-      modelId: currentSel?.modelId ?? currentSession?.modelId ?? '',
-      messages: [],
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    setSessions(prev => [newSession, ...prev]);
-    setCurrentSessionId(newSession.id);
-    if (currentSel) {
-      setSessionSelections(prev => ({ ...prev, [newSession.id]: currentSel }));
+    const appId = currentSel?.appId ?? currentSession?.appId ?? '';
+    const newSession = await createSession(appId, currentSel?.modelId ?? currentSession?.modelId, currentSel?.agentId ?? currentSession?.agentId);
+    if (newSession && currentSel) {
+      setSessionSelections(prev => ({ ...prev, [newSession.sessionId]: currentSel }));
     }
-    toast.success('已创建新对话');
   };
 
-  const deleteSession = (sessionId: string) => {
-    if (sessions.length === 1) {
+  const handleDeleteSession = (sessionId: string) => {
+    if (sessions.length <= 1) {
       toast.error('至少需要保留一个对话');
       return;
     }
-    const remaining = sessions.filter(s => s.id !== sessionId);
-    setSessions(() => remaining);
-    if (currentSessionId === sessionId) {
-      setCurrentSessionId(remaining[0]?.id ?? '');
-    }
-    toast.success('对话已删除');
+    deleteSession(sessionId);
     refreshResourcesBadge();
   };
 
@@ -290,19 +225,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
 
   const updateSessionSelection = (s: ChatSwitcherSelection) => {
     setSessionSelections((prev) => ({ ...prev, [currentSessionId]: s }));
-    setSessions((prev) =>
-      prev.map((session) =>
-        session.id === currentSessionId
-          ? {
-              ...session,
-              appId: s.appId,
-              agentId: s.agentId,
-              modelId: s.modelId,
-              updatedAt: new Date(),
-            }
-          : session
-      )
-    );
+    updateSessionInList(currentSessionId, { appId: s.appId, agentId: s.agentId, modelId: s.modelId });
   };
 
   const insertPrompt = (prompt: string) => {
@@ -311,20 +234,9 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     textareaRef.current?.focus();
   };
 
-  const renameSession = (sessionId: string, newTitle: string) => {
-    setSessions(prev => prev.map(s => (s.id === sessionId ? { ...s, title: newTitle, updatedAt: new Date() } : s)));
-    toast.success('对话已重命名');
-  };
-
-  const toggleSessionStar = (sessionId: string) => {
-    setSessions(prev =>
-      prev.map(s => (s.id === sessionId ? { ...s, isStarred: !s.isStarred, updatedAt: new Date() } : s))
-    );
-  };
-
   const exportChat = () => {
     if (!currentSession) return;
-    const content = currentSession.messages.map(m => `[${m.role}] ${m.content}`).join('\n\n');
+    const content = currentMessages.map(m => `[${m.role}] ${m.content}`).join('\n\n');
     const blob = new Blob([content], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -339,8 +251,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
   };
 
   const clearCurrentChat = () => {
-    setSessions(prev => prev.map(s => (s.id === currentSessionId ? { ...s, messages: [], updatedAt: new Date() } : s)));
-    toast.success('对话已清空');
+    clearSessionMessages(currentSessionId);
   };
 
   const toggleFullscreen = () => {
@@ -360,11 +271,11 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
       <ChatSidebar
         sessions={sessions}
         currentSessionId={currentSessionId}
-        onSessionSelect={setCurrentSessionId}
+        onSessionSelect={selectSession}
         onNewSession={createNewSession}
-        onDeleteSession={deleteSession}
+        onDeleteSession={handleDeleteSession}
         onRenameSession={renameSession}
-        onToggleStar={toggleSessionStar}
+        onToggleStar={toggleStar}
         isOpen={isSidebarOpen}
         onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
       />
@@ -431,22 +342,22 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
         {/* Messages Area */}
         <div className='flex-1 overflow-y-auto px-4 py-6'>
           <div className='max-w-4xl mx-auto space-y-6'>
-            {currentSession?.messages.length === 0 ? (
+            {currentMessages.length === 0 ? (
               <div className='flex flex-col items-center justify-center h-full text-center py-20'>
                 <div
                   className={cn(
                     'w-20 h-20 rounded-full flex items-center justify-center mb-4',
-                    selectedTemplateObj.secondaryColor
+                    selectedTemplateObj?.secondaryColor
                   )}
                 >
-                  <Sparkles className={cn('w-10 h-10', selectedTemplateObj.primaryColor.replace('bg-', 'text-'))} />
+                  <Sparkles className={cn('w-10 h-10', selectedTemplateObj?.primaryColor?.replace('bg-', 'text-'))} />
                 </div>
                 <h3 className='text-xl mb-2 dark:text-white'>开始新对话</h3>
                 <p className='text-gray-500 dark:text-gray-400 mb-6'>输入你的问题，或使用提示词库快速开始</p>
               </div>
             ) : (
               <>
-                {currentSession?.messages.map(message => (
+                {currentMessages.map(message => (
                   <ChatMessage key={message.id} message={message} />
                 ))}
                 <div ref={messagesEndRef} />

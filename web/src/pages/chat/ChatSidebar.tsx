@@ -12,7 +12,8 @@ interface Session {
   appId: string;
   agentId?: string;
   modelId: string;
-  messages: any[];
+  messages?: any[];
+  messageCount?: number;
   createdAt: Date;
   updatedAt: Date;
   isStarred?: boolean;
@@ -118,7 +119,9 @@ export function ChatSidebar({
         ) : (
           <>
             <p className='text-sm truncate'>{session.title}</p>
-            <p className='text-xs text-gray-500 dark:text-gray-400'>{session.messages.length} 条消息</p>
+            <p className='text-xs text-gray-500 dark:text-gray-400'>
+              {(session.messageCount ?? session.messages?.length ?? 0)} 条消息
+            </p>
           </>
         )}
       </div>

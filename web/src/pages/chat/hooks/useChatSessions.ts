@@ -1,0 +1,310 @@
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { toast } from 'sonner';
+import Chat from '@/services/Chat';
+import type { SessionListVo, SessionDetailVo, MessageVo } from '@/services/ChatTypes';
+import { MessageRoleEnum } from '@/enums/enums';
+
+export interface Message {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+  attachments?: Array<{
+    id: string;
+    name: string;
+    type: string;
+    size: number;
+    url: string;
+  }>;
+  isStreaming?: boolean;
+}
+
+export interface Session {
+  /** UI 用主键，与 sessionId 相同，便于 ChatSidebar 等使用 */
+  id: string;
+  /** 会话 UUID，用于消息 API、star API */
+  sessionId: string;
+  /** 实体 ID，用于 delete/update API */
+  entityId: string;
+  title: string;
+  appId: string;
+  agentId: string;
+  modelId: string;
+  messages: Message[];
+  messageCount?: number;
+  createdAt: Date;
+  updatedAt: Date;
+  isStarred?: boolean;
+}
+
+function voToSession(vo: SessionListVo | SessionDetailVo): Session {
+  const sid = vo.sessionId ?? vo.id ?? '';
+  const entityId = String(vo.id ?? sid);
+  const created = (vo as any).createdDate || (vo as any).createdAt ? new Date((vo as any).createdDate ?? (vo as any).createdAt ?? '') : new Date();
+  const updated = (vo as any).modifiedDate || (vo as any).updatedAt ? new Date((vo as any).modifiedDate ?? (vo as any).updatedAt ?? '') : new Date();
+  return {
+    id: String(sid),
+    sessionId: String(sid),
+    entityId,
+    title: vo.title ?? '新对话',
+    appId: vo.appId != null ? String(vo.appId) : '',
+    agentId: vo.agentId != null ? String(vo.agentId) : '',
+    modelId: vo.modelId != null ? String(vo.modelId) : '',
+    messages: [],
+    messageCount: vo.messageCount,
+    createdAt: created,
+    updatedAt: updated,
+    isStarred: vo.isStarred,
+  };
+}
+
+function messageVoToMessage(vo: MessageVo): Message {
+  const role = vo.role === MessageRoleEnum.USER ? 'user' : 'assistant';
+  return {
+    id: vo.id ?? '',
+    role,
+    content: vo.content ?? '',
+    timestamp: vo.datetime ? new Date(vo.datetime) : new Date(),
+    attachments: vo.attachments?.map((a) => ({
+      id: a.id ?? '',
+      name: a.name ?? '',
+      type: a.type ?? '',
+      size: a.size ?? 0,
+      url: a.url ?? '',
+    })),
+    isStreaming: vo.isStreaming,
+  };
+}
+
+export function useChatSessions(initialAppId?: string, initialModelId?: string) {
+  const [sessions, setSessions] = useState<Session[]>([]);
+  const [currentSessionId, setCurrentSessionId] = useState<string>('');
+  const [sessionMessages, setSessionMessages] = useState<Record<string, Message[]>>({});
+  const [sessionsLoading, setSessionsLoading] = useState(true);
+  const [messagesLoading, setMessagesLoading] = useState(false);
+  const loadedMessagesRef = useRef<Set<string>>(new Set());
+
+  const initialSelectedRef = useRef(false);
+  const loadSessions = useCallback(async () => {
+    setSessionsLoading(true);
+    try {
+      const res = await Chat.getSessionList({ pageNo: 1, pageSize: 50 });
+      const data = (res as any)?.data;
+      const list: SessionListVo[] = data?.list ?? [];
+      const mapped = list.map(voToSession).sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+      setSessions(mapped);
+      if (mapped.length > 0 && !initialSelectedRef.current) {
+        initialSelectedRef.current = true;
+        const first = mapped[0];
+        if (first) setCurrentSessionId(first.sessionId);
+      }
+    } catch (e) {
+      console.error('Load sessions failed:', e);
+      toast.error('加载会话列表失败');
+    } finally {
+      setSessionsLoading(false);
+    }
+  }, []);
+
+  const loadMessages = useCallback(async (sessionId: string) => {
+    if (loadedMessagesRef.current.has(sessionId)) return;
+    loadedMessagesRef.current.add(sessionId);
+    setMessagesLoading(true);
+    try {
+      const res = await Chat.getMessageHistory(sessionId, { pageNo: 1, pageSize: 100 });
+      const data = (res as any)?.data;
+      const list: MessageVo[] = data?.list ?? [];
+      const msgs = list.map(messageVoToMessage);
+      setSessionMessages((prev) => ({ ...prev, [sessionId]: msgs }));
+    } catch (e) {
+      loadedMessagesRef.current.delete(sessionId);
+      console.error('Load messages failed:', e);
+      toast.error('加载消息历史失败');
+    } finally {
+      setMessagesLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadSessions();
+  }, [loadSessions]);
+
+  const currentSession = sessions.find((s) => s.sessionId === currentSessionId);
+  const currentMessages = currentSessionId ? sessionMessages[currentSessionId] ?? [] : [];
+
+  const createSession = useCallback(
+    async (appId: string, modelId?: string, agentId?: string) => {
+      const numAppId = parseInt(appId, 10);
+      if (isNaN(numAppId)) {
+        toast.error('请先选择应用');
+        return null;
+      }
+      try {
+        const res = await Chat.createSession({
+          appId: numAppId,
+          modelId: modelId ? parseInt(modelId, 10) : undefined,
+          title: '新对话',
+        } as any);
+        const data = (res as any)?.data as SessionDetailVo;
+        if (!data) {
+          toast.error('创建会话失败');
+          return null;
+        }
+        const session = voToSession(data);
+        setSessions((prev) => [session, ...prev]);
+        setCurrentSessionId(session.sessionId);
+        loadedMessagesRef.current.add(session.sessionId);
+        setSessionMessages((prev) => ({ ...prev, [session.sessionId]: [] }));
+        toast.success('已创建新对话');
+        return session;
+      } catch (e) {
+        console.error('Create session failed:', e);
+        toast.error('创建会话失败');
+        return null;
+      }
+    },
+    []
+  );
+
+  const deleteSession = useCallback(
+    async (sessionId: string) => {
+      const session = sessions.find((s) => s.sessionId === sessionId || s.id === sessionId);
+      const entityId = session?.entityId ?? sessionId;
+      const sid = session?.sessionId ?? sessionId;
+      try {
+        await Chat.deleteSession(entityId);
+        setSessions((prev) => prev.filter((s) => s.sessionId !== sid && s.id !== entityId));
+        if (currentSessionId === sid) {
+          const remaining = sessions.filter((s) => s.sessionId !== sid);
+          setCurrentSessionId(remaining[0]?.sessionId ?? '');
+        }
+        loadedMessagesRef.current.delete(sid);
+        setSessionMessages((prev) => {
+          const next = { ...prev };
+          delete next[sid];
+          return next;
+        });
+        toast.success('对话已删除');
+      } catch (e) {
+        console.error('Delete session failed:', e);
+        toast.error('删除会话失败');
+      }
+    },
+    [sessions, currentSessionId]
+  );
+
+  const renameSession = useCallback(
+    async (sessionId: string, newTitle: string) => {
+      const session = sessions.find((s) => s.sessionId === sessionId || s.id === sessionId);
+      const entityId = session?.entityId ?? sessionId;
+      try {
+        await Chat.updateSession(entityId, { title: newTitle });
+        setSessions((prev) =>
+          prev.map((s) =>
+            (s.sessionId === sessionId || s.id === sessionId)
+              ? { ...s, title: newTitle, updatedAt: new Date() }
+              : s
+          )
+        );
+        toast.success('对话已重命名');
+      } catch (e) {
+        console.error('Rename session failed:', e);
+        toast.error('重命名失败');
+      }
+    },
+    [sessions]
+  );
+
+  const toggleStar = useCallback(
+    async (sessionId: string) => {
+      const session = sessions.find((s) => s.sessionId === sessionId || s.id === sessionId);
+      const idToUse = session?.sessionId ?? sessionId;
+      const nextStarred = !session?.isStarred;
+      try {
+        await Chat.starSession(idToUse, { isStarred: nextStarred });
+        setSessions((prev) =>
+          prev.map((s) =>
+            (s.sessionId === sessionId || s.id === sessionId)
+              ? { ...s, isStarred: nextStarred, updatedAt: new Date() }
+              : s
+          )
+        );
+        toast.success(nextStarred ? '已收藏' : '已取消收藏');
+      } catch (e) {
+        console.error('Star session failed:', e);
+        toast.error('操作失败');
+      }
+    },
+    [sessions]
+  );
+
+  const selectSession = useCallback(
+    (sessionId: string) => {
+      setCurrentSessionId(sessionId);
+      loadMessages(sessionId);
+    },
+    [loadMessages]
+  );
+
+  const appendMessages = useCallback((sessionId: string, newMessages: Message[]) => {
+    setSessionMessages((prev) => {
+      const current = prev[sessionId] ?? [];
+      return { ...prev, [sessionId]: [...current, ...newMessages] };
+    });
+    setSessions((prev) =>
+      prev.map((s) =>
+        s.sessionId === sessionId ? { ...s, updatedAt: new Date() } : s
+      )
+    );
+  }, []);
+
+  const updateSessionInList = useCallback(
+    (sessionId: string, patch: Partial<Pick<Session, 'appId' | 'agentId' | 'modelId'>>) => {
+      setSessions((prev) =>
+        prev.map((s) =>
+          s.sessionId === sessionId ? { ...s, ...patch, updatedAt: new Date() } : s
+        )
+      );
+    },
+    []
+  );
+
+  const refreshSessions = useCallback(() => {
+    loadSessions();
+  }, [loadSessions]);
+
+  const clearSessionMessages = useCallback(async (sessionId: string) => {
+    try {
+      await Chat.clearMessages(sessionId);
+      setSessionMessages((prev) => ({ ...prev, [sessionId]: [] }));
+      setSessions((prev) =>
+        prev.map((s) => (s.sessionId === sessionId ? { ...s, messageCount: 0, updatedAt: new Date() } : s))
+      );
+      toast.success('对话已清空');
+    } catch (e) {
+      console.error('Clear messages failed:', e);
+      toast.error('清空对话失败');
+    }
+  }, []);
+
+  return {
+    sessions,
+    currentSessionId,
+    currentSession,
+    currentMessages,
+    sessionMessages,
+    sessionsLoading,
+    messagesLoading,
+    setCurrentSessionId,
+    createSession,
+    deleteSession,
+    renameSession,
+    toggleStar,
+    selectSession,
+    loadMessages,
+    appendMessages,
+    updateSessionInList,
+    refreshSessions,
+    clearSessionMessages,
+  };
+}
