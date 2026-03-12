@@ -4,7 +4,7 @@ import {
   ChevronDown,
   Search,
   Loader2,
-  MessageSquare,
+  LayoutGrid,
   Bot,
   Cpu,
 } from 'lucide-react';
@@ -175,6 +175,31 @@ export function ChatSwitcher({ selection, onSelectionChange }: ChatSwitcherProps
     }
   }, [modelOpen, debouncedModelKw, loadModels]);
 
+  // 应用列表加载完成后，若有数据且未选中应用，则默认选中第一个
+  useEffect(() => {
+    if (!appLoading && apps.length > 0 && !selection.appId) {
+      const app = apps[0];
+      if (!app) return;
+      const agentsList = app.agents ?? [];
+      const defAgent = app.defaultAgent;
+      const firstActive = agentsList.find((a) => a.status === AgentStatusEnum.ACTIVE);
+      const agent =
+        defAgent && agentsList.some((a) => a?.id === defAgent?.id)
+          ? defAgent
+          : firstActive ?? agentsList[0];
+      const model = agent?.defaultModel;
+      onSelectionChange({
+        appId: String(app.id ?? ''),
+        agentId: agent ? String(agent.id ?? '') : '',
+        modelId: model ? String(model.id ?? '') : '',
+        app,
+        agent: agent ?? undefined,
+        model: model as ModelListVo | undefined,
+      });
+      setAppOpen(false);
+    }
+  }, [appLoading, apps, selection.appId, onSelectionChange]);
+
   const handleAppScroll = useCallback(() => {
     const el = appScrollRef.current;
     if (!el || appLoadMore || appLoading || apps.length >= appTotal) return;
@@ -249,20 +274,24 @@ export function ChatSwitcher({ selection, onSelectionChange }: ChatSwitcherProps
       <DropdownMenu open={appOpen} onOpenChange={setAppOpen}>
         <DropdownMenuTrigger asChild>
           <Button variant='ghost' className='gap-2 h-9 max-w-[160px]'>
-            <span className='text-lg'>{selection.app?.icon || '📱'}</span>
+            {selection.app?.icon ? (
+              <span className='w-4 h-4 flex items-center justify-center text-lg flex-shrink-0'>{selection.app.icon}</span>
+            ) : (
+              <LayoutGrid className='w-4 h-4 text-blue-500 flex-shrink-0' />
+            )}
             <span className='dark:text-white truncate'>{appDisplayName}</span>
             <ChevronDown className='w-4 h-4 text-gray-400 flex-shrink-0' />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align='start' className='w-[320px] p-0 dark:bg-gray-800 dark:border-gray-700'>
+        <DropdownMenuContent align='start' className='w-[300px] p-0 dark:bg-gray-800 dark:border-gray-700'>
           <div className='p-2 border-b dark:border-gray-700'>
             <div className='relative'>
-              <Search className='absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
+              <Search className='absolute ml-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
               <Input
                 placeholder='搜索应用...'
                 value={appKeyword}
                 onChange={(e) => setAppKeyword(e.target.value)}
-                className='pl-8 h-8'
+                className='pl-9 h-8'
               />
             </div>
           </div>
@@ -275,6 +304,10 @@ export function ChatSwitcher({ selection, onSelectionChange }: ChatSwitcherProps
               <div className='flex justify-center py-8'>
                 <Loader2 className='w-6 h-6 animate-spin text-gray-400' />
               </div>
+            ) : !appLoading && apps.length === 0 ? (
+              <div className='py-8 text-center text-gray-500 dark:text-gray-400 text-sm px-4'>
+                暂无已发布应用，请先创建应用
+              </div>
             ) : (
               apps.map((app) => (
                 <button
@@ -286,8 +319,12 @@ export function ChatSwitcher({ selection, onSelectionChange }: ChatSwitcherProps
                     selection.appId === String(app.id) && 'bg-blue-50 dark:bg-blue-900/20'
                   )}
                 >
-                  <div className='w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0 text-lg'>
-                    {app.icon || '📱'}
+                  <div className='w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0'>
+                    {app.icon ? (
+                      <span className='text-xl'>{app.icon}</span>
+                    ) : (
+                      <LayoutGrid className='w-5 h-5 text-gray-600 dark:text-gray-400' />
+                    )}
                   </div>
                   <div className='flex-1 min-w-0'>
                     <div className='flex items-center gap-2'>
@@ -302,7 +339,7 @@ export function ChatSwitcher({ selection, onSelectionChange }: ChatSwitcherProps
                       </p>
                     )}
                     {app.status && (
-                      <Badge variant='secondary' className='mt-1.5 text-xs'>
+                      <Badge variant='secondary' className='mt-2 text-xs'>
                         {t(`enum.ApplicationStatusEnum.${app.status}`) ?? app.status}
                       </Badge>
                     )}
@@ -335,7 +372,7 @@ export function ChatSwitcher({ selection, onSelectionChange }: ChatSwitcherProps
             <ChevronDown className='w-4 h-4 text-gray-400 flex-shrink-0' />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align='start' className='w-[320px] p-0 dark:bg-gray-800 dark:border-gray-700'>
+        <DropdownMenuContent align='start' className='w-[300px] p-0 dark:bg-gray-800 dark:border-gray-700'>
           <div className='max-h-[280px] overflow-y-auto'>
             {agents.length === 0 ? (
               <div className='py-8 text-center text-gray-500 dark:text-gray-400 text-sm'>
@@ -374,7 +411,7 @@ export function ChatSwitcher({ selection, onSelectionChange }: ChatSwitcherProps
                           {agent.description}
                         </p>
                       )}
-                      <div className='flex flex-wrap gap-1.5 mt-1.5'>
+                      <div className='flex flex-wrap gap-1.5 mt-2'>
                         {agent.status && (
                           <Badge variant='secondary' className='text-xs'>
                             {t(`enum.AgentStatusEnum.${agent.status}`) ?? agent.status}
@@ -410,15 +447,15 @@ export function ChatSwitcher({ selection, onSelectionChange }: ChatSwitcherProps
             <ChevronDown className='w-4 h-4 text-gray-400 flex-shrink-0' />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align='start' className='w-[360px] p-0 dark:bg-gray-800 dark:border-gray-700'>
+        <DropdownMenuContent align='start' className='w-[300px] p-0 dark:bg-gray-800 dark:border-gray-700'>
           <div className='p-2 border-b dark:border-gray-700'>
             <div className='relative'>
-              <Search className='absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
+              <Search className='absolute ml-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
               <Input
                 placeholder='搜索模型...'
                 value={modelKeyword}
                 onChange={(e) => setModelKeyword(e.target.value)}
-                className='pl-8 h-8'
+                className='pl-9 h-8'
               />
             </div>
           </div>
@@ -460,15 +497,15 @@ export function ChatSwitcher({ selection, onSelectionChange }: ChatSwitcherProps
                           {model.description}
                         </p>
                       )}
-                      <div className='flex flex-wrap gap-1.5 mt-1.5'>
+                      <div className='flex flex-wrap gap-1.5 mt-2'>
                         {m.type && (
                           <Badge variant='outline' className='text-xs'>
-                            {m.type}
+                            {t(`enum.ModelTypeEnum.${m.type}`) ?? m.type}
                           </Badge>
                         )}
                         {m.provider && (
                           <Badge variant='outline' className='text-xs'>
-                            {m.provider}
+                            {t(`enum.ModelProviderEnum.${m.provider}`) ?? m.provider}
                           </Badge>
                         )}
                         {model.status && (
