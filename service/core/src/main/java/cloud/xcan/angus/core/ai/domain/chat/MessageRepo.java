@@ -22,39 +22,14 @@ public interface MessageRepo extends BaseRepository<Message, Long> {
   long countByCreatedDateBetween(LocalDateTime start, LocalDateTime end);
 
   /**
-   * 根据会话ID(UUID)和角色查询消息
-   */
-  List<Message> findBySessionIdAndRole(String sessionId, MessageRole role);
-
-  /**
    * 查询正在流式生成的消息（按会话ID UUID）
    */
   List<Message> findBySessionIdAndIsStreamingTrue(String sessionId);
 
   /**
-   * 根据父消息ID查询子消息
-   */
-  List<Message> findByParentMessageId(Long parentMessageId);
-
-  /**
-   * 根据会话ID(UUID)统计消息数量
-   */
-  long countBySessionId(String sessionId);
-
-  /**
-   * 根据会话ID(UUID)查询消息列表
-   */
-  List<Message> findBySessionIdOrderByCreatedDateAsc(String sessionId);
-
-  /**
    * 根据会话ID(UUID)分页查询消息
    */
   Page<Message> findBySessionIdOrderByCreatedDateDesc(String sessionId, Pageable pageable);
-
-  /**
-   * 查询会话的最后一条消息（按会话ID UUID）
-   */
-  Message findFirstBySessionIdOrderByCreatedDateDesc(String sessionId);
 
   /**
    * 批量查询多个会话各自的最后一条消息（一次 SQL，兼容 MySQL 5.7）

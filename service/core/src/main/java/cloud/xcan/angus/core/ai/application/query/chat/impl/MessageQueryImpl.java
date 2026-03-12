@@ -122,29 +122,24 @@ public class MessageQueryImpl implements MessageQuery {
 
   @Override
   public Map<String, Message> findLastMessageMapBySessionIds(List<String> sessionIds) {
-    return new BizTemplate<Map<String, Message>>() {
-      @Override
-      protected Map<String, Message> process() {
-        if (sessionIds == null || sessionIds.isEmpty()) {
-          return new HashMap<>();
-        }
+    if (sessionIds == null || sessionIds.isEmpty()) {
+      return new HashMap<>();
+    }
 
-        List<String> validIds = sessionIds.stream()
-            .filter(sid -> sid != null && !sid.isBlank())
-            .toList();
-        if (validIds.isEmpty()) {
-          return new HashMap<>();
-        }
+    List<String> validIds = sessionIds.stream()
+        .filter(sid -> sid != null && !sid.isBlank())
+        .toList();
+    if (validIds.isEmpty()) {
+      return new HashMap<>();
+    }
 
-        List<Message> messages = messageRepo.findLastMessageBySessionIds(validIds);
-        Map<String, Message> result = new HashMap<>();
-        for (Message msg : messages) {
-          if (msg != null && msg.getSessionId() != null) {
-            result.put(msg.getSessionId(), msg);
-          }
-        }
-        return result;
+    List<Message> messages = messageRepo.findLastMessageBySessionIds(validIds);
+    Map<String, Message> result = new HashMap<>();
+    for (Message msg : messages) {
+      if (msg != null && msg.getSessionId() != null) {
+        result.put(msg.getSessionId(), msg);
       }
-    }.execute();
+    }
+    return result;
   }
 }
