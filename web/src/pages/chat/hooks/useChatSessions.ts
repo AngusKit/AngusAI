@@ -151,6 +151,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string) 
         const res = await Chat.createSession({
           appId,
           modelId: modelId?.trim() || undefined,
+          agentId: agentId?.trim() || undefined,
           title: '新对话',
         });
         const data = (res as any)?.data as SessionDetailVo;

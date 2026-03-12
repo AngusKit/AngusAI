@@ -18,6 +18,7 @@ import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
 import cloud.xcan.angus.core.utils.CoreUtils;
+import cloud.xcan.angus.remote.message.ProtocolException;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import java.util.List;
@@ -55,43 +56,68 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
       AIApplication application;
       Model currentModel;
       Agent agent;
+      Long effectiveAgentId;
 
       @Override
       protected void checkParams() {
         // 检查应用和模型是否存在（appId 必填，modelId 可选，默认从 Agent 获取）
         application = applicationQuery.findAndCheck(session.getAppId(), session.getModelId());
         currentModel = application.getCurrentUseMode();
-        agent = agentQuery.findAndCheck(applicationQuery.getDefaultAgentId(application.getId()));
+        // agentId 可选：传入时校验属于该应用，不传时使用应用默认智能体
+        effectiveAgentId = getEffectiveAgentId(application, session);
+        agent = agentQuery.findAndCheck(effectiveAgentId);
         // 会话配额校验
         sessionQuery.checkSessionQuota(session.getAppId());
       }
 
       @Override
       protected Session process() {
-        session.setSessionId(nullSafe(session.getSessionId(), UUID.randomUUID().toString()));
+        // 设置会话信息
         session.setTitle(nullSafe(session.getTitle(), "新对话"));
+        session.setAgentId(effectiveAgentId);
+        session.setSessionId(nullSafe(session.getSessionId(), UUID.randomUUID().toString()));
         // 会话默认使用应用绑定的 Agent 的模型
         if (session.getModelId() == null) {
           session.setModelId(currentModel.getId());
         }
 
-        SessionConfig sessionConfig = session.getConfig();
-        if (currentModel != null && currentModel.getConfig() != null) {
-          var modelConfig = currentModel.getConfig();
-          sessionConfig.setTemperature(nullSafe(sessionConfig.getTemperature(),
-              modelConfig.getTemperature()));
-          sessionConfig.setMaxTokens(nullSafe(sessionConfig.getMaxTokens(),
-              modelConfig.getMaxTokens()));
-          // topP/frequencyPenalty/presencePenalty 不在 ModelConfigDefinition 中，使用默认值
-          sessionConfig.setTopP(nullSafe(sessionConfig.getTopP(), 0.9));
-          sessionConfig.setFrequencyPenalty(nullSafe(sessionConfig.getFrequencyPenalty(), 0.0));
-          sessionConfig.setPresencePenalty(nullSafe(sessionConfig.getPresencePenalty(), 0.0));
-        }
-        sessionConfig.setSystemPrompt(nullSafe(nullSafe(sessionConfig.getSystemPrompt(),
-            agent != null ? agent.getSystemPrompt() : null), ""));
+        // 设置会话配置，优先级：请求参数（会话） > 模型默认配置 > Agent 默认配置 > 系统默认值
+        setSessionConfig(agent, currentModel, session);
 
+        // 保存会话
         insert0(session);
         return session;
+      }
+
+      private Long getEffectiveAgentId(AIApplication application, Session session) {
+        Long effectiveAgentId = session.getAgentId();
+        if (effectiveAgentId == null) {
+          effectiveAgentId = applicationQuery.getDefaultAgentId(application.getId());
+        } else {
+          List<Long> appAgentIds = applicationQuery.getAgentIds(application.getId());
+          if (appAgentIds == null || !appAgentIds.contains(effectiveAgentId)) {
+            throw ProtocolException.of("智能体不属于该应用");
+          }
+        }
+        if (effectiveAgentId == null) {
+          throw ProtocolException.of("应用未绑定智能体，无法创建会话");
+        }
+        return effectiveAgentId;
+      }
+
+      private void setSessionConfig(Agent agent, Model currentModel, Session session) {
+        SessionConfig config = session.getConfig();
+        if (currentModel != null && currentModel.getConfig() != null) {
+          var modelConfig = currentModel.getConfig();
+          config.setTemperature(nullSafe(config.getTemperature(), modelConfig.getTemperature()));
+          config.setMaxTokens(nullSafe(config.getMaxTokens(), modelConfig.getMaxTokens()));
+          // topP/frequencyPenalty/presencePenalty 不在 ModelConfigDefinition 中，使用默认值
+          config.setTopP(nullSafe(config.getTopP(), 0.9));
+          config.setFrequencyPenalty(nullSafe(config.getFrequencyPenalty(), 0.0));
+          config.setPresencePenalty(nullSafe(config.getPresencePenalty(), 0.0));
+        }
+        config.setSystemPrompt(nullSafe(nullSafe(config.getSystemPrompt(),
+            agent != null ? agent.getSystemPrompt() : null), ""));
       }
     }.execute();
   }

@@ -20,6 +20,7 @@ public class SessionAssembler {
     Session session = new Session();
     session.setAppId(dto.getAppId());
     session.setModelId(dto.getModelId());
+    session.setAgentId(dto.getAgentId());
 
     // 设置配置
     session.setConfig(nullSafe(dto.getConfig(), new SessionConfig()));

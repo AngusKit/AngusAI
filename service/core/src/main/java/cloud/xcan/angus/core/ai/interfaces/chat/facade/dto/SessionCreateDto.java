@@ -24,6 +24,9 @@ public class SessionCreateDto {
   @Schema(description = "使用的模型ID")
   private Long modelId;
 
+  @Schema(description = "使用的智能体ID，不传时使用应用默认智能体")
+  private Long agentId;
+
   @Schema(description = "会话配置")
   private SessionConfig config;
 

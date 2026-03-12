@@ -58,6 +58,8 @@ export interface SessionCreateDto {
   appId: string;
   /** 使用的模型ID */
   modelId?: string;
+  /** 使用的智能体ID，不传时使用应用默认智能体 */
+  agentId?: string;
   /** 会话配置 */
   config?: SessionConfig;
 }
