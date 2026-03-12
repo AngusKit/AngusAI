@@ -376,14 +376,14 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
                   <div className='flex flex-col items-center justify-center h-full text-center py-20'>
                     <div
                       className={cn(
-                        'w-20 h-20 rounded-full flex items-center justify-center mb-4',
+                        'w-20 h-20 rounded-full flex items-center justify-center mb-8',
                         selectedTemplateObj?.secondaryColor
                       )}
                     >
                       <Sparkles className={cn('w-10 h-10', selectedTemplateObj?.primaryColor?.replace('bg-', 'text-'))} />
                     </div>
                     {welcomeMessage && (
-                      <h3 className='text-xl mb-4 dark:text-white max-w-2xl'>{welcomeMessage}</h3>
+                      <h3 className='text-xl mb-8 dark:text-white max-w-2xl'>{welcomeMessage}</h3>
                     )}
                     {suggestedQuestions.length > 0 && (
                       <div className='flex flex-wrap justify-center gap-2 mb-6'>
