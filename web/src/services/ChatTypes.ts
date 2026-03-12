@@ -54,16 +54,10 @@ export interface SessionCreateDto {
    * @example "新对话"
    */
   title?: string;
-  /**
-   * 关联的应用ID
-   * @format int64
-   */
-  appId: number;
-  /**
-   * 使用的模型ID
-   * @format int64
-   */
-  modelId?: number;
+  /** 关联的应用ID */
+  appId: string;
+  /** 使用的模型ID */
+  modelId?: string;
   /** 会话配置 */
   config?: SessionConfig;
 }
@@ -77,15 +71,15 @@ export interface SessionDetailVo extends TenantAuditingVo {
   /** 会话标题 */
   title?: string;
   /** 关联的应用ID */
-  appId?: number;
+  appId?: string;
   /** 应用名称 */
   appName?: string;
   /** 使用的智能体ID */
-  agentId?: number;
+  agentId?: string;
   /** 使用的智能体名称 */
   agentName?: string;
   /** 使用的模型ID */
-  modelId?: number;
+  modelId?: string;
   /** 模型名称 */
   modelName?: string;
   /** 消息总数 */
@@ -249,20 +243,14 @@ export type BatchDeleteSessionsResult = ApiLocaleResult & {
 
 /** 切换模型请求 */
 export interface SessionSwitchModelDto {
-  /**
-   * 新模型ID
-   * @format int64
-   */
-  modelId: number;
+  /** 新模型ID */
+  modelId: string;
 }
 
 /** 切换应用请求 */
 export interface SessionSwitchAppDto {
-  /**
-   * 新应用ID
-   * @format int64
-   */
-  appId: number;
+  /** 新应用ID */
+  appId: string;
 }
 
 /** 收藏会话请求 */
@@ -301,15 +289,15 @@ export interface SessionListVo extends TenantAuditingVo {
   /** 会话标题 */
   title?: string;
   /** 关联的应用ID */
-  appId?: number;
+  appId?: string;
   /** 应用名称 */
   appName?: string;
   /** 使用的智能体ID */
-  agentId?: number;
+  agentId?: string;
   /** 使用的智能体名称 */
   agentName?: string;
   /** 使用的模型ID */
-  modelId?: number;
+  modelId?: string;
   /** 模型名称 */
   modelName?: string;
   /** 消息总数 */

@@ -16,12 +16,19 @@ import {
 import { AttachmentPreview } from './AttachmentPreview';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
-import { Switch } from '@/components/ui/switch';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, } from '@/components/ui/dropdown-menu';
 import { cn } from '@/components/ui/utils';
 import { useNavigate } from 'react-router-dom';
+import { AgentChatConfig } from '@/services/AgentChatTypes';
+import {
+  DEFAULT_CHAT_SETTINGS,
+  DEFAULT_FREQUENCY_PENALTY,
+  DEFAULT_MAX_TOKENS,
+  DEFAULT_PRESENCE_PENALTY,
+  DEFAULT_TEMPERATURE,
+  DEFAULT_TOP_P,
+} from './constants';
 
 type TemplateType = 'modern-blue' | 'minimal-gray' | 'elegant-purple' | 'warm-orange';
 
@@ -71,15 +78,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
   };
 
   // Settings state
-  const [settings, setSettings] = useState({
-    temperature: 0.7,
-    maxTokens: 2000,
-    topP: 0.9,
-    frequencyPenalty: 0,
-    presencePenalty: 0,
-    streamResponse: true,
-    saveHistory: true,
-  });
+  const [settings, setSettings] = useState<AgentChatConfig>(DEFAULT_CHAT_SETTINGS);
 
   // Theme templates
   const templates = [
@@ -197,12 +196,22 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     }
   };
 
+  const baseSelection: ChatSwitcherSelection = {
+    appId: currentSession?.appId ?? '',
+    agentId: currentSession?.agentId ?? '',
+    modelId: currentSession?.modelId ?? '',
+    app: undefined,
+    agent: undefined,
+    model: undefined,
+  };
+  const chatSelection = sessionSelections[currentSessionId ?? ''] ?? baseSelection;
+
   const createNewSession = async () => {
-    const currentSel = currentSessionId ? sessionSelections[currentSessionId] : undefined;
-    const appId = currentSel?.appId ?? currentSession?.appId ?? '';
-    const newSession = await createSession(appId, currentSel?.modelId ?? currentSession?.modelId, currentSel?.agentId ?? currentSession?.agentId);
-    if (newSession && currentSel) {
-      setSessionSelections(prev => ({ ...prev, [newSession.sessionId]: currentSel }));
+    const sel = chatSelection;
+    const appId = sel.appId ?? '';
+    const newSession = await createSession(appId, sel.modelId || undefined, sel.agentId || undefined);
+    if (newSession && appId) {
+      setSessionSelections(prev => ({ ...prev, [newSession.sessionId]: sel }));
     }
   };
 
@@ -214,16 +223,6 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     deleteSession(sessionId);
     refreshResourcesBadge();
   };
-
-  const baseSelection: ChatSwitcherSelection = {
-    appId: currentSession?.appId ?? '',
-    agentId: currentSession?.agentId ?? '',
-    modelId: currentSession?.modelId ?? '',
-    app: undefined,
-    agent: undefined,
-    model: undefined,
-  };
-  const chatSelection = sessionSelections[currentSessionId ?? ''] ?? baseSelection;
 
   const updateSessionSelection = (s: ChatSwitcherSelection) => {
     setSessionSelections((prev) => ({ ...prev, [currentSessionId]: s }));
@@ -405,7 +404,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
                   size='icon'
                   onClick={handleSendMessage}
                   disabled={!input.trim() && attachments.length === 0}
-                  className={cn('h-9 w-9', selectedTemplateObj.primaryColor, 'text-white')}
+                  className={cn('h-9 w-9', selectedTemplateObj?.primaryColor ?? 'bg-blue-500', 'text-white')}
                 >
                   <Send className='w-4 h-4' />
                 </Button>
@@ -434,8 +433,8 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
                 <span className='text-sm text-gray-500'>{settings.temperature}</span>
               </div>
               <Slider
-                value={[settings.temperature]}
-                onValueChange={([value]) => setSettings(prev => ({ ...prev, temperature: value }))}
+                value={[settings.temperature ?? DEFAULT_TEMPERATURE]}
+                onValueChange={([value]) => setSettings(prev => ({ ...prev, temperature: value ?? prev.temperature ?? DEFAULT_TEMPERATURE }))}
                 min={0}
                 max={2}
                 step={0.1}
@@ -453,8 +452,8 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
                 <span className='text-sm text-gray-500'>{settings.maxTokens}</span>
               </div>
               <Slider
-                value={[settings.maxTokens]}
-                onValueChange={([value]) => setSettings(prev => ({ ...prev, maxTokens: value }))}
+                value={[settings.maxTokens ?? DEFAULT_MAX_TOKENS]}
+                onValueChange={([value]) => setSettings(prev => ({ ...prev, maxTokens: value ?? prev.maxTokens ?? DEFAULT_MAX_TOKENS }))}
                 min={100}
                 max={4000}
                 step={100}
@@ -470,8 +469,8 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
                 <span className='text-sm text-gray-500'>{settings.topP}</span>
               </div>
               <Slider
-                value={[settings.topP]}
-                onValueChange={([value]) => setSettings(prev => ({ ...prev, topP: value }))}
+                value={[settings.topP ?? DEFAULT_TOP_P]}
+                onValueChange={([value]) => setSettings(prev => ({ ...prev, topP: value ?? prev.topP ?? DEFAULT_TOP_P }))}
                 min={0}
                 max={1}
                 step={0.05}
@@ -487,8 +486,8 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
                 <span className='text-sm text-gray-500'>{settings.frequencyPenalty}</span>
               </div>
               <Slider
-                value={[settings.frequencyPenalty]}
-                onValueChange={([value]) => setSettings(prev => ({ ...prev, frequencyPenalty: value }))}
+                value={[settings.frequencyPenalty ?? DEFAULT_FREQUENCY_PENALTY]}
+                onValueChange={([value]) => setSettings(prev => ({ ...prev, frequencyPenalty: value ?? prev.frequencyPenalty ?? DEFAULT_FREQUENCY_PENALTY }))}
                 min={0}
                 max={2}
                 step={0.1}
@@ -504,38 +503,14 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
                 <span className='text-sm text-gray-500'>{settings.presencePenalty}</span>
               </div>
               <Slider
-                value={[settings.presencePenalty]}
-                onValueChange={([value]) => setSettings(prev => ({ ...prev, presencePenalty: value }))}
+                value={[settings.presencePenalty ?? DEFAULT_PRESENCE_PENALTY]}
+                onValueChange={([value]) => setSettings(prev => ({ ...prev, presencePenalty: value ?? prev.presencePenalty ?? DEFAULT_PRESENCE_PENALTY }))}
                 min={0}
                 max={2}
                 step={0.1}
                 className='w-full'
               />
               <p className='text-xs text-gray-500'>增加模型谈论新话题的可能性。</p>
-            </div>
-
-            {/* Stream Response */}
-            <div className='flex items-center justify-between'>
-              <div className='space-y-0.5'>
-                <Label>流式响应</Label>
-                <p className='text-xs text-gray-500'>启用后将实时显示AI的回复内容</p>
-              </div>
-              <Switch
-                checked={settings.streamResponse}
-                onCheckedChange={checked => setSettings(prev => ({ ...prev, streamResponse: checked }))}
-              />
-            </div>
-
-            {/* Save History */}
-            <div className='flex items-center justify-between'>
-              <div className='space-y-0.5'>
-                <Label>保存历史记录</Label>
-                <p className='text-xs text-gray-500'>自动保存对话历史</p>
-              </div>
-              <Switch
-                checked={settings.saveHistory}
-                onCheckedChange={checked => setSettings(prev => ({ ...prev, saveHistory: checked }))}
-              />
             </div>
           </div>
 

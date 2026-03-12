@@ -227,7 +227,11 @@ export function ChatSidebar({
               className='pl-10 dark:bg-gray-800 dark:border-gray-700'
             />
           </div>
-          <Button onClick={onNewSession} size='icon'>
+          <Button
+            onClick={onNewSession}
+            size='icon'
+            className='bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white'
+          >
             <Plus className='w-4 h-4' />
           </Button>
         </div>

@@ -86,7 +86,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string) 
   const [sessionsLoading, setSessionsLoading] = useState(true);
   const [messagesLoading, setMessagesLoading] = useState(false);
   const [sessionKeyword, setSessionKeyword] = useState('');
-  const debouncedSessionKeyword = useDebounce(sessionKeyword, 300);
+  const debouncedSessionKeyword = useDebounce(sessionKeyword, 500);
   const loadedMessagesRef = useRef<Set<string>>(new Set());
 
   const initialSelectedRef = useRef(false);
@@ -143,17 +143,16 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string) 
 
   const createSession = useCallback(
     async (appId: string, modelId?: string, agentId?: string) => {
-      const numAppId = parseInt(appId, 10);
-      if (isNaN(numAppId)) {
+      if (!appId?.trim()) {
         toast.error('请先选择应用');
         return null;
       }
       try {
         const res = await Chat.createSession({
-          appId: numAppId,
-          modelId: modelId ? parseInt(modelId, 10) : undefined,
+          appId,
+          modelId: modelId?.trim() || undefined,
           title: '新对话',
-        } as any);
+        });
         const data = (res as any)?.data as SessionDetailVo;
         if (!data) {
           toast.error('创建会话失败');

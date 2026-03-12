@@ -39,16 +39,10 @@ export class Chat<SecurityDataType = unknown> {
     query?: PageQuery & {
       /** 会话标题（搜索） */
       title?: string;
-      /**
-       * 筛选指定应用
-       * @format int64
-       */
-      appId?: number;
-      /**
-       * 筛选使用的智能体
-       * @format int64
-       */
-      agentId?: number;
+      /** 筛选指定应用 */
+      appId?: string;
+      /** 筛选使用的智能体 */
+      agentId?: string;
       /** 是否已归档 */
       isArchived?: boolean;
       /** 是否已收藏（星标） */
