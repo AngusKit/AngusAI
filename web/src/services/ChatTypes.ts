@@ -35,16 +35,6 @@ export interface SessionConfig {
   presencePenalty?: number;
   /** 系统提示词（system prompt），用于设定对话的系统角色或上下文，最大长度 60000 字符。 */
   systemPrompt: string;
-  /**
-   * 是否启用流式响应（stream response）；为 null 时自动根据接口类型判断。
-   * @example true
-   */
-  streamResponse?: boolean;
-  /**
-   * 是否保存历史记录（save history），默认 true。
-   * @example true
-   */
-  saveHistory?: boolean;
 }
 
 /** 创建会话请求参数 */

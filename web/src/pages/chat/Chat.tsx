@@ -5,7 +5,7 @@ import { refreshResourcesBadge } from '@/hooks/useResourcesBadge';
 import { ChatSidebar } from './components/ChatSidebar.tsx';
 import { ChatMainArea } from './components/ChatMainArea.tsx';
 import { useChatSessions, type Message } from './hooks/useChatSessions';
-import { PromptLibrary } from './components/PromptLibrary.tsx';
+import { PromptLibraryDialog } from './components/PromptLibraryDialog.tsx';
 import { ChatSwitcher, type ChatSwitcherSelection } from './components/ChatSwitcher.tsx';
 import { SettingsDialog } from './components/SettingsDialog.tsx';
 import { ThemeDialog, CHAT_TEMPLATES, type TemplateType } from './components/ThemeDialog.tsx';
@@ -324,7 +324,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
 
       {/* Prompt Library Dialog */}
       {showPromptLibrary &&
-        <PromptLibrary
+        <PromptLibraryDialog
           onClose={() => setShowPromptLibrary(false)}
           onSelectPrompt={insertPrompt}
         />

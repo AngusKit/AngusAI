@@ -78,7 +78,7 @@ const TAG_COLORS = [
   },
 ];
 
-export function PromptLibrary({ onClose, onSelectPrompt }: PromptLibraryProps) {
+export function PromptLibraryDialog({ onClose, onSelectPrompt }: PromptLibraryProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [categories, setCategories] = useState<Category[]>([
