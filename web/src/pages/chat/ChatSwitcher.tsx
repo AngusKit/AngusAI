@@ -48,6 +48,7 @@ export function ChatSwitcher({ selection, onSelectionChange }: ChatSwitcherProps
     appScrollRef,
     modelScrollRef,
     agents,
+    displayApp,
     selectedModelId,
     handleAppScroll,
     handleModelScroll,
@@ -65,8 +66,8 @@ export function ChatSwitcher({ selection, onSelectionChange }: ChatSwitcherProps
       <DropdownMenu open={appOpen} onOpenChange={setAppOpen}>
         <DropdownMenuTrigger asChild>
           <Button variant='ghost' className='gap-2 h-9 max-w-[160px]'>
-            {selection.app?.icon ? (
-              <span className='w-4 h-4 flex items-center justify-center text-lg flex-shrink-0'>{selection.app.icon}</span>
+            {displayApp?.icon ? (
+              <span className='w-4 h-4 flex items-center justify-center text-lg flex-shrink-0'>{displayApp.icon}</span>
             ) : (
               <LayoutGrid className='w-4 h-4 text-blue-500 flex-shrink-0' />
             )}

@@ -58,11 +58,22 @@ export function useChatSwitcher({ selection, onSelectionChange }: UseChatSwitche
   const modelScrollRef = useRef<HTMLDivElement>(null);
   const modelLoadingRef = useRef(false);
 
-  const agents = selection.app?.agents ?? [];
-  const defaultAgent = selection.app?.defaultAgent;
-  const selectedAgent = agents.find((a) => String(a?.id) === selection.agentId) ?? defaultAgent;
+  // 用 apps 解析 selection，切换 session 时避免因 selection 仅有 ids 无对象而闪动
+  const resolvedApp =
+    selection.app ?? (selection.appId ? apps.find((a) => String(a.id) === selection.appId) : undefined);
+  const agents = resolvedApp?.agents ?? [];
+  const defaultAgent = resolvedApp?.defaultAgent;
+  const selectedAgent =
+    selection.agent ??
+    (selection.agentId ? agents.find((a) => String(a?.id) === selection.agentId) : undefined) ??
+    defaultAgent ??
+    agents.find((a) => a.status === AgentStatusEnum.ACTIVE) ??
+    agents[0];
   const defaultModel = selectedAgent?.defaultModel;
   const selectedModelId = selection.modelId || defaultModel?.id;
+  const resolvedModel =
+    selection.model ??
+    (defaultModel && String(defaultModel.id) === String(selectedModelId ?? '') ? defaultModel : undefined);
 
   const loadApps = useCallback(
     async (page: number, append: boolean) => {
@@ -188,16 +199,29 @@ export function useChatSwitcher({ selection, onSelectionChange }: UseChatSwitche
       agent?.defaultModel && String(agent.defaultModel.id) === String(modelId ?? '')
         ? agent.defaultModel
         : undefined;
+    const nextAppId = String(app.id ?? '');
+    const nextAgentId = agent ? String(agent.id ?? '') : '';
+    const nextModelId = modelId ? String(modelId) : '';
+    // 仅当值发生变化时才更新，避免切换 session 时因同值刷新而闪动
+    if (
+      selection.appId === nextAppId &&
+      selection.agentId === nextAgentId &&
+      selection.modelId === nextModelId &&
+      selection.app &&
+      selection.agent
+    ) {
+      return;
+    }
     onSelectionChange({
-      appId: String(app.id ?? ''),
-      agentId: agent ? String(agent.id ?? '') : '',
-      modelId: modelId ? String(modelId) : '',
+      appId: nextAppId,
+      agentId: nextAgentId,
+      modelId: nextModelId,
       app,
       agent: agent ?? undefined,
       model: model as ModelListVo | undefined,
     });
     setAppOpen(false);
-  }, [needAutoSelect, apps, selection.appId, selection.agentId, selection.modelId, onSelectionChange]);
+  }, [needAutoSelect, apps, selection.appId, selection.agentId, selection.modelId, selection.app, selection.agent, onSelectionChange]);
 
   const handleAppScroll = useCallback(() => {
     const el = appScrollRef.current;
@@ -270,12 +294,12 @@ export function useChatSwitcher({ selection, onSelectionChange }: UseChatSwitche
     [selection, onSelectionChange]
   );
 
-  const appDisplayName = selection.app?.name ?? '选择应用';
+  const appDisplayName = resolvedApp?.name ?? '选择应用';
   const agentDisplayName = selectedAgent?.name ?? '选择智能体';
-  const modelDisplayName =
-    selection.model?.name ??
-    (defaultModel as ModelListVo)?.name ??
-    '选择模型';
+  const modelDisplayName = resolvedModel?.name ?? (defaultModel as ModelListVo)?.name ?? '选择模型';
+
+  // 供展示用，切换 session 时优先用解析结果避免闪动
+  const displayApp = resolvedApp ?? selection.app;
 
   return {
     appOpen,
@@ -299,6 +323,7 @@ export function useChatSwitcher({ selection, onSelectionChange }: UseChatSwitche
     agents,
     selectedAgent,
     selectedModelId,
+    displayApp,
     handleAppScroll,
     handleModelScroll,
     handleSelectApp,
