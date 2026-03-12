@@ -57,18 +57,21 @@ public interface MessageRepo extends BaseRepository<Message, Long> {
   Message findFirstBySessionIdOrderByCreatedDateDesc(String sessionId);
 
   /**
-   * 批量查询多个会话各自的最后一条消息（一次 SQL，使用窗口函数）
+   * 批量查询多个会话各自的最后一条消息（一次 SQL，兼容 MySQL 5.7）
    */
   @Query(
       value =
-          "SELECT t.id, t.session_id, t.session_id_uuid, t.parent_message_id, t.role, t.content,"
-              + " t.attachments, t.usage, t.is_streaming, t.feedback_type, t.feedback_comment,"
-              + " t.tenant_id, t.created_by, t.modified_by, t.created_date, t.modified_date"
-              + " FROM ("
-              + "   SELECT m.*, ROW_NUMBER() OVER (PARTITION BY m.session_id_uuid ORDER BY m.created_date DESC, m.id DESC) AS rn"
-              + "   FROM ai_chat_message m"
-              + "   WHERE m.session_id_uuid IN (:sessionIds)"
-              + " ) t WHERE t.rn = 1",
+          "SELECT m.id, m.session_id, m.session_id_uuid, m.parent_message_id, m.role, m.content,"
+              + " m.attachments, m.usage, m.is_streaming, m.feedback_type, m.feedback_comment,"
+              + " m.tenant_id, m.created_by, m.modified_by, m.created_date, m.modified_date"
+              + " FROM ai_chat_message m"
+              + " INNER JOIN ("
+              + "   SELECT session_id_uuid, MAX(id) AS max_id"
+              + "   FROM ai_chat_message"
+              + "   WHERE session_id_uuid IN (:sessionIds)"
+              + "   GROUP BY session_id_uuid"
+              + " ) latest ON m.session_id_uuid = latest.session_id_uuid AND m.id = latest.max_id"
+              + " WHERE m.session_id_uuid IN (:sessionIds)",
       nativeQuery = true)
   List<Message> findLastMessageBySessionIds(@Param("sessionIds") List<String> sessionIds);
 
