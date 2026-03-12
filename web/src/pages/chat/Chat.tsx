@@ -386,7 +386,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder='输入消息... (Shift + Enter 换行)'
-                className='min-h-[80px] max-h-[240px] resize-none pr-32 py-4 px-4 dark:bg-gray-750 dark:border-gray-600 scrollbar-hide'
+                className='min-h-[80px] max-h-[240px] resize-none pr-32 py-4 px-4 dark:bg-gray-800 dark:border-gray-700 scrollbar-hide'
                 rows={1}
               />
               <div className='absolute right-3 bottom-3 flex items-center gap-1'>

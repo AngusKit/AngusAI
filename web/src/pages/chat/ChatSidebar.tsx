@@ -221,7 +221,7 @@ export function ChatSidebar({
               placeholder='搜索对话...'
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className='pl-10 dark:bg-gray-750 dark:border-gray-600'
+              className='pl-10 dark:bg-gray-800 dark:border-gray-700'
             />
           </div>
           <Button onClick={onNewSession} size='icon'>
