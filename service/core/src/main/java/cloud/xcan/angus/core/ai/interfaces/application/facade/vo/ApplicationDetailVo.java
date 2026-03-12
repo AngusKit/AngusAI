@@ -113,6 +113,12 @@ public class ApplicationDetailVo extends TenantAuditingVo {
 
     @Schema(description = "默认模型（含ID和名称）")
     private ModelInfoVo defaultModel;
+
+    @Schema(description = "欢迎消息")
+    private String welcomeMessage;
+
+    @Schema(description = "建议问题列表")
+    private List<String> suggestedQuestions;
   }
 
   @Data

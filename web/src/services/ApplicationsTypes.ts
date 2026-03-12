@@ -131,6 +131,10 @@ export interface AgentInfoVo {
   interactionMode?: InteractionModeEnum | string;
   /** 默认模型（含ID和名称） */
   defaultModel?: ModelInfoVo;
+  /** 欢迎消息 */
+  welcomeMessage?: string;
+  /** 建议问题列表 */
+  suggestedQuestions?: string[];
 }
 
 /** 应用配置（模型/资源/提示词由绑定的智能体提供） */

@@ -6,7 +6,9 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.NoRepositoryBean;
+import org.springframework.data.repository.query.Param;
 
 /**
  * 消息仓储接口
@@ -53,6 +55,22 @@ public interface MessageRepo extends BaseRepository<Message, Long> {
    * 查询会话的最后一条消息（按会话ID UUID）
    */
   Message findFirstBySessionIdOrderByCreatedDateDesc(String sessionId);
+
+  /**
+   * 批量查询多个会话各自的最后一条消息（一次 SQL，使用窗口函数）
+   */
+  @Query(
+      value =
+          "SELECT t.id, t.session_id, t.session_id_uuid, t.parent_message_id, t.role, t.content,"
+              + " t.attachments, t.usage, t.is_streaming, t.feedback_type, t.feedback_comment,"
+              + " t.tenant_id, t.created_by, t.modified_by, t.created_date, t.modified_date"
+              + " FROM ("
+              + "   SELECT m.*, ROW_NUMBER() OVER (PARTITION BY m.session_id_uuid ORDER BY m.created_date DESC, m.id DESC) AS rn"
+              + "   FROM ai_chat_message m"
+              + "   WHERE m.session_id_uuid IN (:sessionIds)"
+              + " ) t WHERE t.rn = 1",
+      nativeQuery = true)
+  List<Message> findLastMessageBySessionIds(@Param("sessionIds") List<String> sessionIds);
 
   /**
    * 根据会话实体ID删除消息

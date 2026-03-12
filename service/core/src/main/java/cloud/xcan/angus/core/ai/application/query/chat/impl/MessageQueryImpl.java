@@ -129,13 +129,18 @@ public class MessageQueryImpl implements MessageQuery {
           return new HashMap<>();
         }
 
+        List<String> validIds = sessionIds.stream()
+            .filter(sid -> sid != null && !sid.isBlank())
+            .toList();
+        if (validIds.isEmpty()) {
+          return new HashMap<>();
+        }
+
+        List<Message> messages = messageRepo.findLastMessageBySessionIds(validIds);
         Map<String, Message> result = new HashMap<>();
-        for (String sid : sessionIds) {
-          if (sid != null && !sid.isBlank()) {
-            Message msg = messageRepo.findFirstBySessionIdOrderByCreatedDateDesc(sid);
-            if (msg != null) {
-              result.put(sid, msg);
-            }
+        for (Message msg : messages) {
+          if (msg != null && msg.getSessionId() != null) {
+            result.put(msg.getSessionId(), msg);
           }
         }
         return result;

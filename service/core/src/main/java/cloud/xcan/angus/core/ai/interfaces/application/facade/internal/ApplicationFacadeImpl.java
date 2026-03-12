@@ -234,6 +234,8 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
       vo.setStatus(agent.getStatus());
       vo.setInteractionMode(agent.getInteractionMode());
       vo.setDefaultModel(defaultModel);
+      vo.setWelcomeMessage(agent.getWelcomeMessage());
+      vo.setSuggestedQuestions(agent.getSuggestedQuestions());
     } else {
       vo.setId(fallbackId);
       vo.setName("Agent");
