@@ -206,6 +206,24 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
   };
   const chatSelection = sessionSelections[currentSessionId ?? ''] ?? baseSelection;
 
+  // 当前选中的智能体（优先用 selection.agent，否则从 app 中解析）
+  const currentAgent =
+    chatSelection.agent ??
+    chatSelection.app?.agents?.find((a) => String(a?.id) === chatSelection.agentId) ??
+    chatSelection.app?.defaultAgent;
+  const welcomeMessage = currentAgent?.welcomeMessage?.trim() ?? '';
+  const suggestedQuestions = (currentAgent?.suggestedQuestions ?? []).filter((q) => q?.trim());
+  const hasAgentPlaceholder = welcomeMessage !== '' || suggestedQuestions.length > 0;
+
+  // 当前智能体：优先用 selection.agent，否则从 app 解析
+  const currentAgent =
+    chatSelection.agent ??
+    chatSelection.app?.agents?.find((a) => String(a?.id) === chatSelection.agentId) ??
+    chatSelection.app?.defaultAgent;
+  const welcomeMessage = currentAgent?.welcomeMessage?.trim() ?? '';
+  const suggestedQuestions = (currentAgent?.suggestedQuestions ?? []).filter(Boolean) as string[];
+  const hasAgentPlaceholder = welcomeMessage !== '' || suggestedQuestions.length > 0;
+
   const createNewSession = async () => {
     const sel = chatSelection;
     const appId = sel.appId ?? '';
@@ -346,18 +364,59 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
         <div className='flex-1 overflow-y-auto px-4 py-6'>
           <div className='max-w-4xl mx-auto space-y-6'>
             {currentMessages.length === 0 ? (
-              <div className='flex flex-col items-center justify-center h-full text-center py-20'>
-                <div
-                  className={cn(
-                    'w-20 h-20 rounded-full flex items-center justify-center mb-4',
-                    selectedTemplateObj?.secondaryColor
-                  )}
-                >
-                  <Sparkles className={cn('w-10 h-10', selectedTemplateObj?.primaryColor?.replace('bg-', 'text-'))} />
-                </div>
-                <h3 className='text-xl mb-2 dark:text-white'>开始新对话</h3>
-                <p className='text-gray-500 dark:text-gray-400 mb-6'>输入你的问题，或使用提示词库快速开始</p>
-              </div>
+              (() => {
+                const currentAgent =
+                  chatSelection.agent ??
+                  chatSelection.app?.agents?.find((a) => String(a?.id) === chatSelection.agentId) ??
+                  chatSelection.app?.defaultAgent;
+                const welcomeMsg = currentAgent?.welcomeMessage?.trim() ?? '';
+                const suggestedQuestions = currentAgent?.suggestedQuestions?.filter(Boolean) ?? [];
+                const hasAgentContent = welcomeMsg !== '' || suggestedQuestions.length > 0;
+
+                return hasAgentContent ? (
+                  <div className='flex flex-col items-center justify-center h-full text-center py-20'>
+                    <div
+                      className={cn(
+                        'w-20 h-20 rounded-full flex items-center justify-center mb-4',
+                        selectedTemplateObj?.secondaryColor
+                      )}
+                    >
+                      <Sparkles className={cn('w-10 h-10', selectedTemplateObj?.primaryColor?.replace('bg-', 'text-'))} />
+                    </div>
+                    {welcomeMsg && (
+                      <h3 className='text-xl mb-4 dark:text-white max-w-2xl'>{welcomeMsg}</h3>
+                    )}
+                    {suggestedQuestions.length > 0 && (
+                      <div className='flex flex-wrap justify-center gap-2 mb-6'>
+                        {suggestedQuestions.map((q, i) => (
+                          <Button
+                            key={i}
+                            variant='outline'
+                            size='sm'
+                            className='rounded-full'
+                            onClick={() => insertPrompt(q)}
+                          >
+                            {q}
+                          </Button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className='flex flex-col items-center justify-center h-full text-center py-20'>
+                    <div
+                      className={cn(
+                        'w-20 h-20 rounded-full flex items-center justify-center mb-4',
+                        selectedTemplateObj?.secondaryColor
+                      )}
+                    >
+                      <Sparkles className={cn('w-10 h-10', selectedTemplateObj?.primaryColor?.replace('bg-', 'text-'))} />
+                    </div>
+                    <h3 className='text-xl mb-2 dark:text-white'>开始新对话</h3>
+                    <p className='text-gray-500 dark:text-gray-400 mb-6'>输入你的问题，或使用提示词库快速开始</p>
+                  </div>
+                );
+              })()
             ) : (
               <>
                 {currentMessages.map(message => (
