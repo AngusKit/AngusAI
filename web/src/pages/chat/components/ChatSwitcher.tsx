@@ -7,17 +7,17 @@ import {
   Bot,
   Cpu,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/button.tsx';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { cn } from '@/components/ui/utils';
-import { useLanguage } from '@/components/LanguageProvider';
-import { useChatSwitcher, type ChatSwitcherSelection } from './hooks/useChatSwitcher';
+} from '@/components/ui/dropdown-menu.tsx';
+import { Input } from '@/components/ui/input.tsx';
+import { Badge } from '@/components/ui/badge.tsx';
+import { cn } from '@/components/ui/utils.ts';
+import { useLanguage } from '@/components/LanguageProvider.tsx';
+import { useChatSwitcher, type ChatSwitcherSelection } from '../hooks/useChatSwitcher.ts';
 
 export type { ChatSwitcherSelection };
 

@@ -2,13 +2,13 @@ import { useState, useRef, useEffect } from 'react';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { toast } from 'sonner';
 import { refreshResourcesBadge } from '@/hooks/useResourcesBadge';
-import { ChatSidebar } from './ChatSidebar';
-import { ChatMainArea } from './ChatMainArea';
+import { ChatSidebar } from './components/ChatSidebar.tsx';
+import { ChatMainArea } from './components/ChatMainArea.tsx';
 import { useChatSessions, type Message } from './hooks/useChatSessions';
-import { PromptLibrary } from './PromptLibrary';
-import { ChatSwitcher, type ChatSwitcherSelection } from './ChatSwitcher';
-import { SettingsDialog } from './SettingsDialog';
-import { ThemeDialog, CHAT_TEMPLATES, type TemplateType } from './ThemeDialog';
+import { PromptLibrary } from './components/PromptLibrary.tsx';
+import { ChatSwitcher, type ChatSwitcherSelection } from './components/ChatSwitcher.tsx';
+import { SettingsDialog } from './components/SettingsDialog.tsx';
+import { ThemeDialog, CHAT_TEMPLATES, type TemplateType } from './components/ThemeDialog.tsx';
 import { useNavigate } from 'react-router-dom';
 import { AgentChatConfig } from '@/services/AgentChatTypes';
 import { DEFAULT_CHAT_SETTINGS } from './constants';
@@ -276,10 +276,10 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
       />
 
       {/* Prompt Library Dialog */}
-      {showPromptLibrary && 
-        <PromptLibrary 
-          onClose={() => setShowPromptLibrary(false)} 
-          onSelectPrompt={insertPrompt} 
+      {showPromptLibrary &&
+        <PromptLibrary
+          onClose={() => setShowPromptLibrary(false)}
+          onSelectPrompt={insertPrompt}
         />
       }
 

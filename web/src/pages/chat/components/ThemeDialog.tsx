@@ -1,7 +1,7 @@
 import { Palette, Check } from 'lucide-react';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/components/ui/utils';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog.tsx';
+import { Button } from '@/components/ui/button.tsx';
+import { cn } from '@/components/ui/utils.ts';
 import { toast } from 'sonner';
 
 export type TemplateType = 'modern-blue' | 'minimal-gray' | 'elegant-purple' | 'warm-orange';

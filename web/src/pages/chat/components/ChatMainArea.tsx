@@ -14,21 +14,21 @@ import {
   Share2,
   Palette,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { ChatMessage } from './ChatMessage';
-import { ChatSwitcher, type ChatSwitcherSelection } from './ChatSwitcher';
-import { AttachmentPreview } from './AttachmentPreview';
+import { Button } from '@/components/ui/button.tsx';
+import { Textarea } from '@/components/ui/textarea.tsx';
+import { ChatMessage } from './ChatMessage.tsx';
+import { ChatSwitcher, type ChatSwitcherSelection } from './ChatSwitcher.tsx';
+import { AttachmentPreview } from './AttachmentPreview.tsx';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { cn } from '@/components/ui/utils';
-import type { ThemeTemplate } from './ThemeDialog';
-import type { Message } from './hooks/useChatSessions';
+} from '@/components/ui/dropdown-menu.tsx';
+import { cn } from '@/components/ui/utils.ts';
+import type { ThemeTemplate } from './ThemeDialog.tsx';
+import type { Message } from '../hooks/useChatSessions.ts';
 
 export interface ChatMainAreaProps {
   onBack: () => void;

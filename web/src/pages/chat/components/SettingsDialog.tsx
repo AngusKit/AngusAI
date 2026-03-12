@@ -1,16 +1,16 @@
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Slider } from '@/components/ui/slider';
-import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog.tsx';
+import { Label } from '@/components/ui/label.tsx';
+import { Slider } from '@/components/ui/slider.tsx';
+import { Button } from '@/components/ui/button.tsx';
 import { toast } from 'sonner';
-import type { AgentChatConfig } from '@/services/AgentChatTypes';
+import type { AgentChatConfig } from '@/services/AgentChatTypes.ts';
 import {
   DEFAULT_FREQUENCY_PENALTY,
   DEFAULT_MAX_TOKENS,
   DEFAULT_PRESENCE_PENALTY,
   DEFAULT_TEMPERATURE,
   DEFAULT_TOP_P,
-} from './constants';
+} from '../constants.ts';
 
 interface SettingsDialogProps {
   open: boolean;

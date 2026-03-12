@@ -1,10 +1,10 @@
 import { User, Bot, Copy, ThumbsUp, ThumbsDown, RotateCw, Check, Download } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button.tsx';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.tsx';
 import { useState, useMemo } from 'react';
-import { cn } from '@/components/ui/utils';
+import { cn } from '@/components/ui/utils.ts';
 import { toast } from 'sonner';
-import { copyToClipboard } from '../../lib/clipboard';
+import { copyToClipboard } from '../../../lib/clipboard.ts';
 
 interface Message {
   id: string;

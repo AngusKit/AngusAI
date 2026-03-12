@@ -1,9 +1,9 @@
 import { MessageSquare, Plus, Trash2, MoreVertical, ChevronLeft, Search, Clock, Star } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button.tsx';
+import { Input } from '@/components/ui/input.tsx';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from '@/components/ui/dropdown-menu.tsx';
 import { useState, useRef, useEffect } from 'react';
-import { cn } from '@/components/ui/utils';
+import { cn } from '@/components/ui/utils.ts';
 
 interface Session {
   id: string;

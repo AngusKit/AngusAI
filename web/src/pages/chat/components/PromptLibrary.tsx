@@ -1,17 +1,17 @@
 import { X, Search, Star, Copy, Plus, Trash2, Edit, Sparkles, BookOpen, Code, MessageSquare, TrendingUp, FolderPlus, Settings, Check, } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, } from '@/components/ui/dialog';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Badge } from '@/components/ui/badge';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, } from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button.tsx';
+import { Input } from '@/components/ui/input.tsx';
+import { Textarea } from '@/components/ui/textarea.tsx';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, } from '@/components/ui/dialog.tsx';
+import { ScrollArea } from '@/components/ui/scroll-area.tsx';
+import { Badge } from '@/components/ui/badge.tsx';
+import { Label } from '@/components/ui/label.tsx';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.tsx';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, } from '@/components/ui/alert-dialog.tsx';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { cn } from '@/components/ui/utils';
-import { copyToClipboard } from '../../lib/clipboard';
+import { cn } from '@/components/ui/utils.ts';
+import { copyToClipboard } from '../../../lib/clipboard.ts';
 
 interface Prompt {
   id: string;
