@@ -161,6 +161,12 @@ export function ChatSwitcher({ selection, onSelectionChange }: ChatSwitcherProps
     [debouncedModelKw]
   );
 
+  // 进入对话页面后自动加载应用列表
+  useEffect(() => {
+    setAppPage(1);
+    loadApps(1, false);
+  }, [loadApps]);
+
   useEffect(() => {
     if (appOpen) {
       setAppPage(1);
