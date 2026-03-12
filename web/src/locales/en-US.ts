@@ -1113,6 +1113,7 @@ export const enUS = {
     loadPromptsFailed: 'Failed to load prompts',
     favoriteUpdated: 'Favorite status updated',
     promptCopied: 'Prompt copied',
+    promptInserted: 'Prompt inserted',
     usePromptFailed: 'Failed to use prompt',
     copySuffix: '(Copy)',
     duplicateSuccess: 'Prompt duplicated',

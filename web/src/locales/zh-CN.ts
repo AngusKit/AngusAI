@@ -361,6 +361,7 @@ export const zhCN = {
     copySuccess: '已复制到剪贴板',
     copyFailed: '复制失败，请手动复制',
     promptCopied: '提示词已复制',
+    promptInserted: '已插入提示词',
     usePromptFailed: '使用提示词失败',
     copySuffix: '(副本)',
     duplicateSuccess: '已复制提示词',
