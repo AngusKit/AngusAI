@@ -383,7 +383,9 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
                       <Sparkles className={cn('w-10 h-10', selectedTemplateObj?.primaryColor?.replace('bg-', 'text-'))} />
                     </div>
                     {welcomeMessage && (
-                      <h3 className='text-xl mb-8 dark:text-white max-w-2xl'>{welcomeMessage}</h3>
+                      <h3 className='text-xl mb-8 text-gray-800 dark:text-gray-100 max-w-2xl leading-relaxed'>
+                        {welcomeMessage}
+                      </h3>
                     )}
                     {suggestedQuestions.length > 0 && (
                       <div className='flex flex-wrap justify-center gap-2 mb-6'>
@@ -392,7 +394,13 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
                             key={i}
                             variant='outline'
                             size='sm'
-                            className='rounded-full'
+                            className={cn(
+                              'rounded-full',
+                              'text-gray-700 dark:text-gray-300',
+                              'border-gray-300 dark:border-gray-600',
+                              'hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700',
+                              'dark:hover:bg-blue-500/10 dark:hover:border-blue-500/50 dark:hover:text-blue-400'
+                            )}
                             onClick={() => insertPrompt(q)}
                           >
                             {q}
