@@ -1,23 +1,14 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Paperclip, Mic, StopCircle, MoreVertical, Sparkles, BookmarkPlus, Settings, Maximize2, ArrowLeft, Download, Share2, Palette } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { toast } from 'sonner';
 import { refreshResourcesBadge } from '@/hooks/useResourcesBadge';
 import { ChatSidebar } from './ChatSidebar';
-import { ChatMessage } from './ChatMessage';
+import { ChatMainArea } from './ChatMainArea';
 import { useChatSessions, type Message } from './hooks/useChatSessions';
 import { PromptLibrary } from './PromptLibrary';
-import {
-  ChatSwitcher,
-  type ChatSwitcherSelection,
-} from './ChatSwitcher';
-import { AttachmentPreview } from './AttachmentPreview';
+import { ChatSwitcher, type ChatSwitcherSelection } from './ChatSwitcher';
 import { SettingsDialog } from './SettingsDialog';
 import { ThemeDialog, CHAT_TEMPLATES, type TemplateType } from './ThemeDialog';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, } from '@/components/ui/dropdown-menu';
-import { cn } from '@/components/ui/utils';
 import { useNavigate } from 'react-router-dom';
 import { AgentChatConfig } from '@/services/AgentChatTypes';
 import { DEFAULT_CHAT_SETTINGS } from './constants';
@@ -64,7 +55,6 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateType>('modern-blue');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleBack = () => {
@@ -75,11 +65,6 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
   const [settings, setSettings] = useState<AgentChatConfig>(DEFAULT_CHAT_SETTINGS);
 
   const selectedTemplateObj = CHAT_TEMPLATES.find(t => t.id === selectedTemplate) || CHAT_TEMPLATES[0];
-
-  // Auto-scroll to bottom
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [currentMessages]);
 
   // Auto-resize textarea
   useEffect(() => {
@@ -260,174 +245,35 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
       />
 
       {/* Main Chat Area */}
-      <div className='flex-1 flex flex-col'>
-        {/* Top Bar */}
-        <div className='h-14 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 flex items-center justify-between'>
-          <div className='flex items-center gap-3'>
-            {(
-              <>
-                <Button
-                  variant='ghost'
-                  size='icon'
-                  onClick={handleBack}
-                  className='hover:bg-gray-100 dark:hover:bg-gray-700'
-                >
-                  <ArrowLeft className='w-5 h-5' />
-                </Button>
-                <div className='w-px h-6 bg-gray-200 dark:bg-gray-700' />
-              </>
-            )}
-            <ChatSwitcher selection={chatSelection} onSelectionChange={updateSessionSelection} />
-          </div>
-
-          <div className='flex items-center gap-2'>
-            <Button variant='ghost' size='sm' onClick={() => setShowPromptLibrary(true)} className='gap-2'>
-              <BookmarkPlus className='w-4 h-4' />
-              提示词库
-            </Button>
-            <Button variant='ghost' size='icon' onClick={() => setShowThemeDialog(true)} title='外观设置'>
-              <Palette className='w-4 h-4' />
-            </Button>
-            <Button variant='ghost' size='icon' onClick={() => setShowSettings(true)}>
-              <Settings className='w-4 h-4' />
-            </Button>
-            <Button variant='ghost' size='icon' onClick={toggleFullscreen}>
-              <Maximize2 className='w-4 h-4' />
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant='ghost' size='icon'>
-                  <MoreVertical className='w-4 h-4' />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align='end' className='w-48'>
-                <DropdownMenuItem onClick={exportChat}>
-                  <Download className='w-4 h-4 mr-2' />
-                  导出对话
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={shareChat}>
-                  <Share2 className='w-4 h-4 mr-2' />
-                  分享对话
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={clearCurrentChat} className='text-red-600 dark:text-red-400'>
-                  清空当前对话
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
-
-        {/* Messages Area */}
-        <div className='flex-1 overflow-y-auto px-4 py-6'>
-          <div className='max-w-4xl mx-auto space-y-6'>
-            {currentMessages.length === 0 ? (
-              hasAgentPlaceholder ? (
-                  <div className='flex flex-col items-center justify-center h-full text-center py-20'>
-                    <div
-                      className={cn(
-                        'w-20 h-20 rounded-full flex items-center justify-center mb-8',
-                        selectedTemplateObj?.secondaryColor
-                      )}
-                    >
-                      <Sparkles className={cn('w-10 h-10', selectedTemplateObj?.primaryColor?.replace('bg-', 'text-'))} />
-                    </div>
-                    {welcomeMessage && (
-                      <h3 className='text-xl mb-8 text-gray-800 dark:text-gray-100 max-w-2xl leading-relaxed'>
-                        {welcomeMessage}
-                      </h3>
-                    )}
-                    {suggestedQuestions.length > 0 && (
-                      <div className='flex flex-wrap justify-center gap-2 mb-6'>
-                        {suggestedQuestions.map((q, i) => (
-                          <Button
-                            key={i}
-                            variant='outline'
-                            size='sm'
-                            className={cn(
-                              'rounded-full',
-                              'text-gray-700 dark:text-gray-300',
-                              'border-gray-300 dark:border-gray-600',
-                              'hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700',
-                              'dark:hover:bg-blue-500/10 dark:hover:border-blue-500/50 dark:hover:text-blue-400'
-                            )}
-                            onClick={() => insertPrompt(q)}
-                          >
-                            {q}
-                          </Button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className='flex flex-col items-center justify-center h-full text-center py-20'>
-                    <div
-                      className={cn(
-                        'w-20 h-20 rounded-full flex items-center justify-center mb-4',
-                        selectedTemplateObj?.secondaryColor
-                      )}
-                    >
-                      <Sparkles className={cn('w-10 h-10', selectedTemplateObj?.primaryColor?.replace('bg-', 'text-'))} />
-                    </div>
-                    <h3 className='text-xl mb-2 dark:text-white'>开始新对话</h3>
-                    <p className='text-gray-500 dark:text-gray-400 mb-6'>输入你的问题，或使用提示词库快速开始</p>
-                  </div>
-                )
-            ) : (
-              <>
-                {currentMessages.map(message => (
-                  <ChatMessage key={message.id} message={message} />
-                ))}
-                <div ref={messagesEndRef} />
-              </>
-            )}
-          </div>
-        </div>
-
-        {/* Input Area */}
-        <div className='bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4'>
-          <div className='max-w-4xl mx-auto'>
-            {/* Attachments Preview */}
-            {attachments.length > 0 && (
-              <div className='mb-3 flex flex-wrap gap-2'>
-                {attachments.map((file, index) => (
-                  <AttachmentPreview key={index} file={file} onRemove={() => removeAttachment(index)} />
-                ))}
-              </div>
-            )}
-
-            {/* Input Box */}
-            <div className='flex-1 relative'>
-              <Textarea
-                ref={textareaRef}
-                value={input}
-                onChange={e => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder='输入消息... (Shift + Enter 换行)'
-                className='min-h-[80px] max-h-[240px] resize-none pr-32 py-4 px-4 dark:bg-gray-800 dark:border-gray-700 scrollbar-hide'
-                rows={1}
-              />
-              <div className='absolute right-3 bottom-3 flex items-center gap-1'>
-                <input ref={fileInputRef} type='file' multiple className='hidden' onChange={handleFileSelect} />
-                <Button variant='ghost' size='icon' className='h-9 w-9' onClick={() => fileInputRef.current?.click()}>
-                  <Paperclip className='w-4 h-4' />
-                </Button>
-                <Button variant='ghost' size='icon' className='h-9 w-9' onClick={handleVoiceRecord}>
-                  {isRecording ? <StopCircle className='w-4 h-4 text-red-500' /> : <Mic className='w-4 h-4' />}
-                </Button>
-                <Button
-                  size='icon'
-                  onClick={handleSendMessage}
-                  disabled={!input.trim() && attachments.length === 0}
-                  className={cn('h-9 w-9', selectedTemplateObj?.primaryColor ?? 'bg-blue-500', 'text-white')}
-                >
-                  <Send className='w-4 h-4' />
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <ChatMainArea
+        onBack={handleBack}
+        chatSelection={chatSelection}
+        onSelectionChange={updateSessionSelection}
+        onShowPromptLibrary={() => setShowPromptLibrary(true)}
+        onShowThemeDialog={() => setShowThemeDialog(true)}
+        onShowSettings={() => setShowSettings(true)}
+        onToggleFullscreen={toggleFullscreen}
+        onExportChat={exportChat}
+        onShareChat={shareChat}
+        onClearChat={clearCurrentChat}
+        currentMessages={currentMessages}
+        hasAgentPlaceholder={hasAgentPlaceholder}
+        welcomeMessage={welcomeMessage}
+        suggestedQuestions={suggestedQuestions}
+        selectedTemplateObj={selectedTemplateObj}
+        onInsertPrompt={insertPrompt}
+        attachments={attachments}
+        onRemoveAttachment={removeAttachment}
+        input={input}
+        onInputChange={setInput}
+        onKeyDown={handleKeyDown}
+        fileInputRef={fileInputRef}
+        onFileSelect={handleFileSelect}
+        onVoiceRecord={handleVoiceRecord}
+        isRecording={isRecording}
+        onSendMessage={handleSendMessage}
+        textareaRef={textareaRef}
+      />
 
       {/* Prompt Library Dialog */}
       {showPromptLibrary && 
