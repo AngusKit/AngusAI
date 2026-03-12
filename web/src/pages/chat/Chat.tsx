@@ -215,15 +215,6 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
   const suggestedQuestions = (currentAgent?.suggestedQuestions ?? []).filter((q) => q?.trim());
   const hasAgentPlaceholder = welcomeMessage !== '' || suggestedQuestions.length > 0;
 
-  // 当前智能体：优先用 selection.agent，否则从 app 解析
-  const currentAgent =
-    chatSelection.agent ??
-    chatSelection.app?.agents?.find((a) => String(a?.id) === chatSelection.agentId) ??
-    chatSelection.app?.defaultAgent;
-  const welcomeMessage = currentAgent?.welcomeMessage?.trim() ?? '';
-  const suggestedQuestions = (currentAgent?.suggestedQuestions ?? []).filter(Boolean) as string[];
-  const hasAgentPlaceholder = welcomeMessage !== '' || suggestedQuestions.length > 0;
-
   const createNewSession = async () => {
     const sel = chatSelection;
     const appId = sel.appId ?? '';
@@ -243,6 +234,15 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
   };
 
   const updateSessionSelection = (s: ChatSwitcherSelection) => {
+    // 仅当会话列表已加载完毕且确认为空时，才自动创建会话（避免 loadApps 先于 loadSessions 完成时误创建）
+    if (!sessionsLoading && sessions.length === 0 && s.appId) {
+      createSession(s.appId, s.modelId || undefined, s.agentId || undefined).then((newSession) => {
+        if (newSession) {
+          setSessionSelections((prev) => ({ ...prev, [newSession.sessionId]: s }));
+        }
+      });
+      return;
+    }
     setSessionSelections((prev) => ({ ...prev, [currentSessionId]: s }));
     updateSessionInList(currentSessionId, { appId: s.appId, agentId: s.agentId, modelId: s.modelId });
   };
@@ -364,16 +364,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
         <div className='flex-1 overflow-y-auto px-4 py-6'>
           <div className='max-w-4xl mx-auto space-y-6'>
             {currentMessages.length === 0 ? (
-              (() => {
-                const currentAgent =
-                  chatSelection.agent ??
-                  chatSelection.app?.agents?.find((a) => String(a?.id) === chatSelection.agentId) ??
-                  chatSelection.app?.defaultAgent;
-                const welcomeMsg = currentAgent?.welcomeMessage?.trim() ?? '';
-                const suggestedQuestions = currentAgent?.suggestedQuestions?.filter(Boolean) ?? [];
-                const hasAgentContent = welcomeMsg !== '' || suggestedQuestions.length > 0;
-
-                return hasAgentContent ? (
+              hasAgentPlaceholder ? (
                   <div className='flex flex-col items-center justify-center h-full text-center py-20'>
                     <div
                       className={cn(
@@ -383,8 +374,8 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
                     >
                       <Sparkles className={cn('w-10 h-10', selectedTemplateObj?.primaryColor?.replace('bg-', 'text-'))} />
                     </div>
-                    {welcomeMsg && (
-                      <h3 className='text-xl mb-4 dark:text-white max-w-2xl'>{welcomeMsg}</h3>
+                    {welcomeMessage && (
+                      <h3 className='text-xl mb-4 dark:text-white max-w-2xl'>{welcomeMessage}</h3>
                     )}
                     {suggestedQuestions.length > 0 && (
                       <div className='flex flex-wrap justify-center gap-2 mb-6'>
@@ -415,8 +406,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
                     <h3 className='text-xl mb-2 dark:text-white'>开始新对话</h3>
                     <p className='text-gray-500 dark:text-gray-400 mb-6'>输入你的问题，或使用提示词库快速开始</p>
                   </div>
-                );
-              })()
+                )
             ) : (
               <>
                 {currentMessages.map(message => (
