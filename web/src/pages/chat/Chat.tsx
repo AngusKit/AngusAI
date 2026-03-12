@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Paperclip, Mic, StopCircle, MoreVertical, Sparkles, BookmarkPlus, Settings, Maximize2, ArrowLeft, Download, Share2, Palette, Check, } from 'lucide-react';
+import { Send, Paperclip, Mic, StopCircle, MoreVertical, Sparkles, BookmarkPlus, Settings, Maximize2, ArrowLeft, Download, Share2, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
@@ -14,23 +14,13 @@ import {
   type ChatSwitcherSelection,
 } from './ChatSwitcher';
 import { AttachmentPreview } from './AttachmentPreview';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Slider } from '@/components/ui/slider';
+import { SettingsDialog } from './SettingsDialog';
+import { ThemeDialog, CHAT_TEMPLATES, type TemplateType } from './ThemeDialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, } from '@/components/ui/dropdown-menu';
 import { cn } from '@/components/ui/utils';
 import { useNavigate } from 'react-router-dom';
 import { AgentChatConfig } from '@/services/AgentChatTypes';
-import {
-  DEFAULT_CHAT_SETTINGS,
-  DEFAULT_FREQUENCY_PENALTY,
-  DEFAULT_MAX_TOKENS,
-  DEFAULT_PRESENCE_PENALTY,
-  DEFAULT_TEMPERATURE,
-  DEFAULT_TOP_P,
-} from './constants';
-
-type TemplateType = 'modern-blue' | 'minimal-gray' | 'elegant-purple' | 'warm-orange';
+import { DEFAULT_CHAT_SETTINGS } from './constants';
 
 interface ChatProps {
   content?: string;
@@ -84,47 +74,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
   // Settings state
   const [settings, setSettings] = useState<AgentChatConfig>(DEFAULT_CHAT_SETTINGS);
 
-  // Theme templates
-  const templates = [
-    {
-      id: 'modern-blue' as TemplateType,
-      name: '现代蓝',
-      description: '专业清新的蓝色主题',
-      primaryColor: 'bg-blue-500',
-      secondaryColor: 'bg-blue-50 dark:bg-blue-900/20',
-      accentColor: 'border-blue-200 dark:border-blue-800',
-      hoverColor: 'hover:bg-blue-100 dark:hover:bg-blue-900/30',
-    },
-    {
-      id: 'minimal-gray' as TemplateType,
-      name: '简约灰',
-      description: '简洁优雅的灰色主题',
-      primaryColor: 'bg-gray-700',
-      secondaryColor: 'bg-gray-50 dark:bg-gray-800',
-      accentColor: 'border-gray-200 dark:border-gray-700',
-      hoverColor: 'hover:bg-gray-100 dark:hover:bg-gray-750',
-    },
-    {
-      id: 'elegant-purple' as TemplateType,
-      name: '优雅紫',
-      description: '高雅精致的紫色主题',
-      primaryColor: 'bg-purple-500',
-      secondaryColor: 'bg-purple-50 dark:bg-purple-900/20',
-      accentColor: 'border-purple-200 dark:border-purple-800',
-      hoverColor: 'hover:bg-purple-100 dark:hover:bg-purple-900/30',
-    },
-    {
-      id: 'warm-orange' as TemplateType,
-      name: '温暖橙',
-      description: '活力温馨的橙色主题',
-      primaryColor: 'bg-orange-500',
-      secondaryColor: 'bg-orange-50 dark:bg-orange-900/20',
-      accentColor: 'border-orange-200 dark:border-orange-800',
-      hoverColor: 'hover:bg-orange-100 dark:hover:bg-orange-900/30',
-    },
-  ];
-
-  const selectedTemplateObj = templates.find(t => t.id === selectedTemplate) || templates[0];
+  const selectedTemplateObj = CHAT_TEMPLATES.find(t => t.id === selectedTemplate) || CHAT_TEMPLATES[0];
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -480,172 +430,28 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
       </div>
 
       {/* Prompt Library Dialog */}
-      {showPromptLibrary && <PromptLibrary onClose={() => setShowPromptLibrary(false)} onSelectPrompt={insertPrompt} />}
+      {showPromptLibrary && 
+        <PromptLibrary 
+          onClose={() => setShowPromptLibrary(false)} 
+          onSelectPrompt={insertPrompt} 
+        />
+      }
 
       {/* Settings Dialog */}
-      <Dialog open={showSettings} onOpenChange={setShowSettings}>
-        <DialogContent className='max-w-2xl max-h-[80vh] overflow-y-auto'>
-          <DialogHeader>
-            <DialogTitle>对话设置</DialogTitle>
-            <DialogDescription>调整AI对话的参数配置</DialogDescription>
-          </DialogHeader>
-
-          <div className='space-y-6 py-4'>
-            {/* Temperature */}
-            <div className='space-y-2'>
-              <div className='flex items-center justify-between'>
-                <Label>温度 (Temperature)</Label>
-                <span className='text-sm text-gray-500'>{settings.temperature}</span>
-              </div>
-              <Slider
-                value={[settings.temperature ?? DEFAULT_TEMPERATURE]}
-                onValueChange={([value]) => setSettings(prev => ({ ...prev, temperature: value ?? prev.temperature ?? DEFAULT_TEMPERATURE }))}
-                min={0}
-                max={2}
-                step={0.1}
-                className='w-full'
-              />
-              <p className='text-xs text-gray-500'>
-                控制输出的随机性。较高的值使输出更随机，较低的值使输出更集中和确定。
-              </p>
-            </div>
-
-            {/* Max Tokens */}
-            <div className='space-y-2'>
-              <div className='flex items-center justify-between'>
-                <Label>最大令牌数 (Max Tokens)</Label>
-                <span className='text-sm text-gray-500'>{settings.maxTokens}</span>
-              </div>
-              <Slider
-                value={[settings.maxTokens ?? DEFAULT_MAX_TOKENS]}
-                onValueChange={([value]) => setSettings(prev => ({ ...prev, maxTokens: value ?? prev.maxTokens ?? DEFAULT_MAX_TOKENS }))}
-                min={100}
-                max={4000}
-                step={100}
-                className='w-full'
-              />
-              <p className='text-xs text-gray-500'>限制生成响应的最大长度。</p>
-            </div>
-
-            {/* Top P */}
-            <div className='space-y-2'>
-              <div className='flex items-center justify-between'>
-                <Label>Top P</Label>
-                <span className='text-sm text-gray-500'>{settings.topP}</span>
-              </div>
-              <Slider
-                value={[settings.topP ?? DEFAULT_TOP_P]}
-                onValueChange={([value]) => setSettings(prev => ({ ...prev, topP: value ?? prev.topP ?? DEFAULT_TOP_P }))}
-                min={0}
-                max={1}
-                step={0.05}
-                className='w-full'
-              />
-              <p className='text-xs text-gray-500'>核心采样：考虑累积概率为 top_p 的标记结果。</p>
-            </div>
-
-            {/* Frequency Penalty */}
-            <div className='space-y-2'>
-              <div className='flex items-center justify-between'>
-                <Label>频率惩罚 (Frequency Penalty)</Label>
-                <span className='text-sm text-gray-500'>{settings.frequencyPenalty}</span>
-              </div>
-              <Slider
-                value={[settings.frequencyPenalty ?? DEFAULT_FREQUENCY_PENALTY]}
-                onValueChange={([value]) => setSettings(prev => ({ ...prev, frequencyPenalty: value ?? prev.frequencyPenalty ?? DEFAULT_FREQUENCY_PENALTY }))}
-                min={0}
-                max={2}
-                step={0.1}
-                className='w-full'
-              />
-              <p className='text-xs text-gray-500'>降低模型重复相同内容的可能性。</p>
-            </div>
-
-            {/* Presence Penalty */}
-            <div className='space-y-2'>
-              <div className='flex items-center justify-between'>
-                <Label>存在惩罚 (Presence Penalty)</Label>
-                <span className='text-sm text-gray-500'>{settings.presencePenalty}</span>
-              </div>
-              <Slider
-                value={[settings.presencePenalty ?? DEFAULT_PRESENCE_PENALTY]}
-                onValueChange={([value]) => setSettings(prev => ({ ...prev, presencePenalty: value ?? prev.presencePenalty ?? DEFAULT_PRESENCE_PENALTY }))}
-                min={0}
-                max={2}
-                step={0.1}
-                className='w-full'
-              />
-              <p className='text-xs text-gray-500'>增加模型谈论新话题的可能性。</p>
-            </div>
-          </div>
-
-          <div className='flex justify-end gap-2'>
-            <Button variant='outline' onClick={() => setShowSettings(false)}>
-              取消
-            </Button>
-            <Button
-              onClick={() => {
-                setShowSettings(false);
-                toast.success('设置已保存');
-              }}
-            >
-              保存设置
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <SettingsDialog
+        open={showSettings}
+        onOpenChange={setShowSettings}
+        settings={settings}
+        onSettingsChange={setSettings}
+      />
 
       {/* Theme Dialog */}
-      <Dialog open={showThemeDialog} onOpenChange={setShowThemeDialog}>
-        <DialogContent className='max-w-lg'>
-          <DialogHeader>
-            <DialogTitle className='flex items-center gap-2'>
-              <Palette className='w-5 h-5' />
-              外观主题设置
-            </DialogTitle>
-            <DialogDescription>选择你喜欢的对话界面外观主题</DialogDescription>
-          </DialogHeader>
-
-          <div className='space-y-2 py-2'>
-            {templates.map(template => (
-              <div
-                key={template.id}
-                onClick={() => {
-                  setSelectedTemplate(template.id);
-                  toast.success(`已切换到${template.name}主题`);
-                }}
-                className={cn(
-                  'p-3 border-2 rounded-lg cursor-pointer transition-all',
-                  selectedTemplate === template.id
-                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                    : 'border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-700'
-                )}
-              >
-                <div className='flex items-center justify-between mb-2'>
-                  <div>
-                    <div className='dark:text-white'>{template.name}</div>
-                    <div className='text-xs text-gray-500 dark:text-gray-400'>{template.description}</div>
-                  </div>
-                  {selectedTemplate === template.id && <Check className='w-4 h-4 text-blue-500' />}
-                </div>
-                <div className='flex gap-1.5'>
-                  <div
-                    className={cn('w-8 h-8 rounded border-2 border-white dark:border-gray-900', template.primaryColor)}
-                  ></div>
-                  <div className={cn('w-8 h-8 rounded border', template.secondaryColor, template.accentColor)}></div>
-                  <div className={cn('w-8 h-8 rounded border', template.secondaryColor, template.accentColor)}></div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className='flex justify-end gap-2 pt-2'>
-            <Button variant='outline' onClick={() => setShowThemeDialog(false)}>
-              关闭
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <ThemeDialog
+        open={showThemeDialog}
+        onOpenChange={setShowThemeDialog}
+        selectedTemplate={selectedTemplate}
+        onTemplateChange={setSelectedTemplate}
+      />
     </div>
   );
 }

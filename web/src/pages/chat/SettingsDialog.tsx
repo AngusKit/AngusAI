@@ -1,0 +1,136 @@
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Slider } from '@/components/ui/slider';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
+import type { AgentChatConfig } from '@/services/AgentChatTypes';
+import {
+  DEFAULT_FREQUENCY_PENALTY,
+  DEFAULT_MAX_TOKENS,
+  DEFAULT_PRESENCE_PENALTY,
+  DEFAULT_TEMPERATURE,
+  DEFAULT_TOP_P,
+} from './constants';
+
+interface SettingsDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  settings: AgentChatConfig;
+  onSettingsChange: (settings: AgentChatConfig) => void;
+}
+
+export function SettingsDialog({ open, onOpenChange, settings, onSettingsChange }: SettingsDialogProps) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className='max-w-2xl max-h-[80vh] overflow-y-auto'>
+        <DialogHeader>
+          <DialogTitle>对话设置</DialogTitle>
+          <DialogDescription>调整AI对话的参数配置</DialogDescription>
+        </DialogHeader>
+
+        <div className='space-y-6 py-4'>
+          {/* Temperature */}
+          <div className='space-y-2'>
+            <div className='flex items-center justify-between'>
+              <Label>温度 (Temperature)</Label>
+              <span className='text-sm text-gray-500'>{settings.temperature}</span>
+            </div>
+            <Slider
+              value={[settings.temperature ?? DEFAULT_TEMPERATURE]}
+              onValueChange={([value]) => onSettingsChange({ ...settings, temperature: value ?? settings.temperature ?? DEFAULT_TEMPERATURE })}
+              min={0}
+              max={2}
+              step={0.1}
+              className='w-full'
+            />
+            <p className='text-xs text-gray-500'>
+              控制输出的随机性。较高的值使输出更随机，较低的值使输出更集中和确定。
+            </p>
+          </div>
+
+          {/* Max Tokens */}
+          <div className='space-y-2'>
+            <div className='flex items-center justify-between'>
+              <Label>最大令牌数 (Max Tokens)</Label>
+              <span className='text-sm text-gray-500'>{settings.maxTokens}</span>
+            </div>
+            <Slider
+              value={[settings.maxTokens ?? DEFAULT_MAX_TOKENS]}
+              onValueChange={([value]) => onSettingsChange({ ...settings, maxTokens: value ?? settings.maxTokens ?? DEFAULT_MAX_TOKENS })}
+              min={100}
+              max={4000}
+              step={100}
+              className='w-full'
+            />
+            <p className='text-xs text-gray-500'>限制生成响应的最大长度。</p>
+          </div>
+
+          {/* Top P */}
+          <div className='space-y-2'>
+            <div className='flex items-center justify-between'>
+              <Label>Top P</Label>
+              <span className='text-sm text-gray-500'>{settings.topP}</span>
+            </div>
+            <Slider
+              value={[settings.topP ?? DEFAULT_TOP_P]}
+              onValueChange={([value]) => onSettingsChange({ ...settings, topP: value ?? settings.topP ?? DEFAULT_TOP_P })}
+              min={0}
+              max={1}
+              step={0.05}
+              className='w-full'
+            />
+            <p className='text-xs text-gray-500'>核心采样：考虑累积概率为 top_p 的标记结果。</p>
+          </div>
+
+          {/* Frequency Penalty */}
+          <div className='space-y-2'>
+            <div className='flex items-center justify-between'>
+              <Label>频率惩罚 (Frequency Penalty)</Label>
+              <span className='text-sm text-gray-500'>{settings.frequencyPenalty}</span>
+            </div>
+            <Slider
+              value={[settings.frequencyPenalty ?? DEFAULT_FREQUENCY_PENALTY]}
+              onValueChange={([value]) => onSettingsChange({ ...settings, frequencyPenalty: value ?? settings.frequencyPenalty ?? DEFAULT_FREQUENCY_PENALTY })}
+              min={0}
+              max={2}
+              step={0.1}
+              className='w-full'
+            />
+            <p className='text-xs text-gray-500'>降低模型重复相同内容的可能性。</p>
+          </div>
+
+          {/* Presence Penalty */}
+          <div className='space-y-2'>
+            <div className='flex items-center justify-between'>
+              <Label>存在惩罚 (Presence Penalty)</Label>
+              <span className='text-sm text-gray-500'>{settings.presencePenalty}</span>
+            </div>
+            <Slider
+              value={[settings.presencePenalty ?? DEFAULT_PRESENCE_PENALTY]}
+              onValueChange={([value]) => onSettingsChange({ ...settings, presencePenalty: value ?? settings.presencePenalty ?? DEFAULT_PRESENCE_PENALTY })}
+              min={0}
+              max={2}
+              step={0.1}
+              className='w-full'
+            />
+            <p className='text-xs text-gray-500'>增加模型谈论新话题的可能性。</p>
+          </div>
+        </div>
+
+        <div className='flex justify-end gap-2'>
+          <Button variant='outline' onClick={() => onOpenChange(false)}>
+            取消
+          </Button>
+          <Button
+            onClick={() => {
+              onOpenChange(false);
+              toast.success('设置已保存');
+            }}
+          >
+            保存设置
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
