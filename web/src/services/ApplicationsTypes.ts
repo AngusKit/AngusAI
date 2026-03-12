@@ -83,6 +83,8 @@ export interface ApplicationListVo extends TenantAuditingVo {
   publishedDate?: string;
   /** 是否已收藏（星标） */
   isStarred?: boolean;
+  /** 功能设置（用于对话页根据配置控制 UI 显示） */
+  features?: FeaturesConfigVo;
 }
 
 /** The API response result of supporting international message. */
@@ -225,8 +227,10 @@ export interface FeaturesConfigVo {
   enableVoiceInput?: boolean;
   /** 启用图片输入 */
   enableImageInput?: boolean;
-  /** 启用历史记录 */
-  enableHistory?: boolean;
+  /** 启用会话设置：开启后用户可以在对话页面进行温度、最大token等参数设置 */
+  enableSessionSettings?: boolean;
+  /** 启用外观设置：开启后用户可以在对话页面进行主题、外观等设置 */
+  enableAppearanceSettings?: boolean;
   /** 启用提示词库：开启后用户可以在对话页面选择提示词 */
   enablePromptLibrary?: boolean;
   /** 启用会话列表：开启后在对话页面查看对话记录 */
@@ -303,8 +307,10 @@ export interface FeaturesConfig {
   enableVoiceInput?: boolean;
   /** 启用图片输入 */
   enableImageInput?: boolean;
-  /** 启用历史记录 */
-  enableHistory?: boolean;
+  /** 启用会话设置：开启后用户可以在对话页面进行温度、最大token等参数设置 */
+  enableSessionSettings?: boolean;
+  /** 启用外观设置：开启后用户可以在对话页面进行主题、外观等设置 */
+  enableAppearanceSettings?: boolean;
   /** 启用提示词库：开启后用户可以在对话页面选择提示词 */
   enablePromptLibrary?: boolean;
   /** 启用会话列表：开启后在对话页面查看对话记录 */

@@ -12,6 +12,7 @@ import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDeta
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.AgentInfoVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.ModelInfoVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.ApplicationConfigVo;
+import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.FeaturesConfigVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.ApplicationShareVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.ApplicationStatsVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationListVo;
@@ -164,6 +165,13 @@ public class ApplicationAssembler {
     vo.setApiEnabled(application.getApiEnabled());
     vo.setPublishedDate(application.getPublishedDate());
     vo.setIsStarred(isStarred);
+
+    // 设置功能配置（对话页根据配置控制 UI 显示）
+    if (application.getConfig() != null && application.getConfig().getFeatures() != null) {
+      FeaturesConfigVo fvo = new FeaturesConfigVo();
+      CoreUtils.copyProperties(application.getConfig().getFeatures(), fvo);
+      vo.setFeatures(fvo);
+    }
 
     // 设置审计信息
     vo.setTenantId(application.getTenantId());

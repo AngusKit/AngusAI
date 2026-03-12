@@ -15,6 +15,7 @@ import {
   Palette,
   Trash2,
   Plus,
+  Image as ImageIcon,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button.tsx';
 import { Textarea } from '@/components/ui/textarea.tsx';
@@ -40,6 +41,16 @@ export interface ChatMainAreaProps {
   enablePromptLibrary?: boolean;
   /** 是否显示应用切换器，默认 true */
   enableSwitchApp?: boolean;
+  /** 是否启用文件上传，默认 true */
+  enableFileUpload?: boolean;
+  /** 是否启用语音输入，默认 true */
+  enableVoiceInput?: boolean;
+  /** 是否启用图片输入，默认 false */
+  enableImageInput?: boolean;
+  /** 是否显示会话设置（温度、maxToken等），默认 true */
+  enableSessionSettings?: boolean;
+  /** 是否显示外观设置，默认 true */
+  enableAppearanceSettings?: boolean;
   /** 新对话回调（会话列表隐藏时用于下拉菜单中的新对话） */
   onNewSession?: () => void;
   onShowPromptLibrary: () => void;
@@ -74,6 +85,11 @@ export function ChatMainArea({
   onSelectionChange,
   enablePromptLibrary = true,
   enableSwitchApp = true,
+  enableFileUpload = true,
+  enableVoiceInput = true,
+  enableImageInput = false,
+  enableSessionSettings = true,
+  enableAppearanceSettings = true,
   onNewSession,
   onShowPromptLibrary,
   onShowThemeDialog,
@@ -138,12 +154,16 @@ export function ChatMainArea({
               提示词库
             </Button>
           )}
-          <Button variant='ghost' size='icon' onClick={onShowThemeDialog} title='外观设置'>
-            <Palette className='w-4 h-4' />
-          </Button>
-          <Button variant='ghost' size='icon' onClick={onShowSettings}>
-            <Settings className='w-4 h-4' />
-          </Button>
+          {enableAppearanceSettings && (
+            <Button variant='ghost' size='icon' onClick={onShowThemeDialog} title='外观设置'>
+              <Palette className='w-4 h-4' />
+            </Button>
+          )}
+          {enableSessionSettings && (
+            <Button variant='ghost' size='icon' onClick={onShowSettings}>
+              <Settings className='w-4 h-4' />
+            </Button>
+          )}
           <Button variant='ghost' size='icon' onClick={onToggleFullscreen}>
             <Maximize2 className='w-4 h-4' />
           </Button>
@@ -274,12 +294,21 @@ export function ChatMainArea({
             />
             <div className='absolute right-3 bottom-3 flex items-center gap-1'>
               <input ref={fileInputRef} type='file' multiple className='hidden' onChange={onFileSelect} />
-              <Button variant='ghost' size='icon' className='h-9 w-9' onClick={() => fileInputRef.current?.click()}>
-                <Paperclip className='w-4 h-4' />
-              </Button>
-              <Button variant='ghost' size='icon' className='h-9 w-9' onClick={onVoiceRecord}>
-                {isRecording ? <StopCircle className='w-4 h-4 text-red-500' /> : <Mic className='w-4 h-4' />}
-              </Button>
+              {enableFileUpload && (
+                <Button variant='ghost' size='icon' className='h-9 w-9' onClick={() => { if (fileInputRef.current) { fileInputRef.current.accept = '*'; fileInputRef.current.click(); } }} title='上传文件'>
+                  <Paperclip className='w-4 h-4' />
+                </Button>
+              )}
+              {enableImageInput && (
+                <Button variant='ghost' size='icon' className='h-9 w-9' onClick={() => { if (fileInputRef.current) { fileInputRef.current.accept = 'image/*'; fileInputRef.current.click(); } }} title='上传图片'>
+                  <ImageIcon className='w-4 h-4' />
+                </Button>
+              )}
+              {enableVoiceInput && (
+                <Button variant='ghost' size='icon' className='h-9 w-9' onClick={onVoiceRecord}>
+                  {isRecording ? <StopCircle className='w-4 h-4 text-red-500' /> : <Mic className='w-4 h-4' />}
+                </Button>
+              )}
               <Button
                 size='icon'
                 onClick={onSendMessage}

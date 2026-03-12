@@ -12,7 +12,6 @@ import { ThemeDialog, CHAT_TEMPLATES, type TemplateType } from './components/The
 import { useNavigate, useParams } from 'react-router-dom';
 import { AgentChatConfig } from '@/services/AgentChatTypes';
 import { DEFAULT_CHAT_SETTINGS } from './constants';
-import Applications from '@/services/Applications';
 
 interface ChatProps {
   content?: string;
@@ -191,29 +190,16 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
   };
   const chatSelection = sessionSelections[currentSessionId ?? ''] ?? baseSelection;
 
-  // 应用功能配置（从应用详情接口获取，列表接口不返回 features）
-  const [appFeatures, setAppFeatures] = useState<{ enableSessionList?: boolean; enablePromptLibrary?: boolean; enableSwitchApp?: boolean } | null>(null);
-  useEffect(() => {
-    const appId = currentSession?.appId;
-    if (!appId) {
-      setAppFeatures(null);
-      return;
-    }
-    let cancelled = false;
-    Applications.getApplicationDetail(appId)
-      .then((res: any) => {
-        if (cancelled) return;
-        const f = res?.data?.config?.features ?? res?.config?.features;
-        setAppFeatures(f ?? null);
-      })
-      .catch(() => {
-        if (!cancelled) setAppFeatures(null);
-      });
-    return () => { cancelled = true; };
-  }, [currentSession?.appId]);
+  // 应用功能配置（来自应用列表 app.features，undefined 时默认全部展示）
+  const appFeatures = chatSelection.app?.features;
   const enableSessionList = appFeatures?.enableSessionList !== false;
   const enablePromptLibrary = appFeatures?.enablePromptLibrary !== false;
   const enableSwitchApp = appFeatures?.enableSwitchApp !== false;
+  const enableFileUpload = appFeatures?.enableFileUpload !== false;
+  const enableVoiceInput = appFeatures?.enableVoiceInput !== false;
+  const enableImageInput = appFeatures?.enableImageInput !== false;
+  const enableSessionSettings = appFeatures?.enableSessionSettings !== false;
+  const enableAppearanceSettings = appFeatures?.enableAppearanceSettings !== false;
 
   // 当前选中的智能体（优先用 selection.agent，否则从 app 中解析）
   const currentAgent =
@@ -325,6 +311,11 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
         onSelectionChange={updateSessionSelection}
         enablePromptLibrary={enablePromptLibrary}
         enableSwitchApp={enableSwitchApp}
+        enableFileUpload={enableFileUpload}
+        enableVoiceInput={enableVoiceInput}
+        enableImageInput={enableImageInput}
+        enableSessionSettings={enableSessionSettings}
+        enableAppearanceSettings={enableAppearanceSettings}
         onShowPromptLibrary={() => setShowPromptLibrary(true)}
         onShowThemeDialog={() => setShowThemeDialog(true)}
         onNewSession={!enableSessionList ? createNewSession : undefined}

@@ -42,9 +42,6 @@ public class ApplicationConfig {
     @Schema(description = "启用图片输入")
     private Boolean enableImageInput = false;
 
-    @Schema(description = "启用历史记录")
-    private Boolean enableHistory;
-
     @Schema(description = "启用提示词库：开启后用户可以在对话页面选择提示词")
     private Boolean enablePromptLibrary = false;
 
@@ -53,6 +50,12 @@ public class ApplicationConfig {
 
     @Schema(description = "启用切换应用：开启后允许切换应用、默认智能体、默认模型，关闭时隐藏应用切换")
     private Boolean enableSwitchApp = true;
+
+    @Schema(description = "启用会话设置：开启后用户可以在对话页面进行温度、最大token等参数设置")
+    private Boolean enableSessionSettings = true;
+
+    @Schema(description = "启用外观设置：开启后用户可以在对话页面进行主题、外观等设置")
+    private Boolean enableAppearanceSettings = true;
   }
 
   @Data

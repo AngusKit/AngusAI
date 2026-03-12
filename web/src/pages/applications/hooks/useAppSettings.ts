@@ -33,6 +33,8 @@ export function useAppSettings() {
   const [enablePromptLibrary, setEnablePromptLibrary] = useState(true);
   const [enableSessionList, setEnableSessionList] = useState(true);
   const [enableSwitchApp, setEnableSwitchApp] = useState(true);
+  const [enableSessionSettings, setEnableSessionSettings] = useState(true);
+  const [enableAppearanceSettings, setEnableAppearanceSettings] = useState(true);
 
   // 安全与隐私
   const [enableContentFilter, setEnableContentFilter] = useState(true);
@@ -79,6 +81,8 @@ export function useAppSettings() {
         setEnablePromptLibrary(f.enablePromptLibrary ?? true);
         setEnableSessionList(f.enableSessionList ?? true);
         setEnableSwitchApp(f.enableSwitchApp ?? true);
+        setEnableSessionSettings(f.enableSessionSettings ?? true);
+        setEnableAppearanceSettings(f.enableAppearanceSettings ?? true);
       }
       const s = d.config?.security;
       if (s) {
@@ -179,6 +183,8 @@ export function useAppSettings() {
           enablePromptLibrary,
           enableSessionList,
           enableSwitchApp,
+          enableSessionSettings,
+          enableAppearanceSettings,
         },
       },
       setSavingFeatures,
@@ -257,6 +263,10 @@ export function useAppSettings() {
     setEnableSessionList,
     enableSwitchApp,
     setEnableSwitchApp,
+    enableSessionSettings,
+    setEnableSessionSettings,
+    enableAppearanceSettings,
+    setEnableAppearanceSettings,
     enableContentFilter,
     setEnableContentFilter,
     enableDataEncryption,

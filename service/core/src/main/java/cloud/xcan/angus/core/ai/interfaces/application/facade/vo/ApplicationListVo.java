@@ -2,6 +2,7 @@ package cloud.xcan.angus.core.ai.interfaces.application.facade.vo;
 
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.AgentInfoVo;
+import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.FeaturesConfigVo;
 import cloud.xcan.angus.remote.vo.TenantAuditingVo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
@@ -55,5 +56,8 @@ public class ApplicationListVo extends TenantAuditingVo {
 
   @Schema(description = "是否已收藏（星标）")
   private Boolean isStarred;
+
+  @Schema(description = "功能设置（用于对话页根据配置控制 UI 显示）")
+  private FeaturesConfigVo features;
 
 }

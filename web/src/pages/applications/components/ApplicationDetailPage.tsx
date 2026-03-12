@@ -414,6 +414,11 @@ export function ApplicationDetailPage() {
                       <ConfigItem label="文件上传" value={config.features?.enableFileUpload} />
                       <ConfigItem label="语音输入" value={config.features?.enableVoiceInput} />
                       <ConfigItem label="图片输入" value={config.features?.enableImageInput} />
+                      <ConfigItem label="提示词库" value={config.features?.enablePromptLibrary} />
+                      <ConfigItem label="会话列表" value={config.features?.enableSessionList} />
+                      <ConfigItem label="切换应用" value={config.features?.enableSwitchApp} />
+                      <ConfigItem label="会话设置" value={config.features?.enableSessionSettings} />
+                      <ConfigItem label="外观设置" value={config.features?.enableAppearanceSettings} />
                     </div>
                   </div>
                   <div>
