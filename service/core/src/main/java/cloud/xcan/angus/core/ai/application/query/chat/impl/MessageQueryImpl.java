@@ -6,6 +6,7 @@ import cloud.xcan.angus.core.ai.domain.chat.MessageRepo;
 import cloud.xcan.angus.core.ai.domain.chat.SessionRepo;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.ChatStatisticsVo.UsageTrend;
 import cloud.xcan.angus.core.biz.BizTemplate;
+import cloud.xcan.angus.core.utils.PrincipalContextUtils;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import jakarta.annotation.Resource;
 import java.time.LocalDate;
@@ -133,11 +134,22 @@ public class MessageQueryImpl implements MessageQuery {
       return new HashMap<>();
     }
 
-    List<Message> messages = messageRepo.findLastMessageBySessionIds(validIds);
     Map<String, Message> result = new HashMap<>();
-    for (Message msg : messages) {
-      if (msg != null && msg.getSessionId() != null) {
-        result.put(msg.getSessionId(), msg);
+
+    boolean multiTenantCtrl = PrincipalContextUtils.isMultiTenantCtrl();
+    try {
+      if (multiTenantCtrl) {
+        PrincipalContextUtils.setMultiTenantCtrl(false);
+      }
+      List<Message> messages = messageRepo.findLastMessageBySessionIds(validIds);
+      for (Message msg : messages) {
+        if (msg != null && msg.getSessionId() != null) {
+          result.put(msg.getSessionId(), msg);
+        }
+      }
+    } finally {
+      if (multiTenantCtrl) {
+        PrincipalContextUtils.setMultiTenantCtrl(true);
       }
     }
     return result;
