@@ -8,8 +8,10 @@ import { refreshResourcesBadge } from '@/hooks/useResourcesBadge';
 import { ChatSidebar } from './ChatSidebar';
 import { ChatMessage } from './ChatMessage';
 import { PromptLibrary } from './PromptLibrary';
-import { AppSwitcher } from './AppSwitcher';
-import { ModelSwitcher } from './ModelSwitcher';
+import {
+  ChatSwitcher,
+  type ChatSwitcherSelection,
+} from './ChatSwitcher';
 import { AttachmentPreview } from './AttachmentPreview';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
@@ -41,10 +43,12 @@ interface Session {
   id: string;
   title: string;
   appId: string;
+  agentId: string;
   modelId: string;
   messages: Message[];
   createdAt: Date;
   updatedAt: Date;
+  isStarred?: boolean;
 }
 
 interface ChatProps {
@@ -59,14 +63,16 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     {
       id: '1',
       title: '新对话',
-      appId: 'app-1',
-      modelId: 'gpt-4',
+      appId: '',
+      agentId: '',
+      modelId: '',
       messages: [],
       createdAt: new Date(),
       updatedAt: new Date(),
     },
   ]);
   const [currentSessionId, setCurrentSessionId] = useState('1');
+  const [sessionSelections, setSessionSelections] = useState<Record<string, ChatSwitcherSelection>>({});
   const defaultContent = content || sessionStorage.getItem('chatContent') || '';
   const [input, setInput] = useState(defaultContent);
   sessionStorage.removeItem('chatContent');
@@ -239,17 +245,22 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
   };
 
   const createNewSession = () => {
+    const currentSel = currentSessionId ? sessionSelections[currentSessionId] : undefined;
     const newSession: Session = {
       id: Date.now().toString(),
       title: '新对话',
-      appId: currentSession?.appId || 'app-1',
-      modelId: currentSession?.modelId || 'gpt-4',
+      appId: currentSel?.appId ?? currentSession?.appId ?? '',
+      agentId: currentSel?.agentId ?? currentSession?.agentId ?? '',
+      modelId: currentSel?.modelId ?? currentSession?.modelId ?? '',
       messages: [],
       createdAt: new Date(),
       updatedAt: new Date(),
     };
     setSessions(prev => [newSession, ...prev]);
     setCurrentSessionId(newSession.id);
+    if (currentSel) {
+      setSessionSelections(prev => ({ ...prev, [newSession.id]: currentSel }));
+    }
     toast.success('已创建新对话');
   };
 
@@ -258,20 +269,40 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
       toast.error('至少需要保留一个对话');
       return;
     }
-    setSessions(prev => prev.filter(s => s.id !== sessionId));
+    const remaining = sessions.filter(s => s.id !== sessionId);
+    setSessions(() => remaining);
     if (currentSessionId === sessionId) {
-      setCurrentSessionId(sessions[0].id);
+      setCurrentSessionId(remaining[0]?.id ?? '');
     }
     toast.success('对话已删除');
     refreshResourcesBadge();
   };
 
-  const updateSessionApp = (appId: string) => {
-    setSessions(prev => prev.map(s => (s.id === currentSessionId ? { ...s, appId, updatedAt: new Date() } : s)));
+  const baseSelection: ChatSwitcherSelection = {
+    appId: currentSession?.appId ?? '',
+    agentId: currentSession?.agentId ?? '',
+    modelId: currentSession?.modelId ?? '',
+    app: undefined,
+    agent: undefined,
+    model: undefined,
   };
+  const chatSelection = sessionSelections[currentSessionId ?? ''] ?? baseSelection;
 
-  const updateSessionModel = (modelId: string) => {
-    setSessions(prev => prev.map(s => (s.id === currentSessionId ? { ...s, modelId, updatedAt: new Date() } : s)));
+  const updateSessionSelection = (s: ChatSwitcherSelection) => {
+    setSessionSelections((prev) => ({ ...prev, [currentSessionId]: s }));
+    setSessions((prev) =>
+      prev.map((session) =>
+        session.id === currentSessionId
+          ? {
+              ...session,
+              appId: s.appId,
+              agentId: s.agentId,
+              modelId: s.modelId,
+              updatedAt: new Date(),
+            }
+          : session
+      )
+    );
   };
 
   const insertPrompt = (prompt: string) => {
@@ -356,9 +387,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
                 <div className='w-px h-6 bg-gray-200 dark:bg-gray-700' />
               </>
             )}
-            <AppSwitcher currentAppId={currentSession?.appId || 'app-1'} onAppChange={updateSessionApp} />
-            <div className='w-px h-6 bg-gray-200 dark:bg-gray-700' />
-            <ModelSwitcher currentModelId={currentSession?.modelId || 'gpt-4'} onModelChange={updateSessionModel} />
+            <ChatSwitcher selection={chatSelection} onSelectionChange={updateSessionSelection} />
           </div>
 
           <div className='flex items-center gap-2'>

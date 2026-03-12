@@ -10,6 +10,7 @@ interface Session {
   id: string;
   title: string;
   appId: string;
+  agentId?: string;
   modelId: string;
   messages: any[];
   createdAt: Date;
