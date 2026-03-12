@@ -89,31 +89,62 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string) 
   const debouncedSessionKeyword = useDebounce(sessionKeyword, 500);
   const loadedMessagesRef = useRef<Set<string>>(new Set());
 
+  const [sessionPage, setSessionPage] = useState(1);
+  const [sessionTotal, setSessionTotal] = useState(0);
+  const [sessionsLoadMore, setSessionsLoadMore] = useState(false);
+  const sessionsLoadingRef = useRef(false);
   const initialSelectedRef = useRef(false);
-  const loadSessions = useCallback(async () => {
-    setSessionsLoading(true);
-    try {
-      const res = await Chat.getSessionList({
-        pageNo: 1,
-        pageSize: SESSION_PAGE_SIZE,
-        keyword: debouncedSessionKeyword.trim() || undefined,
-      } as any);
-      const data = (res as any)?.data;
-      const list: SessionListVo[] = data?.list ?? [];
-      const mapped = list.map(voToSession).sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
-      setSessions(mapped);
-      if (mapped.length > 0 && !initialSelectedRef.current) {
-        initialSelectedRef.current = true;
-        const first = mapped[0];
-        if (first) setCurrentSessionId(first.sessionId);
+
+  const loadSessions = useCallback(
+    async (page: number, append: boolean) => {
+      if (sessionsLoadingRef.current && !append) return;
+      sessionsLoadingRef.current = true;
+      if (append) setSessionsLoadMore(true);
+      else setSessionsLoading(true);
+      try {
+        const res = await Chat.getSessionList({
+          pageNo: page,
+          pageSize: SESSION_PAGE_SIZE,
+          keyword: debouncedSessionKeyword.trim() || undefined,
+        } as any);
+        const data = (res as any)?.data;
+        const list: SessionListVo[] = data?.list ?? [];
+        const total = Number(data?.total ?? list.length) || list.length;
+        const mapped = list.map(voToSession).sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+        setSessionTotal(total);
+        if (append) {
+          setSessions(prev => {
+            const seen = new Set(prev.map(s => s.sessionId));
+            const merged = [...prev, ...mapped.filter(s => !seen.has(s.sessionId))];
+            return merged.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+          });
+        } else {
+          setSessions(mapped);
+          setSessionPage(1);
+          if (mapped.length > 0 && !initialSelectedRef.current) {
+            initialSelectedRef.current = true;
+            const first = mapped[0];
+            if (first) setCurrentSessionId(first.sessionId);
+          }
+        }
+        setSessionPage(page);
+      } catch (e) {
+        console.error('Load sessions failed:', e);
+        toast.error('加载会话列表失败');
+      } finally {
+        sessionsLoadingRef.current = false;
+        setSessionsLoading(false);
+        setSessionsLoadMore(false);
       }
-    } catch (e) {
-      console.error('Load sessions failed:', e);
-      toast.error('加载会话列表失败');
-    } finally {
-      setSessionsLoading(false);
-    }
-  }, [debouncedSessionKeyword]);
+    },
+    [debouncedSessionKeyword]
+  );
+
+  const loadMoreSessions = useCallback(() => {
+    const totalLoaded = sessions.length;
+    if (sessionsLoadMore || sessionsLoading || totalLoaded >= sessionTotal) return;
+    loadSessions(sessionPage + 1, true);
+  }, [sessions.length, sessionTotal, sessionPage, sessionsLoadMore, sessionsLoading, loadSessions]);
 
   const loadMessages = useCallback(async (sessionId: string) => {
     if (loadedMessagesRef.current.has(sessionId)) return;
@@ -135,7 +166,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string) 
   }, []);
 
   useEffect(() => {
-    loadSessions();
+    loadSessions(1, false);
   }, [loadSessions]);
 
   const currentSession = sessions.find((s) => s.sessionId === currentSessionId);
@@ -161,6 +192,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string) 
         }
         const session = voToSession(data);
         setSessions((prev) => [session, ...prev]);
+        setSessionTotal((prev) => Number(prev) + 1);
         setCurrentSessionId(session.sessionId);
         loadedMessagesRef.current.add(session.sessionId);
         setSessionMessages((prev) => ({ ...prev, [session.sessionId]: [] }));
@@ -178,15 +210,15 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string) 
   const deleteSession = useCallback(
     async (sessionId: string) => {
       const session = sessions.find((s) => s.sessionId === sessionId || s.id === sessionId);
-      const entityId = session?.entityId ?? sessionId;
       const sid = session?.sessionId ?? sessionId;
       try {
-        await Chat.deleteSession(entityId);
-        setSessions((prev) => prev.filter((s) => s.sessionId !== sid && s.id !== entityId));
+        await Chat.deleteSession(sid);
+        setSessions((prev) => prev.filter((s) => s.sessionId !== sid && s.id !== sid));
         if (currentSessionId === sid) {
           const remaining = sessions.filter((s) => s.sessionId !== sid);
           setCurrentSessionId(remaining[0]?.sessionId ?? '');
         }
+        setSessionTotal((prev) => Math.max(0, Number(prev) - 1));
         loadedMessagesRef.current.delete(sid);
         setSessionMessages((prev) => {
           const next = { ...prev };
@@ -205,9 +237,9 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string) 
   const renameSession = useCallback(
     async (sessionId: string, newTitle: string) => {
       const session = sessions.find((s) => s.sessionId === sessionId || s.id === sessionId);
-      const entityId = session?.entityId ?? sessionId;
+      const sid = session?.sessionId ?? sessionId;
       try {
-        await Chat.updateSession(entityId, { title: newTitle });
+        await Chat.updateSession(sid, { title: newTitle });
         setSessions((prev) =>
           prev.map((s) =>
             (s.sessionId === sessionId || s.id === sessionId)
@@ -278,8 +310,10 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string) 
     []
   );
 
+  const hasMoreSessions = sessions.length < sessionTotal;
+
   const refreshSessions = useCallback(() => {
-    loadSessions();
+    loadSessions(1, false);
   }, [loadSessions]);
 
   const clearSessionMessages = useCallback(async (sessionId: string) => {
@@ -304,6 +338,10 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string) 
     sessionMessages,
     sessionsLoading,
     messagesLoading,
+    sessionsLoadMore,
+    hasMoreSessions,
+    loadMoreSessions,
+    sessionTotal,
     setCurrentSessionId,
     createSession,
     deleteSession,

@@ -1,9 +1,8 @@
 import { MessageSquare, Plus, Trash2, MoreVertical, ChevronLeft, Search, Clock, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from '@/components/ui/dropdown-menu';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { cn } from '@/components/ui/utils';
 
 interface Session {
@@ -31,6 +30,12 @@ interface ChatSidebarProps {
   onToggle: () => void;
   searchKeyword?: string;
   onSearchChange?: (value: string) => void;
+  /** 滚动到底部附近时加载更多会话 */
+  onSessionListScroll?: () => void;
+  sessionsLoadMore?: boolean;
+  hasMoreSessions?: boolean;
+  /** 分页返回的会话总数（用于标题展示） */
+  sessionTotal?: number;
 }
 
 export function ChatSidebar({
@@ -45,9 +50,34 @@ export function ChatSidebar({
   onToggle,
   searchKeyword = '',
   onSearchChange,
+  onSessionListScroll,
+  sessionsLoadMore,
+  hasMoreSessions,
+  sessionTotal = 0,
 }: ChatSidebarProps) {
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
+  const sessionListRef = useRef<HTMLDivElement>(null);
+
+  // 内容未超出时无法滚动，需在布局完成后检测并加载下一页
+  useEffect(() => {
+    const id = requestAnimationFrame(() => {
+      const el = sessionListRef.current;
+      if (!el || !onSessionListScroll || sessionsLoadMore || hasMoreSessions === false) return;
+      if (el.scrollHeight <= el.clientHeight && sessions.length > 0) {
+        onSessionListScroll();
+      }
+    });
+    return () => cancelAnimationFrame(id);
+  }, [sessions.length, sessionsLoadMore, hasMoreSessions, onSessionListScroll]);
+
+  const handleSessionListScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const el = e.currentTarget;
+    if (!onSessionListScroll || sessionsLoadMore || hasMoreSessions === false) return;
+    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 40) {
+      onSessionListScroll();
+    }
+  };
 
   const filteredSessions = sessions;
 
@@ -121,8 +151,8 @@ export function ChatSidebar({
           />
         ) : (
           <>
-            <p className='text-xs truncate'>{session.title}</p>
-            <p className='text-[10px] text-gray-500 dark:text-gray-400'>
+            <p className='text-sm truncate'>{session.title}</p>
+            <p className='text-xs text-gray-500 dark:text-gray-400'>
               {(session.messageCount ?? session.messages?.length ?? 0)} 条消息
             </p>
           </>
@@ -177,7 +207,7 @@ export function ChatSidebar({
     if (sessions.length === 0) return null;
     return (
       <div className='mb-4'>
-        <h3 className='text-[10px] text-gray-500 dark:text-gray-400 px-3 mb-2 flex items-center gap-2'>
+        <h3 className='text-xs text-gray-500 dark:text-gray-400 px-3 mb-2 flex items-center gap-2'>
           <Clock className='w-2.5 h-2.5' />
           {title}
         </h3>
@@ -211,13 +241,13 @@ export function ChatSidebar({
           <h2 className='text-lg dark:text-white flex items-center gap-2'>
             <MessageSquare className='w-6 h-6' />
             对话列表
-            <div className='text-sm text-gray-500 dark:text-gray-400 text-center'>({sessions.length})</div>
+            <div className='text-sm text-gray-500 dark:text-gray-400 text-center'>({Number(sessionTotal) > 0 ? Number(sessionTotal) : sessions.length})</div>
           </h2>
           <Button variant='ghost' size='icon' onClick={onToggle} className='h-8 w-8 shrink-0'>
             <ChevronLeft className='w-4 h-4' />
           </Button>
         </div>
-        <div className='flex gap-2 p-3'>
+        <div className='flex gap-2 p-3 mt-2'>
           <div className='flex-1 relative min-w-0'>
             <Search className='absolute ml-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400' />
             <Input
@@ -237,16 +267,23 @@ export function ChatSidebar({
         </div>
       </div>
 
-      {/* Sessions List */}
+      {/* Sessions List - 原生滚动+隐藏滚动条，支持滚动加载 */}
       {filteredSessions.length > 0 ? (
-        <ScrollArea className='flex-1'>
+        <div
+          ref={sessionListRef}
+          className='flex-1 overflow-y-auto min-h-0 scrollbar-hide'
+          onScroll={handleSessionListScroll}
+        >
           <div className='p-4'>
             <SessionGroup title='今天' sessions={groupedSessions.today} />
             <SessionGroup title='昨天' sessions={groupedSessions.yesterday} />
             <SessionGroup title='最近7天' sessions={groupedSessions.lastWeek} />
             <SessionGroup title='更早' sessions={groupedSessions.older} />
+            {sessionsLoadMore && (
+              <div className='py-3 text-center text-xs text-gray-500 dark:text-gray-400'>加载中...</div>
+            )}
           </div>
-        </ScrollArea>
+        </div>
       ) : (
         <div className='flex-1 flex flex-col items-center justify-center p-4'>
           <MessageSquare className='w-12 h-12 mb-3 text-gray-300 dark:text-gray-600' />

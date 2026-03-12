@@ -46,6 +46,10 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     currentSession,
     currentMessages,
     sessionsLoading,
+    sessionsLoadMore,
+    hasMoreSessions,
+    loadMoreSessions,
+    sessionTotal,
     createSession,
     deleteSession,
     renameSession,
@@ -299,6 +303,10 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
         onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
         searchKeyword={sessionKeyword}
         onSearchChange={setSessionKeyword}
+        onSessionListScroll={loadMoreSessions}
+        sessionsLoadMore={sessionsLoadMore}
+        hasMoreSessions={hasMoreSessions}
+        sessionTotal={sessionTotal}
       />
 
       {/* Main Chat Area */}
