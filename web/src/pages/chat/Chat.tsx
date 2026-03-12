@@ -40,6 +40,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     ensureSessionLoaded,
     appendMessages,
     updateSessionInList,
+    updateSessionConfig,
     clearSessionMessages,
     sessionKeyword,
     setSessionKeyword,
@@ -63,8 +64,20 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     onBack ? onBack() : navigate('/dashboard');
   };
 
-  // Settings state
+  // Settings state：切换会话时从 currentSession.config 同步，保存时调用 updateSessionConfig
   const [settings, setSettings] = useState<AgentChatConfig>(DEFAULT_CHAT_SETTINGS);
+  useEffect(() => {
+    if (!currentSessionId) return;
+    const c = currentSession?.config;
+    setSettings({
+      ...DEFAULT_CHAT_SETTINGS,
+      temperature: c?.temperature ?? DEFAULT_CHAT_SETTINGS.temperature,
+      maxTokens: c?.maxTokens ?? DEFAULT_CHAT_SETTINGS.maxTokens,
+      topP: c?.topP ?? DEFAULT_CHAT_SETTINGS.topP,
+      frequencyPenalty: c?.frequencyPenalty ?? DEFAULT_CHAT_SETTINGS.frequencyPenalty,
+      presencePenalty: c?.presencePenalty ?? DEFAULT_CHAT_SETTINGS.presencePenalty,
+    });
+  }, [currentSessionId, currentSession?.config]);
 
   const selectedTemplateObj = CHAT_TEMPLATES.find(t => t.id === selectedTemplate) || CHAT_TEMPLATES[0];
 
@@ -323,6 +336,18 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
         onOpenChange={setShowSettings}
         settings={settings}
         onSettingsChange={setSettings}
+        onSave={async (s) => {
+          if (!currentSessionId) return false;
+          const ok = await updateSessionConfig(currentSessionId, {
+            temperature: s.temperature,
+            maxTokens: s.maxTokens,
+            topP: s.topP,
+            frequencyPenalty: s.frequencyPenalty,
+            presencePenalty: s.presencePenalty,
+          });
+          if (ok) setSettings(s);
+          return ok;
+        }}
       />
 
       {/* Theme Dialog */}

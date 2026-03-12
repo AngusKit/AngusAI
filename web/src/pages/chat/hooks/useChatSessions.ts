@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import { useDebounce } from '@/hooks/useDebounce';
 import Chat from '@/services/Chat';
-import type { SessionListVo, SessionDetailVo, MessageVo } from '@/services/ChatTypes';
+import type { SessionListVo, SessionDetailVo, MessageVo, SessionConfig } from '@/services/ChatTypes';
 import { MessageRoleEnum } from '@/enums/enums';
 
 export interface Message {
@@ -36,6 +36,8 @@ export interface Session {
   createdAt: Date;
   updatedAt: Date;
   isStarred?: boolean;
+  /** 会话配置 */
+  config?: SessionConfig;
 }
 
 function voToSession(vo: SessionListVo | SessionDetailVo): Session {
@@ -56,6 +58,7 @@ function voToSession(vo: SessionListVo | SessionDetailVo): Session {
     createdAt: created,
     updatedAt: updated,
     isStarred: vo.isStarred,
+    config: vo.config,
   };
 }
 
@@ -317,6 +320,35 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
     []
   );
 
+  /** 更新会话配置（温度、maxTokens 等），持久化到后端 */
+  const updateSessionConfig = useCallback(
+    async (sessionId: string, config: Partial<SessionConfig>): Promise<boolean> => {
+      const session = sessions.find((s) => s.sessionId === sessionId || s.id === sessionId);
+      const sid = session?.sessionId ?? sessionId;
+      try {
+        const mergedConfig: SessionConfig = {
+          ...(session?.config ?? {}),
+          ...config,
+          systemPrompt: (session?.config as any)?.systemPrompt ?? '',
+        };
+        await Chat.updateSession(sid, { config: mergedConfig });
+        setSessions((prev) =>
+          prev.map((s) =>
+            s.sessionId === sessionId || s.id === sessionId
+              ? { ...s, config: mergedConfig, updatedAt: new Date() }
+              : s
+          )
+        );
+        return true;
+      } catch (e) {
+        console.error('Update session config failed:', e);
+        toast.error('保存配置失败');
+        return false;
+      }
+    },
+    [sessions]
+  );
+
   const hasMoreSessions = sessions.length < sessionTotal;
 
   const refreshSessions = useCallback(() => {
@@ -384,6 +416,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
     loadMessages,
     appendMessages,
     updateSessionInList,
+    updateSessionConfig,
     refreshSessions,
     clearSessionMessages,
     ensureSessionLoaded,

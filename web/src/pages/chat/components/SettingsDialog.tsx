@@ -11,15 +11,38 @@ import {
   DEFAULT_TEMPERATURE,
   DEFAULT_TOP_P,
 } from '../constants.ts';
+import { useState } from 'react';
 
 interface SettingsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   settings: AgentChatConfig;
   onSettingsChange: (settings: AgentChatConfig) => void;
+  /** 保存到后端，返回是否成功 */
+  onSave?: (settings: AgentChatConfig) => Promise<boolean>;
 }
 
-export function SettingsDialog({ open, onOpenChange, settings, onSettingsChange }: SettingsDialogProps) {
+export function SettingsDialog({ open, onOpenChange, settings, onSettingsChange, onSave }: SettingsDialogProps) {
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    if (onSave) {
+      setSaving(true);
+      try {
+        const ok = await onSave(settings);
+        if (ok) {
+          onOpenChange(false);
+          toast.success('设置已保存');
+        }
+      } finally {
+        setSaving(false);
+      }
+    } else {
+      onOpenChange(false);
+      toast.success('设置已保存');
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='max-w-2xl max-h-[80vh] overflow-y-auto'>
@@ -58,7 +81,7 @@ export function SettingsDialog({ open, onOpenChange, settings, onSettingsChange 
               value={[settings.maxTokens ?? DEFAULT_MAX_TOKENS]}
               onValueChange={([value]) => onSettingsChange({ ...settings, maxTokens: value ?? settings.maxTokens ?? DEFAULT_MAX_TOKENS })}
               min={100}
-              max={4000}
+              max={128000}
               step={100}
               className='w-full'
             />
@@ -118,16 +141,11 @@ export function SettingsDialog({ open, onOpenChange, settings, onSettingsChange 
         </div>
 
         <div className='flex justify-end gap-2'>
-          <Button variant='outline' onClick={() => onOpenChange(false)}>
+          <Button variant='outline' onClick={() => onOpenChange(false)} disabled={saving}>
             取消
           </Button>
-          <Button
-            onClick={() => {
-              onOpenChange(false);
-              toast.success('设置已保存');
-            }}
-          >
-            保存设置
+          <Button onClick={handleSave} disabled={saving}>
+            {saving ? '保存中...' : '保存设置'}
           </Button>
         </div>
       </DialogContent>
