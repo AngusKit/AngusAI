@@ -13,7 +13,9 @@ import {
   Code,
   Lock,
   ArrowLeft,
-  MessageSquare,
+  BookmarkPlus,
+  List,
+  LayoutGrid,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -164,7 +166,11 @@ export function ApplicationSettingsPage() {
               <Separator className="dark:bg-gray-700" />
               <FeatureSwitch icon={<ImageIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />} title="图片输入" desc="允许用户发送图片" checked={hook.enableImageInput} onCheckedChange={hook.setEnableImageInput} />
               <Separator className="dark:bg-gray-700" />
-              <FeatureSwitch icon={<MessageSquare className="w-5 h-5 text-gray-600 dark:text-gray-400" />} title="智能建议" desc="显示相关问题建议" checked={hook.enableSuggestions} onCheckedChange={hook.setEnableSuggestions} />
+              <FeatureSwitch icon={<BookmarkPlus className="w-5 h-5 text-gray-600 dark:text-gray-400" />} title="提示词库" desc="开启后用户可以在对话页面选择提示词" checked={hook.enablePromptLibrary} onCheckedChange={hook.setEnablePromptLibrary} />
+              <Separator className="dark:bg-gray-700" />
+              <FeatureSwitch icon={<List className="w-5 h-5 text-gray-600 dark:text-gray-400" />} title="会话列表" desc="开启后在对话页面查看对话记录" checked={hook.enableSessionList} onCheckedChange={hook.setEnableSessionList} />
+              <Separator className="dark:bg-gray-700" />
+              <FeatureSwitch icon={<LayoutGrid className="w-5 h-5 text-gray-600 dark:text-gray-400" />} title="切换应用" desc="开启后允许切换应用、默认智能体、默认模型，关闭时会隐藏应用切换" checked={hook.enableSwitchApp} onCheckedChange={hook.setEnableSwitchApp} />
               <div className="flex justify-end pt-4">
                 <Button onClick={hook.handleSaveFeatures} disabled={hook.savingFeatures} className="dark:bg-blue-600 dark:hover:bg-blue-700">
                   <Save className="w-4 h-4 mr-2" />

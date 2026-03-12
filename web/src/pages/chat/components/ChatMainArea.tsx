@@ -14,6 +14,7 @@ import {
   Share2,
   Palette,
   Trash2,
+  Plus,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button.tsx';
 import { Textarea } from '@/components/ui/textarea.tsx';
@@ -35,6 +36,12 @@ export interface ChatMainAreaProps {
   onBack: () => void;
   chatSelection: ChatSwitcherSelection;
   onSelectionChange: (s: ChatSwitcherSelection) => void;
+  /** 是否显示提示词库入口，默认 true */
+  enablePromptLibrary?: boolean;
+  /** 是否显示应用切换器，默认 true */
+  enableSwitchApp?: boolean;
+  /** 新对话回调（会话列表隐藏时用于下拉菜单中的新对话） */
+  onNewSession?: () => void;
   onShowPromptLibrary: () => void;
   onShowThemeDialog: () => void;
   onShowSettings: () => void;
@@ -65,6 +72,9 @@ export function ChatMainArea({
   onBack,
   chatSelection,
   onSelectionChange,
+  enablePromptLibrary = true,
+  enableSwitchApp = true,
+  onNewSession,
   onShowPromptLibrary,
   onShowThemeDialog,
   onShowSettings,
@@ -96,6 +106,8 @@ export function ChatMainArea({
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [currentMessages]);
 
+  const appDisplayName = chatSelection.app?.name ?? '应用';
+
   return (
     <div className='flex-1 flex flex-col'>
       {/* Top Bar */}
@@ -110,14 +122,22 @@ export function ChatMainArea({
             <ArrowLeft className='w-5 h-5' />
           </Button>
           <div className='w-px h-6 bg-gray-200 dark:bg-gray-700' />
-          <ChatSwitcher selection={chatSelection} onSelectionChange={onSelectionChange} />
+          {enableSwitchApp ? (
+            <ChatSwitcher selection={chatSelection} onSelectionChange={onSelectionChange} />
+          ) : (
+            <span className='text-sm font-medium text-gray-700 dark:text-gray-200 truncate max-w-[180px]'>
+              {appDisplayName}
+            </span>
+          )}
         </div>
 
         <div className='flex items-center gap-2'>
-          <Button variant='ghost' size='sm' onClick={onShowPromptLibrary} className='gap-2'>
-            <BookmarkPlus className='w-4 h-4' />
-            提示词库
-          </Button>
+          {enablePromptLibrary && (
+            <Button variant='ghost' size='sm' onClick={onShowPromptLibrary} className='gap-2'>
+              <BookmarkPlus className='w-4 h-4' />
+              提示词库
+            </Button>
+          )}
           <Button variant='ghost' size='icon' onClick={onShowThemeDialog} title='外观设置'>
             <Palette className='w-4 h-4' />
           </Button>
@@ -134,6 +154,15 @@ export function ChatMainArea({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align='end' className='w-48'>
+              {onNewSession && (
+                <>
+                  <DropdownMenuItem onClick={onNewSession}>
+                    <Plus className='w-4 h-4 mr-2' />
+                    新对话
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                </>
+              )}
               <DropdownMenuItem onClick={onExportChat}>
                 <Download className='w-4 h-4 mr-2' />
                 导出对话

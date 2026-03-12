@@ -162,11 +162,17 @@ public class ApplicationDetailVo extends TenantAuditingVo {
     @Schema(description = "启用图片输入")
     private Boolean enableImageInput;
 
-    @Schema(description = "启用建议")
-    private Boolean enableSuggestions;
-
     @Schema(description = "启用历史记录")
     private Boolean enableHistory;
+
+    @Schema(description = "启用提示词库：开启后用户可以在对话页面选择提示词")
+    private Boolean enablePromptLibrary;
+
+    @Schema(description = "启用会话列表：开启后在对话页面查看对话记录")
+    private Boolean enableSessionList;
+
+    @Schema(description = "启用切换应用：开启后允许切换应用、默认智能体、默认模型，关闭时隐藏应用切换")
+    private Boolean enableSwitchApp;
   }
 
   @Data

@@ -68,6 +68,11 @@ public class ApplicationCmdImpl extends CommCmd<AIApplication, Long> implements 
 
       @Override
       protected AIApplication process() {
+        // 初始化默认配置
+        if (application.getConfig() == null){
+          application.setConfig(new ApplicationConfig());
+        }
+
         insert0(application);
 
         // 保存智能体绑定（以 applicationId 关联）

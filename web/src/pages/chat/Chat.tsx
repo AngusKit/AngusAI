@@ -6,12 +6,13 @@ import { ChatSidebar } from './components/ChatSidebar.tsx';
 import { ChatMainArea } from './components/ChatMainArea.tsx';
 import { useChatSessions, type Message } from './hooks/useChatSessions';
 import { PromptLibraryDialog } from './components/PromptLibraryDialog.tsx';
-import { ChatSwitcher, type ChatSwitcherSelection } from './components/ChatSwitcher.tsx';
+import { type ChatSwitcherSelection } from './components/ChatSwitcher.tsx';
 import { SettingsDialog } from './components/SettingsDialog.tsx';
 import { ThemeDialog, CHAT_TEMPLATES, type TemplateType } from './components/ThemeDialog.tsx';
 import { useNavigate, useParams } from 'react-router-dom';
 import { AgentChatConfig } from '@/services/AgentChatTypes';
 import { DEFAULT_CHAT_SETTINGS } from './constants';
+import Applications from '@/services/Applications';
 
 interface ChatProps {
   content?: string;
@@ -19,7 +20,7 @@ interface ChatProps {
 }
 
 export function Chat({ content = '', onBack }: ChatProps = {}) {
-  const { t } = useLanguage();
+  useLanguage();
   const navigate = useNavigate();
   const { sessionId: sessionIdFromUrl } = useParams<{ sessionId?: string }>();
   const {
@@ -190,6 +191,30 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
   };
   const chatSelection = sessionSelections[currentSessionId ?? ''] ?? baseSelection;
 
+  // 应用功能配置（从应用详情接口获取，列表接口不返回 features）
+  const [appFeatures, setAppFeatures] = useState<{ enableSessionList?: boolean; enablePromptLibrary?: boolean; enableSwitchApp?: boolean } | null>(null);
+  useEffect(() => {
+    const appId = currentSession?.appId;
+    if (!appId) {
+      setAppFeatures(null);
+      return;
+    }
+    let cancelled = false;
+    Applications.getApplicationDetail(appId)
+      .then((res: any) => {
+        if (cancelled) return;
+        const f = res?.data?.config?.features ?? res?.config?.features;
+        setAppFeatures(f ?? null);
+      })
+      .catch(() => {
+        if (!cancelled) setAppFeatures(null);
+      });
+    return () => { cancelled = true; };
+  }, [currentSession?.appId]);
+  const enableSessionList = appFeatures?.enableSessionList !== false;
+  const enablePromptLibrary = appFeatures?.enablePromptLibrary !== false;
+  const enableSwitchApp = appFeatures?.enableSwitchApp !== false;
+
   // 当前选中的智能体（优先用 selection.agent，否则从 app 中解析）
   const currentAgent =
     chatSelection.agent ??
@@ -272,32 +297,37 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
 
   return (
     <div className='flex h-screen bg-gray-50 dark:bg-gray-900'>
-      {/* Chat Sidebar */}
-      <ChatSidebar
-        sessions={sessions}
-        currentSessionId={currentSessionId}
-        onSessionSelect={handleSessionSelect}
-        onNewSession={createNewSession}
-        onDeleteSession={handleDeleteSession}
-        onRenameSession={renameSession}
-        onToggleStar={toggleStar}
-        isOpen={isSidebarOpen}
-        onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
-        searchKeyword={sessionKeyword}
-        onSearchChange={setSessionKeyword}
-        onSessionListScroll={loadMoreSessions}
-        sessionsLoadMore={sessionsLoadMore}
-        hasMoreSessions={hasMoreSessions}
-        sessionTotal={sessionTotal}
-      />
+      {/* Chat Sidebar（enableSessionList 关闭时不展示） */}
+      {enableSessionList && (
+        <ChatSidebar
+          sessions={sessions}
+          currentSessionId={currentSessionId}
+          onSessionSelect={handleSessionSelect}
+          onNewSession={createNewSession}
+          onDeleteSession={handleDeleteSession}
+          onRenameSession={renameSession}
+          onToggleStar={toggleStar}
+          isOpen={isSidebarOpen}
+          onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
+          searchKeyword={sessionKeyword}
+          onSearchChange={setSessionKeyword}
+          onSessionListScroll={loadMoreSessions}
+          sessionsLoadMore={sessionsLoadMore}
+          hasMoreSessions={hasMoreSessions}
+          sessionTotal={sessionTotal}
+        />
+      )}
 
       {/* Main Chat Area */}
       <ChatMainArea
         onBack={handleBack}
         chatSelection={chatSelection}
         onSelectionChange={updateSessionSelection}
+        enablePromptLibrary={enablePromptLibrary}
+        enableSwitchApp={enableSwitchApp}
         onShowPromptLibrary={() => setShowPromptLibrary(true)}
         onShowThemeDialog={() => setShowThemeDialog(true)}
+        onNewSession={!enableSessionList ? createNewSession : undefined}
         onShowSettings={() => setShowSettings(true)}
         onToggleFullscreen={toggleFullscreen}
         onExportChat={exportChat}
@@ -322,8 +352,8 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
         textareaRef={textareaRef}
       />
 
-      {/* Prompt Library Dialog */}
-      {showPromptLibrary &&
+      {/* Prompt Library Dialog（enablePromptLibrary 关闭时仍允许通过其他入口打开，此处按配置控制） */}
+      {enablePromptLibrary && showPromptLibrary &&
         <PromptLibraryDialog
           onClose={() => setShowPromptLibrary(false)}
           onSelectPrompt={insertPrompt}

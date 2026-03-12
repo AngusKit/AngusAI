@@ -414,7 +414,6 @@ export function ApplicationDetailPage() {
                       <ConfigItem label="文件上传" value={config.features?.enableFileUpload} />
                       <ConfigItem label="语音输入" value={config.features?.enableVoiceInput} />
                       <ConfigItem label="图片输入" value={config.features?.enableImageInput} />
-                      <ConfigItem label="智能建议" value={config.features?.enableSuggestions} />
                     </div>
                   </div>
                   <div>

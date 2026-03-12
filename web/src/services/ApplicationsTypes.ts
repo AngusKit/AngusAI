@@ -225,10 +225,14 @@ export interface FeaturesConfigVo {
   enableVoiceInput?: boolean;
   /** 启用图片输入 */
   enableImageInput?: boolean;
-  /** 启用建议 */
-  enableSuggestions?: boolean;
   /** 启用历史记录 */
   enableHistory?: boolean;
+  /** 启用提示词库：开启后用户可以在对话页面选择提示词 */
+  enablePromptLibrary?: boolean;
+  /** 启用会话列表：开启后在对话页面查看对话记录 */
+  enableSessionList?: boolean;
+  /** 启用切换应用：开启后允许切换应用、默认智能体、默认模型，关闭时隐藏应用切换 */
+  enableSwitchApp?: boolean;
 }
 
 /** 安全设置 */
@@ -299,10 +303,14 @@ export interface FeaturesConfig {
   enableVoiceInput?: boolean;
   /** 启用图片输入 */
   enableImageInput?: boolean;
-  /** 启用建议 */
-  enableSuggestions?: boolean;
   /** 启用历史记录 */
   enableHistory?: boolean;
+  /** 启用提示词库：开启后用户可以在对话页面选择提示词 */
+  enablePromptLibrary?: boolean;
+  /** 启用会话列表：开启后在对话页面查看对话记录 */
+  enableSessionList?: boolean;
+  /** 启用切换应用：开启后允许切换应用、默认智能体、默认模型，关闭时隐藏应用切换 */
+  enableSwitchApp?: boolean;
 }
 
 /** 提示词配置 */

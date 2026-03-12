@@ -30,7 +30,9 @@ export function useAppSettings() {
   const [enableFileUpload, setEnableFileUpload] = useState(true);
   const [enableVoiceInput, setEnableVoiceInput] = useState(true);
   const [enableImageInput, setEnableImageInput] = useState(false);
-  const [enableSuggestions, setEnableSuggestions] = useState(true);
+  const [enablePromptLibrary, setEnablePromptLibrary] = useState(true);
+  const [enableSessionList, setEnableSessionList] = useState(true);
+  const [enableSwitchApp, setEnableSwitchApp] = useState(true);
 
   // 安全与隐私
   const [enableContentFilter, setEnableContentFilter] = useState(true);
@@ -74,7 +76,9 @@ export function useAppSettings() {
         setEnableFileUpload(f.enableFileUpload ?? true);
         setEnableVoiceInput(f.enableVoiceInput ?? true);
         setEnableImageInput(f.enableImageInput ?? false);
-        setEnableSuggestions(f.enableSuggestions ?? true);
+        setEnablePromptLibrary(f.enablePromptLibrary ?? true);
+        setEnableSessionList(f.enableSessionList ?? true);
+        setEnableSwitchApp(f.enableSwitchApp ?? true);
       }
       const s = d.config?.security;
       if (s) {
@@ -172,7 +176,9 @@ export function useAppSettings() {
           enableFileUpload,
           enableVoiceInput,
           enableImageInput,
-          enableSuggestions,
+          enablePromptLibrary,
+          enableSessionList,
+          enableSwitchApp,
         },
       },
       setSavingFeatures,
@@ -245,8 +251,12 @@ export function useAppSettings() {
     setEnableVoiceInput,
     enableImageInput,
     setEnableImageInput,
-    enableSuggestions,
-    setEnableSuggestions,
+    enablePromptLibrary,
+    setEnablePromptLibrary,
+    enableSessionList,
+    setEnableSessionList,
+    enableSwitchApp,
+    setEnableSwitchApp,
     enableContentFilter,
     setEnableContentFilter,
     enableDataEncryption,

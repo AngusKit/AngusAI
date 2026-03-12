@@ -21,32 +21,38 @@ public class ApplicationConfig {
   private Long defaultAgentId;
 
   @Schema(description = "功能设置")
-  private FeaturesConfig features;
+  private FeaturesConfig features = new FeaturesConfig();
 
   @Schema(description = "安全设置")
-  private SecurityConfig security;
+  private SecurityConfig security = new SecurityConfig();
 
   @Schema(description = "发布设置")
-  private PublishConfig publish;
+  private PublishConfig publish = new PublishConfig();
 
   @Data
   @Schema(description = "功能设置")
   public static class FeaturesConfig {
 
     @Schema(description = "启用文件上传")
-    private Boolean enableFileUpload;
+    private Boolean enableFileUpload = false;
 
     @Schema(description = "启用语音输入")
-    private Boolean enableVoiceInput;
+    private Boolean enableVoiceInput = false;
 
     @Schema(description = "启用图片输入")
-    private Boolean enableImageInput;
-
-    @Schema(description = "启用建议")
-    private Boolean enableSuggestions;
+    private Boolean enableImageInput = false;
 
     @Schema(description = "启用历史记录")
     private Boolean enableHistory;
+
+    @Schema(description = "启用提示词库：开启后用户可以在对话页面选择提示词")
+    private Boolean enablePromptLibrary = false;
+
+    @Schema(description = "启用会话列表：开启后在对话页面查看对话记录")
+    private Boolean enableSessionList = true;
+
+    @Schema(description = "启用切换应用：开启后允许切换应用、默认智能体、默认模型，关闭时隐藏应用切换")
+    private Boolean enableSwitchApp = true;
   }
 
   @Data
@@ -54,17 +60,17 @@ public class ApplicationConfig {
   public static class SecurityConfig {
 
     @Schema(description = "启用内容过滤")
-    private Boolean enableContentFilter;
+    private Boolean enableContentFilter = false;
 
     @Schema(description = "启用数据加密")
-    private Boolean enableDataEncryption;
+    private Boolean enableDataEncryption = false;
 
     @Min(value = 1, message = "数据保留天数不能小于1")
     @Schema(description = "数据保留天数", example = "30")
     private Integer dataRetentionDays;
 
     @Schema(description = "启用匿名化")
-    private Boolean enableAnonymization;
+    private Boolean enableAnonymization = false;
   }
 
   @Data
@@ -72,13 +78,13 @@ public class ApplicationConfig {
   public static class PublishConfig {
 
     @Schema(description = "公开访问")
-    private Boolean publicAccess;
+    private Boolean publicAccess = false;
 
     @Schema(description = "启用嵌入")
-    private Boolean embedEnabled;
+    private Boolean embedEnabled = false;
 
     @Schema(description = "启用API")
-    private Boolean apiEnabled;
+    private Boolean apiEnabled = false;
   }
 
 }
