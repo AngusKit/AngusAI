@@ -159,33 +159,45 @@ export function useChatSwitcher({ selection, onSelectionChange }: UseChatSwitche
     }
   }, [modelOpen, debouncedModelKw, loadModels]);
 
-  // 进入对话页面后，应用列表加载完成时自动选中第一个应用（无选中 或 有 appId 但无 app 对象无法展示时）
+  // 进入对话页面后，应用列表加载完成时：优先根据会话的 appId/agentId/modelId 匹配，匹配不到再选中第一个应用
   const needAutoSelect =
     !appLoading &&
     apps.length > 0 &&
     (!selection.appId || !selection.app || !apps.some((a) => String(a.id) === selection.appId));
   useEffect(() => {
     if (!needAutoSelect) return;
-    const app = apps.find((a) => String(a.id) === selection.appId) ?? apps[0];
+    // 1. 优先匹配会话的 appId，否则用第一个应用
+    const app = (selection.appId && apps.some((a) => String(a.id) === selection.appId))
+      ? (apps.find((a) => String(a.id) === selection.appId) ?? apps[0])
+      : apps[0];
     if (!app) return;
     const agentsList = app.agents ?? [];
     const defAgent = app.defaultAgent;
     const firstActive = agentsList.find((a) => a.status === AgentStatusEnum.ACTIVE);
+    // 2. 若 app 匹配到会话，则优先匹配会话的 agentId；否则用默认/第一个活跃智能体
     const agent =
-      defAgent && agentsList.some((a) => a?.id === defAgent?.id)
-        ? defAgent
-        : firstActive ?? agentsList[0];
-    const model = agent?.defaultModel;
+      selection.appId && String(app.id) === selection.appId && selection.agentId
+        ? (agentsList.find((a) => String(a?.id) === selection.agentId) ??
+           (defAgent && agentsList.some((a) => a?.id === defAgent?.id) ? defAgent : firstActive ?? agentsList[0]))
+        : defAgent && agentsList.some((a) => a?.id === defAgent?.id)
+          ? defAgent
+          : firstActive ?? agentsList[0];
+    // 3. 若 agent 匹配到会话，优先用会话的 modelId，且 agent.defaultModel 匹配时带出 model 对象；否则用 agent.defaultModel
+    const modelId = selection.modelId || agent?.defaultModel?.id;
+    const model =
+      agent?.defaultModel && String(agent.defaultModel.id) === String(modelId ?? '')
+        ? agent.defaultModel
+        : undefined;
     onSelectionChange({
       appId: String(app.id ?? ''),
       agentId: agent ? String(agent.id ?? '') : '',
-      modelId: model ? String(model.id ?? '') : '',
+      modelId: modelId ? String(modelId) : '',
       app,
       agent: agent ?? undefined,
       model: model as ModelListVo | undefined,
     });
     setAppOpen(false);
-  }, [needAutoSelect, apps, selection.appId, onSelectionChange]);
+  }, [needAutoSelect, apps, selection.appId, selection.agentId, selection.modelId, onSelectionChange]);
 
   const handleAppScroll = useCallback(() => {
     const el = appScrollRef.current;
