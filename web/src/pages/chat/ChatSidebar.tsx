@@ -29,6 +29,8 @@ interface ChatSidebarProps {
   onToggleStar: (sessionId: string) => void;
   isOpen: boolean;
   onToggle: () => void;
+  searchKeyword?: string;
+  onSearchChange?: (value: string) => void;
 }
 
 export function ChatSidebar({
@@ -41,12 +43,13 @@ export function ChatSidebar({
   onToggleStar,
   isOpen,
   onToggle,
+  searchKeyword = '',
+  onSearchChange,
 }: ChatSidebarProps) {
-  const [searchQuery, setSearchQuery] = useState('');
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
 
-  const filteredSessions = sessions.filter(session => session.title.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredSessions = sessions;
 
   const groupedSessions = {
     today: filteredSessions.filter(s => isToday(s.updatedAt)),
@@ -219,8 +222,8 @@ export function ChatSidebar({
             <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
             <Input
               placeholder='搜索对话...'
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
+              value={searchKeyword}
+              onChange={e => onSearchChange?.(e.target.value)}
               className='pl-10 dark:bg-gray-800 dark:border-gray-700'
             />
           </div>
@@ -241,7 +244,7 @@ export function ChatSidebar({
           {filteredSessions.length === 0 && (
             <div className='text-center py-12'>
               <MessageSquare className='w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600' />
-              <p className='text-sm text-gray-500 dark:text-gray-400'>{searchQuery ? '未找到相关对话' : '暂无对话'}</p>
+              <p className='text-sm text-gray-500 dark:text-gray-400'>{searchKeyword ? '未找到相关对话' : '暂无对话'}</p>
             </div>
           )}
         </div>

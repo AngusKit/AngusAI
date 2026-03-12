@@ -39,8 +39,8 @@ export function useChatSwitcher({ selection, onSelectionChange }: UseChatSwitche
 
   const [appKeyword, setAppKeyword] = useState('');
   const [modelKeyword, setModelKeyword] = useState('');
-  const debouncedAppKw = useDebounce(appKeyword, 300);
-  const debouncedModelKw = useDebounce(modelKeyword, 300);
+  const debouncedAppKw = useDebounce(appKeyword, 500);
+  const debouncedModelKw = useDebounce(modelKeyword, 500);
 
   const [apps, setApps] = useState<ApplicationListVo[]>([]);
   const [appPage, setAppPage] = useState(1);

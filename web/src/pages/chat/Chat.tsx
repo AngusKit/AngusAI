@@ -47,6 +47,8 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     appendMessages,
     updateSessionInList,
     clearSessionMessages,
+    sessionKeyword,
+    setSessionKeyword,
   } = useChatSessions();
   const [sessionSelections, setSessionSelections] = useState<Record<string, ChatSwitcherSelection>>({});
   const defaultContent = content || sessionStorage.getItem('chatContent') || '';
@@ -278,6 +280,8 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
         onToggleStar={toggleStar}
         isOpen={isSidebarOpen}
         onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
+        searchKeyword={sessionKeyword}
+        onSearchChange={setSessionKeyword}
       />
 
       {/* Main Chat Area */}

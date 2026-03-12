@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
+import { useDebounce } from '@/hooks/useDebounce';
 import Chat from '@/services/Chat';
 import type { SessionListVo, SessionDetailVo, MessageVo } from '@/services/ChatTypes';
 import { MessageRoleEnum } from '@/enums/enums';
@@ -76,19 +77,27 @@ function messageVoToMessage(vo: MessageVo): Message {
   };
 }
 
+const SESSION_PAGE_SIZE = 10;
+
 export function useChatSessions(initialAppId?: string, initialModelId?: string) {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [currentSessionId, setCurrentSessionId] = useState<string>('');
   const [sessionMessages, setSessionMessages] = useState<Record<string, Message[]>>({});
   const [sessionsLoading, setSessionsLoading] = useState(true);
   const [messagesLoading, setMessagesLoading] = useState(false);
+  const [sessionKeyword, setSessionKeyword] = useState('');
+  const debouncedSessionKeyword = useDebounce(sessionKeyword, 300);
   const loadedMessagesRef = useRef<Set<string>>(new Set());
 
   const initialSelectedRef = useRef(false);
   const loadSessions = useCallback(async () => {
     setSessionsLoading(true);
     try {
-      const res = await Chat.getSessionList({ pageNo: 1, pageSize: 50 });
+      const res = await Chat.getSessionList({
+        pageNo: 1,
+        pageSize: SESSION_PAGE_SIZE,
+        keyword: debouncedSessionKeyword.trim() || undefined,
+      } as any);
       const data = (res as any)?.data;
       const list: SessionListVo[] = data?.list ?? [];
       const mapped = list.map(voToSession).sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
@@ -104,7 +113,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string) 
     } finally {
       setSessionsLoading(false);
     }
-  }, []);
+  }, [debouncedSessionKeyword]);
 
   const loadMessages = useCallback(async (sessionId: string) => {
     if (loadedMessagesRef.current.has(sessionId)) return;
@@ -306,5 +315,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string) 
     updateSessionInList,
     refreshSessions,
     clearSessionMessages,
+    sessionKeyword,
+    setSessionKeyword,
   };
 }
