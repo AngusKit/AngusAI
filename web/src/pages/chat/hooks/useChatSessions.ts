@@ -179,6 +179,12 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
     loadSessions(1, false);
   }, [loadSessions]);
 
+  // 进入对话页后，当前选中的会话需自动加载消息到内容区展示
+  useEffect(() => {
+    if (!currentSessionId) return;
+    loadMessages(currentSessionId);
+  }, [currentSessionId, loadMessages]);
+
   const currentSession = sessions.find((s) => s.sessionId === currentSessionId);
   const currentMessages = currentSessionId ? sessionMessages[currentSessionId] ?? [] : [];
 
@@ -309,6 +315,21 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
     );
   }, []);
 
+  /** 移除最后一条助手消息（用于重新生成前清理） */
+  const removeLastAssistantMessage = useCallback((sessionId: string) => {
+    setSessionMessages((prev) => {
+      const current = prev[sessionId] ?? [];
+      const lastIdx = current.length - 1;
+      if (lastIdx < 0) return prev;
+      const last = current[lastIdx];
+      if (last?.role !== 'assistant') return prev;
+      return {
+        ...prev,
+        [sessionId]: current.slice(0, lastIdx),
+      };
+    });
+  }, []);
+
   /** 更新指定消息内容（用于流式响应） */
   const updateMessage = useCallback(
     (sessionId: string, messageId: string, patch: Partial<Pick<Message, 'content' | 'isStreaming'>>) => {
@@ -436,6 +457,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
     selectSession,
     loadMessages,
     appendMessages,
+    removeLastAssistantMessage,
     updateMessage,
     updateSessionInList,
     updateSessionConfig,

@@ -12,6 +12,7 @@ import { ThemeDialog, CHAT_TEMPLATES, type TemplateType } from './components/The
 import { useNavigate, useParams } from 'react-router-dom';
 import { AgentChatConfig } from '@/services/AgentChatTypes';
 import { DEFAULT_CHAT_SETTINGS } from './constants';
+import ChatApi from '@/services/Chat';
 
 interface ChatProps {
   content?: string;
@@ -39,6 +40,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     selectSession,
     ensureSessionLoaded,
     appendMessages,
+    removeLastAssistantMessage,
     updateMessage,
     updateSessionInList,
     updateSessionConfig,
@@ -202,6 +204,84 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     }
   };
 
+  const handleRegenerate = async () => {
+    if (!currentSessionId || !currentSession) return;
+    const msgs = currentMessages;
+    if (msgs.length < 2) return;
+    const lastMsg = msgs[msgs.length - 1];
+    const lastUserMsg = msgs[msgs.length - 2];
+    if (!lastMsg || lastMsg.role !== 'assistant') return;
+    if (!lastUserMsg || lastUserMsg.role !== 'user') return;
+    const userContent = lastUserMsg.content?.trim();
+    if (!userContent) return;
+
+    const agentId = chatSelection.agentId ?? chatSelection.app?.defaultAgent?.id ?? currentSession?.agentId;
+    if (!agentId) {
+      toast.error('请先选择智能体');
+      return;
+    }
+
+    removeLastAssistantMessage(currentSessionId);
+    const assistantId = `assistant-${Date.now()}`;
+    const aiPlaceholder: Message = {
+      id: assistantId,
+      role: 'assistant',
+      content: '',
+      timestamp: new Date(),
+      isStreaming: true,
+    };
+    appendMessages(currentSessionId, [aiPlaceholder]);
+    setIsSending(true);
+    try {
+      const { chatStream } = await import('@/pages/chat/hooks/useChatStream.ts');
+      let accumulated = '';
+      await chatStream(
+        {
+          agentId: String(agentId),
+          sessionId: currentSessionId,
+          message: userContent,
+          config: {
+            temperature: settings.temperature,
+            maxTokens: settings.maxTokens,
+            topP: settings.topP,
+            frequencyPenalty: settings.frequencyPenalty,
+            presencePenalty: settings.presencePenalty,
+          },
+        },
+        {
+          onToken: (token) => {
+            accumulated += token;
+            updateMessage(currentSessionId, assistantId, { content: accumulated });
+          },
+        }
+      );
+      updateMessage(currentSessionId, assistantId, { isStreaming: false });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : '请求失败';
+      updateMessage(currentSessionId, assistantId, {
+        content: `请求出错：${msg}`,
+        isStreaming: false,
+      });
+      toast.error(msg);
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const handleFeedback = async (messageId: string, feedbackType: 'like' | 'dislike', comment?: string) => {
+    if (!currentSessionId) return;
+    try {
+      await ChatApi.feedbackMessage(currentSessionId, messageId, {
+        feedbackType,
+        ...(comment ? { comment } : {}),
+      });
+      toast.success(feedbackType === 'like' ? '感谢你的反馈' : '我们会改进');
+    } catch (e) {
+      console.error('Feedback failed:', e);
+      toast.error('反馈提交失败');
+    }
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -357,8 +437,6 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
         onBack={handleBack}
         chatSelection={chatSelection}
         onSelectionChange={updateSessionSelection}
-        currentSessionId={currentSessionId}
-        sessionConfig={settings}
         enablePromptLibrary={enablePromptLibrary}
         enableSwitchApp={enableSwitchApp}
         enableFileUpload={enableFileUpload}
@@ -392,6 +470,8 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
         onSendMessage={handleSendMessage}
         textareaRef={textareaRef}
         isSending={isSending}
+        onRegenerate={handleRegenerate}
+        onFeedback={handleFeedback}
       />
 
       {/* Prompt Library Dialog（enablePromptLibrary 关闭时仍允许通过其他入口打开，此处按配置控制） */}

@@ -79,6 +79,10 @@ export interface ChatMainAreaProps {
   textareaRef: React.RefObject<HTMLTextAreaElement | null>;
   /** 是否正在发送（流式生成中），用于禁用发送按钮 */
   isSending?: boolean;
+  /** 重新生成最后一条 AI 回复 */
+  onRegenerate?: () => void;
+  /** 消息反馈（点赞/点踩），点踩时需填写 comment */
+  onFeedback?: (messageId: string, feedbackType: 'like' | 'dislike', comment?: string) => void;
 }
 
 export function ChatMainArea({
@@ -118,6 +122,8 @@ export function ChatMainArea({
                                onSendMessage,
                                textareaRef,
                                isSending = false,
+                               onRegenerate,
+                               onFeedback,
                              }: ChatMainAreaProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -265,8 +271,14 @@ export function ChatMainArea({
             )
           ) : (
             <>
-              {currentMessages.map(message => (
-                <ChatMessage key={message.id} message={message} />
+              {currentMessages.map((message, index) => (
+                <ChatMessage
+                  key={message.id}
+                  message={message}
+                  isLastAssistant={index === currentMessages.length - 1 && message.role === 'assistant'}
+                  onRegenerate={onRegenerate}
+                  onFeedback={onFeedback}
+                />
               ))}
               <div ref={messagesEndRef} />
             </>

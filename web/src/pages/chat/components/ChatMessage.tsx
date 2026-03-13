@@ -10,6 +10,14 @@ import {
   Eye,
   X,
 } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog.tsx';
+import { Textarea } from '@/components/ui/textarea.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.tsx';
 import type { ReactNode } from 'react';
@@ -41,6 +49,12 @@ interface Message {
 
 interface ChatMessageProps {
   message: Message;
+  /** 是否为最后一条助手消息，仅最后一条显示重新生成按钮 */
+  isLastAssistant?: boolean;
+  /** 重新生成回调 */
+  onRegenerate?: () => void;
+  /** 消息反馈回调（点赞/点踩），点踩时需填写 comment */
+  onFeedback?: (messageId: string, feedbackType: 'like' | 'dislike', comment?: string) => void;
 }
 
 /** Markdown 渲染时的自定义组件 */
@@ -113,10 +127,12 @@ const markdownComponents: Parameters<typeof ReactMarkdown>[0]['components'] = {
   tr: ({ children }: { children?: React.ReactNode }) => <tr className="border-b dark:border-gray-700">{children}</tr>,
 };
 
-export function ChatMessage({ message }: ChatMessageProps) {
+export function ChatMessage({ message, isLastAssistant, onRegenerate, onFeedback }: ChatMessageProps) {
   const [copied, setCopied] = useState(false);
   const [liked, setLiked] = useState<boolean | null>(null);
   const [htmlPreviewOpen, setHtmlPreviewOpen] = useState(false);
+  const [dislikeDialogOpen, setDislikeDialogOpen] = useState(false);
+  const [dislikeComment, setDislikeComment] = useState('');
 
   const handleCopy = async () => {
     const success = await copyToClipboard(message.content);
@@ -129,13 +145,37 @@ export function ChatMessage({ message }: ChatMessageProps) {
     }
   };
 
-  const handleLike = (isLike: boolean) => {
-    setLiked(isLike);
-    toast.success(isLike ? '感谢你的反馈' : '我们会改进');
+  const handleLike = async (isLike: boolean) => {
+    if (!onFeedback || !message.id) return;
+    if (isLike) {
+      try {
+        await onFeedback(message.id, 'like');
+        setLiked(true);
+        toast.success('感谢你的反馈');
+      } catch {
+        toast.error('反馈提交失败');
+      }
+    } else {
+      setDislikeDialogOpen(true);
+    }
+  };
+
+  const handleDislikeSubmit = async () => {
+    if (!onFeedback || !message.id) return;
+    try {
+      await onFeedback(message.id, 'dislike', dislikeComment.trim() || undefined);
+      setLiked(false);
+      setDislikeDialogOpen(false);
+      setDislikeComment('');
+      toast.success('我们会改进');
+    } catch {
+      toast.error('反馈提交失败');
+    }
   };
 
   const handleRegenerate = () => {
-    toast.success('正在重新生成回答...');
+    if (onRegenerate) onRegenerate();
+    else toast.success('正在重新生成回答...');
   };
 
   const isUser = message.role === 'user';
@@ -329,10 +369,12 @@ export function ChatMessage({ message }: ChatMessageProps) {
                   className={cn('w-3 h-3', liked === false && 'fill-red-500 text-red-500')}
                 />
               </Button>
-              <Button variant="ghost" size="sm" className="h-8 gap-2" onClick={handleRegenerate}>
-                <RotateCw className="w-3 h-3" />
-                重新生成
-              </Button>
+              {isLastAssistant && (
+                <Button variant="ghost" size="sm" className="h-8 gap-2" onClick={handleRegenerate}>
+                  <RotateCw className="w-3 h-3" />
+                  重新生成
+                </Button>
+              )}
             </div>
           )}
 
@@ -357,6 +399,37 @@ export function ChatMessage({ message }: ChatMessageProps) {
             </div>
           )}
         </div>
+
+        {/* 点踩反馈弹窗：需填写 800 字内说明 */}
+        <Dialog open={dislikeDialogOpen} onOpenChange={setDislikeDialogOpen}>
+          <DialogContent className="!max-w-[500px] w-full">
+            <DialogHeader>
+              <DialogTitle>反馈说明</DialogTitle>
+            </DialogHeader>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              请告诉我们哪里需要改进（选填，最多 800 字）
+            </p>
+            <Textarea
+              value={dislikeComment}
+              onChange={e => setDislikeComment(e.target.value)}
+              placeholder="输入您的反馈..."
+              className="min-h-[120px] resize-y"
+              rows={5}
+              maxLength={800}
+            />
+            <p className="text-xs text-gray-500">
+              {dislikeComment.length}/800
+            </p>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setDislikeDialogOpen(false)}>
+                取消
+              </Button>
+              <Button onClick={handleDislikeSubmit}>
+                提交反馈
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         {/* HTML 预览区域（主消息区右侧） */}
         {showHtmlPreviewEntry && htmlPreviewOpen && (

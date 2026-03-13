@@ -238,7 +238,7 @@ export function ChatSidebar({
       {/* Header - h-14 与右侧 ChatSwitcher 顶部栏对齐，border-b 与下方边框对齐 */}
       <div className='shrink-0'>
         <div className='h-14 flex items-center justify-between px-4 border-b border-gray-200 dark:border-gray-700'>
-          <h2 className='text-lg dark:text-white flex items-center gap-2'>
+          <h2 className='text-1xl dark:text-white flex items-center gap-2'>
             <MessageSquare className='w-6 h-6' />
             对话列表
             <div className='text-sm text-gray-500 dark:text-gray-400 text-center'>({Number(sessionTotal) > 0 ? Number(sessionTotal) : sessions.length})</div>
