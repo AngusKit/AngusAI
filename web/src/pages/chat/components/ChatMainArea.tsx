@@ -21,9 +21,6 @@ import { Button } from '@/components/ui/button.tsx';
 import { Textarea } from '@/components/ui/textarea.tsx';
 import { ChatMessage } from './ChatMessage.tsx';
 import { ChatSwitcher, type ChatSwitcherSelection } from './ChatSwitcher.tsx';
-import { AngusChatRuntimeProvider } from './AngusChatRuntimeProvider.tsx';
-import { ChatThreadArea } from './ChatThreadArea.tsx';
-import type { AgentChatConfig } from '@/services/AgentChatTypes';
 import { AttachmentPreview } from './AttachmentPreview.tsx';
 import {
   DropdownMenu,
@@ -40,10 +37,6 @@ export interface ChatMainAreaProps {
   onBack: () => void;
   chatSelection: ChatSwitcherSelection;
   onSelectionChange: (s: ChatSwitcherSelection) => void;
-  /** 当前会话 ID（用于 assistant-ui Runtime） */
-  currentSessionId?: string;
-  /** 对话配置（温度等，用于 assistant-ui） */
-  sessionConfig?: AgentChatConfig;
   /** 是否显示提示词库入口，默认 true */
   enablePromptLibrary?: boolean;
   /** 是否显示应用切换器，默认 true */
@@ -89,45 +82,43 @@ export interface ChatMainAreaProps {
 }
 
 export function ChatMainArea({
-  onBack,
-  chatSelection,
-  onSelectionChange,
-  enablePromptLibrary = true,
-  enableSwitchApp = true,
-  enableFileUpload = true,
-  enableVoiceInput = true,
-  enableImageInput = false,
-  enableSessionSettings = true,
-  enableAppearanceSettings = true,
-  onNewSession,
-  onShowPromptLibrary,
-  onShowThemeDialog,
-  onShowSettings,
-  onToggleFullscreen,
-  onExportChat,
-  onShareChat,
-  onClearChat,
-  currentSessionId,
-  sessionConfig,
-  currentMessages,
-  hasAgentPlaceholder,
-  welcomeMessage,
-  suggestedQuestions,
-  selectedTemplateObj,
-  onInsertPrompt,
-  attachments,
-  onRemoveAttachment,
-  input,
-  onInputChange,
-  onKeyDown,
-  fileInputRef,
-  onFileSelect,
-  onVoiceRecord,
-  isRecording,
-  onSendMessage,
-  textareaRef,
-  isSending = false,
-}: ChatMainAreaProps) {
+                               onBack,
+                               chatSelection,
+                               onSelectionChange,
+                               enablePromptLibrary = true,
+                               enableSwitchApp = true,
+                               enableFileUpload = true,
+                               enableVoiceInput = true,
+                               enableImageInput = false,
+                               enableSessionSettings = true,
+                               enableAppearanceSettings = true,
+                               onNewSession,
+                               onShowPromptLibrary,
+                               onShowThemeDialog,
+                               onShowSettings,
+                               onToggleFullscreen,
+                               onExportChat,
+                               onShareChat,
+                               onClearChat,
+                               currentMessages,
+                               hasAgentPlaceholder,
+                               welcomeMessage,
+                               suggestedQuestions,
+                               selectedTemplateObj,
+                               onInsertPrompt,
+                               attachments,
+                               onRemoveAttachment,
+                               input,
+                               onInputChange,
+                               onKeyDown,
+                               fileInputRef,
+                               onFileSelect,
+                               onVoiceRecord,
+                               isRecording,
+                               onSendMessage,
+                               textareaRef,
+                               isSending = false,
+                             }: ChatMainAreaProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -135,8 +126,6 @@ export function ChatMainArea({
   }, [currentMessages]);
 
   const appDisplayName = chatSelection.app?.name ?? '应用';
-  const agentId = chatSelection.agentId ?? chatSelection.app?.defaultAgent?.id ?? '';
-  const useAssistantUI = !!currentSessionId && !!agentId;
 
   return (
     <div className='flex-1 flex flex-col'>
@@ -216,36 +205,9 @@ export function ChatMainArea({
       </div>
 
       {/* Messages Area */}
-      <div className='flex-1 flex flex-col min-h-0'>
-        {useAssistantUI ? (
-          <AngusChatRuntimeProvider
-            key={currentSessionId}
-            sessionId={currentSessionId!}
-            agentId={agentId}
-            config={sessionConfig}
-          >
-            <ChatThreadArea
-              input={input}
-              onInputChange={onInputChange}
-              onKeyDown={onKeyDown}
-              textareaRef={textareaRef}
-              attachments={attachments}
-              onRemoveAttachment={onRemoveAttachment}
-              fileInputRef={fileInputRef}
-              onFileSelect={onFileSelect}
-              enableFileUpload={enableFileUpload}
-              enableImageInput={enableImageInput}
-              enableVoiceInput={enableVoiceInput}
-              isRecording={isRecording}
-              onVoiceRecord={onVoiceRecord}
-              selectedTemplateObj={selectedTemplateObj}
-            />
-          </AngusChatRuntimeProvider>
-        ) : (
-          <>
-            <div className='flex-1 overflow-y-auto px-4 py-10'>
-              <div className='max-w-4xl mx-auto pt-6 pb-6 space-y-6'>
-                {currentMessages.length === 0 ? (
+      <div className='flex-1 overflow-y-auto px-4 py-10'>
+        <div className='max-w-4xl mx-auto pt-6 pb-6 space-y-6'>
+          {currentMessages.length === 0 ? (
             hasAgentPlaceholder ? (
               <div className='flex flex-col items-center justify-center h-full text-center py-20'>
                 <div
@@ -309,61 +271,58 @@ export function ChatMainArea({
               <div ref={messagesEndRef} />
             </>
           )}
-              </div>
-            </div>
+        </div>
+      </div>
 
-            {/* Input Area - legacy */}
-            <div className='bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4'>
-              <div className='max-w-4xl mx-auto'>
-                {attachments.length > 0 && (
-                  <div className='mb-3 flex flex-wrap gap-2'>
-                    {attachments.map((file, index) => (
-                      <AttachmentPreview key={index} file={file} onRemove={() => onRemoveAttachment(index)} />
-                    ))}
-                  </div>
-                )}
-
-                <div className='flex-1 relative'>
-                  <Textarea
-                    ref={textareaRef}
-                    value={input}
-                    onChange={e => onInputChange(e.target.value)}
-                    onKeyDown={onKeyDown}
-                    placeholder='输入消息... (Shift + Enter 换行)'
-                    className='min-h-[80px] max-h-[240px] resize-none pr-32 py-4 px-4 dark:bg-gray-800 dark:border-gray-700 scrollbar-hide'
-                    rows={1}
-                  />
-                  <div className='absolute right-3 bottom-3 flex items-center gap-1'>
-                    <input ref={fileInputRef} type='file' multiple className='hidden' onChange={onFileSelect} />
-                    {enableFileUpload && (
-                      <Button variant='ghost' size='icon' className='h-9 w-9' onClick={() => { if (fileInputRef.current) { fileInputRef.current.accept = '*'; fileInputRef.current.click(); } }} title='上传文件'>
-                        <Paperclip className='w-4 h-4' />
-                      </Button>
-                    )}
-                    {enableImageInput && (
-                      <Button variant='ghost' size='icon' className='h-9 w-9' onClick={() => { if (fileInputRef.current) { fileInputRef.current.accept = 'image/*'; fileInputRef.current.click(); } }} title='上传图片'>
-                        <ImageIcon className='w-4 h-4' />
-                      </Button>
-                    )}
-                    {enableVoiceInput && (
-                      <Button variant='ghost' size='icon' className='h-9 w-9' onClick={onVoiceRecord}>
-                        {isRecording ? <StopCircle className='w-4 h-4 text-red-500' /> : <Mic className='w-4 h-4' />}
-                      </Button>
-                    )}
-                    <Button
-                      size='icon'
-                      onClick={onSendMessage}
-                      disabled={isSending || (!input.trim() && attachments.length === 0)}
-                      className={cn('h-9 w-9', selectedTemplateObj?.primaryColor ?? 'bg-blue-500', 'text-white')}
-                    >
-                      <Send className='w-4 h-4' />
-                    </Button>
-                  </div>
-                </div>
-              </div>
+      {/* Input Area */}
+      <div className='bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4'>
+        <div className='max-w-4xl mx-auto'>
+          {attachments.length > 0 && (
+            <div className='mb-3 flex flex-wrap gap-2'>
+              {attachments.map((file, index) => (
+                <AttachmentPreview key={index} file={file} onRemove={() => onRemoveAttachment(index)} />
+              ))}
             </div>
-          </>
-        )}
+          )}
+
+          <div className='flex-1 relative'>
+            <Textarea
+              ref={textareaRef}
+              value={input}
+              onChange={e => onInputChange(e.target.value)}
+              onKeyDown={onKeyDown}
+              placeholder='输入消息... (Shift + Enter 换行)'
+              className='min-h-[80px] max-h-[240px] resize-none pr-32 py-4 px-4 dark:bg-gray-800 dark:border-gray-700 scrollbar-hide'
+              rows={1}
+            />
+            <div className='absolute right-3 bottom-3 flex items-center gap-1'>
+              <input ref={fileInputRef} type='file' multiple className='hidden' onChange={onFileSelect} />
+              {enableFileUpload && (
+                <Button variant='ghost' size='icon' className='h-9 w-9' onClick={() => { if (fileInputRef.current) { fileInputRef.current.accept = '*'; fileInputRef.current.click(); } }} title='上传文件'>
+                  <Paperclip className='w-4 h-4' />
+                </Button>
+              )}
+              {enableImageInput && (
+                <Button variant='ghost' size='icon' className='h-9 w-9' onClick={() => { if (fileInputRef.current) { fileInputRef.current.accept = 'image/*'; fileInputRef.current.click(); } }} title='上传图片'>
+                  <ImageIcon className='w-4 h-4' />
+                </Button>
+              )}
+              {enableVoiceInput && (
+                <Button variant='ghost' size='icon' className='h-9 w-9' onClick={onVoiceRecord}>
+                  {isRecording ? <StopCircle className='w-4 h-4 text-red-500' /> : <Mic className='w-4 h-4' />}
+                </Button>
+              )}
+              <Button
+                size='icon'
+                onClick={onSendMessage}
+                disabled={isSending || (!input.trim() && attachments.length === 0)}
+                className={cn('h-9 w-9', selectedTemplateObj?.primaryColor ?? 'bg-blue-500', 'text-white')}
+              >
+                <Send className='w-4 h-4' />
+              </Button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
