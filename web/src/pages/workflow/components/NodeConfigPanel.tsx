@@ -1,26 +1,19 @@
 /**
- * 节点配置面板 - 选中节点时展示配置表单
+ * 节点配置面板 - 选中节点时展示配置表单（内嵌侧边栏，无蒙版）
  */
 import { useCallback, useMemo } from 'react';
 import type { Node } from 'reactflow';
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-} from '@/components/ui/sheet';
+import { X } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Button } from '@/components/ui/button';
 import { getNodeTypeDef } from '../nodes/nodeTypes';
-import { cn } from '@/components/ui/utils';
 
 interface NodeConfigPanelProps {
   node: Node | null;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onClose: () => void;
   onUpdateNodeData: (nodeId: string, data: Partial<Node['data']>) => void;
 }
 
@@ -93,7 +86,7 @@ function ConfigFields({
   );
 }
 
-export function NodeConfigPanel({ node, open, onOpenChange, onUpdateNodeData }: NodeConfigPanelProps) {
+export function NodeConfigPanel({ node, onClose, onUpdateNodeData }: NodeConfigPanelProps) {
   const def = node ? getNodeTypeDef(node.type as string) : null;
   const config = useMemo(() => {
     const c = (node?.data as { config?: Record<string, unknown> })?.config;
@@ -122,42 +115,46 @@ export function NodeConfigPanel({ node, open, onOpenChange, onUpdateNodeData }: 
   const label = (node.data as { label?: string })?.label ?? def?.label ?? node.type;
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="sm:max-w-md">
-        <SheetHeader>
-          <SheetTitle className="flex items-center gap-2">
-            {def?.icon && (
-              <div
-                className="w-8 h-8 rounded flex items-center justify-center"
-                style={{ background: def.color, color: 'white' }}
-              >
-                <def.icon className="w-4 h-4" />
-              </div>
-            )}
-            节点配置
-          </SheetTitle>
-          <SheetDescription>{def?.description ?? node.type}</SheetDescription>
-        </SheetHeader>
-        <ScrollArea className="h-[calc(100vh-12rem)] pr-4 mt-4">
-          <div className="space-y-4">
-            <div>
-              <Label>节点名称</Label>
-              <Input
-                className="mt-1"
-                value={label}
-                onChange={e => handleLabelChange(e.target.value)}
-                placeholder="节点名称"
-              />
+    <div
+      className="w-80 shrink-0 flex flex-col border-l border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900"
+      role="complementary"
+      aria-label="节点配置"
+    >
+      <div className="flex items-center justify-between p-3 border-b border-gray-200 dark:border-gray-700 shrink-0">
+        <h3 className="text-sm font-semibold dark:text-white flex items-center gap-2">
+          {def?.icon && (
+            <div
+              className="w-6 h-6 rounded flex items-center justify-center"
+              style={{ background: def.color, color: 'white' }}
+            >
+              <def.icon className="w-3 h-3" />
             </div>
-            <div>
-              <Label>配置参数</Label>
-              <div className="mt-2">
-                <ConfigFields config={config} onChange={handleChange} nodeType={node.type as string} />
-              </div>
+          )}
+          节点配置
+        </h3>
+        <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 shrink-0">
+          <X className="w-4 h-4" />
+        </Button>
+      </div>
+      <ScrollArea className="flex-1 min-h-0">
+        <div className="p-3 space-y-4">
+          <div>
+            <Label className="text-sm">节点名称</Label>
+            <Input
+              className="mt-1"
+              value={label}
+              onChange={e => handleLabelChange(e.target.value)}
+              placeholder="节点名称"
+            />
+          </div>
+          <div>
+            <Label className="text-sm">配置参数</Label>
+            <div className="mt-2">
+              <ConfigFields config={config} onChange={handleChange} nodeType={node.type as string} />
             </div>
           </div>
-        </ScrollArea>
-      </SheetContent>
-    </Sheet>
+        </div>
+      </ScrollArea>
+    </div>
   );
 }

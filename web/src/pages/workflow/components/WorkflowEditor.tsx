@@ -57,7 +57,6 @@ function WorkflowEditorContent({ workflowId, workflowName, workflowStatus, onClo
     handleSave,
     handleStartStop,
     toggleFullscreen,
-    selectedNodeId,
     setSelectedNodeId,
     selectedNode,
     handleExecute,
@@ -78,8 +77,6 @@ function WorkflowEditorContent({ workflowId, workflowName, workflowStatus, onClo
     },
     [onDrop, screenToFlowPosition]
   );
-
-  const configPanelOpen = !!selectedNodeId;
 
   if (loading) {
     return (
@@ -178,16 +175,16 @@ function WorkflowEditorContent({ workflowId, workflowName, workflowStatus, onClo
           </div>
         </div>
 
-        {/* 主体：节点面板 + 画布 */}
+        {/* 主体：节点面板 + 画布 + 配置面板 */}
         <div className='flex flex-1 min-h-0'>
           <NodePanel className='w-56 shrink-0' />
-          <div className='flex-1 relative' onDragOver={onDragOver} onDrop={handleDropWithPosition}>
+          <div className='flex-1 relative min-w-0' onDragOver={onDragOver} onDrop={handleDropWithPosition}>
             <ReactFlow
               nodes={nodes}
               edges={edges}
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}
-              onConnect={params => onConnect({ ...params, type: 'smoothstep', animated: true })}
+              onConnect={onConnect}
               onSelectionChange={onSelectionChange}
               onPaneClick={() => setSelectedNodeId(null)}
               onNodeClick={(_, node) => setSelectedNodeId(node.id)}
@@ -207,6 +204,21 @@ function WorkflowEditorContent({ workflowId, workflowName, workflowStatus, onClo
               <Background variant={BackgroundVariant.Dots} gap={12} size={1} className='dark:bg-gray-900' />
             </ReactFlow>
           </div>
+          {showLogsPanel ? (
+            <ExecutionLogsPanel
+              open={true}
+              onClose={() => setShowLogsPanel(false)}
+              logs={executionLogs}
+              loading={logsLoading}
+              onLoad={loadExecutionLogs}
+            />
+          ) : selectedNode ? (
+            <NodeConfigPanel
+              node={selectedNode}
+              onClose={() => setSelectedNodeId(null)}
+              onUpdateNodeData={updateNodeData}
+            />
+          ) : null}
         </div>
 
         {/* 底部信息栏 */}
@@ -221,24 +233,11 @@ function WorkflowEditorContent({ workflowId, workflowName, workflowStatus, onClo
         </div>
       </Card>
 
-      <NodeConfigPanel
-        node={selectedNode}
-        open={configPanelOpen}
-        onOpenChange={open => !open && setSelectedNodeId(null)}
-        onUpdateNodeData={updateNodeData}
-      />
       <ExecuteDialog
         open={showExecuteDialog}
         onOpenChange={setShowExecuteDialog}
         onExecute={handleExecute}
         loading={executionLoading}
-      />
-      <ExecutionLogsPanel
-        open={showLogsPanel}
-        onOpenChange={setShowLogsPanel}
-        logs={executionLogs}
-        loading={logsLoading}
-        onLoad={loadExecutionLogs}
       />
     </div>
   );

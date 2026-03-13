@@ -41,7 +41,7 @@ export function ExecuteDialog({ open, onOpenChange, onExecute, loading }: Execut
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="w-full max-w-[600px]">
         <DialogHeader>
           <DialogTitle>执行工作流</DialogTitle>
           <DialogDescription>输入工作流所需的变量（JSON 格式），如 {"{ \"key\": \"value\" }"}</DialogDescription>

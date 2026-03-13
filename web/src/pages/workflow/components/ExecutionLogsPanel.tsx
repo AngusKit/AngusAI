@@ -1,16 +1,17 @@
 /**
- * 执行日志面板 - 展示执行历史
+ * 执行日志面板 - 展示执行历史（内嵌侧边栏，无蒙版）
  */
 import { useEffect } from 'react';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
+import { X } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import type { ExecutionLogVo } from '@/services/WorkflowsTypes';
 import { cn } from '@/components/ui/utils';
 
 interface ExecutionLogsPanelProps {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onClose: () => void;
   logs: ExecutionLogVo[];
   loading: boolean;
   onLoad: () => void;
@@ -35,23 +36,31 @@ function statusColor(status?: string): string {
   return 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400';
 }
 
-export function ExecutionLogsPanel({ open, onOpenChange, logs, loading, onLoad }: ExecutionLogsPanelProps) {
+export function ExecutionLogsPanel({ open, onClose, logs, loading, onLoad }: ExecutionLogsPanelProps) {
   useEffect(() => {
     if (open) onLoad();
   }, [open, onLoad]);
 
+  if (!open) return null;
+
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="sm:max-w-lg">
-        <SheetHeader>
-          <SheetTitle>执行日志</SheetTitle>
-          <SheetDescription>工作流历史执行记录</SheetDescription>
-        </SheetHeader>
-        <ScrollArea className="h-[calc(100vh-10rem)] pr-4 mt-4">
+    <div
+      className="w-80 shrink-0 flex flex-col border-l border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900"
+      role="complementary"
+      aria-label="执行日志"
+    >
+      <div className="flex items-center justify-between p-3 border-b border-gray-200 dark:border-gray-700 shrink-0">
+        <h3 className="text-sm font-semibold dark:text-white">执行日志</h3>
+        <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 shrink-0">
+          <X className="w-4 h-4" />
+        </Button>
+      </div>
+      <ScrollArea className="flex-1 min-h-0">
+        <div className="p-3">
           {loading ? (
-            <div className="py-8 text-center text-gray-500 dark:text-gray-400">加载中...</div>
+            <div className="py-8 text-center text-gray-500 dark:text-gray-400 text-sm">加载中...</div>
           ) : logs.length === 0 ? (
-            <div className="py-8 text-center text-gray-500 dark:text-gray-400">暂无执行记录</div>
+            <div className="py-8 text-center text-gray-500 dark:text-gray-400 text-sm">暂无执行记录</div>
           ) : (
             <div className="space-y-3">
               {logs.map((log, i) => (
@@ -79,8 +88,8 @@ export function ExecutionLogsPanel({ open, onOpenChange, logs, loading, onLoad }
               ))}
             </div>
           )}
-        </ScrollArea>
-      </SheetContent>
-    </Sheet>
+        </div>
+      </ScrollArea>
+    </div>
   );
 }
