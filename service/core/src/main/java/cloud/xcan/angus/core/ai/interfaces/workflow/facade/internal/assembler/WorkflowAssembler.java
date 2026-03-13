@@ -14,6 +14,9 @@ import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowListVo;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder;
 import cloud.xcan.angus.remote.search.SearchCriteria;
+import cloud.xcan.angus.spec.utils.JsonUtils;
+import com.fasterxml.jackson.core.type.TypeReference;
+import java.util.List;
 import java.util.Set;
 
 public class WorkflowAssembler {
@@ -34,7 +37,6 @@ public class WorkflowAssembler {
     // 创建配置对象
     if (dto.getConfig() != null) {
       WorkflowConfig config = new WorkflowConfig();
-      // TODO: 根据dto.getConfig()设置配置
       workflow.setConfig(config);
     }
     return workflow;
@@ -53,7 +55,21 @@ public class WorkflowAssembler {
 
   public static WorkflowConfig toConfig(WorkflowConfigUpdateDto dto) {
     WorkflowConfig config = new WorkflowConfig();
-    // TODO: 根据dto设置配置
+    if (dto.getNodes() != null && !dto.getNodes().isEmpty()) {
+      config.setNodes(JsonUtils.fromJsonObject(dto.getNodes(),
+          new TypeReference<List<WorkflowConfig.WorkflowNode>>() {
+          }));
+    }
+    if (dto.getEdges() != null && !dto.getEdges().isEmpty()) {
+      config.setEdges(JsonUtils.fromJsonObject(dto.getEdges(),
+          new TypeReference<List<WorkflowConfig.WorkflowEdge>>() {
+          }));
+    }
+    if (dto.getVariables() != null && !dto.getVariables().isEmpty()) {
+      config.setVariables(JsonUtils.fromJsonObject(dto.getVariables(),
+          new TypeReference<List<WorkflowConfig.VariableConfig>>() {
+          }));
+    }
     return config;
   }
 
