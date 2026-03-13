@@ -45,7 +45,7 @@ public class ResourceSharingListVo extends TenantAuditingVo {
   @Schema(description = "共享范围")
   private SharedWith sharedWith;
 
-  @Schema(description = "成员数量")
+  @Schema(description = "成员数量，为空时为所有成员")
   private Integer memberCount;
 
   @Schema(description = "权限")
