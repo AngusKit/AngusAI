@@ -43,17 +43,58 @@ function normalizeNodeType(t: string | undefined): string {
   return t ?? 'default';
 }
 
-function parseConfigToNodesEdges(config: object | undefined): { nodes: Node[]; edges: Edge[] } {
-  if (!config || typeof config !== 'object') return { nodes: MINIMAL_NODES, edges: MINIMAL_EDGES };
-  const c = config as { nodes?: Node[]; edges?: Edge[] };
+function toNum(v: unknown): number {
+  if (typeof v === 'number' && !Number.isNaN(v)) return v;
+  if (typeof v === 'string') {
+    const n = parseFloat(v);
+    return Number.isNaN(n) ? 0 : n;
+  }
+  return 0;
+}
+
+function parseConfigToNodesEdges(config: object | string | undefined): { nodes: Node[]; edges: Edge[] } {
+  let c: { nodes?: Node[]; edges?: Edge[] } | undefined;
+  if (config == null) return { nodes: MINIMAL_NODES, edges: MINIMAL_EDGES };
+  if (typeof config === 'string') {
+    try {
+      c = JSON.parse(config) as { nodes?: Node[]; edges?: Edge[] };
+    } catch {
+      return { nodes: MINIMAL_NODES, edges: MINIMAL_EDGES };
+    }
+  } else if (typeof config === 'object') {
+    c = config as { nodes?: Node[]; edges?: Edge[] };
+  } else {
+    return { nodes: MINIMAL_NODES, edges: MINIMAL_EDGES };
+  }
   if (Array.isArray(c.nodes) && Array.isArray(c.edges)) {
     const nodes = c.nodes.length
-      ? c.nodes.map(n => ({
-          ...n,
-          type: normalizeNodeType(n.type as string | undefined) as string,
-        }))
+      ? c.nodes.map(n => {
+          const pos = n.position as { x?: unknown; y?: unknown } | undefined;
+          return {
+            ...n,
+            type: normalizeNodeType(n.type as string | undefined) as string,
+            position: {
+              x: pos ? toNum(pos.x) : 0,
+              y: pos ? toNum(pos.y) : 0,
+            },
+          };
+        })
       : MINIMAL_NODES;
-    const edges = c.edges.length ? c.edges : MINIMAL_EDGES;
+    const nodeIds = new Set(nodes.map(n => String(n.id)));
+    const edges = c.edges.length
+      ? c.edges
+          .map((e: Edge) => ({
+            id: String(e.id ?? ''),
+            source: String(e.source ?? ''),
+            target: String(e.target ?? ''),
+            sourceHandle: e.sourceHandle != null ? String(e.sourceHandle) : undefined,
+            targetHandle: e.targetHandle != null ? String(e.targetHandle) : undefined,
+            type: 'smoothstep' as const,
+            animated: true,
+            style: { stroke: '#94a3b8', strokeWidth: 2 },
+          }))
+          .filter(e => nodeIds.has(e.source) && nodeIds.has(e.target))
+      : MINIMAL_EDGES;
     return { nodes, edges };
   }
   return { nodes: MINIMAL_NODES, edges: MINIMAL_EDGES };
@@ -102,8 +143,20 @@ export function useWorkflowEditor(workflowId: string, workflowStatus: string, on
     Workflows.getWorkflowDetail(workflowId)
       .then((res: unknown) => {
         if (cancelled) return;
-        const data = (res as { data?: WorkflowDetailVo }).data;
-        const cfg = data?.config;
+        // 兼容 API 返回 { data: workflow } 或 { data: { data: workflow } } 两种结构
+        const raw = (res as { data?: unknown }).data;
+        const data: WorkflowDetailVo | undefined =
+          raw && typeof raw === 'object' && 'config' in raw
+            ? (raw as WorkflowDetailVo)
+            : (raw as { data?: WorkflowDetailVo })?.data;
+        let cfg = data?.config;
+        if (typeof cfg === 'string') {
+          try {
+            cfg = JSON.parse(cfg) as object;
+          } catch {
+            cfg = undefined;
+          }
+        }
         const { nodes: n, edges: e } = parseConfigToNodesEdges(cfg);
         setNodes(n);
         setEdges(e);
