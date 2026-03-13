@@ -9,17 +9,13 @@ xcan:
   global:
     cors:
       enabled: true
-  opt-log:
-    enabled: true
-    clearBeforeDay: 360
   api-log:
     enabled: true
-    userRequest:
-      enabled: true
-      printLevel: FULL
-    systemRequest:
-      enabled: true
-      printLevel: FULL
+    printLevel: FULL
+    clearBeforeDay: 7   # 该配置选项只对GM服务有效，优先级低于数据库配置
+    apiRequest:
+      maxPayloadLength: 204800 # 当采集请求完整参数时只记录不超过200KB的请求体内容
+      pushLoggerService: true
   id-gen:
     enabled: true
   plugin:
