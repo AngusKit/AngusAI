@@ -1,5 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.workflow.facade.internal.assembler;
 
+import cloud.xcan.angus.core.ai.domain.Visibility;
 import cloud.xcan.angus.core.ai.domain.workflow.ExecutionStats;
 import cloud.xcan.angus.core.ai.domain.workflow.Workflow;
 import cloud.xcan.angus.core.ai.domain.workflow.WorkflowConfig;
@@ -28,6 +29,7 @@ public class WorkflowAssembler {
     // 设置默认状态
     workflow.setStatus(WorkflowStatus.DRAFT);
     workflow.setVersion("1.0.0");
+    workflow.setVisibility(Visibility.PRIVATE);
 
     // 创建配置对象
     if (dto.getConfig() != null) {
