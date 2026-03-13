@@ -31,7 +31,7 @@ public class ResourceSharingMemberCmdImpl extends CommCmd<ResourceSharingMember,
         // 不添加所有者自己
         if (!memberId.equals(resourceOwnerId)) {
           ResourceSharingMember member = toMemberDomain(sharing, memberId);
-          resourceSharingMemberRepo.save(member);
+          insert0(member);
         }
       }
     }
