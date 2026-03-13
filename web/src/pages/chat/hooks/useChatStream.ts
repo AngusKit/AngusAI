@@ -18,7 +18,7 @@ async function buildStreamRequest(path: string, body: unknown): Promise<{ url: s
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    // 'Accept': 'text/event-stream',
+    //'Accept': 'text/event-stream',
     [HEADER_ACCEPT_LANGUAGE]: cookieUtils.getCurrentLanguage(),
     [HEADER_DEVICE_ID]: await httpUtils.preloadVisitorId(),
   };

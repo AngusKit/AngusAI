@@ -52,7 +52,7 @@ public class AgentQueryImpl implements AgentQuery {
         Agent agent = agentRepo.findById(id)
             .orElseThrow(() -> ResourceNotFound.of("智能体「{0}」不存在", new Object[]{id}));
         if (!AgentStatus.ACTIVE.equals(agent.getStatus())) {
-          throw ProtocolException.of("智能体「{0}」未发布", new Object[]{id});
+          throw ResourceNotFound.of("智能体「{0}」未发布", new Object[]{id});
         }
         return agent;
       }

@@ -4,24 +4,25 @@ import static cloud.xcan.angus.core.ai.application.converter.AgentConverter.toCh
 import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_CHAT_SSE_TIMEOUT_MS;
 import static cloud.xcan.angus.spec.principal.PrincipalContext.getUserId;
 import static cloud.xcan.angus.spec.utils.ObjectUtils.lengthSafe;
+import static cloud.xcan.angus.spec.utils.ObjectUtils.nullSafe;
 
 import cloud.xcan.agentx.core.agent.AgentRegistry;
 import cloud.xcan.agentx.core.agent.ChatConfigOverride;
 import cloud.xcan.angus.core.ai.application.cmd.agent.AgentChatCmd;
 import cloud.xcan.angus.core.ai.application.cmd.agent.AgentCmd;
+import cloud.xcan.angus.core.ai.application.cmd.analytics.ApiUsageLogCmd;
 import cloud.xcan.angus.core.ai.application.cmd.chat.MessageCmd;
 import cloud.xcan.angus.core.ai.application.cmd.chat.SessionCmd;
-import cloud.xcan.angus.core.ai.application.cmd.analytics.ApiUsageLogCmd;
 import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.domain.agent.Agent;
 import cloud.xcan.angus.core.ai.domain.agent.AgentChatConfig;
 import cloud.xcan.angus.core.ai.domain.agent.AgentChatResult;
+import cloud.xcan.angus.core.ai.domain.analytics.ApiUsageLog;
 import cloud.xcan.angus.core.ai.domain.chat.Message;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRole;
 import cloud.xcan.angus.core.ai.domain.chat.Session;
 import cloud.xcan.angus.core.ai.domain.model.Model;
-import cloud.xcan.angus.core.ai.domain.analytics.ApiUsageLog;
 import cloud.xcan.angus.core.ai.infra.agent.utils.ChatConfigMergeUtils;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.remote.message.SysException;
@@ -83,7 +84,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
   private Executor sseEmitterChatExecutor;
 
   @Override
-  public AgentChatResult chat(Long agentId, String sessionId, String message, Long timeoutMs,
+  public AgentChatResult chat(Long agentId, String sessionId, String message,
       AgentChatConfig config) {
     return new BizTemplate<AgentChatResult>() {
       Agent agent;
@@ -103,7 +104,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
         messageCmd.create0(session, MessageRole.USER, message);
 
         // 合并请求/会话/智能体/模型配置，得到最终覆盖参数
-        ChatConfigOverride override = getChatConfigOverride(agent, config, session, timeoutMs);
+        ChatConfigOverride override = getChatConfigOverride(agent, config, session);
         String agentIdStr = String.valueOf(agentId);
         String defaultModelIdStr = agent.getDefaultModelId() != null
             ? String.valueOf(agent.getDefaultModelId()) : null;
@@ -114,16 +115,12 @@ public class AgentChatCmdImpl implements AgentChatCmd {
         Exception chatError = null;
         try {
           // 异步执行 LLM 调用，有 override 时指定模型与配置
-          // 注意：可以改为在主线程直接调用 agentRegistry.chat()，但建议保留 executor，便于控制 LLM 并发。若需要 Java 层超时，可改用 future.get(timeout, unit)
-          reply = syncChatExecutor
-              .submit(() -> {
-                if (override != null && agent.getDefaultModelId() != null) {
-                  return agentRegistry.chat(agentIdStr, session.getSessionId(),
-                      message, defaultModelIdStr, override);
-                }
-                return agentRegistry.chat(agentIdStr, session.getSessionId(), message);
-              })
-              .get();
+          // 注意：可以改为在主线程直接调用 agentRegistry.chat()，但建议保留 executor，便于控制 LLM 并发。
+          // 若需要 Java 层超时，可改用 future.get(timeout, unit)
+          reply = override != null && agent.getDefaultModelId() != null
+              ? agentRegistry.chat(agentIdStr, session.getSessionId(), message,
+              defaultModelIdStr, override)
+              : agentRegistry.chat(agentIdStr, session.getSessionId(), message);
         } catch (Exception e) {
           chatError = e;
           throw SysException.of(e.getMessage());
@@ -143,12 +140,9 @@ public class AgentChatCmdImpl implements AgentChatCmd {
   }
 
   @Override
-  public SseEmitter chatStream(Long agentId, String sessionId, String message, Long timeoutMs,
+  public SseEmitter chatStream(Long agentId, String sessionId, String message,
       AgentChatConfig config) {
     return new BizTemplate<SseEmitter>() {
-      final long effectiveTimeout = timeoutMs != null && timeoutMs > 0
-          ? timeoutMs : AGENT_CHAT_SSE_TIMEOUT_MS;
-      final SseEmitter emitter = new SseEmitter(effectiveTimeout);
       Agent agent;
       Session session;
       Message assistantMessage;
@@ -161,7 +155,16 @@ public class AgentChatCmdImpl implements AgentChatCmd {
 
       @Override
       protected SseEmitter process() {
+        // 按照优先级获取会话配置
+        ChatConfigOverride override = getChatConfigOverride(agent, config, session);
+        Long timeoutMs = nullSafe(override.getTimeoutMs(), AGENT_CHAT_SSE_TIMEOUT_MS);
+
+        // 构造SseEmitter
+        final SseEmitter emitter = new SseEmitter(timeoutMs);
+
+        // 注册智能体
         agentCmd.ensureRegistered(agent);
+
         // 落库用户消息
         messageCmd.create0(session, MessageRole.USER, message);
 
@@ -171,9 +174,8 @@ public class AgentChatCmdImpl implements AgentChatCmd {
         messageCmd.setStreaming(assistantMessage, true);
 
         // 合并配置，得到最终覆盖参数
-        ChatConfigOverride override = getChatConfigOverride(agent, config, session,
-            effectiveTimeout);
         String agentIdStr = String.valueOf(agentId);
+        String defaultModelId = String.valueOf(agent.getDefaultModelId());
 
         // 异步执行流式调用，通过 SSE 推送 token
         // 注意：必须保持使用 sseEmitterChatExecutor，否则会破坏 SSE 的流式模型和整体稳定性
@@ -181,9 +183,9 @@ public class AgentChatCmdImpl implements AgentChatCmd {
           StringBuilder fullContent = new StringBuilder();
           long streamStartMs = System.currentTimeMillis();
           try {
-            TokenStream stream = override != null && agent.getDefaultModelId() != null
+            TokenStream stream = agent.getDefaultModelId() != null
                 ? agentRegistry.chatStream(agentIdStr, session.getSessionId(), message,
-                String.valueOf(agent.getDefaultModelId()), override)
+                defaultModelId, override)
                 : agentRegistry.chatStream(agentIdStr, session.getSessionId(), message);
             // 每收到 token：累积内容并推送前端
             stream.onPartialResponse(token -> {
@@ -237,11 +239,10 @@ public class AgentChatCmdImpl implements AgentChatCmd {
    * 合并请求/会话/智能体/模型配置，生成 ChatConfigOverride。 合并优先级：请求 config > 会话 config > 智能体 config > 模型 config。
    */
   private ChatConfigOverride getChatConfigOverride(Agent agent, AgentChatConfig config,
-      Session session, Long requestTimeoutMs) {
+      Session session) {
     Model model = agent.getDefaultModelId() != null
         ? modelQuery.findById(agent.getDefaultModelId()).orElse(null) : null;
-    AgentChatConfig merged = ChatConfigMergeUtils.merge(config, requestTimeoutMs, session, agent,
-        model);
+    AgentChatConfig merged = ChatConfigMergeUtils.merge(config, session, agent, model);
     return toChatConfigOverride(merged);
   }
 

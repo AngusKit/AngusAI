@@ -2,8 +2,10 @@ package cloud.xcan.angus.core.ai.infra.agent;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
@@ -65,5 +67,18 @@ public class AgentChatSseEmitterConfiguration {
     executor.setAwaitTerminationSeconds(30);
     executor.initialize();
     return executor;
+  }
+
+  /**
+   * SSE 流式接口专用 Filter：禁用响应缓冲，确保 token 实时到达客户端
+   */
+  @Bean
+  public FilterRegistrationBean<SseStreamBufferFilter> sseStreamBufferFilter() {
+    FilterRegistrationBean<SseStreamBufferFilter> registration = new FilterRegistrationBean<>();
+    registration.setFilter(new SseStreamBufferFilter());
+    registration.addUrlPatterns("/api/v1/agents/chat/stream");
+    registration.setOrder(Ordered.HIGHEST_PRECEDENCE);
+    registration.setAsyncSupported(true);
+    return registration;
   }
 }

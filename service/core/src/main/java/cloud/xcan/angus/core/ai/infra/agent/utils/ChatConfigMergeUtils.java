@@ -28,13 +28,12 @@ public final class ChatConfigMergeUtils {
    * 合并对话配置
    *
    * @param requestConfig    请求层配置（可选）
-   * @param requestTimeoutMs 请求顶层超时（dto.timeoutMs），当 config 无 timeoutMs 时使用
    * @param session          会话（含 config，可选）
    * @param agent            智能体（含 systemPrompt）
    * @param model            智能体默认模型（含 temperature、maxTokens、timeoutSeconds 等，可选）
    * @return 合并后的配置
    */
-  public static AgentChatConfig merge(AgentChatConfig requestConfig, Long requestTimeoutMs,
+  public static AgentChatConfig merge(AgentChatConfig requestConfig,
       Session session, Agent agent, Model model) {
     SessionConfig sessionConfig = session != null ? session.getConfig() : null;
 
@@ -72,7 +71,6 @@ public final class ChatConfigMergeUtils {
 
     Long timeoutMs = firstNonNull(
         getRequestTimeoutMs(requestConfig),
-        requestTimeoutMs,
         getModelTimeoutMs(model),
         CHAT_DEFAULT_TIMEOUT_MS);
 

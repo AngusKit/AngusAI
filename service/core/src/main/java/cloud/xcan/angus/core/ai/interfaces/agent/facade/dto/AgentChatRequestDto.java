@@ -21,9 +21,6 @@ public class AgentChatRequestDto {
   @Schema(description = "用户消息", requiredMode = Schema.RequiredMode.REQUIRED, example = "你好")
   private String message;
 
-  @Schema(description = "超时时间（毫秒），不传则使用默认值。流式对话默认 120000ms，同步对话默认 60000ms", example = "120000")
-  private Long timeoutMs;
-
   @Schema(description = "对话配置覆盖，可选；优先级高于会话与智能体配置")
   private AgentChatConfig config;
 
