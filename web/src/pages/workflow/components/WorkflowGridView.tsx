@@ -2,14 +2,24 @@
  * 工作流网格视图
  * 卡片式展示工作流列表
  */
-import { Workflow as WorkflowIcon, Play, Edit, Trash2, MoreHorizontal, Copy } from 'lucide-react';
+import { useState } from 'react';
+import { Workflow as WorkflowIcon, Play, Square, Pencil, Edit, Trash2, MoreHorizontal, Copy, Eye } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { WorkflowStatusEnum } from '@/enums/enums';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { VisibilityEnum, WorkflowStatusEnum } from '@/enums/enums';
+import { enumToMessages } from '@/enums/utils';
 import type { WorkflowDisplayItem } from '../utils';
 import { WorkflowListEmpty } from './WorkflowListEmpty';
+
+const VISIBILITY_OPTIONS = enumToMessages(VisibilityEnum);
 
 /** 工作流操作处理器 */
 export interface WorkflowActions {
@@ -17,7 +27,10 @@ export interface WorkflowActions {
   onStop: (w: WorkflowDisplayItem) => void;
   onDesign: (w: WorkflowDisplayItem) => void;
   onNavigate: (w: WorkflowDisplayItem) => void;
-  onAction: (action: string, w: WorkflowDisplayItem) => void;
+  onEditInfo: (w: WorkflowDisplayItem) => void;
+  onModifyVisibility: (w: WorkflowDisplayItem, visibility: import('@/enums/enums').VisibilityEnum) => void;
+  onClone: (w: WorkflowDisplayItem) => void;
+  onAction: (action: string, w: WorkflowDisplayItem, extra?: unknown) => void;
 }
 
 interface WorkflowGridViewProps {
@@ -32,6 +45,7 @@ interface WorkflowGridViewProps {
 
 export function WorkflowGridView({ workflows, loading, actions, hasFilter = false, searchQuery, onCreateClick }: WorkflowGridViewProps) {
   const displayList = loading ? [] : workflows;
+  const [visibilityDialogWorkflow, setVisibilityDialogWorkflow] = useState<WorkflowDisplayItem | null>(null);
 
   return (
     <>
@@ -80,7 +94,11 @@ export function WorkflowGridView({ workflows, loading, actions, hasFilter = fals
                   }}
                   title={w.status === WorkflowStatusEnum.RUNNING ? '停止' : '运行'}
                 >
-                  <Play className='w-4 h-4 text-green-600 dark:text-green-400' />
+                  {w.status === WorkflowStatusEnum.RUNNING ? (
+                    <Square className='w-4 h-4 text-red-600 dark:text-red-400 fill-current' />
+                  ) : (
+                    <Play className='w-4 h-4 text-green-600 dark:text-green-400' />
+                  )}
                 </button>
                 <button
                   className='p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors'
@@ -100,6 +118,26 @@ export function WorkflowGridView({ workflows, loading, actions, hasFilter = fals
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align='end' className='dark:bg-gray-800 dark:border-gray-700'>
+                  <DropdownMenuItem
+                    onClick={e => {
+                      e.stopPropagation();
+                      actions.onEditInfo(w);
+                    }}
+                    className='dark:text-gray-300'
+                  >
+                    <Pencil className='w-4 h-4 mr-2' />
+                    编辑流程信息
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={e => {
+                      e.stopPropagation();
+                      setVisibilityDialogWorkflow(w);
+                    }}
+                    className='dark:text-gray-300'
+                  >
+                    <Eye className='w-4 h-4 mr-2' />
+                    修改可见性
+                  </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={e => {
                       e.stopPropagation();
@@ -165,6 +203,31 @@ export function WorkflowGridView({ workflows, loading, actions, hasFilter = fals
         />
         </div>
       )}
+
+      <Dialog open={!!visibilityDialogWorkflow} onOpenChange={open => !open && setVisibilityDialogWorkflow(null)}>
+        <DialogContent className='sm:max-w-sm dark:bg-gray-800 dark:border-gray-700'>
+          <DialogHeader>
+            <DialogTitle>修改可见性</DialogTitle>
+          </DialogHeader>
+          <div className='grid gap-2 py-2'>
+            {VISIBILITY_OPTIONS.map(({ value, message }) => (
+              <button
+                key={value}
+                type='button'
+                className='flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-600 px-4 py-3 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-gray-200 transition-colors'
+                onClick={() => {
+                  if (visibilityDialogWorkflow) {
+                    actions.onModifyVisibility(visibilityDialogWorkflow, value);
+                    setVisibilityDialogWorkflow(null);
+                  }
+                }}
+              >
+                {message}
+              </button>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

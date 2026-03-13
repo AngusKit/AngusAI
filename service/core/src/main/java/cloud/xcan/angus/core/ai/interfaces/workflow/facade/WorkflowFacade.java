@@ -58,6 +58,14 @@ public interface WorkflowFacade {
   void delete(Long id);
 
   /**
+   * 克隆工作流
+   *
+   * @param id 源工作流 ID
+   * @return 克隆后的新工作流详情
+   */
+  WorkflowDetailVo clone(Long id);
+
+  /**
    * 获取工作流详情
    */
   WorkflowDetailVo getDetail(Long id);

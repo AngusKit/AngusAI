@@ -161,7 +161,7 @@ export const enumTranslations = {
     DISABLED: 'Disabled',
   },
   VisibilityEnum: {
-    PRIVATE: 'Private',
+    PRIVATE: 'Only me',
     TEAM: 'Team',
     PUBLIC: 'Public',
   },

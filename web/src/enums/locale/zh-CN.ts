@@ -161,7 +161,7 @@ export const enumTranslations = {
     DISABLED: '禁用',
   },
   VisibilityEnum: {
-    PRIVATE: '私有',
+    PRIVATE: '仅自己',
     TEAM: '团队',
     PUBLIC: '公开',
   },

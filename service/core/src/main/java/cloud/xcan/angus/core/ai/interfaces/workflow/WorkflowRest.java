@@ -138,6 +138,17 @@ public class WorkflowRest {
     workflowFacade.delete(id);
   }
 
+  @Operation(operationId = "cloneWorkflow", summary = "克隆工作流", description = "复制工作流，创建新草稿")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "201", description = "克隆成功")
+  })
+  @ResponseStatus(HttpStatus.CREATED)
+  @PostMapping("/{id}/clone")
+  public ApiLocaleResult<WorkflowDetailVo> clone(
+      @Parameter(description = "源工作流ID") @PathVariable Long id) {
+    return ApiLocaleResult.success(workflowFacade.clone(id));
+  }
+
   @Operation(operationId = "getWorkflowDetail", summary = "获取工作流详情", description = "获取指定工作流的详细信息")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "工作流详情获取成功"),

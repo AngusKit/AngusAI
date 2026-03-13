@@ -185,6 +185,48 @@ public class WorkflowCmdImpl extends CommCmd<Workflow, Long> implements Workflow
   }
 
   @Override
+  @Transactional
+  public Workflow clone(Long id) {
+    return new BizTemplate<Workflow>() {
+      Workflow source;
+
+      @Override
+      protected void checkParams() {
+        source = workflowQuery.findAndCheck(id);
+      }
+
+      @Override
+      protected Workflow process() {
+        String cloneName = (source.getName() == null ? "工作流" : source.getName()) + " (副本)";
+        int suffix = 1;
+        String uniqueName = cloneName;
+        while (workflowQuery.existsByName(uniqueName)) {
+          uniqueName = cloneName.replaceFirst("\\(副本\\)$", "") + " (副本" + (++suffix) + ")";
+        }
+        Workflow cloned = new Workflow();
+        cloned.setName(uniqueName);
+        cloned.setDescription(source.getDescription());
+        cloned.setIcon(source.getIcon());
+        cloned.setIconBg(source.getIconBg());
+        cloned.setType(source.getType());
+        cloned.setStatus(WorkflowStatus.DRAFT);
+        cloned.setVersion("1.0.0");
+        cloned.setVisibility(source.getVisibility());
+        cloned.setConfig(source.getConfig());
+        cloned.setTags(source.getTags());
+        cloned.setTotalExecutions(0L);
+        cloned.setSuccessfulExecutions(0L);
+        cloned.setFailedExecutions(0L);
+        cloned.setAvgExecutionTime(null);
+        cloned.setLastExecutionTime(null);
+        cloned.setLastExecutionStatus(null);
+        insert0(cloned);
+        return cloned;
+      }
+    }.execute();
+  }
+
+  @Override
   protected BaseRepository<Workflow, Long> getRepository() {
     return workflowRepo;
   }

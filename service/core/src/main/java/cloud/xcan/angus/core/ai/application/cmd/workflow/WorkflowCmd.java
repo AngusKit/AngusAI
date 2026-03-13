@@ -47,4 +47,11 @@ public interface WorkflowCmd {
    */
   void delete(Long id);
 
+  /**
+   * 克隆工作流
+   *
+   * @param id 源工作流 ID
+   * @return 克隆后的新工作流
+   */
+  Workflow clone(Long id);
 }

@@ -2,14 +2,25 @@
  * 工作流表格视图
  * 表格式展示工作流列表
  */
-import { Workflow as WorkflowIcon, Play, Edit, Trash2 } from 'lucide-react';
+import { useState } from 'react';
+import { Workflow as WorkflowIcon, Play, Square, Edit, Trash2, MoreHorizontal, Copy, Pencil, Eye } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
-import { WorkflowStatusEnum } from '@/enums/enums';
+import { VisibilityEnum, WorkflowStatusEnum } from '@/enums/enums';
+import { enumToMessages } from '@/enums/utils';
 import type { WorkflowDisplayItem } from '../utils';
 import type { WorkflowActions } from './WorkflowGridView';
 import { WorkflowListEmpty } from './WorkflowListEmpty';
+
+const VISIBILITY_OPTIONS = enumToMessages(VisibilityEnum);
 
 interface WorkflowTableViewProps {
   workflows: WorkflowDisplayItem[];
@@ -29,6 +40,7 @@ export function WorkflowTableView({
   onCreateClick,
 }: WorkflowTableViewProps) {
   const displayList = loading ? [] : workflows;
+  const [visibilityDialogWorkflow, setVisibilityDialogWorkflow] = useState<WorkflowDisplayItem | null>(null);
 
   return (
     <>
@@ -132,8 +144,13 @@ export function WorkflowTableView({
                           onClick={() =>
                             w.status === WorkflowStatusEnum.RUNNING ? actions.onStop(w) : actions.onStart(w)
                           }
+                          title={w.status === WorkflowStatusEnum.RUNNING ? '停止' : '运行'}
                         >
-                          <Play className='w-4 h-4 text-green-500' />
+                          {w.status === WorkflowStatusEnum.RUNNING ? (
+                            <Square className='w-4 h-4 text-red-600 dark:text-red-400 fill-current' />
+                          ) : (
+                            <Play className='w-4 h-4 text-green-500' />
+                          )}
                         </button>
                         <button
                           className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
@@ -142,12 +159,40 @@ export function WorkflowTableView({
                         >
                           <Edit className='w-4 h-4 text-blue-600 dark:text-blue-400' />
                         </button>
-                        <button
-                          className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'
-                          onClick={() => actions.onAction('删除', w)}
-                        >
-                          <Trash2 className='w-4 h-4 text-red-500' />
-                        </button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded'>
+                              <MoreHorizontal className='w-4 h-4 text-gray-600 dark:text-gray-400' />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align='end' className='dark:bg-gray-800 dark:border-gray-700'>
+                            <DropdownMenuItem onClick={() => actions.onEditInfo(w)} className='dark:text-gray-300'>
+                              <Pencil className='w-4 h-4 mr-2' />
+                              编辑流程信息
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => setVisibilityDialogWorkflow(w)}
+                              className='dark:text-gray-300'
+                            >
+                              <Eye className='w-4 h-4 mr-2' />
+                              修改可见性
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => actions.onAction('复制', w)}
+                              className='dark:text-gray-300'
+                            >
+                              <Copy className='w-4 h-4 mr-2' />
+                              复制工作流
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => actions.onAction('删除', w)}
+                              className='text-red-600 dark:text-red-400'
+                            >
+                              <Trash2 className='w-4 h-4 mr-2' />
+                              删除工作流
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     </td>
                   </tr>
@@ -167,6 +212,31 @@ export function WorkflowTableView({
         />
         </div>
       )}
+
+      <Dialog open={!!visibilityDialogWorkflow} onOpenChange={open => !open && setVisibilityDialogWorkflow(null)}>
+        <DialogContent className='sm:max-w-sm dark:bg-gray-800 dark:border-gray-700'>
+          <DialogHeader>
+            <DialogTitle>修改可见性</DialogTitle>
+          </DialogHeader>
+          <div className='grid gap-2 py-2'>
+            {VISIBILITY_OPTIONS.map(({ value, message }) => (
+              <button
+                key={value}
+                type='button'
+                className='flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-600 px-4 py-3 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-gray-200 transition-colors'
+                onClick={() => {
+                  if (visibilityDialogWorkflow) {
+                    actions.onModifyVisibility(visibilityDialogWorkflow, value);
+                    setVisibilityDialogWorkflow(null);
+                  }
+                }}
+              >
+                {message}
+              </button>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

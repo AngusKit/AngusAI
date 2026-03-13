@@ -91,6 +91,12 @@ public class WorkflowFacadeImpl implements WorkflowFacade {
     workflowCmd.delete(id);
   }
 
+  @Override
+  public WorkflowDetailVo clone(Long id) {
+    var saved = workflowCmd.clone(id);
+    return WorkflowAssembler.toDetailVo(saved);
+  }
+
   @NameJoin
   @Override
   public WorkflowDetailVo getDetail(Long id) {

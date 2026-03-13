@@ -202,6 +202,22 @@ export class Workflows<SecurityDataType = unknown> {
       ...params,
     });
   /**
+   * @description 克隆工作流
+   *
+   * @tags Workflow
+   * @name CloneWorkflow
+   * @summary 克隆工作流
+   * @request POST:/api/v1/workflows/{id}/clone
+   * @secure
+   */
+  cloneWorkflow = (id: string, params: RequestParams = {}) =>
+    this.http.request<WorkflowDetailResult>({
+      path: `${AI}/workflows/${id}/clone`,
+      method: 'POST',
+      secure: true,
+      ...params,
+    });
+  /**
    * @description 更新工作流基本信息
    *
    * @tags Workflow
