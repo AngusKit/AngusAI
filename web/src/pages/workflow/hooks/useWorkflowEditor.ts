@@ -4,7 +4,7 @@
  */
 import { useState, useCallback, useEffect, useRef } from 'react';
 import type { Node, Edge, Connection } from 'reactflow';
-import { useNodesState, useEdgesState, addEdge, reconnectEdge } from 'reactflow';
+import { useNodesState, useEdgesState, addEdge, reconnectEdge, useReactFlow } from 'reactflow';
 import { validateConnection } from '../utils/workflowConnectionValidation';
 import { toast } from 'sonner';
 import Workflows from '@/services/Workflows';
@@ -69,6 +69,7 @@ function generateNodeId(): string {
 export type NodeExecutionStatus = 'pending' | 'running' | 'success' | 'failed';
 
 export function useWorkflowEditor(workflowId: string, workflowStatus: string, onClose: () => void) {
+  const { getNodes, getEdges } = useReactFlow();
   const [loading, setLoading] = useState(true);
   const [nodes, setNodes, onNodesChange] = useNodesState(MINIMAL_NODES);
   const [edges, setEdges, onEdgesChange] = useEdgesState(MINIMAL_EDGES);
@@ -251,24 +252,35 @@ export function useWorkflowEditor(workflowId: string, workflowStatus: string, on
   );
 
   const handleSave = useCallback(async () => {
-    if (!workflowId) return;
+    if (!workflowId) {
+      toast.error('缺少工作流 ID，无法保存');
+      return;
+    }
     setSaving(true);
     try {
-      await Workflows.updateWorkflowConfig(workflowId, {
-        nodes: nodes.map(n => ({
+      // 使用 getNodes/getEdges 确保获取 React Flow 存储中的最新数据，避免闭包陈旧
+      const currentNodes = getNodes();
+      const currentEdges = getEdges();
+      const payload = {
+        nodes: currentNodes.map(n => ({
           id: n.id,
           type: n.type,
-          data: n.data,
+          data: {
+            label: n.data?.label,
+            config: n.data?.config,
+            // 不保存 executionStatus（仅用于执行时 UI 展示）
+          },
           position: n.position,
         })),
-        edges: edges.map(e => ({
+        edges: currentEdges.map(e => ({
           id: e.id,
           source: e.source,
           target: e.target,
           sourceHandle: e.sourceHandle,
           targetHandle: e.targetHandle,
         })),
-      });
+      };
+      await Workflows.updateWorkflowConfig(workflowId, payload);
       toast.success('工作流已保存');
       setHasChanges(false);
     } catch (e: unknown) {
@@ -276,7 +288,7 @@ export function useWorkflowEditor(workflowId: string, workflowStatus: string, on
     } finally {
       setSaving(false);
     }
-  }, [workflowId, nodes, edges]);
+  }, [workflowId, getNodes, getEdges]);
 
   const handleExecute = useCallback(
     async (inputs?: Record<string, unknown>) => {
