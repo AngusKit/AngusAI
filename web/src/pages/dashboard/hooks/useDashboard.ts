@@ -179,9 +179,8 @@ export function useRecentApplications() {
     async function load() {
       try {
         const res = await DashboardApi.getRecentApplications({ limit: 6, offset: 0 });
-        const payload = (res as unknown as { data?: { items?: RecentApplicationItemVo[] } })?.data;
-        const items = payload?.items ?? [];
-        setApplications(items.map((vo: RecentApplicationItemVo, i: number) => toApplication(vo, i)));
+        const data = (res as unknown as { data?: RecentApplicationItemVo[] })?.data ?? [];
+        setApplications(data.map((vo: RecentApplicationItemVo, i: number) => toApplication(vo, i)));
       } catch {
         setApplications([]);
       } finally {
