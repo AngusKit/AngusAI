@@ -2,18 +2,19 @@
  * 工作流设计器
  * 完整功能：节点面板、画布拖拽、节点配置、执行、执行日志
  */
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import ReactFlow, {
   Controls,
   Background,
   BackgroundVariant,
   MiniMap,
+  Panel,
   ReactFlowProvider,
   useReactFlow,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { Button } from '@/components/ui/button';
-import { Save, Maximize2, Minimize2, X, Play, Pause, Zap, List } from 'lucide-react';
+import { Save, Maximize2, Minimize2, X, Play, Pause, Zap, List, Undo2, Redo2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useWorkflowEditor } from '../hooks/useWorkflowEditor';
@@ -21,6 +22,7 @@ import { NodePanel } from './NodePanel';
 import { NodeConfigPanel } from './NodeConfigPanel';
 import { ExecuteDialog } from './ExecuteDialog';
 import { ExecutionLogsPanel } from './ExecutionLogsPanel';
+import { ConnectEndMenu } from './ConnectEndMenu';
 import { WorkflowNode } from '../nodes';
 import { NODE_TYPES } from '../nodes/nodeTypes';
 
@@ -39,7 +41,9 @@ interface WorkflowEditorProps {
 }
 
 function WorkflowEditorContent({ workflowId, workflowName, workflowStatus, onClose }: WorkflowEditorProps) {
-  const { screenToFlowPosition } = useReactFlow();
+  const rf = useReactFlow();
+  const screenToFlowPosition = rf.screenToFlowPosition;
+  const flowToScreenPosition = (rf as { flowToScreenPosition?: (pos: { x: number; y: number }) => { x: number; y: number } }).flowToScreenPosition;
   const {
     loading,
     nodes,
@@ -47,6 +51,10 @@ function WorkflowEditorContent({ workflowId, workflowName, workflowStatus, onClo
     onNodesChange,
     onEdgesChange,
     onConnect,
+    isValidConnection,
+    onConnectStart,
+    onConnectEnd,
+    onReconnect,
     onDrop,
     onDragOver,
     onSelectionChange,
@@ -69,7 +77,29 @@ function WorkflowEditorContent({ workflowId, workflowName, workflowStatus, onClo
     logsLoading,
     loadExecutionLogs,
     updateNodeData,
+    connectEndMenu,
+    setConnectEndMenu,
+    handleAddNodeAt,
+    handleUndo,
+    handleRedo,
   } = useWorkflowEditor(workflowId, workflowStatus, onClose);
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.metaKey) {
+        if (e.key === 'z') {
+          e.preventDefault();
+          if (e.shiftKey) handleRedo();
+          else handleUndo();
+        } else if (e.key === 'y') {
+          e.preventDefault();
+          handleRedo();
+        }
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [handleUndo, handleRedo]);
 
   const handleDropWithPosition = useCallback(
     (e: React.DragEvent) => {
@@ -169,6 +199,24 @@ function WorkflowEditorContent({ workflowId, workflowName, workflowStatus, onClo
               {isFullscreen ? <Minimize2 className='w-4 h-4 mr-2' /> : <Maximize2 className='w-4 h-4 mr-2' />}
               {isFullscreen ? '退出全屏' : '全屏'}
             </Button>
+            <Button
+              size='sm'
+              variant='outline'
+              onClick={handleUndo}
+              className='dark:bg-gray-800 dark:border-gray-700 dark:text-white'
+              title='撤销 (Ctrl+Z)'
+            >
+              <Undo2 className='w-4 h-4' />
+            </Button>
+            <Button
+              size='sm'
+              variant='outline'
+              onClick={handleRedo}
+              className='dark:bg-gray-800 dark:border-gray-700 dark:text-white'
+              title='重做 (Ctrl+Shift+Z)'
+            >
+              <Redo2 className='w-4 h-4' />
+            </Button>
             <Button size='sm' variant='outline' onClick={onClose} className='dark:bg-gray-800 dark:border-gray-700 dark:text-white'>
               <X className='w-4 h-4' />
             </Button>
@@ -185,6 +233,10 @@ function WorkflowEditorContent({ workflowId, workflowName, workflowStatus, onClo
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}
               onConnect={onConnect}
+              onReconnect={onReconnect}
+              onConnectStart={onConnectStart}
+              onConnectEnd={e => onConnectEnd(e as MouseEvent | TouchEvent, screenToFlowPosition)}
+              isValidConnection={isValidConnection}
               onSelectionChange={onSelectionChange}
               onPaneClick={() => setSelectedNodeId(null)}
               onNodeClick={(_, node) => setSelectedNodeId(node.id)}
@@ -192,7 +244,26 @@ function WorkflowEditorContent({ workflowId, workflowName, workflowStatus, onClo
               fitView
               className='dark:bg-gray-900'
               connectionLineStyle={{ stroke: '#3b82f6' }}
+              defaultEdgeOptions={{
+                type: 'smoothstep',
+                animated: true,
+                style: { stroke: '#94a3b8', strokeWidth: 2 },
+                interactionWidth: 20,
+              }}
+              deleteKeyCode={['Backspace', 'Delete']}
+              edgesFocusable
+              proOptions={{ hideAttribution: true }}
             >
+              {connectEndMenu && flowToScreenPosition && (
+                <Panel position='top-left' style={{ left: flowToScreenPosition(connectEndMenu).x, top: flowToScreenPosition(connectEndMenu).y }}>
+                  <ConnectEndMenu
+                    position={connectEndMenu}
+                    onClose={() => setConnectEndMenu(null)}
+                    onSelect={(def, pos) => handleAddNodeAt(def, pos)}
+                    flowToScreenPosition={flowToScreenPosition}
+                  />
+                </Panel>
+              )}
               <Controls className='dark:bg-gray-800 dark:border-gray-700' />
               <MiniMap
                 className='dark:bg-gray-800 dark:border-gray-700'

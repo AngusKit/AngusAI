@@ -206,3 +206,38 @@ html {
 .scrollbar-hide::-webkit-scrollbar {
   display: none; /* Chrome, Safari, and Opera */
 }
+
+/* 工作流设计器连线视觉增强：悬停/选中状态（参考工作流设计器节点连线设计第四节） */
+.react-flow__edge .react-flow__edge-path {
+  transition: stroke 0.15s ease, stroke-width 0.15s ease;
+}
+.react-flow__edge.selected .react-flow__edge-path {
+  stroke: #3b82f6 !important;
+  stroke-width: 2.5 !important;
+}
+.react-flow__edge:hover .react-flow__edge-path {
+  stroke: #64748b !important;
+  stroke-width: 2 !important;
+}
+.dark .react-flow__edge:hover .react-flow__edge-path {
+  stroke: #94a3b8 !important;
+}
+
+/* 连线重连手柄：选中边时显示可拖拽的端点，便于重连 */
+.react-flow__edgeupdater {
+  width: 12px !important;
+  height: 12px !important;
+  background: #3b82f6 !important;
+  border: 2px solid white !important;
+  border-radius: 50% !important;
+  cursor: grab !important;
+  opacity: 1 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+.react-flow__edgeupdater:hover {
+  background: #2563eb !important;
+  transform: scale(1.15);
+}
+.react-flow__edgeupdater:active {
+  cursor: grabbing !important;
+}

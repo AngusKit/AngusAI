@@ -61,6 +61,7 @@ function WorkflowNodeComponent({ data, selected, type }: NodeProps<WorkflowNodeD
           id={h.id}
           position={Position.Left}
           className="!w-3 !h-3 !border-2 !bg-white"
+          connectionLimit={1}
         />
       ))}
       <div className="text-sm font-medium flex items-center gap-2">

@@ -4,7 +4,8 @@
  */
 import { useState, useCallback, useEffect, useRef } from 'react';
 import type { Node, Edge, Connection } from 'reactflow';
-import { useNodesState, useEdgesState, addEdge } from 'reactflow';
+import { useNodesState, useEdgesState, addEdge, reconnectEdge } from 'reactflow';
+import { validateConnection } from '../utils/workflowConnectionValidation';
 import { toast } from 'sonner';
 import Workflows from '@/services/Workflows';
 import {
@@ -84,9 +85,12 @@ export function useWorkflowEditor(workflowId: string, workflowStatus: string, on
   const [logsLoading, setLogsLoading] = useState(false);
   const [showExecuteDialog, setShowExecuteDialog] = useState(false);
   const [showLogsPanel, setShowLogsPanel] = useState(false);
+  const [connectEndMenu, setConnectEndMenu] = useState<{ x: number; y: number } | null>(null);
 
   const historyRef = useRef<{ nodes: Node[]; edges: Edge[] }[]>([]);
   const historyIndexRef = useRef(-1);
+  const lastInvalidReasonRef = useRef<string | null>(null);
+  const connectionMadeRef = useRef(false);
 
   useEffect(() => {
     if (!workflowId) {
@@ -102,6 +106,8 @@ export function useWorkflowEditor(workflowId: string, workflowStatus: string, on
         const { nodes: n, edges: e } = parseConfigToNodesEdges(cfg);
         setNodes(n);
         setEdges(e);
+        historyRef.current = [{ nodes: n, edges: e }];
+        historyIndexRef.current = 0;
       })
       .catch(() => {
         if (!cancelled) toast.error('加载工作流配置失败');
@@ -114,28 +120,101 @@ export function useWorkflowEditor(workflowId: string, workflowStatus: string, on
     };
   }, [workflowId, setNodes, setEdges]);
 
+  const pushHistory = useCallback(() => {
+    const snapshot = {
+      nodes: nodes.map(n => ({ ...n })),
+      edges: edges.map(e => ({ ...e })),
+    };
+    historyRef.current = historyRef.current.slice(0, historyIndexRef.current + 1);
+    historyRef.current.push(snapshot);
+    if (historyRef.current.length > 50) {
+      historyRef.current.shift();
+      historyIndexRef.current -= 1;
+    } else {
+      historyIndexRef.current = historyRef.current.length - 1;
+    }
+  }, [nodes, edges]);
+
   const onConnect = useCallback(
     (params: Connection) => {
+      connectionMadeRef.current = true;
+      lastInvalidReasonRef.current = null;
+      pushHistory();
       setEdges(eds => addEdge({ ...params, animated: true, type: 'smoothstep' }, eds));
       setHasChanges(true);
     },
-    [setEdges]
+    [setEdges, pushHistory]
+  );
+
+  const isValidConnection = useCallback(
+    (params: Connection) => {
+      const result = validateConnection(params, nodes, edges);
+      if (!result.valid) {
+        lastInvalidReasonRef.current = result.reason ?? null;
+        return false;
+      }
+      lastInvalidReasonRef.current = null;
+      return true;
+    },
+    [nodes, edges]
+  );
+
+  const handleConnectStart = useCallback(() => {
+    connectionMadeRef.current = false;
+    lastInvalidReasonRef.current = null;
+  }, []);
+
+  const handleConnectEnd = useCallback(
+    (event: MouseEvent | TouchEvent, screenToFlowPosition: (pos: { x: number; y: number }) => { x: number; y: number }) => {
+      if (connectionMadeRef.current) return;
+      const reason = lastInvalidReasonRef.current;
+      lastInvalidReasonRef.current = null;
+      if (reason) {
+        toast.error(reason);
+        return;
+      }
+      // 空白释放：弹出快捷创建节点菜单
+      const clientX = 'touches' in event ? event.changedTouches[0]?.clientX : event.clientX;
+      const clientY = 'touches' in event ? event.changedTouches[0]?.clientY : event.clientY;
+      if (clientX != null && clientY != null) {
+        setConnectEndMenu(screenToFlowPosition({ x: clientX, y: clientY }));
+      }
+    },
+    []
   );
 
   const handleNodeChange = useCallback(
     (changes: unknown) => {
+      pushHistory();
       onNodesChange(changes as Parameters<typeof onNodesChange>[0]);
       setHasChanges(true);
     },
-    [onNodesChange]
+    [onNodesChange, pushHistory]
   );
 
   const handleEdgeChange = useCallback(
     (changes: unknown) => {
+      pushHistory();
       onEdgesChange(changes as Parameters<typeof onEdgesChange>[0]);
       setHasChanges(true);
     },
-    [onEdgesChange]
+    [onEdgesChange, pushHistory]
+  );
+
+  const onReconnect = useCallback(
+    (oldEdge: Edge, newConnection: Connection) => {
+      // 校验时排除当前边，否则会误判「目标已有连线」
+      const otherEdges = edges.filter(e => e.id !== oldEdge.id);
+      const result = validateConnection(newConnection, nodes, otherEdges);
+      if (!result.valid) {
+        toast.error(result.reason ?? '无法重连');
+        return;
+      }
+      pushHistory();
+      setEdges(eds => reconnectEdge(oldEdge, newConnection, eds));
+      setHasChanges(true);
+    },
+    [nodes, edges, setEdges, pushHistory]
   );
 
   const handleDrop = useCallback(
@@ -166,7 +245,7 @@ export function useWorkflowEditor(workflowId: string, workflowStatus: string, on
 
   const handleSelectionChange = useCallback(
     ({ nodes: selNodes }: { nodes: Node[] }) => {
-      setSelectedNodeId(selNodes.length === 1 ? selNodes[0].id : null);
+      setSelectedNodeId(selNodes.length === 1 ? selNodes[0]?.id ?? null : null);
     },
     []
   );
@@ -281,6 +360,45 @@ export function useWorkflowEditor(workflowId: string, workflowStatus: string, on
 
   const toggleFullscreen = useCallback(() => setIsFullscreen(v => !v), []);
 
+  const handleUndo = useCallback(() => {
+    if (historyIndexRef.current <= 0) return;
+    historyIndexRef.current -= 1;
+    const snap = historyRef.current[historyIndexRef.current];
+    if (snap) {
+      setNodes(snap.nodes);
+      setEdges(snap.edges);
+      setHasChanges(true);
+    }
+  }, [setNodes, setEdges]);
+
+  const handleRedo = useCallback(() => {
+    if (historyIndexRef.current >= historyRef.current.length - 1) return;
+    historyIndexRef.current += 1;
+    const snap = historyRef.current[historyIndexRef.current];
+    if (snap) {
+      setNodes(snap.nodes);
+      setEdges(snap.edges);
+      setHasChanges(true);
+    }
+  }, [setNodes, setEdges]);
+
+  const handleAddNodeAt = useCallback(
+    (def: { type: string; label: string; defaultConfig?: Record<string, unknown> }, position: { x: number; y: number }) => {
+      const id = generateNodeId();
+      const newNode: Node = {
+        id,
+        type: def.type,
+        data: { label: def.label, config: def.defaultConfig ? { ...def.defaultConfig } : {} },
+        position,
+      };
+      pushHistory();
+      setNodes(nds => [...nds, newNode]);
+      setConnectEndMenu(null);
+      setHasChanges(true);
+    },
+    [setNodes, pushHistory]
+  );
+
   const updateNodeData = useCallback(
     (nodeId: string, data: Partial<Node['data']>) => {
       setNodes(nds =>
@@ -309,6 +427,7 @@ export function useWorkflowEditor(workflowId: string, workflowStatus: string, on
     onNodesChange: handleNodeChange,
     onEdgesChange: handleEdgeChange,
     onConnect,
+    isValidConnection,
     onDrop: handleDrop,
     onDragOver: handleDragOver,
     onSelectionChange: handleSelectionChange,
@@ -335,5 +454,13 @@ export function useWorkflowEditor(workflowId: string, workflowStatus: string, on
     logsLoading,
     loadExecutionLogs,
     updateNodeData,
+    onConnectStart: handleConnectStart,
+    onConnectEnd: handleConnectEnd,
+    onReconnect,
+    connectEndMenu,
+    setConnectEndMenu,
+    handleAddNodeAt,
+    handleUndo,
+    handleRedo,
   };
 }

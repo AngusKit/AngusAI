@@ -23,10 +23,15 @@ import {
 
 export type NodeCategory = 'flow' | 'ai' | 'integration';
 
+/** 端口数据类型（预留，用于未来类型兼容校验） */
+export type PortDataType = 'any' | 'string' | 'json' | 'number' | 'boolean' | 'image';
+
 export interface NodeTypeHandle {
   id: string;
   label: string;
   position: 'left' | 'right' | 'top' | 'bottom';
+  /** 端口数据类型，默认 any 表示兼容所有类型 */
+  dataType?: PortDataType;
 }
 
 export interface NodeTypeDef {
@@ -43,6 +48,8 @@ export interface NodeTypeDef {
   outputHandles?: NodeTypeHandle[];
   /** 默认 config 模板 */
   defaultConfig?: Record<string, unknown>;
+  /** 是否在节点面板中隐藏（未来支持等） */
+  hidden?: boolean;
 }
 
 /** 节点类型按分类分组 */
@@ -204,12 +211,13 @@ export const NODE_TYPES: NodeTypeDef[] = [
   {
     type: 'SUB_WORKFLOW',
     label: '子工作流',
-    description: '调用子工作流',
+    description: '调用子工作流（未来支持）',
     category: 'integration',
     icon: Workflow,
     color: '#2dd4bf',
     borderColor: '#14b8a6',
     defaultConfig: { workflowId: '', inputMapping: {} },
+    hidden: true, // 未来支持
   },
   {
     type: 'SET_VARIABLE',
@@ -227,6 +235,7 @@ export function getNodeTypeDef(type: string): NodeTypeDef | undefined {
   return NODE_TYPES.find(n => n.type === type);
 }
 
+/** 节点面板可见的节点类型（排除 hidden 的节点） */
 export function getNodesByCategory(): Record<NodeCategory, NodeTypeDef[]> {
   const map: Record<NodeCategory, NodeTypeDef[]> = {
     flow: [],
@@ -234,7 +243,7 @@ export function getNodesByCategory(): Record<NodeCategory, NodeTypeDef[]> {
     integration: [],
   };
   for (const n of NODE_TYPES) {
-    map[n.category].push(n);
+    if (!n.hidden) map[n.category].push(n);
   }
   return map;
 }
