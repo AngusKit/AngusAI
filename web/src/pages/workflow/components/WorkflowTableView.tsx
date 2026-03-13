@@ -168,7 +168,7 @@ export function WorkflowTableView({
                           <DropdownMenuContent align='end' className='dark:bg-gray-800 dark:border-gray-700'>
                             <DropdownMenuItem onClick={() => actions.onEditInfo(w)} className='dark:text-gray-300'>
                               <Pencil className='w-4 h-4 mr-2' />
-                              编辑流程信息
+                              编辑流程
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => setVisibilityDialogWorkflow(w)}

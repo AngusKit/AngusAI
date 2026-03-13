@@ -126,7 +126,7 @@ export function WorkflowGridView({ workflows, loading, actions, hasFilter = fals
                     className='dark:text-gray-300'
                   >
                     <Pencil className='w-4 h-4 mr-2' />
-                    编辑流程信息
+                    编辑流程
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={e => {
