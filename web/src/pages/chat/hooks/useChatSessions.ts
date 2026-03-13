@@ -309,6 +309,27 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
     );
   }, []);
 
+  /** 更新指定消息内容（用于流式响应） */
+  const updateMessage = useCallback(
+    (sessionId: string, messageId: string, patch: Partial<Pick<Message, 'content' | 'isStreaming'>>) => {
+      setSessionMessages((prev) => {
+        const current = prev[sessionId] ?? [];
+        return {
+          ...prev,
+          [sessionId]: current.map((m) =>
+            m.id === messageId ? { ...m, ...patch } : m
+          ),
+        };
+      });
+      setSessions((prev) =>
+        prev.map((s) =>
+          s.sessionId === sessionId ? { ...s, updatedAt: new Date() } : s
+        )
+      );
+    },
+    []
+  );
+
   const updateSessionInList = useCallback(
     (sessionId: string, patch: Partial<Pick<Session, 'appId' | 'agentId' | 'modelId'>>) => {
       setSessions((prev) =>
@@ -415,6 +436,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
     selectSession,
     loadMessages,
     appendMessages,
+    updateMessage,
     updateSessionInList,
     updateSessionConfig,
     refreshSessions,

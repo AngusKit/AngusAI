@@ -77,6 +77,8 @@ export interface ChatMainAreaProps {
   isRecording: boolean;
   onSendMessage: () => void;
   textareaRef: React.RefObject<HTMLTextAreaElement | null>;
+  /** 是否正在发送（流式生成中），用于禁用发送按钮 */
+  isSending?: boolean;
 }
 
 export function ChatMainArea({
@@ -115,6 +117,7 @@ export function ChatMainArea({
   isRecording,
   onSendMessage,
   textareaRef,
+  isSending = false,
 }: ChatMainAreaProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -312,7 +315,7 @@ export function ChatMainArea({
               <Button
                 size='icon'
                 onClick={onSendMessage}
-                disabled={!input.trim() && attachments.length === 0}
+                disabled={isSending || (!input.trim() && attachments.length === 0)}
                 className={cn('h-9 w-9', selectedTemplateObj?.primaryColor ?? 'bg-blue-500', 'text-white')}
               >
                 <Send className='w-4 h-4' />

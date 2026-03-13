@@ -39,6 +39,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     selectSession,
     ensureSessionLoaded,
     appendMessages,
+    updateMessage,
     updateSessionInList,
     updateSessionConfig,
     clearSessionMessages,
@@ -119,13 +120,26 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     navigate(`/chat/${sessionId}`);
   };
 
+  const [isSending, setIsSending] = useState(false);
+
   const handleSendMessage = async () => {
     if (!input.trim() && attachments.length === 0) return;
+    if (!currentSessionId) {
+      toast.error('请先选择或创建对话');
+      return;
+    }
 
+    const agentId = chatSelection.agentId ?? chatSelection.app?.defaultAgent?.id ?? currentSession?.agentId;
+    if (!agentId) {
+      toast.error('请先选择智能体');
+      return;
+    }
+
+    const userContent = input.trim();
     const newMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
-      content: input,
+      content: userContent,
       timestamp: new Date(),
       attachments: attachments.map((file, index) => ({
         id: `${Date.now()}-${index}`,
@@ -140,18 +154,52 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     setInput('');
     setAttachments([]);
 
-    // Simulate AI response (实际应用中会调用 AI API)
-    setTimeout(() => {
-      const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content:
-          '这是一个模拟的AI响应。在实际应用中，这里会调用真实的AI API。\n\n你可以使用 **Markdown** 格式化文本，包括：\n- 列表项\n- **粗体**和*斜体*\n- [链接](https://example.com)\n- `代码块`\n\n```javascript\nconst greeting = "Hello, World!";\nconsole.log(greeting);\n```',
-        timestamp: new Date(),
+    const assistantId = `assistant-${Date.now()}`;
+    const aiPlaceholder: Message = {
+      id: assistantId,
+      role: 'assistant',
+      content: '',
+      timestamp: new Date(),
+      isStreaming: true,
+    };
+    appendMessages(currentSessionId, [aiPlaceholder]);
+
+    setIsSending(true);
+
+    try {
+      const { chatStream } = await import('@/pages/chat/hooks/useChatStream.ts');
+      let accumulated = '';
+      await chatStream(
+        {
+          agentId: String(agentId),
+          sessionId: currentSessionId,
+          message: userContent,
+          config: {
+            temperature: settings.temperature,
+            maxTokens: settings.maxTokens,
+            topP: settings.topP,
+            frequencyPenalty: settings.frequencyPenalty,
+            presencePenalty: settings.presencePenalty,
+          },
+        },
+        {
+          onToken: (token) => {
+            accumulated += token;
+            updateMessage(currentSessionId, assistantId, { content: accumulated });
+          },
+        }
+      );
+      updateMessage(currentSessionId, assistantId, { isStreaming: false });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : '请求失败';
+      updateMessage(currentSessionId, assistantId, {
+        content: `请求出错：${msg}`,
         isStreaming: false,
-      };
-      appendMessages(currentSessionId, [aiMessage]);
-    }, 1000);
+      });
+      toast.error(msg);
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -341,6 +389,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
         isRecording={isRecording}
         onSendMessage={handleSendMessage}
         textareaRef={textareaRef}
+        isSending={isSending}
       />
 
       {/* Prompt Library Dialog（enablePromptLibrary 关闭时仍允许通过其他入口打开，此处按配置控制） */}
