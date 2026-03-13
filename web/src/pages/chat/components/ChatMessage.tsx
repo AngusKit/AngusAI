@@ -150,7 +150,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
   const renderMainContent = () => {
     const content = message.content || '';
     const wrapClass =
-      'text-sm dark:text-gray-100 prose prose-sm dark:prose-invert max-w-none prose-p:leading-relaxed prose-p:my-1.5 first:prose-p:mt-0 last:prose-p:mb-0';
+      'text-sm dark:text-gray-100 prose prose-sm dark:prose-invert max-w-none prose-p:leading-relaxed prose-p:my-1.5 [&>:first-child]:mt-2 [&>:last-child]:mb-2 prose-pre:mt-2 prose-pre:mb-2 prose-blockquote:mt-2 prose-blockquote:mb-2';
 
     if (isUser) {
       return <p className="whitespace-pre-wrap break-words">{content}</p>;
@@ -268,10 +268,15 @@ export function ChatMessage({ message }: ChatMessageProps) {
               'max-w-3xl',
               isUser
                 ? 'bg-transparent px-0 py-2 text-gray-900 dark:text-gray-100'
-                : 'rounded-2xl px-6 py-5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700'
+                : 'rounded-2xl overflow-hidden bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700'
             )}
           >
-            <div className="flex items-start gap-3 min-h-[1.5em]">
+            <div
+              className={cn(
+                'flex items-start gap-3 min-h-[1.5em]',
+                isUser ? 'px-0 py-2' : 'px-6 py-6'
+              )}
+            >
               <div className="flex-1 min-w-0">{renderMainContent()}</div>
               {/* HTML 预览入口 */}
               {showHtmlPreviewEntry && (
