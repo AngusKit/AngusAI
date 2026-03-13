@@ -10,6 +10,7 @@ import cloud.xcan.angus.spec.principal.PrincipalContext;
 import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ApiUsageLogCmdImpl extends CommCmd<ApiUsageLog, Long> implements ApiUsageLogCmd {
@@ -18,6 +19,7 @@ public class ApiUsageLogCmdImpl extends CommCmd<ApiUsageLog, Long> implements Ap
   private ApiUsageLogRepo apiUsageLogRepo;
 
   @Override
+  @Transactional
   public void create(ApiUsageLog usageLog) {
     usageLog.setId(usageLog.getId());
     Principal principal = PrincipalContext.get();

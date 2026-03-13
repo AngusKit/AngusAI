@@ -205,7 +205,7 @@ export function ChatMainArea({
       </div>
 
       {/* Messages Area */}
-      <div className='flex-1 overflow-y-auto px-4 py-6'>
+      <div className='flex-1 overflow-y-auto px-4 py-10'>
         <div className='max-w-4xl mx-auto space-y-6'>
           {currentMessages.length === 0 ? (
             hasAgentPlaceholder ? (

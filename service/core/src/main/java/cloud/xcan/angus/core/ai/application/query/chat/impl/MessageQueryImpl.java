@@ -58,7 +58,7 @@ public class MessageQueryImpl implements MessageQuery {
     return new BizTemplate<Page<Message>>() {
       @Override
       protected Page<Message> process() {
-        return messageRepo.findBySessionIdOrderByCreatedDateDesc(sessionId, pageable);
+        return messageRepo.findBySessionIdOrderByCreatedDateAsc(sessionId, pageable);
       }
     }.execute();
   }
