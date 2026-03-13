@@ -67,7 +67,7 @@ public class Message extends TenantAuditingEntity<Message, Long> {
    * 使用统计（仅AI消息）
    */
   @Type(JsonType.class)
-  @Column(columnDefinition = "json")
+  @Column(name = "`usage`", columnDefinition = "json")
   private MessageUsage usage;
 
   /**

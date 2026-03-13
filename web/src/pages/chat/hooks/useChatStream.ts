@@ -18,7 +18,7 @@ async function buildStreamRequest(path: string, body: unknown): Promise<{ url: s
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    'Accept': 'text/event-stream',
+    // 'Accept': 'text/event-stream',
     [HEADER_ACCEPT_LANGUAGE]: cookieUtils.getCurrentLanguage(),
     [HEADER_DEVICE_ID]: await httpUtils.preloadVisitorId(),
   };
@@ -53,14 +53,20 @@ export async function chatStream(
     body: JSON.stringify(data),
   });
 
+  // 如果设置 'Accept': 'text/event-stream', 代码会直接抛出异常不会运行到这
   if (!res.ok) {
     const text = await res.text();
     let msg = res.statusText;
-    try {
-      const parsed = JSON.parse(text);
-      msg = parsed?.message || parsed?.msg || msg;
-    } catch {
-      if (text) msg = text.slice(0, 200);
+    const ct = res.headers.get('Content-Type') ?? '';
+    if (ct.includes('application/json')) {
+      try {
+        const parsed = JSON.parse(text);
+        msg = parsed?.message ?? parsed?.msg ?? msg;
+      } catch {
+        if (text) msg = text.slice(0, 200);
+      }
+    } else if (text) {
+      msg = text.slice(0, 200);
     }
     if (res.status === 401) {
       app.toSignIn(true);
