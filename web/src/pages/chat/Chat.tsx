@@ -357,6 +357,8 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
         onBack={handleBack}
         chatSelection={chatSelection}
         onSelectionChange={updateSessionSelection}
+        currentSessionId={currentSessionId}
+        sessionConfig={settings}
         enablePromptLibrary={enablePromptLibrary}
         enableSwitchApp={enableSwitchApp}
         enableFileUpload={enableFileUpload}

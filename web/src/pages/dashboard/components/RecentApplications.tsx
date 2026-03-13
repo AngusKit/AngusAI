@@ -54,14 +54,6 @@ export function RecentApplications({ onNavigate }: { onNavigate?: (page: string)
     }, 300);
   };
 
-  const handleEditApp = (app: Application) => {
-    toast.info(`${t('recentApps.openingEditor')} ${app.name}...`);
-    setSelectedApp(null);
-    setTimeout(() => {
-      onNavigate?.(`apps/${app.id}/settings`);
-    }, 300);
-  };
-
   const handleShareApp = (_app: Application) => {
     toast.success(t('recentApps.shareLinkCopied'));
   };
@@ -111,16 +103,6 @@ export function RecentApplications({ onNavigate }: { onNavigate?: (page: string)
                     <MessageSquare className='w-3.5 h-3.5' />
                     {t('recentApps.enterChat')}
                   </Button>
-                  <button
-                    onClick={e => {
-                      e.stopPropagation();
-                      handleEditApp(app);
-                    }}
-                    className='p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity'
-                    title={t('recentApps.editApp')}
-                  >
-                    <Edit className='w-4 h-4 text-gray-600 dark:text-gray-300' />
-                  </button>
                   <button
                     onClick={e => {
                       e.stopPropagation();
