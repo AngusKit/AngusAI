@@ -1,49 +1,92 @@
 /**
  * 工作流设计器 Hook
- * 节点/连线状态、加载配置、保存、启动/停止
+ * 节点/连线、拖拽、选中、保存、执行、撤销重做
  */
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import type { Node, Edge, Connection } from 'reactflow';
 import { useNodesState, useEdgesState, addEdge } from 'reactflow';
 import { toast } from 'sonner';
 import Workflows from '@/services/Workflows';
-import { WorkflowDetailVo } from '@/services/WorkflowsTypes';
+import {
+  WorkflowDetailVo,
+  WorkflowExecuteResultVo,
+  ExecutionDetailVo,
+  ExecutionLogVo,
+  PageExecutionLogVo,
+} from '@/services/WorkflowsTypes';
+import { getNodeTypeDef } from '../nodes/nodeTypes';
 
-/** 初始节点 */
-const initialNodes: Node[] = [
-  { id: '1', type: 'input', data: { label: '开始' }, position: { x: 0, y: 0 }, style: { background: '#3b82f6', color: 'white', border: '2px solid #2563eb', borderRadius: '8px', padding: '10px 20px' } },
-  { id: '2', data: { label: 'AI处理节点' }, position: { x: 0, y: 0 }, style: { background: '#8b5cf6', color: 'white', border: '2px solid #7c3aed', borderRadius: '8px', padding: '10px 20px' } },
-  { id: '3', data: { label: '条件判断' }, position: { x: 0, y: 0 }, style: { background: '#f59e0b', color: 'white', border: '2px solid #d97706', borderRadius: '8px', padding: '10px 20px' } },
-  { id: '4', data: { label: '数据存储' }, position: { x: 0, y: 0 }, style: { background: '#10b981', color: 'white', border: '2px solid #059669', borderRadius: '8px', padding: '10px 20px' } },
-  { id: '5', type: 'output', data: { label: '结束' }, position: { x: 0, y: 0 }, style: { background: '#ef4444', color: 'white', border: '2px solid #dc2626', borderRadius: '8px', padding: '10px 20px' } },
+/** 最小画布：仅 START + END */
+const MINIMAL_NODES: Node[] = [
+  {
+    id: 'start',
+    type: 'START',
+    data: { label: '开始' },
+    position: { x: 100, y: 150 },
+  },
+  {
+    id: 'end',
+    type: 'END',
+    data: { label: '结束' },
+    position: { x: 400, y: 150 },
+  },
 ];
 
-/** 初始连线 */
-const initialEdges: Edge[] = [
-  { id: 'e1-2', source: '1', target: '2', type: 'smoothstep', animated: true, style: { stroke: '#3b82f6' } },
-  { id: 'e2-3', source: '2', target: '3', type: 'smoothstep', animated: true, style: { stroke: '#8b5cf6' } },
-  { id: 'e2-4', source: '2', target: '4', type: 'smoothstep', animated: true, style: { stroke: '#8b5cf6' } },
-  { id: 'e3-5', source: '3', target: '5', type: 'smoothstep', style: { stroke: '#f59e0b' } },
-  { id: 'e4-5', source: '4', target: '5', type: 'smoothstep', style: { stroke: '#10b981' } },
+const MINIMAL_EDGES: Edge[] = [
+  { id: 'e-start-end', source: 'start', target: 'end', type: 'smoothstep', animated: true },
 ];
+
+function normalizeNodeType(t: string | undefined): string {
+  if (t === 'input') return 'START';
+  if (t === 'output') return 'END';
+  return t ?? 'default';
+}
 
 function parseConfigToNodesEdges(config: object | undefined): { nodes: Node[]; edges: Edge[] } {
-  if (!config || typeof config !== 'object') return { nodes: initialNodes, edges: initialEdges };
+  if (!config || typeof config !== 'object') return { nodes: MINIMAL_NODES, edges: MINIMAL_EDGES };
   const c = config as { nodes?: Node[]; edges?: Edge[] };
   if (Array.isArray(c.nodes) && Array.isArray(c.edges)) {
-    return { nodes: c.nodes.length ? c.nodes : initialNodes, edges: c.edges };
+    const nodes = c.nodes.length
+      ? c.nodes.map(n => ({
+          ...n,
+          type: normalizeNodeType(n.type as string | undefined) as string,
+        }))
+      : MINIMAL_NODES;
+    const edges = c.edges.length ? c.edges : MINIMAL_EDGES;
+    return { nodes, edges };
   }
-  return { nodes: initialNodes, edges: initialEdges };
+  return { nodes: MINIMAL_NODES, edges: MINIMAL_EDGES };
 }
+
+/** 生成唯一节点 ID */
+let nodeIdSeq = 0;
+function generateNodeId(): string {
+  nodeIdSeq += 1;
+  return `node-${Date.now()}-${nodeIdSeq}`;
+}
+
+export type NodeExecutionStatus = 'pending' | 'running' | 'success' | 'failed';
 
 export function useWorkflowEditor(workflowId: string, workflowStatus: string, onClose: () => void) {
   const [loading, setLoading] = useState(true);
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [nodes, setNodes, onNodesChange] = useNodesState(MINIMAL_NODES);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(MINIMAL_EDGES);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const [saving, setSaving] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [nodeExecutions, setNodeExecutions] = useState<Record<string, NodeExecutionStatus>>({});
+  const [executionId, setExecutionId] = useState<string | null>(null);
+  const [executionLoading, setExecutionLoading] = useState(false);
+  const [executeResult, setExecuteResult] = useState<WorkflowExecuteResultVo | null>(null);
+  const [executionLogs, setExecutionLogs] = useState<ExecutionLogVo[]>([]);
+  const [logsLoading, setLogsLoading] = useState(false);
+  const [showExecuteDialog, setShowExecuteDialog] = useState(false);
+  const [showLogsPanel, setShowLogsPanel] = useState(false);
+
+  const historyRef = useRef<{ nodes: Node[]; edges: Edge[] }[]>([]);
+  const historyIndexRef = useRef(-1);
 
   useEffect(() => {
     if (!workflowId) {
@@ -73,7 +116,7 @@ export function useWorkflowEditor(workflowId: string, workflowStatus: string, on
 
   const onConnect = useCallback(
     (params: Connection) => {
-      setEdges(eds => addEdge({ ...params, animated: true }, eds));
+      setEdges(eds => addEdge({ ...params, animated: true, type: 'smoothstep' }, eds));
       setHasChanges(true);
     },
     [setEdges]
@@ -95,13 +138,57 @@ export function useWorkflowEditor(workflowId: string, workflowStatus: string, on
     [onEdgesChange]
   );
 
+  const handleDrop = useCallback(
+    (e: React.DragEvent, screenToFlowPosition: (pos: { x: number; y: number }) => { x: number; y: number }) => {
+      e.preventDefault();
+      const typeStr = e.dataTransfer.getData('application/reactflow-node-type');
+      if (!typeStr) return;
+      const def = getNodeTypeDef(typeStr);
+      if (!def) return;
+      const position = screenToFlowPosition({ x: e.clientX, y: e.clientY });
+      const id = generateNodeId();
+      const newNode: Node = {
+        id,
+        type: def.type,
+        data: { label: def.label, config: def.defaultConfig ? { ...def.defaultConfig } : {} },
+        position,
+      };
+      setNodes(nds => [...nds, newNode]);
+      setHasChanges(true);
+    },
+    [setNodes]
+  );
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  }, []);
+
+  const handleSelectionChange = useCallback(
+    ({ nodes: selNodes }: { nodes: Node[] }) => {
+      setSelectedNodeId(selNodes.length === 1 ? selNodes[0].id : null);
+    },
+    []
+  );
+
   const handleSave = useCallback(async () => {
     if (!workflowId) return;
     setSaving(true);
     try {
       await Workflows.updateWorkflowConfig(workflowId, {
-        nodes: nodes.map(n => ({ id: n.id, type: n.type, data: n.data, position: n.position })),
-        edges: edges.map(e => ({ id: e.id, source: e.source, target: e.target })),
+        nodes: nodes.map(n => ({
+          id: n.id,
+          type: n.type,
+          data: n.data,
+          position: n.position,
+        })),
+        edges: edges.map(e => ({
+          id: e.id,
+          source: e.source,
+          target: e.target,
+          sourceHandle: e.sourceHandle,
+          targetHandle: e.targetHandle,
+        })),
       });
       toast.success('工作流已保存');
       setHasChanges(false);
@@ -111,6 +198,67 @@ export function useWorkflowEditor(workflowId: string, workflowStatus: string, on
       setSaving(false);
     }
   }, [workflowId, nodes, edges]);
+
+  const handleExecute = useCallback(
+    async (inputs?: Record<string, unknown>) => {
+      if (!workflowId) return;
+      setExecutionLoading(true);
+      setNodeExecutions({});
+      setExecuteResult(null);
+      try {
+        const res = await Workflows.executeWorkflow(workflowId, {
+          inputs: inputs ?? {},
+          mode: 'sync',
+        });
+        const data = (res as { data?: WorkflowExecuteResultVo }).data;
+        if (data) {
+          setExecuteResult(data);
+          setExecutionId(data.executionId ?? null);
+          if (data.executionId) {
+            try {
+              const detailRes = await Workflows.getExecutionDetail(data.executionId);
+              const detail = (detailRes as { data?: ExecutionDetailVo }).data;
+              const ne = detail?.nodeExecutions as Record<string, { status?: string }> | undefined;
+              if (ne) {
+                const statusMap: Record<string, NodeExecutionStatus> = {};
+                for (const [nodeId, info] of Object.entries(ne)) {
+                  const s = info?.status?.toUpperCase();
+                  if (s === 'SUCCESS') statusMap[nodeId] = 'success';
+                  else if (s === 'FAILED') statusMap[nodeId] = 'failed';
+                  else if (s === 'RUNNING') statusMap[nodeId] = 'running';
+                  else statusMap[nodeId] = 'pending';
+                }
+                setNodeExecutions(statusMap);
+              }
+            } catch {
+              // ignore
+            }
+          }
+          toast.success(data.status === 'COMPLETED' ? '执行成功' : `执行完成: ${data.status}`);
+        }
+      } catch (e: unknown) {
+        toast.error((e as { message?: string })?.message ?? '执行失败');
+      } finally {
+        setExecutionLoading(false);
+      }
+    },
+    [workflowId]
+  );
+
+  const loadExecutionLogs = useCallback(async () => {
+    if (!workflowId) return;
+    setLogsLoading(true);
+    try {
+      const res = await Workflows.getExecutionLogs({ workflowId, pageNo: 1, pageSize: 20 });
+      const data = (res as { data?: PageExecutionLogVo }).data;
+      const list = data?.list ?? [];
+      setExecutionLogs(list);
+    } catch {
+      setExecutionLogs([]);
+    } finally {
+      setLogsLoading(false);
+    }
+  }, [workflowId]);
 
   const handleStartStop = useCallback(async () => {
     if (!workflowId) return;
@@ -133,13 +281,37 @@ export function useWorkflowEditor(workflowId: string, workflowStatus: string, on
 
   const toggleFullscreen = useCallback(() => setIsFullscreen(v => !v), []);
 
+  const updateNodeData = useCallback(
+    (nodeId: string, data: Partial<Node['data']>) => {
+      setNodes(nds =>
+        nds.map(n => (n.id === nodeId ? { ...n, data: { ...n.data, ...data } } : n))
+      );
+      setHasChanges(true);
+    },
+    [setNodes]
+  );
+
+  const nodesWithStatus = nodes.map(n => {
+    const status = nodeExecutions[n.id];
+    return {
+      ...n,
+      data: {
+        ...n.data,
+        executionStatus: status,
+      },
+    };
+  });
+
   return {
     loading,
-    nodes,
+    nodes: nodesWithStatus,
     edges,
     onNodesChange: handleNodeChange,
     onEdgesChange: handleEdgeChange,
     onConnect,
+    onDrop: handleDrop,
+    onDragOver: handleDragOver,
+    onSelectionChange: handleSelectionChange,
     isFullscreen,
     hasChanges,
     saving,
@@ -147,5 +319,21 @@ export function useWorkflowEditor(workflowId: string, workflowStatus: string, on
     handleSave,
     handleStartStop,
     toggleFullscreen,
+    selectedNodeId,
+    setSelectedNodeId,
+    selectedNode: nodes.find(n => n.id === selectedNodeId) ?? null,
+    handleExecute,
+    executionLoading,
+    executeResult,
+    nodeExecutions,
+    executionId,
+    showExecuteDialog,
+    setShowExecuteDialog,
+    showLogsPanel,
+    setShowLogsPanel,
+    executionLogs,
+    logsLoading,
+    loadExecutionLogs,
+    updateNodeData,
   };
 }
