@@ -44,22 +44,22 @@ public class MessageFacadeImpl implements MessageFacade {
 
   @Override
   public AttachmentUploadVo uploadAttachment(MultipartFile file, String sessionId) {
-//    // 1. 验证文件类型
-//    if (!fileStorageService.isValidFileType(file.getContentType())) {
-//      throw new IllegalArgumentException("不支持的文件类型: " + file.getContentType());
-//    }
-//
-//    // 2. 上传文件
-//    cloud.xcan.angus.core.ai.domain.chat.Attachment attachment = fileStorageService.uploadFile(file,
-//        sessionId);
-//
-//    // 3. 构建返回结果
-//    AttachmentUploadVo vo = new AttachmentUploadVo();
-//    vo.setId(attachment.getId());
-//    vo.setName(attachment.getName());
-//    vo.setType(attachment.getType());
-//    vo.setSize(attachment.getSize());
-//    vo.setUrl(attachment.getUrl());
+    //    // 1. 验证文件类型
+    //    if (!fileStorageService.isValidFileType(file.getContentType())) {
+    //      throw new IllegalArgumentException("不支持的文件类型: " + file.getContentType());
+    //    }
+    //
+    //    // 2. 上传文件
+    //    cloud.xcan.angus.core.ai.domain.chat.Attachment attachment = fileStorageService.uploadFile(file,
+    //        sessionId);
+    //
+    //    // 3. 构建返回结果
+    //    AttachmentUploadVo vo = new AttachmentUploadVo();
+    //    vo.setId(attachment.getId());
+    //    vo.setName(attachment.getName());
+    //    vo.setType(attachment.getType());
+    //    vo.setSize(attachment.getSize());
+    //    vo.setUrl(attachment.getUrl());
     //vo.setUploadedAt(attachment.getUploadedAt());
     return null;
   }

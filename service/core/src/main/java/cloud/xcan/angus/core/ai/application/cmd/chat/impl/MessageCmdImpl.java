@@ -53,7 +53,7 @@ public class MessageCmdImpl extends CommCmd<Message, Long> implements MessageCmd
       @Override
       protected void checkParams() {
         message = messageRepo.findById(id)
-            .orElseThrow(() -> ResourceNotFound.of("消息不存在", new Object[]{}));
+            .orElseThrow(() -> ResourceNotFound.of("消息「{0}」不存在", new Object[]{id}));
       }
 
       @Override
@@ -73,7 +73,7 @@ public class MessageCmdImpl extends CommCmd<Message, Long> implements MessageCmd
       @Override
       protected void checkParams() {
         messageRepo.findById(id)
-            .orElseThrow(() -> ResourceNotFound.of("消息不存在", new Object[]{}));
+            .orElseThrow(() -> ResourceNotFound.of("消息「{0}」不存在", new Object[]{id}));
       }
 
       @Override
