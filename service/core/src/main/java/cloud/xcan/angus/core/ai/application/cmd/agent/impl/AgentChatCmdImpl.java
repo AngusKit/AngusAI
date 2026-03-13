@@ -1,7 +1,7 @@
 package cloud.xcan.angus.core.ai.application.cmd.agent.impl;
 
 import static cloud.xcan.angus.core.ai.application.converter.AgentConverter.toChatConfigOverride;
-import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_CHAT_SSE_TIMEOUT_MS;
+import static cloud.xcan.angus.core.ai.domain.Constants.CHAT_DEFAULT_TIMEOUT_MS;
 import static cloud.xcan.angus.spec.principal.PrincipalContext.getUserId;
 import static cloud.xcan.angus.spec.utils.ObjectUtils.lengthSafe;
 import static cloud.xcan.angus.spec.utils.ObjectUtils.nullSafe;
@@ -29,7 +29,6 @@ import cloud.xcan.angus.remote.message.SysException;
 import dev.langchain4j.service.TokenStream;
 import jakarta.annotation.Resource;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -68,13 +67,6 @@ public class AgentChatCmdImpl implements AgentChatCmd {
 
   @Resource
   private ApiUsageLogCmd apiUsageLogCmd;
-
-  /**
-   * 同步对话专用线程池，用于超时控制
-   */
-  @Resource
-  @Qualifier("syncChatExecutor")
-  private ExecutorService syncChatExecutor;
 
   /**
    * 流式 SSE 专用线程池
@@ -157,7 +149,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
       protected SseEmitter process() {
         // 按照优先级获取会话配置
         ChatConfigOverride override = getChatConfigOverride(agent, config, session);
-        Long timeoutMs = nullSafe(override.getTimeoutMs(), AGENT_CHAT_SSE_TIMEOUT_MS);
+        Long timeoutMs = nullSafe(override.getTimeoutMs(), CHAT_DEFAULT_TIMEOUT_MS);
 
         // 构造SseEmitter
         final SseEmitter emitter = new SseEmitter(timeoutMs);
@@ -295,8 +287,8 @@ public class AgentChatCmdImpl implements AgentChatCmd {
           Double outputPrice = config.getOutputPricePerMillionTokens();
           int in = inputTokens != null ? inputTokens : 0;
           int out = outputTokens != null ? outputTokens : 0;
-          if ((inputPrice == null || inputPrice <= 0) && (outputPrice == null
-              || outputPrice <= 0)) {
+          if ((inputPrice == null || inputPrice <= 0)
+              && (outputPrice == null || outputPrice <= 0)) {
             return null;
           }
           double costUsd = 0;

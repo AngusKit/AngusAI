@@ -68,16 +68,6 @@ public interface Constants {
   int AGENT_MEMORY_DEFAULT_MAX_TOKENS = 8000;
 
   /**
-   * 智能体流式对话 SSE 超时默认值（毫秒），2 分钟，适应长回复场景
-   */
-  long AGENT_CHAT_SSE_TIMEOUT_MS = 120_000L;
-
-  /**
-   * 智能体同步对话超时默认值（毫秒），1 分钟
-   */
-  long AGENT_CHAT_SYNC_TIMEOUT_MS = 60_000L;
-
-  /**
    * 对话默认温度 0-2
    */
   double CHAT_DEFAULT_TEMPERATURE = 0.7;
@@ -103,9 +93,9 @@ public interface Constants {
   double CHAT_DEFAULT_PRESENCE_PENALTY = 0.0;
 
   /**
-   * 模型请求默认超时（毫秒），60 秒
+   * 模型请求默认超时（毫秒），120 秒
    */
-  long CHAT_DEFAULT_TIMEOUT_MS = 60_000L;
+  long CHAT_DEFAULT_TIMEOUT_MS = 120_000L;
 
   // ==================== 会话配额常量 ====================
 
