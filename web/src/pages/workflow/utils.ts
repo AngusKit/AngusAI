@@ -63,14 +63,14 @@ export function getStatsFromStatistics(stats: WorkflowStatisticsVo | null): Stat
       successRate: '--',
     };
   }
-  const total = stats.totalWorkflows ?? 0;
-  const running = stats.runningWorkflows ?? 0;
-  const today = stats.todayCalls ?? 0;
-  const rate = stats.successRate ?? 0;
+  const total = Number(stats.totalWorkflows ?? 0);
+  const running = Number(stats.runningWorkflows ?? 0);
+  const today = Number(stats.todayCalls ?? 0);
+  const rate = Number(stats.successRate ?? NaN);
   return {
     totalWorkflows: String(total),
     runningWorkflows: String(running),
-    todayCalls: today.toLocaleString(),
-    successRate: rate ? `${rate.toFixed(1)}%` : '--',
+    todayCalls: !Number.isNaN(today) ? today.toLocaleString() : '--',
+    successRate: !Number.isNaN(rate) ? `${rate.toFixed(1)}%` : '--',
   };
 }
