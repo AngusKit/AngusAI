@@ -41,7 +41,7 @@ export function WorkflowVisibilityDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='sm:max-w-md dark:bg-gray-800 dark:border-gray-700'>
+      <DialogContent className='!max-w-sm dark:bg-gray-800 dark:border-gray-700'>
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2'>
             <Eye className='w-5 h-5' />

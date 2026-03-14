@@ -83,9 +83,9 @@ export function useWorkflowPage() {
     }
   };
 
-  /** 编辑流程信息（跳转详情页） */
+  /** 编辑工作流信息（跳转工作流信息编辑页，直接进入编辑模式） */
   const handleEditInfo = (w: WorkflowDisplayItem) => {
-    navigate(`/workflow/${w.id}`);
+    navigate(`/workflow/${w.id}?mode=edit`);
   };
 
   /** 下拉菜单操作分发 */
@@ -99,7 +99,7 @@ export function useWorkflowPage() {
     } else if (action === '修改可见性' && extra != null) {
       handleModifyVisibility(w, extra as VisibilityEnum);
     } else if (action === '编辑') {
-      navigate(`/workflow/${w.id}`);
+      handleDesignWorkflow(w);
     } else {
       toast.info(`${action}功能敬请期待`);
     }

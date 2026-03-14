@@ -1,13 +1,9 @@
 import { ApiLocaleResult, PageQuery, AI } from '@xcan-angus/infra';
 import {
-  ExecutionDetailResult,
-  ExecutionLogResult,
   GetWorkflowListOrderByEnum,
   WorkflowConfigUpdateDto,
   WorkflowCreateDto,
   WorkflowDetailResult,
-  WorkflowExecuteDto,
-  WorkflowExecuteResultResult,
   WorkflowListResult,
   WorkflowStatisticsResult,
   WorkflowUpdateDto,
@@ -152,24 +148,6 @@ export class Workflows<SecurityDataType = unknown> {
       ...params,
     });
   /**
-   * @description 手动执行或调试工作流
-   *
-   * @tags Workflow
-   * @name ExecuteWorkflow
-   * @summary 执行工作流
-   * @request POST:/api/v1/workflows/{id}/execute
-   * @secure
-   */
-  executeWorkflow = (id: string, data: WorkflowExecuteDto, params: RequestParams = {}) =>
-    this.http.request<WorkflowExecuteResultResult>({
-      path: `${AI}/workflows/${id}/execute`,
-      method: 'POST',
-      body: data,
-      secure: true,
-      type: ContentType.Json,
-      ...params,
-    });
-  /**
    * @description 获取指定工作流的详细信息
    *
    * @tags Workflow
@@ -255,52 +233,6 @@ export class Workflows<SecurityDataType = unknown> {
       path: `${AI}/workflows/stats`,
       method: 'GET',
       query: query,
-      secure: true,
-      ...params,
-    });
-  /**
-   * @description 获取特定执行的详细信息
-   *
-   * @tags Workflow
-   * @name GetExecutionDetail
-   * @summary 获取执行详情
-   * @request GET:/api/v1/workflows/executions/{executionId}
-   * @secure
-   */
-  getExecutionDetail = (executionId: string, params: RequestParams = {}) =>
-    this.http.request<ExecutionDetailResult>({
-      path: `${AI}/workflows/executions/${executionId}`,
-      method: 'GET',
-      secure: true,
-      ...params,
-    });
-  /**
-   * @description 获取工作流执行日志
-   *
-   * @tags Workflow
-   * @name GetExecutionLogs
-   * @summary 获取执行日志
-   * @request GET:/api/v1/workflows/execution-logs
-   * @secure
-   */
-  getExecutionLogs = (
-    query?: PageQuery & {
-      /**
-       * 工作流ID
-       * @format int64
-       */
-      workflowId?: string;
-      /** 工作流名称 */
-      workflowName?: string;
-      /** 状态筛选 */
-      status?: string;
-    },
-    params: RequestParams = {}
-  ) =>
-    this.http.request<ExecutionLogResult>({
-      path: `${AI}/workflows/execution-logs`,
-      method: 'GET',
-      query: query as unknown as QueryParamsType,
       secure: true,
       ...params,
     });

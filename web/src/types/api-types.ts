@@ -16,3 +16,4 @@ export * from '../services/SettingsTypes.ts';
 export * from '../services/SharingTypes.ts';
 export * from '../services/VectorStoresTypes.ts';
 export * from '../services/WorkflowsTypes.ts';
+export * from '../services/WorkflowExecutionTypes.ts';

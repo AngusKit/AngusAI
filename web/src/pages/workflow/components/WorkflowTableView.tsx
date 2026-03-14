@@ -214,7 +214,7 @@ export function WorkflowTableView({
       )}
 
       <Dialog open={!!visibilityDialogWorkflow} onOpenChange={open => !open && setVisibilityDialogWorkflow(null)}>
-        <DialogContent className='sm:max-w-sm dark:bg-gray-800 dark:border-gray-700'>
+        <DialogContent className='!max-w-sm dark:bg-gray-800 dark:border-gray-700'>
           <DialogHeader>
             <DialogTitle>修改可见性</DialogTitle>
           </DialogHeader>

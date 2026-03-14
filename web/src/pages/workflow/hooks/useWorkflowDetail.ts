@@ -3,7 +3,7 @@
  * 加载详情、表单编辑、保存、标签管理
  */
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import Workflows from '@/services/Workflows';
 import { WorkflowDetailVo } from '@/services/WorkflowsTypes';
@@ -12,9 +12,11 @@ import { WorkflowStatusEnum } from '@/enums/enums';
 export function useWorkflowDetail() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
+  const initialMode = searchParams.get('mode') === 'edit' ? 'edit' : 'view';
   const [detail, setDetail] = useState<WorkflowDetailVo | null>(null);
   const [loading, setLoading] = useState(true);
-  const [mode, setMode] = useState<'view' | 'edit'>('view');
+  const [mode, setMode] = useState<'view' | 'edit'>(initialMode);
   const [formData, setFormData] = useState({
     name: '',
     description: '',

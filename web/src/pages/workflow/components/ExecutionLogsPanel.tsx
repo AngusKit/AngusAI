@@ -6,7 +6,7 @@ import { X } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import type { ExecutionLogVo } from '@/services/WorkflowsTypes';
+import type { ExecutionLogVo } from '@/services/WorkflowExecutionTypes';
 import { cn } from '@/components/ui/utils';
 
 interface ExecutionLogsPanelProps {

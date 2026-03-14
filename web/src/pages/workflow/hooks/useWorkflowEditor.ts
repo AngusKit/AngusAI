@@ -5,16 +5,17 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import type { Node, Edge, Connection } from 'reactflow';
 import { useNodesState, useEdgesState, addEdge, reconnectEdge, useReactFlow } from 'reactflow';
-import { validateConnection } from '../utils/workflowConnectionValidation';
+import { validateConnection } from '../utils/connectionValidation';
 import { toast } from 'sonner';
 import Workflows from '@/services/Workflows';
+import WorkflowExecution from '@/services/WorkflowExecution';
+import { WorkflowDetailVo } from '@/services/WorkflowsTypes';
 import {
-  WorkflowDetailVo,
   WorkflowExecuteResultVo,
   ExecutionDetailVo,
   ExecutionLogVo,
   PageExecutionLogVo,
-} from '@/services/WorkflowsTypes';
+} from '@/services/WorkflowExecutionTypes';
 import { getNodeTypeDef } from '../nodes/nodeTypes';
 
 /** 最小画布：仅 START + END */
@@ -350,7 +351,7 @@ export function useWorkflowEditor(workflowId: string, workflowStatus: string, on
       setNodeExecutions({});
       setExecuteResult(null);
       try {
-        const res = await Workflows.executeWorkflow(workflowId, {
+        const res = await WorkflowExecution.executeWorkflow(workflowId, {
           inputs: inputs ?? {},
           mode: 'sync',
         });
@@ -360,7 +361,7 @@ export function useWorkflowEditor(workflowId: string, workflowStatus: string, on
           setExecutionId(data.executionId ?? null);
           if (data.executionId) {
             try {
-              const detailRes = await Workflows.getExecutionDetail(data.executionId);
+              const detailRes = await WorkflowExecution.getExecutionDetail(data.executionId);
               const detail = (detailRes as { data?: ExecutionDetailVo }).data;
               const ne = detail?.nodeExecutions as Record<string, { status?: string }> | undefined;
               if (ne) {
@@ -393,7 +394,7 @@ export function useWorkflowEditor(workflowId: string, workflowStatus: string, on
     if (!workflowId) return;
     setLogsLoading(true);
     try {
-      const res = await Workflows.getExecutionLogs({ workflowId, pageNo: 1, pageSize: 20 });
+      const res = await WorkflowExecution.getExecutionLogs({ workflowId, pageNo: 1, pageSize: 20 });
       const data = (res as { data?: PageExecutionLogVo }).data;
       const list = data?.list ?? [];
       setExecutionLogs(list);
