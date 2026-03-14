@@ -130,14 +130,6 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
                     </TooltipTrigger>
                     <TooltipContent side="right">{tooltipText}</TooltipContent>
                   </Tooltip>
-                  {item.badge && (
-                    <span
-                      className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 flex items-center justify-center text-[10px] font-medium rounded-full bg-red-500 text-white leading-none"
-                      aria-hidden
-                    >
-                      {item.badge}
-                    </span>
-                  )}
                 </div>
               );
             })
