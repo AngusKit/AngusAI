@@ -12,6 +12,9 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu.tsx';
 import { MemberPermissionEnum, SharedWithEnum } from '@/enums/enums.ts';
@@ -151,36 +154,44 @@ export function ResourceTable({
                       align="end"
                       className="dark:bg-gray-800 dark:border-gray-700"
                     >
-                      <DropdownMenuItem
-                        onClick={() =>
-                          onChangePermission(resource, MemberPermissionEnum.VIEW)
-                        }
-                        className="dark:text-gray-300"
-                      >
-                        <Eye className="w-4 h-4 mr-2" />
-                        设为查看权限
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() =>
-                          onChangePermission(resource, MemberPermissionEnum.EDIT)
-                        }
-                        className="dark:text-gray-300"
-                      >
-                        <Edit className="w-4 h-4 mr-2" />
-                        设为编辑权限
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() =>
-                          onChangePermission(
-                            resource,
-                            MemberPermissionEnum.MANAGE
-                          )
-                        }
-                        className="dark:text-gray-300"
-                      >
-                        <Shield className="w-4 h-4 mr-2" />
-                        设为管理权限
-                      </DropdownMenuItem>
+                      <DropdownMenuSub>
+                        <DropdownMenuSubTrigger className="dark:text-gray-300">
+                          <Shield className="w-4 h-4 mr-2" />
+                          修改权限
+                        </DropdownMenuSubTrigger>
+                        <DropdownMenuSubContent
+                          align="end"
+                          className="dark:bg-gray-800 dark:border-gray-700"
+                        >
+                          <DropdownMenuItem
+                            onClick={() =>
+                              onChangePermission(resource, MemberPermissionEnum.VIEW)
+                            }
+                            className="dark:text-gray-300"
+                          >
+                            <Eye className="w-4 h-4 mr-2" />
+                            设为查看权限
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() =>
+                              onChangePermission(resource, MemberPermissionEnum.EDIT)
+                            }
+                            className="dark:text-gray-300"
+                          >
+                            <Edit className="w-4 h-4 mr-2" />
+                            设为编辑权限
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() =>
+                              onChangePermission(resource, MemberPermissionEnum.MANAGE)
+                            }
+                            className="dark:text-gray-300"
+                          >
+                            <Shield className="w-4 h-4 mr-2" />
+                            设为管理权限
+                          </DropdownMenuItem>
+                        </DropdownMenuSubContent>
+                      </DropdownMenuSub>
                       <DropdownMenuItem
                         onClick={() => onRemove(resource)}
                         className="text-red-600 dark:text-red-400"
