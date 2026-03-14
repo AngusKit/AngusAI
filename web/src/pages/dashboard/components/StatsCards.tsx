@@ -7,17 +7,17 @@ import { useStatsOverview, type StatData } from '../hooks/useDashboard.ts';
 
 function StatCardSkeleton() {
   return (
-    <Card className='px-5 py-[35px] dark:bg-gray-800'>
+    <Card className='p-5 min-h-[140px] dark:bg-gray-800 dark:border-gray-700'>
       <div className='flex items-start justify-between'>
         <div className='flex items-start gap-4'>
-          <Skeleton className='w-12 h-12 rounded-xl dark:bg-gray-700 flex-shrink-0' />
-          <div>
-            <Skeleton className='h-4 w-20 mb-1 dark:bg-gray-700' />
-            <Skeleton className='h-8 w-16 mb-1 dark:bg-gray-700' />
-            <Skeleton className='h-3 w-32 dark:bg-gray-700' />
+          <Skeleton className='w-12 h-12 mt-4 rounded-xl dark:bg-gray-700 flex-shrink-0' />
+          <div className='space-y-2 flex-1 min-w-0'>
+            <Skeleton className='h-4 w-16 dark:bg-gray-700' />
+            <Skeleton className='h-9 w-20 dark:bg-gray-700' />
+            <Skeleton className='h-3 w-28 dark:bg-gray-700' />
           </div>
         </div>
-        <Skeleton className='w-16 h-6 rounded dark:bg-gray-700 flex-shrink-0' />
+        <Skeleton className='w-14 h-5 rounded-full dark:bg-gray-700 flex-shrink-0' />
       </div>
     </Card>
   );
