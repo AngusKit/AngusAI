@@ -38,11 +38,6 @@ public interface WorkflowFacade {
   WorkflowDetailVo modifyVisibility(Long id, Visibility visibility);
 
   /**
-   * 执行工作流
-   */
-  WorkflowExecuteResultVo execute(Long id, WorkflowExecuteDto dto);
-
-  /**
    * 启动工作流运行
    */
   WorkflowDetailVo start(Long id);
@@ -79,15 +74,5 @@ public interface WorkflowFacade {
    * 获取工作流统计
    */
   WorkflowStatisticsVo getStatistics(String period);
-
-  /**
-   * 获取执行日志
-   */
-  PageResult<ExecutionLogVo> getExecutionLogs(WorkflowExecutionLogFindDto dto);
-
-  /**
-   * 获取执行详情
-   */
-  ExecutionDetailVo getExecutionDetail(String executionId);
 
 }

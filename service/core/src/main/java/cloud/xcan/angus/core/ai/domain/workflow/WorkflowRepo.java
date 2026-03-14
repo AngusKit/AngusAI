@@ -16,4 +16,9 @@ public interface WorkflowRepo extends BaseRepository<Workflow, Long> {
    * 根据名称检查工作流是否存在（排除指定ID）
    */
   boolean existsByNameAndIdNot(String name, Long id);
+
+  /**
+   * 按状态统计工作流数量
+   */
+  long countByStatus(cloud.xcan.angus.core.ai.domain.workflow.WorkflowStatus status);
 }

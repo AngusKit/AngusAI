@@ -3,12 +3,16 @@ package cloud.xcan.angus.core.ai.interfaces.workflow.facade.internal.assembler;
 import cloud.xcan.angus.core.ai.domain.Visibility;
 import cloud.xcan.angus.core.ai.domain.workflow.ExecutionStats;
 import cloud.xcan.angus.core.ai.domain.workflow.Workflow;
+import cloud.xcan.angus.core.ai.domain.workflow.WorkflowExecution;
 import cloud.xcan.angus.core.ai.domain.workflow.WorkflowConfig;
 import cloud.xcan.angus.core.ai.domain.workflow.WorkflowStatus;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowConfigUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowFindDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowUpdateDto;
+import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowExecutionLogFindDto;
+import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.ExecutionDetailVo;
+import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.ExecutionLogVo;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowListVo;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
@@ -141,6 +145,50 @@ public class WorkflowAssembler {
         .orderByFields("id", "createdDate", "name", "type", "status")
         .matchSearchFields("name", "description", "tags")
         .inAndNotFields("type")
+        .build();
+    return new GenericSpecification<>(filters);
+  }
+
+  public static ExecutionLogVo toExecutionLogVo(WorkflowExecution ex) {
+    ExecutionLogVo vo = new ExecutionLogVo();
+    vo.setId(ex.getId());
+    vo.setExecutionId(ex.getExecutionId());
+    vo.setWorkflowId(ex.getWorkflowId());
+    vo.setWorkflowName(ex.getWorkflowName());
+    vo.setActivity(ex.getActivity() != null ? ex.getActivity() : "执行工作流");
+    vo.setStatus(ex.getStatus());
+    vo.setOperator(ex.getCreatedBy() != null ? String.valueOf(ex.getCreatedBy()) : null);
+    vo.setExecutionTime(ex.getExecutionTime());
+    vo.setCreatedDate(ex.getCreatedDate());
+    vo.setInputs(ex.getInputs());
+    vo.setOutputs(ex.getOutputs());
+    vo.setError(ex.getErrorMessage());
+    vo.setNodeExecutions(ex.getNodeExecutions());
+    return vo;
+  }
+
+  public static ExecutionDetailVo toExecutionDetailVo(WorkflowExecution ex) {
+    ExecutionDetailVo vo = new ExecutionDetailVo();
+    vo.setExecutionId(ex.getExecutionId());
+    vo.setWorkflowId(ex.getWorkflowId());
+    vo.setWorkflowName(ex.getWorkflowName());
+    vo.setStatus(ex.getStatus());
+    vo.setStartedAt(ex.getStartedAt());
+    vo.setCompletedAt(ex.getCompletedAt());
+    vo.setExecutionTime(ex.getExecutionTime());
+    vo.setInputs(ex.getInputs());
+    vo.setOutputs(ex.getOutputs());
+    vo.setNodeExecutions(ex.getNodeExecutions());
+    vo.setError(ex.getErrorMessage());
+    return vo;
+  }
+
+  public static GenericSpecification<WorkflowExecution> getExecutionLogSpecification(
+      WorkflowExecutionLogFindDto dto) {
+    Set<SearchCriteria> filters = new SearchCriteriaBuilder<>(dto)
+        .rangeSearchFields("id", "workflowId", "createdDate")
+        .orderByFields("id", "createdDate", "startedAt")
+        .matchSearchFields("workflowName", "status")
         .build();
     return new GenericSpecification<>(filters);
   }

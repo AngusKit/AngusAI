@@ -4,22 +4,19 @@ import static cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder.getMatchS
 import static cloud.xcan.angus.core.utils.CoreUtils.buildVoPageResult;
 
 import cloud.xcan.angus.core.ai.application.cmd.workflow.WorkflowCmd;
+import cloud.xcan.angus.core.ai.application.query.workflow.WorkflowExecutionQuery;
 import cloud.xcan.angus.core.ai.application.query.workflow.WorkflowQuery;
 import cloud.xcan.angus.core.ai.domain.Visibility;
 import cloud.xcan.angus.core.ai.domain.workflow.Workflow;
 import cloud.xcan.angus.core.ai.domain.workflow.WorkflowConfig;
+import cloud.xcan.angus.core.ai.domain.workflow.WorkflowStatus;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.WorkflowFacade;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowConfigUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowCreateDto;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowExecuteDto;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowExecutionLogFindDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowFindDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.internal.assembler.WorkflowAssembler;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.ExecutionDetailVo;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.ExecutionLogVo;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowDetailVo;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowExecuteResultVo;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowListVo;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowStatisticsVo;
 import cloud.xcan.angus.core.biz.NameJoin;
@@ -37,6 +34,9 @@ public class WorkflowFacadeImpl implements WorkflowFacade {
 
   @Resource
   private WorkflowCmd workflowCmd;
+
+  @Resource
+  private WorkflowExecutionQuery workflowExecutionQuery;
 
   @Override
   public WorkflowDetailVo create(WorkflowCreateDto dto) {
@@ -63,15 +63,6 @@ public class WorkflowFacadeImpl implements WorkflowFacade {
   public WorkflowDetailVo modifyVisibility(Long id, Visibility visibility) {
     Workflow saved = workflowCmd.modifyVisibility(id, visibility);
     return WorkflowAssembler.toDetailVo(saved);
-  }
-
-  @Override
-  public WorkflowExecuteResultVo execute(Long id, WorkflowExecuteDto dto) {
-    // 这里应该调用工作流执行服务
-    // 暂时返回模拟数据
-    WorkflowExecuteResultVo result = new WorkflowExecuteResultVo();
-    // TODO: 实现工作流执行逻辑
-    return result;
   }
 
   @Override
@@ -115,28 +106,15 @@ public class WorkflowFacadeImpl implements WorkflowFacade {
 
   @Override
   public WorkflowStatisticsVo getStatistics(String period) {
-    // 这里应该调用统计服务获取详细数据
-    // 暂时返回模拟数据
     WorkflowStatisticsVo statistics = new WorkflowStatisticsVo();
-    // TODO: 实现统计逻辑
+    statistics.setTotalWorkflows(workflowQuery.count());
+    statistics.setRunningWorkflows(workflowQuery.countByStatus(WorkflowStatus.RUNNING));
+    var today = java.time.LocalDate.now();
+    long todayCalls = workflowExecutionQuery.countByDate(today);
+    long todaySuccess = workflowExecutionQuery.countSuccessByDate(today);
+    statistics.setTodayCalls(todayCalls);
+    statistics.setSuccessRate(todayCalls > 0 ? (todaySuccess * 100.0 / todayCalls) : 0.0);
     return statistics;
   }
 
-  @Override
-  public PageResult<ExecutionLogVo> getExecutionLogs(WorkflowExecutionLogFindDto dto) {
-    // 这里应该调用执行日志查询服务
-    // 暂时返回模拟数据
-    PageResult<ExecutionLogVo> result = new PageResult<>();
-    // TODO: 实现执行日志查询逻辑
-    return result;
-  }
-
-  @Override
-  public ExecutionDetailVo getExecutionDetail(String executionId) {
-    // 这里应该调用执行详情查询服务
-    // 暂时返回模拟数据
-    ExecutionDetailVo result = new ExecutionDetailVo();
-    // TODO: 实现执行详情查询逻辑
-    return result;
-  }
 }

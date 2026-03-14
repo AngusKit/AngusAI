@@ -60,4 +60,13 @@ public class WorkflowQueryImpl implements WorkflowQuery {
     return workflowRepo.existsByNameAndIdNot(name, id);
   }
 
+  @Override
+  public long count() {
+    return workflowRepo.count();
+  }
+
+  @Override
+  public long countByStatus(cloud.xcan.angus.core.ai.domain.workflow.WorkflowStatus status) {
+    return workflowRepo.countByStatus(status);
+  }
 }

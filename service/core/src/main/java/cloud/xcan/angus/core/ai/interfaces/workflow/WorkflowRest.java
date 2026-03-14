@@ -4,14 +4,9 @@ import cloud.xcan.angus.core.ai.domain.Visibility;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.WorkflowFacade;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowConfigUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowCreateDto;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowExecuteDto;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowExecutionLogFindDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowFindDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowUpdateDto;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.ExecutionDetailVo;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.ExecutionLogVo;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowDetailVo;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowExecuteResultVo;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowListVo;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowStatisticsVo;
 import cloud.xcan.angus.remote.ApiLocaleResult;
@@ -95,18 +90,6 @@ public class WorkflowRest {
     return ApiLocaleResult.success(workflowFacade.modifyVisibility(id, visibility));
   }
 
-  @Operation(operationId = "executeWorkflow", summary = "执行工作流", description = "手动执行或调试工作流")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "执行成功"),
-      @ApiResponse(responseCode = "202", description = "执行已启动")
-  })
-  @PostMapping("/{id}/execute")
-  public ApiLocaleResult<WorkflowExecuteResultVo> execute(
-      @Parameter(description = "工作流ID") @PathVariable Long id,
-      @Valid @RequestBody WorkflowExecuteDto dto) {
-    return ApiLocaleResult.success(workflowFacade.execute(id, dto));
-  }
-
   @Operation(operationId = "startWorkflow", summary = "运行工作流", description = "运行工作流")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "已停止")
@@ -180,26 +163,6 @@ public class WorkflowRest {
   public ApiLocaleResult<WorkflowStatisticsVo> getStatistics(
       @Parameter(description = "统计周期") @RequestParam(required = false) String period) {
     return ApiLocaleResult.success(workflowFacade.getStatistics(period));
-  }
-
-  @Operation(operationId = "getExecutionLogs", summary = "获取执行日志", description = "获取工作流执行日志")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "执行日志获取成功")
-  })
-  @GetMapping("/execution-logs")
-  public ApiLocaleResult<PageResult<ExecutionLogVo>> getExecutionLogs(
-      @Valid @ParameterObject WorkflowExecutionLogFindDto dto) {
-    return ApiLocaleResult.success(workflowFacade.getExecutionLogs(dto));
-  }
-
-  @Operation(operationId = "getExecutionDetail", summary = "获取执行详情", description = "获取特定执行的详细信息")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "执行详情获取成功")
-  })
-  @GetMapping("/executions/{executionId}")
-  public ApiLocaleResult<ExecutionDetailVo> getExecutionDetail(
-      @Parameter(description = "执行ID") @PathVariable String executionId) {
-    return ApiLocaleResult.success(workflowFacade.getExecutionDetail(executionId));
   }
 
 }

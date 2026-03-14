@@ -26,9 +26,6 @@ public class ExecutionLogVo {
   @Schema(description = "执行状态")
   private String status;
 
-  @Schema(description = "状态颜色")
-  private String statusColor;
-
   @Schema(description = "操作人")
   private String operator;
 

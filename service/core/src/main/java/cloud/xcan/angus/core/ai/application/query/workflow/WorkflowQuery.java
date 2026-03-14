@@ -33,5 +33,13 @@ public interface WorkflowQuery {
    */
   boolean existsByNameAndIdNot(String name, Long id);
 
+  /**
+   * 统计工作流总数
+   */
+  long count();
 
+  /**
+   * 按状态统计工作流数量
+   */
+  long countByStatus(cloud.xcan.angus.core.ai.domain.workflow.WorkflowStatus status);
 }
