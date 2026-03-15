@@ -18,6 +18,8 @@ export interface Message {
     url: string;
   }>;
   isStreaming?: boolean;
+  /** 反馈类型：like或dislike */
+  feedbackType?: string;
 }
 
 export interface Session {
@@ -65,18 +67,19 @@ function voToSession(vo: SessionListVo | SessionDetailVo): Session {
 function messageVoToMessage(vo: MessageVo): Message {
   const role = vo.role === MessageRoleEnum.USER ? 'user' : 'assistant';
   return {
-    id: vo.id ?? '',
+    id: String(vo.id ?? ''),
     role,
     content: vo.content ?? '',
     timestamp: vo.datetime ? new Date(vo.datetime) : new Date(),
     attachments: vo.attachments?.map((a) => ({
-      id: a.id ?? '',
+      id: String(a.id ?? ''),
       name: a.name ?? '',
       type: a.type ?? '',
       size: a.size ?? 0,
       url: a.url ?? '',
     })),
     isStreaming: vo.isStreaming,
+    feedbackType: vo.feedbackType,
   };
 }
 
@@ -330,9 +333,9 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
     });
   }, []);
 
-  /** 更新指定消息内容（用于流式响应） */
+  /** 更新指定消息内容（用于流式响应、反馈等） */
   const updateMessage = useCallback(
-    (sessionId: string, messageId: string, patch: Partial<Pick<Message, 'content' | 'isStreaming'>>) => {
+    (sessionId: string, messageId: string, patch: Partial<Pick<Message, 'content' | 'isStreaming' | 'feedbackType'>>) => {
       setSessionMessages((prev) => {
         const current = prev[sessionId] ?? [];
         return {

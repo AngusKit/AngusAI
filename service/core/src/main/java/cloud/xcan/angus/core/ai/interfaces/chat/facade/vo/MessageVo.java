@@ -38,4 +38,10 @@ public class MessageVo {
 
   @Schema(description = "是否正在流式生成")
   private Boolean isStreaming;
+
+  @Schema(description = "反馈类型：like或dislike")
+  private String feedbackType;
+
+  @Schema(description = "反馈说明（点踩时可填）")
+  private String feedbackComment;
 }

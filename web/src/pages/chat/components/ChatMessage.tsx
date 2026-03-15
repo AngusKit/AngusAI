@@ -20,7 +20,7 @@ import { Button } from '@/components/ui/button.tsx';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.tsx';
 import type { ReactNode } from 'react';
 import React from 'react';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -43,6 +43,8 @@ interface Message {
     url: string;
   }>;
   isStreaming?: boolean;
+  /** 反馈类型：like或dislike */
+  feedbackType?: string;
 }
 
 interface ChatMessageProps {
@@ -134,9 +136,19 @@ const markdownComponents: Parameters<typeof ReactMarkdown>[0]['components'] = {
 
 const ChatMessageInner = ({ message, isLastAssistant, onRegenerate, onFeedback }: ChatMessageProps) => {
   const [copied, setCopied] = useState(false);
-  const [liked, setLiked] = useState<boolean | null>(null);
+  const [liked, setLiked] = useState<boolean | null>(() => {
+    const ft = message.feedbackType;
+    if (ft === 'like') return true;
+    if (ft === 'dislike') return false;
+    return null;
+  });
   const [dislikeDialogOpen, setDislikeDialogOpen] = useState(false);
   const [dislikeComment, setDislikeComment] = useState('');
+
+  useEffect(() => {
+    const ft = message.feedbackType;
+    setLiked(ft === 'like' ? true : ft === 'dislike' ? false : null);
+  }, [message.feedbackType]);
 
   const handleCopy = async () => {
     const success = await copyToClipboard(message.content);
@@ -155,9 +167,8 @@ const ChatMessageInner = ({ message, isLastAssistant, onRegenerate, onFeedback }
       try {
         await onFeedback(message.id, 'like');
         setLiked(true);
-        toast.success('感谢你的反馈');
       } catch {
-        toast.error('反馈提交失败');
+        // 错误时由父组件 handleFeedback 统一 toast
       }
     } else {
       setDislikeDialogOpen(true);
@@ -171,9 +182,8 @@ const ChatMessageInner = ({ message, isLastAssistant, onRegenerate, onFeedback }
       setLiked(false);
       setDislikeDialogOpen(false);
       setDislikeComment('');
-      toast.success('我们会改进');
     } catch {
-      toast.error('反馈提交失败');
+      // 错误时由父组件 handleFeedback 统一 toast
     }
   };
 

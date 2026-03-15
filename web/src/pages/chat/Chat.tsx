@@ -308,11 +308,12 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
         ...(comment ? { comment } : {}),
       });
       toast.success(feedbackType === 'like' ? '感谢你的反馈' : '我们会改进');
+      updateMessage(currentSessionId, messageId, { feedbackType });
     } catch (e) {
       console.error('Feedback failed:', e);
       toast.error('反馈提交失败');
     }
-  }, [currentSessionId]);
+  }, [currentSessionId, updateMessage]);
 
   const handleCompositionStart = () => {
     isComposingRef.current = true;

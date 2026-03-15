@@ -141,6 +141,10 @@ export interface MessageVo {
   datetime?: string;
   /** 是否正在流式生成 */
   isStreaming?: boolean;
+  /** 反馈类型：like或dislike */
+  feedbackType?: string;
+  /** 反馈说明（点踩时可填） */
+  feedbackComment?: string;
 }
 
 /** The API response result of supporting international message. */

@@ -19,6 +19,8 @@ public class MessageAssembler {
     vo.setUsage(message.getUsage());
     vo.setIsStreaming(message.getIsStreaming());
     vo.setDatetime(message.getCreatedDate());
+    vo.setFeedbackType(message.getFeedbackType());
+    vo.setFeedbackComment(message.getFeedbackComment());
     return vo;
   }
 
