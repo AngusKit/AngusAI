@@ -60,10 +60,13 @@ public class OpenAIChatCompletionsRequest {
   @Schema(description = "Chat 消息")
   public static class ChatMessage {
 
-    @Schema(description = "角色：system/user/assistant", requiredMode = Schema.RequiredMode.REQUIRED, allowableValues = {
-        "system", "user", "assistant"})
+    @NotNull
+    @Schema(description = "角色：system/user/assistant",
+        requiredMode = Schema.RequiredMode.REQUIRED,
+        allowableValues = {"system", "user", "assistant"})
     private String role;
 
+    @NotNull
     @Schema(description = "消息内容", requiredMode = Schema.RequiredMode.REQUIRED)
     private String content;
 
