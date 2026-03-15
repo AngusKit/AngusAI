@@ -14,7 +14,6 @@ import cloud.xcan.angus.core.ai.application.cmd.agent.AgentCmd;
 import cloud.xcan.angus.core.ai.application.cmd.analytics.ApiUsageLogCmd;
 import cloud.xcan.angus.core.ai.application.cmd.chat.MessageCmd;
 import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
-import cloud.xcan.angus.core.ai.application.query.chat.SessionQuery;
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.domain.agent.Agent;
 import cloud.xcan.angus.core.ai.domain.agent.AgentChatResult;
@@ -62,9 +61,6 @@ public class AgentChatCmdImpl implements AgentChatCmd {
 
   @Resource
   private MessageCmd messageCmd;
-
-  @Resource
-  private SessionQuery sessionQuery;
 
   @Resource
   private ModelQuery modelQuery;
