@@ -74,8 +74,8 @@ export interface ApplicationListVo extends TenantAuditingVo {
   embedEnabled?: boolean;
   /** 是否启用API */
   apiEnabled?: boolean;
-  /** API调用次数 */
-  apiCalls?: number;
+  /** 统计数据 */
+  stats?: ApplicationStatsVo;
   /**
    * 发布时间
    * @format date-time

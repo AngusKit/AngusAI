@@ -105,7 +105,7 @@ export function useApplicationList() {
           status: (app.status as ApplicationStatusEnum) ?? ApplicationStatusEnum.DRAFT,
           isStarred: app.isStarred ?? false,
           tags: app.tags ?? [],
-          visits: `${app.apiCalls ?? 0} 次调用`,
+          visits: `${app.stats?.totalApiCalls ?? 0} 次调用`,
           agentIds: app.agents?.map(a => (a.id != null ? String(a.id) : undefined)).filter((id): id is string => !!id) ?? [],
           defaultAgentId: app.defaultAgent?.id != null ? String(app.defaultAgent.id) : undefined,
         }));

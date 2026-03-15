@@ -471,7 +471,7 @@ export function ApplicationDetailPage() {
                 <StatCard
                   icon={<Clock className="w-4 h-4" />}
                   label="调用次数"
-                  value={overview?.totalCalls ?? overview?.totalApiCalls ?? (detail as any).apiCalls ?? '--'}
+                  value={overview?.totalCalls ?? overview?.totalApiCalls ?? detail?.stats?.totalApiCalls ?? '--'}
                 />
                 <StatCard
                   icon={<TrendingUp className="w-4 h-4" />}
