@@ -3,6 +3,7 @@ package cloud.xcan.angus.core.ai.domain.agent;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
 import cloud.xcan.angus.core.jpa.repository.NameJoinRepository;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.query.Param;
@@ -32,6 +33,11 @@ public interface AgentRepo extends NameJoinRepository<Agent, Long>, BaseReposito
    * 检查编码是否存在（排除指定ID）
    */
   boolean existsByEncodingAndIdNot(String encoding, Long id);
+
+  /**
+   * 根据编码查询智能体
+   */
+  Optional<Agent> findByEncoding(String code);
 
   /**
    * 根据状态查询

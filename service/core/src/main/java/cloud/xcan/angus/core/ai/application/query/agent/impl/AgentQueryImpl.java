@@ -13,7 +13,6 @@ import cloud.xcan.angus.core.ai.domain.application.ApplicationAgentRepo;
 import cloud.xcan.angus.core.ai.interfaces.agent.facade.vo.AgentCountVo;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
-import cloud.xcan.angus.remote.message.ProtocolException;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import jakarta.annotation.Resource;
 import java.util.List;
@@ -40,6 +39,17 @@ public class AgentQueryImpl implements AgentQuery {
       protected Agent process() {
         return agentRepo.findById(id)
             .orElseThrow(() -> ResourceNotFound.of("智能体「{0}」不存在", new Object[]{id}));
+      }
+    }.execute();
+  }
+
+  @Override
+  public Agent findAndCheck(String code) {
+    return new BizTemplate<Agent>() {
+      @Override
+      protected Agent process() {
+        return agentRepo.findByEncoding(code)
+            .orElseThrow(() -> ResourceNotFound.of("智能体「{0}」不存在", new Object[]{code}));
       }
     }.execute();
   }

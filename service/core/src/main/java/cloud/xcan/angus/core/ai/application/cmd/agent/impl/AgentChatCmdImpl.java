@@ -179,7 +179,6 @@ public class AgentChatCmdImpl implements AgentChatCmd {
         sseEmitterChatExecutor.execute(() -> {
           StringBuilder fullContent = new StringBuilder();
           long streamStartMs = System.currentTimeMillis();
-          String modelDisplay = "agent_" + agentIdStr;  // TODO 定义智能体编码作为类模型名称
           try {
             TokenStream stream = agent.getDefaultModelId() != null
                 ? agentRegistry.chatStream(agentIdStr, sessionDb.getSessionId(), message,
@@ -193,7 +192,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
                         .sessionId(sessionDb.getSessionId())
                         .object("chat.completion.chunk")
                         .created(System.currentTimeMillis() / 1000)
-                        .model(modelDisplay)
+                        .model(agent.getEncoding())
                         .choices(List.of(new OpenAIChatCompletionChunk.ChunkChoice(
                             0,
                             new OpenAIChatCompletionsResponse.Delta(null, token),

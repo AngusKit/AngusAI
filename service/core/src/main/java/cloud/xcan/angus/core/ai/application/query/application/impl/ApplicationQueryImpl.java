@@ -269,14 +269,6 @@ public class ApplicationQueryImpl implements ApplicationQuery {
         .collect(Collectors.toSet());
   }
 
-  @Override
-  public Set<Long> findStarredApplicationIdsForCurrentUser() {
-    Long userId = getUserId();
-    return applicationStarRepo.findByUserId(userId).stream()
-        .map(ApplicationStar::getApplicationId)
-        .collect(Collectors.toSet());
-  }
-
   private void buildOverview(ApplicationStatisticsVo vo, Long appId, LocalDateTime start,
       LocalDateTime end) {
     Object[] row = apiUsageLogRepo.getAppOverviewStats(appId, start, end);

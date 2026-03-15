@@ -74,9 +74,4 @@ public interface ApplicationQuery {
    */
   Set<Long> findStarredApplicationIds(List<Long> applicationIds);
 
-  /**
-   * 查询当前用户已收藏的所有应用ID集合（用于 starred 筛选）
-   */
-  Set<Long> findStarredApplicationIdsForCurrentUser();
-
 }

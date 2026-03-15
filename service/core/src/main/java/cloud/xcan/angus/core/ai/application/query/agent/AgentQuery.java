@@ -17,6 +17,11 @@ public interface AgentQuery {
   Agent findAndCheck(Long id);
 
   /**
+   * 查询智能体并检查是否存在
+   */
+  Agent findAndCheck(String code);
+
+  /**
    * 查询智能体并检查是否存在且有效
    */
   Agent findAndCheckValid(Long id);

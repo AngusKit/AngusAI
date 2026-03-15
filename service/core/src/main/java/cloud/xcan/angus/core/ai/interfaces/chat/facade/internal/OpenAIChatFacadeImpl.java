@@ -5,6 +5,7 @@ import static cloud.xcan.angus.core.utils.GsonUtils.toJson;
 import cloud.xcan.agentx.core.agent.AgentRegistry;
 import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
 import cloud.xcan.angus.core.ai.application.query.application.ApplicationQuery;
+import cloud.xcan.angus.core.ai.domain.agent.Agent;
 import cloud.xcan.angus.core.ai.domain.chat.openai.OpenAIChatCompletionChunk;
 import cloud.xcan.angus.core.ai.domain.chat.openai.OpenAIChatCompletionsRequest;
 import cloud.xcan.angus.core.ai.domain.chat.openai.OpenAIChatCompletionsResponse;
@@ -80,24 +81,21 @@ public class OpenAIChatFacadeImpl implements OpenAIChatFacade {
 
   private OpenAIChatCompletionsResponse doChatCompletions(
       OpenAIChatCompletionsRequest request, String sessionId, Long appId, Long agentId) {
-    String resolvedAgentId = resolveAgentId(request.getModel(), appId, agentId);
+    Agent resolvedAgent = resolveAgent(request.getModel(), appId, agentId);
     boolean hasSession = sessionId != null && !sessionId.isBlank();
-    String effectiveSessionId = hasSession ? sessionId : "openai-" + UUID.randomUUID();
+    String effectiveSessionId = hasSession ? sessionId : "angusai-" + UUID.randomUUID();
 
     String message = OpenAIMessagesConverter.toAgentMessage(request.getMessages(), hasSession);
     if (message.isBlank()) {
       throw ProtocolException.of("messages 中必须包含至少一条 user 消息");
     }
-
-    String modelDisplay = request.getModel() != null
-        ? request.getModel() : "agent_" + resolvedAgentId;
-    return chatSync(resolvedAgentId, effectiveSessionId, message, modelDisplay);
+    return chatSync(String.valueOf(resolvedAgent.getId()), effectiveSessionId,
+        message, resolvedAgent.getEncoding());
   }
 
   private SseEmitter doChatCompletionsStream(
       OpenAIChatCompletionsRequest request, String sessionId, Long appId, Long agentId) {
-    // TODO model参数为模型名称或者AngusAI智能体名称，智能体名称必须以 `Agent_`开头
-    String resolvedAgentId = resolveAgentId(request.getModel(), appId, agentId);
+    Agent resolveAgent = resolveAgent(request.getModel(), appId, agentId);
     boolean hasSession = sessionId != null && !sessionId.isBlank();
     String effectiveSessionId = hasSession ? sessionId : "openai-" + UUID.randomUUID();
 
@@ -105,10 +103,8 @@ public class OpenAIChatFacadeImpl implements OpenAIChatFacade {
     if (message.isBlank()) {
       throw ProtocolException.of("messages 中必须包含至少一条 user 消息");
     }
-
-    String modelDisplay = request.getModel() != null
-        ? request.getModel() : "agent_" + resolvedAgentId;
-    return chatStream(resolvedAgentId, effectiveSessionId, message, modelDisplay);
+    return chatStream(String.valueOf(resolveAgent.getId()), effectiveSessionId,
+        message, resolveAgent.getEncoding());
   }
 
   private OpenAIChatCompletionsResponse chatSync(
@@ -184,54 +180,21 @@ public class OpenAIChatFacadeImpl implements OpenAIChatFacade {
     );
   }
 
-  private String resolveAgentId(String model, Long appId, Long agentId) {
+  private Agent resolveAgent(String model, Long appId, Long agentId) {
     if (agentId != null) {
-      agentQuery.findAndCheck(agentId);
-      return String.valueOf(agentId);
+      return agentQuery.findAndCheck(agentId);
     }
     if (appId != null) {
       Long defaultAgentId = applicationQuery.getDefaultAgentId(appId);
       if (defaultAgentId == null) {
         throw ProtocolException.of("应用未绑定智能体，请先配置应用");
       }
-      return String.valueOf(defaultAgentId);
+      return agentQuery.findAndCheck(defaultAgentId);
     }
     if (model == null || model.isBlank()) {
       throw ProtocolException.of("model 参数必填");
     }
-    String id = parseAgentIdFromModel(model);
-    if (id != null) {
-      agentQuery.findAndCheck(Long.parseLong(id));
-      return id;
-    }
-    throw ProtocolException.of("model 格式不支持，请使用 agent_123 或 123 指定智能体");
-  }
-
-  /**
-   * 解析 model 参数为 Agent ID agent_123 或 123（纯数字）→ Agent
-   */
-  private String parseAgentIdFromModel(String model) {
-    if (model == null) {
-      return null;
-    }
-    model = model.trim();
-    if (model.startsWith("agent_")) {
-      String id = model.substring(6).trim();
-      return isNumeric(id) ? id : null;
-    }
-    return isNumeric(model) ? model : null;
-  }
-
-  private boolean isNumeric(String s) {
-    if (s == null || s.isEmpty()) {
-      return false;
-    }
-    for (char c : s.toCharArray()) {
-      if (!Character.isDigit(c)) {
-        return false;
-      }
-    }
-    return true;
+    return agentQuery.findAndCheck(model);
   }
 
   private int estimateTokens(String text) {
