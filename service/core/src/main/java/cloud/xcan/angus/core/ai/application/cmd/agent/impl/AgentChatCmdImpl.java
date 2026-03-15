@@ -19,9 +19,9 @@ import cloud.xcan.angus.core.ai.domain.agent.Agent;
 import cloud.xcan.angus.core.ai.domain.agent.AgentChatResult;
 import cloud.xcan.angus.core.ai.domain.analytics.ApiUsageLog;
 import cloud.xcan.angus.core.ai.domain.chat.Message;
-import cloud.xcan.angus.core.ai.domain.chat.SessionConfig;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRole;
 import cloud.xcan.angus.core.ai.domain.chat.Session;
+import cloud.xcan.angus.core.ai.domain.chat.SessionConfig;
 import cloud.xcan.angus.core.ai.domain.model.Model;
 import cloud.xcan.angus.core.ai.infra.agent.utils.ChatConfigMergeUtils;
 import cloud.xcan.angus.core.biz.BizTemplate;
@@ -95,8 +95,12 @@ public class AgentChatCmdImpl implements AgentChatCmd {
         // 有会话时先落库用户消息
         messageCmd.create0(session, MessageRole.USER, message);
 
+        // Model 仅查询一次，复用给 getChatConfigOverride 和 saveApiUsageLog
+        Model model = agent.getDefaultModelId() != null
+            ? modelQuery.findById(agent.getDefaultModelId()).orElse(null) : null;
+
         // 合并请求/会话/智能体/模型配置，得到最终覆盖参数
-        ChatConfigOverride override = getChatConfigOverride(agent, config, session);
+        ChatConfigOverride override = getChatConfigOverride(agent, config, session, model);
         String agentIdStr = String.valueOf(agentId);
         String defaultModelIdStr = agent.getDefaultModelId() != null
             ? String.valueOf(agent.getDefaultModelId()) : null;
@@ -119,7 +123,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
         } finally {
           int estInput = estimateTokens(message);
           int estOutput = chatError == null ? estimateTokens(reply) : 0;
-          saveApiUsageLog(agent, session, "/api/v1/agents/chat", startMs, chatError == null,
+          saveApiUsageLog(agent, session, model, "/api/v1/agents/chat", startMs, chatError == null,
               chatError != null ? chatError.getMessage() : null, estInput, estOutput,
               estInput + estOutput);
         }
@@ -147,8 +151,12 @@ public class AgentChatCmdImpl implements AgentChatCmd {
 
       @Override
       protected SseEmitter process() {
+        // Model 仅查询一次，复用给 getChatConfigOverride 和 saveApiUsageLog
+        Model model = agent.getDefaultModelId() != null
+            ? modelQuery.findById(agent.getDefaultModelId()).orElse(null) : null;
+
         // 按照优先级获取会话配置
-        ChatConfigOverride override = getChatConfigOverride(agent, config, session);
+        ChatConfigOverride override = getChatConfigOverride(agent, config, session, model);
         Long timeoutMs = nullSafe(override.getTimeoutMs(), CHAT_DEFAULT_TIMEOUT_MS);
 
         // 构造SseEmitter
@@ -171,6 +179,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
 
         // 异步执行流式调用，通过 SSE 推送 token
         // 注意：必须保持使用 sseEmitterChatExecutor，否则会破坏 SSE 的流式模型和整体稳定性
+        final Model modelForAsync = model;
         sseEmitterChatExecutor.execute(() -> {
           StringBuilder fullContent = new StringBuilder();
           long streamStartMs = System.currentTimeMillis();
@@ -204,20 +213,20 @@ public class AgentChatCmdImpl implements AgentChatCmd {
                   if (total == null && (inTokens != null || outTokens != null)) {
                     total = (inTokens != null ? inTokens : 0) + (outTokens != null ? outTokens : 0);
                   }
-                  saveApiUsageLog(agent, session, "/api/v1/agents/chat/stream",
+                  saveApiUsageLog(agent, session, modelForAsync, "/api/v1/agents/chat/stream",
                       streamStartMs, true, null, inTokens, outTokens, total);
                   emitter.complete();
                 })
                 .onError(e -> {
                   messageCmd.setStreaming(assistantMessage, false);
-                  saveApiUsageLog(agent, session, "/api/v1/agents/chat/stream",
+                  saveApiUsageLog(agent, session, modelForAsync, "/api/v1/agents/chat/stream",
                       streamStartMs, false, e.getMessage(), null, null, null);
                   emitter.completeWithError(e);
                 });
             stream.start();
           } catch (Exception e) {
             messageCmd.setStreaming(assistantMessage, false);
-            saveApiUsageLog(agent, session, "/api/v1/agents/chat/stream",
+            saveApiUsageLog(agent, session, modelForAsync, "/api/v1/agents/chat/stream",
                 streamStartMs, false, e.getMessage(), null, null, null);
             emitter.completeWithError(e);
           }
@@ -229,24 +238,29 @@ public class AgentChatCmdImpl implements AgentChatCmd {
 
   /**
    * 合并请求/会话/智能体/模型配置，生成 ChatConfigOverride。 合并优先级：请求 config > 会话 config > 智能体 config > 模型 config。
+   *
+   * @param model 已查询的模型，可为 null；为 null 时内部会按需查询
    */
   private ChatConfigOverride getChatConfigOverride(Agent agent, SessionConfig config,
-      Session session) {
-    Model model = agent.getDefaultModelId() != null
-        ? modelQuery.findById(agent.getDefaultModelId()).orElse(null) : null;
-    SessionConfig merged = ChatConfigMergeUtils.merge(config, session, agent, model);
+      Session session, Model model) {
+    Model m = model != null ? model
+        : (agent.getDefaultModelId() != null ? modelQuery.findById(agent.getDefaultModelId())
+            .orElse(null) : null);
+    SessionConfig merged = ChatConfigMergeUtils.merge(config, session, agent, m);
     return toChatConfigOverride(merged);
   }
 
   /**
    * 保存 API 使用日志，关联对话
+   *
+   * @param model 已查询的模型，可为 null；为 null 时 calculateCost 内部会按需查询
    */
-  private void saveApiUsageLog(Agent agent, Session session, String endpoint,
+  private void saveApiUsageLog(Agent agent, Session session, Model model, String endpoint,
       long startMs, boolean isSuccessful, String errorMessage,
       Integer inputTokens, Integer outputTokens, Integer totalTokens) {
     try {
       int responseTimeMs = (int) (System.currentTimeMillis() - startMs);
-      Integer cost = calculateCost(agent, inputTokens, outputTokens);
+      Integer cost = calculateCost(agent, model, inputTokens, outputTokens);
       ApiUsageLog log = new ApiUsageLog()
           .setAppId(session != null ? session.getAppId() : null)
           .setAgentId(agent != null ? agent.getId() : null)
@@ -271,36 +285,37 @@ public class AgentChatCmdImpl implements AgentChatCmd {
 
   /**
    * 根据模型定价计算费用（美元分，即 cents）
+   *
+   * @param model 已查询的模型，可为 null；为 null 时内部会按 agent 的 defaultModelId 查询
    */
-  private Integer calculateCost(Agent agent, Integer inputTokens, Integer outputTokens) {
+  private Integer calculateCost(Agent agent, Model model, Integer inputTokens,
+      Integer outputTokens) {
     if (agent == null || agent.getDefaultModelId() == null || (inputTokens == null
         && outputTokens == null)) {
       return null;
     }
-    return modelQuery.findById(agent.getDefaultModelId())
-        .map(model -> {
-          var config = model.getConfig();
-          if (config == null) {
-            return null;
-          }
-          Double inputPrice = config.getInputPricePerMillionTokens();
-          Double outputPrice = config.getOutputPricePerMillionTokens();
-          int in = inputTokens != null ? inputTokens : 0;
-          int out = outputTokens != null ? outputTokens : 0;
-          if ((inputPrice == null || inputPrice <= 0)
-              && (outputPrice == null || outputPrice <= 0)) {
-            return null;
-          }
-          double costUsd = 0;
-          if (inputPrice != null && inputPrice > 0) {
-            costUsd += (in / 1_000_000.0) * inputPrice;
-          }
-          if (outputPrice != null && outputPrice > 0) {
-            costUsd += (out / 1_000_000.0) * outputPrice;
-          }
-          return costUsd > 0 ? (int) Math.round(costUsd * 100) : null;
-        })
-        .orElse(null);
+    Model m = model != null ? model
+        : modelQuery.findById(agent.getDefaultModelId()).orElse(null);
+    if (m == null || m.getConfig() == null) {
+      return null;
+    }
+    var config = m.getConfig();
+    Double inputPrice = config.getInputPricePerMillionTokens();
+    Double outputPrice = config.getOutputPricePerMillionTokens();
+    int in = inputTokens != null ? inputTokens : 0;
+    int out = outputTokens != null ? outputTokens : 0;
+    if ((inputPrice == null || inputPrice <= 0)
+        && (outputPrice == null || outputPrice <= 0)) {
+      return null;
+    }
+    double costUsd = 0;
+    if (inputPrice != null && inputPrice > 0) {
+      costUsd += (in / 1_000_000.0) * inputPrice;
+    }
+    if (outputPrice != null && outputPrice > 0) {
+      costUsd += (out / 1_000_000.0) * outputPrice;
+    }
+    return costUsd > 0 ? (int) Math.round(costUsd * 100) : null;
   }
 
   /**
