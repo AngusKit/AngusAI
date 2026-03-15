@@ -5,19 +5,18 @@ import static cloud.xcan.angus.core.utils.GsonUtils.toJson;
 import cloud.xcan.agentx.core.agent.AgentRegistry;
 import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
 import cloud.xcan.angus.core.ai.application.query.application.ApplicationQuery;
-import cloud.xcan.angus.core.ai.domain.application.AIApplication;
-import cloud.xcan.angus.core.ai.interfaces.chat.facade.OpenAIChatFacade;
 import cloud.xcan.angus.core.ai.domain.chat.openai.OpenAIChatCompletionChunk;
 import cloud.xcan.angus.core.ai.domain.chat.openai.OpenAIChatCompletionsRequest;
 import cloud.xcan.angus.core.ai.domain.chat.openai.OpenAIChatCompletionsResponse;
 import cloud.xcan.angus.core.ai.domain.chat.openai.OpenAIMessagesConverter;
-import cloud.xcan.angus.spec.utils.JsonUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import cloud.xcan.angus.core.ai.interfaces.chat.facade.OpenAIChatFacade;
 import cloud.xcan.angus.remote.message.ProtocolException;
 import dev.langchain4j.service.TokenStream;
 import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.Executor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -35,6 +34,13 @@ public class OpenAIChatFacadeImpl implements OpenAIChatFacade {
 
   @Resource
   private ApplicationQuery applicationQuery;
+
+  /**
+   * 流式 SSE 专用线程池
+   */
+  @Resource
+  @Qualifier("sseEmitterChatExecutor")
+  private Executor sseEmitterChatExecutor;
 
   @Override
   public OpenAIChatCompletionsResponse chatCompletions(
@@ -100,9 +106,82 @@ public class OpenAIChatFacadeImpl implements OpenAIChatFacade {
       throw ProtocolException.of("messages 中必须包含至少一条 user 消息");
     }
 
-    String modelDisplay =
-        request.getModel() != null ? request.getModel() : "agent_" + resolvedAgentId;
+    String modelDisplay = request.getModel() != null
+        ? request.getModel() : "agent_" + resolvedAgentId;
     return chatStream(resolvedAgentId, effectiveSessionId, message, modelDisplay);
+  }
+
+  private OpenAIChatCompletionsResponse chatSync(
+      String agentId, String sessionId, String message, String model) {
+    String reply = agentRegistry.chat(agentId, sessionId, message);
+    return OpenAIChatCompletionsResponse.builder()
+        .id("chatcmpl-" + UUID.randomUUID().toString().replace("-", "").substring(0, 24))
+        .object("chat.completion")
+        .created(System.currentTimeMillis() / 1000)
+        .model(model)
+        .choices(List.of(
+            new OpenAIChatCompletionsResponse.Choice(
+                0,
+                new OpenAIChatCompletionsResponse.Message("assistant", reply),
+                null,
+                "stop"
+            )))
+        .usage(estimateUsage(message, reply))
+        .build();
+  }
+
+  private SseEmitter chatStream(String agentId, String sessionId, String message, String model) {
+    SseEmitter emitter = new SseEmitter(120_000L);
+
+    sseEmitterChatExecutor.execute(() -> {
+      try {
+        TokenStream stream = agentRegistry.chatStream(agentId, sessionId, message);
+
+        stream.onPartialResponse(token -> {
+              try {
+                OpenAIChatCompletionChunk chunk = OpenAIChatCompletionChunk.builder()
+                    .id("chatcmpl-stream")
+                    .sessionId(sessionId)
+                    .object("chat.completion.chunk")
+                    .created(System.currentTimeMillis() / 1000)
+                    .model(model)
+                    .choices(
+                        List.of(new OpenAIChatCompletionChunk.ChunkChoice(
+                            0,
+                            new OpenAIChatCompletionsResponse.Delta(null, token),
+                            null
+                        )))
+                    .build();
+                emitter.send(SseEmitter.event().data("data: " + toJson(chunk) + "\n\n"));
+              } catch (Exception e) {
+                emitter.completeWithError(e);
+              }
+            })
+            .onCompleteResponse(r -> {
+              try {
+                emitter.send(SseEmitter.event().data("data: [DONE]\n\n"));
+                emitter.complete();
+              } catch (Exception e) {
+                emitter.completeWithError(e);
+              }
+            })
+            .onError(emitter::completeWithError);
+        stream.start();
+      } catch (Exception e) {
+        emitter.completeWithError(e);
+      }
+    });
+    return emitter;
+  }
+
+  private OpenAIChatCompletionsResponse.Usage estimateUsage(String prompt, String completion) {
+    int promptTokens = estimateTokens(prompt);
+    int completionTokens = estimateTokens(completion);
+    return new OpenAIChatCompletionsResponse.Usage(
+        promptTokens,
+        completionTokens,
+        promptTokens + completionTokens
+    );
   }
 
   private String resolveAgentId(String model, Long appId, Long agentId) {
@@ -126,78 +205,6 @@ public class OpenAIChatFacadeImpl implements OpenAIChatFacade {
       return id;
     }
     throw ProtocolException.of("model 格式不支持，请使用 agent_123 或 123 指定智能体");
-  }
-
-  private OpenAIChatCompletionsResponse chatSync(String agentId, String sessionId, String message,
-      String model) {
-    String reply = agentRegistry.chat(agentId, sessionId, message);
-
-    return OpenAIChatCompletionsResponse.builder()
-        .id("chatcmpl-" + UUID.randomUUID().toString().replace("-", "").substring(0, 24))
-        .object("chat.completion")
-        .created(System.currentTimeMillis() / 1000)
-        .model(model)
-        .choices(List.of(new OpenAIChatCompletionsResponse.Choice(
-            0,
-            new OpenAIChatCompletionsResponse.Message("assistant", reply),
-            null,
-            "stop"
-        )))
-        .usage(estimateUsage(message, reply))
-        .build();
-  }
-
-  private SseEmitter chatStream(String agentId, String sessionId, String message, String model) {
-    SseEmitter emitter = new SseEmitter(120_000L);
-
-    new Thread(() -> {
-      try {
-        TokenStream stream = agentRegistry.chatStream(agentId, sessionId, message);
-
-        stream.onPartialResponse(token -> {
-              try {
-                OpenAIChatCompletionChunk chunk = OpenAIChatCompletionChunk.builder()
-                    .id("chatcmpl-stream")
-                    .object("chat.completion.chunk")
-                    .created(System.currentTimeMillis() / 1000)
-                    .model(model)
-                    .choices(List.of(new OpenAIChatCompletionChunk.ChunkChoice(
-                        0,
-                        new OpenAIChatCompletionsResponse.Delta(null, token),
-                        null
-                    )))
-                    .build();
-                emitter.send(SseEmitter.event().data("data: " + toJson(chunk) + "\n\n"));
-              } catch (Exception e) {
-                emitter.completeWithError(e);
-              }
-            })
-            .onCompleteResponse(r -> {
-              try {
-                emitter.send(SseEmitter.event().data("data: [DONE]\n\n"));
-                emitter.complete();
-              } catch (Exception e) {
-                emitter.completeWithError(e);
-              }
-            })
-            .onError(emitter::completeWithError);
-        stream.start();
-      } catch (Exception e) {
-        emitter.completeWithError(e);
-      }
-    }).start();
-
-    return emitter;
-  }
-
-  private OpenAIChatCompletionsResponse.Usage estimateUsage(String prompt, String completion) {
-    int promptTokens = estimateTokens(prompt);
-    int completionTokens = estimateTokens(completion);
-    return new OpenAIChatCompletionsResponse.Usage(
-        promptTokens,
-        completionTokens,
-        promptTokens + completionTokens
-    );
   }
 
   /**

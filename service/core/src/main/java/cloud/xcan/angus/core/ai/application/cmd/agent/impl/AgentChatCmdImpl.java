@@ -193,7 +193,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
                   fullContent.append(token);
                   try {
                     OpenAIChatCompletionChunk chunk = OpenAIChatCompletionChunk.builder()
-                        .id(messageDb.getId().toString())
+                        .id("chatcmpl-stream")
                         .sessionId(sessionDb.getSessionId())
                         .object("chat.completion.chunk")
                         .created(System.currentTimeMillis() / 1000)
