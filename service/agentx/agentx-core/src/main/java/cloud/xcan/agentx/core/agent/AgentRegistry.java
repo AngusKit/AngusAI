@@ -336,17 +336,16 @@ public class AgentRegistry {
     }
     String inputToUse = inputGuard.result();
 
-    Object memoryId = normalizeSessionId(sessionId);
-    String sessionIdStr = (String) memoryId;
+    String memoryId = normalizeSessionId(sessionId);
     var definition = instance.getDefinition();
     String wfMode = getWorkflowMode(definition);
     if (definition.getWorkflowId() != null && WORKFLOW_MODE_BEFORE.equals(wfMode)) {
-      runWorkflowIfConfigured(definition, Map.of("message", inputToUse, "sessionId", sessionIdStr));
+      runWorkflowIfConfigured(definition, Map.of("message", inputToUse, "sessionId", memoryId));
     }
 
     if (definition.getWorkflowId() != null && WORKFLOW_MODE_INSTEAD.equals(wfMode)) {
       String wfResponse = runWorkflowIfConfigured(definition,
-          Map.of("message", inputToUse, "sessionId", sessionIdStr));
+          Map.of("message", inputToUse, "sessionId", memoryId));
       return wfResponse != null ? wfResponse : "";
     }
 
@@ -356,7 +355,7 @@ public class AgentRegistry {
     // AFTER_CHAT：LLM 后执行工作流（通知、记录等）
     if (definition.getWorkflowId() != null && WORKFLOW_MODE_AFTER.equals(wfMode)) {
       runWorkflowIfConfigured(definition,
-          Map.of("message", inputToUse, "response", response, "sessionId", sessionIdStr));
+          Map.of("message", inputToUse, "response", response, "sessionId", memoryId));
     }
 
     GuardrailApplyResult outputGuard = applyOutputGuardrail(instance, response);

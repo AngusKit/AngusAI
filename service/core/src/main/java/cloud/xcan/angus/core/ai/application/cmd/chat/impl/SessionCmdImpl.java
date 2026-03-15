@@ -130,11 +130,12 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
     if (existing != null) {
       return existing;
     }
+
     Session session = new Session();
-    session.setSessionId(effectiveSessionId);
-   session.setAppId(agent.getId());
-    session.setAgentId(agent.getId());
     session.setTitle("新对话");
+    session.setSessionId(effectiveSessionId);
+    session.setAppId(agent.getApplicationId());
+    session.setAgentId(agent.getId());
     SessionConfig config = new SessionConfig();
     session.setConfig(config);
     return self.create(session);
