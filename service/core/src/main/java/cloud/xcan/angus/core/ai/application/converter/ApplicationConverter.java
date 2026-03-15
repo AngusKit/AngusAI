@@ -14,10 +14,6 @@ public class ApplicationConverter {
     AIApplication newApplication = new AIApplication()
         .setName(newName)
         .setStatus(ApplicationStatus.DRAFT)
-        .setApiCalls(0L)
-        .setTotalTokens(0L)
-        .setAvgResponseTime(0.0)
-        .setSuccessRate(0.0)
         .setPublicAccess(false)
         .setEmbedEnabled(false)
         .setApiEnabled(false);
