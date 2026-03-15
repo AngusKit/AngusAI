@@ -124,7 +124,7 @@ export function ChatSidebar({
     <div
       onClick={() => !renamingId && onSessionSelect(session.id)}
       className={cn(
-        'group flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-colors',
+        'group flex items-center gap-2 px-2 py-1 rounded-lg cursor-pointer transition-colors',
         currentSessionId === session.id
           ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
           : 'hover:bg-gray-100 dark:hover:bg-gray-750 text-gray-700 dark:text-gray-300'
@@ -206,12 +206,12 @@ export function ChatSidebar({
   const SessionGroup = ({ title, sessions }: { title: string; sessions: Session[] }) => {
     if (sessions.length === 0) return null;
     return (
-      <div className='mb-4'>
-        <h3 className='text-xs text-gray-500 dark:text-gray-400 px-3 mb-2 flex items-center gap-2'>
+      <div className='mb-2'>
+        <h3 className='text-xs text-gray-500 dark:text-gray-400 px-2 mb-1 flex items-center gap-1.5'>
           <Clock className='w-2.5 h-2.5' />
           {title}
         </h3>
-        <div className='space-y-1'>
+        <div className='space-y-0.5'>
           {sessions.map(session => (
             <SessionItem key={session.id} session={session} />
           ))}
@@ -274,7 +274,7 @@ export function ChatSidebar({
           className='flex-1 overflow-y-auto min-h-0 scrollbar-hide'
           onScroll={handleSessionListScroll}
         >
-          <div className='p-4'>
+          <div className='p-2'>
             <SessionGroup title='今天' sessions={groupedSessions.today} />
             <SessionGroup title='昨天' sessions={groupedSessions.yesterday} />
             <SessionGroup title='最近7天' sessions={groupedSessions.lastWeek} />
