@@ -1,6 +1,7 @@
 package cloud.xcan.agentx.core.agent;
 
 import cloud.xcan.agentx.core.agent.definition.AgentDefinition;
+import cloud.xcan.agentx.core.agent.internal.AgentServiceBuilder;
 import cloud.xcan.agentx.core.agent.runtime.AgentChatService;
 import cloud.xcan.agentx.core.agent.runtime.AgentInstance;
 import cloud.xcan.agentx.core.agent.runtime.AgentStreamingChatService;
@@ -18,51 +19,58 @@ import cloud.xcan.agentx.core.workflow.WorkflowDefinitionProvider;
 import cloud.xcan.agentx.core.workflow.dsl.WorkflowDefinition;
 import cloud.xcan.agentx.core.workflow.engine.WorkflowEngine;
 import cloud.xcan.agentx.core.workflow.engine.WorkflowExecutionResult;
-import dev.langchain4j.agent.tool.ToolSpecification;
-import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.StreamingChatModel;
-import dev.langchain4j.service.AiServices;
 import dev.langchain4j.service.TokenStream;
-import dev.langchain4j.service.tool.ToolExecutor;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * Agent 注册中心 — 管理所有 Agent 实例的生命周期。
  * <p>
- * 模型通过 {@link ModelRegistry} 从数据库配置动态获取， 不再要求外部传入 ChatModel / StreamingChatModel。
+ * 职责划分：
+ * <ul>
+ *   <li>生命周期：register / unregister / get / listAll</li>
+ *   <li>对话编排：chat / chatStream（护栏→工作流→LLM→工作流→护栏）</li>
+ *   <li>服务构建：委托 {@link AgentServiceBuilder}</li>
+ * </ul>
+ * 模型通过 {@link ModelRegistry} 从数据库配置动态获取。
  * </p>
  */
 @Slf4j
-@RequiredArgsConstructor
 public class AgentRegistry {
 
   private static final String WORKFLOW_MODE_BEFORE = "BEFORE_CHAT";
   private static final String WORKFLOW_MODE_AFTER = "AFTER_CHAT";
   private static final String WORKFLOW_MODE_INSTEAD = "INSTEAD_OF_CHAT";
   private static final String SESSION_DEFAULT = "default";
-  private static final int RAG_TOP_K = 5;
   private static final String GUARDRAIL_PREFIX = "[Guardrail] ";
 
   private record GuardrailApplyResult(boolean passed, String result) {
-
   }
 
   private final Map<String, AgentInstance> agents = new ConcurrentHashMap<>();
-  private final ToolRegistry toolRegistry;
-  private final MemoryFactory memoryFactory;
+  private final AgentServiceBuilder serviceBuilder;
   private final ModelRegistry modelRegistry;
   private final SkillRegistry skillRegistry;
   private final GuardrailChain guardrailChain;
-  private final ContentRetrieverFactory contentRetrieverFactory;
   private final WorkflowEngine workflowEngine;
   private final WorkflowDefinitionProvider workflowDefinitionProvider;
+
+  public AgentRegistry(ToolRegistry toolRegistry, MemoryFactory memoryFactory,
+      ModelRegistry modelRegistry, SkillRegistry skillRegistry, GuardrailChain guardrailChain,
+      ContentRetrieverFactory contentRetrieverFactory, WorkflowEngine workflowEngine,
+      WorkflowDefinitionProvider workflowDefinitionProvider) {
+    this.serviceBuilder = new AgentServiceBuilder(toolRegistry, skillRegistry, memoryFactory,
+        contentRetrieverFactory);
+    this.modelRegistry = modelRegistry;
+    this.skillRegistry = skillRegistry;
+    this.guardrailChain = guardrailChain;
+    this.workflowEngine = workflowEngine;
+    this.workflowDefinitionProvider = workflowDefinitionProvider;
+  }
 
   /**
    * 注册并构建 Agent 实例 — 从 AgentDefinition.model 配置中解析模型
@@ -105,87 +113,17 @@ public class AgentRegistry {
 
     AgentInstance instance = new AgentInstance(definition);
 
-    // 构建同步对话服务
-    var syncBuilder = AiServices.builder(AgentChatService.class)
-        .chatModel(chatModel);
+    // 委托 AgentServiceBuilder 构建同步对话服务
+    instance.setAiServiceProxy(
+        serviceBuilder.buildChatService(definition, chatModel, null, this::resolveSystemPromptWithSkills));
 
-    // 绑定工具：@Tool beans 作为 tools(objects)，仅执行器插件作为 tools(Map)
-    List<String> allToolIds = definition.getToolIds() != null
-        ? new ArrayList<>(definition.getToolIds()) : new ArrayList<>();
-
-    List<Object> toolObjects = toolRegistry.getToolObjectsForIds(allToolIds);
-    Map<ToolSpecification, ToolExecutor> toolMap = toolRegistry.getToolMapForIds(allToolIds);
-
-    if (!toolObjects.isEmpty()) {
-      syncBuilder.tools(toolObjects);
-    }
-    if (!toolMap.isEmpty()) {
-      syncBuilder.tools(toolMap);
-    }
-
-    // 绑定 LangChain4j 技能（activate_skill、read_skill_resource）
-    // skillIds 即技能名称（Skill.name()）
-    if (definition.getSkillIds() != null && !definition.getSkillIds().isEmpty()) {
-      skillRegistry.resolveSkillsToolProvider(definition.getSkillIds())
-          .ifPresent(syncBuilder::toolProvider);
-    }
-
-    // 绑定记忆
-    ChatMemoryProvider memoryProvider = memoryFactory.create(definition.getMemory());
-    syncBuilder.chatMemoryProvider(memoryProvider);
-
-    // RAG：当存在 knowledgeBaseIds 时绑定 contentRetriever
-    AgentDefinition.ModelConfig defModel = definition.getModel();
-    if (contentRetrieverFactory != null && definition.getKnowledgeBaseIds() != null
-        && !definition.getKnowledgeBaseIds().isEmpty()) {
-      ModelProvider embeddingProvider = defModel != null && defModel.getProvider() != null
-          ? defModel.getProvider() : ModelProvider.DEEPSEEK;
-      contentRetrieverFactory.createContentRetriever(
-              definition.getKnowledgeBaseIds(), embeddingProvider, RAG_TOP_K)
-          .ifPresent(syncBuilder::contentRetriever);
-    }
-
-    String systemPrompt = resolveSystemPromptWithSkills(definition, null);
-    if (systemPrompt != null && !systemPrompt.isBlank()) {
-      final String finalPrompt = systemPrompt;
-      syncBuilder.systemMessageProvider(memoryId -> finalPrompt);
-    }
-
-    instance.setAiServiceProxy(syncBuilder.build());
-
-    // 构建流式服务（当有 StreamingChatModel 时）
+    // 当有流式模型时，构建流式对话服务
     if (streamingModel != null) {
-      var streamBuilder = AiServices.builder(AgentStreamingChatService.class)
-          .streamingChatModel(streamingModel);
-
-      if (contentRetrieverFactory != null && definition.getKnowledgeBaseIds() != null
-          && !definition.getKnowledgeBaseIds().isEmpty()) {
-        ModelProvider embProvider = defModel != null && defModel.getProvider() != null
-            ? defModel.getProvider() : ModelProvider.DEEPSEEK;
-        contentRetrieverFactory.createContentRetriever(
-                definition.getKnowledgeBaseIds(), embProvider, RAG_TOP_K)
-            .ifPresent(streamBuilder::contentRetriever);
-      }
-      if (!toolObjects.isEmpty()) {
-        streamBuilder.tools(toolObjects);
-      }
-      if (!toolMap.isEmpty()) {
-        streamBuilder.tools(toolMap);
-      }
-      if (definition.getSkillIds() != null && !definition.getSkillIds().isEmpty()) {
-        skillRegistry.resolveSkillsToolProvider(definition.getSkillIds())
-            .ifPresent(streamBuilder::toolProvider);
-      }
-      streamBuilder.chatMemoryProvider(memoryProvider);
-      if (systemPrompt != null && !systemPrompt.isBlank()) {
-        final String finalPrompt = systemPrompt;
-        streamBuilder.systemMessageProvider(memoryId -> finalPrompt);
-      }
-      instance.setStreamingServiceProxy(streamBuilder.build());
+      instance.setStreamingServiceProxy(serviceBuilder.buildStreamingChatService(
+          definition, streamingModel, null, this::resolveSystemPromptWithSkills));
     }
 
     instance.activate();
-
     agents.put(definition.getId(), instance);
     log.info("Agent registered and activated: {}", definition.getId());
     return instance;
@@ -193,6 +131,18 @@ public class AgentRegistry {
 
   public Optional<AgentInstance> get(String agentId) {
     return Optional.ofNullable(agents.get(agentId));
+  }
+
+  public Map<String, AgentInstance> listAll() {
+    return Map.copyOf(agents);
+  }
+
+  public void unregister(String agentId) {
+    AgentInstance removed = agents.remove(agentId);
+    if (removed != null) {
+      removed.archive();
+      log.info("Agent unregistered: {}", agentId);
+    }
   }
 
   /**
@@ -289,38 +239,8 @@ public class AgentRegistry {
 
   private AgentChatService buildChatService(AgentDefinition definition, ChatModel chatModel,
       String systemPromptOverride) {
-    var syncBuilder = AiServices.builder(AgentChatService.class).chatModel(chatModel);
-    List<String> allToolIds = definition.getToolIds() != null
-        ? new ArrayList<>(definition.getToolIds()) : new ArrayList<>();
-    List<Object> toolObjects = toolRegistry.getToolObjectsForIds(allToolIds);
-    Map<ToolSpecification, ToolExecutor> toolMap = toolRegistry.getToolMapForIds(allToolIds);
-    if (!toolObjects.isEmpty()) {
-      syncBuilder.tools(toolObjects);
-    }
-    if (!toolMap.isEmpty()) {
-      syncBuilder.tools(toolMap);
-    }
-    if (definition.getSkillIds() != null && !definition.getSkillIds().isEmpty()) {
-      skillRegistry.resolveSkillsToolProvider(definition.getSkillIds())
-          .ifPresent(syncBuilder::toolProvider);
-    }
-    ChatMemoryProvider memoryProvider = memoryFactory.create(definition.getMemory());
-    syncBuilder.chatMemoryProvider(memoryProvider);
-    AgentDefinition.ModelConfig defModel = definition.getModel();
-    if (contentRetrieverFactory != null && definition.getKnowledgeBaseIds() != null
-        && !definition.getKnowledgeBaseIds().isEmpty()) {
-      ModelProvider embeddingProvider = defModel != null && defModel.getProvider() != null
-          ? defModel.getProvider() : ModelProvider.DEEPSEEK;
-      contentRetrieverFactory.createContentRetriever(
-              definition.getKnowledgeBaseIds(), embeddingProvider, RAG_TOP_K)
-          .ifPresent(syncBuilder::contentRetriever);
-    }
-    String systemPrompt = resolveSystemPromptWithSkills(definition, systemPromptOverride);
-    if (systemPrompt != null && !systemPrompt.isBlank()) {
-      final String finalPrompt = systemPrompt;
-      syncBuilder.systemMessageProvider(memoryId -> finalPrompt);
-    }
-    return syncBuilder.build();
+    return serviceBuilder.buildChatService(definition, chatModel, systemPromptOverride,
+        this::resolveSystemPromptWithSkills);
   }
 
   public String chat(String agentId, String sessionId, String message) {
@@ -404,39 +324,8 @@ public class AgentRegistry {
 
   private AgentStreamingChatService buildStreamingChatService(AgentDefinition definition,
       StreamingChatModel streamingModel, String systemPromptOverride) {
-    var streamBuilder = AiServices.builder(AgentStreamingChatService.class)
-        .streamingChatModel(streamingModel);
-    List<String> allToolIds = definition.getToolIds() != null
-        ? new ArrayList<>(definition.getToolIds()) : new ArrayList<>();
-    List<Object> toolObjects = toolRegistry.getToolObjectsForIds(allToolIds);
-    Map<ToolSpecification, ToolExecutor> toolMap = toolRegistry.getToolMapForIds(allToolIds);
-    if (!toolObjects.isEmpty()) {
-      streamBuilder.tools(toolObjects);
-    }
-    if (!toolMap.isEmpty()) {
-      streamBuilder.tools(toolMap);
-    }
-    if (definition.getSkillIds() != null && !definition.getSkillIds().isEmpty()) {
-      skillRegistry.resolveSkillsToolProvider(definition.getSkillIds())
-          .ifPresent(streamBuilder::toolProvider);
-    }
-    ChatMemoryProvider memoryProvider = memoryFactory.create(definition.getMemory());
-    streamBuilder.chatMemoryProvider(memoryProvider);
-    AgentDefinition.ModelConfig defModel = definition.getModel();
-    if (contentRetrieverFactory != null && definition.getKnowledgeBaseIds() != null
-        && !definition.getKnowledgeBaseIds().isEmpty()) {
-      ModelProvider embProvider = defModel != null && defModel.getProvider() != null
-          ? defModel.getProvider() : ModelProvider.DEEPSEEK;
-      contentRetrieverFactory.createContentRetriever(
-              definition.getKnowledgeBaseIds(), embProvider, RAG_TOP_K)
-          .ifPresent(streamBuilder::contentRetriever);
-    }
-    String systemPrompt = resolveSystemPromptWithSkills(definition, systemPromptOverride);
-    if (systemPrompt != null && !systemPrompt.isBlank()) {
-      final String finalPrompt = systemPrompt;
-      streamBuilder.systemMessageProvider(memoryId -> finalPrompt);
-    }
-    return streamBuilder.build();
+    return serviceBuilder.buildStreamingChatService(definition, streamingModel, systemPromptOverride,
+        this::resolveSystemPromptWithSkills);
   }
 
   /**
@@ -462,18 +351,6 @@ public class AgentRegistry {
     Object memoryId = normalizeSessionId(sessionId);
     AgentStreamingChatService service = (AgentStreamingChatService) instance.getStreamingServiceProxy();
     return service.chatStream(memoryId, inputToUse);
-  }
-
-  public void unregister(String agentId) {
-    AgentInstance removed = agents.remove(agentId);
-    if (removed != null) {
-      removed.archive();
-      log.info("Agent unregistered: {}", agentId);
-    }
-  }
-
-  public Map<String, AgentInstance> listAll() {
-    return Map.copyOf(agents);
   }
 
   /**
