@@ -19,6 +19,9 @@ public class AgentListVo extends TenantAuditingVo {
   @Schema(description = "名称")
   private String name;
 
+  @Schema(description = "编码（唯一标识，不超过80字符）")
+  private String encoding;
+
   @Schema(description = "描述")
   private String description;
 

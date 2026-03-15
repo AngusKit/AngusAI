@@ -13,6 +13,8 @@ export interface AgentDetailVo extends TenantAuditingVo {
   id?: string;
   /** 名称 */
   name?: string;
+  /** 编码（唯一标识，不超过80字符） */
+  encoding?: string;
   /** 描述 */
   description?: string;
   /** 状态 */
@@ -73,6 +75,8 @@ export interface AgentListVo {
   id?: string;
   /** 名称 */
   name?: string;
+  /** 编码（唯一标识，不超过80字符） */
+  encoding?: string;
   /** 描述 */
   description?: string;
   /** 状态 */
@@ -122,6 +126,8 @@ export type AgentCountResult = ApiLocaleResult & {
 export interface AgentCreateDto {
   /** 智能体名称（必填） */
   name: string;
+  /** 智能体编码（必填，唯一标识，不超过80字符） */
+  encoding: string;
   /** 描述 */
   description?: string;
   /** 交互模式，默认 CHATBOT */
@@ -152,6 +158,8 @@ export interface AgentCreateDto {
 export interface AgentUpdateDto {
   /** 智能体名称（必填） */
   name?: string;
+  /** 智能体编码（必填，唯一标识，不超过80字符） */
+  encoding?: string;
   /** 描述 */
   description?: string;
   /** 交互模式 */

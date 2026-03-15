@@ -8,6 +8,7 @@ import cloud.xcan.agentx.core.agent.enums.InteractionMode;
 import cloud.xcan.agentx.core.agent.enums.ReasoningStrategy;
 import cloud.xcan.agentx.core.memory.enums.MemoryStrategy;
 import cloud.xcan.angus.core.ai.application.converter.AgentConverter;
+import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_ENCODING_MAX_LENGTH;
 import cloud.xcan.angus.core.ai.domain.Constants;
 import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
@@ -44,6 +45,9 @@ public class Agent extends TenantAuditingEntity<Agent, Long> {
 
   @Column(name = "name", nullable = false, length = MAX_NAME_LENGTH)
   private String name;
+
+  @Column(name = "encoding", nullable = false, length = AGENT_ENCODING_MAX_LENGTH)
+  private String encoding;
 
   @Column(name = "description", length = MAX_DESC_LENGTH_X4)
   private String description;

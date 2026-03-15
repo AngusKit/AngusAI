@@ -12,6 +12,12 @@ public interface Constants {
   String CHAT_ATTACHMENTS_UPLOAD_BIZ_KEY = "angusAIChatAttachments";
 
   // ==================== 智能体常量 ====================
+
+  /**
+   * 智能体编码最大长度
+   */
+  int AGENT_ENCODING_MAX_LENGTH = 80;
+
   /**
    * 智能体系统提示词最大长度（注意：这里允许100k字符，如果对于具体模型太长时在对应模型上手动截取安全长度字符）
    */

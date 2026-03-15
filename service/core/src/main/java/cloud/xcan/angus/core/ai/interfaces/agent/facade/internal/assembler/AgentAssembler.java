@@ -27,6 +27,7 @@ public class AgentAssembler {
   public static Agent toDomain(AgentCreateDto dto) {
     Agent agent = new Agent();
     agent.setName(dto.getName());
+    agent.setEncoding(dto.getEncoding());
     agent.setDescription(dto.getDescription());
     agent.setInteractionMode(nullSafe(dto.getInteractionMode(), InteractionMode.CHATBOT));
     agent.setReasoningStrategy(
@@ -63,6 +64,7 @@ public class AgentAssembler {
 
   public static void mergeUpdate(Agent agent, AgentUpdateDto dto) {
     agent.setName(dto.getName());
+    agent.setEncoding(dto.getEncoding());
     agent.setDescription(dto.getDescription());
     agent.setInteractionMode(nullSafe(dto.getInteractionMode(), InteractionMode.CHATBOT));
     agent.setReasoningStrategy(
@@ -127,6 +129,7 @@ public class AgentAssembler {
     AgentDetailVo vo = new AgentDetailVo();
     vo.setId(agent.getId());
     vo.setName(agent.getName());
+    vo.setEncoding(agent.getEncoding());
     vo.setDescription(agent.getDescription());
     vo.setStatus(agent.getStatus());
     vo.setInteractionMode(agent.getInteractionMode());
@@ -162,6 +165,7 @@ public class AgentAssembler {
     AgentListVo vo = new AgentListVo();
     vo.setId(agent.getId());
     vo.setName(agent.getName());
+    vo.setEncoding(agent.getEncoding());
     vo.setDescription(agent.getDescription());
     vo.setStatus(agent.getStatus());
     vo.setInteractionMode(agent.getInteractionMode());

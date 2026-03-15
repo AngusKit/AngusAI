@@ -24,6 +24,16 @@ public interface AgentRepo extends NameJoinRepository<Agent, Long>, BaseReposito
   boolean existsByNameAndIdNot(String name, Long id);
 
   /**
+   * 检查编码是否存在（同租户下）
+   */
+  boolean existsByEncoding(String encoding);
+
+  /**
+   * 检查编码是否存在（排除指定ID）
+   */
+  boolean existsByEncodingAndIdNot(String encoding, Long id);
+
+  /**
    * 根据状态查询
    */
   List<Agent> findByStatus(AgentStatus status);

@@ -117,6 +117,16 @@ public class AgentQueryImpl implements AgentQuery {
   }
 
   @Override
+  public boolean existsByEncoding(String encoding) {
+    return agentRepo.existsByEncoding(encoding);
+  }
+
+  @Override
+  public boolean existsByEncodingAndIdNot(String encoding, Long id) {
+    return agentRepo.existsByEncodingAndIdNot(encoding, id);
+  }
+
+  @Override
   public boolean isReferencedByApplications(Long agentId) {
     return agentId != null && applicationAgentBindingRepo.existsByAgentId(agentId);
   }

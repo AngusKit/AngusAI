@@ -10,6 +10,7 @@ import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_SUGGESTED_QUESTION
 import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_SUMMARY_PROMPT_MAX_LENGTH;
 import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_SYSTEM_PROMPT_MAX_LENGTH;
 import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_TOOL_IDS_MAX_SIZE;
+import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_ENCODING_MAX_LENGTH;
 import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_WELCOME_MESSAGE_MAX_LENGTH;
 import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_DESC_LENGTH_X4;
 import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_NAME_LENGTH;
@@ -34,6 +35,11 @@ public class AgentCreateDto {
   @Size(max = MAX_NAME_LENGTH)
   @Schema(description = "智能体名称", requiredMode = RequiredMode.REQUIRED)
   private String name;
+
+  @NotBlank
+  @Size(max = AGENT_ENCODING_MAX_LENGTH)
+  @Schema(description = "智能体编码，唯一标识，不超过80字符", requiredMode = RequiredMode.REQUIRED)
+  private String encoding;
 
   @Size(max = MAX_DESC_LENGTH_X4)
   @Schema(description = "描述")

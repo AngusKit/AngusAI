@@ -58,6 +58,16 @@ public interface AgentQuery {
   boolean existsByNameAndIdNot(String name, Long id);
 
   /**
+   * 检查智能体编码是否存在
+   */
+  boolean existsByEncoding(String encoding);
+
+  /**
+   * 检查智能体编码是否存在（排除指定ID）
+   */
+  boolean existsByEncodingAndIdNot(String encoding, Long id);
+
+  /**
    * 检查智能体是否被应用引用
    */
   boolean isReferencedByApplications(Long agentId);

@@ -1,5 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.agent.facade.dto;
 
+import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_ENCODING_MAX_LENGTH;
 import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_SUGGESTED_QUESTIONS_MAX_SIZE;
 import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_SYSTEM_PROMPT_MAX_LENGTH;
 import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_WELCOME_MESSAGE_MAX_LENGTH;
@@ -25,6 +26,11 @@ public class AgentUpdateDto {
   @Size(max = MAX_NAME_LENGTH)
   @Schema(description = "智能体名称", requiredMode = RequiredMode.REQUIRED)
   private String name;
+
+  @NotBlank
+  @Size(max = AGENT_ENCODING_MAX_LENGTH)
+  @Schema(description = "智能体编码，唯一标识，不超过80字符", requiredMode = RequiredMode.REQUIRED)
+  private String encoding;
 
   @Size(max = MAX_DESC_LENGTH_X4)
   @Schema(description = "描述")

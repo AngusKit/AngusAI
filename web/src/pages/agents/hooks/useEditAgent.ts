@@ -10,6 +10,7 @@ import {
   MemoryStrategyEnum,
 } from '@/enums/enums';
 import {
+  AGENT_ENCODING_MAX_LENGTH,
   AGENT_SYSTEM_PROMPT_MAX_LENGTH,
   AGENT_WELCOME_MESSAGE_MAX_LENGTH,
   AGENT_SUMMARY_PROMPT_MAX_LENGTH,
@@ -59,6 +60,7 @@ export function useEditAgent() {
       );
       setForm({
         name: d.name ?? '',
+        encoding: d.encoding ?? '',
         description: d.description ?? '',
         interactionMode: (d.interactionMode ?? InteractionModeEnum.CHATBOT) as InteractionModeEnum,
         reasoningStrategy: (d.reasoningStrategy ?? ReasoningStrategyEnum.FUNCTION_CALLING) as ReasoningStrategyEnum,
@@ -104,6 +106,14 @@ export function useEditAgent() {
       toast.error('请输入智能体名称');
       return;
     }
+    if (!form.encoding.trim()) {
+      toast.error('请输入智能体编码');
+      return;
+    }
+    if (form.encoding.length > AGENT_ENCODING_MAX_LENGTH) {
+      toast.error(`智能体编码不超过 ${AGENT_ENCODING_MAX_LENGTH} 字符`);
+      return;
+    }
     if (form.systemPrompt.length > AGENT_SYSTEM_PROMPT_MAX_LENGTH) {
       toast.error(`系统提示词不超过 ${AGENT_SYSTEM_PROMPT_MAX_LENGTH.toLocaleString()} 字`);
       return;
@@ -120,6 +130,7 @@ export function useEditAgent() {
     try {
       const dto: AgentUpdateDto = {
         name: form.name.trim(),
+        encoding: form.encoding.trim(),
         description: form.description.trim() || undefined,
         interactionMode: form.interactionMode,
         reasoningStrategy: form.reasoningStrategy,

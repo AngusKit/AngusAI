@@ -15,6 +15,7 @@ import {
   MemoryStrategyEnum,
 } from '@/enums/enums';
 import {
+  AGENT_ENCODING_MAX_LENGTH,
   AGENT_SYSTEM_PROMPT_MAX_LENGTH,
   AGENT_WELCOME_MESSAGE_MAX_LENGTH,
   AGENT_SUMMARY_PROMPT_MAX_LENGTH,
@@ -64,6 +65,11 @@ export function EditAgentPage() {
               <div>
                 <Label className="dark:text-gray-300">名称（必填）</Label>
                 <Input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="智能体名称" maxLength={100} className="mt-2 dark:bg-gray-900 dark:border-gray-700 dark:text-white" />
+              </div>
+              <div>
+                <Label className="dark:text-gray-300">编码（必填）</Label>
+                <Input value={form.encoding} onChange={e => setForm(f => ({ ...f, encoding: e.target.value }))} placeholder="智能体编码，唯一标识" maxLength={80} className="mt-2 dark:bg-gray-900 dark:border-gray-700 dark:text-white" />
+                <p className="text-xs text-gray-500 mt-1">不超过 80 字符，用于唯一标识</p>
               </div>
               <div>
                 <Label className="dark:text-gray-300">描述</Label>

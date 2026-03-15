@@ -58,6 +58,11 @@ export function CreateAgentPage() {
                 <p className="text-xs text-gray-500 mt-1">不超过 100 字</p>
               </div>
               <div>
+                <Label className="dark:text-gray-300">编码（必填）</Label>
+                <Input value={form.encoding} onChange={e => setForm(f => ({ ...f, encoding: e.target.value }))} placeholder="智能体编码，唯一标识" maxLength={80} className="mt-2 dark:bg-gray-900 dark:border-gray-700 dark:text-white" />
+                <p className="text-xs text-gray-500 mt-1">不超过 80 字符，用于唯一标识</p>
+              </div>
+              <div>
                 <Label className="dark:text-gray-300">描述</Label>
                 <Textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder="智能体简要介绍" maxLength={800} rows={4} className="mt-2 dark:bg-gray-900 dark:border-gray-700 dark:text-white resize-none" />
                 <p className="text-xs text-gray-500 mt-1">不超过 800 字</p>

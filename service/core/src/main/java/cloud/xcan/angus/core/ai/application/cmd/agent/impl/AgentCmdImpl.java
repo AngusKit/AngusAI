@@ -69,6 +69,9 @@ public class AgentCmdImpl extends CommCmd<Agent, Long> implements AgentCmd {
         if (agentQuery.existsByName(agent.getName())) {
           throw ResourceExisted.of("智能体名称「{0}」已存在", new Object[]{agent.getName()});
         }
+        if (agentQuery.existsByEncoding(agent.getEncoding())) {
+          throw ResourceExisted.of("智能体编码「{0}」已存在", new Object[]{agent.getEncoding()});
+        }
         modelQuery.findAndCheck(agent.getDefaultModelId());
         validateReferencedResources(agent);
       }
@@ -89,6 +92,9 @@ public class AgentCmdImpl extends CommCmd<Agent, Long> implements AgentCmd {
       protected void checkParams() {
         if (agentQuery.existsByNameAndIdNot(agent.getName(), agent.getId())) {
           throw ResourceExisted.of("智能体名称「{0}」已存在", new Object[]{agent.getName()});
+        }
+        if (agentQuery.existsByEncodingAndIdNot(agent.getEncoding(), agent.getId())) {
+          throw ResourceExisted.of("智能体编码「{0}」已存在", new Object[]{agent.getEncoding()});
         }
         if (agent.getDefaultModelId() != null) {
           modelQuery.findAndCheck(agent.getDefaultModelId());
