@@ -162,7 +162,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
         agentCmd.ensureRegistered(agent);
 
         // 落库用户消息
-        Message messageDb = messageCmd.create0(sessionDb, MessageRole.USER, message);
+        messageCmd.create0(sessionDb, MessageRole.USER, message);
 
         // 预创建占位助手消息并标记为流式
         assistantMessage = messageCmd.create0(sessionDb, MessageRole.ASSISTANT,

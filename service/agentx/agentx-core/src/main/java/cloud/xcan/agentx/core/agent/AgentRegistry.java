@@ -49,6 +49,7 @@ public class AgentRegistry {
   private static final String GUARDRAIL_PREFIX = "[Guardrail] ";
 
   private record GuardrailApplyResult(boolean passed, String result) {
+
   }
 
   private final Map<String, AgentInstance> agents = new ConcurrentHashMap<>();
@@ -115,7 +116,8 @@ public class AgentRegistry {
 
     // 委托 AgentServiceBuilder 构建同步对话服务
     instance.setAiServiceProxy(
-        serviceBuilder.buildChatService(definition, chatModel, null, this::resolveSystemPromptWithSkills));
+        serviceBuilder.buildChatService(definition, chatModel, null,
+            this::resolveSystemPromptWithSkills));
 
     // 当有流式模型时，构建流式对话服务
     if (streamingModel != null) {
@@ -324,7 +326,8 @@ public class AgentRegistry {
 
   private AgentStreamingChatService buildStreamingChatService(AgentDefinition definition,
       StreamingChatModel streamingModel, String systemPromptOverride) {
-    return serviceBuilder.buildStreamingChatService(definition, streamingModel, systemPromptOverride,
+    return serviceBuilder.buildStreamingChatService(definition, streamingModel,
+        systemPromptOverride,
         this::resolveSystemPromptWithSkills);
   }
 
