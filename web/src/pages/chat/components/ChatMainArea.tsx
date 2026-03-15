@@ -1,4 +1,5 @@
 import { useRef, useEffect } from 'react';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import {
   MoreVertical,
   Sparkles,
@@ -133,6 +134,20 @@ export function ChatMainArea({
   const SCROLL_THROTTLE_MS = 200;
   /** 距底部小于此像素视为「在底部」，才自动滚动；否则用户已向上查看历史，不打断 */
   const BOTTOM_THRESHOLD_PX = 350;
+  /** 消息数超过此阈值时启用虚拟列表，只渲染可见区域以提升性能 */
+  const VIRTUAL_THRESHOLD = 6;
+
+  const useVirtual = currentMessages.length > VIRTUAL_THRESHOLD;
+  const virtualizer = useVirtualizer({
+    count: currentMessages.length,
+    getScrollElement: () => messagesContainerRef.current,
+    estimateSize: () => 180,
+    gap: 24,
+    overscan: 5,
+    getItemKey: (i) => currentMessages[i]?.id ?? String(i),
+  });
+  const virtualItems = useVirtual ? virtualizer.getVirtualItems() : [];
+  const totalSize = useVirtual ? virtualizer.getTotalSize() : 0;
 
   // 切换会话时，下次有消息时需滚动到底部
   if (currentSessionId !== prevSessionIdRef.current) {
@@ -311,6 +326,40 @@ export function ChatMainArea({
                 <p className='text-gray-500 dark:text-gray-400 mb-6'>输入你的问题，或使用提示词库快速开始</p>
               </div>
             )
+          ) : useVirtual ? (
+            <>
+              <div
+                className="relative w-full"
+                style={{ height: `${totalSize}px` }}
+              >
+                {virtualItems.map((virtualRow) => {
+                  const message = currentMessages[virtualRow.index];
+                  if (!message) return null;
+                  return (
+                    <div
+                      key={message.id}
+                      ref={virtualizer.measureElement}
+                      data-index={virtualRow.index}
+                      className="absolute left-0 right-0 pb-6"
+                      style={{
+                        transform: `translateY(${virtualRow.start}px)`,
+                      }}
+                    >
+                      <ChatMessage
+                        message={message}
+                        isLastAssistant={
+                          virtualRow.index === currentMessages.length - 1 &&
+                          message.role === 'assistant'
+                        }
+                        onRegenerate={onRegenerate}
+                        onFeedback={onFeedback}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+              <div ref={messagesEndRef} />
+            </>
           ) : (
             <>
               {currentMessages.map((message, index) => (

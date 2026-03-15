@@ -31,6 +31,8 @@
     "vite:build:priv": "vite build --mode priv"
   },
   "dependencies": {
+    "@copilotkit/react-core": "^1.54.0",
+    "@copilotkit/react-ui": "^1.54.0",
     "@radix-ui/react-accordion": "^1.2.3",
     "@radix-ui/react-alert-dialog": "^1.1.6",
     "@radix-ui/react-aspect-ratio": "^1.1.2",
@@ -57,8 +59,7 @@
     "@radix-ui/react-toggle": "^1.1.2",
     "@radix-ui/react-toggle-group": "^1.1.2",
     "@radix-ui/react-tooltip": "^1.1.8",
-    "@copilotkit/react-core": "^1.54.0",
-    "@copilotkit/react-ui": "^1.54.0",
+    "@tanstack/react-virtual": "^3.13.22",
     "@xcan-angus/infra": "^2.0.0",
     "axios": "^1.13.1",
     "class-variance-authority": "^0.7.1",
@@ -74,8 +75,8 @@
     "react-hook-form": "^7.55.0",
     "react-markdown": "^10.1.0",
     "react-resizable-panels": "^2.1.7",
-    "react-syntax-highlighter": "^15.6.1",
     "react-router-dom": "^7.13.1",
+    "react-syntax-highlighter": "^15.6.1",
     "reactflow": "*",
     "recharts": "^2.15.2",
     "remark-gfm": "^4.0.1",

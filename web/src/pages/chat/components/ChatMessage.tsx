@@ -15,6 +15,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog.tsx';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip.tsx';
 import { Textarea } from '@/components/ui/textarea.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar.tsx';
@@ -358,26 +363,36 @@ const ChatMessageInner = ({ message, isLastAssistant, onRegenerate, onFeedback }
                   </>
                 )}
               </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
-                onClick={() => handleLike(true)}
-              >
-                <ThumbsUp
-                  className={cn('w-3 h-3', liked === true && 'fill-green-500 text-green-500')}
-                />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
-                onClick={() => handleLike(false)}
-              >
-                <ThumbsDown
-                  className={cn('w-3 h-3', liked === false && 'fill-red-500 text-red-500')}
-                />
-              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => handleLike(true)}
+                  >
+                    <ThumbsUp
+                      className={cn('w-3 h-3', liked === true && 'fill-green-500 text-green-500')}
+                    />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top">点赞</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => handleLike(false)}
+                  >
+                    <ThumbsDown
+                      className={cn('w-3 h-3', liked === false && 'fill-red-500 text-red-500')}
+                    />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top">点踩</TooltipContent>
+              </Tooltip>
               {isLastAssistant && (
                 <Button variant="ghost" size="sm" className="h-8 gap-2" onClick={handleRegenerate}>
                   <RotateCw className="w-3 h-3" />
