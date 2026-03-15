@@ -7,8 +7,6 @@ import {
   RotateCw,
   Check,
   Download,
-  Eye,
-  X,
 } from 'lucide-react';
 import {
   Dialog,
@@ -137,7 +135,6 @@ const markdownComponents: Parameters<typeof ReactMarkdown>[0]['components'] = {
 const ChatMessageInner = ({ message, isLastAssistant, onRegenerate, onFeedback }: ChatMessageProps) => {
   const [copied, setCopied] = useState(false);
   const [liked, setLiked] = useState<boolean | null>(null);
-  const [htmlPreviewOpen, setHtmlPreviewOpen] = useState(false);
   const [dislikeDialogOpen, setDislikeDialogOpen] = useState(false);
   const [dislikeComment, setDislikeComment] = useState('');
 
@@ -218,15 +215,13 @@ const ChatMessageInner = ({ message, isLastAssistant, onRegenerate, onFeedback }
       case 'html':
         return (
           <pre className="text-xs font-mono whitespace-pre-wrap break-all overflow-x-auto max-h-64 overflow-y-auto rounded bg-gray-50 dark:bg-gray-900 p-3">
-            {escapeHtml(content)}
+            {content}
           </pre>
         );
       default:
         return <p className="whitespace-pre-wrap break-words">{content}</p>;
     }
   };
-
-  const showHtmlPreviewEntry = !isUser && contentFormat === 'html' && message.content?.trim();
 
   return (
     <div className={cn('flex gap-4 group', isUser ? 'flex-row-reverse' : 'flex-row')}>
@@ -246,7 +241,7 @@ const ChatMessageInner = ({ message, isLastAssistant, onRegenerate, onFeedback }
         )}
       </Avatar>
 
-      {/* Message Content + Optional HTML Preview */}
+      {/* Message Content */}
       <div
         className={cn(
           'flex-1 flex gap-3 min-w-0',
@@ -324,18 +319,6 @@ const ChatMessageInner = ({ message, isLastAssistant, onRegenerate, onFeedback }
               )}
             >
               <div className="flex-1 min-w-0">{renderMainContent()}</div>
-              {/* HTML 预览入口 */}
-              {showHtmlPreviewEntry && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 shrink-0 gap-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
-                  onClick={() => setHtmlPreviewOpen(prev => !prev)}
-                >
-                  <Eye className="w-4 h-4" />
-                  {htmlPreviewOpen ? '关闭预览' : 'HTML 预览'}
-                </Button>
-              )}
             </div>
           </div>
 
@@ -437,35 +420,6 @@ const ChatMessageInner = ({ message, isLastAssistant, onRegenerate, onFeedback }
           </DialogContent>
         </Dialog>
 
-        {/* HTML 预览区域（主消息区右侧） */}
-        {showHtmlPreviewEntry && htmlPreviewOpen && (
-          <div
-            className={cn(
-              'w-80 shrink-0 rounded-xl border border-gray-200 dark:border-gray-700',
-              'bg-white dark:bg-gray-800 overflow-hidden flex flex-col'
-            )}
-          >
-            <div className="flex items-center justify-between px-3 py-2 border-b border-gray-200 dark:border-gray-700">
-              <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
-                HTML 预览
-              </span>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6"
-                onClick={() => setHtmlPreviewOpen(false)}
-              >
-                <X className="w-4 h-4" />
-              </Button>
-            </div>
-            <iframe
-              title="HTML 预览"
-              sandbox="allow-same-origin"
-              srcDoc={wrapHtmlForPreview(message.content)}
-              className="flex-1 min-h-[200px] w-full border-0"
-            />
-          </div>
-        )}
       </div>
     </div>
   );
@@ -487,23 +441,3 @@ function normalizeMarkdownForStreaming(content: string): string {
   return content;
 }
 
-/** 转义 HTML 以在 <pre> 中安全显示 */
-function escapeHtml(str: string): string {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
-/** 包装 HTML 以在 iframe 中安全渲染（添加基础样式，沙箱已限制 script） */
-function wrapHtmlForPreview(html: string): string {
-  const escaped = html
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-    .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '');
-  return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
-    body { margin: 12px; font-size: 14px; line-height: 1.5; }
-    pre { white-space: pre-wrap; word-break: break-all; }
-  </style></head><body>${escaped}</body></html>`;
-}

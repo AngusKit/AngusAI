@@ -22,6 +22,11 @@ const MARKDOWN_PATTERNS = [
   /^---+$/m, // 分隔线
 ];
 
+/** 移除 Markdown 代码块内容，避免代码块内的 HTML 被误判为 HTML 格式 */
+function stripCodeBlocks(text: string): string {
+  return text.replace(/```[\w]*\n?[\s\S]*?```/g, '\n');
+}
+
 /**
  * 识别消息内容的格式类型
  * @param content 原始消息文本
@@ -31,8 +36,11 @@ export function detectContentFormat(content: string): ContentFormat {
   const trimmed = content.trim();
   if (!trimmed) return 'plain';
 
-  // 优先检测 HTML：包含完整标签结构
-  if (HTML_TAG_REGEX.test(trimmed)) {
+  // 若包含 Markdown 代码块，则代码块内的 HTML 不参与格式判断（视为 Markdown）
+  const withoutCodeBlocks = stripCodeBlocks(trimmed);
+
+  // 检测 HTML：仅在非代码块区域包含完整标签时判为 HTML
+  if (withoutCodeBlocks && HTML_TAG_REGEX.test(withoutCodeBlocks)) {
     return 'html';
   }
 
