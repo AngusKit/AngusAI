@@ -2,6 +2,7 @@ package cloud.xcan.angus.core.ai.interfaces.application.facade.vo;
 
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.AgentInfoVo;
+import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.ApplicationStatsVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.FeaturesConfigVo;
 import cloud.xcan.angus.remote.vo.TenantAuditingVo;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -48,8 +49,8 @@ public class ApplicationListVo extends TenantAuditingVo {
   @Schema(description = "是否启用API")
   private Boolean apiEnabled;
 
-  @Schema(description = "API调用次数")
-  private Long apiCalls;
+  @Schema(description = "统计数据")
+  private ApplicationStatsVo stats;
 
   @Schema(description = "发布时间")
   private LocalDateTime publishedDate;

@@ -1,6 +1,6 @@
 package cloud.xcan.angus.core.ai.application.query.analytics;
 
-import cloud.xcan.angus.core.ai.domain.analytics.ApiUsageLog;
+import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.ApplicationStatsVo;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -64,39 +64,13 @@ public interface AnalyticsQuery {
   Map<String, Object> getErrorAnalysis(LocalDateTime start, LocalDateTime end, Long appId);
 
   /**
-   * 获取最近的调用记录
-   */
-  List<ApiUsageLog> getRecentCalls(Integer limit);
-
-  /**
-   * 统计总调用次数
-   */
-  Long countTotalCalls(LocalDateTime start, LocalDateTime end, Long appId);
-
-  /**
-   * 统计成功调用次数
-   */
-  Long countSuccessfulCalls(LocalDateTime start, LocalDateTime end, Long appId);
-
-  /**
-   * 统计活跃用户数
-   */
-  Long countActiveUsers(LocalDateTime start, LocalDateTime end, Long appId);
-
-  /**
-   * 统计Token总量
-   */
-  Long sumTotalTokens(LocalDateTime start, LocalDateTime end, Long appId);
-
-  /**
-   * 计算平均响应时间
-   */
-  Double calculateAvgResponseTime(LocalDateTime start, LocalDateTime end, Long appId);
-
-  /**
    * 获取最近使用的应用及使用统计（按最后使用时间降序）
    */
   List<Map<String, Object>> getRecentAppUsageStats(LocalDateTime since, Integer limit,
       Integer offset);
 
+  /**
+   * 获取应用统计数据（总调用次数、成功率、平均响应时间、Token使用量等）
+   */
+  Map<Long, ApplicationStatsVo> getApplicationStats(List<Long> appIds);
 }

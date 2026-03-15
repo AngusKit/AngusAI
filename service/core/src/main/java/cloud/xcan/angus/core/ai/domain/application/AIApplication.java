@@ -50,19 +50,6 @@ public class AIApplication extends TenantAuditingEntity<AIApplication, Long> {
   @Column(name = "published_date")
   private LocalDateTime publishedDate;
 
-  // 统计数据
-  @Column(name = "api_calls")
-  private Long apiCalls = 0L;
-
-  @Column(name = "total_tokens")
-  private Long totalTokens = 0L;
-
-  @Column(name = "avg_response_time")
-  private Double avgResponseTime = 0.0;
-
-  @Column(name = "success_rate")
-  private Double successRate = 0.0;
-
   // 配置信息（JSON格式存储）
   @Type(JsonType.class)
   @Column(columnDefinition = "json", name = "config")

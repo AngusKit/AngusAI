@@ -8,6 +8,7 @@ import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.getStatusErrorName
 import cloud.xcan.angus.core.ai.application.query.analytics.AnalyticsQuery;
 import cloud.xcan.angus.core.ai.domain.analytics.ApiUsageLog;
 import cloud.xcan.angus.core.ai.domain.analytics.ApiUsageLogRepo;
+import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.ApplicationStatsVo;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -317,9 +319,7 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
           item.put("tokens", result[2] != null ? result[2] : 0L);
           item.put("cost", result[3] != null ? result[3] : 0L);
           item.put("percentage",
-              totalCost > 0
-                  ? (((Number) result[3]).longValue() * 100.0 / totalCost)
-                  : 0.0);
+              totalCost > 0 ? (((Number) result[3]).longValue() * 100.0 / totalCost) : 0.0);
 
           distribution.add(item);
           count++;
@@ -402,38 +402,6 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
   }
 
   @Override
-  public List<ApiUsageLog> getRecentCalls(Integer limit) {
-    return apiUsageLogRepo.findRecentCalls(PageRequest.of(0, limit != null ? limit : 10));
-  }
-
-  @Override
-  public Long countTotalCalls(LocalDateTime start, LocalDateTime end, Long appId) {
-    return appId != null
-        ? apiUsageLogRepo.countByAppIdAndTimeRange(appId, start, end)
-        : apiUsageLogRepo.countByTimeRange(start, end);
-  }
-
-  @Override
-  public Long countSuccessfulCalls(LocalDateTime start, LocalDateTime end, Long appId) {
-    return apiUsageLogRepo.countSuccessfulByTimeRange(start, end);
-  }
-
-  @Override
-  public Long countActiveUsers(LocalDateTime start, LocalDateTime end, Long appId) {
-    return apiUsageLogRepo.countDistinctUsersByTimeRange(start, end);
-  }
-
-  @Override
-  public Long sumTotalTokens(LocalDateTime start, LocalDateTime end, Long appId) {
-    return apiUsageLogRepo.sumTokensByTimeRange(start, end);
-  }
-
-  @Override
-  public Double calculateAvgResponseTime(LocalDateTime start, LocalDateTime end, Long appId) {
-    return apiUsageLogRepo.avgResponseTimeByTimeRange(start, end);
-  }
-
-  @Override
   public List<Map<String, Object>> getRecentAppUsageStats(LocalDateTime since, Integer limit,
       Integer offset) {
     return new BizTemplate<List<Map<String, Object>>>() {
@@ -441,8 +409,7 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
       protected List<Map<String, Object>> process() {
         int pageSize = limit != null && limit > 0 ? limit : 6;
         int page = offset != null && offset > 0 ? offset / pageSize : 0;
-        org.springframework.data.domain.Pageable pageable =
-            org.springframework.data.domain.PageRequest.of(page, pageSize);
+        Pageable pageable = PageRequest.of(page, pageSize);
 
         List<Object[]> results = apiUsageLogRepo.getRecentAppUsageStats(since, pageable);
         List<Map<String, Object>> stats = new ArrayList<>();
@@ -456,6 +423,16 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
           stats.add(item);
         }
         return stats;
+      }
+    }.execute();
+  }
+
+  @Override
+  public Map<Long, ApplicationStatsVo> getApplicationStats(List<Long> appIds) {
+    return new BizTemplate<Map<Long, ApplicationStatsVo>>() {
+      @Override
+      protected Map<Long, ApplicationStatsVo> process() {
+        return null;
       }
     }.execute();
   }

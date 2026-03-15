@@ -47,10 +47,6 @@ public class ApplicationAssembler {
 
     // 设置默认值
     application.setStatus(ApplicationStatus.DRAFT)
-        .setApiCalls(0L)
-        .setTotalTokens(0L)
-        .setAvgResponseTime(0.0)
-        .setSuccessRate(0.0)
         .setPublicAccess(false)
         .setEmbedEnabled(false)
         .setApiEnabled(false);
@@ -106,7 +102,7 @@ public class ApplicationAssembler {
   }
 
   public static ApplicationDetailVo toDetailVo(AIApplication application,
-      List<AgentInfoVo> agents, AgentInfoVo defaultAgent) {
+      List<AgentInfoVo> agents, AgentInfoVo defaultAgent, ApplicationStatsVo statsVo) {
     ApplicationDetailVo vo = new ApplicationDetailVo();
     vo.setId(application.getId());
     vo.setName(application.getName());
@@ -136,11 +132,6 @@ public class ApplicationAssembler {
     vo.setShare(CoreUtils.copyProperties(application.getShare(), new ApplicationShareVo()));
 
     // 设置统计信息
-    ApplicationStatsVo statsVo = new ApplicationStatsVo();
-    statsVo.setTotalApiCalls(application.getApiCalls());
-    statsVo.setTotalTokens(application.getTotalTokens());
-    statsVo.setAvgResponseTime(application.getAvgResponseTime());
-    statsVo.setSuccessRate(application.getSuccessRate());
     vo.setStats(statsVo);
     vo.setAgents(agents != null ? agents : java.util.List.of());
     vo.setDefaultAgent(defaultAgent);
@@ -148,7 +139,7 @@ public class ApplicationAssembler {
   }
 
   public static ApplicationListVo toListVo(AIApplication application,
-      List<AgentInfoVo> agents, AgentInfoVo defaultAgent,
+      List<AgentInfoVo> agents, AgentInfoVo defaultAgent, ApplicationStatsVo statsVo,
       boolean isStarred) {
     ApplicationListVo vo = new ApplicationListVo();
     vo.setId(application.getId());
@@ -159,12 +150,14 @@ public class ApplicationAssembler {
     vo.setStatus(application.getStatus());
     vo.setAgents(agents != null ? agents : List.of());
     vo.setDefaultAgent(defaultAgent);
-    vo.setApiCalls(application.getApiCalls());
     vo.setPublicAccess(application.getPublicAccess());
     vo.setEmbedEnabled(application.getEmbedEnabled());
     vo.setApiEnabled(application.getApiEnabled());
     vo.setPublishedDate(application.getPublishedDate());
     vo.setIsStarred(isStarred);
+
+    // 设置统计
+    vo.setStats(statsVo);
 
     // 设置功能配置（对话页根据配置控制 UI 显示）
     if (application.getConfig() != null && application.getConfig().getFeatures() != null) {
