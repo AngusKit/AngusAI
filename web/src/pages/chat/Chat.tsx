@@ -213,12 +213,20 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
             navigate(`/chat/${sessionId}`);
           }
         },
-        onToken: (token) => {
-          accumulated += token;
-          updateMessage(effectiveKeyRef.current, assistantId, { content: accumulated });
-        },
+        onToken: (() => {
+          let lastFlush = 0;
+          const STREAM_THROTTLE_MS = 60;
+          return (token: string) => {
+            accumulated += token;
+            const now = Date.now();
+            if (now - lastFlush >= STREAM_THROTTLE_MS) {
+              lastFlush = now;
+              updateMessage(effectiveKeyRef.current, assistantId, { content: accumulated });
+            }
+          };
+        })(),
       });
-      updateMessage(effectiveKeyRef.current, assistantId, { isStreaming: false });
+      updateMessage(effectiveKeyRef.current, assistantId, { content: accumulated, isStreaming: false });
     } catch (err) {
       const msg = err instanceof Error ? err.message : '请求失败';
       updateMessage(effectiveKeyRef.current, assistantId, {
@@ -266,6 +274,8 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     try {
       const { chatStream } = await import('@/pages/chat/hooks/useChatStream.ts');
       let accumulated = '';
+      let lastFlush = 0;
+      const STREAM_THROTTLE_MS = 60;
       await chatStream(
         {
           sessionId: currentSessionId,
@@ -275,11 +285,15 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
         {
           onToken: (token) => {
             accumulated += token;
-            updateMessage(currentSessionId, assistantId, { content: accumulated });
+            const now = Date.now();
+            if (now - lastFlush >= STREAM_THROTTLE_MS) {
+              lastFlush = now;
+              updateMessage(currentSessionId, assistantId, { content: accumulated });
+            }
           },
         }
       );
-      updateMessage(currentSessionId, assistantId, { isStreaming: false });
+      updateMessage(currentSessionId, assistantId, { content: accumulated, isStreaming: false });
     } catch (err) {
       const msg = err instanceof Error ? err.message : '请求失败';
       updateMessage(currentSessionId, assistantId, {

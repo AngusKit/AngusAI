@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/dialog.tsx';
 import { Textarea } from '@/components/ui/textarea.tsx';
 import { Button } from '@/components/ui/button.tsx';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.tsx';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar.tsx';
 import type { ReactNode } from 'react';
 import React from 'react';
 import { useState, useMemo, useEffect } from 'react';
@@ -132,6 +132,19 @@ const markdownComponents: Parameters<typeof ReactMarkdown>[0]['components'] = {
     <td className="px-4 py-2 text-sm border-b dark:border-gray-700">{children}</td>
   ),
   tr: ({ children }: { children?: React.ReactNode }) => <tr className="border-b dark:border-gray-700">{children}</tr>,
+  /** 拦截外部图片 URL，避免 via.placeholder、unsplash 等第三方请求导致 ERR_CONNECTION_CLOSED 及性能问题 */
+  img: ({ src, alt }: { src?: string; alt?: string }) => {
+    const s = src ?? '';
+    const isExternal = /^https?:\/\//i.test(s) && !s.startsWith(window.location.origin);
+    if (isExternal) {
+      return (
+        <span className="inline-block px-2 py-1 text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 rounded">
+          [图片: {alt || s.slice(0, 40)}]
+        </span>
+      );
+    }
+    return <img src={s} alt={alt ?? ''} className="max-w-full rounded" loading="lazy" />;
+  },
 };
 
 const ChatMessageInner = ({ message, isLastAssistant, onRegenerate, onFeedback }: ChatMessageProps) => {
@@ -238,12 +251,9 @@ const ChatMessageInner = ({ message, isLastAssistant, onRegenerate, onFeedback }
       {/* Avatar */}
       <Avatar className={cn('w-8 h-8 flex-shrink-0', isUser && 'ring-2 ring-blue-500')}>
         {isUser ? (
-          <>
-            <AvatarImage src="https://images.unsplash.com/photo-1652795385761-7ac287d0cd03?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBhdmF0YXIlMjBjYXJ0b29ufGVufDF8fHx8MTc2MTEwMTExNXww&ixlib=rb-4.1.0&q=80&w=1080" />
-            <AvatarFallback className="bg-blue-500 text-white">
-              <User className="w-4 h-4" />
-            </AvatarFallback>
-          </>
+          <AvatarFallback className="bg-blue-500 text-white">
+            <User className="w-4 h-4" />
+          </AvatarFallback>
         ) : (
           <AvatarFallback className="bg-gradient-to-br from-purple-500 to-blue-500 text-white">
             <Bot className="w-4 h-4" />
