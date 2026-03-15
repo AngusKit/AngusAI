@@ -1,7 +1,7 @@
-import type { AgentChatConfig } from '@/services/AgentChatTypes';
+import type { SessionConfig } from '@/services/ChatTypes';
 
 /** 默认对话配置 */
-export const DEFAULT_CHAT_SETTINGS: AgentChatConfig = {
+export const DEFAULT_CHAT_SETTINGS: SessionConfig = {
   temperature: 0.7,
   maxTokens: 2000,
   topP: 0.9,

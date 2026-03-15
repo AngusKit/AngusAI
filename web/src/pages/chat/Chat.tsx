@@ -10,7 +10,7 @@ import { type ChatSwitcherSelection } from './components/ChatSwitcher.tsx';
 import { SettingsDialog } from './components/SettingsDialog.tsx';
 import { ThemeDialog, CHAT_TEMPLATES, type TemplateType } from './components/ThemeDialog.tsx';
 import { useNavigate, useParams } from 'react-router-dom';
-import { AgentChatConfig } from '@/services/AgentChatTypes';
+import type { SessionConfig } from '@/services/ChatTypes';
 import { DEFAULT_CHAT_SETTINGS } from './constants';
 import ChatApi from '@/services/Chat';
 
@@ -68,7 +68,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
   };
 
   // Settings state：切换会话时从 currentSession.config 同步，保存时调用 updateSessionConfig
-  const [settings, setSettings] = useState<AgentChatConfig>(DEFAULT_CHAT_SETTINGS);
+  const [settings, setSettings] = useState<SessionConfig>(DEFAULT_CHAT_SETTINGS);
   useEffect(() => {
     if (!currentSessionId) return;
     const c = currentSession?.config;

@@ -16,10 +16,10 @@ import cloud.xcan.angus.core.ai.application.cmd.chat.SessionCmd;
 import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.domain.agent.Agent;
-import cloud.xcan.angus.core.ai.domain.agent.AgentChatConfig;
 import cloud.xcan.angus.core.ai.domain.agent.AgentChatResult;
 import cloud.xcan.angus.core.ai.domain.analytics.ApiUsageLog;
 import cloud.xcan.angus.core.ai.domain.chat.Message;
+import cloud.xcan.angus.core.ai.domain.chat.SessionConfig;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRole;
 import cloud.xcan.angus.core.ai.domain.chat.Session;
 import cloud.xcan.angus.core.ai.domain.model.Model;
@@ -77,7 +77,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
 
   @Override
   public AgentChatResult chat(Long agentId, String sessionId, String message,
-      AgentChatConfig config) {
+      SessionConfig config) {
     return new BizTemplate<AgentChatResult>() {
       Agent agent;
       Session session;
@@ -133,7 +133,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
 
   @Override
   public SseEmitter chatStream(Long agentId, String sessionId, String message,
-      AgentChatConfig config) {
+      SessionConfig config) {
     return new BizTemplate<SseEmitter>() {
       Agent agent;
       Session session;
@@ -230,11 +230,11 @@ public class AgentChatCmdImpl implements AgentChatCmd {
   /**
    * 合并请求/会话/智能体/模型配置，生成 ChatConfigOverride。 合并优先级：请求 config > 会话 config > 智能体 config > 模型 config。
    */
-  private ChatConfigOverride getChatConfigOverride(Agent agent, AgentChatConfig config,
+  private ChatConfigOverride getChatConfigOverride(Agent agent, SessionConfig config,
       Session session) {
     Model model = agent.getDefaultModelId() != null
         ? modelQuery.findById(agent.getDefaultModelId()).orElse(null) : null;
-    AgentChatConfig merged = ChatConfigMergeUtils.merge(config, session, agent, model);
+    SessionConfig merged = ChatConfigMergeUtils.merge(config, session, agent, model);
     return toChatConfigOverride(merged);
   }
 

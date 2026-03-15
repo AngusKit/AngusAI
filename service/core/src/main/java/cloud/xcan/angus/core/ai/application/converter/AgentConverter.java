@@ -9,7 +9,7 @@ import cloud.xcan.agentx.core.agent.definition.AgentDefinition;
 import cloud.xcan.agentx.core.memory.enums.MemoryStrategy;
 import cloud.xcan.agentx.core.model.ModelProvider;
 import cloud.xcan.angus.core.ai.domain.agent.Agent;
-import cloud.xcan.angus.core.ai.domain.agent.AgentChatConfig;
+import cloud.xcan.angus.core.ai.domain.chat.SessionConfig;
 import cloud.xcan.angus.core.ai.domain.model.Model;
 import java.util.Collections;
 import java.util.List;
@@ -85,7 +85,7 @@ public class AgentConverter {
         .build();
   }
 
-  public static ChatConfigOverride toChatConfigOverride(AgentChatConfig config) {
+  public static ChatConfigOverride toChatConfigOverride(SessionConfig config) {
     if (config == null) {
       return null;
     }

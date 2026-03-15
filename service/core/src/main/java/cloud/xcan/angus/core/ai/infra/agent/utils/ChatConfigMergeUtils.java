@@ -8,7 +8,6 @@ import static cloud.xcan.angus.core.ai.domain.Constants.CHAT_DEFAULT_TIMEOUT_MS;
 import static cloud.xcan.angus.core.ai.domain.Constants.CHAT_DEFAULT_TOP_P;
 
 import cloud.xcan.angus.core.ai.domain.agent.Agent;
-import cloud.xcan.angus.core.ai.domain.agent.AgentChatConfig;
 import cloud.xcan.angus.core.ai.domain.chat.Session;
 import cloud.xcan.angus.core.ai.domain.chat.SessionConfig;
 import cloud.xcan.angus.core.ai.domain.model.Model;
@@ -33,7 +32,7 @@ public final class ChatConfigMergeUtils {
    * @param model            智能体默认模型（含 temperature、maxTokens、timeoutSeconds 等，可选）
    * @return 合并后的配置
    */
-  public static AgentChatConfig merge(AgentChatConfig requestConfig,
+  public static SessionConfig merge(SessionConfig requestConfig,
       Session session, Agent agent, Model model) {
     SessionConfig sessionConfig = session != null ? session.getConfig() : null;
 
@@ -74,7 +73,7 @@ public final class ChatConfigMergeUtils {
         getModelTimeoutMs(model),
         CHAT_DEFAULT_TIMEOUT_MS);
 
-    AgentChatConfig merged = new AgentChatConfig();
+    SessionConfig merged = new SessionConfig();
     merged.setTemperature(temperature);
     merged.setMaxTokens(maxTokens);
     merged.setTopP(topP);
@@ -95,31 +94,31 @@ public final class ChatConfigMergeUtils {
     return null;
   }
 
-  private static Double getRequestTemperature(AgentChatConfig c) {
+  private static Double getRequestTemperature(SessionConfig c) {
     return c != null ? c.getTemperature() : null;
   }
 
-  private static Integer getRequestMaxTokens(AgentChatConfig c) {
+  private static Integer getRequestMaxTokens(SessionConfig c) {
     return c != null ? c.getMaxTokens() : null;
   }
 
-  private static Double getRequestTopP(AgentChatConfig c) {
+  private static Double getRequestTopP(SessionConfig c) {
     return c != null ? c.getTopP() : null;
   }
 
-  private static Double getRequestFrequencyPenalty(AgentChatConfig c) {
+  private static Double getRequestFrequencyPenalty(SessionConfig c) {
     return c != null ? c.getFrequencyPenalty() : null;
   }
 
-  private static Double getRequestPresencePenalty(AgentChatConfig c) {
+  private static Double getRequestPresencePenalty(SessionConfig c) {
     return c != null ? c.getPresencePenalty() : null;
   }
 
-  private static Long getRequestTimeoutMs(AgentChatConfig c) {
+  private static Long getRequestTimeoutMs(SessionConfig c) {
     return c != null ? c.getTimeoutMs() : null;
   }
 
-  private static String getRequestSystemPrompt(AgentChatConfig c) {
+  private static String getRequestSystemPrompt(SessionConfig c) {
     return c != null ? c.getSystemPrompt() : null;
   }
 

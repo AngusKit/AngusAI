@@ -1,6 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.agent.facade.dto;
 
-import cloud.xcan.angus.core.ai.domain.agent.AgentChatConfig;
+import cloud.xcan.angus.core.ai.domain.chat.SessionConfig;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -22,6 +22,6 @@ public class AgentChatRequestDto {
   private String message;
 
   @Schema(description = "对话配置覆盖，可选；优先级高于会话与智能体配置")
-  private AgentChatConfig config;
+  private SessionConfig config;
 
 }

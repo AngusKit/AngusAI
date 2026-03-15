@@ -1,7 +1,7 @@
 import { ApiLocaleResult, TenantAuditingVo } from '@xcan-angus/infra';
 import { MessageRoleEnum } from '@/enums/enums.ts';
 
-/** 会话配置 */
+/** 会话/对话配置（合并原 AgentChatConfig 与 SessionConfig） */
 export interface SessionConfig {
   /**
    * 温度参数，范围 0-2，用于控制生成文本的随机性，越大越随机。
@@ -34,7 +34,9 @@ export interface SessionConfig {
    */
   presencePenalty?: number;
   /** 系统提示词（system prompt），用于设定对话的系统角色或上下文，最大长度 60000 字符。 */
-  systemPrompt: string;
+  systemPrompt?: string;
+  /** 模型请求超时（毫秒），请求级，优先级高于模型配置 */
+  timeoutMs?: number;
 }
 
 /** 创建会话请求参数 */

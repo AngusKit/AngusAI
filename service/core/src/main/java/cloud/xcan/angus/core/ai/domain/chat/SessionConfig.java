@@ -3,16 +3,20 @@ package cloud.xcan.angus.core.ai.domain.chat;
 import cloud.xcan.angus.core.ai.domain.Constants;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import java.io.Serializable;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
 
 /**
- * 会话配置
+ * 会话/对话配置
+ * <p>
+ * 合并原 AgentChatConfig 与 SessionConfig，用于会话创建、对话请求覆盖等。优先级：请求 > 会话 > 智能体 > 默认。
+ * </p>
  */
-@Schema(description = "会话配置")
+@Schema(description = "会话/对话配置")
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SessionConfig implements Serializable {
@@ -28,6 +32,8 @@ public class SessionConfig implements Serializable {
    * 最大令牌数
    */
   @Schema(description = "最大令牌数（max tokens），控制生成文本的最大长度。若为空则使用模型默认值。", example = "1024")
+  @Min(1)
+  @Max(128000)
   private Integer maxTokens;
 
   /**
@@ -55,8 +61,13 @@ public class SessionConfig implements Serializable {
    * 系统提示词
    */
   @Schema(description = "系统提示词（system prompt），用于设定对话的系统角色或上下文，最大长度 60000 字符。")
-  @NotBlank
   @Length(max = Constants.AGENT_SYSTEM_PROMPT_MAX_LENGTH)
   private String systemPrompt;
 
+  /**
+   * 模型请求超时（毫秒），请求级，优先级高于模型配置
+   */
+  @Schema(description = "模型请求超时（毫秒），请求级，优先级高于模型配置", example = "60000")
+  @Min(1000)
+  private Long timeoutMs;
 }

@@ -3,7 +3,7 @@ import { Label } from '@/components/ui/label.tsx';
 import { Slider } from '@/components/ui/slider.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { toast } from 'sonner';
-import type { AgentChatConfig } from '@/services/AgentChatTypes.ts';
+import type { SessionConfig } from '@/services/ChatTypes';
 import {
   DEFAULT_FREQUENCY_PENALTY,
   DEFAULT_MAX_TOKENS,
@@ -16,10 +16,10 @@ import { useState } from 'react';
 interface SettingsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  settings: AgentChatConfig;
-  onSettingsChange: (settings: AgentChatConfig) => void;
+  settings: SessionConfig;
+  onSettingsChange: (settings: SessionConfig) => void;
   /** 保存到后端，返回是否成功 */
-  onSave?: (settings: AgentChatConfig) => Promise<boolean>;
+  onSave?: (settings: SessionConfig) => Promise<boolean>;
 }
 
 export function SettingsDialog({ open, onOpenChange, settings, onSettingsChange, onSave }: SettingsDialogProps) {
