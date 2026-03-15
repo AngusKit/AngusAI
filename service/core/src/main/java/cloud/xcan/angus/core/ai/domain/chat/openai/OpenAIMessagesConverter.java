@@ -1,4 +1,4 @@
-package cloud.xcan.angus.core.ai.interfaces.chat.openai;
+package cloud.xcan.angus.core.ai.domain.chat.openai;
 
 import java.util.List;
 

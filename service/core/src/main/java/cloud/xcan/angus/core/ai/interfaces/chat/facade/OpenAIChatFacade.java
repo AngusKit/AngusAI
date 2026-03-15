@@ -1,7 +1,7 @@
 package cloud.xcan.angus.core.ai.interfaces.chat.facade;
 
-import cloud.xcan.angus.core.ai.interfaces.chat.openai.OpenAIChatCompletionsRequest;
-import cloud.xcan.angus.core.ai.interfaces.chat.openai.OpenAIChatCompletionsResponse;
+import cloud.xcan.angus.core.ai.domain.chat.openai.OpenAIChatCompletionsRequest;
+import cloud.xcan.angus.core.ai.domain.chat.openai.OpenAIChatCompletionsResponse;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**

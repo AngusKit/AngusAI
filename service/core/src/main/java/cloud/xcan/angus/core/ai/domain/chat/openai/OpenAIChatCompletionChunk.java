@@ -1,4 +1,4 @@
-package cloud.xcan.angus.core.ai.interfaces.chat.openai;
+package cloud.xcan.angus.core.ai.domain.chat.openai;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -35,6 +35,7 @@ public class OpenAIChatCompletionChunk {
   public static class ChunkChoice {
 
     private Integer index;
+
     private OpenAIChatCompletionsResponse.Delta delta;
 
     @JsonProperty("finish_reason")

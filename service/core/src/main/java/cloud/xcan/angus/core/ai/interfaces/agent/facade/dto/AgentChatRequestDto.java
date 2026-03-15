@@ -1,10 +1,9 @@
 package cloud.xcan.angus.core.ai.interfaces.agent.facade.dto;
 
 import cloud.xcan.angus.core.ai.domain.chat.SessionConfig;
-import cloud.xcan.angus.core.ai.interfaces.chat.openai.OpenAIChatCompletionsRequest;
+import cloud.xcan.angus.core.ai.domain.chat.openai.OpenAIChatCompletionsRequest;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -50,12 +49,5 @@ public class AgentChatRequestDto {
   @Valid
   @Schema(description = "对话配置覆盖，可选")
   private SessionConfig config;
-
-  @AssertTrue(message = "appId 与 sessionId 二选一必填")
-  public boolean isAppIdOrSessionIdRequired() {
-    boolean hasAppId = appId != null;
-    boolean hasSessionId = sessionId != null && !sessionId.isBlank();
-    return hasAppId != hasSessionId;
-  }
 
 }

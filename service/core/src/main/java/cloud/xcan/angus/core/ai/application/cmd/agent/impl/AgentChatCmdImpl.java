@@ -2,6 +2,7 @@ package cloud.xcan.angus.core.ai.application.cmd.agent.impl;
 
 import static cloud.xcan.angus.core.ai.application.converter.AgentConverter.toChatConfigOverride;
 import static cloud.xcan.angus.core.ai.domain.Constants.CHAT_DEFAULT_TIMEOUT_MS;
+import static cloud.xcan.angus.core.utils.GsonUtils.toJson;
 import static cloud.xcan.angus.spec.principal.PrincipalContext.getUserId;
 import static cloud.xcan.angus.spec.utils.ObjectUtils.lengthSafe;
 import static cloud.xcan.angus.spec.utils.ObjectUtils.nullSafe;
@@ -12,7 +13,6 @@ import cloud.xcan.angus.core.ai.application.cmd.agent.AgentChatCmd;
 import cloud.xcan.angus.core.ai.application.cmd.agent.AgentCmd;
 import cloud.xcan.angus.core.ai.application.cmd.analytics.ApiUsageLogCmd;
 import cloud.xcan.angus.core.ai.application.cmd.chat.MessageCmd;
-import cloud.xcan.angus.core.ai.application.cmd.chat.SessionCmd;
 import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
 import cloud.xcan.angus.core.ai.application.query.chat.SessionQuery;
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
@@ -23,12 +23,11 @@ import cloud.xcan.angus.core.ai.domain.chat.Message;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRole;
 import cloud.xcan.angus.core.ai.domain.chat.Session;
 import cloud.xcan.angus.core.ai.domain.chat.SessionConfig;
+import cloud.xcan.angus.core.ai.domain.chat.openai.OpenAIChatCompletionChunk;
+import cloud.xcan.angus.core.ai.domain.chat.openai.OpenAIChatCompletionsResponse;
 import cloud.xcan.angus.core.ai.domain.model.Model;
 import cloud.xcan.angus.core.ai.infra.agent.utils.ChatConfigMergeUtils;
-import cloud.xcan.angus.core.ai.interfaces.chat.openai.OpenAIChatCompletionChunk;
-import cloud.xcan.angus.core.ai.interfaces.chat.openai.OpenAIChatCompletionsResponse;
 import cloud.xcan.angus.core.biz.BizTemplate;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import cloud.xcan.angus.remote.message.SysException;
 import dev.langchain4j.service.TokenStream;
 import jakarta.annotation.Resource;
@@ -65,9 +64,6 @@ public class AgentChatCmdImpl implements AgentChatCmd {
   private MessageCmd messageCmd;
 
   @Resource
-  private SessionCmd sessionCmd;
-
-  @Resource
   private SessionQuery sessionQuery;
 
   @Resource
@@ -75,9 +71,6 @@ public class AgentChatCmdImpl implements AgentChatCmd {
 
   @Resource
   private ApiUsageLogCmd apiUsageLogCmd;
-
-  @Resource
-  private ObjectMapper objectMapper;
 
   /**
    * 流式 SSE 专用线程池
@@ -87,33 +80,29 @@ public class AgentChatCmdImpl implements AgentChatCmd {
   private Executor sseEmitterChatExecutor;
 
   @Override
-  public AgentChatResult chat(Long agentId, String sessionId, String message,
-      SessionConfig config) {
+  public AgentChatResult chat(Session sessionDb, String message, SessionConfig config) {
     return new BizTemplate<AgentChatResult>() {
       Agent agent;
-      Session session;
 
       @Override
       protected void checkParams() {
         // 校验智能体是否存在
-        agent = agentQuery.findAndCheckValid(agentId);
-        // 检查会话是否存在
-        session = sessionQuery.findAndCheckBySessionId(sessionId);
+        agent = agentQuery.findAndCheckValid(sessionDb.getAgentId());
       }
 
       @Override
       protected AgentChatResult process() {
         agentCmd.ensureRegistered(agent);
         // 有会话时先落库用户消息
-        messageCmd.create0(session, MessageRole.USER, message);
+        messageCmd.create0(sessionDb, MessageRole.USER, message);
 
         // Model 仅查询一次，复用给 getChatConfigOverride 和 saveApiUsageLog
         Model model = agent.getDefaultModelId() != null
             ? modelQuery.findById(agent.getDefaultModelId()).orElse(null) : null;
 
         // 合并请求/会话/智能体/模型配置，得到最终覆盖参数
-        ChatConfigOverride override = getChatConfigOverride(agent, config, session, model);
-        String agentIdStr = String.valueOf(agentId);
+        ChatConfigOverride override = getChatConfigOverride(agent, config, sessionDb, model);
+        String agentIdStr = String.valueOf(sessionDb.getAgentId());
         String defaultModelIdStr = agent.getDefaultModelId() != null
             ? String.valueOf(agent.getDefaultModelId()) : null;
 
@@ -126,41 +115,38 @@ public class AgentChatCmdImpl implements AgentChatCmd {
           // 注意：可以改为在主线程直接调用 agentRegistry.chat()，但建议保留 executor，便于控制 LLM 并发。
           // 若需要 Java 层超时，可改用 future.get(timeout, unit)
           reply = override != null && agent.getDefaultModelId() != null
-              ? agentRegistry.chat(agentIdStr, session.getSessionId(), message,
+              ? agentRegistry.chat(agentIdStr, sessionDb.getSessionId(), message,
               defaultModelIdStr, override)
-              : agentRegistry.chat(agentIdStr, session.getSessionId(), message);
+              : agentRegistry.chat(agentIdStr, sessionDb.getSessionId(), message);
         } catch (Exception e) {
           chatError = e;
           throw SysException.of(e.getMessage());
         } finally {
           int estInput = estimateTokens(message);
           int estOutput = chatError == null ? estimateTokens(reply) : 0;
-          saveApiUsageLog(agent, session, model, "/api/v1/agents/chat", startMs, chatError == null,
+          saveApiUsageLog(agent, sessionDb, model, "/api/v1/agents/chat", startMs,
+              chatError == null,
               chatError != null ? chatError.getMessage() : null, estInput, estOutput,
               estInput + estOutput);
         }
 
         // 落库助手回复
-        messageCmd.create0(session, MessageRole.ASSISTANT, reply);
-        return new AgentChatResult(reply, session.getSessionId());
+        messageCmd.create0(sessionDb, MessageRole.ASSISTANT, reply);
+        return new AgentChatResult(reply, sessionDb.getSessionId());
       }
     }.execute();
   }
 
   @Override
-  public SseEmitter chatStream(Long agentId, String sessionId, String message,
-      SessionConfig config) {
+  public SseEmitter chatStream(Session sessionDb, String message, SessionConfig config) {
     return new BizTemplate<SseEmitter>() {
       Agent agent;
-      Session session;
       Message assistantMessage;
 
       @Override
       protected void checkParams() {
         // 校验智能体是否存在
-        agent = agentQuery.findAndCheckValid(agentId);
-        // 检查会话是否存在
-        session = sessionQuery.findAndCheckBySessionId(sessionId);
+        agent = agentQuery.findAndCheckValid(sessionDb.getAgentId());
       }
 
       @Override
@@ -170,7 +156,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
             ? modelQuery.findById(agent.getDefaultModelId()).orElse(null) : null;
 
         // 按照优先级获取会话配置
-        ChatConfigOverride override = getChatConfigOverride(agent, config, session, model);
+        ChatConfigOverride override = getChatConfigOverride(agent, config, sessionDb, model);
         Long timeoutMs = nullSafe(override.getTimeoutMs(), CHAT_DEFAULT_TIMEOUT_MS);
 
         // 构造SseEmitter
@@ -180,15 +166,15 @@ public class AgentChatCmdImpl implements AgentChatCmd {
         agentCmd.ensureRegistered(agent);
 
         // 落库用户消息
-        messageCmd.create0(session, MessageRole.USER, message);
+        Message messageDb = messageCmd.create0(sessionDb, MessageRole.USER, message);
 
         // 预创建占位助手消息并标记为流式
-        assistantMessage = messageCmd.create0(session, MessageRole.ASSISTANT,
+        assistantMessage = messageCmd.create0(sessionDb, MessageRole.ASSISTANT,
             STREAMING_PLACEHOLDER);
         messageCmd.setStreaming(assistantMessage, true);
 
         // 合并配置，得到最终覆盖参数
-        String agentIdStr = String.valueOf(agentId);
+        String agentIdStr = String.valueOf(sessionDb.getAgentId());
         String defaultModelId = String.valueOf(agent.getDefaultModelId());
 
         // 异步执行流式调用，通过 SSE 推送 token
@@ -197,21 +183,18 @@ public class AgentChatCmdImpl implements AgentChatCmd {
         sseEmitterChatExecutor.execute(() -> {
           StringBuilder fullContent = new StringBuilder();
           long streamStartMs = System.currentTimeMillis();
-          String modelDisplay = "agent_" + agentId;
+          String modelDisplay = "agent_" + agentIdStr;  // TODO 定义智能体编码作为类模型名称
           try {
             TokenStream stream = agent.getDefaultModelId() != null
-                ? agentRegistry.chatStream(agentIdStr, session.getSessionId(), message,
+                ? agentRegistry.chatStream(agentIdStr, sessionDb.getSessionId(), message,
                 defaultModelId, override)
-                : agentRegistry.chatStream(agentIdStr, session.getSessionId(), message);
-            // OpenAI 格式：每 token 发送 data: {"choices":[{"delta":{"content":"x"}}]}，首块携带 session_id 供无会话模式
-            final boolean[] isFirstChunk = {true};
-            String sessionIdForStream = session.getSessionId();
+                : agentRegistry.chatStream(agentIdStr, sessionDb.getSessionId(), message);
             stream.onPartialResponse(token -> {
                   fullContent.append(token);
                   try {
                     OpenAIChatCompletionChunk chunk = OpenAIChatCompletionChunk.builder()
-                        .id("chatcmpl-stream")
-                        .sessionId(isFirstChunk[0] ? sessionIdForStream : null)
+                        .id(messageDb.getId().toString())
+                        .sessionId(sessionDb.getSessionId())
                         .object("chat.completion.chunk")
                         .created(System.currentTimeMillis() / 1000)
                         .model(modelDisplay)
@@ -220,11 +203,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
                             new OpenAIChatCompletionsResponse.Delta(null, token),
                             null)))
                         .build();
-                    if (isFirstChunk[0]) {
-                      isFirstChunk[0] = false;
-                    }
-                    String json = objectMapper.writeValueAsString(chunk);
-                    emitter.send(SseEmitter.event().data("data: " + json + "\n\n"));
+                    emitter.send(SseEmitter.event().data("data: " + toJson(chunk) + "\n\n"));
                   } catch (Exception e) {
                     emitter.completeWithError(e);
                   }
@@ -245,7 +224,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
                   if (total == null && (inTokens != null || outTokens != null)) {
                     total = (inTokens != null ? inTokens : 0) + (outTokens != null ? outTokens : 0);
                   }
-                  saveApiUsageLog(agent, session, modelForAsync, "/api/v1/agents/chat/stream",
+                  saveApiUsageLog(agent, sessionDb, modelForAsync, "/api/v1/agents/chat/stream",
                       streamStartMs, true, null, inTokens, outTokens, total);
                   try {
                     emitter.send(SseEmitter.event().data("data: [DONE]\n\n"));
@@ -255,14 +234,14 @@ public class AgentChatCmdImpl implements AgentChatCmd {
                 })
                 .onError(e -> {
                   messageCmd.setStreaming(assistantMessage, false);
-                  saveApiUsageLog(agent, session, modelForAsync, "/api/v1/agents/chat/stream",
+                  saveApiUsageLog(agent, sessionDb, modelForAsync, "/api/v1/agents/chat/stream",
                       streamStartMs, false, e.getMessage(), null, null, null);
                   emitter.completeWithError(e);
                 });
             stream.start();
           } catch (Exception e) {
             messageCmd.setStreaming(assistantMessage, false);
-            saveApiUsageLog(agent, session, modelForAsync, "/api/v1/agents/chat/stream",
+            saveApiUsageLog(agent, sessionDb, modelForAsync, "/api/v1/agents/chat/stream",
                 streamStartMs, false, e.getMessage(), null, null, null);
             emitter.completeWithError(e);
           }
