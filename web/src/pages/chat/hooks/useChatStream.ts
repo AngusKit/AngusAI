@@ -34,8 +34,20 @@ async function buildStreamRequest(path: string, _body: unknown): Promise<{ url: 
 }
 
 /**
+ * 剥离行首的 data: 前缀（支持后端可能返回的 data:data: 双重前缀）
+ */
+function peelDataPrefix(line: string): string {
+  let s = line.trim();
+  while (s.startsWith('data:')) {
+    s = s.slice(5).trim();
+  }
+  return s;
+}
+
+/**
  * 解析 SSE 流（OpenAI 格式）
  * 后端格式：data: OpenAIChatCompletionChunk 或 data: [DONE]
+ * 兼容 data:data: 双重前缀及 sessionId/session_id 两种字段名
  */
 export async function chatStream(
   data: AgentChatRequestDto,
@@ -90,12 +102,13 @@ export async function chatStream(
       buffer = lines.pop() || '';
       for (const line of lines) {
         if (!line.startsWith('data:')) continue;
-        const payload = line.slice(5).trim();
+        let payload = peelDataPrefix(line);
         if (!payload) continue;
         if (payload === '[DONE]') continue;
         try {
-          const obj = JSON.parse(payload) as OpenAIChatCompletionChunk;
-          if (obj?.session_id) callbacks.onSessionId?.(obj.session_id);
+          const obj = JSON.parse(payload) as OpenAIChatCompletionChunk & { sessionId?: string };
+          const sid = obj?.session_id ?? obj?.sessionId;
+          if (sid) callbacks.onSessionId?.(sid);
           const content = obj?.choices?.[0]?.delta?.content;
           if (content) callbacks.onToken(content);
         } catch {
@@ -106,10 +119,13 @@ export async function chatStream(
     if (buffer) {
       const dataIdx = buffer.indexOf('data:');
       if (dataIdx >= 0) {
-        const payload = buffer.slice(dataIdx + 5).split('\n')[0]?.trim() ?? '';
+        const rawLine = buffer.slice(dataIdx).split('\n')[0] ?? '';
+        const payload = peelDataPrefix(rawLine);
         if (payload && payload !== '[DONE]') {
           try {
-            const obj = JSON.parse(payload) as OpenAIChatCompletionChunk;
+            const obj = JSON.parse(payload) as OpenAIChatCompletionChunk & { sessionId?: string };
+            const sid = obj?.session_id ?? obj?.sessionId;
+            if (sid) callbacks.onSessionId?.(sid);
             const content = obj?.choices?.[0]?.delta?.content;
             if (content) callbacks.onToken(content);
           } catch {
