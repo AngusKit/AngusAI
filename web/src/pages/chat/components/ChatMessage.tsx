@@ -7,6 +7,7 @@ import {
   RotateCw,
   Check,
   Download,
+  Eye,
 } from 'lucide-react';
 import {
   Dialog,
@@ -34,6 +35,7 @@ import { cn } from '@/components/ui/utils.ts';
 import { toast } from 'sonner';
 import { copyToClipboard } from '../../../lib/clipboard.ts';
 import { detectContentFormat, type ContentFormat } from '../lib/messageFormat.ts';
+import { HtmlPreviewDialog } from './HtmlPreviewDialog.tsx';
 
 interface Message {
   id: string;
@@ -62,6 +64,79 @@ interface ChatMessageProps {
   onFeedback?: (messageId: string, feedbackType: 'like' | 'dislike', comment?: string) => void;
 }
 
+/** 代码块：复制、下载、HTML 预览（仅 html 语言） */
+function CodeBlockWithActions({ code, lang }: { code: string; lang: string }) {
+  const [copied, setCopied] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const isHtml = /^(html?|markup)$/i.test(lang);
+
+  const handleCopy = async () => {
+    const ok = await copyToClipboard(code);
+    if (ok) {
+      setCopied(true);
+      toast.success('已复制');
+      setTimeout(() => setCopied(false), 2000);
+    } else toast.error('复制失败');
+  };
+
+  const handleDownload = () => {
+    const ext = lang ? (lang === 'html' ? 'html' : lang) : 'txt';
+    const blob = new Blob([code], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `code.${ext}`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <div className="my-3 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+      {/* 工具栏：直接展示，不依赖悬停 */}
+      <div className="flex items-center justify-end gap-1 px-2 py-1.5 bg-gray-100 dark:bg-gray-800/80 border-b border-gray-200 dark:border-gray-700">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handleCopy}>
+              {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>复制</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handleDownload}>
+              <Download className="w-3 h-3" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>下载</TooltipContent>
+        </Tooltip>
+        {isHtml && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setPreviewOpen(true)}>
+                <Eye className="w-3 h-3" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>预览</TooltipContent>
+          </Tooltip>
+        )}
+      </div>
+      <SyntaxHighlighter
+        language={lang}
+        style={oneDark}
+        PreTag="div"
+        customStyle={{ margin: 0, borderRadius: 0 }}
+        className="!my-0 !rounded-none overflow-x-auto text-sm [&>code]:!p-4"
+      >
+        {code}
+      </SyntaxHighlighter>
+      {isHtml && (
+        <HtmlPreviewDialog open={previewOpen} onOpenChange={setPreviewOpen} html={code} title="HTML 预览" />
+      )}
+    </div>
+  );
+}
+
 /** Markdown 渲染时的自定义组件 */
 const markdownComponents: Parameters<typeof ReactMarkdown>[0]['components'] = {
   p: ({ children }: { children?: ReactNode }) => <p className="mb-2 last:mb-0">{children}</p>,
@@ -83,15 +158,7 @@ const markdownComponents: Parameters<typeof ReactMarkdown>[0]['components'] = {
     const lang = match?.[1] ?? '';
     const code = String(children ?? '').replace(/\n$/, '');
     return (
-      <SyntaxHighlighter
-        language={lang}
-        style={oneDark}
-        PreTag="div"
-        customStyle={{ margin: 0, borderRadius: '0.5rem' }}
-        className="!my-3 !rounded-lg overflow-x-auto text-sm [&>code]:!p-4"
-      >
-        {code}
-      </SyntaxHighlighter>
+      <CodeBlockWithActions code={code} lang={lang} />
     );
   },
   pre: ({ children }: { children?: React.ReactNode }) => (
@@ -162,6 +229,7 @@ const ChatMessageInner = ({ message, isLastAssistant, onRegenerate, onFeedback }
   });
   const [dislikeDialogOpen, setDislikeDialogOpen] = useState(false);
   const [dislikeComment, setDislikeComment] = useState('');
+  const [htmlPreviewOpen, setHtmlPreviewOpen] = useState(false);
 
   useEffect(() => {
     const ft = message.feedbackType;
@@ -210,6 +278,18 @@ const ChatMessageInner = ({ message, isLastAssistant, onRegenerate, onFeedback }
     else toast.success('正在重新生成回答...');
   };
 
+  const handleDownloadMessage = () => {
+    const ext = contentFormat === 'html' ? 'html' : contentFormat === 'markdown' ? 'md' : 'txt';
+    const blob = new Blob([message.content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `消息_${message.timestamp.toISOString().slice(0, 19).replace(/[-:T]/g, '')}.${ext}`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success('已下载');
+  };
+
   const isUser = message.role === 'user';
 
   // 识别 → 解析 → 渲染管道
@@ -242,9 +322,28 @@ const ChatMessageInner = ({ message, isLastAssistant, onRegenerate, onFeedback }
         );
       case 'html':
         return (
-          <pre className="text-xs font-mono whitespace-pre-wrap break-all overflow-x-auto max-h-64 overflow-y-auto rounded bg-gray-50 dark:bg-gray-900 p-3">
-            {content}
-          </pre>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 gap-1.5 text-xs"
+                onClick={() => setHtmlPreviewOpen(true)}
+              >
+                <Eye className="w-3 h-3" />
+                预览 HTML
+              </Button>
+            </div>
+            <pre className="text-xs font-mono whitespace-pre-wrap break-all overflow-x-auto max-h-64 overflow-y-auto rounded bg-gray-50 dark:bg-gray-900 p-3">
+              {content}
+            </pre>
+            <HtmlPreviewDialog
+              open={htmlPreviewOpen}
+              onOpenChange={setHtmlPreviewOpen}
+              html={content}
+              title="HTML 预览"
+            />
+          </div>
         );
       default:
         return <p className="whitespace-pre-wrap break-words">{content}</p>;
@@ -399,6 +498,15 @@ const ChatMessageInner = ({ message, isLastAssistant, onRegenerate, onFeedback }
                   重新生成
                 </Button>
               )}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-8 gap-2" onClick={handleDownloadMessage}>
+                    <Download className="w-3 h-3" />
+                    下载
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top">下载消息</TooltipContent>
+              </Tooltip>
             </div>
           )}
 
