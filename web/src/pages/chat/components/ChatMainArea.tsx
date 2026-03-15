@@ -1,9 +1,5 @@
 import { useRef, useEffect } from 'react';
 import {
-  Send,
-  Paperclip,
-  Mic,
-  StopCircle,
   MoreVertical,
   Sparkles,
   BookmarkPlus,
@@ -15,13 +11,11 @@ import {
   Palette,
   Trash2,
   Plus,
-  Image as ImageIcon,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button.tsx';
-import { Textarea } from '@/components/ui/textarea.tsx';
 import { ChatMessage } from './ChatMessage.tsx';
+import { ChatInputBar, type ChatInputBarHandle } from './ChatInputBar.tsx';
 import { ChatSwitcher, type ChatSwitcherSelection } from './ChatSwitcher.tsx';
-import { AttachmentPreview } from './AttachmentPreview.tsx';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -68,19 +62,19 @@ export interface ChatMainAreaProps {
   suggestedQuestions: string[];
   selectedTemplateObj?: ThemeTemplate;
   onInsertPrompt: (prompt: string) => void;
-  attachments: File[];
-  onRemoveAttachment: (index: number) => void;
-  input: string;
-  onInputChange: (value: string) => void;
-  onKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
+  /** 输入区 ref，用于提示词库注入等 */
+  inputBarRef?: React.RefObject<ChatInputBarHandle | null>;
+  /** 初始输入内容（如分享链接预填） */
+  initialContent?: string;
+  /** 发送消息，由输入区调用并传入 content 和 attachments */
+  onSend: (content: string, attachments: File[]) => void;
+  onVoiceRecord?: () => void;
+  isRecording?: boolean;
+  /** IME 检测 */
+  isComposingRef?: React.MutableRefObject<boolean>;
+  lastCompositionEndRef?: React.MutableRefObject<number>;
   onCompositionStart?: () => void;
   onCompositionEnd?: () => void;
-  fileInputRef: React.RefObject<HTMLInputElement | null>;
-  onFileSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onVoiceRecord: () => void;
-  isRecording: boolean;
-  onSendMessage: () => void;
-  textareaRef: React.RefObject<HTMLTextAreaElement | null>;
   /** 是否正在发送（流式生成中），用于禁用发送按钮 */
   isSending?: boolean;
   /** 点击发送后需滚动到底部的 ref，由父组件在发送时设为 true */
@@ -117,19 +111,15 @@ export function ChatMainArea({
                                suggestedQuestions,
                                selectedTemplateObj,
                                onInsertPrompt,
-                               attachments,
-                               onRemoveAttachment,
-                               input,
-                               onInputChange,
-                               onKeyDown,
+                               inputBarRef,
+                               initialContent = '',
+                               onSend,
+                               onVoiceRecord,
+                               isRecording = false,
+                               isComposingRef,
+                               lastCompositionEndRef,
                                onCompositionStart,
                                onCompositionEnd,
-                               fileInputRef,
-                               onFileSelect,
-                               onVoiceRecord,
-                               isRecording,
-                               onSendMessage,
-                               textareaRef,
                                isSending = false,
                                scrollAfterSendRef,
                                onRegenerate,
@@ -338,58 +328,23 @@ export function ChatMainArea({
         </div>
       </div>
 
-      {/* Input Area */}
-      <div className='bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4'>
-        <div className='max-w-4xl mx-auto'>
-          {attachments.length > 0 && (
-            <div className='mb-3 flex flex-wrap gap-2'>
-              {attachments.map((file, index) => (
-                <AttachmentPreview key={index} file={file} onRemove={() => onRemoveAttachment(index)} />
-              ))}
-            </div>
-          )}
-
-          <div className='flex-1 relative'>
-            <Textarea
-              ref={textareaRef}
-              value={input}
-              onChange={e => onInputChange(e.target.value)}
-              onKeyDown={onKeyDown}
-              onCompositionStart={onCompositionStart}
-              onCompositionEnd={onCompositionEnd}
-              placeholder='输入消息... (Shift + Enter 换行)'
-              className='min-h-[80px] max-h-[240px] resize-none pr-32 py-4 px-4 dark:bg-gray-800 dark:border-gray-700 scrollbar-hide'
-              rows={1}
-            />
-            <div className='absolute right-3 bottom-3 flex items-center gap-1'>
-              <input ref={fileInputRef} type='file' multiple className='hidden' onChange={onFileSelect} />
-              {enableFileUpload && (
-                <Button variant='ghost' size='icon' className='h-9 w-9' onClick={() => { if (fileInputRef.current) { fileInputRef.current.accept = '*'; fileInputRef.current.click(); } }} title='上传文件'>
-                  <Paperclip className='w-4 h-4' />
-                </Button>
-              )}
-              {enableImageInput && (
-                <Button variant='ghost' size='icon' className='h-9 w-9' onClick={() => { if (fileInputRef.current) { fileInputRef.current.accept = 'image/*'; fileInputRef.current.click(); } }} title='上传图片'>
-                  <ImageIcon className='w-4 h-4' />
-                </Button>
-              )}
-              {enableVoiceInput && (
-                <Button variant='ghost' size='icon' className='h-9 w-9' onClick={onVoiceRecord}>
-                  {isRecording ? <StopCircle className='w-4 h-4 text-red-500' /> : <Mic className='w-4 h-4' />}
-                </Button>
-              )}
-              <Button
-                size='icon'
-                onClick={onSendMessage}
-                disabled={isSending || (!input.trim() && attachments.length === 0)}
-                className={cn('h-9 w-9', selectedTemplateObj?.primaryColor ?? 'bg-blue-500', 'text-white')}
-              >
-                <Send className='w-4 h-4' />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Input Area - 独立组件，输入时仅重渲染自身，解决延迟问题 */}
+      <ChatInputBar
+        ref={inputBarRef}
+        initialContent={initialContent}
+        onSend={onSend}
+        isSending={isSending}
+        enableFileUpload={enableFileUpload}
+        enableImageInput={enableImageInput}
+        enableVoiceInput={enableVoiceInput}
+        selectedTemplateObj={selectedTemplateObj}
+        onVoiceRecord={onVoiceRecord}
+        isRecording={isRecording}
+        isComposingRef={isComposingRef}
+        lastCompositionEndRef={lastCompositionEndRef}
+        onCompositionStart={onCompositionStart}
+        onCompositionEnd={onCompositionEnd}
+      />
     </div>
   );
 }

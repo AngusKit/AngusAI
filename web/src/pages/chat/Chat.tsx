@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { toast } from 'sonner';
 import { refreshResourcesBadge } from '@/hooks/useResourcesBadge';
@@ -46,23 +46,22 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     updateSessionInList,
     updateSessionConfig,
     clearSessionMessages,
+    setSessionMessages,
+    setCurrentSessionId,
     sessionKeyword,
     setSessionKeyword,
   } = useChatSessions(undefined, undefined, sessionIdFromUrl);
   const [sessionSelections, setSessionSelections] = useState<Record<string, ChatSwitcherSelection>>({});
   const defaultContent = content || sessionStorage.getItem('chatContent') || '';
-  const [input, setInput] = useState(defaultContent);
   sessionStorage.removeItem('chatContent');
   const [isRecording, setIsRecording] = useState(false);
-  const [attachments, setAttachments] = useState<File[]>([]);
+  const inputBarRef = useRef<{ insertText: (text: string) => void; focus: () => void } | null>(null);
   const [showPromptLibrary, setShowPromptLibrary] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showThemeDialog, setShowThemeDialog] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateType>('modern-blue');
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const isComposingRef = useRef(false);
   const lastCompositionEndRef = useRef(0);
   const scrollAfterSendRef = useRef(false);
@@ -113,14 +112,6 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     navigate(`/chat/${currentSessionId}`, { replace: true });
   }, [currentSessionId, sessionIdFromUrl, navigate]);
 
-  // Auto-resize textarea
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px';
-    }
-  }, [input]);
-
   const handleSessionSelect = (sessionId: string) => {
     selectSession(sessionId);
     navigate(`/chat/${sessionId}`);
@@ -128,8 +119,8 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
 
   const [isSending, setIsSending] = useState(false);
 
-  const handleSendMessage = async () => {
-    if (!input.trim() && attachments.length === 0) return;
+  const handleSendMessage = async (userContent: string, files: File[]) => {
+    if (!userContent.trim() && files.length === 0) return;
     // 防止重复发送：发送中或有流式消息时不再发送
     if (isSending || currentMessages.some((m) => m.isStreaming)) {
       toast.error('请等待当前消息发送完成');
@@ -146,7 +137,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
 
     scrollAfterSendRef.current = true; // 发送后自动定位到底部
 
-    const userContent = input.trim();
+    const attachments = files;
     const newMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
@@ -168,8 +159,6 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     } else {
       appendMessages(displayKey, [newMessage]);
     }
-    setInput('');
-    setAttachments([]);
 
     const assistantId = `assistant-${Date.now()}`;
     const aiPlaceholder: Message = {
@@ -190,7 +179,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     };
 
     // 只提交最后一条用户消息，上下文由后端根据 sessionId 从会话历史中获取
-    const messages: Array<{ role: string; content: string }> = [{ role: 'user', content: userContent }];
+    const messages = [{ role: 'user' as const, content: userContent }];
 
     setIsSending(true);
     const effectiveKeyRef = { current: displayKey };
@@ -242,7 +231,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     }
   };
 
-  const handleRegenerate = async () => {
+  const handleRegenerate = useCallback(async () => {
     if (!currentSessionId || !currentSession) return;
     const msgs = currentMessages;
     if (msgs.length < 2) return;
@@ -273,7 +262,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
       presencePenalty: settings.presencePenalty,
     };
     // 只提交最后一条用户消息，上下文由后端根据 sessionId 从会话历史中获取
-    const messages: Array<{ role: string; content: string }> = [{ role: 'user', content: userContent }];
+    const messages = [{ role: 'user' as const, content: userContent }];
     try {
       const { chatStream } = await import('@/pages/chat/hooks/useChatStream.ts');
       let accumulated = '';
@@ -301,9 +290,17 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     } finally {
       setIsSending(false);
     }
-  };
+  }, [
+    currentSessionId,
+    currentSession,
+    currentMessages,
+    removeLastAssistantMessage,
+    appendMessages,
+    updateMessage,
+    settings,
+  ]);
 
-  const handleFeedback = async (messageId: string, feedbackType: 'like' | 'dislike', comment?: string) => {
+  const handleFeedback = useCallback(async (messageId: string, feedbackType: 'like' | 'dislike', comment?: string) => {
     if (!currentSessionId) return;
     try {
       await ChatApi.feedbackMessage(currentSessionId, messageId, {
@@ -315,7 +312,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
       console.error('Feedback failed:', e);
       toast.error('反馈提交失败');
     }
-  };
+  }, [currentSessionId]);
 
   const handleCompositionStart = () => {
     isComposingRef.current = true;
@@ -327,29 +324,6 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     setTimeout(() => {
       isComposingRef.current = false;
     }, 120);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      // IME 输入法中回车用于确认选字，不触发发送（composition 事件 + 时间戳兜底）
-      if (e.nativeEvent.isComposing || isComposingRef.current) return;
-      if (Date.now() - lastCompositionEndRef.current < 120) return;
-      // 当输入框内有选中内容时，回车用于换行/替换选区，不触发发送（优先使用 ref 保证取到真实 textarea）
-      const el = textareaRef.current ?? (e.target as HTMLTextAreaElement);
-      if (el && typeof el.selectionStart === 'number' && el.selectionStart !== el.selectionEnd) return;
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
-
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    setAttachments(prev => [...prev, ...files]);
-    toast.success(`已添加 ${files.length} 个附件`);
-  };
-
-  const removeAttachment = (index: number) => {
-    setAttachments(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleVoiceRecord = () => {
@@ -426,9 +400,8 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
   };
 
   const insertPrompt = (prompt: string) => {
-    setInput(prev => prev + prompt);
+    inputBarRef.current?.insertText(prompt);
     setShowPromptLibrary(false);
-    textareaRef.current?.focus();
   };
 
   const exportChat = () => {
@@ -512,19 +485,15 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
         suggestedQuestions={suggestedQuestions}
         selectedTemplateObj={selectedTemplateObj}
         onInsertPrompt={insertPrompt}
-        attachments={attachments}
-        onRemoveAttachment={removeAttachment}
-        input={input}
-        onInputChange={setInput}
-        onKeyDown={handleKeyDown}
-        onCompositionStart={handleCompositionStart}
-        onCompositionEnd={handleCompositionEnd}
-        fileInputRef={fileInputRef}
-        onFileSelect={handleFileSelect}
+        inputBarRef={inputBarRef}
+        initialContent={defaultContent}
+        onSend={handleSendMessage}
         onVoiceRecord={handleVoiceRecord}
         isRecording={isRecording}
-        onSendMessage={handleSendMessage}
-        textareaRef={textareaRef}
+        isComposingRef={isComposingRef}
+        lastCompositionEndRef={lastCompositionEndRef}
+        onCompositionStart={handleCompositionStart}
+        onCompositionEnd={handleCompositionEnd}
         isSending={isSending || currentMessages.some((m) => m.isStreaming)}
         scrollAfterSendRef={scrollAfterSendRef}
         onRegenerate={handleRegenerate}

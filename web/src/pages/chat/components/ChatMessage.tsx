@@ -134,7 +134,7 @@ const markdownComponents: Parameters<typeof ReactMarkdown>[0]['components'] = {
   tr: ({ children }: { children?: React.ReactNode }) => <tr className="border-b dark:border-gray-700">{children}</tr>,
 };
 
-export function ChatMessage({ message, isLastAssistant, onRegenerate, onFeedback }: ChatMessageProps) {
+const ChatMessageInner = ({ message, isLastAssistant, onRegenerate, onFeedback }: ChatMessageProps) => {
   const [copied, setCopied] = useState(false);
   const [liked, setLiked] = useState<boolean | null>(null);
   const [htmlPreviewOpen, setHtmlPreviewOpen] = useState(false);
@@ -469,7 +469,10 @@ export function ChatMessage({ message, isLastAssistant, onRegenerate, onFeedback
       </div>
     </div>
   );
-}
+};
+
+/** 使用 React.memo 避免输入时重渲染所有消息，减轻输入延迟 */
+export const ChatMessage = React.memo(ChatMessageInner);
 
 /**
  * 流式输出时补齐未闭合的 Markdown 结构，避免解析失败导致格式错乱
