@@ -61,6 +61,8 @@ export interface ChatMainAreaProps {
   onShareChat: () => void;
   onClearChat: () => void;
   currentMessages: Message[];
+  /** 当前会话 ID，用于进入/切换会话时滚动到底部 */
+  currentSessionId?: string;
   hasAgentPlaceholder: boolean;
   welcomeMessage: string;
   suggestedQuestions: string[];
@@ -71,6 +73,8 @@ export interface ChatMainAreaProps {
   input: string;
   onInputChange: (value: string) => void;
   onKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
+  onCompositionStart?: () => void;
+  onCompositionEnd?: () => void;
   fileInputRef: React.RefObject<HTMLInputElement | null>;
   onFileSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onVoiceRecord: () => void;
@@ -105,6 +109,7 @@ export function ChatMainArea({
                                onShareChat,
                                onClearChat,
                                currentMessages,
+                               currentSessionId,
                                hasAgentPlaceholder,
                                welcomeMessage,
                                suggestedQuestions,
@@ -115,6 +120,8 @@ export function ChatMainArea({
                                input,
                                onInputChange,
                                onKeyDown,
+                               onCompositionStart,
+                               onCompositionEnd,
                                fileInputRef,
                                onFileSelect,
                                onVoiceRecord,
@@ -126,10 +133,44 @@ export function ChatMainArea({
                                onFeedback,
                              }: ChatMainAreaProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const lastScrollTimeRef = useRef(0);
+  const prevSessionIdRef = useRef<string | undefined>(undefined);
+  const needInitialScrollRef = useRef(true);
+  const SCROLL_THROTTLE_MS = 200;
+  /** 距底部小于此像素视为「在底部」，才自动滚动；否则用户已向上查看历史，不打断 */
+  const BOTTOM_THRESHOLD_PX = 150;
+
+  // 切换会话时，下次有消息时需滚动到底部
+  if (currentSessionId !== prevSessionIdRef.current) {
+    prevSessionIdRef.current = currentSessionId;
+    needInitialScrollRef.current = true;
+  }
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [currentMessages]);
+    const container = messagesContainerRef.current;
+    if (!container) return;
+
+    // 进入对话页或切换会话时，有消息则定位到底部
+    if (needInitialScrollRef.current && currentMessages.length > 0) {
+      needInitialScrollRef.current = false;
+      lastScrollTimeRef.current = Date.now();
+      messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+      return;
+    }
+
+    const { scrollTop, scrollHeight, clientHeight } = container;
+    const isNearBottom = scrollHeight - scrollTop - clientHeight < BOTTOM_THRESHOLD_PX;
+    if (!isNearBottom) return; // 用户已向上滚动，保持当前视口
+
+    const last = currentMessages[currentMessages.length - 1];
+    const isStreaming = last?.isStreaming === true;
+    const now = Date.now();
+    // 流式输出时对滚动做节流，避免每次 token 更新都触发导致页面抖动
+    if (isStreaming && now - lastScrollTimeRef.current < SCROLL_THROTTLE_MS) return;
+    lastScrollTimeRef.current = now;
+    messagesEndRef.current?.scrollIntoView({ behavior: isStreaming ? 'auto' : 'smooth' });
+  }, [currentMessages, currentSessionId]);
 
   const appDisplayName = chatSelection.app?.name ?? '应用';
 
@@ -211,7 +252,7 @@ export function ChatMainArea({
       </div>
 
       {/* Messages Area */}
-      <div className='flex-1 overflow-y-auto px-4 py-10'>
+      <div ref={messagesContainerRef} className='flex-1 overflow-y-auto px-4 py-10'>
         <div className='max-w-4xl mx-auto pt-6 pb-6 space-y-6'>
           {currentMessages.length === 0 ? (
             hasAgentPlaceholder ? (
@@ -303,6 +344,8 @@ export function ChatMainArea({
               value={input}
               onChange={e => onInputChange(e.target.value)}
               onKeyDown={onKeyDown}
+              onCompositionStart={onCompositionStart}
+              onCompositionEnd={onCompositionEnd}
               placeholder='输入消息... (Shift + Enter 换行)'
               className='min-h-[80px] max-h-[240px] resize-none pr-32 py-4 px-4 dark:bg-gray-800 dark:border-gray-700 scrollbar-hide'
               rows={1}

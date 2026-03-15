@@ -63,6 +63,8 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateType>('modern-blue');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const isComposingRef = useRef(false);
+  const lastCompositionEndRef = useRef(0);
 
   const handleBack = () => {
     onBack ? onBack() : navigate('/dashboard');
@@ -311,8 +313,26 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     }
   };
 
+  const handleCompositionStart = () => {
+    isComposingRef.current = true;
+  };
+
+  const handleCompositionEnd = () => {
+    lastCompositionEndRef.current = Date.now();
+    // compositionend 后 keydown 可能延迟触发（部分 IME/浏览器），延迟 120ms 再置为 false
+    setTimeout(() => {
+      isComposingRef.current = false;
+    }, 120);
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
+      // IME 输入法中回车用于确认选字，不触发发送（composition 事件 + 时间戳兜底）
+      if (e.nativeEvent.isComposing || isComposingRef.current) return;
+      if (Date.now() - lastCompositionEndRef.current < 120) return;
+      // 当输入框内有选中内容时，回车用于换行/替换选区，不触发发送（优先使用 ref 保证取到真实 textarea）
+      const el = textareaRef.current ?? (e.target as HTMLTextAreaElement);
+      if (el && typeof el.selectionStart === 'number' && el.selectionStart !== el.selectionEnd) return;
       e.preventDefault();
       handleSendMessage();
     }
@@ -482,6 +502,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
         onShareChat={shareChat}
         onClearChat={clearCurrentChat}
         currentMessages={currentMessages}
+        currentSessionId={currentSessionId ?? undefined}
         hasAgentPlaceholder={hasAgentPlaceholder}
         welcomeMessage={welcomeMessage}
         suggestedQuestions={suggestedQuestions}
@@ -492,6 +513,8 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
         input={input}
         onInputChange={setInput}
         onKeyDown={handleKeyDown}
+        onCompositionStart={handleCompositionStart}
+        onCompositionEnd={handleCompositionEnd}
         fileInputRef={fileInputRef}
         onFileSelect={handleFileSelect}
         onVoiceRecord={handleVoiceRecord}
