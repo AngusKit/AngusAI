@@ -11,9 +11,9 @@ import {
   routerUtils as RouterUtils,
 } from '@xcan-angus/infra';
 import { AUTH_BEARER_PREFIX, HEADER_ACCEPT_LANGUAGE, HEADER_AUTHORIZATION, HEADER_DEVICE_ID } from '@/Constants.ts';
-import type { AgentChatRequestDto } from '@/services/AgentChatTypes.ts';
+import type { AgentChatRequestDto, OpenAIChatCompletionChunk } from '@/services/AgentChatTypes.ts';
 
-async function buildStreamRequest(path: string, body: unknown): Promise<{ url: string; headers: HeadersInit }> {
+async function buildStreamRequest(path: string, _body: unknown): Promise<{ url: string; headers: HeadersInit }> {
   let url = RouterUtils.getAIApiUrl(path);
 
   const headers: Record<string, string> = {
@@ -35,7 +35,7 @@ async function buildStreamRequest(path: string, body: unknown): Promise<{ url: s
 
 /**
  * 解析 SSE 流（OpenAI 格式）
- * 后端格式：data: {"choices":[{"delta":{"content":"x"}}]} 或 data: [DONE]
+ * 后端格式：data: OpenAIChatCompletionChunk 或 data: [DONE]
  */
 export async function chatStream(
   data: AgentChatRequestDto,
@@ -94,10 +94,7 @@ export async function chatStream(
         if (!payload) continue;
         if (payload === '[DONE]') continue;
         try {
-          const obj = JSON.parse(payload) as {
-            choices?: Array<{ delta?: { content?: string } }>;
-            session_id?: string;
-          };
+          const obj = JSON.parse(payload) as OpenAIChatCompletionChunk;
           if (obj?.session_id) callbacks.onSessionId?.(obj.session_id);
           const content = obj?.choices?.[0]?.delta?.content;
           if (content) callbacks.onToken(content);
@@ -109,10 +106,10 @@ export async function chatStream(
     if (buffer) {
       const dataIdx = buffer.indexOf('data:');
       if (dataIdx >= 0) {
-        const payload = buffer.slice(dataIdx + 5).split('\n')[0].trim();
+        const payload = buffer.slice(dataIdx + 5).split('\n')[0]?.trim() ?? '';
         if (payload && payload !== '[DONE]') {
           try {
-            const obj = JSON.parse(payload) as { choices?: Array<{ delta?: { content?: string } }> };
+            const obj = JSON.parse(payload) as OpenAIChatCompletionChunk;
             const content = obj?.choices?.[0]?.delta?.content;
             if (content) callbacks.onToken(content);
           } catch {

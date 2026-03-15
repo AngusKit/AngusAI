@@ -45,3 +45,42 @@ export interface AgentChatResponseVo {
 export type AgentChatResult = ApiLocaleResult & {
   data?: AgentChatResponseVo;
 };
+
+// ============ 流式 SSE Chunk（与后端 OpenAIChatCompletionChunk 对应） ============
+
+/** 流式增量消息（delta），每 token 对应一段 content */
+export interface ChatCompletionDelta {
+  /** 角色（首块可能携带） */
+  role?: string;
+  /** 增量内容 */
+  content?: string;
+}
+
+/** 流式 Chunk 中的生成选项 */
+export interface ChatCompletionChunkChoice {
+  /** 生成选项索引，通常为 0 */
+  index?: number;
+  /** 增量消息，包含当前 token 对应的增量内容 */
+  delta?: ChatCompletionDelta;
+  /** 结束原因：流进行中为 null；流结束时为 stop/length/tool_calls/content_filter 等 */
+  finish_reason?: string | null;
+}
+
+/** OpenAI Chat Completions 流式 Chunk（SSE 每 token 推送的数据结构，与后端 OpenAIChatCompletionChunk 对应） */
+export interface OpenAIChatCompletionChunk {
+  /** 唯一标识，流式场景常用固定值 chatcmpl-stream */
+  id?: string;
+  /** 会话 ID，无会话模式时首块携带，供前端建立关联 */
+  session_id?: string;
+  /** 对象类型，流式固定为 chat.completion.chunk */
+  object?: string;
+  /** 创建时间（Unix 秒） */
+  created?: number;
+  /** 使用的模型名称 */
+  model?: string;
+  /** 生成选项列表，流式时每块通常仅一个元素 */
+  choices?: ChatCompletionChunkChoice[];
+}
+
+/** @deprecated 使用 OpenAIChatCompletionChunk */
+export type ChatCompletionChunk = OpenAIChatCompletionChunk;
