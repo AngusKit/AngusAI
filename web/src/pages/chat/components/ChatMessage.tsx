@@ -21,12 +21,12 @@ import { Textarea } from '@/components/ui/textarea.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.tsx';
 import type { ReactNode } from 'react';
+import React from 'react';
 import { useState, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import remarkBreaks from 'remark-breaks';
-import rehypeHighlight from 'rehype-highlight';
-import 'highlight.js/styles/github-dark.min.css';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 import { cn } from '@/components/ui/utils.ts';
 import { toast } from 'sonner';
 import { copyToClipboard } from '../../../lib/clipboard.ts';
@@ -74,16 +74,23 @@ const markdownComponents: Parameters<typeof ReactMarkdown>[0]['components'] = {
         </code>
       );
     }
+    const match = /language-(\w+)/.exec(className ?? '');
+    const lang = match?.[1] ?? '';
+    const code = String(children ?? '').replace(/\n$/, '');
     return (
-      <code className={cn('text-sm font-mono block', className)} {...props}>
-        {children}
-      </code>
+      <SyntaxHighlighter
+        language={lang}
+        style={oneDark}
+        PreTag="div"
+        customStyle={{ margin: 0, borderRadius: '0.5rem' }}
+        className="!my-3 !rounded-lg overflow-x-auto text-sm [&>code]:!p-4"
+      >
+        {code}
+      </SyntaxHighlighter>
     );
   },
   pre: ({ children }: { children?: React.ReactNode }) => (
-    <pre className="my-3 overflow-x-auto rounded-lg bg-gray-900 dark:bg-gray-950">
-      {children}
-    </pre>
+    <div className="[&>div]:!mt-0 [&>div]:!mb-0">{children}</div>
   ),
   a: ({ href, children }: { href?: string; children?: React.ReactNode }) => (
     <a
@@ -201,8 +208,7 @@ export function ChatMessage({ message, isLastAssistant, onRegenerate, onFeedback
         return (
           <div className={wrapClass}>
             <ReactMarkdown
-              remarkPlugins={[remarkGfm, remarkBreaks]}
-              rehypePlugins={[rehypeHighlight]}
+              remarkPlugins={[remarkGfm]}
               components={markdownComponents}
             >
               {normalizeMarkdownForStreaming(content)}

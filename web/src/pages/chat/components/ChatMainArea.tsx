@@ -83,6 +83,8 @@ export interface ChatMainAreaProps {
   textareaRef: React.RefObject<HTMLTextAreaElement | null>;
   /** 是否正在发送（流式生成中），用于禁用发送按钮 */
   isSending?: boolean;
+  /** 点击发送后需滚动到底部的 ref，由父组件在发送时设为 true */
+  scrollAfterSendRef?: React.MutableRefObject<boolean>;
   /** 重新生成最后一条 AI 回复 */
   onRegenerate?: () => void;
   /** 消息反馈（点赞/点踩），点踩时需填写 comment */
@@ -129,6 +131,7 @@ export function ChatMainArea({
                                onSendMessage,
                                textareaRef,
                                isSending = false,
+                               scrollAfterSendRef,
                                onRegenerate,
                                onFeedback,
                              }: ChatMainAreaProps) {
@@ -139,7 +142,7 @@ export function ChatMainArea({
   const needInitialScrollRef = useRef(true);
   const SCROLL_THROTTLE_MS = 200;
   /** 距底部小于此像素视为「在底部」，才自动滚动；否则用户已向上查看历史，不打断 */
-  const BOTTOM_THRESHOLD_PX = 150;
+  const BOTTOM_THRESHOLD_PX = 350;
 
   // 切换会话时，下次有消息时需滚动到底部
   if (currentSessionId !== prevSessionIdRef.current) {
@@ -154,6 +157,14 @@ export function ChatMainArea({
     // 进入对话页或切换会话时，有消息则定位到底部
     if (needInitialScrollRef.current && currentMessages.length > 0) {
       needInitialScrollRef.current = false;
+      lastScrollTimeRef.current = Date.now();
+      messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+      return;
+    }
+
+    // 点击发送后需定位到底部
+    if (scrollAfterSendRef?.current && currentMessages.length > 0) {
+      scrollAfterSendRef.current = false;
       lastScrollTimeRef.current = Date.now();
       messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
       return;

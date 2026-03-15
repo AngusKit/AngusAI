@@ -65,6 +65,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const isComposingRef = useRef(false);
   const lastCompositionEndRef = useRef(0);
+  const scrollAfterSendRef = useRef(false);
 
   const handleBack = () => {
     onBack ? onBack() : navigate('/dashboard');
@@ -142,6 +143,8 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
       toast.error('请先选择应用或创建对话');
       return;
     }
+
+    scrollAfterSendRef.current = true; // 发送后自动定位到底部
 
     const userContent = input.trim();
     const newMessage: Message = {
@@ -250,6 +253,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     const userContent = lastUserMsg.content?.trim();
     if (!userContent) return;
 
+    scrollAfterSendRef.current = true;
     removeLastAssistantMessage(currentSessionId);
     const assistantId = `assistant-${Date.now()}`;
     const aiPlaceholder: Message = {
@@ -522,6 +526,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
         onSendMessage={handleSendMessage}
         textareaRef={textareaRef}
         isSending={isSending || currentMessages.some((m) => m.isStreaming)}
+        scrollAfterSendRef={scrollAfterSendRef}
         onRegenerate={handleRegenerate}
         onFeedback={handleFeedback}
       />
