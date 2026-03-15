@@ -24,7 +24,6 @@ public class OpenAIChatCompletionChunk {
   private String sessionId;
 
   @Builder.Default
-  @Builder.Default
   private String object = "chat.completion.chunk";
   private Long created;
   private String model;

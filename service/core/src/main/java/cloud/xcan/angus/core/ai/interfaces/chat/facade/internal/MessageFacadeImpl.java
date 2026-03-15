@@ -24,9 +24,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-/**
- * Message Facade实现
- */
 @Component
 public class MessageFacadeImpl implements MessageFacade {
 
