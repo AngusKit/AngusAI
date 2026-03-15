@@ -462,12 +462,27 @@ const ChatMessageInner = ({ message, isLastAssistant, onRegenerate, onFeedback }
                   </>
                 )}
               </Button>
+              {isLastAssistant && (
+                <Button variant="ghost" size="sm" className="h-8 gap-2" onClick={handleRegenerate}>
+                  <RotateCw className="w-3 h-3" />
+                  重新生成
+                </Button>
+              )}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-8 gap-2" onClick={handleDownloadMessage}>
+                    <Download className="w-3 h-3" />
+                    下载
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top">下载消息</TooltipContent>
+              </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8"
+                    className="h-8 w-8 ml-4"
                     onClick={() => handleLike(true)}
                   >
                     <ThumbsUp
@@ -491,21 +506,6 @@ const ChatMessageInner = ({ message, isLastAssistant, onRegenerate, onFeedback }
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent side="top">点踩</TooltipContent>
-              </Tooltip>
-              {isLastAssistant && (
-                <Button variant="ghost" size="sm" className="h-8 gap-2" onClick={handleRegenerate}>
-                  <RotateCw className="w-3 h-3" />
-                  重新生成
-                </Button>
-              )}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-8 gap-2" onClick={handleDownloadMessage}>
-                    <Download className="w-3 h-3" />
-                    下载
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="top">下载消息</TooltipContent>
               </Tooltip>
             </div>
           )}
