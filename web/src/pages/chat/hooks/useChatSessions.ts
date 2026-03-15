@@ -161,7 +161,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
     loadedMessagesRef.current.add(sessionId);
     setMessagesLoading(true);
     try {
-      const res = await Chat.getMessageHistory(sessionId, { pageNo: 1, pageSize: 100 });
+      const res = await Chat.getMessageHistory(sessionId, { pageNo: 1, pageSize: 200 });
       const data = (res as any)?.data;
       const list: MessageVo[] = data?.list ?? [];
       const msgs = list.map(messageVoToMessage);

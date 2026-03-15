@@ -127,6 +127,11 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
 
   const handleSendMessage = async () => {
     if (!input.trim() && attachments.length === 0) return;
+    // 防止重复发送：发送中或有流式消息时不再发送
+    if (isSending || currentMessages.some((m) => m.isStreaming)) {
+      toast.error('请等待当前消息发送完成');
+      return;
+    }
 
     const hasSession = !!currentSessionId;
     const appId = chatSelection.appId ?? chatSelection.app?.id ?? '';
@@ -179,18 +184,8 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
       presencePenalty: settings.presencePenalty,
     };
 
-    // OpenAI 格式：构建 messages 数组（完整对话历史 + 新用户消息）
-    const existingForApi = hasSession
-      ? currentMessages.filter(
-          (m) =>
-            m.role === 'user' ||
-            (m.role === 'assistant' && (m.content ?? '').length > 0 && !m.isStreaming)
-        )
-      : [];
-    const messages: Array<{ role: string; content: string }> = [
-      ...existingForApi.map((m) => ({ role: m.role, content: m.content ?? '' })),
-      { role: 'user', content: userContent },
-    ];
+    // 只提交最后一条用户消息，上下文由后端根据 sessionId 从会话历史中获取
+    const messages: Array<{ role: string; content: string }> = [{ role: 'user', content: userContent }];
 
     setIsSending(true);
     const effectiveKeyRef = { current: displayKey };
@@ -271,15 +266,8 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
       frequencyPenalty: settings.frequencyPenalty,
       presencePenalty: settings.presencePenalty,
     };
-    // OpenAI 格式：构建 messages（历史到最后一轮 user，不含待重生的 assistant）
-    const msgsForApi = msgs.slice(0, -1);
-    const messages: Array<{ role: string; content: string }> = msgsForApi
-      .filter(
-        (m) =>
-          m.role === 'user' ||
-          (m.role === 'assistant' && (m.content ?? '').length > 0 && !m.isStreaming)
-      )
-      .map((m) => ({ role: m.role, content: m.content ?? '' }));
+    // 只提交最后一条用户消息，上下文由后端根据 sessionId 从会话历史中获取
+    const messages: Array<{ role: string; content: string }> = [{ role: 'user', content: userContent }];
     try {
       const { chatStream } = await import('@/pages/chat/hooks/useChatStream.ts');
       let accumulated = '';
@@ -510,7 +498,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
         isRecording={isRecording}
         onSendMessage={handleSendMessage}
         textareaRef={textareaRef}
-        isSending={isSending}
+        isSending={isSending || currentMessages.some((m) => m.isStreaming)}
         onRegenerate={handleRegenerate}
         onFeedback={handleFeedback}
       />
