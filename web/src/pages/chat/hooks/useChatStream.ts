@@ -34,13 +34,14 @@ async function buildStreamRequest(path: string, body: unknown): Promise<{ url: s
 }
 
 /**
- * 解析 SSE 流并回调每个 token
- * 后端格式：data: <token>\n\n
+ * 解析 SSE 流（OpenAI 格式）
+ * 后端格式：data: {"choices":[{"delta":{"content":"x"}}]} 或 data: [DONE]
  */
 export async function chatStream(
   data: AgentChatRequestDto,
   callbacks: {
     onToken: (token: string) => void;
+    onSessionId?: (sessionId: string) => void;
     onError?: (err: Error) => void;
   }
 ): Promise<void> {
@@ -88,15 +89,37 @@ export async function chatStream(
       const lines = buffer.split('\n');
       buffer = lines.pop() || '';
       for (const line of lines) {
-        if (line.startsWith('data:')) {
-          const payload = line.slice(5).trim();
-          if (payload) callbacks.onToken(payload);
+        if (!line.startsWith('data:')) continue;
+        const payload = line.slice(5).trim();
+        if (!payload) continue;
+        if (payload === '[DONE]') continue;
+        try {
+          const obj = JSON.parse(payload) as {
+            choices?: Array<{ delta?: { content?: string } }>;
+            session_id?: string;
+          };
+          if (obj?.session_id) callbacks.onSessionId?.(obj.session_id);
+          const content = obj?.choices?.[0]?.delta?.content;
+          if (content) callbacks.onToken(content);
+        } catch {
+          /* 非 JSON，忽略 */
         }
       }
     }
-    if (buffer && buffer.startsWith('data:')) {
-      const payload = buffer.slice(5).trim();
-      if (payload) callbacks.onToken(payload);
+    if (buffer) {
+      const dataIdx = buffer.indexOf('data:');
+      if (dataIdx >= 0) {
+        const payload = buffer.slice(dataIdx + 5).split('\n')[0].trim();
+        if (payload && payload !== '[DONE]') {
+          try {
+            const obj = JSON.parse(payload) as { choices?: Array<{ delta?: { content?: string } }> };
+            const content = obj?.choices?.[0]?.delta?.content;
+            if (content) callbacks.onToken(content);
+          } catch {
+            /* ignore */
+          }
+        }
+      }
     }
   } catch (e) {
     callbacks.onError?.(e instanceof Error ? e : new Error(String(e)));

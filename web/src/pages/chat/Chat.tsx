@@ -39,6 +39,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     toggleStar,
     selectSession,
     ensureSessionLoaded,
+    addSessionFromChat,
     appendMessages,
     removeLastAssistantMessage,
     updateMessage,
@@ -126,14 +127,12 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
 
   const handleSendMessage = async () => {
     if (!input.trim() && attachments.length === 0) return;
-    if (!currentSessionId) {
-      toast.error('请先选择或创建对话');
-      return;
-    }
 
-    const agentId = chatSelection.agentId ?? chatSelection.app?.defaultAgent?.id ?? currentSession?.agentId;
-    if (!agentId) {
-      toast.error('请先选择智能体');
+    const hasSession = !!currentSessionId;
+    const appId = chatSelection.appId ?? chatSelection.app?.id ?? '';
+    const hasAppForNewSession = !!appId;
+    if (!hasSession && !hasAppForNewSession) {
+      toast.error('请先选择应用或创建对话');
       return;
     }
 
@@ -152,7 +151,13 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
       })),
     };
 
-    appendMessages(currentSessionId, [newMessage]);
+    const displayKey = hasSession ? currentSessionId : `pending-${Date.now()}`;
+    if (!hasSession) {
+      setSessionMessages((prev) => ({ ...prev, [displayKey]: [newMessage] }));
+      setCurrentSessionId(displayKey);
+    } else {
+      appendMessages(displayKey, [newMessage]);
+    }
     setInput('');
     setAttachments([]);
 
@@ -164,37 +169,70 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
       timestamp: new Date(),
       isStreaming: true,
     };
-    appendMessages(currentSessionId, [aiPlaceholder]);
+    appendMessages(displayKey, [aiPlaceholder]);
+
+    const configPayload = {
+      temperature: settings.temperature,
+      maxTokens: settings.maxTokens,
+      topP: settings.topP,
+      frequencyPenalty: settings.frequencyPenalty,
+      presencePenalty: settings.presencePenalty,
+    };
+
+    // OpenAI 格式：构建 messages 数组（完整对话历史 + 新用户消息）
+    const existingForApi = hasSession
+      ? currentMessages.filter(
+          (m) =>
+            m.role === 'user' ||
+            (m.role === 'assistant' && (m.content ?? '').length > 0 && !m.isStreaming)
+        )
+      : [];
+    const messages: Array<{ role: string; content: string }> = [
+      ...existingForApi.map((m) => ({ role: m.role, content: m.content ?? '' })),
+      { role: 'user', content: userContent },
+    ];
 
     setIsSending(true);
+    const effectiveKeyRef = { current: displayKey };
 
     try {
       const { chatStream } = await import('@/pages/chat/hooks/useChatStream.ts');
       let accumulated = '';
-      await chatStream(
-        {
-          agentId: String(agentId),
-          sessionId: currentSessionId,
-          message: userContent,
-          config: {
-            temperature: settings.temperature,
-            maxTokens: settings.maxTokens,
-            topP: settings.topP,
-            frequencyPenalty: settings.frequencyPenalty,
-            presencePenalty: settings.presencePenalty,
-          },
+      const chatPayload: import('@/services/AgentChatTypes').AgentChatRequestDto = {
+        messages,
+        config: configPayload,
+      };
+      if (hasSession) {
+        chatPayload.sessionId = currentSessionId;
+      } else {
+        chatPayload.appId = String(appId);
+        if (chatSelection.modelId) chatPayload.modelId = String(chatSelection.modelId);
+        const aid = chatSelection.agentId ?? chatSelection.app?.defaultAgent?.id;
+        if (aid) chatPayload.agentId = String(aid);
+      }
+
+      await chatStream(chatPayload, {
+        onSessionId: (sessionId) => {
+          if (displayKey.startsWith('pending-')) {
+            effectiveKeyRef.current = sessionId;
+            addSessionFromChat(sessionId, displayKey, {
+              appId,
+              agentId: String(chatSelection.agentId ?? chatSelection.app?.defaultAgent?.id ?? ''),
+              modelId: String(chatSelection.modelId ?? ''),
+            });
+            setSessionSelections((p) => ({ ...p, [sessionId]: chatSelection }));
+            navigate(`/chat/${sessionId}`);
+          }
         },
-        {
-          onToken: (token) => {
-            accumulated += token;
-            updateMessage(currentSessionId, assistantId, { content: accumulated });
-          },
-        }
-      );
-      updateMessage(currentSessionId, assistantId, { isStreaming: false });
+        onToken: (token) => {
+          accumulated += token;
+          updateMessage(effectiveKeyRef.current, assistantId, { content: accumulated });
+        },
+      });
+      updateMessage(effectiveKeyRef.current, assistantId, { isStreaming: false });
     } catch (err) {
       const msg = err instanceof Error ? err.message : '请求失败';
-      updateMessage(currentSessionId, assistantId, {
+      updateMessage(effectiveKeyRef.current, assistantId, {
         content: `请求出错：${msg}`,
         isStreaming: false,
       });
@@ -215,12 +253,6 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     const userContent = lastUserMsg.content?.trim();
     if (!userContent) return;
 
-    const agentId = chatSelection.agentId ?? chatSelection.app?.defaultAgent?.id ?? currentSession?.agentId;
-    if (!agentId) {
-      toast.error('请先选择智能体');
-      return;
-    }
-
     removeLastAssistantMessage(currentSessionId);
     const assistantId = `assistant-${Date.now()}`;
     const aiPlaceholder: Message = {
@@ -232,21 +264,30 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     };
     appendMessages(currentSessionId, [aiPlaceholder]);
     setIsSending(true);
+    const configPayload = {
+      temperature: settings.temperature,
+      maxTokens: settings.maxTokens,
+      topP: settings.topP,
+      frequencyPenalty: settings.frequencyPenalty,
+      presencePenalty: settings.presencePenalty,
+    };
+    // OpenAI 格式：构建 messages（历史到最后一轮 user，不含待重生的 assistant）
+    const msgsForApi = msgs.slice(0, -1);
+    const messages: Array<{ role: string; content: string }> = msgsForApi
+      .filter(
+        (m) =>
+          m.role === 'user' ||
+          (m.role === 'assistant' && (m.content ?? '').length > 0 && !m.isStreaming)
+      )
+      .map((m) => ({ role: m.role, content: m.content ?? '' }));
     try {
       const { chatStream } = await import('@/pages/chat/hooks/useChatStream.ts');
       let accumulated = '';
       await chatStream(
         {
-          agentId: String(agentId),
           sessionId: currentSessionId,
-          message: userContent,
-          config: {
-            temperature: settings.temperature,
-            maxTokens: settings.maxTokens,
-            topP: settings.topP,
-            frequencyPenalty: settings.frequencyPenalty,
-            presencePenalty: settings.presencePenalty,
-          },
+          messages,
+          config: configPayload,
         },
         {
           onToken: (token) => {

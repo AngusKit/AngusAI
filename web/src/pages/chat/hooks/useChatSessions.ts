@@ -437,6 +437,47 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
     [sessions]
   );
 
+  /**
+   * 对话接口无会话模式下，收到 sessionId 后将会话加入列表并迁移消息
+   *
+   * @param sessionId 后端返回的会话ID
+   * @param pendingKey 临时 key，其下的消息将迁移到 sessionId
+   * @param selection 应用/模型/智能体选择信息
+   */
+  const addSessionFromChat = useCallback(
+    (sessionId: string, pendingKey: string, selection: { appId?: string; agentId?: string; modelId?: string }) => {
+      const now = new Date();
+      const session: Session = {
+        id: sessionId,
+        sessionId,
+        entityId: sessionId,
+        title: '新对话',
+        appId: selection.appId ?? '',
+        agentId: selection.agentId ?? '',
+        modelId: selection.modelId ?? '',
+        messages: [],
+        createdAt: now,
+        updatedAt: now,
+      };
+      setSessions((prev) => {
+        const seen = new Set(prev.map((s) => s.sessionId));
+        if (seen.has(sessionId)) return prev;
+        return [session, ...prev].sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+      });
+      setSessionMessages((prev) => {
+        const msgs = prev[pendingKey] ?? [];
+        const next = { ...prev };
+        delete next[pendingKey];
+        next[sessionId] = msgs;
+        return next;
+      });
+      setSessionTotal((prev) => prev + 1);
+      setCurrentSessionId(sessionId);
+      loadedMessagesRef.current.add(sessionId);
+    },
+    []
+  );
+
   return {
     sessions,
     currentSessionId,
@@ -464,6 +505,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
     refreshSessions,
     clearSessionMessages,
     ensureSessionLoaded,
+    addSessionFromChat,
     sessionKeyword,
     setSessionKeyword,
   };

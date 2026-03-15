@@ -46,9 +46,6 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
   @Resource
   private AgentQuery agentQuery;
 
-  @Resource
-  private SessionCmd self;
-
   @Override
   @Transactional
   public Session create(Session session) {
@@ -56,16 +53,15 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
       AIApplication application;
       Model currentModel;
       Agent agent;
-      Long effectiveAgentId;
 
       @Override
       protected void checkParams() {
         // 检查应用和模型是否存在（appId 必填，modelId 可选，默认从 Agent 获取）
         application = applicationQuery.findAndCheck(session.getAppId(), session.getModelId());
+        // 获取当前使用模型
         currentModel = application.getCurrentUseMode();
         // agentId 可选：传入时校验属于该应用，不传时使用应用默认智能体
-        effectiveAgentId = getEffectiveAgentId(application, session);
-        agent = agentQuery.findAndCheck(effectiveAgentId);
+        agent = agentQuery.findAndCheck(getEffectiveAgentId(application, session));
         // 会话配额校验
         sessionQuery.checkSessionQuota(session.getAppId());
       }
@@ -74,7 +70,7 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
       protected Session process() {
         // 设置会话信息
         session.setTitle(nullSafe(session.getTitle(), "新对话"));
-        session.setAgentId(effectiveAgentId);
+        session.setAgentId(agent.getId());
         session.setSessionId(nullSafe(session.getSessionId(), UUID.randomUUID().toString()));
         // 会话默认使用应用绑定的 Agent 的模型
         if (session.getModelId() == null) {
@@ -120,25 +116,6 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
             agent != null ? agent.getSystemPrompt() : null), ""));
       }
     }.execute();
-  }
-
-  @Override
-  public Session createOrGetForAgentChat(Agent agent, String sessionId) {
-    String effectiveSessionId = (sessionId != null && !sessionId.isBlank())
-        ? sessionId : UUID.randomUUID().toString();
-    Session existing = sessionQuery.findBySessionId(effectiveSessionId);
-    if (existing != null) {
-      return existing;
-    }
-
-    Session session = new Session();
-    session.setTitle("新对话");
-    session.setSessionId(effectiveSessionId);
-    session.setAppId(agent.getApplicationId());
-    session.setAgentId(agent.getId());
-    SessionConfig config = new SessionConfig();
-    session.setConfig(config);
-    return self.create(session);
   }
 
   @Override

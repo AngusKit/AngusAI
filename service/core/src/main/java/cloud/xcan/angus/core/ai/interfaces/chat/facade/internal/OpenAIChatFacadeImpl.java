@@ -5,9 +5,11 @@ import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
 import cloud.xcan.angus.core.ai.application.query.application.ApplicationQuery;
 import cloud.xcan.angus.core.ai.domain.application.AIApplication;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.OpenAIChatFacade;
+import cloud.xcan.angus.core.ai.interfaces.chat.openai.OpenAIChatCompletionChunk;
 import cloud.xcan.angus.core.ai.interfaces.chat.openai.OpenAIChatCompletionsRequest;
 import cloud.xcan.angus.core.ai.interfaces.chat.openai.OpenAIChatCompletionsResponse;
 import cloud.xcan.angus.core.ai.interfaces.chat.openai.OpenAIMessagesConverter;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import cloud.xcan.angus.remote.message.ProtocolException;
 import dev.langchain4j.service.TokenStream;
 import jakarta.annotation.Resource;
@@ -30,6 +32,9 @@ public class OpenAIChatFacadeImpl implements OpenAIChatFacade {
 
   @Resource
   private ApplicationQuery applicationQuery;
+
+  @Resource
+  private ObjectMapper objectMapper;
 
   @Override
   public OpenAIChatCompletionsResponse chatCompletions(OpenAIChatCompletionsRequest request,
@@ -178,11 +183,18 @@ public class OpenAIChatFacadeImpl implements OpenAIChatFacade {
 
         stream.onPartialResponse(token -> {
               try {
-                String json = String.format(
-                    "{\"id\":\"chatcmpl-stream\",\"object\":\"chat.completion.chunk\",\"created\":%d,\"model\":\"%s\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"%s\"},\"finish_reason\":null}]}",
-                    System.currentTimeMillis() / 1000,
-                    model.replace("\\", "\\\\").replace("\"", "\\\""),
-                    escapeJson(token));
+                OpenAIChatCompletionChunk chunk = OpenAIChatCompletionChunk.builder()
+                    .id("chatcmpl-stream")
+                    .object("chat.completion.chunk")
+                    .created(System.currentTimeMillis() / 1000)
+                    .model(model)
+                    .choices(List.of(new OpenAIChatCompletionChunk.ChunkChoice(
+                        0,
+                        new OpenAIChatCompletionsResponse.Delta(null, token),
+                        null
+                    )))
+                    .build();
+                String json = objectMapper.writeValueAsString(chunk);
                 emitter.send(SseEmitter.event().data("data: " + json + "\n\n"));
               } catch (Exception e) {
                 emitter.completeWithError(e);
@@ -204,17 +216,6 @@ public class OpenAIChatFacadeImpl implements OpenAIChatFacade {
     }).start();
 
     return emitter;
-  }
-
-  private String escapeJson(String s) {
-    if (s == null) {
-      return "";
-    }
-    return s.replace("\\", "\\\\")
-        .replace("\"", "\\\"")
-        .replace("\n", "\\n")
-        .replace("\r", "\\r")
-        .replace("\t", "\\t");
   }
 
   private OpenAIChatCompletionsResponse.Usage estimateUsage(String prompt, String completion) {

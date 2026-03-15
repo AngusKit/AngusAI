@@ -14,6 +14,7 @@ import cloud.xcan.angus.core.ai.application.cmd.analytics.ApiUsageLogCmd;
 import cloud.xcan.angus.core.ai.application.cmd.chat.MessageCmd;
 import cloud.xcan.angus.core.ai.application.cmd.chat.SessionCmd;
 import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
+import cloud.xcan.angus.core.ai.application.query.chat.SessionQuery;
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.domain.agent.Agent;
 import cloud.xcan.angus.core.ai.domain.agent.AgentChatResult;
@@ -24,10 +25,14 @@ import cloud.xcan.angus.core.ai.domain.chat.Session;
 import cloud.xcan.angus.core.ai.domain.chat.SessionConfig;
 import cloud.xcan.angus.core.ai.domain.model.Model;
 import cloud.xcan.angus.core.ai.infra.agent.utils.ChatConfigMergeUtils;
+import cloud.xcan.angus.core.ai.interfaces.chat.openai.OpenAIChatCompletionChunk;
+import cloud.xcan.angus.core.ai.interfaces.chat.openai.OpenAIChatCompletionsResponse;
 import cloud.xcan.angus.core.biz.BizTemplate;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import cloud.xcan.angus.remote.message.SysException;
 import dev.langchain4j.service.TokenStream;
 import jakarta.annotation.Resource;
+import java.util.List;
 import java.util.concurrent.Executor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -63,10 +68,16 @@ public class AgentChatCmdImpl implements AgentChatCmd {
   private SessionCmd sessionCmd;
 
   @Resource
+  private SessionQuery sessionQuery;
+
+  @Resource
   private ModelQuery modelQuery;
 
   @Resource
   private ApiUsageLogCmd apiUsageLogCmd;
+
+  @Resource
+  private ObjectMapper objectMapper;
 
   /**
    * 流式 SSE 专用线程池
@@ -84,9 +95,10 @@ public class AgentChatCmdImpl implements AgentChatCmd {
 
       @Override
       protected void checkParams() {
-        // 校验智能体并获取会话：有 sessionId 则复用，无则新建
+        // 校验智能体是否存在
         agent = agentQuery.findAndCheckValid(agentId);
-        session = sessionCmd.createOrGetForAgentChat(agent, sessionId);
+        // 检查会话是否存在
+        session = sessionQuery.findAndCheckBySessionId(sessionId);
       }
 
       @Override
@@ -145,8 +157,10 @@ public class AgentChatCmdImpl implements AgentChatCmd {
 
       @Override
       protected void checkParams() {
+        // 校验智能体是否存在
         agent = agentQuery.findAndCheckValid(agentId);
-        session = sessionCmd.createOrGetForAgentChat(agent, sessionId);
+        // 检查会话是否存在
+        session = sessionQuery.findAndCheckBySessionId(sessionId);
       }
 
       @Override
@@ -183,16 +197,34 @@ public class AgentChatCmdImpl implements AgentChatCmd {
         sseEmitterChatExecutor.execute(() -> {
           StringBuilder fullContent = new StringBuilder();
           long streamStartMs = System.currentTimeMillis();
+          String modelDisplay = "agent_" + agentId;
           try {
             TokenStream stream = agent.getDefaultModelId() != null
                 ? agentRegistry.chatStream(agentIdStr, session.getSessionId(), message,
                 defaultModelId, override)
                 : agentRegistry.chatStream(agentIdStr, session.getSessionId(), message);
-            // 每收到 token：累积内容并推送前端
+            // OpenAI 格式：每 token 发送 data: {"choices":[{"delta":{"content":"x"}}]}，首块携带 session_id 供无会话模式
+            final boolean[] isFirstChunk = {true};
+            String sessionIdForStream = session.getSessionId();
             stream.onPartialResponse(token -> {
                   fullContent.append(token);
                   try {
-                    emitter.send(SseEmitter.event().data(token));
+                    OpenAIChatCompletionChunk chunk = OpenAIChatCompletionChunk.builder()
+                        .id("chatcmpl-stream")
+                        .sessionId(isFirstChunk[0] ? sessionIdForStream : null)
+                        .object("chat.completion.chunk")
+                        .created(System.currentTimeMillis() / 1000)
+                        .model(modelDisplay)
+                        .choices(List.of(new OpenAIChatCompletionChunk.ChunkChoice(
+                            0,
+                            new OpenAIChatCompletionsResponse.Delta(null, token),
+                            null)))
+                        .build();
+                    if (isFirstChunk[0]) {
+                      isFirstChunk[0] = false;
+                    }
+                    String json = objectMapper.writeValueAsString(chunk);
+                    emitter.send(SseEmitter.event().data("data: " + json + "\n\n"));
                   } catch (Exception e) {
                     emitter.completeWithError(e);
                   }
@@ -215,6 +247,10 @@ public class AgentChatCmdImpl implements AgentChatCmd {
                   }
                   saveApiUsageLog(agent, session, modelForAsync, "/api/v1/agents/chat/stream",
                       streamStartMs, true, null, inTokens, outTokens, total);
+                  try {
+                    emitter.send(SseEmitter.event().data("data: [DONE]\n\n"));
+                  } catch (Exception ignored) {
+                  }
                   emitter.complete();
                 })
                 .onError(e -> {
