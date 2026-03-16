@@ -20,18 +20,19 @@ public class ApiUsageLogCmdImpl extends CommCmd<ApiUsageLog, Long> implements Ap
 
   @Override
   @Transactional
-  public void create(ApiUsageLog usageLog) {
+  public void create(ApiUsageLog usageLog, Principal principal) {
     usageLog.setId(usageLog.getId());
-    Principal principal = PrincipalContext.get();
-    if (principal != null) {
-      usageLog.setIpAddress(principal.getRemoteAddress());
-      usageLog.setUserAgent(principal.getUserAgent());
-      if (principal.getDeviceInfo() != null) {
+    usageLog.setIpAddress(principal.getRemoteAddress());
+    usageLog.setUserAgent(principal.getUserAgent());
+    if (principal.getDeviceInfo() != null) {
+      if (principal.getDeviceInfo().getDeviceType() != null){
         usageLog.setDevice(principal.getDeviceInfo().getDeviceType().getValue());
-        usageLog.setDeviceId(principal.getDeviceInfo().getDeviceId());
       }
+      usageLog.setDeviceId(principal.getDeviceInfo().getDeviceId());
     }
     usageLog.setRequestTime(LocalDateTime.now());
+    usageLog.setUserId(principal.getUserId());
+    usageLog.setTenantId(principal.getTenantId());
     insert(usageLog);
   }
 

@@ -31,7 +31,7 @@ public class ApplicationStatisticsVo {
     private Double totalCost;
 
     @Schema(description = "平均响应时间（秒）")
-    private Double avgResponseTime;
+    private Long avgResponseTime;
 
     @Schema(description = "成功率")
     private Double successRate;

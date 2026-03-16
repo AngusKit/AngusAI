@@ -278,7 +278,7 @@ public class ApplicationQueryImpl implements ApplicationQuery {
       overview.setTotalCalls(0L);
       overview.setTotalTokens(0L);
       overview.setTotalCost(0.0);
-      overview.setAvgResponseTime(0.0);
+      overview.setAvgResponseTime(0L);
       overview.setSuccessRate(0.0);
     } else {
       Object[] data = (Object[]) row[0];
@@ -286,13 +286,13 @@ public class ApplicationQueryImpl implements ApplicationQuery {
       long successfulCalls = data[1] != null ? ((Number) data[1]).longValue() : 0;
       long totalTokens = data[2] != null ? ((Number) data[2]).longValue() : 0;
       int costCents = data[3] != null ? ((Number) data[3]).intValue() : 0;
-      Double avgResponseTime = data[4] != null ? ((Number) data[4]).doubleValue() / 1000 : null;
+      Long avgResponseTime = data[4] != null ? Math.round(((Number) data[4]).doubleValue() / 1000) : null;
 
       overview.setTotalCalls(totalCalls);
       overview.setTotalTokens(totalTokens);
       overview.setTotalCost(costCents / 100.0);
       overview.setAvgResponseTime(avgResponseTime);
-      overview.setSuccessRate(totalCalls > 0 ? successfulCalls * 100.0 / totalCalls : 0.0);
+      overview.setSuccessRate(totalCalls > 0 ? Math.round(successfulCalls * 10000.0 / totalCalls) / 100.0 : 0.0);
     }
     vo.setOverview(overview);
   }

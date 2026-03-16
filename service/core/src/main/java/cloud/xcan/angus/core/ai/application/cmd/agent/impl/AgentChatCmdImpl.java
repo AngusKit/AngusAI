@@ -3,7 +3,7 @@ package cloud.xcan.angus.core.ai.application.cmd.agent.impl;
 import static cloud.xcan.angus.core.ai.application.converter.AgentConverter.toChatConfigOverride;
 import static cloud.xcan.angus.core.ai.domain.Constants.CHAT_DEFAULT_TIMEOUT_MS;
 import static cloud.xcan.angus.core.utils.GsonUtils.toJson;
-import static cloud.xcan.angus.spec.principal.PrincipalContext.getUserId;
+import static cloud.xcan.angus.spec.principal.PrincipalContext.get;
 import static cloud.xcan.angus.spec.utils.ObjectUtils.lengthSafe;
 import static cloud.xcan.angus.spec.utils.ObjectUtils.nullSafe;
 
@@ -28,10 +28,14 @@ import cloud.xcan.angus.core.ai.domain.model.Model;
 import cloud.xcan.angus.core.ai.infra.agent.utils.ChatConfigMergeUtils;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.remote.message.SysException;
+import cloud.xcan.angus.spec.principal.Principal;
+import cloud.xcan.angus.spec.principal.PrincipalContext;
 import dev.langchain4j.service.TokenStream;
 import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.concurrent.Executor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -49,6 +53,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
    * 流式助手消息占位内容，用于满足 MessageCmd 非空校验，最终由 updateContent 覆盖
    */
   private static final String STREAMING_PLACEHOLDER = ".";
+  private static final Logger log = LoggerFactory.getLogger(AgentChatCmdImpl.class);
 
   @Resource
   private AgentCmd agentCmd;
@@ -120,10 +125,9 @@ public class AgentChatCmdImpl implements AgentChatCmd {
         } finally {
           int estInput = estimateTokens(message);
           int estOutput = chatError == null ? estimateTokens(reply) : 0;
-          saveApiUsageLog(agent, sessionDb, model, "/api/v1/agents/chat", startMs,
-              chatError == null,
-              chatError != null ? chatError.getMessage() : null, estInput, estOutput,
-              estInput + estOutput);
+          saveApiUsageLog(get(), agent, sessionDb, model, "/api/v1/agents/chat", startMs,
+              chatError == null, chatError != null ? chatError.getMessage() : null, estInput,
+              estOutput, estInput + estOutput);
         }
 
         // 落库助手回复
@@ -176,6 +180,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
         // 异步执行流式调用，通过 SSE 推送 token
         // 注意：必须保持使用 sseEmitterChatExecutor，否则会破坏 SSE 的流式模型和整体稳定性
         final Model modelForAsync = model;
+        Principal principal = PrincipalContext.get();
         sseEmitterChatExecutor.execute(() -> {
           StringBuilder fullContent = new StringBuilder();
           long streamStartMs = System.currentTimeMillis();
@@ -219,8 +224,9 @@ public class AgentChatCmdImpl implements AgentChatCmd {
                   if (total == null && (inTokens != null || outTokens != null)) {
                     total = (inTokens != null ? inTokens : 0) + (outTokens != null ? outTokens : 0);
                   }
-                  saveApiUsageLog(agent, sessionDb, modelForAsync, "/api/v1/agents/chat/stream",
-                      streamStartMs, true, null, inTokens, outTokens, total);
+                  saveApiUsageLog(principal, agent, sessionDb, modelForAsync,
+                      "/api/v1/agents/chat/stream", streamStartMs, true, null,
+                      inTokens, outTokens, total);
                   try {
                     emitter.send(SseEmitter.event().data("data: [DONE]\n\n"));
                   } catch (Exception ignored) {
@@ -229,15 +235,17 @@ public class AgentChatCmdImpl implements AgentChatCmd {
                 })
                 .onError(e -> {
                   messageCmd.setStreaming(assistantMessage, false);
-                  saveApiUsageLog(agent, sessionDb, modelForAsync, "/api/v1/agents/chat/stream",
-                      streamStartMs, false, e.getMessage(), null, null, null);
+                  saveApiUsageLog(principal, agent, sessionDb, modelForAsync,
+                      "/api/v1/agents/chat/stream", streamStartMs, false, e.getMessage(),
+                      null, null, null);
                   emitter.completeWithError(e);
                 });
             stream.start();
           } catch (Exception e) {
             messageCmd.setStreaming(assistantMessage, false);
-            saveApiUsageLog(agent, sessionDb, modelForAsync, "/api/v1/agents/chat/stream",
-                streamStartMs, false, e.getMessage(), null, null, null);
+            saveApiUsageLog(principal, agent, sessionDb, modelForAsync,
+                "/api/v1/agents/chat/stream", streamStartMs, false, e.getMessage(), null, null,
+                null);
             emitter.completeWithError(e);
           }
         });
@@ -265,8 +273,8 @@ public class AgentChatCmdImpl implements AgentChatCmd {
    *
    * @param model 已查询的模型，可为 null；为 null 时 calculateCost 内部会按需查询
    */
-  private void saveApiUsageLog(Agent agent, Session session, Model model, String endpoint,
-      long startMs, boolean isSuccessful, String errorMessage,
+  private void saveApiUsageLog(Principal principal, Agent agent, Session session, Model model,
+      String endpoint, long startMs, boolean isSuccessful, String errorMessage,
       Integer inputTokens, Integer outputTokens, Integer totalTokens) {
     try {
       int responseTimeMs = (int) (System.currentTimeMillis() - startMs);
@@ -275,7 +283,6 @@ public class AgentChatCmdImpl implements AgentChatCmd {
           .setAppId(session != null ? session.getAppId() : null)
           .setAgentId(agent != null ? agent.getId() : null)
           .setModelId(agent != null ? agent.getDefaultModelId() : null)
-          .setUserId(getUserId())
           .setEndpoint(endpoint)
           .setMethod("POST")
           .setStatusCode(isSuccessful ? 200 : 500)
@@ -287,9 +294,9 @@ public class AgentChatCmdImpl implements AgentChatCmd {
           .setIsSuccessful(isSuccessful)
           .setErrorMessage(lengthSafe(errorMessage, 1000))
           .setSessionId(session != null ? session.getSessionId() : null);
-      apiUsageLogCmd.create(log);
+      apiUsageLogCmd.create(log, principal);
     } catch (Exception e) {
-      // 日志记录失败不影响主流程
+      log.error(e.getMessage());
     }
   }
 
