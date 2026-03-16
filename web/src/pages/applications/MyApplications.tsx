@@ -440,40 +440,42 @@ function ApplicationCard({
   return (
     <div
       onClick={() => onAppClick(app)}
-      className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md dark:hover:shadow-gray-900/50 transition-shadow cursor-pointer group"
+      className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md dark:hover:shadow-gray-900/50 transition-shadow cursor-pointer group flex flex-col h-full"
     >
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex items-start gap-3">
-          <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 text-3xl">
-            {app.icon}
+      <div className="flex-1 min-h-0">
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex items-start gap-3">
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 text-3xl">
+              {app.icon}
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="dark:text-white mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                {app.name}
+              </h3>
+              <Badge className={`text-xs ${getStatusBadgeColor(app.status)}`}>
+                {getEnumDescription(ApplicationStatusEnum, app.status)}
+              </Badge>
+            </div>
           </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="dark:text-white mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-              {app.name}
-            </h3>
-            <Badge className={`text-xs ${getStatusBadgeColor(app.status)}`}>
-              {getEnumDescription(ApplicationStatusEnum, app.status)}
-            </Badge>
-          </div>
+          <AppDropdownMenu
+            app={app}
+            onStatusChange={onStatusChange}
+            onSettings={onSettings}
+            onEdit={onEdit}
+            onShare={onShare}
+            onMoreAction={onMoreAction}
+          />
         </div>
-        <AppDropdownMenu
-          app={app}
-          onStatusChange={onStatusChange}
-          onSettings={onSettings}
-          onEdit={onEdit}
-          onShare={onShare}
-          onMoreAction={onMoreAction}
-        />
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">{app.description}</p>
+        <div className="flex flex-wrap gap-2">
+          {app.tags.map((tag, index) => (
+            <span key={index} className={`text-xs px-2 py-1 rounded-md border ${getTagColor(tag, index)}`}>
+              {tag}
+            </span>
+          ))}
+        </div>
       </div>
-      <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">{app.description}</p>
-      <div className="flex flex-wrap gap-2 mb-4">
-        {app.tags.map((tag, index) => (
-          <span key={index} className={`text-xs px-2 py-1 rounded-md border ${getTagColor(tag, index)}`}>
-            {tag}
-          </span>
-        ))}
-      </div>
-      <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-700">
+      <div className="flex items-center justify-between mt-4 pt-3 mt-auto shrink-0 border-t border-gray-100 dark:border-gray-700">
         <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
           <Clock className="w-4 h-4" />
           <span>{app.visits || '暂无数据'}</span>
