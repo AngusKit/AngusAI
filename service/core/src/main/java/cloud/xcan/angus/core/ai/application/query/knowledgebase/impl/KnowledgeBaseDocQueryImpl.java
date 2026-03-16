@@ -101,7 +101,8 @@ public class KnowledgeBaseDocQueryImpl implements KnowledgeBaseDocQuery {
       int activeCount = row[2] == null ? 0 : ((Number) row[2]).intValue();
       long totalSize = row[3] == null ? 0L : ((Number) row[3]).longValue();
       int totalChunks = row[4] == null ? 0 : ((Number) row[4]).intValue();
-      result.put(kbId, new KnowledgeBaseDocStats(kbId, docCount, activeCount, totalSize, totalChunks));
+      result.put(kbId,
+          new KnowledgeBaseDocStats(kbId, docCount, activeCount, totalSize, totalChunks));
     }
     return result;
   }

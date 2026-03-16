@@ -1,12 +1,12 @@
 package cloud.xcan.angus.core.ai.interfaces.application.facade.vo;
 
-import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
-import cloud.xcan.angus.core.ai.domain.agent.AgentStatus;
-import cloud.xcan.angus.core.ai.domain.model.ModelStatus;
-import cloud.xcan.angus.remote.vo.TenantAuditingVo;
 import cloud.xcan.agentx.core.agent.enums.InteractionMode;
 import cloud.xcan.agentx.core.model.ModelConfigDefinition;
 import cloud.xcan.agentx.core.model.ModelProvider;
+import cloud.xcan.angus.core.ai.domain.agent.AgentStatus;
+import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
+import cloud.xcan.angus.core.ai.domain.model.ModelStatus;
+import cloud.xcan.angus.remote.vo.TenantAuditingVo;
 import dev.langchain4j.model.catalog.ModelType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;

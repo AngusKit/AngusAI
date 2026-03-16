@@ -11,6 +11,7 @@ import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
 import cloud.xcan.angus.core.ai.application.query.application.ApplicationQuery;
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.domain.agent.Agent;
+import cloud.xcan.angus.core.ai.domain.analytics.ApiUsageLogRepo;
 import cloud.xcan.angus.core.ai.domain.application.AIApplication;
 import cloud.xcan.angus.core.ai.domain.application.AIApplicationRepo;
 import cloud.xcan.angus.core.ai.domain.application.AIApplicationSearchRepo;
@@ -20,7 +21,6 @@ import cloud.xcan.angus.core.ai.domain.application.ApplicationCountsProjection;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStar;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStarRepo;
 import cloud.xcan.angus.core.ai.domain.model.Model;
-import cloud.xcan.angus.core.ai.domain.analytics.ApiUsageLogRepo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationCountVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationStatisticsVo;
 import cloud.xcan.angus.core.biz.BizTemplate;
@@ -293,13 +293,15 @@ public class ApplicationQueryImpl implements ApplicationQuery {
       long successfulCalls = data[1] != null ? ((Number) data[1]).longValue() : 0;
       long totalTokens = data[2] != null ? ((Number) data[2]).longValue() : 0;
       int costCents = data[3] != null ? ((Number) data[3]).intValue() : 0;
-      Long avgResponseTime = data[4] != null ? Math.round(((Number) data[4]).doubleValue() / 1000) : null;
+      Long avgResponseTime =
+          data[4] != null ? Math.round(((Number) data[4]).doubleValue() / 1000) : null;
 
       overview.setTotalCalls(totalCalls);
       overview.setTotalTokens(totalTokens);
       overview.setTotalCost(costCents / 100.0);
       overview.setAvgResponseTime(avgResponseTime);
-      overview.setSuccessRate(totalCalls > 0 ? Math.round(successfulCalls * 10000.0 / totalCalls) / 100.0 : 0.0);
+      overview.setSuccessRate(
+          totalCalls > 0 ? Math.round(successfulCalls * 10000.0 / totalCalls) / 100.0 : 0.0);
     }
     vo.setOverview(overview);
   }
@@ -324,7 +326,8 @@ public class ApplicationQueryImpl implements ApplicationQuery {
         }
         long callCount = r[1] != null ? ((Number) r[1]).longValue() : 0;
         long tokenCount = r[2] != null ? ((Number) r[2]).longValue() : 0;
-        Double avgResp = r[3] != null ? Math.round(((Number) r[3]).doubleValue() / 1000 * 100.0) / 100.0 : 0.0;
+        Double avgResp =
+            r[3] != null ? Math.round(((Number) r[3]).doubleValue() / 1000 * 100.0) / 100.0 : 0.0;
 
         ApplicationStatisticsVo.TrendDataVo callPoint = new ApplicationStatisticsVo.TrendDataVo();
         callPoint.setDate(dateStr);

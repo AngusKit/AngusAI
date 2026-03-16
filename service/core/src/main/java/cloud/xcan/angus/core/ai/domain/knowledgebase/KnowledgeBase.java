@@ -48,16 +48,6 @@ public class KnowledgeBase extends TenantAuditingEntity<KnowledgeBase, Long> {
   @Column(name = "enabled", nullable = false)
   private Boolean enabled = true;
 
-  // 统计数据（临时字段，由门面层通过 KnowledgeBaseDocQuery 批量统计文档数据填充）
-  @Transient
-  private Integer documentsCount = 0;
-
-  @Transient
-  private Long totalSize = 0L;
-
-  @Transient
-  private Integer totalChunks = 0;
-
   @Type(JsonType.class)
   @Column(columnDefinition = "json", name = "tags")
   private List<String> tags;
@@ -66,6 +56,13 @@ public class KnowledgeBase extends TenantAuditingEntity<KnowledgeBase, Long> {
   @Column(columnDefinition = "json", name = "config")
   private KnowledgeBaseConfig config;
 
+  // 统计数据（临时字段，由门面层通过 KnowledgeBaseDocQuery 批量统计文档数据填充）
+  @Transient
+  private Integer documentsCount = 0;
+  @Transient
+  private Long totalSize = 0L;
+  @Transient
+  private Integer totalChunks = 0;
   @Transient
   private Integer activeDocuments; // 已启用文档数
 

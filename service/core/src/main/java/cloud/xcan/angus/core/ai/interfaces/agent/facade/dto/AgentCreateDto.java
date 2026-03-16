@@ -2,6 +2,7 @@ package cloud.xcan.angus.core.ai.interfaces.agent.facade.dto;
 
 import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_API_COLLECTION_IDS_MAX_SIZE;
 import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_DATASET_IDS_MAX_SIZE;
+import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_ENCODING_MAX_LENGTH;
 import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_KNOWLEDGE_BASE_IDS_MAX_SIZE;
 import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_MEMORY_DEFAULT_MAX_TOKENS;
 import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_MEMORY_DEFAULT_WINDOW_SIZE;
@@ -10,7 +11,6 @@ import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_SUGGESTED_QUESTION
 import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_SUMMARY_PROMPT_MAX_LENGTH;
 import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_SYSTEM_PROMPT_MAX_LENGTH;
 import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_TOOL_IDS_MAX_SIZE;
-import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_ENCODING_MAX_LENGTH;
 import static cloud.xcan.angus.core.ai.domain.Constants.AGENT_WELCOME_MESSAGE_MAX_LENGTH;
 import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_DESC_LENGTH_X4;
 import static cloud.xcan.angus.spec.experimental.BizConstant.MAX_NAME_LENGTH;

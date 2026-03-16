@@ -28,7 +28,8 @@ public interface ApplicationStarRepo extends BaseRepository<ApplicationStar, Lon
   /**
    * 批量查询用户已标星的应用ID列表
    */
-  List<ApplicationStar> findByUserIdAndApplicationIdIn(Long userId, Collection<Long> applicationIds);
+  List<ApplicationStar> findByUserIdAndApplicationIdIn(Long userId,
+      Collection<Long> applicationIds);
 
   /**
    * 查询用户已标星的所有应用

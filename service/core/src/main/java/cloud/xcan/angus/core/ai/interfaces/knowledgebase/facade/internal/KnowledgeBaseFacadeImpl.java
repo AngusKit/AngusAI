@@ -122,11 +122,13 @@ public class KnowledgeBaseFacadeImpl implements KnowledgeBaseFacade {
     if (knowledgeBases == null || knowledgeBases.isEmpty()) {
       return;
     }
-    List<Long> ids = knowledgeBases.stream().map(KnowledgeBase::getId).filter(Objects::nonNull).toList();
+    List<Long> ids = knowledgeBases.stream().map(KnowledgeBase::getId).filter(Objects::nonNull)
+        .toList();
     if (ids.isEmpty()) {
       return;
     }
-    Map<Long, KnowledgeBaseDocStats> statsMap = knowledgeBaseDocQuery.getStatsByKnowledgeBaseIds(ids);
+    Map<Long, KnowledgeBaseDocStats> statsMap = knowledgeBaseDocQuery.getStatsByKnowledgeBaseIds(
+        ids);
     for (KnowledgeBase kb : knowledgeBases) {
       KnowledgeBaseDocStats stats = statsMap.get(kb.getId());
       if (stats != null) {
@@ -269,7 +271,8 @@ public class KnowledgeBaseFacadeImpl implements KnowledgeBaseFacade {
     Map<Long, KnowledgeBase> knowledgeBaseMap = knowledgeBaseQuery.findByIds(knowledgeBaseIds);
 
     // 批量查询文档统计（文件数、分段数）
-    Map<Long, KnowledgeBaseDocStats> statsMap = knowledgeBaseDocQuery.getStatsByKnowledgeBaseIds(knowledgeBaseIds);
+    Map<Long, KnowledgeBaseDocStats> statsMap = knowledgeBaseDocQuery.getStatsByKnowledgeBaseIds(
+        knowledgeBaseIds);
 
     // 构建TopKnowledgeBase列表
     List<KnowledgeBaseStatisticsVo.TopKnowledgeBase> topKnowledgeBases = new ArrayList<>();

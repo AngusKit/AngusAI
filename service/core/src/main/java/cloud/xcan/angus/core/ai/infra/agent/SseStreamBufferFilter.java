@@ -12,8 +12,8 @@ import java.io.IOException;
 /**
  * SSE 流式接口专用 Filter
  * <p>
- * 在请求到达 Controller 前禁用响应缓冲，确保 emitter.send() 的数据立即 flush 到客户端。
- * Servlet 容器（如 Tomcat）默认缓冲约 8KB，导致 token 无法实时到达前端/Postman。
+ * 在请求到达 Controller 前禁用响应缓冲，确保 emitter.send() 的数据立即 flush 到客户端。 Servlet 容器（如 Tomcat）默认缓冲约 8KB，导致
+ * token 无法实时到达前端/Postman。
  * </p>
  */
 public class SseStreamBufferFilter implements Filter {

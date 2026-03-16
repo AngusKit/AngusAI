@@ -14,9 +14,8 @@ import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelListVo;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder;
 import cloud.xcan.angus.remote.search.SearchCriteria;
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.Set;
+import org.apache.commons.lang3.StringUtils;
 
 public class ModelAssembler {
 

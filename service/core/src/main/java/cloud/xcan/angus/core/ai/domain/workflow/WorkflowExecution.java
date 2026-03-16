@@ -12,8 +12,7 @@ import lombok.Setter;
 import org.hibernate.annotations.Type;
 
 /**
- * 工作流执行记录
- * 根据工作流节点信息记录每次执行的输入、输出、节点执行详情
+ * 工作流执行记录 根据工作流节点信息记录每次执行的输入、输出、节点执行详情
  */
 @Setter
 @Getter
@@ -24,35 +23,51 @@ public class WorkflowExecution extends TenantAuditingEntity<WorkflowExecution, L
   @Id
   private Long id;
 
-  /** 执行ID（业务标识，UUID），供前端查询 */
+  /**
+   * 执行ID（业务标识，UUID），供前端查询
+   */
   @Column(name = "execution_id", nullable = false, unique = true, length = 64)
   private String executionId;
 
-  /** 工作流ID */
+  /**
+   * 工作流ID
+   */
   @Column(name = "workflow_id", nullable = false)
   private Long workflowId;
 
-  /** 工作流名称（冗余存储，便于列表展示） */
+  /**
+   * 工作流名称（冗余存储，便于列表展示）
+   */
   @Column(name = "workflow_name", length = 100)
   private String workflowName;
 
-  /** 活动描述，如「执行工作流」 */
+  /**
+   * 活动描述，如「执行工作流」
+   */
   @Column(name = "activity", length = 200)
   private String activity;
 
-  /** 执行状态：SUCCESS, FAILED, RUNNING */
+  /**
+   * 执行状态：SUCCESS, FAILED, RUNNING
+   */
   @Column(name = "status", nullable = false, length = 20)
   private String status;
 
-  /** 开始时间 */
+  /**
+   * 开始时间
+   */
   @Column(name = "started_at", nullable = false)
   private LocalDateTime startedAt;
 
-  /** 完成时间 */
+  /**
+   * 完成时间
+   */
   @Column(name = "completed_at")
   private LocalDateTime completedAt;
 
-  /** 执行时长（毫秒） */
+  /**
+   * 执行时长（毫秒）
+   */
   @Column(name = "execution_time")
   private Long executionTime;
 
@@ -64,12 +79,16 @@ public class WorkflowExecution extends TenantAuditingEntity<WorkflowExecution, L
   @Column(name = "outputs", columnDefinition = "json")
   private Object outputs;
 
-  /** 节点执行详情：nodeId -> { status, result, error } */
+  /**
+   * 节点执行详情：nodeId -> { status, result, error }
+   */
   @Type(JsonType.class)
   @Column(name = "node_executions", columnDefinition = "json")
   private Object nodeExecutions;
 
-  /** 错误信息 */
+  /**
+   * 错误信息
+   */
   @Column(name = "error_message", length = 2000)
   private String errorMessage;
 

@@ -26,10 +26,10 @@ public final class ChatConfigMergeUtils {
   /**
    * 合并对话配置
    *
-   * @param requestConfig    请求层配置（可选）
-   * @param session          会话（含 config，可选）
-   * @param agent            智能体（含 systemPrompt）
-   * @param model            智能体默认模型（含 temperature、maxTokens、timeoutSeconds 等，可选）
+   * @param requestConfig 请求层配置（可选）
+   * @param session       会话（含 config，可选）
+   * @param agent         智能体（含 systemPrompt）
+   * @param model         智能体默认模型（含 temperature、maxTokens、timeoutSeconds 等，可选）
    * @return 合并后的配置
    */
   public static SessionConfig merge(SessionConfig requestConfig,

@@ -29,9 +29,6 @@ public class KnowledgeBaseAssembler {
 
     // 设置默认值
     knowledgeBase.setEnabled(true);
-    knowledgeBase.setDocumentsCount(0);
-    knowledgeBase.setTotalSize(0L);
-    knowledgeBase.setTotalChunks(0);
 
     // 设置向量化配置
     knowledgeBase.setConfig(dto.getConfig());

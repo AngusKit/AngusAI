@@ -2,7 +2,6 @@ package cloud.xcan.angus.core.ai.domain.application;
 
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
 import cloud.xcan.angus.core.jpa.repository.NameJoinRepository;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.query.Param;

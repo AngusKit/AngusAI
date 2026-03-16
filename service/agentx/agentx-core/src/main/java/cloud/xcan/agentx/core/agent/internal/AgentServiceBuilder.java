@@ -8,16 +8,16 @@ import cloud.xcan.agentx.core.memory.MemoryFactory;
 import cloud.xcan.agentx.core.model.ModelProvider;
 import cloud.xcan.agentx.core.skill.SkillRegistry;
 import cloud.xcan.agentx.core.tool.ToolRegistry;
+import dev.langchain4j.agent.tool.ToolSpecification;
 import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.StreamingChatModel;
 import dev.langchain4j.service.AiServices;
+import dev.langchain4j.service.tool.ToolExecutor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import dev.langchain4j.agent.tool.ToolSpecification;
-import dev.langchain4j.service.tool.ToolExecutor;
 
 /**
  * Agent 对话服务构建器 — 将 AgentDefinition 与外部依赖组装成 LangChain4j AiServices 实例。

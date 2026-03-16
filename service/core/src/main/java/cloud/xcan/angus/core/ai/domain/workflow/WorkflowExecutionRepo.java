@@ -34,7 +34,8 @@ public interface WorkflowExecutionRepo extends BaseRepository<WorkflowExecution,
   /**
    * 分页查询：按工作流ID和状态
    */
-  Page<WorkflowExecution> findByWorkflowIdAndStatus(Long workflowId, String status, Pageable pageable);
+  Page<WorkflowExecution> findByWorkflowIdAndStatus(Long workflowId, String status,
+      Pageable pageable);
 
   /**
    * 统计今日执行次数（指定租户）

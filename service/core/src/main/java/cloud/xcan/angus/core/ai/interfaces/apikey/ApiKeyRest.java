@@ -1,10 +1,10 @@
 package cloud.xcan.angus.core.ai.interfaces.apikey;
 
-import cloud.xcan.angus.core.ai.interfaces.apikey.facade.ApiKeyFacade;
 import cloud.xcan.angus.core.ai.interfaces.analytics.facade.dto.ApiKeyCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.analytics.facade.dto.ApiKeyRevokeDto;
 import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.ApiKeyDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.ApiKeyListVo;
+import cloud.xcan.angus.core.ai.interfaces.apikey.facade.ApiKeyFacade;
 import cloud.xcan.angus.remote.ApiLocaleResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

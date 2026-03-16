@@ -83,7 +83,7 @@ public class ResourceSharingAssembler {
 
     vo.setOwnerId(sharing.getOwnerId());
     vo.setSharedWith(sharing.getSharedWith());
-    vo.setMemberCount(sharing.getMemberIds() != null ?sharing.getMemberIds().size() : null);
+    vo.setMemberCount(sharing.getMemberIds() != null ? sharing.getMemberIds().size() : null);
     vo.setPermission(sharing.getPermission());
 
     // 设置审计信息

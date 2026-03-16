@@ -1,8 +1,8 @@
 package cloud.xcan.angus.core.ai.interfaces.chat;
 
-import cloud.xcan.angus.core.ai.interfaces.chat.facade.OpenAIChatFacade;
 import cloud.xcan.angus.core.ai.domain.chat.openai.OpenAIChatCompletionsRequest;
 import cloud.xcan.angus.core.ai.domain.chat.openai.OpenAIChatCompletionsResponse;
+import cloud.xcan.angus.core.ai.interfaces.chat.facade.OpenAIChatFacade;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

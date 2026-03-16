@@ -4,10 +4,10 @@ import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.determineGranul
 import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.parseTimeRange;
 import static cloud.xcan.angus.spec.principal.PrincipalContext.getUserId;
 
+import cloud.xcan.angus.core.ai.application.query.analytics.AnalyticsQuery;
 import cloud.xcan.angus.core.ai.application.query.application.ApplicationQuery;
 import cloud.xcan.angus.core.ai.application.query.chat.SessionQuery;
 import cloud.xcan.angus.core.ai.application.query.notification.NotificationQuery;
-import cloud.xcan.angus.core.ai.application.query.analytics.AnalyticsQuery;
 import cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.TimeRange;
 import cloud.xcan.angus.core.ai.interfaces.analytics.facade.AnalyticsFacade;
 import cloud.xcan.angus.core.ai.interfaces.analytics.facade.dto.AnalyticsQueryDto;

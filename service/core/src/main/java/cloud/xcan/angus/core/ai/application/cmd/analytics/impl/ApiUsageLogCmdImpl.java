@@ -6,7 +6,6 @@ import cloud.xcan.angus.core.ai.domain.analytics.ApiUsageLogRepo;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
 import cloud.xcan.angus.spec.principal.Principal;
-import cloud.xcan.angus.spec.principal.PrincipalContext;
 import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import org.springframework.stereotype.Service;
@@ -25,7 +24,7 @@ public class ApiUsageLogCmdImpl extends CommCmd<ApiUsageLog, Long> implements Ap
     usageLog.setIpAddress(principal.getRemoteAddress());
     usageLog.setUserAgent(principal.getUserAgent());
     if (principal.getDeviceInfo() != null) {
-      if (principal.getDeviceInfo().getDeviceType() != null){
+      if (principal.getDeviceInfo().getDeviceType() != null) {
         usageLog.setDevice(principal.getDeviceInfo().getDeviceType().getValue());
       }
       usageLog.setDeviceId(principal.getDeviceInfo().getDeviceId());

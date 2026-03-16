@@ -6,16 +6,15 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
-
-import java.util.List;
 
 /**
  * 智能体对话请求（严格遵循 OpenAI 消息格式）
  * <p>
- * 消息格式：messages 数组，每项为 {role: system|user|assistant, content: string}
- * 对话流程：每次请求携带完整消息历史（与 OpenAI Chat Completions 一致）
+ * 消息格式：messages 数组，每项为 {role: system|user|assistant, content: string} 对话流程：每次请求携带完整消息历史（与 OpenAI
+ * Chat Completions 一致）
  * <p>
  * 会话管理（二选一）：
  * <ul>

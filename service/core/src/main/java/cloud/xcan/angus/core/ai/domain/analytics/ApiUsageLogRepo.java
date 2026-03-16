@@ -92,9 +92,10 @@ public interface ApiUsageLogRepo extends BaseRepository<ApiUsageLog, Long> {
   /**
    * 最近使用的应用及使用统计（按最后使用时间降序）
    */
-  @Query(value = "SELECT app_id, MAX(request_time) AS last_used, COUNT(*) AS total_calls, AVG(response_time_ms) AS avg_response_ms "
-      + "FROM ai_api_usage_log WHERE request_time >= :since AND app_id IS NOT NULL "
-      + "GROUP BY app_id ORDER BY MAX(request_time) DESC", nativeQuery = true)
+  @Query(value =
+      "SELECT app_id, MAX(request_time) AS last_used, COUNT(*) AS total_calls, AVG(response_time_ms) AS avg_response_ms "
+          + "FROM ai_api_usage_log WHERE request_time >= :since AND app_id IS NOT NULL "
+          + "GROUP BY app_id ORDER BY MAX(request_time) DESC", nativeQuery = true)
   List<Object[]> getRecentAppUsageStats(@Param("since") java.time.LocalDateTime since,
       org.springframework.data.domain.Pageable pageable);
 

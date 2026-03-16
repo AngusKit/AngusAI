@@ -188,7 +188,6 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
   }
 
 
-
   @Override
   @Transactional
   public void switchModel(Long id, Long modelId) {

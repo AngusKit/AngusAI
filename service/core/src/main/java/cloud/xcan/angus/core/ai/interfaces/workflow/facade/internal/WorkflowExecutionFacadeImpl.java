@@ -1,37 +1,21 @@
 package cloud.xcan.angus.core.ai.interfaces.workflow.facade.internal;
 
-import static cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder.getMatchSearchFields;
 import static cloud.xcan.angus.core.utils.CoreUtils.buildVoPageResult;
 
 import cloud.xcan.angus.core.ai.application.cmd.workflow.WorkflowCmd;
 import cloud.xcan.angus.core.ai.application.query.workflow.WorkflowExecutionQuery;
 import cloud.xcan.angus.core.ai.application.query.workflow.WorkflowQuery;
-import cloud.xcan.angus.core.ai.domain.Visibility;
-import cloud.xcan.angus.core.ai.domain.workflow.Workflow;
-import cloud.xcan.angus.core.ai.domain.workflow.WorkflowConfig;
 import cloud.xcan.angus.core.ai.domain.workflow.WorkflowExecution;
-import cloud.xcan.angus.core.ai.domain.workflow.WorkflowStatus;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.WorkflowExecutionFacade;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.WorkflowFacade;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowConfigUpdateDto;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowExecuteDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowExecutionLogFindDto;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowFindDto;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.dto.WorkflowUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.internal.assembler.WorkflowAssembler;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.ExecutionDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.ExecutionLogVo;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowDetailVo;
 import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowExecuteResultVo;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowListVo;
-import cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo.WorkflowStatisticsVo;
-import cloud.xcan.angus.core.biz.NameJoin;
-import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.PageResult;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import jakarta.annotation.Resource;
-import java.time.LocalDate;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 

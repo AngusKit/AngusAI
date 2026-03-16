@@ -460,8 +460,10 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
         long totalCalls = data[0] != null ? ((Number) data[0]).longValue() : 0L;
         long successfulCalls = data[1] != null ? ((Number) data[1]).longValue() : 0L;
         Long totalTokens = data[2] != null ? ((Number) data[2]).longValue() : 0L;
-        Long avgResponseTime = data[4] != null ? Math.round(((Number) data[4]).doubleValue() / 1000) : null;
-        Double successRate = totalCalls > 0 ? Math.round(successfulCalls * 10000.0 / totalCalls) / 100.0 : null;
+        Long avgResponseTime =
+            data[4] != null ? Math.round(((Number) data[4]).doubleValue() / 1000) : null;
+        Double successRate =
+            totalCalls > 0 ? Math.round(successfulCalls * 10000.0 / totalCalls) / 100.0 : null;
 
         vo.setTotalApiCalls(totalCalls);
         vo.setTotalTokens(totalTokens);

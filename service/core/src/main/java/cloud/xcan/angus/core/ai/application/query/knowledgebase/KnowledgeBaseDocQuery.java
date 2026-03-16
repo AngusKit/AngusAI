@@ -42,7 +42,8 @@ public interface KnowledgeBaseDocQuery {
    * @param knowledgeBaseIds 知识库ID列表
    * @return 知识库ID -> 统计信息 的映射
    */
-  java.util.Map<Long, KnowledgeBaseDocStats> getStatsByKnowledgeBaseIds(List<Long> knowledgeBaseIds);
+  java.util.Map<Long, KnowledgeBaseDocStats> getStatsByKnowledgeBaseIds(
+      List<Long> knowledgeBaseIds);
 
   /**
    * 统计存储总大小

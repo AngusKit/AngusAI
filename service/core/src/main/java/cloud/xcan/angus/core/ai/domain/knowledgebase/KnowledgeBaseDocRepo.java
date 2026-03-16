@@ -41,8 +41,8 @@ public interface KnowledgeBaseDocRepo extends BaseRepository<KnowledgeBaseDoc, L
       @Param("documentIds") List<Long> documentIds);
 
   /**
-   * 按知识库ID批量统计文档数据
-   * 返回格式：List&lt;Object[]&gt; [knowledgeBaseId, documentsCount, activeDocuments, totalSize, totalChunks]
+   * 按知识库ID批量统计文档数据 返回格式：List&lt;Object[]&gt; [knowledgeBaseId, documentsCount, activeDocuments,
+   * totalSize, totalChunks]
    */
   @Query("SELECT d.knowledgeBaseId, COUNT(d), "
       + "SUM(CASE WHEN d.enabled = true THEN 1 ELSE 0 END), "
