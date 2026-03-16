@@ -102,17 +102,6 @@ public class KnowledgeBaseDocQueryImpl implements KnowledgeBaseDocQuery {
   }
 
   @Override
-  public List<Object[]> countByKnowledgeBaseIds(List<Long> knowledgeBaseIds) {
-    if (knowledgeBaseIds == null || knowledgeBaseIds.isEmpty()) {
-      return List.of();
-    }
-    Map<Long, KnowledgeBaseDocStats> statsMap = getStatsByKnowledgeBaseIds(knowledgeBaseIds);
-    return statsMap.entrySet().stream()
-        .map(e -> new Object[]{e.getKey(), (long) e.getValue().getDocumentsCount()})
-        .toList();
-  }
-
-  @Override
   public Long sumTotalStoreSize() {
     return knowledgeBaseDocRepo.sumTotalStoreSize();
   }
