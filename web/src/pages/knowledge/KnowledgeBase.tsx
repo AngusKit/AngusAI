@@ -623,8 +623,8 @@ export function KnowledgeBase() {
         const mappedKnowledgeBase: KnowledgeBaseItem = {
           ...knowledgeBase,
           description: detail.description || knowledgeBase.description,
-          documentCount: String(detail.documentsCount || 0),
-          size: detail.totalSize || knowledgeBase.size,
+          documentCount: String(detail.stats?.totalDocuments ?? 0),
+          size: detail.stats?.totalSize || knowledgeBase.size,
           tags: detail.tags,
           visibility: detail.visibility,
           chunkSize: detail.config?.chunkSize,

@@ -60,8 +60,6 @@ public class KnowledgeBaseAssembler {
     vo.setIcon(knowledgeBase.getIcon());
     vo.setIconBg(knowledgeBase.getIconBg());
     vo.setDescription(knowledgeBase.getDescription());
-    vo.setDocumentsCount(knowledgeBase.getDocumentsCount());
-    vo.setTotalSize(formatFileSize(knowledgeBase.getTotalSize()));
     vo.setEnabled(knowledgeBase.getEnabled());
     vo.setTags(knowledgeBase.getTags());
     vo.setVisibility(knowledgeBase.getVisibility());
@@ -76,11 +74,11 @@ public class KnowledgeBaseAssembler {
     // 设置统计信息
     KnowledgeBaseStatsVo stats = new KnowledgeBaseStatsVo();
     stats.setTotalDocuments(knowledgeBase.getDocumentsCount());
-    // TODO 计算已启用文档数
     stats.setActiveDocuments(knowledgeBase.getActiveDocuments());
     stats.setTotalChunks(knowledgeBase.getTotalChunks());
     stats.setAvgChunkSize(knowledgeBase.getTotalChunks() > 0
         ? knowledgeBase.getConfig().getChunkSize() : 0);
+    stats.setTotalSize(formatFileSize(knowledgeBase.getTotalSize()));
     vo.setStats(stats);
 
     // 设置配置信息

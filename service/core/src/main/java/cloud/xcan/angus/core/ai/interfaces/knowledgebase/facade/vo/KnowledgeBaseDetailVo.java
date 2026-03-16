@@ -28,12 +28,6 @@ public class KnowledgeBaseDetailVo extends TenantAuditingVo {
   @Schema(description = "描述", example = "存储产品相关文档和资料")
   private String description;
 
-  @Schema(description = "文档数量", example = "15")
-  private Integer documentsCount;
-
-  @Schema(description = "总大小", example = "2.5 MB")
-  private String totalSize;
-
   @Schema(description = "是否启用", example = "true")
   private Boolean enabled;
 

@@ -18,4 +18,7 @@ public class KnowledgeBaseStatsVo {
 
   @Schema(description = "平均分段大小", example = "512")
   private Integer avgChunkSize;
+
+  @Schema(description = "总大小", example = "2.5 MB")
+  private String totalSize;
 }

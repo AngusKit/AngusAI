@@ -27,6 +27,11 @@ export interface KnowledgeBaseStatsVo {
    * @example 512
    */
   avgChunkSize?: number;
+  /**
+   * 总大小
+   * @example "2.5 MB"
+   */
+  totalSize?: string;
 }
 
 /** 知识库详情视图对象 */
@@ -57,17 +62,6 @@ export interface KnowledgeBaseDetailVo extends TenantAuditingVo {
    * @example "存储产品相关文档和资料"
    */
   description?: string;
-  /**
-   * 文档数量
-   * @format int32
-   * @example 15
-   */
-  documentsCount?: number;
-  /**
-   * 总大小
-   * @example 2.5
-   */
-  totalSize?: string;
   /**
    * 是否启用
    * @example true
