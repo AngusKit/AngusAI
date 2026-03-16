@@ -6,15 +6,14 @@ import Applications from '@/services/Applications';
 import type { ApplicationDetailVo, ApplicationStatisticsVo } from '@/services/ApplicationsTypes';
 import { ApplicationStatusEnum } from '@/enums/enums';
 
-/** 默认统计时间范围：最近7天 */
-function getDefaultStatsRange() {
+/** 默认统计时间范围：本月 */
+function getDefaultStatsRange(): { startDate: string; endDate: string } {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth(), 1);
   const end = new Date();
-  const start = new Date();
-  start.setDate(start.getDate() - 7);
   return {
     startDate: start.toISOString().slice(0, 10),
     endDate: end.toISOString().slice(0, 10),
-    period: 'DAY' as const,
   };
 }
 
@@ -27,31 +26,22 @@ export function useApplicationDetail() {
   const [loading, setLoading] = useState(true);
   const [detail, setDetail] = useState<ApplicationDetailVo | null>(null);
   const [statistics, setStatistics] = useState<ApplicationStatisticsVo | null>(null);
+  const [statisticsLoading, setStatisticsLoading] = useState(false);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
 
-  /** 加载应用详情与完整统计数据（含 overview、trends、topUsers） */
+  /** 加载应用详情（不含统计） */
   const loadDetail = useCallback(async () => {
     if (!id) return;
     setLoading(true);
     try {
-      const range = getDefaultStatsRange();
-      const [detailRes, statsRes] = await Promise.all([
-        Applications.getApplicationDetail(id),
-        Applications.getApplicationStatistics(id, range).catch(() => null),
-      ]);
+      const detailRes = await Applications.getApplicationDetail(id);
       const d = (detailRes as any)?.data ?? detailRes;
       if (!d?.id && !d?.name) {
         toast.error('应用不存在');
         navigate('/apps');
         return;
       }
-      const statsData = (statsRes as any)?.data ?? statsRes;
-      const overview = statsData?.overview ?? statsData;
-      setDetail({
-        ...d,
-        stats: overview ? { ...d?.stats, ...overview } : d?.stats,
-      } as ApplicationDetailVo);
-      setStatistics(statsData);
+      setDetail(d as ApplicationDetailVo);
     } catch (err: any) {
       toast.error(err?.message || err?.data?.message || '加载失败');
       navigate('/apps');
@@ -59,6 +49,25 @@ export function useApplicationDetail() {
       setLoading(false);
     }
   }, [id, navigate]);
+
+  /** 加载统计数据，默认本月；进入统计分析 Tab 时调用 */
+  const loadStatistics = useCallback(
+    async (startDate?: string, endDate?: string) => {
+      if (!id) return;
+      const range = startDate && endDate ? { startDate, endDate } : getDefaultStatsRange();
+      setStatisticsLoading(true);
+      try {
+        const statsRes = await Applications.getApplicationStatistics(id, range);
+        const statsData = (statsRes as any)?.data ?? statsRes;
+        setStatistics(statsData);
+      } catch {
+        setStatistics(null);
+      } finally {
+        setStatisticsLoading(false);
+      }
+    },
+    [id]
+  );
 
   useEffect(() => {
     loadDetail();
@@ -112,9 +121,12 @@ export function useApplicationDetail() {
     detail,
     statistics,
     loading,
+    statisticsLoading,
     shareDialogOpen,
     setShareDialogOpen,
     loadDetail,
+    loadStatistics,
+    getDefaultStatsRange,
     handleToggleStatus,
     handleDuplicate,
     handleDelete,

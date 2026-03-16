@@ -168,9 +168,8 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
   }
 
   @Override
-  public ApplicationStatisticsVo getStatistics(
-      Long id, String startDate, String endDate, String period) {
-    return applicationQuery.getStatistics(id, startDate, endDate, period);
+  public ApplicationStatisticsVo getStatistics(Long id, String startDate, String endDate) {
+    return applicationQuery.getStatistics(id, startDate, endDate);
   }
 
   /**

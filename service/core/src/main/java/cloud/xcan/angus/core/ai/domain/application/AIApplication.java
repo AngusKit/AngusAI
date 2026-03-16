@@ -1,5 +1,6 @@
 package cloud.xcan.angus.core.ai.domain.application;
 
+import cloud.xcan.angus.core.ai.domain.agent.Agent;
 import cloud.xcan.angus.core.ai.domain.model.Model;
 import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
@@ -82,6 +83,9 @@ public class AIApplication extends TenantAuditingEntity<AIApplication, Long> {
   private boolean shareAnonymousAccess;
   @Transient
   private boolean shareAuthorizationRequired;
+
+  @Transient
+  private Agent defaultAgent;
   @Transient
   private Model appDefaultModel;
   @Transient

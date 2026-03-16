@@ -162,14 +162,28 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
 
       @Override
       protected Void process() {
+        // 切换应用
         session.setAppId(appId);
-        Model defaultModel = application.getCurrentUseMode();
-        session.setModelId(defaultModel != null ? defaultModel.getId() : null);
+
+        // 切换到默认智能体
+        Agent defaultAgent = application.getDefaultAgent();
+        if (defaultAgent != null) {
+          session.setAgentId(defaultAgent.getId());
+        }
+
+        // 切换到默认模型
+        Model defaultModel = application.getAppDefaultModel();
+        if (defaultModel != null) {
+          session.setModelId(defaultModel.getId());
+        }
+
         sessionRepo.save(session);
         return null;
       }
     }.execute();
   }
+
+
 
   @Override
   @Transactional

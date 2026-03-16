@@ -47,7 +47,7 @@ public interface ApplicationQuery {
   /**
    * 获取应用统计数据（概览、趋势、热门用户）
    */
-  ApplicationStatisticsVo getStatistics(Long id, String startDate, String endDate, String period);
+  ApplicationStatisticsVo getStatistics(Long id, String startDate, String endDate);
 
   /**
    * 检查应用名称是否存在

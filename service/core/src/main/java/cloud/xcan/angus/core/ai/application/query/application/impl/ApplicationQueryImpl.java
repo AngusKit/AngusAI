@@ -6,6 +6,7 @@ import static cloud.xcan.angus.spec.principal.PrincipalContext.getUserId;
 import static cloud.xcan.angus.spec.utils.ObjectUtils.nullSafe;
 import static java.util.Objects.nonNull;
 
+import cloud.xcan.angus.api.manager.UserManager;
 import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
 import cloud.xcan.angus.core.ai.application.query.application.ApplicationQuery;
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
@@ -31,7 +32,6 @@ import cloud.xcan.angus.remote.search.SearchCriteria;
 import jakarta.annotation.Resource;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -67,6 +67,9 @@ public class ApplicationQueryImpl implements ApplicationQuery {
 
   @Resource
   private ApiUsageLogRepo apiUsageLogRepo;
+
+  @Resource
+  private UserManager userManager;
 
   private static final int DEFAULT_TOP_USERS_LIMIT = 20;
 
@@ -109,7 +112,7 @@ public class ApplicationQueryImpl implements ApplicationQuery {
   public AIApplication findAndCheck(Long id, @Nullable Long currentUseModelId) {
     return new BizTemplate<AIApplication>() {
       AIApplication application;
-      Agent agent;
+      Agent defaultAgent;
       Model currentUseMode;
       Model appDefaultModel;
 
@@ -131,17 +134,17 @@ public class ApplicationQueryImpl implements ApplicationQuery {
           throw ProtocolException.of("应用未绑定智能体，请先配置应用");
         }
         // 从绑定的智能体获取模型
-        agent = agentQuery.findAndCheck(defaultAgentId);
-        if (nonNull(agent.getDefaultModelId())) {
-          appDefaultModel = modelQuery.findAndCheck(agent.getDefaultModelId());
+        defaultAgent = agentQuery.findAndCheck(defaultAgentId);
+        if (nonNull(defaultAgent.getDefaultModelId())) {
+          appDefaultModel = modelQuery.findAndCheck(defaultAgent.getDefaultModelId());
         }
         // 检查当前使用模型是否存在
         if (nonNull(currentUseModelId)) {
           currentUseMode = modelQuery.findAndCheck(currentUseModelId);
         }
         // 切换应用模型时，检查模型类型是否一致
-        if (nonNull(currentUseModelId) && nonNull(agent.getDefaultModelId())
-            && !Objects.equals(currentUseModelId, agent.getDefaultModelId())
+        if (nonNull(currentUseModelId) && nonNull(defaultAgent.getDefaultModelId())
+            && !Objects.equals(currentUseModelId, defaultAgent.getDefaultModelId())
             && nonNull(appDefaultModel)
             && !Objects.equals(currentUseMode.getType(), appDefaultModel.getType())) {
           throw ProtocolException.of("当前选择模型类型[{0}]与智能体默认模型类型[{1}]不一致",
@@ -151,6 +154,8 @@ public class ApplicationQueryImpl implements ApplicationQuery {
 
       @Override
       protected AIApplication process() {
+        // 设置默认智能体和模型信息到应用对象，供后续使用
+        application.setDefaultAgent(defaultAgent);
         application.setAppDefaultModel(appDefaultModel);
         application.setCurrentUseMode(nullSafe(currentUseMode, appDefaultModel));
         return application;
@@ -206,15 +211,16 @@ public class ApplicationQueryImpl implements ApplicationQuery {
   }
 
   @Override
-  public ApplicationStatisticsVo getStatistics(Long id, String startDate, String endDate,
-      String period) {
+  public ApplicationStatisticsVo getStatistics(Long id, String startDate, String endDate) {
     return new BizTemplate<ApplicationStatisticsVo>() {
       @Override
       protected ApplicationStatisticsVo process() {
-        findAndCheck(id);
         LocalDateTime start = parseStartDate(startDate);
         LocalDateTime end = parseEndDate(endDate);
-        if (start.equals(LocalDateTime.of(1970, 1, 1, 0, 0))) {
+        // 若开始或结束时间为空/无效，默认查询近30天
+        if (startDate == null || startDate.isBlank() || endDate == null || endDate.isBlank()
+            || start.equals(LocalDateTime.of(1970, 1, 1, 0, 0))) {
+          end = LocalDateTime.now();
           start = LocalDateTime.now().minusDays(30).toLocalDate().atStartOfDay();
         }
 
@@ -274,7 +280,7 @@ public class ApplicationQueryImpl implements ApplicationQuery {
     Object[] row = apiUsageLogRepo.getAppOverviewStats(appId, start, end);
     ApplicationStatisticsVo.OverviewStatsVo overview = new ApplicationStatisticsVo.OverviewStatsVo();
     // JPQL 聚合可能返回 Object[1]{Object[5]} 的嵌套结构，需解包
-    if (row[0] == null) {
+    if (row == null || row.length == 0 || row[0] == null) {
       overview.setTotalCalls(0L);
       overview.setTotalTokens(0L);
       overview.setTotalCost(0.0);
@@ -307,31 +313,30 @@ public class ApplicationQueryImpl implements ApplicationQuery {
     if (rows != null) {
       for (Object[] r : rows) {
         Object dateObj = r[0];
-        long datetime = 0L;
+        String dateStr = null;
         if (dateObj != null) {
           if (dateObj instanceof java.sql.Date sqlDate) {
-            datetime = sqlDate.toLocalDate().atStartOfDay(ZoneId.systemDefault())
-                .toInstant().toEpochMilli();
+            dateStr = sqlDate.toLocalDate().format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE);
           } else if (dateObj instanceof LocalDate localDate) {
-            datetime = localDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+            dateStr = localDate.format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE);
           }
         }
         long callCount = r[1] != null ? ((Number) r[1]).longValue() : 0;
         long tokenCount = r[2] != null ? ((Number) r[2]).longValue() : 0;
-        Double avgResp = r[3] != null ? ((Number) r[3]).doubleValue() : 0.0;
+        Double avgResp = r[3] != null ? Math.round(((Number) r[3]).doubleValue() / 1000 * 100.0) / 100.0 : 0.0;
 
         ApplicationStatisticsVo.TrendDataVo callPoint = new ApplicationStatisticsVo.TrendDataVo();
-        callPoint.setDatetime(datetime);
+        callPoint.setDate(dateStr);
         callPoint.setValue((double) callCount);
         calls.add(callPoint);
 
         ApplicationStatisticsVo.TrendDataVo tokenPoint = new ApplicationStatisticsVo.TrendDataVo();
-        tokenPoint.setDatetime(datetime);
+        tokenPoint.setDate(dateStr);
         tokenPoint.setValue((double) tokenCount);
         tokens.add(tokenPoint);
 
         ApplicationStatisticsVo.TrendDataVo respPoint = new ApplicationStatisticsVo.TrendDataVo();
-        respPoint.setDatetime(datetime);
+        respPoint.setDate(dateStr);
         respPoint.setValue(avgResp);
         responseTime.add(respPoint);
       }
@@ -353,10 +358,12 @@ public class ApplicationQueryImpl implements ApplicationQuery {
       for (Object[] r : rows) {
         ApplicationStatisticsVo.TopUserVo u = new ApplicationStatisticsVo.TopUserVo();
         u.setUserId(r[0] != null ? ((Number) r[0]).longValue() : null);
-        u.setUsername(null);
         u.setCallCount(r[1] != null ? ((Number) r[1]).longValue() : 0L);
         topUsers.add(u);
       }
+    }
+    if (!topUsers.isEmpty()) {
+      userManager.setUserNameAndAvatar(topUsers, "userId", "userName", "userAvatar");
     }
     vo.setTopUsers(topUsers);
   }

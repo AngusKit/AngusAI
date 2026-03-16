@@ -73,6 +73,6 @@ public interface ApplicationFacade {
   /**
    * 获取应用统计
    */
-  ApplicationStatisticsVo getStatistics(Long id, String startDate, String endDate, String period);
+  ApplicationStatisticsVo getStatistics(Long id, String startDate, String endDate);
 
 }

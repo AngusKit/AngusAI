@@ -55,8 +55,8 @@ public class ApplicationStatisticsVo {
   @Schema(description = "趋势数据项")
   public static class TrendDataVo {
 
-    @Schema(description = "时间戳")
-    private Long datetime;
+    @Schema(description = "日期，格式 yyyy-MM-dd")
+    private String date;
 
     @Schema(description = "数值")
     private Double value;
@@ -70,7 +70,10 @@ public class ApplicationStatisticsVo {
     private Long userId;
 
     @Schema(description = "用户名")
-    private String username;
+    private String userName;
+
+    @Schema(description = "用户头像")
+    private String userAvatar;
 
     @Schema(description = "调用次数")
     private Long callCount;

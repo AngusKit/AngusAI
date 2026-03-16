@@ -183,9 +183,8 @@ public class ApplicationRest {
   public ApiLocaleResult<ApplicationStatisticsVo> getStatistics(
       @Parameter(description = "应用ID") @PathVariable Long id,
       @Parameter(description = "开始日期") @RequestParam(required = false) String startDate,
-      @Parameter(description = "结束日期") @RequestParam(required = false) String endDate,
-      @Parameter(description = "统计周期") @RequestParam(required = false) String period) {
-    return ApiLocaleResult.success(applicationFacade.getStatistics(id, startDate, endDate, period));
+      @Parameter(description = "结束日期") @RequestParam(required = false) String endDate) {
+    return ApiLocaleResult.success(applicationFacade.getStatistics(id, startDate, endDate));
   }
 
 }

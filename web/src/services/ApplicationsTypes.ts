@@ -565,7 +565,9 @@ export interface TopUserVo {
    */
   userId?: number;
   /** 用户名 */
-  username?: string;
+  userName?: string;
+  /** 用户头像 */
+  userAvatar?: string;
   /**
    * 调用次数
    * @format int64
@@ -576,10 +578,9 @@ export interface TopUserVo {
 /** 趋势数据项 */
 export interface TrendDataVo {
   /**
-   * 时间戳
-   * @format int64
+   * 日期，格式 yyyy-MM-dd
    */
-  datetime?: number;
+  date?: string;
   /**
    * 数值
    * @format double

@@ -1,3 +1,4 @@
+import { useState, useMemo } from 'react';
 import {
   ChevronRight,
   Edit,
@@ -25,6 +26,7 @@ import {
   Calendar,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -53,13 +55,58 @@ export function ApplicationDetailPage() {
     detail,
     statistics,
     loading,
+    statisticsLoading,
     shareDialogOpen,
     setShareDialogOpen,
+    loadStatistics,
     handleToggleStatus,
     handleDuplicate,
     handleDelete,
     navigate,
   } = useApplicationDetail();
+
+  const [activeTab, setActiveTab] = useState('basic');
+  const currentMonthStr = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
+  const [selectedMonth, setSelectedMonth] = useState(currentMonthStr);
+
+  /** 根据 yyyy-MM 获取月份起止日期 */
+  const getMonthRange = (ym: string) => {
+    const [y, m] = ym.split('-').map(Number);
+    const now = new Date();
+    const start = new Date(y, m - 1, 1);
+    const end =
+      y === now.getFullYear() && m === now.getMonth() + 1
+        ? new Date()
+        : new Date(y, m, 0);
+    return {
+      startDate: start.toISOString().slice(0, 10),
+      endDate: end.toISOString().slice(0, 10),
+    };
+  };
+
+  const handleTabChange = (v: string) => {
+    setActiveTab(v);
+    if (v === 'statistics') {
+      const { startDate, endDate } = getMonthRange(selectedMonth);
+      loadStatistics(startDate, endDate);
+    }
+  };
+
+  const handleMonthChange = (ym: string) => {
+    setSelectedMonth(ym);
+    const { startDate, endDate } = getMonthRange(ym);
+    loadStatistics(startDate, endDate);
+  };
+
+  /** 月份选项：本月及过去 11 个月 */
+  const monthOptions = useMemo(() => {
+    const now = new Date();
+    return Array.from({ length: 12 }, (_, i) => {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      return { value: ym, label: `${d.getFullYear()}年${d.getMonth() + 1}月` };
+    });
+  }, []);
 
   if (loading) {
     return (
@@ -207,7 +254,7 @@ export function ApplicationDetailPage() {
       </Card>
 
       {/* Tabs 区域：与 UserDetail 一致 */}
-      <Tabs defaultValue="basic" className="space-y-6">
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
         <TabsList className="dark:bg-gray-800">
           <TabsTrigger value="basic">
             <Info className="w-4 h-4 mr-2" />
@@ -463,10 +510,34 @@ export function ApplicationDetailPage() {
         <TabsContent value="statistics">
           <Card className="dark:bg-gray-800 dark:border-gray-700">
             <div className="p-6">
-              <div className="mb-6">
-                <h3 className="text-base dark:text-white mb-1">统计数据</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">应用的调用量、Token 消耗、响应时间等</p>
+              <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
+                <div>
+                  <h3 className="text-base dark:text-white mb-1">统计数据</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">应用的调用量、Token 消耗、响应时间等</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">时间范围</span>
+                  <Select value={selectedMonth} onValueChange={handleMonthChange}>
+                    <SelectTrigger className="w-[140px] dark:bg-gray-900 dark:border-gray-700 dark:text-white">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
+                      {monthOptions.map((o) => (
+                        <SelectItem key={o.value} value={o.value} className="dark:text-gray-300">
+                          {o.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
+              {statisticsLoading ? (
+                <div className="py-16 flex flex-col items-center justify-center text-center">
+                  <Loader2 className="w-10 h-10 animate-spin text-blue-600 dark:text-blue-400 mb-4" />
+                  <p className="text-sm text-gray-600 dark:text-gray-400">加载统计数据中...</p>
+                </div>
+              ) : (
+              <>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                 <StatCard
                   icon={<Clock className="w-4 h-4" />}
@@ -480,15 +551,15 @@ export function ApplicationDetailPage() {
                 />
                 <StatCard
                   icon={<BarChart3 className="w-4 h-4" />}
-                  label="平均响应(ms)"
+                  label="平均响应(秒)"
                   value={
-                    overview?.avgResponseTime != null ? String(Math.round(overview.avgResponseTime)) : '--'
+                    overview?.avgResponseTime != null ? String(overview.avgResponseTime) : '--'
                   }
                 />
                 <StatCard
                   icon={<Link2 className="w-4 h-4" />}
                   label="成功率"
-                  value={overview?.successRate != null ? `${Math.round(overview.successRate * 100)}%` : '--'}
+                  value={overview?.successRate != null ? `${overview.successRate}%` : '--'}
                 />
               </div>
 
@@ -501,7 +572,7 @@ export function ApplicationDetailPage() {
                 <div className="space-y-6">
                   <div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">调用次数趋势</div>
-                    <div className="h-64 rounded-lg border dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/30 min-h-[16rem]">
+                    <div className="h-64 rounded-lg border dark:border-gray-700 bg-white dark:bg-slate-800/20 min-h-[16rem]">
                       {(trends?.calls?.length ?? 0) > 0 ? (
                         <div className="h-full w-full">
                           <TrendsChart trends={trends!} type="calls" />
@@ -515,7 +586,7 @@ export function ApplicationDetailPage() {
                   </div>
                   <div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">Token 数趋势</div>
-                    <div className="h-64 rounded-lg border dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/30 min-h-[16rem]">
+                    <div className="h-64 rounded-lg border dark:border-gray-700 bg-white dark:bg-slate-800/20 min-h-[16rem]">
                       {(trends?.tokens?.length ?? 0) > 0 ? (
                         <div className="h-full w-full">
                           <TrendsChart trends={trends!} type="tokens" />
@@ -528,8 +599,8 @@ export function ApplicationDetailPage() {
                     </div>
                   </div>
                   <div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">响应时间趋势 (ms)</div>
-                    <div className="h-64 rounded-lg border dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/30 min-h-[16rem]">
+                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">响应时间趋势 (秒)</div>
+                    <div className="h-64 rounded-lg border dark:border-gray-700 bg-white dark:bg-slate-800/20 min-h-[16rem]">
                       {(trends?.responseTime?.length ?? 0) > 0 ? (
                         <div className="h-full w-full">
                           <TrendsChart trends={trends!} type="responseTime" />
@@ -550,7 +621,7 @@ export function ApplicationDetailPage() {
                   <Users className="w-4 h-4" />
                   热门用户信息
                 </h4>
-                <div className="rounded-lg border dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/30 min-h-[12rem]">
+                <div className="rounded-lg border dark:border-gray-700 bg-slate-50/70 dark:bg-slate-800/25 min-h-[12rem]">
                   {topUsers.length > 0 ? (
                     <div className="p-4 space-y-3">
                       {topUsers.slice(0, 10).map((u, idx) => (
@@ -563,7 +634,7 @@ export function ApplicationDetailPage() {
                               <User className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                             </div>
                             <div>
-                              <div className="dark:text-white">{u.username ?? `用户 ${u.userId ?? idx + 1}`}</div>
+                              <div className="dark:text-white">{u.userName ?? `用户 ${u.userId ?? idx + 1}`}</div>
                               <div className="text-sm text-gray-600 dark:text-gray-400">ID: {u.userId ?? '-'}</div>
                             </div>
                           </div>
@@ -582,8 +653,10 @@ export function ApplicationDetailPage() {
                   )}
                 </div>
               </div>
-            </div>
-          </Card>
+            </>
+          )}
+        </div>
+      </Card>
         </TabsContent>
 
         {/* Tab: 分享信息 */}
@@ -741,14 +814,20 @@ function TrendsChart({
   const series = type === 'calls' ? (trends.calls ?? []) : type === 'tokens' ? (trends.tokens ?? []) : (trends.responseTime ?? []);
   const dataKey = type === 'calls' ? 'calls' : type === 'tokens' ? 'tokens' : 'responseTime';
   const data = series.map((c) => ({
-    time: c.datetime ? new Date(c.datetime).toLocaleDateString() : '',
+    time: c.date ?? '',
     [dataKey]: c.value ?? 0,
   }));
   if (data.length === 0) return null;
   return (
     <ResponsiveContainer width="100%" height="100%">
       <AreaChart data={data}>
-        <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
+        <defs>
+          <linearGradient id="chartAreaGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.25} />
+            <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0.02} />
+          </linearGradient>
+        </defs>
+        <CartesianGrid strokeDasharray="3 3" className="stroke-slate-200 dark:stroke-slate-600" />
         <XAxis dataKey="time" className="text-xs" />
         <YAxis className="text-xs" />
         <Tooltip
@@ -762,7 +841,7 @@ function TrendsChart({
           type="monotone"
           dataKey={dataKey}
           stroke="hsl(var(--primary))"
-          fill="hsl(var(--primary) / 0.2)"
+          fill="url(#chartAreaGradient)"
           strokeWidth={2}
         />
       </AreaChart>

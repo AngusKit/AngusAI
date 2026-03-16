@@ -248,12 +248,10 @@ export class Applications<SecurityDataType = unknown> {
   getApplicationStatistics = (
     id: string,
     query?: {
-      /** 开始日期 */
+      /** 开始日期 yyyy-MM-dd */
       startDate?: string;
-      /** 结束日期 */
+      /** 结束日期 yyyy-MM-dd */
       endDate?: string;
-      /** 统计周期 */
-      period?: string;
     },
     params: RequestParams = {}
   ) =>
