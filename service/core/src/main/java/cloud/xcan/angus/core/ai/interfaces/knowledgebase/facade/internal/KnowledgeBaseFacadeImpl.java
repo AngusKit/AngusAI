@@ -9,6 +9,7 @@ import static cloud.xcan.angus.core.utils.CoreUtils.buildVoPageResult;
 
 import cloud.xcan.angus.core.ai.application.cmd.knowledgebase.KnowledgeBaseCmd;
 import cloud.xcan.angus.core.ai.application.query.knowledgebase.KnowledgeBaseDocQuery;
+import cloud.xcan.angus.core.ai.application.query.knowledgebase.KnowledgeBaseDocStats;
 import cloud.xcan.angus.core.ai.application.query.knowledgebase.KnowledgeBaseDocUsageLogQuery;
 import cloud.xcan.angus.core.ai.application.query.knowledgebase.KnowledgeBaseQuery;
 import cloud.xcan.angus.core.ai.domain.Visibility;
@@ -62,6 +63,7 @@ public class KnowledgeBaseFacadeImpl implements KnowledgeBaseFacade {
   public KnowledgeBaseDetailVo create(KnowledgeBaseCreateDto dto) {
     KnowledgeBase knowledgeBase = KnowledgeBaseAssembler.toCreateDomain(dto);
     KnowledgeBase saved = knowledgeBaseCmd.create(knowledgeBase);
+    fillStats(List.of(saved));
     return KnowledgeBaseAssembler.toDetailVo(saved);
   }
 
@@ -70,6 +72,7 @@ public class KnowledgeBaseFacadeImpl implements KnowledgeBaseFacade {
   public KnowledgeBaseDetailVo update(Long id, KnowledgeBaseUpdateDto dto) {
     KnowledgeBase knowledgeBase = KnowledgeBaseAssembler.toUpdateDomain(id, dto);
     KnowledgeBase saved = knowledgeBaseCmd.update(knowledgeBase);
+    fillStats(List.of(saved));
     return KnowledgeBaseAssembler.toDetailVo(saved);
   }
 
@@ -77,6 +80,7 @@ public class KnowledgeBaseFacadeImpl implements KnowledgeBaseFacade {
   @Override
   public KnowledgeBaseDetailVo toggle(Long id, KnowledgeBaseToggleDto dto) {
     KnowledgeBase knowledgeBase = knowledgeBaseCmd.toggle(id, dto.getEnabled());
+    fillStats(List.of(knowledgeBase));
     return KnowledgeBaseAssembler.toDetailVo(knowledgeBase);
   }
 
@@ -84,6 +88,7 @@ public class KnowledgeBaseFacadeImpl implements KnowledgeBaseFacade {
   @Override
   public KnowledgeBaseDetailVo modifyVisibility(Long id, Visibility visibility) {
     KnowledgeBase knowledgeBase = knowledgeBaseCmd.modifyVisibility(id, visibility);
+    fillStats(List.of(knowledgeBase));
     return KnowledgeBaseAssembler.toDetailVo(knowledgeBase);
   }
 
@@ -96,6 +101,7 @@ public class KnowledgeBaseFacadeImpl implements KnowledgeBaseFacade {
   @Override
   public KnowledgeBaseDetailVo getDetail(Long id) {
     KnowledgeBase knowledgeBase = knowledgeBaseQuery.findAndCheck(id);
+    fillStats(List.of(knowledgeBase));
     return KnowledgeBaseAssembler.toDetailVo(knowledgeBase);
   }
 
@@ -105,7 +111,31 @@ public class KnowledgeBaseFacadeImpl implements KnowledgeBaseFacade {
     GenericSpecification<KnowledgeBase> spec = KnowledgeBaseAssembler.getSpecification(dto);
     Page<KnowledgeBase> page = knowledgeBaseQuery.find(spec, dto.tranPage(),
         dto.fullTextSearch, getMatchSearchFields(dto.getClass()));
+    fillStats(page.getContent());
     return buildVoPageResult(page, KnowledgeBaseAssembler::toListVo);
+  }
+
+  /**
+   * 根据知识库ID批量统计文档数据并填充到实体
+   */
+  private void fillStats(List<KnowledgeBase> knowledgeBases) {
+    if (knowledgeBases == null || knowledgeBases.isEmpty()) {
+      return;
+    }
+    List<Long> ids = knowledgeBases.stream().map(KnowledgeBase::getId).filter(Objects::nonNull).toList();
+    if (ids.isEmpty()) {
+      return;
+    }
+    Map<Long, KnowledgeBaseDocStats> statsMap = knowledgeBaseDocQuery.getStatsByKnowledgeBaseIds(ids);
+    for (KnowledgeBase kb : knowledgeBases) {
+      KnowledgeBaseDocStats stats = statsMap.get(kb.getId());
+      if (stats != null) {
+        kb.setDocumentsCount(stats.getDocumentsCount());
+        kb.setTotalSize(stats.getTotalSize());
+        kb.setTotalChunks(stats.getTotalChunks());
+        kb.setActiveDocuments(stats.getActiveDocuments());
+      }
+    }
   }
 
   /**
@@ -238,40 +268,8 @@ public class KnowledgeBaseFacadeImpl implements KnowledgeBaseFacade {
     // 批量查询知识库详情，避免循环查询数据库
     Map<Long, KnowledgeBase> knowledgeBaseMap = knowledgeBaseQuery.findByIds(knowledgeBaseIds);
 
-    // 批量查询文件数和分段数，避免循环查询数据库
-    Map<Long, Long> fileCountMap = new HashMap<>();
-    Map<Long, Long> chunkCountMap = new HashMap<>();
-
-    // 批量查询文件数
-    List<Object[]> fileCountRows = knowledgeBaseDocQuery.countByKnowledgeBaseIds(knowledgeBaseIds);
-    if (fileCountRows != null) {
-      for (Object[] row : fileCountRows) {
-        Long knowledgeBaseId = row[0] == null ? null : ((Number) row[0]).longValue();
-        Long count = row[1] == null ? 0L : ((Number) row[1]).longValue();
-        if (knowledgeBaseId != null) {
-          fileCountMap.put(knowledgeBaseId, count);
-        }
-      }
-    }
-
-    // 批量查询分段数
-    List<Object[]> chunkCountRows = knowledgeBaseDocQuery.countByKnowledgeBaseIds(
-        knowledgeBaseIds);
-    if (chunkCountRows != null) {
-      for (Object[] row : chunkCountRows) {
-        Long knowledgeBaseId = row[0] == null ? null : ((Number) row[0]).longValue();
-        Long count = row[1] == null ? 0L : ((Number) row[1]).longValue();
-        if (knowledgeBaseId != null) {
-          chunkCountMap.put(knowledgeBaseId, count);
-        }
-      }
-    }
-
-    // 为没有数据的知识库设置默认值0
-    for (Long knowledgeBaseId : knowledgeBaseIds) {
-      fileCountMap.putIfAbsent(knowledgeBaseId, 0L);
-      chunkCountMap.putIfAbsent(knowledgeBaseId, 0L);
-    }
+    // 批量查询文档统计（文件数、分段数）
+    Map<Long, KnowledgeBaseDocStats> statsMap = knowledgeBaseDocQuery.getStatsByKnowledgeBaseIds(knowledgeBaseIds);
 
     // 构建TopKnowledgeBase列表
     List<KnowledgeBaseStatisticsVo.TopKnowledgeBase> topKnowledgeBases = new ArrayList<>();
@@ -281,12 +279,16 @@ public class KnowledgeBaseFacadeImpl implements KnowledgeBaseFacade {
         continue; // 知识库不存在，跳过
       }
 
+      KnowledgeBaseDocStats stats = statsMap.get(knowledgeBaseId);
+      long fileCount = stats != null ? stats.getDocumentsCount() : 0L;
+      long chunkCount = stats != null ? stats.getTotalChunks() : 0L;
+
       KnowledgeBaseStatisticsVo.TopKnowledgeBase topKnowledgeBase = new KnowledgeBaseStatisticsVo.TopKnowledgeBase();
       topKnowledgeBase.setId(knowledgeBaseId);
       topKnowledgeBase.setName(knowledgeBase.getName());
       topKnowledgeBase.setQueryCount(queryCountMap.get(knowledgeBaseId));
-      topKnowledgeBase.setFileCount(fileCountMap.getOrDefault(knowledgeBaseId, 0L));
-      topKnowledgeBase.setChunkCount(chunkCountMap.getOrDefault(knowledgeBaseId, 0L));
+      topKnowledgeBase.setFileCount(fileCount);
+      topKnowledgeBase.setChunkCount(chunkCount);
       topKnowledgeBases.add(topKnowledgeBase);
     }
     return topKnowledgeBases;

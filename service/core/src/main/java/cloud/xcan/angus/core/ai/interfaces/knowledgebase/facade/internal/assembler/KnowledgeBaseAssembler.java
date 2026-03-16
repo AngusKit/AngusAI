@@ -112,8 +112,7 @@ public class KnowledgeBaseAssembler {
     // Build the final filters
     Set<SearchCriteria> filters = new SearchCriteriaBuilder<>(dto)
         .rangeSearchFields("id", "createdDate", "modifiedDate")
-        .orderByFields("id", "createdDate",
-            "modifiedDate", "documentsCount", "totalSize", "name")
+        .orderByFields("id", "createdDate", "modifiedDate", "name")
         .matchSearchFields("name", "description")
         .inAndNotFields("visibility", "enabled")
         .build();

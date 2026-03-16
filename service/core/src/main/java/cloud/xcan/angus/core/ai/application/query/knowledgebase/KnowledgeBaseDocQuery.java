@@ -37,6 +37,14 @@ public interface KnowledgeBaseDocQuery {
   List<Object[]> countByKnowledgeBaseIds(List<Long> knowledgeBaseIds);
 
   /**
+   * 批量根据知识库ID统计文档数据（文档数、已启用数、总大小、分段数）
+   *
+   * @param knowledgeBaseIds 知识库ID列表
+   * @return 知识库ID -> 统计信息 的映射
+   */
+  java.util.Map<Long, KnowledgeBaseDocStats> getStatsByKnowledgeBaseIds(List<Long> knowledgeBaseIds);
+
+  /**
    * 统计存储总大小
    */
   Long sumTotalStoreSize();

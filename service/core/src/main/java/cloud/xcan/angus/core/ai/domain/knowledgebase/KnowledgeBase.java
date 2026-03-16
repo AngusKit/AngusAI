@@ -48,14 +48,14 @@ public class KnowledgeBase extends TenantAuditingEntity<KnowledgeBase, Long> {
   @Column(name = "enabled", nullable = false)
   private Boolean enabled = true;
 
-  // 统计数据
-  @Column(name = "documents_count")
+  // 统计数据（临时字段，由门面层通过 KnowledgeBaseDocQuery 批量统计文档数据填充）
+  @Transient
   private Integer documentsCount = 0;
 
-  @Column(name = "total_size")
+  @Transient
   private Long totalSize = 0L;
 
-  @Column(name = "total_chunks")
+  @Transient
   private Integer totalChunks = 0;
 
   @Type(JsonType.class)

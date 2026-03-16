@@ -40,4 +40,14 @@ public interface KnowledgeBaseDocRepo extends BaseRepository<KnowledgeBaseDoc, L
   void deleteByKnowledgeBaseIdAndIdIn(@Param("knowledgeBaseId") Long knowledgeBaseId,
       @Param("documentIds") List<Long> documentIds);
 
+  /**
+   * 按知识库ID批量统计文档数据
+   * 返回格式：List&lt;Object[]&gt; [knowledgeBaseId, documentsCount, activeDocuments, totalSize, totalChunks]
+   */
+  @Query("SELECT d.knowledgeBaseId, COUNT(d), "
+      + "SUM(CASE WHEN d.enabled = true THEN 1 ELSE 0 END), "
+      + "COALESCE(SUM(d.size), 0L), COALESCE(SUM(COALESCE(d.chunks, 0)), 0) "
+      + "FROM KnowledgeBaseDoc d WHERE d.knowledgeBaseId IN :ids GROUP BY d.knowledgeBaseId")
+  List<Object[]> getStatsByKnowledgeBaseIds(@Param("ids") List<Long> ids);
+
 }

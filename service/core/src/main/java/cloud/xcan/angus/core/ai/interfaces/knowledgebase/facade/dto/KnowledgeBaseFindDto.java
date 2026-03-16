@@ -25,12 +25,6 @@ public class KnowledgeBaseFindDto extends PageQuery {
   @Schema(description = "启用状态筛选")
   private Boolean enabled;
 
-  @Schema(description = "文档数")
-  private Long documentsCount;
-
-  @Schema(description = "总大小")
-  private Long totalSize;
-
   @Schema(description = "所属租户ID")
   private Long tenantId;
 
@@ -47,7 +41,7 @@ public class KnowledgeBaseFindDto extends PageQuery {
   private LocalDateTime modifiedDate;
 
   @Schema(description = "排序字段", example = "modifiedDate", allowableValues = {"createdDate",
-      "modifiedDate", "documentsCount", "totalSize", "name"})
+      "modifiedDate", "name"})
   private String orderBy = "modifiedDate";
 
   @Override

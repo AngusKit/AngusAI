@@ -62,7 +62,7 @@ import {useLanguage} from '@/components/LanguageProvider.tsx';
 import {toast} from 'sonner';
 import KnowledgeBases from '@/services/KnowledgeBases';
 import Documents from '@/services/Documents';
-import {KnowledgeBaseDocStatusEnum, KnowledgeBaseDocTypeEnum} from '@/enums/enums';
+import {EnabledStatusEnum, KnowledgeBaseDocStatusEnum, KnowledgeBaseDocTypeEnum} from '@/enums/enums';
 import type {KnowledgeBaseListVo, KnowledgeBaseStatisticsVo} from '@/services/KnowledgeBasesTypes';
 import {GetKnowledgeBaseListOrderByEnum} from '@/services/KnowledgeBasesTypes';
 import type {KnowledgeBaseDocListVo} from '@/services/DocumentsTypes';
@@ -140,7 +140,7 @@ export function KnowledgeBase() {
   const folderInputRef = useRef<HTMLInputElement>(null);
   const uploadIntervalsRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
 
-  const getVisibilityLabel = (visibility?: VisibilityEnum) => {
+  const getVisibilityLabel = (visibility?: string | VisibilityEnum) => {
     return getEnumDescription(VisibilityEnum, visibility as VisibilityEnum);
   };
 
@@ -311,8 +311,11 @@ export function KnowledgeBase() {
         pageSize: itemsPerPage,
       };
 
-      // 根据排序方式设置 orderBy
-      queryParams.orderBy = sortBy as GetKnowledgeBaseListOrderByEnum;
+      // 根据排序方式设置 orderBy（documentsCount/totalSize 由后端实时统计，不支持服务端排序，客户端排序）
+      const apiOrderBy = ['documentsCount', 'totalSize'].includes(sortBy)
+        ? GetKnowledgeBaseListOrderByEnum.ModifiedDate
+        : (sortBy as GetKnowledgeBaseListOrderByEnum);
+      queryParams.orderBy = apiOrderBy;
 
       const response = await KnowledgeBases.getKnowledgeBaseList(queryParams);
 
@@ -333,7 +336,7 @@ export function KnowledgeBase() {
           documentCount: String(kb.documentsCount || 0),
           size: kb.totalSize || '0 MB',
           status: getKnowledgeStatusLabel(!!kb.enabled),
-          statusColor: kb.enabled ? ENABLED_STATUS_COLOR.enabled : ENABLED_STATUS_COLOR.disabled,
+          statusColor: kb.enabled ? ENABLED_STATUS_COLOR[EnabledStatusEnum.ENABLED] : ENABLED_STATUS_COLOR[EnabledStatusEnum.DISABLED],
           enabled: kb.enabled || false,
           visibility: kb.visibility,
           createdDate: kb.createdDate,
@@ -343,14 +346,27 @@ export function KnowledgeBase() {
           tags: kb.tags,
         }));
 
-        // 注意：createdDate 需要降序排序（最近创建在前），但 API 可能默认是升序
-        // 如果后端不支持排序方向，这里需要客户端处理 createdDate 的降序
+        // 统计字段改为临时计算后，后端不再支持 documentsCount/totalSize 排序，在此做客户端排序
         if (sortBy === 'createdDate') {
           mappedList.sort((a, b) => {
             const dateA = a.createdDate ? new Date(a.createdDate).getTime() : 0;
             const dateB = b.createdDate ? new Date(b.createdDate).getTime() : 0;
             return dateB - dateA; // 降序：最近创建在前
           });
+        } else if (sortBy === 'documentsCount') {
+          mappedList.sort((a, b) => parseInt(b.documentCount, 10) - parseInt(a.documentCount, 10));
+        } else if (sortBy === 'totalSize') {
+          const parseBytes = (s: string) => {
+            const m = s.match(/^([\d.]+)\s*(\w*)/);
+            if (!m) return 0;
+            const v = parseFloat(m[1]);
+            const u = (m[2] || 'B').toUpperCase();
+            const mult: Record<string, number> = { B: 1, KB: 1024, MB: 1024 ** 2, GB: 1024 ** 3 };
+            return v * (mult[u] || 1);
+          };
+          mappedList.sort((a, b) => parseBytes(b.size) - parseBytes(a.size));
+        } else if (sortBy === 'name') {
+          mappedList.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
         }
 
         setKnowledgeBases(mappedList);
@@ -387,7 +403,7 @@ export function KnowledgeBase() {
               ...kb,
               enabled: newEnabled,
               status: getKnowledgeStatusLabel(newEnabled),
-              statusColor: newEnabled ? ENABLED_STATUS_COLOR.enabled : ENABLED_STATUS_COLOR.disabled,
+              statusColor: newEnabled ? ENABLED_STATUS_COLOR[EnabledStatusEnum.ENABLED] : ENABLED_STATUS_COLOR[EnabledStatusEnum.DISABLED],
             };
           }
           return kb;
@@ -511,8 +527,8 @@ export function KnowledgeBase() {
                 ? getDocumentStatusText(KnowledgeBaseDocStatusEnum.COMPLETED)
                 : t('common.status.disabled'),
               statusColor: newEnabled
-                ? completedStatus?.color || ENABLED_STATUS_COLOR.enabled
-                : ENABLED_STATUS_COLOR.disabled,
+                ? completedStatus?.color || ENABLED_STATUS_COLOR[EnabledStatusEnum.ENABLED]
+                : ENABLED_STATUS_COLOR[EnabledStatusEnum.DISABLED],
             };
           }
           return d;

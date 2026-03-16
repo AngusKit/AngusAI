@@ -1,6 +1,7 @@
 package cloud.xcan.angus.core.ai.application.query.knowledgebase.impl;
 
 import cloud.xcan.angus.core.ai.application.query.knowledgebase.KnowledgeBaseDocQuery;
+import cloud.xcan.angus.core.ai.application.query.knowledgebase.KnowledgeBaseDocStats;
 import cloud.xcan.angus.core.ai.domain.knowledgebase.KnowledgeBaseDoc;
 import cloud.xcan.angus.core.ai.domain.knowledgebase.KnowledgeBaseDocChunkRepo;
 import cloud.xcan.angus.core.ai.domain.knowledgebase.KnowledgeBaseDocRepo;
@@ -10,7 +11,9 @@ import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import jakarta.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -73,7 +76,34 @@ public class KnowledgeBaseDocQueryImpl implements KnowledgeBaseDocQuery {
 
   @Override
   public List<Object[]> countByKnowledgeBaseIds(List<Long> knowledgeBaseIds) {
-    return List.of();
+    if (knowledgeBaseIds == null || knowledgeBaseIds.isEmpty()) {
+      return List.of();
+    }
+    Map<Long, KnowledgeBaseDocStats> statsMap = getStatsByKnowledgeBaseIds(knowledgeBaseIds);
+    return statsMap.entrySet().stream()
+        .map(e -> new Object[]{e.getKey(), (long) e.getValue().getDocumentsCount()})
+        .toList();
+  }
+
+  @Override
+  public Map<Long, KnowledgeBaseDocStats> getStatsByKnowledgeBaseIds(List<Long> knowledgeBaseIds) {
+    if (knowledgeBaseIds == null || knowledgeBaseIds.isEmpty()) {
+      return new HashMap<>();
+    }
+    List<Object[]> rows = knowledgeBaseDocRepo.getStatsByKnowledgeBaseIds(knowledgeBaseIds);
+    Map<Long, KnowledgeBaseDocStats> result = new HashMap<>();
+    for (Object[] row : rows) {
+      Long kbId = row[0] == null ? null : ((Number) row[0]).longValue();
+      if (kbId == null) {
+        continue;
+      }
+      int docCount = row[1] == null ? 0 : ((Number) row[1]).intValue();
+      int activeCount = row[2] == null ? 0 : ((Number) row[2]).intValue();
+      long totalSize = row[3] == null ? 0L : ((Number) row[3]).longValue();
+      int totalChunks = row[4] == null ? 0 : ((Number) row[4]).intValue();
+      result.put(kbId, new KnowledgeBaseDocStats(kbId, docCount, activeCount, totalSize, totalChunks));
+    }
+    return result;
   }
 
   @Override
