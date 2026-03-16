@@ -81,10 +81,11 @@ export function WorkflowGridView({ workflows, loading, actions, hasFilter = fals
           {displayList.map(w => (
           <Card
             key={w.id}
-            className='p-5 dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-all'
+            className='p-5 dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-all flex flex-col h-full'
           >
+            <div className='flex-1 min-h-0'>
             {/* 操作按钮区 */}
-            <div className='flex items-start justify-between mb-4'>
+            <div className='flex items-start justify-between mb-3'>
               <div className='flex items-center gap-3'>
                 <button
                   className='p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors'
@@ -183,9 +184,10 @@ export function WorkflowGridView({ workflows, loading, actions, hasFilter = fals
               </div>
             </div>
 
-            <p className='text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2'>{w.description}</p>
+            <p className='text-sm text-gray-600 dark:text-gray-400 mb-2 line-clamp-2'>{w.description}</p>
+            </div>
 
-            <div className='flex items-center justify-between text-sm text-gray-500 dark:text-gray-400'>
+            <div className='flex items-center justify-between pt-3 mt-auto shrink-0 border-t border-gray-100 dark:border-gray-700 text-sm text-gray-500 dark:text-gray-400'>
               <span>{w.calls}</span>
               <span>{w.successRate}</span>
             </div>

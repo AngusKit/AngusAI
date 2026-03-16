@@ -379,7 +379,7 @@ function ApplicationCard({
         className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md dark:hover:shadow-gray-900/50 transition-shadow cursor-pointer group"
       >
         <div className="flex items-center gap-6">
-          <div className="w-11 h-11 rounded-lg flex items-center justify-center flex-shrink-0 text-2xl">
+          <div className="w-16 h-16 rounded-lg flex items-center justify-center flex-shrink-0 text-3xl">
             {app.icon}
           </div>
           <div className="flex-1 min-w-0">
