@@ -2,7 +2,7 @@
  * API Collection 管理 Hook
  */
 
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { toast } from 'sonner';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -68,6 +68,8 @@ export const useAPICollectionManagement = (): UseAPICollectionManagementReturn =
   const debouncedSearchQuery = useDebounce(searchQuery, SEARCH_DEBOUNCE_MS);
   const debouncedEndpointSearchQuery = useDebounce(endpointSearchQuery, SEARCH_DEBOUNCE_MS);
   const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null);
+  const selectedCollectionIdRef = useRef<string | null>(null);
+  selectedCollectionIdRef.current = selectedCollectionId;
   const [collections, setCollections] = useState<CollectionListItem[]>([]);
   const [collectionsLoading, setCollectionsLoading] = useState(false);
   const [collectionsTotal, setCollectionsTotal] = useState(0);
@@ -118,7 +120,7 @@ export const useAPICollectionManagement = (): UseAPICollectionManagementReturn =
           setCollectionDetail(null);
           setEndpoints([]);
           setEndpointTotal(0);
-        } else if (!selectedCollectionId || !mappedList.some(item => item.id === selectedCollectionId)) {
+        } else if (!selectedCollectionIdRef.current || !mappedList.some(item => item.id === selectedCollectionIdRef.current!)) {
           const firstId = mappedList[0]?.id;
           if (firstId) {
             setSelectedCollectionId(firstId);
@@ -132,7 +134,7 @@ export const useAPICollectionManagement = (): UseAPICollectionManagementReturn =
         setCollectionsLoading(false);
       }
     },
-    [selectedCollectionId, t]
+    [t]
   );
 
   const loadCollectionDetail = useCallback(
