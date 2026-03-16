@@ -55,6 +55,7 @@ export function WorkflowTableView({
                   <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400' />
                   <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400' />
                   <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400' />
+                  <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400' />
                 </tr>
               </thead>
               <tbody className='divide-y divide-gray-200 dark:divide-gray-700'>
@@ -71,6 +72,9 @@ export function WorkflowTableView({
                     </td>
                     <td className='px-6 py-4'>
                       <Skeleton className='h-5 w-14 rounded dark:bg-gray-700' />
+                    </td>
+                    <td className='px-6 py-4'>
+                      <Skeleton className='h-4 w-12 dark:bg-gray-700' />
                     </td>
                     <td className='px-6 py-4'>
                       <Skeleton className='h-4 w-10 dark:bg-gray-700' />
@@ -99,6 +103,7 @@ export function WorkflowTableView({
                 <tr>
                   <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>工作流名称</th>
                   <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>状态</th>
+                  <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>可见性</th>
                   <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>今日调用</th>
                   <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>成功率</th>
                   <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>操作</th>
@@ -134,6 +139,9 @@ export function WorkflowTableView({
                     </td>
                     <td className='px-6 py-4'>
                       <Badge className={`text-xs ${w.statusColor} border-0`}>{w.statusDisplay}</Badge>
+                    </td>
+                    <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>
+                      {w.visibilityDisplay ?? '--'}
                     </td>
                     <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{w.calls}</td>
                     <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{w.successRate}</td>

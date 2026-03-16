@@ -57,16 +57,12 @@ export function useWorkflowPage() {
     }
   };
 
-  /** 克隆工作流 */
+  /** 克隆工作流 - 复制成功后停留在列表页 */
   const handleCloneWorkflow = async (w: WorkflowDisplayItem) => {
     try {
-      const res = await Workflows.cloneWorkflow(w.id);
-      const data = (res as { data?: { id?: string } }).data;
+      await Workflows.cloneWorkflow(w.id);
       toast.success(`工作流已复制: ${w.name}`);
       loadWorkflows();
-      if (data?.id) {
-        navigate(`/workflow/${data.id}`);
-      }
     } catch (e: unknown) {
       toast.error((e as { message?: string })?.message ?? '复制失败');
     }

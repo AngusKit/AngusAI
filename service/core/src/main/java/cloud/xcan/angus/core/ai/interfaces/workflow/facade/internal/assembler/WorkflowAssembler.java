@@ -86,6 +86,7 @@ public class WorkflowAssembler {
     vo.setIconBg(workflow.getIconBg());
     vo.setType(workflow.getType());
     vo.setStatus(workflow.getStatus());
+    vo.setVisibility(workflow.getVisibility());
     vo.setVersion(workflow.getVersion());
     vo.setCreatedDate(workflow.getCreatedDate());
     vo.setModifiedDate(workflow.getModifiedDate());
@@ -113,6 +114,7 @@ public class WorkflowAssembler {
     vo.setIconBg(workflow.getIconBg());
     vo.setType(workflow.getType());
     vo.setStatus(workflow.getStatus());
+    vo.setVisibility(workflow.getVisibility());
     vo.setVersion(workflow.getVersion());
 
     // 设置审计信息

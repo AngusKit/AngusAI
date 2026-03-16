@@ -1,5 +1,5 @@
 import { ApiLocaleResult, TenantAuditingVo } from '@xcan-angus/infra';
-import { WorkflowStatusEnum, WorkflowTypeEnum } from '@/enums/enums.ts';
+import { VisibilityEnum, WorkflowStatusEnum, WorkflowTypeEnum } from '@/enums/enums.ts';
 
 /** 执行统计 */
 export interface ExecutionStats {
@@ -35,6 +35,8 @@ export interface WorkflowDetailVo extends TenantAuditingVo {
   type?: WorkflowTypeEnum;
   /** 工作流状态 */
   status?: WorkflowStatusEnum;
+  /** 可见性 */
+  visibility?: VisibilityEnum;
   /** 是否启用 */
   enabled?: boolean;
   /** 版本号 */
@@ -136,6 +138,8 @@ export interface WorkflowListVo extends TenantAuditingVo {
   type?: WorkflowTypeEnum;
   /** 工作流状态 */
   status?: WorkflowStatusEnum;
+  /** 可见性 */
+  visibility?: VisibilityEnum;
   /** 是否启用 */
   enabled?: boolean;
   /**

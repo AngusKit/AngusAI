@@ -1,5 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.workflow.facade.vo;
 
+import cloud.xcan.angus.core.ai.domain.Visibility;
 import cloud.xcan.angus.core.ai.domain.workflow.ExecutionStats;
 import cloud.xcan.angus.core.ai.domain.workflow.WorkflowStatus;
 import cloud.xcan.angus.core.ai.domain.workflow.WorkflowType;
@@ -33,6 +34,9 @@ public class WorkflowDetailVo extends TenantAuditingVo {
 
   @Schema(description = "工作流状态")
   private WorkflowStatus status;
+
+  @Schema(description = "可见性")
+  private Visibility visibility;
 
   @Schema(description = "是否启用")
   private Boolean enabled;

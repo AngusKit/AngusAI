@@ -2,7 +2,8 @@
  * 工作流模块工具函数
  */
 import type { WorkflowListVo, WorkflowStatisticsVo } from '@/services/WorkflowsTypes';
-import { WorkflowStatusEnum } from '@/enums/enums';
+import { VisibilityEnum, WorkflowStatusEnum } from '@/enums/enums';
+import { getEnumDescription } from '@/enums/utils';
 import { ICON_BG_MAP, STATUS_COLOR_MAP, STATUS_DISPLAY_MAP } from './constants';
 
 /** 列表项展示数据结构 */
@@ -15,6 +16,8 @@ export interface WorkflowDisplayItem {
   status: WorkflowStatusEnum | string;
   statusDisplay: string;
   statusColor: string;
+  visibility?: string;
+  visibilityDisplay?: string;
   calls: string;
   successRate: string;
 }
@@ -29,6 +32,7 @@ export function mapWorkflowVoToItem(vo: WorkflowListVo): WorkflowDisplayItem {
   const successRateVal = stats?.successRate != null ? Number(stats.successRate) : null;
   const iconStyle = ICON_BG_MAP[vo.iconBg ?? ''] ?? ICON_BG_MAP['bg-blue-500'];
 
+  const visibility = (vo.visibility ?? VisibilityEnum.PRIVATE) as VisibilityEnum;
   return {
     id: vo.id ?? '',
     name: vo.name ?? '',
@@ -38,6 +42,8 @@ export function mapWorkflowVoToItem(vo: WorkflowListVo): WorkflowDisplayItem {
     status,
     statusDisplay: STATUS_DISPLAY_MAP[status] ?? status,
     statusColor: STATUS_COLOR_MAP[status] ?? STATUS_COLOR_MAP[WorkflowStatusEnum.DRAFT],
+    visibility,
+    visibilityDisplay: getEnumDescription(VisibilityEnum, visibility),
     calls: `今日运行：${todayCalls} 次`,
     successRate: successRateVal != null ? `成功率：${successRateVal.toFixed(1)}%` : '--',
   };

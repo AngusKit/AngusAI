@@ -180,7 +180,12 @@ export function WorkflowGridView({ workflows, loading, actions, hasFilter = fals
                 >
                   {w.name}
                 </h3>
-                <Badge className={`text-xs ${w.statusColor} border-0`}>{w.statusDisplay}</Badge>
+                <div className='flex items-center gap-2 flex-wrap'>
+                  <Badge className={`text-xs ${w.statusColor} border-0`}>{w.statusDisplay}</Badge>
+                  {w.visibilityDisplay && (
+                    <span className='text-xs text-gray-500 dark:text-gray-400'>{w.visibilityDisplay}</span>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -189,7 +194,10 @@ export function WorkflowGridView({ workflows, loading, actions, hasFilter = fals
 
             <div className='flex items-center justify-between pt-3 mt-auto shrink-0 border-t border-gray-100 dark:border-gray-700 text-sm text-gray-500 dark:text-gray-400'>
               <span>{w.calls}</span>
-              <span>{w.successRate}</span>
+              <div className='flex items-center gap-3'>
+                <span>{w.visibilityDisplay ?? '--'}</span>
+                <span>{w.successRate}</span>
+              </div>
             </div>
           </Card>
           ))}
