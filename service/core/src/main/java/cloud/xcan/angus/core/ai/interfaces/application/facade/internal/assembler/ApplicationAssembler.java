@@ -13,6 +13,8 @@ import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDeta
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.ModelInfoVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.ApplicationConfigVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.FeaturesConfigVo;
+import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.PublishConfigVo;
+import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.SecurityConfigVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.ApplicationShareVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.ApplicationStatsVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationListVo;
@@ -125,6 +127,23 @@ public class ApplicationAssembler {
       configVo.setAgents(agents != null ? agents : java.util.List.of());
       configVo.setDefaultAgent(defaultAgent);
       CoreUtils.copyProperties(application.getConfig(), configVo);
+
+      // 关联 features、security、publish 配置
+      if (application.getConfig().getFeatures() != null) {
+        FeaturesConfigVo fvo = new FeaturesConfigVo();
+        CoreUtils.copyProperties(application.getConfig().getFeatures(), fvo);
+        configVo.setFeatures(fvo);
+      }
+      if (application.getConfig().getSecurity() != null) {
+        SecurityConfigVo svo = new SecurityConfigVo();
+        CoreUtils.copyProperties(application.getConfig().getSecurity(), svo);
+        configVo.setSecurity(svo);
+      }
+      if (application.getConfig().getPublish() != null) {
+        PublishConfigVo pvo = new PublishConfigVo();
+        CoreUtils.copyProperties(application.getConfig().getPublish(), pvo);
+        configVo.setPublish(pvo);
+      }
     }
     vo.setConfig(configVo);
 
