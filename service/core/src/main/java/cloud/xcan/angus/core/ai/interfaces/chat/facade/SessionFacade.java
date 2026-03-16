@@ -5,6 +5,7 @@ import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.SessionCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.SessionFindDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.SessionStarDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.SessionSwitchAppDto;
+import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.SessionSwitchAgentDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.SessionSwitchModelDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.SessionUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.SessionDetailVo;
@@ -35,6 +36,11 @@ public interface SessionFacade {
    * 切换模型
    */
   SessionDetailVo switchModel(String sessionId, SessionSwitchModelDto dto);
+
+  /**
+   * 切换智能体（需验证智能体已绑定到会话当前应用）
+   */
+  SessionDetailVo switchAgent(String sessionId, SessionSwitchAgentDto dto);
 
   /**
    * 收藏/取消收藏会话

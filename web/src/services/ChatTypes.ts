@@ -245,6 +245,12 @@ export interface SessionSwitchModelDto {
   modelId: string;
 }
 
+/** 切换智能体请求 */
+export interface SessionSwitchAgentDto {
+  /** 新智能体ID */
+  agentId: string;
+}
+
 /** 切换应用请求 */
 export interface SessionSwitchAppDto {
   /** 新应用ID */

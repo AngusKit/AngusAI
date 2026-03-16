@@ -6,6 +6,7 @@ import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.SessionCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.SessionFindDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.SessionStarDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.SessionSwitchAppDto;
+import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.SessionSwitchAgentDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.SessionSwitchModelDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.SessionUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.SessionDetailVo;
@@ -77,6 +78,14 @@ public class SessionRest {
       @Parameter(description = "会话ID(UUID)") @PathVariable String sessionId,
       @Valid @RequestBody SessionSwitchModelDto dto) {
     return ApiLocaleResult.success(sessionFacade.switchModel(sessionId, dto));
+  }
+
+  @Operation(operationId = "switchAgent", summary = "切换智能体", description = "切换会话使用的智能体（需验证智能体已绑定到当前应用）")
+  @PatchMapping("/{sessionId}/switch-agent")
+  public ApiLocaleResult<SessionDetailVo> switchAgent(
+      @Parameter(description = "会话ID(UUID)") @PathVariable String sessionId,
+      @Valid @RequestBody SessionSwitchAgentDto dto) {
+    return ApiLocaleResult.success(sessionFacade.switchAgent(sessionId, dto));
   }
 
   @Operation(operationId = "starSession", summary = "收藏/取消收藏会话", description = "收藏或取消收藏会话（前端显示为星标）")

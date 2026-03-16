@@ -7,6 +7,7 @@ import cloud.xcan.angus.core.ai.application.cmd.chat.SessionCmd;
 import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
 import cloud.xcan.angus.core.ai.application.query.application.ApplicationQuery;
 import cloud.xcan.angus.core.ai.application.query.chat.SessionQuery;
+import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.domain.agent.Agent;
 import cloud.xcan.angus.core.ai.domain.application.AIApplication;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRepo;
@@ -45,6 +46,9 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
 
   @Resource
   private AgentQuery agentQuery;
+
+  @Resource
+  private ModelQuery modelQuery;
 
   @Override
   @Transactional
@@ -200,6 +204,40 @@ public class SessionCmdImpl extends CommCmd<Session, Long> implements SessionCmd
       @Override
       protected Void process() {
         session.setModelId(modelId);
+        sessionRepo.save(session);
+        return null;
+      }
+    }.execute();
+  }
+
+  @Override
+  @Transactional
+  public void switchAgent(Long id, Long agentId) {
+    new BizTemplate<Void>() {
+      Session session;
+      Agent agent;
+
+      @Override
+      protected void checkParams() {
+        session = sessionQuery.findAndCheck(id);
+        Long appId = session.getAppId();
+        if (appId == null) {
+          throw ProtocolException.of("会话未关联应用，无法切换智能体");
+        }
+        List<Long> appAgentIds = applicationQuery.getAgentIds(appId);
+        if (appAgentIds == null || !appAgentIds.contains(agentId)) {
+          throw ProtocolException.of("智能体未绑定该应用");
+        }
+        agent = agentQuery.findAndCheck(agentId);
+      }
+
+      @Override
+      protected Void process() {
+        session.setAgentId(agent.getId());
+        if (nonNull(agent.getDefaultModelId())) {
+          modelQuery.findAndCheck(agent.getDefaultModelId());
+          session.setModelId(agent.getDefaultModelId());
+        }
         sessionRepo.save(session);
         return null;
       }

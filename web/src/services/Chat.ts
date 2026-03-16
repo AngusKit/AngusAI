@@ -12,6 +12,7 @@ import {
   SessionCreateDto,
   SessionDetailResult,
   SessionStarDto,
+  SessionSwitchAgentDto,
   SessionSwitchAppDto,
   SessionSwitchModelDto,
   SessionUpdateDto,
@@ -243,6 +244,24 @@ export class Chat<SecurityDataType = unknown> {
   switchModel = (sessionId: string, data: SessionSwitchModelDto, params: RequestParams = {}) =>
     this.http.request<SessionDetailResult>({
       path: `${AI}/chat/sessions/${sessionId}/switch-model`,
+      method: 'PATCH',
+      body: data,
+      secure: true,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * @description 切换会话使用的智能体（需验证智能体已绑定到当前应用）
+   *
+   * @tags 对话会话
+   * @name SwitchAgent
+   * @summary 切换智能体
+   * @request PATCH:/api/v1/chat/sessions/{sessionId}/switch-agent
+   * @secure
+   */
+  switchAgent = (sessionId: string, data: SessionSwitchAgentDto, params: RequestParams = {}) =>
+    this.http.request<SessionDetailResult>({
+      path: `${AI}/chat/sessions/${sessionId}/switch-agent`,
       method: 'PATCH',
       body: data,
       secure: true,

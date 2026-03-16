@@ -15,6 +15,7 @@ import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.SessionCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.SessionFindDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.SessionStarDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.SessionSwitchAppDto;
+import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.SessionSwitchAgentDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.SessionSwitchModelDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.SessionUpdateDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.internal.assembler.SessionAssembler;
@@ -68,6 +69,14 @@ public class SessionFacadeImpl implements SessionFacade {
   public SessionDetailVo switchModel(String sessionId, SessionSwitchModelDto dto) {
     Session session = sessionQuery.findAndCheckBySessionId(sessionId);
     sessionCmd.switchModel(session.getId(), dto.getModelId());
+    setLastMessage(List.of(session));
+    return SessionAssembler.toDetailVo(sessionQuery.findAndCheck(session.getId()));
+  }
+
+  @Override
+  public SessionDetailVo switchAgent(String sessionId, SessionSwitchAgentDto dto) {
+    Session session = sessionQuery.findAndCheckBySessionId(sessionId);
+    sessionCmd.switchAgent(session.getId(), dto.getAgentId());
     setLastMessage(List.of(session));
     return SessionAssembler.toDetailVo(sessionQuery.findAndCheck(session.getId()));
   }

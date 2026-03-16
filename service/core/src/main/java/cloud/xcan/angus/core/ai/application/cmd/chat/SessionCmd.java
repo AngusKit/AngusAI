@@ -28,6 +28,11 @@ public interface SessionCmd {
   void switchModel(Long id, Long modelId);
 
   /**
+   * 切换智能体（需验证智能体已绑定到会话当前应用）
+   */
+  void switchAgent(Long id, Long agentId);
+
+  /**
    * 收藏/取消收藏
    */
   void star(Long id, Boolean isStarred);
