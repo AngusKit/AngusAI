@@ -90,11 +90,18 @@ public class KnowledgeBaseAssembler {
     vo.setIcon(knowledgeBase.getIcon());
     vo.setIconBg(knowledgeBase.getIconBg());
     vo.setDescription(knowledgeBase.getDescription());
-    vo.setDocumentsCount(knowledgeBase.getDocumentsCount());
-    vo.setTotalSize(formatFileSize(knowledgeBase.getTotalSize()));
     vo.setEnabled(knowledgeBase.getEnabled());
     vo.setTags(knowledgeBase.getTags());
     vo.setVisibility(knowledgeBase.getVisibility());
+
+    KnowledgeBaseStatsVo stats = new KnowledgeBaseStatsVo();
+    stats.setTotalDocuments(knowledgeBase.getDocumentsCount());
+    stats.setActiveDocuments(knowledgeBase.getActiveDocuments());
+    stats.setTotalChunks(knowledgeBase.getTotalChunks());
+    stats.setAvgChunkSize(knowledgeBase.getTotalChunks() != null && knowledgeBase.getTotalChunks() > 0
+        ? knowledgeBase.getConfig().getChunkSize() : 0);
+    stats.setTotalSize(formatFileSize(knowledgeBase.getTotalSize()));
+    vo.setStats(stats);
 
     // 设置审计信息
     vo.setTenantId(knowledgeBase.getTenantId());

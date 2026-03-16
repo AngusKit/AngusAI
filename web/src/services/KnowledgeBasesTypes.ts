@@ -230,17 +230,8 @@ export interface KnowledgeBaseListVo extends TenantAuditingVo {
    * @example "存储产品相关文档和资料"
    */
   description?: string;
-  /**
-   * 文档数量
-   * @format int32
-   * @example 15
-   */
-  documentsCount?: number;
-  /**
-   * 总大小
-   * @example 2.5
-   */
-  totalSize?: string;
+  /** 统计信息 */
+  stats?: KnowledgeBaseStatsVo;
   /**
    * 是否启用
    * @example true
