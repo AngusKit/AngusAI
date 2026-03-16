@@ -164,7 +164,7 @@ export function WorkflowGridView({ workflows, loading, actions, hasFilter = fals
             </div>
 
             {/* 工作流信息 */}
-            <div className='flex items-start gap-3 mb-3'>
+            <div className='flex items-start gap-3 mb-6'>
               <div
                 className={`${w.iconBg} w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0`}
               >
@@ -189,13 +189,12 @@ export function WorkflowGridView({ workflows, loading, actions, hasFilter = fals
               </div>
             </div>
 
-            <p className='text-sm text-gray-600 dark:text-gray-400 mb-2 line-clamp-2'>{w.description}</p>
+            <p className='text-sm text-gray-600 dark:text-gray-400 line-clamp-2 '>{w.description}</p>
             </div>
 
             <div className='flex items-center justify-between pt-3 mt-auto shrink-0 border-t border-gray-100 dark:border-gray-700 text-sm text-gray-500 dark:text-gray-400'>
               <span>{w.calls}</span>
               <div className='flex items-center gap-3'>
-                <span>{w.visibilityDisplay ?? '--'}</span>
                 <span>{w.successRate}</span>
               </div>
             </div>
