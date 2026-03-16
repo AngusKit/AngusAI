@@ -277,7 +277,6 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
               : s
           )
         );
-        toast.success('对话已重命名');
       } catch (e) {
         console.error('Rename session failed:', e);
         toast.error('重命名失败');

@@ -10,7 +10,7 @@ import { SettingsDialog } from './components/SettingsDialog.tsx';
 import { ThemeDialog, CHAT_TEMPLATES, type TemplateType } from './components/ThemeDialog.tsx';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { SessionConfig } from '@/services/ChatTypes';
-import { DEFAULT_CHAT_SETTINGS } from './constants';
+import { DEFAULT_CHAT_SETTINGS, DEFAULT_SESSION_TITLE, truncateForTitle } from './constants';
 import ChatApi from '@/services/Chat';
 
 interface ChatProps {
@@ -185,6 +185,14 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     const effectiveKeyRef = { current: displayKey };
 
     try {
+      // 已有会话且为默认名称时，先重命名再发送
+      if (hasSession && (currentSession?.title?.trim() ?? '') === DEFAULT_SESSION_TITLE) {
+        const titleFromContent = truncateForTitle(userContent);
+        if (titleFromContent) {
+          await renameSession(currentSessionId!, titleFromContent);
+        }
+      }
+
       const { chatStream } = await import('@/pages/chat/hooks/useChatStream.ts');
       let accumulated = '';
       const chatPayload: import('@/services/AgentChatTypes').AgentChatRequestDto = {
@@ -211,6 +219,11 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
             });
             setSessionSelections((p) => ({ ...p, [sessionId]: chatSelection }));
             navigate(`/chat/${sessionId}`);
+            // 新会话默认名为「新对话」，用首条消息重命名
+            const titleFromContent = truncateForTitle(userContent);
+            if (titleFromContent) {
+              renameSession(sessionId, titleFromContent).catch(() => {});
+            }
           }
         },
         onToken: (() => {
