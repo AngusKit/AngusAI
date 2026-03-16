@@ -447,17 +447,24 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
       private ApplicationStatsVo buildStatsVo(Long appId, LocalDateTime start, LocalDateTime end) {
         Object[] row = apiUsageLogRepo.getAppOverviewStats(appId, start, end);
         ApplicationStatsVo vo = new ApplicationStatsVo();
-        if (row == null || row.length < 5) {
+        // JPQL 聚合可能返回 Object[1]{Object[5]} 的嵌套结构，需解包
+        if (row[0] == null) {
+          vo.setTotalApiCalls(0L);
+          vo.setTotalTokens(0L);
+          vo.setAvgResponseTime(0.0);
+          vo.setSuccessRate(0.0);
           return vo;
         }
-        Long totalCalls = row[0] != null ? ((Number) row[0]).longValue() : 0L;
-        Long successfulCalls = row[1] != null ? ((Number) row[1]).longValue() : 0L;
-        Long totalTokens = row[2] != null ? ((Number) row[2]).longValue() : 0L;
-        Double avgResponseTime = row[4] != null ? ((Number) row[4]).doubleValue() : null;
+
+        Object[] data = (Object[]) row[0];
+        long totalCalls = data[0] != null ? ((Number) data[0]).longValue() : 0L;
+        long successfulCalls = data[1] != null ? ((Number) data[1]).longValue() : 0L;
+        Long totalTokens = data[2] != null ? ((Number) data[2]).longValue() : 0L;
+        Double avgResponseTime = data[4] != null ? ((Number) data[4]).doubleValue()  / 1000 : null;
         Double successRate = totalCalls > 0 ? (successfulCalls * 1.0 / totalCalls) : null;
 
         vo.setTotalApiCalls(totalCalls);
-        vo.setTotalTokens(totalTokens != null ? totalTokens : 0L);
+        vo.setTotalTokens(totalTokens);
         vo.setAvgResponseTime(avgResponseTime);
         vo.setSuccessRate(successRate);
         return vo;

@@ -273,24 +273,26 @@ public class ApplicationQueryImpl implements ApplicationQuery {
       LocalDateTime end) {
     Object[] row = apiUsageLogRepo.getAppOverviewStats(appId, start, end);
     ApplicationStatisticsVo.OverviewStatsVo overview = new ApplicationStatisticsVo.OverviewStatsVo();
-    if (row != null && row.length >= 5) {
-      long totalCalls = row[0] != null ? ((Number) row[0]).longValue() : 0;
-      long successfulCalls = row[1] != null ? ((Number) row[1]).longValue() : 0;
-      long totalTokens = row[2] != null ? ((Number) row[2]).longValue() : 0;
-      int costCents = row[3] != null ? ((Number) row[3]).intValue() : 0;
-      Double avgResponseTime = row[4] != null ? ((Number) row[4]).doubleValue() : null;
+    // JPQL 聚合可能返回 Object[1]{Object[5]} 的嵌套结构，需解包
+    if (row[0] == null) {
+      overview.setTotalCalls(0L);
+      overview.setTotalTokens(0L);
+      overview.setTotalCost(0.0);
+      overview.setAvgResponseTime(0.0);
+      overview.setSuccessRate(0.0);
+    } else {
+      Object[] data = (Object[]) row[0];
+      long totalCalls = data[0] != null ? ((Number) data[0]).longValue() : 0;
+      long successfulCalls = data[1] != null ? ((Number) data[1]).longValue() : 0;
+      long totalTokens = data[2] != null ? ((Number) data[2]).longValue() : 0;
+      int costCents = data[3] != null ? ((Number) data[3]).intValue() : 0;
+      Double avgResponseTime = data[4] != null ? ((Number) data[4]).doubleValue() / 1000 : null;
 
       overview.setTotalCalls(totalCalls);
       overview.setTotalTokens(totalTokens);
       overview.setTotalCost(costCents / 100.0);
       overview.setAvgResponseTime(avgResponseTime);
       overview.setSuccessRate(totalCalls > 0 ? successfulCalls * 100.0 / totalCalls : 0.0);
-    } else {
-      overview.setTotalCalls(0L);
-      overview.setTotalTokens(0L);
-      overview.setTotalCost(0.0);
-      overview.setAvgResponseTime(0.0);
-      overview.setSuccessRate(0.0);
     }
     vo.setOverview(overview);
   }

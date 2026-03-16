@@ -219,7 +219,7 @@ public class ApplicationDetailVo extends TenantAuditingVo {
     @Schema(description = "总token数")
     private Long totalTokens;
 
-    @Schema(description = "平均响应时间")
+    @Schema(description = "平均响应时间（秒）")
     private Double avgResponseTime;
 
     @Schema(description = "成功率")
