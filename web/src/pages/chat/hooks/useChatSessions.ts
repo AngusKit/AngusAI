@@ -226,10 +226,17 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
     []
   );
 
+  const deletingRef = useRef<Set<string>>(new Set());
+  /** 刚删除的会话 id，用于 ensureSessionLoaded 跳过 getSessionDetail，避免删除后 effect 用旧 URL 请求已删会话 */
+  const recentlyDeletedRef = useRef<Set<string>>(new Set());
+
   const deleteSession = useCallback(
     async (sessionId: string) => {
       const session = sessions.find((s) => s.sessionId === sessionId || s.id === sessionId);
       const sid = session?.sessionId ?? sessionId;
+      if (deletingRef.current.has(sid)) return;
+      deletingRef.current.add(sid);
+      recentlyDeletedRef.current.add(sid);
       try {
         await Chat.deleteSession(sid);
         setSessions((prev) => prev.filter((s) => s.sessionId !== sid && s.id !== sid));
@@ -248,6 +255,8 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
       } catch (e) {
         console.error('Delete session failed:', e);
         toast.error('删除会话失败');
+      } finally {
+        deletingRef.current.delete(sid);
       }
     },
     [sessions, currentSessionId]
@@ -257,12 +266,14 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
     async (sessionId: string, newTitle: string) => {
       const session = sessions.find((s) => s.sessionId === sessionId || s.id === sessionId);
       const sid = session?.sessionId ?? sessionId;
+      const trimmed = newTitle.trim();
+      if (!trimmed || trimmed === (session?.title ?? '').trim()) return;
       try {
-        await Chat.updateSession(sid, { title: newTitle });
+        await Chat.updateSession(sid, { title: trimmed });
         setSessions((prev) =>
           prev.map((s) =>
             (s.sessionId === sessionId || s.id === sessionId)
-              ? { ...s, title: newTitle, updatedAt: new Date() }
+              ? { ...s, title: trimmed, updatedAt: new Date() }
               : s
           )
         );
@@ -417,6 +428,10 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
   /** 通过 URL 直接进入会话时，若会话不在列表中则拉取详情并加入列表 */
   const ensureSessionLoaded = useCallback(
     async (sessionId: string): Promise<Session | null> => {
+      if (recentlyDeletedRef.current.has(sessionId)) {
+        recentlyDeletedRef.current.delete(sessionId);
+        return null;
+      }
       const existing = sessions.find((s) => s.sessionId === sessionId || s.id === sessionId);
       if (existing) return existing;
       try {

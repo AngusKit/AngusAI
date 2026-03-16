@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { toast } from 'sonner';
-import { refreshResourcesBadge } from '@/hooks/useResourcesBadge';
 import { ChatSidebar } from './components/ChatSidebar.tsx';
 import { ChatMainArea } from './components/ChatMainArea.tsx';
 import { useChatSessions, type Message } from './hooks/useChatSessions';
@@ -65,6 +64,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
   const isComposingRef = useRef(false);
   const lastCompositionEndRef = useRef(0);
   const scrollAfterSendRef = useRef(false);
+  const lastDeleteRef = useRef<{ id: string; t: number }>({ id: '', t: 0 });
 
   const handleBack = () => {
     onBack ? onBack() : navigate('/dashboard');
@@ -390,14 +390,28 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     }
   };
 
-  const handleDeleteSession = (sessionId: string) => {
-    if (sessions.length <= 1) {
-      toast.error('至少需要保留一个对话');
-      return;
-    }
-    deleteSession(sessionId);
-    refreshResourcesBadge();
-  };
+  const handleDeleteSession = useCallback(
+    async (sessionId: string) => {
+      if (sessions.length <= 1) {
+        toast.error('至少需要保留一个对话');
+        return;
+      }
+      const now = Date.now();
+      if (lastDeleteRef.current.id === sessionId && now - lastDeleteRef.current.t < 1500) return;
+      lastDeleteRef.current = { id: sessionId, t: now };
+      // 若删除的是当前会话，必须先更新 URL 再执行删除，否则 deleteSession 的 setState 会先触发重渲染，
+      // effect 仍读取到旧的 sessionIdFromUrl，从而调用 ensureSessionLoaded(已删id) -> getSessionDetail
+      const isDeletingCurrent = sessionId === currentSessionId;
+      const nextSessionId = isDeletingCurrent
+        ? sessions.filter(s => s.sessionId !== sessionId && s.id !== sessionId)[0]?.sessionId
+        : null;
+      if (isDeletingCurrent) {
+        navigate(nextSessionId ? `/chat/${nextSessionId}` : '/chat', { replace: true });
+      }
+      await deleteSession(sessionId);
+    },
+    [sessions, currentSessionId, deleteSession, navigate]
+  );
 
   const updateSessionSelection = (s: ChatSwitcherSelection) => {
     // 仅当会话列表已加载完毕且确认为空时，才自动创建会话（避免 loadApps 先于 loadSessions 完成时误创建）

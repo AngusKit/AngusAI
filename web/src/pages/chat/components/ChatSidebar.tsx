@@ -58,6 +58,8 @@ export function ChatSidebar({
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
   const sessionListRef = useRef<HTMLDivElement>(null);
+  /** 防止 Radix onSelect 重复触发导致删除接口调用两次 */
+  const deleteGuardRef = useRef<{ id: string; t: number }>({ id: '', t: 0 });
 
   // 内容未超出时无法滚动，需在布局完成后检测并加载下一页
   useEffect(() => {
@@ -112,9 +114,10 @@ export function ChatSidebar({
     setRenameValue(currentTitle);
   };
 
-  const submitRename = (sessionId: string) => {
-    if (renameValue.trim()) {
-      onRenameSession(sessionId, renameValue.trim());
+  const submitRename = (sessionId: string, currentTitle: string) => {
+    const newTitle = renameValue.trim();
+    if (newTitle && newTitle !== currentTitle.trim()) {
+      onRenameSession(sessionId, newTitle);
     }
     setRenamingId(null);
     setRenameValue('');
@@ -139,12 +142,13 @@ export function ChatSidebar({
             onChange={e => setRenameValue(e.target.value)}
             onKeyDown={e => {
               if (e.key === 'Enter') {
-                submitRename(session.id);
+                submitRename(session.id, session.title);
               } else if (e.key === 'Escape') {
                 setRenamingId(null);
+                setRenameValue('');
               }
             }}
-            onBlur={() => submitRename(session.id)}
+            onBlur={() => submitRename(session.id, session.title)}
             className='h-7 text-sm'
             autoFocus
             onClick={e => e.stopPropagation()}
@@ -190,9 +194,13 @@ export function ChatSidebar({
           </DropdownMenuItem>
           <DropdownMenuItem
             className='text-red-600 dark:text-red-400'
-            onClick={e => {
+            onSelect={e => {
               e.stopPropagation();
-              onDeleteSession(session.id);
+              const id = session.id;
+              const now = Date.now();
+              if (deleteGuardRef.current.id === id && now - deleteGuardRef.current.t < 800) return;
+              deleteGuardRef.current = { id, t: now };
+              onDeleteSession(id);
             }}
           >
             <Trash2 className='w-4 h-4 mr-2' />
