@@ -116,31 +116,6 @@ public class KnowledgeBaseFacadeImpl implements KnowledgeBaseFacade {
   }
 
   /**
-   * 根据知识库ID批量统计文档数据并填充到实体
-   */
-  private void fillStats(List<KnowledgeBase> knowledgeBases) {
-    if (knowledgeBases == null || knowledgeBases.isEmpty()) {
-      return;
-    }
-    List<Long> ids = knowledgeBases.stream().map(KnowledgeBase::getId).filter(Objects::nonNull)
-        .toList();
-    if (ids.isEmpty()) {
-      return;
-    }
-    Map<Long, KnowledgeBaseDocStats> statsMap = knowledgeBaseDocQuery.getStatsByKnowledgeBaseIds(
-        ids);
-    for (KnowledgeBase kb : knowledgeBases) {
-      KnowledgeBaseDocStats stats = statsMap.get(kb.getId());
-      if (stats != null) {
-        kb.setDocumentsCount(stats.getDocumentsCount());
-        kb.setTotalSize(stats.getTotalSize());
-        kb.setTotalChunks(stats.getTotalChunks());
-        kb.setActiveDocuments(stats.getActiveDocuments());
-      }
-    }
-  }
-
-  /**
    * 获取知识库统计信息
    *
    * @param dto 统计参数
@@ -286,7 +261,8 @@ public class KnowledgeBaseFacadeImpl implements KnowledgeBaseFacade {
       long fileCount = stats != null ? stats.getDocumentsCount() : 0L;
       long chunkCount = stats != null ? stats.getTotalChunks() : 0L;
 
-      KnowledgeBaseStatisticsVo.TopKnowledgeBase topKnowledgeBase = new KnowledgeBaseStatisticsVo.TopKnowledgeBase();
+      KnowledgeBaseStatisticsVo.TopKnowledgeBase topKnowledgeBase
+          = new KnowledgeBaseStatisticsVo.TopKnowledgeBase();
       topKnowledgeBase.setId(knowledgeBaseId);
       topKnowledgeBase.setName(knowledgeBase.getName());
       topKnowledgeBase.setQueryCount(queryCountMap.get(knowledgeBaseId));
@@ -333,4 +309,32 @@ public class KnowledgeBaseFacadeImpl implements KnowledgeBaseFacade {
     }
     return trends;
   }
+
+  /**
+   * 根据知识库ID批量统计文档数据并填充到实体
+   */
+  private void fillStats(List<KnowledgeBase> knowledgeBases) {
+    if (knowledgeBases == null || knowledgeBases.isEmpty()) {
+      return;
+    }
+    List<Long> ids = knowledgeBases.stream()
+        .map(KnowledgeBase::getId)
+        .filter(Objects::nonNull)
+        .toList();
+    if (ids.isEmpty()) {
+      return;
+    }
+    Map<Long, KnowledgeBaseDocStats> statsMap
+        = knowledgeBaseDocQuery.getStatsByKnowledgeBaseIds(ids);
+    for (KnowledgeBase kb : knowledgeBases) {
+      KnowledgeBaseDocStats stats = statsMap.get(kb.getId());
+      if (stats != null) {
+        kb.setDocumentsCount(stats.getDocumentsCount());
+        kb.setTotalSize(stats.getTotalSize());
+        kb.setTotalChunks(stats.getTotalChunks());
+        kb.setActiveDocuments(stats.getActiveDocuments());
+      }
+    }
+  }
+
 }

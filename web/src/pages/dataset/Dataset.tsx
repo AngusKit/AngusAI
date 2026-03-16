@@ -251,8 +251,8 @@ export function Dataset() {
     const type = vo.type || DatasetTypeEnum.FILE;
     const typeLabelKey = type === DatasetTypeEnum.FILE ? t('dataset.types.file') : t('dataset.types.datasource');
 
-    const dataCount = vo.dataStatistics?.totalFilesOrTables ? String(vo.dataStatistics.totalFilesOrTables) : '0';
-    const size = vo.dataStatistics?.totalRecordsSize || '0';
+    const dataCount = vo.stats?.totalFilesOrTables ? String(vo.stats.totalFilesOrTables) : '0';
+    const size = vo.stats?.totalRecordsSize || '0';
     const createdDate = vo.createdDate || '';
     const modifiedDate = vo.modifiedDate || '';
     const creator = vo.creator ? vo.creator : '';
@@ -414,10 +414,10 @@ export function Dataset() {
         // 更新viewingDataset的详细信息
         setViewingDataset({
           ...dataset,
-          dataCount: detail.dataStatistics?.totalFilesOrTables
-            ? String(detail.dataStatistics.totalFilesOrTables)
+          dataCount: detail.stats?.totalFilesOrTables
+            ? String(detail.stats.totalFilesOrTables)
             : dataset.dataCount,
-          size: detail.dataStatistics?.totalRecordsSize || dataset.size,
+          size: detail.stats?.totalRecordsSize || dataset.size,
         });
       }
     } catch (error: any) {
@@ -1658,22 +1658,22 @@ export function Dataset() {
             <div className='flex items-start justify-between mb-4'>
               <div className='flex items-center gap-4'>
                 <div className='bg-blue-500 w-14 h-14 rounded-xl flex items-center justify-center text-3xl'>
-                  {datasetDetail.datasourceConfig?.databaseType === DatasourceTypeEnum.MySQL
+                  {datasetDetail.config?.databaseType === DatasourceTypeEnum.MySQL
                     ? '🐬'
-                    : datasetDetail.datasourceConfig?.databaseType === DatasourceTypeEnum.PostgreSQL
+                    : datasetDetail.config?.databaseType === DatasourceTypeEnum.PostgreSQL
                       ? '🐘'
-                      : datasetDetail.datasourceConfig?.databaseType === DatasourceTypeEnum.SQLServer
+                      : datasetDetail.config?.databaseType === DatasourceTypeEnum.SQLServer
                         ? '🔷'
-                        : datasetDetail.datasourceConfig?.databaseType === DatasourceTypeEnum.Oracle
+                        : datasetDetail.config?.databaseType === DatasourceTypeEnum.Oracle
                           ? '🔴'
                           : '🔌'}
                 </div>
                 <div>
                   <h2 className='text-xl dark:text-white mb-1'>
-                    {datasetDetail.datasourceConfig?.name || t('dataset.datasource.header.defaultName')}
+                    {datasetDetail.config?.name || t('dataset.datasource.header.defaultName')}
                   </h2>
                   <p className='text-sm text-gray-600 dark:text-gray-400'>
-                    {datasetDetail.datasourceConfig?.jdbcUrl || t('dataset.datasource.header.noJdbcUrl')}
+                    {datasetDetail.config?.jdbcUrl || t('dataset.datasource.header.noJdbcUrl')}
                   </p>
                   <div className='flex items-center gap-3 mt-2'>
                     <Badge className='text-xs bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-0'>
@@ -1726,7 +1726,7 @@ export function Dataset() {
                 <div className='text-sm text-gray-600 dark:text-gray-400 mb-1'>
                   {t('dataset.datasource.stats.databaseSize')}
                 </div>
-                <div className='text-2xl dark:text-white'>{datasetDetail.dataStatistics?.usedStoreSize || '0 MB'}</div>
+                <div className='text-2xl dark:text-white'>{datasetDetail.stats?.usedStoreSize || '0 MB'}</div>
               </Card>
               <Card className='p-4 dark:bg-gray-800 dark:border-gray-700'>
                 <div className='text-sm text-gray-600 dark:text-gray-400 mb-1'>
@@ -1741,8 +1741,8 @@ export function Dataset() {
                   {t('dataset.datasource.stats.totalRecords')}
                 </div>
                 <div className='text-2xl dark:text-white'>
-                  {datasetDetail.dataStatistics?.totalRecords
-                    ? formatToHumanString(datasetDetail.dataStatistics.totalRecords)
+                  {datasetDetail.stats?.totalRecords
+                    ? formatToHumanString(datasetDetail.stats.totalRecords)
                     : '0'}
                 </div>
               </Card>

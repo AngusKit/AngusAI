@@ -4,6 +4,7 @@ import cloud.xcan.angus.core.ai.domain.knowledgebase.KnowledgeBaseDoc;
 import cloud.xcan.angus.core.ai.domain.knowledgebase.KnowledgeBaseDocSearchResult;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import java.util.List;
+import java.util.Map;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -27,23 +28,17 @@ public interface KnowledgeBaseDocQuery {
       Integer limit, Double threshold);
 
   /**
-   * 检查知识库下是否存在同名文件
-   */
-  boolean existsByKnowledgeBaseIdAndName(Long knowledgeBaseId, String fileName);
-
-  /**
-   * 批量根据知识库ID统计文档数 返回 List<Object[]> [knowledgeBaseId, docCount]
-   */
-  List<Object[]> countByKnowledgeBaseIds(List<Long> knowledgeBaseIds);
-
-  /**
    * 批量根据知识库ID统计文档数据（文档数、已启用数、总大小、分段数）
    *
    * @param knowledgeBaseIds 知识库ID列表
    * @return 知识库ID -> 统计信息 的映射
    */
-  java.util.Map<Long, KnowledgeBaseDocStats> getStatsByKnowledgeBaseIds(
-      List<Long> knowledgeBaseIds);
+  Map<Long, KnowledgeBaseDocStats> getStatsByKnowledgeBaseIds(List<Long> knowledgeBaseIds);
+
+  /**
+   * 检查知识库下是否存在同名文件
+   */
+  boolean existsByKnowledgeBaseIdAndName(Long knowledgeBaseId, String fileName);
 
   /**
    * 统计存储总大小

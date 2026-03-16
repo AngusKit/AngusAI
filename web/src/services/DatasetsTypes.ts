@@ -54,9 +54,9 @@ export interface DatasetDetailVo extends TenantAuditingVo {
   /** 标签 */
   tags?: string[];
   /** 数据源配置信息 */
-  datasourceConfig?: DatasourceConfigVo;
+  config?: DatasourceConfigVo;
   /** 统计信息 */
-  dataStatistics?: DatasetDataStatisticsVo;
+  stats?: DatasetDataStatisticsVo;
 }
 
 /** The API response result of supporting international message. */
@@ -243,9 +243,9 @@ export interface DatasetListVo extends TenantAuditingVo {
   /** 标签 */
   tags?: string[];
   /** 数据源配置信息 */
-  datasourceConfig?: DatasourceConfigVo;
+  config?: DatasourceConfigVo;
   /** 统计信息 */
-  dataStatistics?: DatasetDataStatisticsVo;
+  stats?: DatasetDataStatisticsVo;
 }
 
 export interface PageResultDatasetListVo {

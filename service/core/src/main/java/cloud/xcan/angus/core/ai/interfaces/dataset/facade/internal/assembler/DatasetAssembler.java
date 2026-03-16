@@ -116,10 +116,10 @@ public class DatasetAssembler {
     vo.setTags(dataset.getTags());
 
     // 设置数据源配置
-    vo.setDatasourceConfig(toDatasourceConfigVo(dataset.getConfig()));
+    vo.setConfig(toDatasourceConfigVo(dataset.getConfig()));
 
     // 设置统计信息
-    vo.setDataStatistics(toDatasetDataStatisticsVo(dataset));
+    vo.setStats(toDatasetDataStatisticsVo(dataset));
 
     // 设置审计信息
     vo.setTenantId(dataset.getTenantId());
@@ -143,7 +143,7 @@ public class DatasetAssembler {
     vo.setTags(dataset.getTags());
 
     // 设置统计信息
-    vo.setDataStatistics(toDatasetDataStatisticsVo(dataset));
+    vo.setStats(toDatasetDataStatisticsVo(dataset));
 
     // 设置审计信息
     vo.setTenantId(dataset.getTenantId());

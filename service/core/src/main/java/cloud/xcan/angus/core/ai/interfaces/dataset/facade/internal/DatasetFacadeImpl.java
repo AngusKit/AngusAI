@@ -8,6 +8,8 @@ import static cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder.getMatchS
 import static cloud.xcan.angus.core.utils.CoreUtils.buildVoPageResult;
 
 import cloud.xcan.angus.core.ai.application.cmd.dataset.DatasetCmd;
+import cloud.xcan.angus.core.ai.application.query.dataset.DatasetDataQuery;
+import cloud.xcan.angus.core.ai.application.query.dataset.DatasetDataStats;
 import cloud.xcan.angus.core.ai.application.query.dataset.DatasetQuery;
 import cloud.xcan.angus.core.ai.application.query.dataset.DatasetUsageLogQuery;
 import cloud.xcan.angus.core.ai.domain.Visibility;
@@ -59,6 +61,9 @@ public class DatasetFacadeImpl implements DatasetFacade {
   @Resource
   private DatasetDataRepo datasetDataRepo;
 
+  @Resource
+  private DatasetDataQuery datasetDataQuery;
+
   private static final int TOP_N = 10;
   private static final int DEFAULT_MONTHS = 1; // 默认统计近一月
 
@@ -67,6 +72,7 @@ public class DatasetFacadeImpl implements DatasetFacade {
   public DatasetDetailVo create(DatasetCreateDto dto) {
     Dataset dataset = DatasetAssembler.toCreateDomain(dto);
     Dataset saved = datasetCmd.create(dataset);
+    fillStats(List.of(saved));
     return DatasetAssembler.toDetailVo(saved);
   }
 
@@ -75,6 +81,7 @@ public class DatasetFacadeImpl implements DatasetFacade {
   public DatasetDetailVo update(Long id, DatasetUpdateDto dto) {
     Dataset dataset = DatasetAssembler.toUpdateDomain(id, dto);
     Dataset saved = datasetCmd.update(dataset);
+    fillStats(List.of(saved));
     return DatasetAssembler.toDetailVo(saved);
   }
 
@@ -82,6 +89,7 @@ public class DatasetFacadeImpl implements DatasetFacade {
   @Override
   public DatasetDetailVo toggle(Long id, DatasetToggleDto dto) {
     Dataset saved = datasetCmd.toggle(id, dto.getEnabled());
+    fillStats(List.of(saved));
     return DatasetAssembler.toDetailVo(saved);
   }
 
@@ -89,6 +97,7 @@ public class DatasetFacadeImpl implements DatasetFacade {
   @Override
   public DatasetDetailVo modifyVisibility(Long id, Visibility visibility) {
     Dataset saved = datasetCmd.modifyVisibility(id, visibility);
+    fillStats(List.of(saved));
     return DatasetAssembler.toDetailVo(saved);
   }
 
@@ -120,6 +129,7 @@ public class DatasetFacadeImpl implements DatasetFacade {
   @Override
   public DatasetDetailVo getDetail(Long id) {
     Dataset dataset = datasetQuery.findAndCheck(id);
+    fillStats(List.of(dataset));
     return DatasetAssembler.toDetailVo(dataset);
   }
 
@@ -129,6 +139,7 @@ public class DatasetFacadeImpl implements DatasetFacade {
     GenericSpecification<Dataset> spec = DatasetAssembler.getSpecification(dto);
     Page<Dataset> page = datasetQuery.find(spec, dto.tranPage(),
         dto.fullTextSearch, getMatchSearchFields(dto.getClass()));
+    fillStats(page.getContent());
     return buildVoPageResult(page, DatasetAssembler::toListVo);
   }
 
@@ -344,4 +355,28 @@ public class DatasetFacadeImpl implements DatasetFacade {
     }
     return trends;
   }
+
+  /**
+   * 根据数据集ID批量统计数据并填充到实体
+   */
+  private void fillStats(List<Dataset> datasets) {
+    if (datasets == null || datasets.isEmpty()) {
+      return;
+    }
+    List<Long> ids = datasets.stream().map(Dataset::getId).filter(Objects::nonNull).toList();
+    if (ids.isEmpty()) {
+      return;
+    }
+    Map<Long, DatasetDataStats> statsMap = datasetDataQuery.getStatsByDatasetIds(ids);
+    for (Dataset ds : datasets) {
+      DatasetDataStats stats = statsMap.get(ds.getId());
+      if (stats != null) {
+        ds.setTotalFilesOrTables(stats.getTotalFilesOrTables());
+        ds.setTotalRecords(stats.getTotalRecords());
+        ds.setTotalRecordsSize(stats.getTotalRecordsSize());
+        ds.setUsedStoreSize(stats.getTotalRecordsSize()); // usedStoreSize 与 totalRecordsSize 相同
+      }
+    }
+  }
+
 }

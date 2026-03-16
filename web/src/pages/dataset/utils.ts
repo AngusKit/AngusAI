@@ -58,8 +58,8 @@ export interface DatabaseTable {
  */
 export function convertDatasetVoToItem(vo: DatasetListVo): DatasetItem {
 
-  const dataCount = vo.dataStatistics?.totalFilesOrTables ? String(vo.dataStatistics.totalFilesOrTables) : '0';
-  const size = vo.dataStatistics?.totalRecordsSize || '0';
+  const dataCount = vo.stats?.totalFilesOrTables ? String(vo.stats.totalFilesOrTables) : '0';
+  const size = vo.stats?.totalRecordsSize || '0';
   const createdDate = vo.createdDate || '';
   const modifiedDate = vo.modifiedDate || '';
   const creator = vo.creator ? vo.creator : '';

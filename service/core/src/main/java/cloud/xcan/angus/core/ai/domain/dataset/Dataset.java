@@ -84,21 +84,14 @@ public class Dataset extends TenantAuditingEntity<Dataset, Long> {
   @Column(name = "error_count")
   private Long errorCount = 0L;
 
-  // 统计数据
-  @Schema(description = "总文件或表数")
-  @Column(name = "total_files_or_tables")
+  // 统计数据（临时字段，由门面层通过 DatasetDataQuery 批量统计填充）
+  @Transient
   private long totalFilesOrTables;
-
-  @Schema(description = "总记录数")
-  @Column(name = "total_records")
+  @Transient
   private long totalRecords;
-
-  @Schema(description = "记录总大小")
-  @Column(name = "total_records_size")
+  @Transient
   private long totalRecordsSize;
-
-  @Schema(description = "已使用存储空间大小")
-  @Column(name = "used_store_size")
+  @Transient
   private long usedStoreSize;
 
   @Transient

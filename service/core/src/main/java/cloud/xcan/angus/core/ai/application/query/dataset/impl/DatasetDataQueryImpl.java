@@ -1,6 +1,7 @@
 package cloud.xcan.angus.core.ai.application.query.dataset.impl;
 
 import cloud.xcan.angus.core.ai.application.query.dataset.DatasetDataQuery;
+import cloud.xcan.angus.core.ai.application.query.dataset.DatasetDataStats;
 import cloud.xcan.angus.core.ai.application.query.dataset.DatasetQuery;
 import cloud.xcan.angus.core.ai.domain.dataset.Dataset;
 import cloud.xcan.angus.core.ai.domain.dataset.DatasetData;
@@ -11,6 +12,9 @@ import cloud.xcan.angus.core.ai.infra.util.DatasourceUtils.TableDataResult;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import jakarta.annotation.Resource;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.lang.Nullable;
@@ -37,6 +41,32 @@ public class DatasetDataQueryImpl implements DatasetDataQuery {
         return fullTextSearch
             ? datasetDataSearchRepo.find(spec.getCriteria(), pageable, DatasetData.class, match)
             : datasetDataRepo.findAll(spec, pageable);
+      }
+    }.execute();
+  }
+
+  @Override
+  public Map<Long, DatasetDataStats> getStatsByDatasetIds(List<Long> datasetIds) {
+    return new BizTemplate<Map<Long, DatasetDataStats>>() {
+      @Override
+      protected Map<Long, DatasetDataStats> process() {
+        if (datasetIds == null || datasetIds.isEmpty()) {
+          return new HashMap<>();
+        }
+        List<Object[]> rows = datasetDataRepo.getStatsByDatasetIds(datasetIds);
+        Map<Long, DatasetDataStats> result = new HashMap<>();
+        for (Object[] row : rows) {
+          Long datasetId = row[0] == null ? null : ((Number) row[0]).longValue();
+          if (datasetId == null) {
+            continue;
+          }
+          long totalFilesOrTables = row[1] == null ? 0 : ((Number) row[1]).longValue();
+          long totalRecords = row[2] == null ? 0 : ((Number) row[2]).longValue();
+          long totalRecordsSize = row[3] == null ? 0 : ((Number) row[3]).longValue();
+          result.put(datasetId,
+              new DatasetDataStats(datasetId, totalFilesOrTables, totalRecords, totalRecordsSize));
+        }
+        return result;
       }
     }.execute();
   }

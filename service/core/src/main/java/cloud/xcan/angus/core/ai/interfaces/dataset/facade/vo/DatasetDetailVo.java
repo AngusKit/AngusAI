@@ -41,8 +41,8 @@ public class DatasetDetailVo extends TenantAuditingVo {
   private List<String> tags;
 
   @Schema(description = "数据源配置信息")
-  private DatasourceConfigVo datasourceConfig;
+  private DatasourceConfigVo config;
 
   @Schema(description = "统计信息")
-  private DatasetDataStatsVo dataStatistics;
+  private DatasetDataStatsVo stats;
 }

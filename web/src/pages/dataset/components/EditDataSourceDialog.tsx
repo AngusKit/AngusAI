@@ -59,8 +59,8 @@ export function EditDataSourceDialog({
       const response = await Datasets.getDatasetDetail(datasetId);
       const responseData = (response as any).data;
 
-      if (responseData?.datasourceConfig) {
-        loadFromConfig(responseData.datasourceConfig);
+      if (responseData?.config) {
+        loadFromConfig(responseData.config);
       } else {
         resetForm();
       }

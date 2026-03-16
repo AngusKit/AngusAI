@@ -70,6 +70,33 @@ public class KnowledgeBaseDocQueryImpl implements KnowledgeBaseDocQuery {
   }
 
   @Override
+  public Map<Long, KnowledgeBaseDocStats> getStatsByKnowledgeBaseIds(List<Long> knowledgeBaseIds) {
+    return new BizTemplate<Map<Long, KnowledgeBaseDocStats>>() {
+      @Override
+      protected Map<Long, KnowledgeBaseDocStats> process() {
+        if (knowledgeBaseIds == null || knowledgeBaseIds.isEmpty()) {
+          return new HashMap<>();
+        }
+        List<Object[]> rows = knowledgeBaseDocRepo.getStatsByKnowledgeBaseIds(knowledgeBaseIds);
+        Map<Long, KnowledgeBaseDocStats> result = new HashMap<>();
+        for (Object[] row : rows) {
+          Long kbId = row[0] == null ? null : ((Number) row[0]).longValue();
+          if (kbId == null) {
+            continue;
+          }
+          int docCount = row[1] == null ? 0 : ((Number) row[1]).intValue();
+          int activeCount = row[2] == null ? 0 : ((Number) row[2]).intValue();
+          long totalSize = row[3] == null ? 0L : ((Number) row[3]).longValue();
+          int totalChunks = row[4] == null ? 0 : ((Number) row[4]).intValue();
+          result.put(kbId,
+              new KnowledgeBaseDocStats(kbId, docCount, activeCount, totalSize, totalChunks));
+        }
+        return result;
+      }
+    }.execute();
+  }
+
+  @Override
   public boolean existsByKnowledgeBaseIdAndName(Long knowledgeBaseId, String fileName) {
     return knowledgeBaseDocRepo.existsByKnowledgeBaseIdAndName(knowledgeBaseId, fileName);
   }
@@ -83,28 +110,6 @@ public class KnowledgeBaseDocQueryImpl implements KnowledgeBaseDocQuery {
     return statsMap.entrySet().stream()
         .map(e -> new Object[]{e.getKey(), (long) e.getValue().getDocumentsCount()})
         .toList();
-  }
-
-  @Override
-  public Map<Long, KnowledgeBaseDocStats> getStatsByKnowledgeBaseIds(List<Long> knowledgeBaseIds) {
-    if (knowledgeBaseIds == null || knowledgeBaseIds.isEmpty()) {
-      return new HashMap<>();
-    }
-    List<Object[]> rows = knowledgeBaseDocRepo.getStatsByKnowledgeBaseIds(knowledgeBaseIds);
-    Map<Long, KnowledgeBaseDocStats> result = new HashMap<>();
-    for (Object[] row : rows) {
-      Long kbId = row[0] == null ? null : ((Number) row[0]).longValue();
-      if (kbId == null) {
-        continue;
-      }
-      int docCount = row[1] == null ? 0 : ((Number) row[1]).intValue();
-      int activeCount = row[2] == null ? 0 : ((Number) row[2]).intValue();
-      long totalSize = row[3] == null ? 0L : ((Number) row[3]).longValue();
-      int totalChunks = row[4] == null ? 0 : ((Number) row[4]).intValue();
-      result.put(kbId,
-          new KnowledgeBaseDocStats(kbId, docCount, activeCount, totalSize, totalChunks));
-    }
-    return result;
   }
 
   @Override

@@ -50,4 +50,11 @@ public interface DatasetDataRepo extends BaseRepository<DatasetData, Long> {
       "WHERE dd.datasetId IN :datasetIds GROUP BY dd.datasetId")
   List<Object[]> sumRecordsByDatasetIds(@Param("datasetIds") List<Long> datasetIds);
 
+  /**
+   * 按数据集ID批量统计 返回 List&lt;Object[]&gt; [datasetId, totalFilesOrTables, totalRecords, totalRecordsSize]
+   */
+  @Query("SELECT dd.datasetId, COUNT(dd), COALESCE(SUM(dd.dataCount), 0), COALESCE(SUM(dd.dataSize), 0) "
+      + "FROM DatasetData dd WHERE dd.datasetId IN :ids GROUP BY dd.datasetId")
+  List<Object[]> getStatsByDatasetIds(@Param("ids") List<Long> ids);
+
 }
