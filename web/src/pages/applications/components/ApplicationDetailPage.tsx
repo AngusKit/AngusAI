@@ -33,6 +33,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ApplicationStatusEnum } from '@/enums/enums';
 import { getEnumDescription } from '@/enums/utils';
 import { ShareApplicationDialog } from './ShareApplicationDialog';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getTagColor } from '../utils';
 import { useApplicationDetail } from '../hooks';
 import {
@@ -572,7 +573,7 @@ export function ApplicationDetailPage() {
                 <div className="space-y-6">
                   <div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">调用次数趋势</div>
-                    <div className="h-64 rounded-lg border dark:border-gray-700 bg-white dark:bg-slate-800/20 min-h-[16rem]">
+                    <div className="h-64 rounded-lg border border-sky-200 dark:border-sky-700/50 bg-sky-200/80 dark:bg-sky-900/40 min-h-[16rem]">
                       {(trends?.calls?.length ?? 0) > 0 ? (
                         <div className="h-full w-full">
                           <TrendsChart trends={trends!} type="calls" />
@@ -586,7 +587,7 @@ export function ApplicationDetailPage() {
                   </div>
                   <div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">Token 数趋势</div>
-                    <div className="h-64 rounded-lg border dark:border-gray-700 bg-white dark:bg-slate-800/20 min-h-[16rem]">
+                    <div className="h-64 rounded-lg border border-sky-200 dark:border-sky-700/50 bg-sky-200/80 dark:bg-sky-900/40 min-h-[16rem]">
                       {(trends?.tokens?.length ?? 0) > 0 ? (
                         <div className="h-full w-full">
                           <TrendsChart trends={trends!} type="tokens" />
@@ -600,7 +601,7 @@ export function ApplicationDetailPage() {
                   </div>
                   <div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">响应时间趋势 (秒)</div>
-                    <div className="h-64 rounded-lg border dark:border-gray-700 bg-white dark:bg-slate-800/20 min-h-[16rem]">
+                    <div className="h-64 rounded-lg border border-sky-200 dark:border-sky-700/50 bg-sky-200/80 dark:bg-sky-900/40 min-h-[16rem]">
                       {(trends?.responseTime?.length ?? 0) > 0 ? (
                         <div className="h-full w-full">
                           <TrendsChart trends={trends!} type="responseTime" />
@@ -630,9 +631,14 @@ export function ApplicationDetailPage() {
                           className="flex items-center justify-between p-4 rounded-lg border dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-750 bg-white dark:bg-gray-800"
                         >
                           <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                              <User className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                            </div>
+                            <Avatar className="w-10 h-10 rounded-lg flex-shrink-0">
+                              {u.userAvatar && (
+                                <AvatarImage src={u.userAvatar} alt={u.userName ?? '头像'} referrerPolicy="no-referrer" />
+                              )}
+                              <AvatarFallback className="bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 rounded-lg">
+                                {(u.userName ?? '') ? (u.userName as string).slice(0, 2) : <User className="w-5 h-5" />}
+                              </AvatarFallback>
+                            </Avatar>
                             <div>
                               <div className="dark:text-white">{u.userName ?? `用户 ${u.userId ?? idx + 1}`}</div>
                               <div className="text-sm text-gray-600 dark:text-gray-400">ID: {u.userId ?? '-'}</div>
@@ -803,7 +809,7 @@ function ChartPlaceholder({ text }: { text: string }) {
   );
 }
 
-/** 趋势图 */
+/** 趋势图 - 样式与分析页 UsageAnalytics 保持一致 */
 function TrendsChart({
   trends,
   type = 'calls',
@@ -813,35 +819,40 @@ function TrendsChart({
 }) {
   const series = type === 'calls' ? (trends.calls ?? []) : type === 'tokens' ? (trends.tokens ?? []) : (trends.responseTime ?? []);
   const dataKey = type === 'calls' ? 'calls' : type === 'tokens' ? 'tokens' : 'responseTime';
+  const nameMap = { calls: '调用次数', tokens: '令牌数', responseTime: '响应时间' };
   const data = series.map((c) => ({
     time: c.date ?? '',
     [dataKey]: c.value ?? 0,
   }));
+  const gradientId = `chartAreaGradient-${type}`;
+  const strokeColor = type === 'tokens' ? '#8b5cf6' : type === 'responseTime' ? '#10b981' : '#3b82f6';
   if (data.length === 0) return null;
   return (
     <ResponsiveContainer width="100%" height="100%">
       <AreaChart data={data}>
         <defs>
-          <linearGradient id="chartAreaGradient" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.25} />
-            <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0.02} />
+          <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor={strokeColor} stopOpacity={0.3} />
+            <stop offset="95%" stopColor={strokeColor} stopOpacity={0} />
           </linearGradient>
         </defs>
-        <CartesianGrid strokeDasharray="3 3" className="stroke-slate-200 dark:stroke-slate-600" />
-        <XAxis dataKey="time" className="text-xs" />
-        <YAxis className="text-xs" />
+        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+        <XAxis dataKey="time" stroke="#9ca3af" className="text-xs" />
+        <YAxis stroke="#9ca3af" className="text-xs" />
         <Tooltip
           contentStyle={{
-            backgroundColor: 'var(--chart-background)',
-            border: '1px solid var(--chart-border)',
+            backgroundColor: '#1f2937',
+            border: '1px solid #374151',
             borderRadius: '8px',
+            color: '#fff',
           }}
         />
         <Area
           type="monotone"
           dataKey={dataKey}
-          stroke="hsl(var(--primary))"
-          fill="url(#chartAreaGradient)"
+          name={nameMap[dataKey]}
+          stroke={strokeColor}
+          fill={`url(#${gradientId})`}
           strokeWidth={2}
         />
       </AreaChart>
