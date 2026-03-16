@@ -22,6 +22,9 @@ import { WorkflowListEmpty } from './WorkflowListEmpty';
 
 const VISIBILITY_OPTIONS = enumToMessages(VisibilityEnum);
 
+/** 表格列宽：名称列最多 45% */
+const TABLE_COL_LAYOUT = '45% 1fr 1fr 1fr 1fr auto';
+
 interface WorkflowTableViewProps {
   workflows: WorkflowDisplayItem[];
   loading: boolean;
@@ -44,10 +47,21 @@ export function WorkflowTableView({
 
   return (
     <>
+      <style>{`.workflow-table-fixed col:first-child { width: 45% !important; min-width: 45% !important; }
+.workflow-table-fixed th:first-child,
+.workflow-table-fixed td:first-child { width: 45% !important; min-width: 45% !important; box-sizing: border-box; }`}</style>
       {loading ? (
         <Card className='dark:bg-gray-800 dark:border-gray-700 mb-4'>
-          <div className='overflow-x-auto'>
-            <table className='w-full'>
+          <div className='overflow-x-auto w-full'>
+            <table className='workflow-table-fixed w-full min-w-full table-fixed' style={{ tableLayout: 'fixed' }}>
+              <colgroup>
+                <col style={{ width: '45%' }} />
+                <col style={{ width: '10%' }} />
+                <col style={{ width: '10%' }} />
+                <col style={{ width: '12%' }} />
+                <col style={{ width: '12%' }} />
+                <col style={{ width: '11%' }} />
+              </colgroup>
               <thead className='bg-gray-50 dark:bg-gray-900'>
                 <tr>
                   <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400' />
@@ -97,11 +111,19 @@ export function WorkflowTableView({
         </Card>
       ) : displayList.length > 0 ? (
         <Card className='dark:bg-gray-800 dark:border-gray-700 mb-4'>
-          <div className='overflow-x-auto'>
-            <table className='w-full'>
+          <div className='overflow-x-auto w-full'>
+            <table className='workflow-table-fixed w-full min-w-full table-fixed' style={{ tableLayout: 'fixed' }}>
+              <colgroup>
+                <col style={{ width: '45%' }} />
+                <col />
+                <col />
+                <col />
+                <col />
+                <col />
+              </colgroup>
               <thead className='bg-gray-50 dark:bg-gray-900'>
                 <tr>
-                  <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>工作流名称</th>
+                  <th style={{ width: '45%' }} className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>工作流名称</th>
                   <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>状态</th>
                   <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>可见性</th>
                   <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>今日调用</th>
@@ -116,16 +138,16 @@ export function WorkflowTableView({
                     className='hover:bg-gray-50 dark:hover:bg-gray-900 cursor-pointer'
                     onClick={() => actions.onNavigate(w)}
                   >
-                    <td className='px-6 py-4'>
-                      <div className='flex items-center gap-3'>
+                    <td className='px-6 py-4' style={{ width: '45%' }}>
+                      <div className='flex items-center gap-3 min-w-0'>
                         <div
-                          className={`${w.iconBg} w-10 h-10 rounded-lg flex items-center justify-center`}
+                          className={`${w.iconBg} w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0`}
                         >
                           <WorkflowIcon className={`w-5 h-5 ${w.iconColor}`} />
                         </div>
-                        <div>
+                        <div className='min-w-0 flex-1 overflow-hidden'>
                           <div
-                            className='text-sm text-blue-600 dark:text-blue-400 mb-1 cursor-pointer'
+                            className='text-sm text-blue-600 dark:text-blue-400 mb-1 cursor-pointer truncate'
                             onClick={e => {
                               e.stopPropagation();
                               actions.onNavigate(w);
@@ -234,7 +256,7 @@ export function WorkflowTableView({
                 className='flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-600 px-4 py-3 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-gray-200 transition-colors'
                 onClick={() => {
                   if (visibilityDialogWorkflow) {
-                    actions.onModifyVisibility(visibilityDialogWorkflow, value);
+                    actions.onModifyVisibility(visibilityDialogWorkflow, value as VisibilityEnum);
                     setVisibilityDialogWorkflow(null);
                   }
                 }}

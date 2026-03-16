@@ -226,7 +226,7 @@ export function WorkflowGridView({ workflows, loading, actions, hasFilter = fals
                 className='flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-600 px-4 py-3 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-gray-200 transition-colors'
                 onClick={() => {
                   if (visibilityDialogWorkflow) {
-                    actions.onModifyVisibility(visibilityDialogWorkflow, value);
+                    actions.onModifyVisibility(visibilityDialogWorkflow, value as VisibilityEnum);
                     setVisibilityDialogWorkflow(null);
                   }
                 }}
