@@ -32,6 +32,7 @@ import cloud.xcan.angus.remote.search.SearchCriteria;
 import jakarta.annotation.Resource;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -316,9 +317,9 @@ public class ApplicationQueryImpl implements ApplicationQuery {
         String dateStr = null;
         if (dateObj != null) {
           if (dateObj instanceof java.sql.Date sqlDate) {
-            dateStr = sqlDate.toLocalDate().format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE);
+            dateStr = sqlDate.toLocalDate().format(DateTimeFormatter.ISO_LOCAL_DATE);
           } else if (dateObj instanceof LocalDate localDate) {
-            dateStr = localDate.format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE);
+            dateStr = localDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
           }
         }
         long callCount = r[1] != null ? ((Number) r[1]).longValue() : 0;
