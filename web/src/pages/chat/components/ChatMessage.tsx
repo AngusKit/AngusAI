@@ -447,7 +447,7 @@ const ChatMessageInner = ({ message, isLastAssistant, onRegenerate, onFeedback }
           </div>
 
           {/* Actions */}
-          {!isUser && (
+          {!message.isStreaming && !isUser && (
             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
               <Button variant="ghost" size="sm" className="h-8 gap-2" onClick={handleCopy}>
                 {copied ? (
