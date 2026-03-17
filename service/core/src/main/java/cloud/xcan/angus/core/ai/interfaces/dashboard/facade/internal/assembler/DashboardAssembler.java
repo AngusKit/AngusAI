@@ -94,14 +94,27 @@ public class DashboardAssembler {
    * @param thisMonth 本月统计数据
    * @param lastMonth 上月统计数据
    * @param totalApps 当前应用总数（跨周期一致）
+   * @param activeConversations 进行中对话数量（实时）
    */
   public static List<StatItemVo> toStatsOverviewVo(
       Map<String, Object> thisWeek,
       Map<String, Object> lastWeek,
       Map<String, Object> thisMonth,
       Map<String, Object> lastMonth,
-      Long totalApps) {
+      Long totalApps,
+      Long activeConversations) {
     List<StatItemVo> stats = new ArrayList<>();
+
+    // 进行中对话数量（实时统计）
+    StatItemVo activeConversationsStat = new StatItemVo();
+    activeConversationsStat.setType("activeConversations");
+    activeConversationsStat.setLabel("dashboard.stats.activeConversations");
+    activeConversationsStat.setValue(formatNumber(activeConversations != null ? activeConversations : 0L));
+    activeConversationsStat.setSubtitle("正在进行中");
+    activeConversationsStat.setTrend("-");
+    activeConversationsStat.setTrendUp(false);
+    activeConversationsStat.setDetails(null);
+    stats.add(activeConversationsStat);
 
     String appsStr = formatNumber(totalApps != null ? totalApps : 0L);
     StatItemVo totalAppsStat = new StatItemVo();

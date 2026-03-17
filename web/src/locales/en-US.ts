@@ -283,6 +283,7 @@ export const enUS = {
       apiCalls: 'API Calls',
       tokenUsage: 'Token Usage',
       activeUsers: 'Active Users',
+      activeConversations: 'Active Conversations',
     },
   },
 

@@ -7,6 +7,7 @@ import static cloud.xcan.angus.spec.principal.PrincipalContext.getUserId;
 
 import cloud.xcan.angus.core.ai.application.query.analytics.ChatAnalyticsQuery;
 import cloud.xcan.angus.core.ai.application.query.application.ApplicationQuery;
+import cloud.xcan.angus.core.ai.application.query.chat.MessageQuery;
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.domain.application.AIApplication;
 import cloud.xcan.angus.core.ai.domain.model.Model;
@@ -36,6 +37,9 @@ public class DashboardFacadeImpl implements DashboardFacade {
 
   @Resource
   private ModelQuery modelQuery;
+
+  @Resource
+  private MessageQuery messageQuery;
 
   @Override
   public UsageDetailsVo getUsageDetails(DashboardQueryDto dto) {
@@ -101,8 +105,10 @@ public class DashboardFacadeImpl implements DashboardFacade {
       totalApps = applicationQuery.getCurrentUserCounts().getTotal();
     }
 
+    long activeConversations = messageQuery.countActiveConversations();
+
     return DashboardAssembler.toStatsOverviewVo(
-        thisWeek, lastWeek, thisMonth, lastMonth, totalApps);
+        thisWeek, lastWeek, thisMonth, lastMonth, totalApps, activeConversations);
   }
 
   @Override

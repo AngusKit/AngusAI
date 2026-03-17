@@ -54,4 +54,9 @@ public interface MessageQuery {
    * @return sessionId -> Message，仅包含有消息的会话
    */
   Map<String, Message> findLastMessageMapBySessionIds(List<String> sessionIds);
+
+  /**
+   * 统计进行中对话数量：当前有消息正在流式生成的会话数
+   */
+  long countActiveConversations();
 }

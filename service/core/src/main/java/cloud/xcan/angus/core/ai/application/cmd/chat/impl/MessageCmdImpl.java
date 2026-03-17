@@ -93,6 +93,7 @@ public class MessageCmdImpl extends CommCmd<Message, Long> implements MessageCmd
   }
 
   @Override
+  @Transactional
   public void setStreaming(Message message, Boolean isStreaming) {
     message.setIsStreaming(isStreaming);
     messageRepo.save(message);

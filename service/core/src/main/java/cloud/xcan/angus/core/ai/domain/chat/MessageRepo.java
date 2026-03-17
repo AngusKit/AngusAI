@@ -27,6 +27,12 @@ public interface MessageRepo extends BaseRepository<Message, Long> {
   List<Message> findBySessionIdAndIsStreamingTrue(String sessionId);
 
   /**
+   * 统计进行中对话数量：当前有消息正在流式生成的会话数（is_streaming=true 的 distinct session）
+   */
+  @Query("SELECT COUNT(DISTINCT m.sessionId) FROM Message m WHERE m.isStreaming = true AND m.sessionId IS NOT NULL")
+  long countActiveConversations();
+
+  /**
    * 根据会话ID(UUID)分页查询消息
    */
   Page<Message> findBySessionIdOrderByCreatedDateAsc(String sessionId, Pageable pageable);

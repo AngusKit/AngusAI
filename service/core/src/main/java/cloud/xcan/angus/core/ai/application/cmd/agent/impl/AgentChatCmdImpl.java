@@ -98,6 +98,11 @@ public class AgentChatCmdImpl implements AgentChatCmd {
         // 有会话时先落库用户消息
         Message userMessage = messageCmd.create0(sessionDb, MessageRole.USER, message);
 
+        // 预创建占位助手消息并标记为流式，便于进行中对话统计（与流式 chatStream 一致）
+        Message assistantMessage = messageCmd.create0(sessionDb, MessageRole.ASSISTANT,
+            STREAMING_PLACEHOLDER, userMessage.getId());
+        messageCmd.setStreaming(assistantMessage, true);
+
         // Model 仅查询一次，复用给 getChatConfigOverride 和 saveApiUsageLog
         Model model = agent.getDefaultModelId() != null
             ? modelQuery.findById(agent.getDefaultModelId()).orElse(null) : null;
@@ -129,10 +134,11 @@ public class AgentChatCmdImpl implements AgentChatCmd {
           saveApiUsageLog(get(), agent, sessionDb, model, "/api/v1/agents/chat", startMs,
               chatError == null, chatError != null ? chatError.getMessage() : null, estInput,
               estOutput, estInput + estOutput, userMessage.getId());
+          // 更新助手消息内容并关闭流式标记
+          assistantMessage.setContent(chatError == null ? reply : "");
+          messageCmd.setStreaming(assistantMessage, false);
         }
 
-        // 落库助手回复，关联对应的 USER 消息 ID
-        messageCmd.create0(sessionDb, MessageRole.ASSISTANT, reply, userMessage.getId());
         return new AgentChatResult(reply, sessionDb.getSessionId());
       }
     }.execute();

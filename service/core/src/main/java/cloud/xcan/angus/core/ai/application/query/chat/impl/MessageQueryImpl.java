@@ -154,4 +154,14 @@ public class MessageQueryImpl implements MessageQuery {
     }
     return result;
   }
+
+  @Override
+  public long countActiveConversations() {
+    return new BizTemplate<Long>() {
+      @Override
+      protected Long process() {
+        return messageRepo.countActiveConversations();
+      }
+    }.execute();
+  }
 }
