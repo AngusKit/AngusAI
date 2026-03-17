@@ -152,7 +152,51 @@ export function useUsageAnalytics() {
     }
   }, [appIdParam, timeRange, granularity]);
 
-  /** 加载全部数据 */
+  /** 加载基础数据（概览 + API 调用 + 热门端点） */
+  const loadBase = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      await Promise.all([
+        loadOverview(),
+        loadApiCallsTrend(),
+        loadTopEndpoints(),
+      ]);
+    } catch (e) {
+      toast.error('加载数据失败');
+      console.error(e);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [loadOverview, loadApiCallsTrend, loadTopEndpoints]);
+
+  /** 加载令牌使用 Tab 数据 */
+  const loadTokenTab = useCallback(async () => {
+    try {
+      await Promise.all([
+        loadTokenUsageTrend(),
+        loadAppDistribution(),
+        loadModelDistribution(),
+      ]);
+    } catch (e) {
+      toast.error('加载令牌数据失败');
+      console.error(e);
+    }
+  }, [loadTokenUsageTrend, loadAppDistribution, loadModelDistribution]);
+
+  /** 加载性能分析 Tab 数据 */
+  const loadPerformanceTab = useCallback(async () => {
+    try {
+      await Promise.all([
+        loadResponseTimeAnalysis(),
+        loadErrorAnalysis(),
+      ]);
+    } catch (e) {
+      toast.error('加载性能数据失败');
+      console.error(e);
+    }
+  }, [loadResponseTimeAnalysis, loadErrorAnalysis]);
+
+  /** 加载全部数据（用于刷新按钮） */
   const loadAll = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -188,8 +232,8 @@ export function useUsageAnalytics() {
   }, [loadApplications]);
 
   useEffect(() => {
-    loadAll();
-  }, [loadAll]);
+    loadBase();
+  }, [loadBase]);
 
   return {
     timeRange,
@@ -206,6 +250,8 @@ export function useUsageAnalytics() {
     modelDistribution,
     appDistribution,
     errorAnalysis,
+    loadTokenTab,
+    loadPerformanceTab,
     refresh: loadAll,
   };
 }

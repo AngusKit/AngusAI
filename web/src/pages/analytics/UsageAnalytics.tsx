@@ -35,6 +35,7 @@ import {
   Pie,
   Cell,
 } from 'recharts';
+import { useState, useEffect } from 'react';
 import {
   useUsageAnalytics,
   mapApiCallsToChartData,
@@ -123,6 +124,7 @@ const DEFAULT_ERROR_ANALYSIS = [
 
 export function UsageAnalytics() {
   const { t } = useLanguage();
+  const [activeTab, setActiveTab] = useState<string>('api-calls');
   const {
     timeRange,
     setTimeRange,
@@ -138,8 +140,15 @@ export function UsageAnalytics() {
     appDistribution,
     modelDistribution,
     errorAnalysis,
+    loadTokenTab,
+    loadPerformanceTab,
     refresh,
   } = useUsageAnalytics();
+
+  useEffect(() => {
+    if (activeTab === 'tokens') loadTokenTab();
+    else if (activeTab === 'performance') loadPerformanceTab();
+  }, [activeTab, timeRange, selectedAppId, loadTokenTab, loadPerformanceTab]);
 
   const apiCallsChartData = mapApiCallsToChartData(apiCallsTrend);
   const tokenUsageChartData = mapTokenUsageToChartData(tokenUsageTrend);
@@ -319,7 +328,7 @@ export function UsageAnalytics() {
           <Skeleton className='h-[350px] w-full rounded dark:bg-gray-700' />
         </Card>
       ) : (
-        <Tabs defaultValue='api-calls' className='space-y-6'>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className='space-y-6'>
           <TabsList className='grid w-full grid-cols-3 h-auto p-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700'>
             <TabsTrigger
               value='api-calls'
