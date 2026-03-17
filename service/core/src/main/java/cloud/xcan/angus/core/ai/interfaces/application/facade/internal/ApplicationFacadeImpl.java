@@ -3,6 +3,7 @@ package cloud.xcan.angus.core.ai.interfaces.application.facade.internal;
 import static cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder.getMatchSearchFields;
 import static cloud.xcan.angus.core.utils.CoreUtils.buildVoPageResult;
 
+import cloud.xcan.angus.core.ai.application.cmd.activity.ActivityCmd;
 import cloud.xcan.angus.core.ai.application.cmd.application.ApplicationCmd;
 import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
 import cloud.xcan.angus.core.ai.application.query.analytics.ChatAnalyticsQuery;
@@ -12,6 +13,7 @@ import cloud.xcan.angus.core.ai.domain.agent.Agent;
 import cloud.xcan.angus.core.ai.domain.application.AIApplication;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationAgent;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationConfig;
+import cloud.xcan.angus.core.ai.domain.activity.ActivityActions;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
 import cloud.xcan.angus.core.ai.domain.model.Model;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.ApplicationFacade;
@@ -50,6 +52,9 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
   private ApplicationCmd applicationCmd;
 
   @Resource
+  private ActivityCmd activityCmd;
+
+  @Resource
   private AgentQuery agentQuery;
 
   @Resource
@@ -63,6 +68,8 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
   public ApplicationDetailVo create(ApplicationCreateDto dto) {
     AIApplication application = ApplicationAssembler.toCreateDomain(dto);
     AIApplication saved = applicationCmd.create(application);
+    activityCmd.recordApplicationActivity(saved.getId(), saved.getName(),
+        ActivityActions.ACTIVITY_APPLICATION_CREATED, saved.getName());
     Map<Long, ApplicationStatsVo> statsVoMap = chatAnalyticsQuery.getApplicationStats(
         List.of(saved.getId()));
     return ApplicationAssembler.toDetailVo(saved, getAgentsVo(saved.getId()),
@@ -73,9 +80,12 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
   @Override
   public ApplicationDetailVo duplicate(Long id, ApplicationDuplicateDto dto) {
     AIApplication saved = applicationCmd.duplicate(id, dto.getName());
-    Map<Long, ApplicationStatsVo> statsVoMap = chatAnalyticsQuery.getApplicationStats(List.of(id));
+    activityCmd.recordApplicationActivity(saved.getId(), saved.getName(),
+        ActivityActions.ACTIVITY_APPLICATION_DUPLICATED, saved.getName());
+    Map<Long, ApplicationStatsVo> statsVoMap = chatAnalyticsQuery.getApplicationStats(
+        List.of(saved.getId()));
     return ApplicationAssembler.toDetailVo(saved, getAgentsVo(saved.getId()),
-        getDefaultAgentVo(saved.getId()), statsVoMap.get(id));
+        getDefaultAgentVo(saved.getId()), statsVoMap.get(saved.getId()));
   }
 
   @NameJoin
@@ -83,6 +93,8 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
   public ApplicationDetailVo update(Long id, ApplicationUpdateDto dto) {
     AIApplication application = ApplicationAssembler.toUpdateDomain(id, dto);
     AIApplication saved = applicationCmd.update(application);
+    activityCmd.recordApplicationActivity(saved.getId(), saved.getName(),
+        ActivityActions.ACTIVITY_APPLICATION_UPDATED, saved.getName());
     Map<Long, ApplicationStatsVo> statsVoMap = chatAnalyticsQuery.getApplicationStats(List.of(id));
     return ApplicationAssembler.toDetailVo(saved, getAgentsVo(saved.getId()),
         getDefaultAgentVo(saved.getId()), statsVoMap.get(id));
@@ -92,6 +104,8 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
   @Override
   public ApplicationDetailVo updateConfig(Long id, ApplicationConfig config) {
     AIApplication saved = applicationCmd.updateConfig(id, config);
+    activityCmd.recordApplicationActivity(saved.getId(), saved.getName(),
+        ActivityActions.ACTIVITY_APPLICATION_CONFIG_UPDATED, saved.getName());
     Map<Long, ApplicationStatsVo> statsVoMap = chatAnalyticsQuery.getApplicationStats(List.of(id));
     return ApplicationAssembler.toDetailVo(saved, getAgentsVo(saved.getId()),
         getDefaultAgentVo(saved.getId()), statsVoMap.get(id));
@@ -101,6 +115,11 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
   @Override
   public ApplicationDetailVo modifyStatus(Long id, ApplicationStatus status) {
     AIApplication saved = applicationCmd.modifyStatus(id, status);
+    String actionKey = status == ApplicationStatus.PUBLISHED
+        ? ActivityActions.ACTIVITY_APPLICATION_PUBLISHED
+        : ActivityActions.ACTIVITY_APPLICATION_UNPUBLISHED;
+    activityCmd.recordApplicationActivity(saved.getId(), saved.getName(), actionKey,
+        saved.getName());
     Map<Long, ApplicationStatsVo> statsVoMap = chatAnalyticsQuery.getApplicationStats(List.of(id));
     return ApplicationAssembler.toDetailVo(saved, getAgentsVo(saved.getId()),
         getDefaultAgentVo(saved.getId()), statsVoMap.get(id));
@@ -111,6 +130,8 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
   public ApplicationDetailVo share(Long id, ApplicationShareDto dto) {
     AIApplication application = ApplicationAssembler.shareDomain(id, dto);
     AIApplication saved = applicationCmd.share(application);
+    activityCmd.recordApplicationActivity(saved.getId(), saved.getName(),
+        ActivityActions.ACTIVITY_APPLICATION_SHARED, saved.getName());
     Map<Long, ApplicationStatsVo> statsVoMap = chatAnalyticsQuery.getApplicationStats(List.of(id));
     return ApplicationAssembler.toDetailVo(saved, getAgentsVo(saved.getId()),
         getDefaultAgentVo(saved.getId()), statsVoMap.get(id));
@@ -120,6 +141,11 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
   @Override
   public ApplicationDetailVo star(Long id, Boolean isStarred) {
     AIApplication saved = applicationCmd.star(id, isStarred);
+    String actionKey = Boolean.TRUE.equals(isStarred)
+        ? ActivityActions.ACTIVITY_APPLICATION_STAR_ADDED
+        : ActivityActions.ACTIVITY_APPLICATION_STAR_REMOVED;
+    activityCmd.recordApplicationActivity(saved.getId(), saved.getName(), actionKey,
+        saved.getName());
     Map<Long, ApplicationStatsVo> statsVoMap = chatAnalyticsQuery.getApplicationStats(List.of(id));
     return ApplicationAssembler.toDetailVo(saved, getAgentsVo(id), getDefaultAgentVo(id),
         statsVoMap.get(id));
@@ -127,7 +153,11 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
 
   @Override
   public void delete(Long id) {
+    AIApplication app = applicationQuery.findById(id).orElse(null);
+    String appName = app != null ? app.getName() : String.valueOf(id);
     applicationCmd.delete(id);
+    activityCmd.recordApplicationActivity(id, appName,
+      ActivityActions.ACTIVITY_APPLICATION_DELETED, appName);
   }
 
   @NameJoin
