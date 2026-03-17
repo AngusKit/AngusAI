@@ -83,7 +83,7 @@ export function RecentApplications({ onNavigate }: { onNavigate?: (page: string)
         )}
       </div>
 
-      <div className='grid grid-cols-1 lg:grid-cols-3 gap-4'>
+      <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 items-stretch'>
         {isLoading ? (
           <>
             <ApplicationSkeleton />
@@ -92,8 +92,12 @@ export function RecentApplications({ onNavigate }: { onNavigate?: (page: string)
           </>
         ) : applications.length > 0 ? (
           applications.map(app => (
-            <Card key={app.id} className='p-5 hover:shadow-lg transition-all group dark:bg-gray-800'>
-              <div className='flex items-start justify-between mb-3'>
+            <Card
+              key={app.id}
+              className='flex flex-col min-h-[260px] h-full p-5 hover:shadow-lg transition-all group dark:bg-gray-800'
+            >
+              {/* 头部 */}
+              <div className='flex items-start justify-between flex-shrink-0'>
                 <div className='flex items-center gap-3'>
                   <div
                     className={`${app.iconBg} w-12 h-12 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform`}
@@ -116,25 +120,18 @@ export function RecentApplications({ onNavigate }: { onNavigate?: (page: string)
                     <MessageSquare className='w-3.5 h-3.5' />
                     {t('recentApps.enterChat')}
                   </Button>
-                  <button
-                    onClick={e => {
-                      e.stopPropagation();
-                      handleShareApp(app);
-                    }}
-                    className='p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity'
-                    title={t('recentApps.shareApp')}
-                  >
-                    <ExternalLink className='w-4 h-4 text-gray-600 dark:text-gray-300' />
-                  </button>
                 </div>
               </div>
 
-              <div onClick={() => handleCardClick(app)} className='cursor-pointer'>
-                <p className='text-sm text-gray-500 dark:text-gray-400 mb-2 leading-relaxed line-clamp-2'>
+              {/* 内容区：可滚动，描述与 tags 自然展示，溢出时在卡片内滚动 */}
+              <div
+                onClick={() => handleCardClick(app)}
+                className='cursor-pointer flex-1 min-h-0 overflow-y-auto overscroll-contain flex flex-col pr-1 -mr-1'
+              >
+                <p className='text-sm text-gray-500 dark:text-gray-400 mb-2 leading-relaxed'>
                   {app.description}
                 </p>
-
-                <div className='flex flex-wrap gap-2 mb-2'>
+                <div className='flex flex-wrap gap-2 mt-2'>
                   {app.tags.map((tag, tagIndex) => (
                     <span
                       key={tagIndex}
@@ -144,13 +141,20 @@ export function RecentApplications({ onNavigate }: { onNavigate?: (page: string)
                     </span>
                   ))}
                 </div>
+              </div>
 
-                <div className='border-t border-gray-200 dark:border-gray-600 pt-4 mt-4 flex items-center justify-between text-xs text-gray-400 dark:text-gray-500'>
-                  <span>{app.usage}</span>
-                  <span>
-                    {t('recentApps.lastAccess')}：{formatLastUsedDisplay(app.lastUsed)}
-                  </span>
-                </div>
+              {/* 底部：固定在卡片底部，同行卡片对齐 */}
+              <div
+                onClick={() => handleCardClick(app)}
+                role='button'
+                tabIndex={0}
+                onKeyDown={e => e.key === 'Enter' && handleCardClick(app)}
+                className='cursor-pointer flex-shrink-0 border-t border-gray-200 dark:border-gray-600 pt-3 flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 h-10'
+              >
+                <span className='truncate'>{app.usage}</span>
+                <span className='shrink-0 ml-2'>
+                  {t('recentApps.lastAccess')}：{formatLastUsedDisplay(app.lastUsed)}
+                </span>
               </div>
             </Card>
           ))
