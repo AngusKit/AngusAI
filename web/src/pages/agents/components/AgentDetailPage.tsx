@@ -1,6 +1,7 @@
 import {
   Bot,
   ChevronRight,
+  Copy,
   Edit,
   Play,
   Pause,
@@ -28,6 +29,8 @@ import {
   MemoryStrategyEnum,
 } from '@/enums/enums';
 import { getEnumDescription } from '@/enums/utils';
+import { toast } from 'sonner';
+import { copyToClipboard } from '@/lib/clipboard';
 import { useAgentDetail } from '../hooks';
 import { getAgentStatusColor } from '../utils';
 
@@ -95,8 +98,21 @@ export function AgentDetailPage() {
                     {detail.status === 'ACTIVE' ? '已发布' : '离线'}
                   </Badge>
                 </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                  ID: {detail.id ?? '-'}
+                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-4">
+                  <span>编码: {detail.encoding ?? '-'}</span>
+                  {detail.encoding && (
+                    <button
+                      onClick={async e => {
+                        e.stopPropagation();
+                        const ok = await copyToClipboard(detail.encoding!);
+                        toast[ok ? 'success' : 'error'](ok ? '编码已复制到剪贴板' : '复制失败');
+                      }}
+                      className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                      title="复制编码"
+                    >
+                      <Copy className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
                 {detail.description && (
                   <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 max-w-xl">

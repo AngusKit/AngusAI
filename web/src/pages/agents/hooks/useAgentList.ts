@@ -12,6 +12,8 @@ export interface AgentListItem {
   id: string;
   name: string;
   description: string;
+  /** 编码（唯一标识） */
+  encoding?: string;
   status: string;
   statusEnum?: AgentStatusEnum;
   interactionMode?: string;
@@ -75,6 +77,7 @@ export function useAgentList() {
           id: String(item.id ?? ''),
           name: item.name ?? '--',
           description: item.description ?? '--',
+          encoding: item.encoding,
           status: item.status ?? 'INACTIVE',
           statusEnum: item.status as AgentStatusEnum | undefined,
           interactionMode: item.interactionMode,

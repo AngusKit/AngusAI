@@ -354,6 +354,11 @@ function AgentCard({
               <Badge className={`text-xs ${statusColor} border-0`}>
                 {agent.statusEnum === AgentStatusEnum.ACTIVE ? '已发布' : '离线'}
               </Badge>
+              {agent.encoding && (
+                <Badge variant="outline" className="text-xs font-mono text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-600 ml-2">
+                  {agent.encoding}
+                </Badge>
+              )}
             </div>
           </div>
           <div className="flex items-center gap-3 shrink-0">
@@ -403,6 +408,11 @@ function AgentCard({
             <Badge className={`text-xs ${statusColor} border-0`}>
               {agent.statusEnum === AgentStatusEnum.ACTIVE ? '已发布' : '离线'}
             </Badge>
+            {agent.encoding && (
+              <Badge variant="outline" className="text-xs font-mono text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-600 ml-2">
+                {agent.encoding}
+              </Badge>
+            )}
           </div>
         </div>
         <AgentDropdownMenu agent={agent} onToggleStatus={onToggleStatus} onEdit={onEdit} onDelete={onDelete} />
