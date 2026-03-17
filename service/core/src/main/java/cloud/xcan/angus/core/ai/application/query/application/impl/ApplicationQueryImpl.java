@@ -1,6 +1,7 @@
 package cloud.xcan.angus.core.ai.application.query.application.impl;
 
 import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatCost;
+import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatCostFromDollars;
 import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.parseEndDate;
 import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.parseStartDate;
 import static cloud.xcan.angus.spec.principal.PrincipalContext.getUserId;
@@ -12,7 +13,6 @@ import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
 import cloud.xcan.angus.core.ai.application.query.application.ApplicationQuery;
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.domain.agent.Agent;
-import cloud.xcan.angus.core.ai.domain.chat.ChatUsageLogRepo;
 import cloud.xcan.angus.core.ai.domain.application.AIApplication;
 import cloud.xcan.angus.core.ai.domain.application.AIApplicationRepo;
 import cloud.xcan.angus.core.ai.domain.application.AIApplicationSearchRepo;
@@ -21,6 +21,7 @@ import cloud.xcan.angus.core.ai.domain.application.ApplicationAgentRepo;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationCountsProjection;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStar;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStarRepo;
+import cloud.xcan.angus.core.ai.domain.chat.ChatUsageLogRepo;
 import cloud.xcan.angus.core.ai.domain.model.Model;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationCountVo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationStatisticsVo;
@@ -293,14 +294,14 @@ public class ApplicationQueryImpl implements ApplicationQuery {
       long totalCalls = data[0] != null ? ((Number) data[0]).longValue() : 0;
       long successfulCalls = data[1] != null ? ((Number) data[1]).longValue() : 0;
       long totalTokens = data[2] != null ? ((Number) data[2]).longValue() : 0;
-      int costCents = data[3] != null ? ((Number) data[3]).intValue() : 0;
+      double totalCost = data[3] != null ? ((Number) data[3]).doubleValue() : 0.0;
       Long avgResponseTime =
           data[4] != null ? Math.round(((Number) data[4]).doubleValue() / 1000) : null;
 
       overview.setTotalCalls(totalCalls);
       overview.setTotalTokens(totalTokens);
-      overview.setTotalCost(costCents / 100.0);
-      overview.setTotalCostDisplay(formatCost((long) costCents));
+      overview.setTotalCost(totalCost);
+      overview.setTotalCostDisplay(formatCostFromDollars(totalCost));
       overview.setAvgResponseTime(avgResponseTime);
       overview.setSuccessRate(
           totalCalls > 0 ? Math.round(successfulCalls * 10000.0 / totalCalls) / 100.0 : 0.0);

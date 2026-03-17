@@ -144,7 +144,7 @@ CREATE TABLE `api_usage_log`
     input_tokens     INTEGER NULL,
     output_tokens    INTEGER NULL,
     total_tokens     INTEGER NULL,
-    cost             INTEGER NULL,
+    cost             DECIMAL(20,8) NULL COMMENT '费用(美元USD)',
     is_successful    TINYINT(1) NOT NULL,
     error_message    VARCHAR(1000) NULL,
     ip_address       VARCHAR(45) NULL,

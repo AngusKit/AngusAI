@@ -1,6 +1,8 @@
 package cloud.xcan.angus.core.ai.application.query.model.impl;
 
 import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatCost;
+import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatCostFromDollars;
+import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.getDouble;
 import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.getLong;
 import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.parseEndDate;
 import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.parseStartDate;
@@ -105,7 +107,7 @@ public class ModelQueryImpl implements ModelQuery {
     long successCalls = getLong(overview, "successfulCalls");
     long failedCalls = getLong(overview, "failedCalls");
     long totalTokens = getLong(overview, "totalTokens");
-    long costCents = getLong(overview, "totalCostCents");
+    double totalCost = getDouble(overview, "totalCost");
     Double avgResponseTimeMs = (Double) overview.get("avgResponseTimeMs");
 
     vo.setTotalCalls(totalCalls);
@@ -113,8 +115,8 @@ public class ModelQueryImpl implements ModelQuery {
     vo.setFailedCalls(failedCalls);
     vo.setTotalTokens(totalTokens);
     vo.setTotalTokensConsumed(totalTokens);
-    vo.setTotalCost(costCents / 100.0);
-    vo.setTotalCostDisplay(formatCost(costCents));
+    vo.setTotalCost(totalCost);
+    vo.setTotalCostDisplay(formatCostFromDollars(totalCost));
 
     if (totalCalls > 0) {
       vo.setSuccessRate((double) successCalls * 100.0 / (double) totalCalls);
@@ -160,13 +162,13 @@ public class ModelQueryImpl implements ModelQuery {
     TodayGrowthTrend trend = new TodayGrowthTrend();
 
     long callsToday = getLong(todayStats, "totalCalls");
-    long costCents = getLong(todayStats, "totalCostCents");
+    double totalCost = getDouble(todayStats, "totalCost");
     long tokensToday = getLong(todayStats, "totalTokens");
     Double avgResponseTimeMs = (Double) todayStats.get("avgResponseTimeMs");
 
     trend.setAddedCalls(callsToday);
-    trend.setAddedCost(costCents / 100.0);
-    trend.setAddedCostDisplay(formatCost(costCents));
+    trend.setAddedCost(totalCost);
+    trend.setAddedCostDisplay(formatCostFromDollars(totalCost));
     trend.setAddedTokens(tokensToday);
 
     Set<SearchCriteria> addedFilters = SearchCriteria.merge(SearchCriteria.criteria(),

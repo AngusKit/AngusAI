@@ -32,6 +32,8 @@ import cloud.xcan.angus.spec.principal.Principal;
 import cloud.xcan.angus.spec.principal.PrincipalContext;
 import dev.langchain4j.service.TokenStream;
 import jakarta.annotation.Resource;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.concurrent.Executor;
 import org.slf4j.Logger;
@@ -278,8 +280,8 @@ public class AgentChatCmdImpl implements AgentChatCmd {
       Integer inputTokens, Integer outputTokens, Integer totalTokens) {
     try {
       int responseTimeMs = (int) (System.currentTimeMillis() - startMs);
-      Integer cost = calculateCost(agent, model, inputTokens, outputTokens);
-      ChatUsageLog log = new ChatUsageLog()
+      BigDecimal cost = calculateCost(agent, model, inputTokens, outputTokens);
+      ChatUsageLog usageLog = new ChatUsageLog()
           .setAppId(session != null ? session.getAppId() : null)
           .setAgentId(agent != null ? agent.getId() : null)
           .setModelId(agent != null ? agent.getDefaultModelId() : null)
@@ -294,18 +296,19 @@ public class AgentChatCmdImpl implements AgentChatCmd {
           .setIsSuccessful(isSuccessful)
           .setErrorMessage(lengthSafe(errorMessage, 1000))
           .setSessionId(session != null ? session.getSessionId() : null);
-      chatUsageLogCmd.create(log, principal);
+      chatUsageLogCmd.create(usageLog, principal);
     } catch (Exception e) {
       log.error(e.getMessage());
     }
   }
 
   /**
-   * 根据模型定价计算费用（美元分，即 cents）
+   * Calculate cost in USD from model pricing. Uses BigDecimal to preserve decimals
+   * and avoid rounding to zero when token count is very small.
    *
-   * @param model 已查询的模型，可为 null；为 null 时内部会按 agent 的 defaultModelId 查询
+   * @param model model already loaded, or null to load by agent.defaultModelId
    */
-  private Integer calculateCost(Agent agent, Model model, Integer inputTokens,
+  private BigDecimal calculateCost(Agent agent, Model model, Integer inputTokens,
       Integer outputTokens) {
     if (agent == null || agent.getDefaultModelId() == null || (inputTokens == null
         && outputTokens == null)) {
@@ -325,14 +328,18 @@ public class AgentChatCmdImpl implements AgentChatCmd {
         && (outputPrice == null || outputPrice <= 0)) {
       return null;
     }
-    double costUsd = 0;
+    BigDecimal costUsd = BigDecimal.ZERO;
     if (inputPrice != null && inputPrice > 0) {
-      costUsd += (in / 1_000_000.0) * inputPrice;
+      costUsd = costUsd.add(
+          BigDecimal.valueOf(in).divide(BigDecimal.valueOf(1_000_000), 8, RoundingMode.HALF_UP)
+              .multiply(BigDecimal.valueOf(inputPrice)));
     }
     if (outputPrice != null && outputPrice > 0) {
-      costUsd += (out / 1_000_000.0) * outputPrice;
+      costUsd = costUsd.add(
+          BigDecimal.valueOf(out).divide(BigDecimal.valueOf(1_000_000), 8, RoundingMode.HALF_UP)
+              .multiply(BigDecimal.valueOf(outputPrice)));
     }
-    return costUsd > 0 ? (int) Math.round(costUsd * 100) : null;
+    return costUsd.compareTo(BigDecimal.ZERO) > 0 ? costUsd.setScale(8, RoundingMode.HALF_UP) : null;
   }
 
   /**

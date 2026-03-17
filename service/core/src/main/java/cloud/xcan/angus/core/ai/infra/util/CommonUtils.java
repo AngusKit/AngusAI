@@ -96,6 +96,17 @@ public class CommonUtils {
     return v instanceof Number ? ((Number) v).longValue() : 0L;
   }
 
+  /**
+   * 从 Map 中获取 Double 值，用于 cost（美元）等字段
+   */
+  public static double getDouble(Map<String, Object> map, String key) {
+    Object v = map.get(key);
+    if (v == null) {
+      return 0.0;
+    }
+    return v instanceof Number ? ((Number) v).doubleValue() : 0.0;
+  }
+
   public static Long toLong(Object value, Long defaultValue) {
     if (value == null) {
       return defaultValue;

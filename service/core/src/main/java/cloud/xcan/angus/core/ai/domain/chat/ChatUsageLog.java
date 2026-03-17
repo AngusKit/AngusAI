@@ -5,6 +5,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
@@ -60,11 +61,11 @@ public class ChatUsageLog extends TenantEntity<ChatUsageLog, Long> {
   private Integer totalTokens;
 
   /**
-   * 费用，单位：美分(cents)。
-   * <p>存储最小货币单位避免浮点精度问题，如 1234 表示 $12.34。
+   * 费用，单位：美元(USD)。
+   * <p>使用 BigDecimal 存储，支持小额 token 产生的微小费用，避免四舍五入丢失。
    */
-  @Column(name = "cost")
-  private Integer cost;
+  @Column(name = "cost", precision = 20, scale = 8)
+  private BigDecimal cost;
 
   @Column(name = "is_successful", nullable = false)
   private Boolean isSuccessful;

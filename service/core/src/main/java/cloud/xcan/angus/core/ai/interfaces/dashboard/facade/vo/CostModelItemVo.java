@@ -13,8 +13,8 @@ public class CostModelItemVo {
   @Schema(description = "模型名称")
   private String modelName;
 
-  @Schema(description = "费用，单位：美分(cents)；展示请用 costDisplay")
-  private Long cost;
+  @Schema(description = "费用，单位：美元(USD)；展示请用 costDisplay")
+  private Double cost;
 
   @Schema(description = "费用展示字符串，如 $125.80，后端已格式化，前端直接展示")
   private String costDisplay;

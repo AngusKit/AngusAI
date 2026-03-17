@@ -136,7 +136,7 @@ CREATE TABLE "api_usage_log" (
   "input_tokens" INTEGER NULL,
   "output_tokens" INTEGER NULL,
   "total_tokens" INTEGER NULL,
-  "cost" INTEGER NULL,
+  "cost" DECIMAL(20,8) NULL,
   "is_successful" BOOLEAN NOT NULL,
   "error_message" VARCHAR(1000) NULL,
   "ip_address" VARCHAR(45) NULL,

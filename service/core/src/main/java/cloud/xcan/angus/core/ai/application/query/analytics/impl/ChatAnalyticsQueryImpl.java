@@ -66,21 +66,21 @@ public class ChatAnalyticsQueryImpl implements ChatAnalyticsQuery {
           stats.put("successfulCalls", 0L);
           stats.put("failedCalls", 0L);
           stats.put("totalTokens", 0L);
-          stats.put("totalCostCents", 0L);
+          stats.put("totalCost", 0.0);
           stats.put("avgResponseTimeMs", null);
           return stats;
         }
         long totalCalls = data[0] != null ? ((Number) data[0]).longValue() : 0L;
         long successfulCalls = data[1] != null ? ((Number) data[1]).longValue() : 0L;
         long totalTokens = data[2] != null ? ((Number) data[2]).longValue() : 0L;
-        long totalCostCents = data[3] != null ? ((Number) data[3]).longValue() : 0L;
+        double totalCost = data[3] != null ? ((Number) data[3]).doubleValue() : 0.0;
         Double avgResponseTimeMs = data[4] != null ? ((Number) data[4]).doubleValue() : null;
 
         stats.put("totalCalls", totalCalls);
         stats.put("successfulCalls", successfulCalls);
         stats.put("failedCalls", totalCalls - successfulCalls);
         stats.put("totalTokens", totalTokens);
-        stats.put("totalCostCents", totalCostCents);
+        stats.put("totalCost", totalCost);
         stats.put("avgResponseTimeMs", avgResponseTimeMs);
         return stats;
       }
@@ -216,9 +216,10 @@ public class ChatAnalyticsQueryImpl implements ChatAnalyticsQuery {
           long totalTokens = groupLogs.stream()
               .mapToLong(log -> log.getTotalTokens() != null ? log.getTotalTokens() : 0)
               .sum();
-          long cost = groupLogs.stream()
-              .mapToLong(log -> log.getCost() != null ? log.getCost() : 0)
-              .sum();
+          double cost = groupLogs.stream()
+              .map(log -> log.getCost() != null ? log.getCost() : java.math.BigDecimal.ZERO)
+              .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add)
+              .doubleValue();
 
           dataPoint.put("date", entry.getKey());
           dataPoint.put("inputTokens", inputTokens);
@@ -332,7 +333,7 @@ public class ChatAnalyticsQueryImpl implements ChatAnalyticsQuery {
           item.put("calls", result[1]);
           item.put("tokens", result[2]);
           item.put("avgResponseTime", result[3]);
-          item.put("cost", result.length > 4 ? result[4] : 0L);
+          item.put("cost", result.length > 4 && result[4] != null ? ((Number) result[4]).doubleValue() : 0.0);
           item.put("percentage",
               total > 0 ? (((Number) result[1]).doubleValue() / total * 100) : 0.0);
 
@@ -360,7 +361,7 @@ public class ChatAnalyticsQueryImpl implements ChatAnalyticsQuery {
           item.put("calls", result[1]);
           item.put("tokens", result[2]);
           item.put("avgResponseTime", result.length > 3 ? result[3] : null);
-          item.put("cost", result.length > 4 ? result[4] : 0L);
+          item.put("cost", result.length > 4 && result[4] != null ? ((Number) result[4]).doubleValue() : 0.0);
           item.put("percentage", totalCalls > 0
               ? (((Number) result[1]).doubleValue() / totalCalls * 100) : 0.0);
 
@@ -380,8 +381,8 @@ public class ChatAnalyticsQueryImpl implements ChatAnalyticsQuery {
         List<Object[]> results = chatUsageLogRepo.groupByModelOrderByCost(start, end);
         List<Map<String, Object>> distribution = new ArrayList<>();
 
-        long totalCost = results.stream()
-            .mapToLong(r -> ((Number) r[3]).longValue())
+        double totalCost = results.stream()
+            .mapToDouble(r -> r[3] != null ? ((Number) r[3]).doubleValue() : 0.0)
             .sum();
 
         int count = 0;
@@ -389,14 +390,14 @@ public class ChatAnalyticsQueryImpl implements ChatAnalyticsQuery {
           if (limit != null && count >= limit) {
             break;
           }
+          double cost = result[3] != null ? ((Number) result[3]).doubleValue() : 0.0;
           Map<String, Object> item = new HashMap<>();
           item.put("modelId", result[0]);
           item.put("calls", result[1]);
           item.put("tokens", result[2] != null ? result[2] : 0L);
-          item.put("cost", result[3] != null ? result[3] : 0L);
+          item.put("cost", cost);
           item.put("percentage",
-              totalCost > 0 ? (((Number) Objects.requireNonNull(result[3])).longValue() * 100.0
-                  / totalCost) : 0.0);
+              totalCost > 0 ? (cost * 100.0 / totalCost) : 0.0);
 
           distribution.add(item);
           count++;

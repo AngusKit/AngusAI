@@ -589,7 +589,7 @@ export function BillingSubscription() {
               请使用{selectedPaymentMethod === 'alipay' ? '支付宝' : '微信'}
               扫码支付
             </p>
-            <p className='text-2xl dark:text-white'>¥{plan?.price}</p>
+            <p className='text-2xl dark:text-white'>${plan?.price}</p>
             <div className='flex items-center justify-center gap-2 text-sm text-gray-600 dark:text-gray-400'>
               <Clock className='w-4 h-4' />
               <span>剩余时间: {formatCountdown(countdown)}</span>
@@ -820,7 +820,7 @@ export function BillingSubscription() {
                 </div>
                 <h3 className='text-xl dark:text-white mb-2'>{plan.name}</h3>
                 <div className='mb-2'>
-                  <span className='text-3xl dark:text-white'>{plan.price === 0 ? '免费' : `¥${plan.price}`}</span>
+                  <span className='text-3xl dark:text-white'>{plan.price === 0 ? '免费' : `$${plan.price}`}</span>
                   {plan.price > 0 && <span className='text-sm text-gray-600 dark:text-gray-400'>/月</span>}
                 </div>
                 <p className='text-sm text-gray-600 dark:text-gray-400'>{plan.description}</p>
@@ -969,7 +969,7 @@ export function BillingSubscription() {
               </div>
               <div className='flex items-center gap-4'>
                 <div className='text-right'>
-                  <div className='dark:text-white'>¥{invoice.amount}</div>
+                  <div className='dark:text-white'>${invoice.amount}</div>
                   <div className='text-sm text-gray-600 dark:text-gray-400'>{invoice.date}</div>
                 </div>
                 <Button variant='ghost' size='sm' onClick={() => handleDownloadInvoice(invoice)}>
@@ -1058,7 +1058,7 @@ export function BillingSubscription() {
                       <div className='flex justify-between'>
                         <span className='text-gray-600 dark:text-gray-400'>费用：</span>
                         <span className='dark:text-white'>
-                          ¥{calculatePrice(plans.find(p => p.id === selectedPlan)?.price || 0, billingCycle)}/
+                          ${calculatePrice(plans.find(p => p.id === selectedPlan)?.price || 0, billingCycle)}/
                           {billingCycleConfig[billingCycle].label}
                         </span>
                       </div>
@@ -1066,7 +1066,7 @@ export function BillingSubscription() {
                         <div className='flex justify-between text-green-600 dark:text-green-400'>
                           <span>优惠折扣：</span>
                           <span>
-                            -{getDiscountPercentage(billingCycle)}% (节省 ¥
+                            -{getDiscountPercentage(billingCycle)}% (节省 $
                             {getSavings(plans.find(p => p.id === selectedPlan)?.price || 0, billingCycle)})
                           </span>
                         </div>
@@ -1199,7 +1199,7 @@ export function BillingSubscription() {
                           <div className='flex items-center justify-between text-sm mb-1'>
                             <span className='text-gray-600 dark:text-gray-400'>原价</span>
                             <span className='text-gray-500 dark:text-gray-400 line-through text-sm'>
-                              ¥
+                              $
                               {(plans.find(p => p.id === selectedPlan)?.price || 0) *
                                 billingCycleConfig[billingCycle].months}
                             </span>
@@ -1208,12 +1208,12 @@ export function BillingSubscription() {
                         <div className='flex items-center justify-between mb-3'>
                           <span className='dark:text-white'>应付金额</span>
                           <span className='text-lg dark:text-white'>
-                            ¥{calculatePrice(plans.find(p => p.id === selectedPlan)?.price || 0, billingCycle)}
+                            ${calculatePrice(plans.find(p => p.id === selectedPlan)?.price || 0, billingCycle)}
                           </span>
                         </div>
                         {billingCycle !== 'monthly' && (
                           <div className='text-xs text-green-600 dark:text-green-400 mb-3 text-right'>
-                            节省 ¥{getSavings(plans.find(p => p.id === selectedPlan)?.price || 0, billingCycle)}
+                           节省 ${getSavings(plans.find(p => p.id === selectedPlan)?.price || 0, billingCycle)}
                           </div>
                         )}
                       </>

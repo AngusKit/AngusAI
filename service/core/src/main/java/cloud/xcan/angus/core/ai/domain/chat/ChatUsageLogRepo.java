@@ -70,7 +70,7 @@ public interface ChatUsageLogRepo extends BaseRepository<ChatUsageLog, Long> {
 
   /**
    * 全局概览统计（一次聚合，用于模型统计等） 返回 [totalCalls, successfulCalls, totalTokens, totalCost,
-   * avgResponseTimeMs]。cost 单位：美分(cents)
+   * avgResponseTimeMs]。cost 单位：美元(USD)
    */
   @Query("SELECT COUNT(l), "
       + "SUM(CASE WHEN l.isSuccessful = true THEN 1 ELSE 0 END), "
@@ -82,7 +82,7 @@ public interface ChatUsageLogRepo extends BaseRepository<ChatUsageLog, Long> {
       @Param("end") LocalDateTime end);
 
   /**
-   * 按应用分组统计 返回 [appId, calls, tokens, avgResponseTime, cost] cost 单位：美分(cents)
+   * 按应用分组统计 返回 [appId, calls, tokens, avgResponseTime, cost] cost 单位：美元(USD)
    */
   @Query(
       "SELECT l.appId, COUNT(l), COALESCE(SUM(l.totalTokens), 0), AVG(l.responseTimeMs), COALESCE(SUM(l.cost), 0) "
@@ -91,7 +91,7 @@ public interface ChatUsageLogRepo extends BaseRepository<ChatUsageLog, Long> {
   List<Object[]> groupByApp(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
   /**
-   * 按模型分组统计 返回 [modelId, calls, tokens, avgResponseTime, cost] cost 单位：美分(cents)
+   * 按模型分组统计 返回 [modelId, calls, tokens, avgResponseTime, cost] cost 单位：美元(USD)
    */
   @Query(
       "SELECT l.modelId, COUNT(l), COALESCE(SUM(l.totalTokens), 0), AVG(l.responseTimeMs), COALESCE(SUM(l.cost), 0) "
@@ -146,7 +146,7 @@ public interface ChatUsageLogRepo extends BaseRepository<ChatUsageLog, Long> {
 
   /**
    * 应用概览统计（一次聚合：总调用、成功数、token、成本、平均响应时间） 返回 Object[]: [totalCalls, successfulCalls, totalTokens,
-   * totalCost, avgResponseTime]
+   * totalCost, avgResponseTime]。cost 单位：美元(USD)
    */
   @Query("SELECT COUNT(l), "
       + "SUM(CASE WHEN l.isSuccessful = true THEN 1 ELSE 0 END), "

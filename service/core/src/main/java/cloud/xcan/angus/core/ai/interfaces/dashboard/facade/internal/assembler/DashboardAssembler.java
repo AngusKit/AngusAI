@@ -1,6 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.dashboard.facade.internal.assembler;
 
-import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatCost;
+import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatCostFromDollars;
 import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatLargeNumber;
 import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatNumber;
 import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatPercentageTo2Decimals;
@@ -75,9 +75,9 @@ public class DashboardAssembler {
       CostModelItemVo item = new CostModelItemVo();
       item.setRank(i + 1);
       item.setModelName((String) d.getOrDefault("modelName", "未知模型"));
-      long cost = toLong(d.get("cost"), 0L);
+      double cost = toDouble(d.get("cost"), 0.0);
       item.setCost(cost);
-      item.setCostDisplay(formatCost(cost));
+      item.setCostDisplay(formatCostFromDollars(cost));
       item.setPercentage(formatPercentageTo2Decimals(toDouble(d.get("percentage"), 0.0)));
       costModelList.add(item);
     }
