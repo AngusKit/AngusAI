@@ -1,6 +1,6 @@
 package cloud.xcan.angus.core.ai.interfaces.analytics;
 
-import cloud.xcan.angus.core.ai.interfaces.analytics.facade.AnalyticsFacade;
+import cloud.xcan.angus.core.ai.interfaces.analytics.facade.ChatAnalyticsFacade;
 import cloud.xcan.angus.core.ai.interfaces.analytics.facade.dto.AnalyticsQueryDto;
 import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.AnalyticsOverviewVo;
 import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.ApiCallsTrendVo;
@@ -28,14 +28,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "Analytics", description = "使用分析 - API使用统计、性能分析、趋势图表等功能")
+@Tag(name = "ChatAnalytics", description = "对话分析 - 使用统计、性能分析、趋势图表等功能")
 @Validated
 @RestController
 @RequestMapping("/api/v1/analytics")
-public class AnalyticsRest {
+public class ChatAnalyticsRest {
 
   @Resource
-  private AnalyticsFacade analyticsFacade;
+  private ChatAnalyticsFacade chatAnalyticsFacade;
 
   @Operation(operationId = "getAnalyticsOverview", summary = "获取分析概览",
       description = "获取使用分析的概览统计数据，包括API调用、活跃用户、Token消耗、响应时间等核心指标")
@@ -46,7 +46,7 @@ public class AnalyticsRest {
   @GetMapping("/overview")
   public ApiLocaleResult<AnalyticsOverviewVo> getOverview(
       @Valid @ParameterObject AnalyticsQueryDto dto) {
-    return ApiLocaleResult.success(analyticsFacade.getOverview(dto));
+    return ApiLocaleResult.success(chatAnalyticsFacade.getOverview(dto));
   }
 
   @Operation(operationId = "getApiCallsTrend", summary = "获取API调用趋势",
@@ -58,7 +58,7 @@ public class AnalyticsRest {
   @GetMapping("/api-calls")
   public ApiLocaleResult<ApiCallsTrendVo> getApiCallsTrend(
       @Valid @ParameterObject AnalyticsQueryDto dto) {
-    return ApiLocaleResult.success(analyticsFacade.getApiCallsTrend(dto));
+    return ApiLocaleResult.success(chatAnalyticsFacade.getApiCallsTrend(dto));
   }
 
   @Operation(operationId = "getTokenUsageTrend", summary = "获取Token使用趋势",
@@ -70,7 +70,7 @@ public class AnalyticsRest {
   @GetMapping("/token-usage")
   public ApiLocaleResult<TokenUsageTrendVo> getTokenUsageTrend(
       @Valid @ParameterObject AnalyticsQueryDto dto) {
-    return ApiLocaleResult.success(analyticsFacade.getTokenUsageTrend(dto));
+    return ApiLocaleResult.success(chatAnalyticsFacade.getTokenUsageTrend(dto));
   }
 
   @Operation(operationId = "getResponseTimeAnalysis", summary = "获取响应时间分析",
@@ -82,7 +82,7 @@ public class AnalyticsRest {
   @GetMapping("/response-time")
   public ApiLocaleResult<ResponseTimeAnalysisVo> getResponseTimeAnalysis(
       @Valid @ParameterObject AnalyticsQueryDto dto) {
-    return ApiLocaleResult.success(analyticsFacade.getResponseTimeAnalysis(dto));
+    return ApiLocaleResult.success(chatAnalyticsFacade.getResponseTimeAnalysis(dto));
   }
 
   @Operation(operationId = "getAppDistribution", summary = "获取应用使用分布",
@@ -95,7 +95,7 @@ public class AnalyticsRest {
   public ApiLocaleResult<AppDistributionVo> getAppDistribution(
       @Valid @ParameterObject AnalyticsQueryDto dto,
       @Parameter(description = "Top N，默认10") @RequestParam(required = false, defaultValue = "10") Integer limit) {
-    return ApiLocaleResult.success(analyticsFacade.getAppDistribution(dto, limit));
+    return ApiLocaleResult.success(chatAnalyticsFacade.getAppDistribution(dto, limit));
   }
 
   @Operation(operationId = "getModelDistribution", summary = "获取模型使用分布",
@@ -107,7 +107,7 @@ public class AnalyticsRest {
   @GetMapping("/model-distribution")
   public ApiLocaleResult<ModelDistributionVo> getModelDistribution(
       @Valid @ParameterObject AnalyticsQueryDto dto) {
-    return ApiLocaleResult.success(analyticsFacade.getModelDistribution(dto));
+    return ApiLocaleResult.success(chatAnalyticsFacade.getModelDistribution(dto));
   }
 
   @Operation(operationId = "getTopEndpoints", summary = "获取Top接口统计",
@@ -121,7 +121,7 @@ public class AnalyticsRest {
       @Valid @ParameterObject AnalyticsQueryDto dto,
       @Parameter(description = "Top N，默认10") @RequestParam(required = false, defaultValue = "10") Integer limit,
       @Parameter(description = "排序字段") @RequestParam(required = false, defaultValue = "calls") String orderBy) {
-    return ApiLocaleResult.success(analyticsFacade.getTopEndpoints(dto, limit, orderBy));
+    return ApiLocaleResult.success(chatAnalyticsFacade.getTopEndpoints(dto, limit, orderBy));
   }
 
   @Operation(operationId = "getErrorAnalysis", summary = "获取错误分析",
@@ -133,7 +133,7 @@ public class AnalyticsRest {
   @GetMapping("/errors")
   public ApiLocaleResult<ErrorAnalysisVo> getErrorAnalysis(
       @Valid @ParameterObject AnalyticsQueryDto dto) {
-    return ApiLocaleResult.success(analyticsFacade.getErrorAnalysis(dto));
+    return ApiLocaleResult.success(chatAnalyticsFacade.getErrorAnalysis(dto));
   }
 
   @Operation(operationId = "getResourcesBadge", summary = "获取关键资源badge统计",
@@ -144,6 +144,6 @@ public class AnalyticsRest {
   @ResponseStatus(HttpStatus.OK)
   @GetMapping("/resources/badge")
   public ApiLocaleResult<ResourcesBadgeVo> getResourcesBadge() {
-    return ApiLocaleResult.success(analyticsFacade.getResourcesBadge());
+    return ApiLocaleResult.success(chatAnalyticsFacade.getResourcesBadge());
   }
 }

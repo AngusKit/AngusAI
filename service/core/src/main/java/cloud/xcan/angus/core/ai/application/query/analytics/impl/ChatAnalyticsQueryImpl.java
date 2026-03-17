@@ -5,9 +5,9 @@ import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.calculatePercentil
 import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatDateByGranularity;
 import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.getStatusErrorName;
 
-import cloud.xcan.angus.core.ai.application.query.analytics.AnalyticsQuery;
-import cloud.xcan.angus.core.ai.domain.analytics.ApiUsageLog;
-import cloud.xcan.angus.core.ai.domain.analytics.ApiUsageLogRepo;
+import cloud.xcan.angus.core.ai.application.query.analytics.ChatAnalyticsQuery;
+import cloud.xcan.angus.core.ai.domain.chat.ChatUsageLog;
+import cloud.xcan.angus.core.ai.domain.chat.ChatUsageLogRepo;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDetailVo.ApplicationStatsVo;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import jakarta.annotation.Resource;
@@ -25,10 +25,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AnalyticsQueryImpl implements AnalyticsQuery {
+public class ChatAnalyticsQueryImpl implements ChatAnalyticsQuery {
 
   @Resource
-  private ApiUsageLogRepo apiUsageLogRepo;
+  private ChatUsageLogRepo chatUsageLogRepo;
 
   @Override
   public Map<String, Object> getOverviewStatsForRange(LocalDateTime start, LocalDateTime end,
@@ -38,11 +38,11 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
       protected Map<String, Object> process() {
         Map<String, Object> stats = new HashMap<>();
         Long totalCalls = appId != null
-            ? apiUsageLogRepo.countByAppIdAndTimeRange(appId, start, end)
-            : apiUsageLogRepo.countByTimeRange(start, end);
-        Long activeUsers = apiUsageLogRepo.countDistinctUsersByTimeRange(start, end);
-        Long totalTokens = apiUsageLogRepo.sumTokensByTimeRange(start, end);
-        Double avgResponseTime = apiUsageLogRepo.avgResponseTimeByTimeRange(start, end);
+            ? chatUsageLogRepo.countByAppIdAndTimeRange(appId, start, end)
+            : chatUsageLogRepo.countByTimeRange(start, end);
+        Long activeUsers = chatUsageLogRepo.countDistinctUsersByTimeRange(start, end);
+        Long totalTokens = chatUsageLogRepo.sumTokensByTimeRange(start, end);
+        Double avgResponseTime = chatUsageLogRepo.avgResponseTimeByTimeRange(start, end);
 
         stats.put("totalCalls", totalCalls);
         stats.put("activeUsers", activeUsers);
@@ -58,7 +58,7 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
     return new BizTemplate<Map<String, Object>>() {
       @Override
       protected Map<String, Object> process() {
-        Object[] row = apiUsageLogRepo.getGlobalOverviewStats(start, end);
+        Object[] row = chatUsageLogRepo.getGlobalOverviewStats(start, end);
         Map<String, Object> stats = new HashMap<>();
         if (row == null || row[0] == null) {
           stats.put("totalCalls", 0L);
@@ -95,16 +95,16 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
 
         // 当前周期数据
         Long totalCalls = appId != null
-            ? apiUsageLogRepo.countByAppIdAndTimeRange(appId, start, end)
-            : apiUsageLogRepo.countByTimeRange(start, end);
+            ? chatUsageLogRepo.countByAppIdAndTimeRange(appId, start, end)
+            : chatUsageLogRepo.countByTimeRange(start, end);
 
         Long successfulCalls = appId != null
-            ? apiUsageLogRepo.countByAppIdAndTimeRange(appId, start, end) // 简化，实际需要过滤成功的
-            : apiUsageLogRepo.countSuccessfulByTimeRange(start, end);
+            ? chatUsageLogRepo.countByAppIdAndTimeRange(appId, start, end) // 简化，实际需要过滤成功的
+            : chatUsageLogRepo.countSuccessfulByTimeRange(start, end);
 
-        Long activeUsers = apiUsageLogRepo.countDistinctUsersByTimeRange(start, end);
-        Long totalTokens = apiUsageLogRepo.sumTokensByTimeRange(start, end);
-        Double avgResponseTime = apiUsageLogRepo.avgResponseTimeByTimeRange(start, end);
+        Long activeUsers = chatUsageLogRepo.countDistinctUsersByTimeRange(start, end);
+        Long totalTokens = chatUsageLogRepo.sumTokensByTimeRange(start, end);
+        Double avgResponseTime = chatUsageLogRepo.avgResponseTimeByTimeRange(start, end);
 
         // 上一周期数据(用于计算变化)
         long periodDuration = ChronoUnit.SECONDS.between(start, end);
@@ -112,12 +112,12 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
         LocalDateTime prevEnd = start;
 
         Long prevTotalCalls = appId != null
-            ? apiUsageLogRepo.countByAppIdAndTimeRange(appId, prevStart, prevEnd)
-            : apiUsageLogRepo.countByTimeRange(prevStart, prevEnd);
+            ? chatUsageLogRepo.countByAppIdAndTimeRange(appId, prevStart, prevEnd)
+            : chatUsageLogRepo.countByTimeRange(prevStart, prevEnd);
 
-        Long prevActiveUsers = apiUsageLogRepo.countDistinctUsersByTimeRange(prevStart, prevEnd);
-        Long prevTotalTokens = apiUsageLogRepo.sumTokensByTimeRange(prevStart, prevEnd);
-        Double prevAvgResponseTime = apiUsageLogRepo.avgResponseTimeByTimeRange(prevStart, prevEnd);
+        Long prevActiveUsers = chatUsageLogRepo.countDistinctUsersByTimeRange(prevStart, prevEnd);
+        Long prevTotalTokens = chatUsageLogRepo.sumTokensByTimeRange(prevStart, prevEnd);
+        Double prevAvgResponseTime = chatUsageLogRepo.avgResponseTimeByTimeRange(prevStart, prevEnd);
 
         stats.put("totalCalls", totalCalls);
         stats.put("successfulCalls", successfulCalls);
@@ -146,19 +146,19 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
       @Override
       protected List<Map<String, Object>> process() {
         List<Map<String, Object>> trend = new ArrayList<>();
-        List<ApiUsageLog> logs = appId != null
-            ? apiUsageLogRepo.findByAppIdAndRequestTimeBetween(appId, start, end)
-            : apiUsageLogRepo.findByRequestTimeBetween(start, end);
+        List<ChatUsageLog> logs = appId != null
+            ? chatUsageLogRepo.findByAppIdAndRequestTimeBetween(appId, start, end)
+            : chatUsageLogRepo.findByRequestTimeBetween(start, end);
 
         // 按时间粒度分组聚合
-        Map<String, List<ApiUsageLog>> grouped = groupByGranularity(logs, granularity);
+        Map<String, List<ChatUsageLog>> grouped = groupByGranularity(logs, granularity);
 
-        for (Map.Entry<String, List<ApiUsageLog>> entry : grouped.entrySet()) {
+        for (Map.Entry<String, List<ChatUsageLog>> entry : grouped.entrySet()) {
           Map<String, Object> dataPoint = new HashMap<>();
-          List<ApiUsageLog> groupLogs = entry.getValue();
+          List<ChatUsageLog> groupLogs = entry.getValue();
 
           long totalCalls = groupLogs.size();
-          long successfulCalls = groupLogs.stream().filter(ApiUsageLog::getIsSuccessful).count();
+          long successfulCalls = groupLogs.stream().filter(ChatUsageLog::getIsSuccessful).count();
           long failedCalls = totalCalls - successfulCalls;
 
           dataPoint.put("date", entry.getKey());
@@ -185,15 +185,15 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
       @Override
       protected List<Map<String, Object>> process() {
         List<Map<String, Object>> trend = new ArrayList<>();
-        List<ApiUsageLog> logs = appId != null
-            ? apiUsageLogRepo.findByAppIdAndRequestTimeBetween(appId, start, end)
-            : apiUsageLogRepo.findByRequestTimeBetween(start, end);
+        List<ChatUsageLog> logs = appId != null
+            ? chatUsageLogRepo.findByAppIdAndRequestTimeBetween(appId, start, end)
+            : chatUsageLogRepo.findByRequestTimeBetween(start, end);
 
-        Map<String, List<ApiUsageLog>> grouped = groupByGranularity(logs, granularity);
+        Map<String, List<ChatUsageLog>> grouped = groupByGranularity(logs, granularity);
 
-        for (Map.Entry<String, List<ApiUsageLog>> entry : grouped.entrySet()) {
+        for (Map.Entry<String, List<ChatUsageLog>> entry : grouped.entrySet()) {
           Map<String, Object> dataPoint = new HashMap<>();
-          List<ApiUsageLog> groupLogs = entry.getValue();
+          List<ChatUsageLog> groupLogs = entry.getValue();
 
           long inputTokens = groupLogs.stream()
               .mapToLong(log -> log.getInputTokens() != null ? log.getInputTokens() : 0)
@@ -231,19 +231,19 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
       @Override
       protected List<Map<String, Object>> process() {
         List<Map<String, Object>> trend = new ArrayList<>();
-        List<ApiUsageLog> logs = appId != null
-            ? apiUsageLogRepo.findByAppIdAndRequestTimeBetween(appId, start, end)
-            : apiUsageLogRepo.findByRequestTimeBetween(start, end);
+        List<ChatUsageLog> logs = appId != null
+            ? chatUsageLogRepo.findByAppIdAndRequestTimeBetween(appId, start, end)
+            : chatUsageLogRepo.findByRequestTimeBetween(start, end);
 
-        Map<String, List<ApiUsageLog>> grouped = groupByGranularity(logs, granularity);
+        Map<String, List<ChatUsageLog>> grouped = groupByGranularity(logs, granularity);
 
-        for (Map.Entry<String, List<ApiUsageLog>> entry : grouped.entrySet()) {
+        for (Map.Entry<String, List<ChatUsageLog>> entry : grouped.entrySet()) {
           Map<String, Object> dataPoint = new HashMap<>();
-          List<ApiUsageLog> groupLogs = entry.getValue();
+          List<ChatUsageLog> groupLogs = entry.getValue();
 
           if (!groupLogs.isEmpty()) {
             List<Integer> responseTimes = groupLogs.stream()
-                .map(ApiUsageLog::getResponseTimeMs)
+                .map(ChatUsageLog::getResponseTimeMs)
                 .sorted()
                 .collect(Collectors.toList());
 
@@ -279,7 +279,7 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
     return new BizTemplate<Map<String, Object>>() {
       @Override
       protected Map<String, Object> process() {
-        List<Object[]> results = apiUsageLogRepo.groupByEndpointOrderByAvgTime(start, end,
+        List<Object[]> results = chatUsageLogRepo.groupByEndpointOrderByAvgTime(start, end,
             PageRequest.of(0, 1));
         if (results.isEmpty()) {
           return new HashMap<>();
@@ -304,7 +304,7 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
     return new BizTemplate<List<Map<String, Object>>>() {
       @Override
       protected List<Map<String, Object>> process() {
-        List<Object[]> results = apiUsageLogRepo.groupByApp(start, end);
+        List<Object[]> results = chatUsageLogRepo.groupByApp(start, end);
         List<Map<String, Object>> distribution = new ArrayList<>();
 
         long total = results.stream().mapToLong(r -> ((Number) r[1]).longValue()).sum();
@@ -337,7 +337,7 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
     return new BizTemplate<List<Map<String, Object>>>() {
       @Override
       protected List<Map<String, Object>> process() {
-        List<Object[]> results = apiUsageLogRepo.groupByModel(start, end);
+        List<Object[]> results = chatUsageLogRepo.groupByModel(start, end);
         List<Map<String, Object>> distribution = new ArrayList<>();
 
         long totalCalls = results.stream().mapToLong(r -> ((Number) r[1]).longValue()).sum();
@@ -365,7 +365,7 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
     return new BizTemplate<List<Map<String, Object>>>() {
       @Override
       protected List<Map<String, Object>> process() {
-        List<Object[]> results = apiUsageLogRepo.groupByModelOrderByCost(start, end);
+        List<Object[]> results = chatUsageLogRepo.groupByModelOrderByCost(start, end);
         List<Map<String, Object>> distribution = new ArrayList<>();
 
         long totalCost = results.stream()
@@ -400,7 +400,7 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
     return new BizTemplate<List<Map<String, Object>>>() {
       @Override
       protected List<Map<String, Object>> process() {
-        List<Object[]> results = apiUsageLogRepo.groupByEndpoint(start, end);
+        List<Object[]> results = chatUsageLogRepo.groupByEndpoint(start, end);
         List<Map<String, Object>> endpoints = new ArrayList<>();
 
         int count = 0;
@@ -438,7 +438,7 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
         Map<String, Object> analysis = new HashMap<>();
 
         // 按状态码统计
-        List<Object[]> statusCodeResults = apiUsageLogRepo.groupByStatusCode(start, end);
+        List<Object[]> statusCodeResults = chatUsageLogRepo.groupByStatusCode(start, end);
         List<Map<String, Object>> byStatusCode = new ArrayList<>();
 
         long totalErrors = statusCodeResults.stream()
@@ -476,7 +476,7 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
         int page = offset != null && offset > 0 ? offset / pageSize : 0;
         Pageable pageable = PageRequest.of(page, pageSize);
 
-        List<Object[]> results = apiUsageLogRepo.getRecentAppUsageStats(since, pageable);
+        List<Object[]> results = chatUsageLogRepo.getRecentAppUsageStats(since, pageable);
         List<Map<String, Object>> stats = new ArrayList<>();
 
         for (Object[] result : results) {
@@ -510,7 +510,7 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
       }
 
       private ApplicationStatsVo buildStatsVo(Long appId, LocalDateTime start, LocalDateTime end) {
-        Object[] row = apiUsageLogRepo.getAppOverviewStats(appId, start, end);
+        Object[] row = chatUsageLogRepo.getAppOverviewStats(appId, start, end);
         ApplicationStatsVo vo = new ApplicationStatsVo();
         // JPQL 聚合可能返回 Object[1]{Object[5]} 的嵌套结构，需解包
         if (row[0] == null) {
@@ -542,11 +542,11 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
   /**
    * 按时间粒度分组日志
    */
-  private Map<String, List<ApiUsageLog>> groupByGranularity(List<ApiUsageLog> logs,
+  private Map<String, List<ChatUsageLog>> groupByGranularity(List<ChatUsageLog> logs,
       String granularity) {
-    Map<String, List<ApiUsageLog>> grouped = new HashMap<>();
+    Map<String, List<ChatUsageLog>> grouped = new HashMap<>();
 
-    for (ApiUsageLog log : logs) {
+    for (ChatUsageLog log : logs) {
       String key = formatDateByGranularity(log.getRequestTime(), granularity);
       grouped.computeIfAbsent(key, k -> new ArrayList<>()).add(log);
     }

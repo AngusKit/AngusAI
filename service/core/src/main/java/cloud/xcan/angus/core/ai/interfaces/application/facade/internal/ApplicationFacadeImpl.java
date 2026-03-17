@@ -5,7 +5,7 @@ import static cloud.xcan.angus.core.utils.CoreUtils.buildVoPageResult;
 
 import cloud.xcan.angus.core.ai.application.cmd.application.ApplicationCmd;
 import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
-import cloud.xcan.angus.core.ai.application.query.analytics.AnalyticsQuery;
+import cloud.xcan.angus.core.ai.application.query.analytics.ChatAnalyticsQuery;
 import cloud.xcan.angus.core.ai.application.query.application.ApplicationQuery;
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.domain.agent.Agent;
@@ -56,14 +56,14 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
   private ModelQuery modelQuery;
 
   @Resource
-  private AnalyticsQuery analyticsQuery;
+  private ChatAnalyticsQuery chatAnalyticsQuery;
 
   @NameJoin
   @Override
   public ApplicationDetailVo create(ApplicationCreateDto dto) {
     AIApplication application = ApplicationAssembler.toCreateDomain(dto);
     AIApplication saved = applicationCmd.create(application);
-    Map<Long, ApplicationStatsVo> statsVoMap = analyticsQuery.getApplicationStats(
+    Map<Long, ApplicationStatsVo> statsVoMap = chatAnalyticsQuery.getApplicationStats(
         List.of(saved.getId()));
     return ApplicationAssembler.toDetailVo(saved, getAgentsVo(saved.getId()),
         getDefaultAgentVo(saved.getId()), statsVoMap.get(saved.getId()));
@@ -73,7 +73,7 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
   @Override
   public ApplicationDetailVo duplicate(Long id, ApplicationDuplicateDto dto) {
     AIApplication saved = applicationCmd.duplicate(id, dto.getName());
-    Map<Long, ApplicationStatsVo> statsVoMap = analyticsQuery.getApplicationStats(List.of(id));
+    Map<Long, ApplicationStatsVo> statsVoMap = chatAnalyticsQuery.getApplicationStats(List.of(id));
     return ApplicationAssembler.toDetailVo(saved, getAgentsVo(saved.getId()),
         getDefaultAgentVo(saved.getId()), statsVoMap.get(id));
   }
@@ -83,7 +83,7 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
   public ApplicationDetailVo update(Long id, ApplicationUpdateDto dto) {
     AIApplication application = ApplicationAssembler.toUpdateDomain(id, dto);
     AIApplication saved = applicationCmd.update(application);
-    Map<Long, ApplicationStatsVo> statsVoMap = analyticsQuery.getApplicationStats(List.of(id));
+    Map<Long, ApplicationStatsVo> statsVoMap = chatAnalyticsQuery.getApplicationStats(List.of(id));
     return ApplicationAssembler.toDetailVo(saved, getAgentsVo(saved.getId()),
         getDefaultAgentVo(saved.getId()), statsVoMap.get(id));
   }
@@ -92,7 +92,7 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
   @Override
   public ApplicationDetailVo updateConfig(Long id, ApplicationConfig config) {
     AIApplication saved = applicationCmd.updateConfig(id, config);
-    Map<Long, ApplicationStatsVo> statsVoMap = analyticsQuery.getApplicationStats(List.of(id));
+    Map<Long, ApplicationStatsVo> statsVoMap = chatAnalyticsQuery.getApplicationStats(List.of(id));
     return ApplicationAssembler.toDetailVo(saved, getAgentsVo(saved.getId()),
         getDefaultAgentVo(saved.getId()), statsVoMap.get(id));
   }
@@ -101,7 +101,7 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
   @Override
   public ApplicationDetailVo modifyStatus(Long id, ApplicationStatus status) {
     AIApplication saved = applicationCmd.modifyStatus(id, status);
-    Map<Long, ApplicationStatsVo> statsVoMap = analyticsQuery.getApplicationStats(List.of(id));
+    Map<Long, ApplicationStatsVo> statsVoMap = chatAnalyticsQuery.getApplicationStats(List.of(id));
     return ApplicationAssembler.toDetailVo(saved, getAgentsVo(saved.getId()),
         getDefaultAgentVo(saved.getId()), statsVoMap.get(id));
   }
@@ -111,7 +111,7 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
   public ApplicationDetailVo share(Long id, ApplicationShareDto dto) {
     AIApplication application = ApplicationAssembler.shareDomain(id, dto);
     AIApplication saved = applicationCmd.share(application);
-    Map<Long, ApplicationStatsVo> statsVoMap = analyticsQuery.getApplicationStats(List.of(id));
+    Map<Long, ApplicationStatsVo> statsVoMap = chatAnalyticsQuery.getApplicationStats(List.of(id));
     return ApplicationAssembler.toDetailVo(saved, getAgentsVo(saved.getId()),
         getDefaultAgentVo(saved.getId()), statsVoMap.get(id));
   }
@@ -120,7 +120,7 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
   @Override
   public ApplicationDetailVo star(Long id, Boolean isStarred) {
     AIApplication saved = applicationCmd.star(id, isStarred);
-    Map<Long, ApplicationStatsVo> statsVoMap = analyticsQuery.getApplicationStats(List.of(id));
+    Map<Long, ApplicationStatsVo> statsVoMap = chatAnalyticsQuery.getApplicationStats(List.of(id));
     return ApplicationAssembler.toDetailVo(saved, getAgentsVo(id), getDefaultAgentVo(id),
         statsVoMap.get(id));
   }
@@ -134,7 +134,7 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
   @Override
   public ApplicationDetailVo getDetail(Long id) {
     AIApplication saved = applicationQuery.findAndCheck(id);
-    Map<Long, ApplicationStatsVo> statsVoMap = analyticsQuery.getApplicationStats(List.of(id));
+    Map<Long, ApplicationStatsVo> statsVoMap = chatAnalyticsQuery.getApplicationStats(List.of(id));
     return ApplicationAssembler.toDetailVo(saved, getAgentsVo(id), getDefaultAgentVo(id),
         statsVoMap.get(id));
   }
@@ -150,7 +150,7 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
           -> ApplicationAssembler.toListVo(app, List.of(), null, null, false));
     }
     List<Long> appIds = page.getContent().stream().map(AIApplication::getId).toList();
-    Map<Long, ApplicationStatsVo> statsVoMap = analyticsQuery.getApplicationStats(appIds);
+    Map<Long, ApplicationStatsVo> statsVoMap = chatAnalyticsQuery.getApplicationStats(appIds);
     AgentsBatchResult batch = batchLoadAgentsAndDefaultAgents(appIds);
     Set<Long> starredAppIds = applicationQuery.findStarredApplicationIds(appIds);
     return buildVoPageResult(page, app -> {

@@ -11,13 +11,13 @@ import cloud.xcan.agentx.core.agent.AgentRegistry;
 import cloud.xcan.agentx.core.agent.ChatConfigOverride;
 import cloud.xcan.angus.core.ai.application.cmd.agent.AgentChatCmd;
 import cloud.xcan.angus.core.ai.application.cmd.agent.AgentCmd;
-import cloud.xcan.angus.core.ai.application.cmd.analytics.ApiUsageLogCmd;
+import cloud.xcan.angus.core.ai.application.cmd.analytics.ChatUsageLogCmd;
 import cloud.xcan.angus.core.ai.application.cmd.chat.MessageCmd;
 import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.domain.agent.Agent;
 import cloud.xcan.angus.core.ai.domain.agent.AgentChatResult;
-import cloud.xcan.angus.core.ai.domain.analytics.ApiUsageLog;
+import cloud.xcan.angus.core.ai.domain.chat.ChatUsageLog;
 import cloud.xcan.angus.core.ai.domain.chat.Message;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRole;
 import cloud.xcan.angus.core.ai.domain.chat.Session;
@@ -71,7 +71,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
   private ModelQuery modelQuery;
 
   @Resource
-  private ApiUsageLogCmd apiUsageLogCmd;
+  private ChatUsageLogCmd chatUsageLogCmd;
 
   /**
    * 流式 SSE 专用线程池
@@ -208,7 +208,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
                     emitter.completeWithError(e);
                   }
                 })
-                // 流结束：用完整内容覆盖占位消息，关闭流式标记，记录 ApiUsageLog（含 token 用量与成本）
+                // 流结束：用完整内容覆盖占位消息，关闭流式标记，记录 ChatUsageLog（含 token 用量与成本）
                 .onCompleteResponse(r -> {
                   assistantMessage.setContent(fullContent.toString());
                   messageCmd.setStreaming(assistantMessage, false);
@@ -279,7 +279,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
     try {
       int responseTimeMs = (int) (System.currentTimeMillis() - startMs);
       Integer cost = calculateCost(agent, model, inputTokens, outputTokens);
-      ApiUsageLog log = new ApiUsageLog()
+      ChatUsageLog log = new ChatUsageLog()
           .setAppId(session != null ? session.getAppId() : null)
           .setAgentId(agent != null ? agent.getId() : null)
           .setModelId(agent != null ? agent.getDefaultModelId() : null)
@@ -294,7 +294,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
           .setIsSuccessful(isSuccessful)
           .setErrorMessage(lengthSafe(errorMessage, 1000))
           .setSessionId(session != null ? session.getSessionId() : null);
-      apiUsageLogCmd.create(log, principal);
+      chatUsageLogCmd.create(log, principal);
     } catch (Exception e) {
       log.error(e.getMessage());
     }

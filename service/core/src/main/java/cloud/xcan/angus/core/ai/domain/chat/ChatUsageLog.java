@@ -1,4 +1,4 @@
-package cloud.xcan.angus.core.ai.domain.analytics;
+package cloud.xcan.angus.core.ai.domain.chat;
 
 import cloud.xcan.angus.core.jpa.multitenancy.TenantEntity;
 import jakarta.persistence.Column;
@@ -15,7 +15,7 @@ import lombok.experimental.Accessors;
 @Setter
 @Getter
 @Accessors(chain = true)
-public class ApiUsageLog extends TenantEntity<ApiUsageLog, Long> {
+public class ChatUsageLog extends TenantEntity<ChatUsageLog, Long> {
 
   @Id
   private Long id;

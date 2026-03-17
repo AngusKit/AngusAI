@@ -12,7 +12,7 @@ import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
 import cloud.xcan.angus.core.ai.application.query.application.ApplicationQuery;
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.domain.agent.Agent;
-import cloud.xcan.angus.core.ai.domain.analytics.ApiUsageLogRepo;
+import cloud.xcan.angus.core.ai.domain.chat.ChatUsageLogRepo;
 import cloud.xcan.angus.core.ai.domain.application.AIApplication;
 import cloud.xcan.angus.core.ai.domain.application.AIApplicationRepo;
 import cloud.xcan.angus.core.ai.domain.application.AIApplicationSearchRepo;
@@ -68,7 +68,7 @@ public class ApplicationQueryImpl implements ApplicationQuery {
   private ApplicationStarRepo applicationStarRepo;
 
   @Resource
-  private ApiUsageLogRepo apiUsageLogRepo;
+  private ChatUsageLogRepo chatUsageLogRepo;
 
   @Resource
   private UserManager userManager;
@@ -278,7 +278,7 @@ public class ApplicationQueryImpl implements ApplicationQuery {
 
   private void buildOverview(ApplicationStatisticsVo vo, Long appId, LocalDateTime start,
       LocalDateTime end) {
-    Object[] row = apiUsageLogRepo.getAppOverviewStats(appId, start, end);
+    Object[] row = chatUsageLogRepo.getAppOverviewStats(appId, start, end);
     ApplicationStatisticsVo.OverviewStatsVo overview = new ApplicationStatisticsVo.OverviewStatsVo();
     // JPQL 聚合可能返回 Object[1]{Object[5]} 的嵌套结构，需解包
     if (row == null || row.length == 0 || row[0] == null) {
@@ -310,7 +310,7 @@ public class ApplicationQueryImpl implements ApplicationQuery {
 
   private void buildTrends(ApplicationStatisticsVo vo, Long appId, LocalDateTime start,
       LocalDateTime end) {
-    List<Object[]> rows = apiUsageLogRepo.getAppTrendByDay(appId, start, end);
+    List<Object[]> rows = chatUsageLogRepo.getAppTrendByDay(appId, start, end);
     List<ApplicationStatisticsVo.TrendDataVo> calls = new ArrayList<>();
     List<ApplicationStatisticsVo.TrendDataVo> tokens = new ArrayList<>();
     List<ApplicationStatisticsVo.TrendDataVo> responseTime = new ArrayList<>();
@@ -357,7 +357,7 @@ public class ApplicationQueryImpl implements ApplicationQuery {
 
   private void buildTopUsers(ApplicationStatisticsVo vo, Long appId, LocalDateTime start,
       LocalDateTime end) {
-    List<Object[]> rows = apiUsageLogRepo.getTopUsersByAppId(appId, start, end,
+    List<Object[]> rows = chatUsageLogRepo.getTopUsersByAppId(appId, start, end,
         PageRequest.of(0, DEFAULT_TOP_USERS_LIMIT));
     List<ApplicationStatisticsVo.TopUserVo> topUsers = new ArrayList<>();
     if (rows != null) {

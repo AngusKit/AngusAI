@@ -5,13 +5,13 @@ import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.parseTimeRange;
 import static cloud.xcan.angus.spec.principal.PrincipalContext.getUserId;
 
 import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
-import cloud.xcan.angus.core.ai.application.query.analytics.AnalyticsQuery;
+import cloud.xcan.angus.core.ai.application.query.analytics.ChatAnalyticsQuery;
 import cloud.xcan.angus.core.ai.application.query.application.ApplicationQuery;
 import cloud.xcan.angus.core.ai.application.query.chat.SessionQuery;
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.application.query.notification.NotificationQuery;
 import cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.TimeRange;
-import cloud.xcan.angus.core.ai.interfaces.analytics.facade.AnalyticsFacade;
+import cloud.xcan.angus.core.ai.interfaces.analytics.facade.ChatAnalyticsFacade;
 import cloud.xcan.angus.core.ai.interfaces.analytics.facade.dto.AnalyticsQueryDto;
 import cloud.xcan.angus.core.ai.interfaces.analytics.facade.internal.assembler.AnalyticsAssembler;
 import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.AnalyticsOverviewVo;
@@ -31,10 +31,10 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AnalyticsFacadeImpl implements AnalyticsFacade {
+public class ChatAnalyticsFacadeImpl implements ChatAnalyticsFacade {
 
   @Resource
-  private AnalyticsQuery analyticsQuery;
+  private ChatAnalyticsQuery chatAnalyticsQuery;
 
   @Resource
   private ApplicationQuery applicationQuery;
@@ -55,7 +55,7 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
   public AnalyticsOverviewVo getOverview(AnalyticsQueryDto dto) {
     TimeRange timeRange = parseTimeRange(dto.getTimeRange());
 
-    Map<String, Object> stats = analyticsQuery.getOverviewStats(
+    Map<String, Object> stats = chatAnalyticsQuery.getOverviewStats(
         timeRange.start, timeRange.end, dto.getAppId());
 
     return AnalyticsAssembler.toOverviewVo(stats, dto.getTimeRange(),
@@ -68,7 +68,7 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
     TimeRange timeRange = parseTimeRange(dto.getTimeRange());
     String granularity = determineGranularity(dto.getTimeRange(), dto.getGranularity());
 
-    List<Map<String, Object>> trendData = analyticsQuery.getApiCallsTrend(
+    List<Map<String, Object>> trendData = chatAnalyticsQuery.getApiCallsTrend(
         timeRange.start, timeRange.end, dto.getAppId(), granularity);
     return AnalyticsAssembler.toApiCallsTrendVo(trendData);
   }
@@ -78,7 +78,7 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
     TimeRange timeRange = parseTimeRange(dto.getTimeRange());
     String granularity = determineGranularity(dto.getTimeRange(), dto.getGranularity());
 
-    List<Map<String, Object>> trendData = analyticsQuery.getTokenUsageTrend(
+    List<Map<String, Object>> trendData = chatAnalyticsQuery.getTokenUsageTrend(
         timeRange.start, timeRange.end, dto.getAppId(), granularity);
     return AnalyticsAssembler.toTokenUsageTrendVo(trendData);
   }
@@ -88,9 +88,9 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
     TimeRange timeRange = parseTimeRange(dto.getTimeRange());
     String granularity = determineGranularity(dto.getTimeRange(), dto.getGranularity());
 
-    List<Map<String, Object>> analysisData = analyticsQuery.getResponseTimeAnalysis(
+    List<Map<String, Object>> analysisData = chatAnalyticsQuery.getResponseTimeAnalysis(
         timeRange.start, timeRange.end, dto.getAppId(), granularity);
-    Map<String, Object> slowestEndpoint = analyticsQuery.getSlowestEndpoint(
+    Map<String, Object> slowestEndpoint = chatAnalyticsQuery.getSlowestEndpoint(
         timeRange.start, timeRange.end, dto.getAppId());
 
     return AnalyticsAssembler.toResponseTimeAnalysisVo(analysisData, slowestEndpoint);
@@ -100,7 +100,7 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
   public AppDistributionVo getAppDistribution(AnalyticsQueryDto dto, Integer limit) {
     TimeRange timeRange = parseTimeRange(dto.getTimeRange());
 
-    List<Map<String, Object>> distributionData = analyticsQuery.getAppDistribution(
+    List<Map<String, Object>> distributionData = chatAnalyticsQuery.getAppDistribution(
         timeRange.start, timeRange.end, limit != null ? limit : 10);
     return AnalyticsAssembler.toAppDistributionVo(fillAppNames(distributionData));
   }
@@ -109,7 +109,7 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
   public ModelDistributionVo getModelDistribution(AnalyticsQueryDto dto) {
     TimeRange timeRange = parseTimeRange(dto.getTimeRange());
 
-    List<Map<String, Object>> distributionData = analyticsQuery.getModelDistribution(
+    List<Map<String, Object>> distributionData = chatAnalyticsQuery.getModelDistribution(
         timeRange.start, timeRange.end);
     return AnalyticsAssembler.toModelDistributionVo(fillModelNames(distributionData));
   }
@@ -118,7 +118,7 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
   public TopEndpointsVo getTopEndpoints(AnalyticsQueryDto dto, Integer limit, String orderBy) {
     TimeRange timeRange = parseTimeRange(dto.getTimeRange());
 
-    List<Map<String, Object>> endpointsData = analyticsQuery.getTopEndpoints(
+    List<Map<String, Object>> endpointsData = chatAnalyticsQuery.getTopEndpoints(
         timeRange.start, timeRange.end, limit != null ? limit : 10, orderBy);
     return AnalyticsAssembler.toTopEndpointsVo(endpointsData);
   }
@@ -127,7 +127,7 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
   public ErrorAnalysisVo getErrorAnalysis(AnalyticsQueryDto dto) {
     TimeRange timeRange = parseTimeRange(dto.getTimeRange());
 
-    Map<String, Object> analysisData = analyticsQuery.getErrorAnalysis(
+    Map<String, Object> analysisData = chatAnalyticsQuery.getErrorAnalysis(
         timeRange.start, timeRange.end, dto.getAppId());
     return AnalyticsAssembler.toErrorAnalysisVo(analysisData);
   }

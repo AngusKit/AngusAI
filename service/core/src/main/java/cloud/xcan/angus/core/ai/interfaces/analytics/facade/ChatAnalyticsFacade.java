@@ -11,7 +11,7 @@ import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.ResponseTimeAnaly
 import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.TokenUsageTrendVo;
 import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.TopEndpointsVo;
 
-public interface AnalyticsFacade {
+public interface ChatAnalyticsFacade {
 
   /**
    * 获取分析概览

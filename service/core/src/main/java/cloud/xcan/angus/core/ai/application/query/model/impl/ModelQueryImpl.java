@@ -5,7 +5,7 @@ import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.getLong;
 import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.parseEndDate;
 import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.parseStartDate;
 
-import cloud.xcan.angus.core.ai.application.query.analytics.AnalyticsQuery;
+import cloud.xcan.angus.core.ai.application.query.analytics.ChatAnalyticsQuery;
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.domain.model.LastMonthGrowthTrend;
 import cloud.xcan.angus.core.ai.domain.model.Model;
@@ -42,7 +42,7 @@ public class ModelQueryImpl implements ModelQuery {
   private ModelSearchRepo modelSearchRepo;
 
   @Resource
-  private AnalyticsQuery analyticsQuery;
+  private ChatAnalyticsQuery chatAnalyticsQuery;
 
   @Override
   public Model findAndCheck(Long id) {
@@ -100,7 +100,7 @@ public class ModelQueryImpl implements ModelQuery {
     long activeModels = modelRepo.countAllByFilters(activeFilters);
     vo.setActiveModels(activeModels);
 
-    Map<String, Object> overview = analyticsQuery.getModelOverviewStatsForRange(start, end);
+    Map<String, Object> overview = chatAnalyticsQuery.getModelOverviewStatsForRange(start, end);
     long totalCalls = getLong(overview, "totalCalls");
     long successCalls = getLong(overview, "successfulCalls");
     long failedCalls = getLong(overview, "failedCalls");
@@ -130,7 +130,7 @@ public class ModelQueryImpl implements ModelQuery {
   }
 
   private void buildLastMonthTrend(ModelStatisticsVo vo, LocalDateTime start, LocalDateTime end) {
-    Map<String, Object> lmStats = analyticsQuery.getModelOverviewStatsForRange(start, end);
+    Map<String, Object> lmStats = chatAnalyticsQuery.getModelOverviewStatsForRange(start, end);
     LastMonthGrowthTrend lm = new LastMonthGrowthTrend();
 
     long callsLast30 = getLong(lmStats, "totalCalls");
@@ -156,7 +156,7 @@ public class ModelQueryImpl implements ModelQuery {
   }
 
   private void buildTodayTrend(ModelStatisticsVo vo, LocalDateTime start, LocalDateTime end) {
-    Map<String, Object> todayStats = analyticsQuery.getModelOverviewStatsForRange(start, end);
+    Map<String, Object> todayStats = chatAnalyticsQuery.getModelOverviewStatsForRange(start, end);
     TodayGrowthTrend trend = new TodayGrowthTrend();
 
     long callsToday = getLong(todayStats, "totalCalls");

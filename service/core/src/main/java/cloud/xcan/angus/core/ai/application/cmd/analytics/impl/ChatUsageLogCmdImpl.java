@@ -1,8 +1,8 @@
 package cloud.xcan.angus.core.ai.application.cmd.analytics.impl;
 
-import cloud.xcan.angus.core.ai.application.cmd.analytics.ApiUsageLogCmd;
-import cloud.xcan.angus.core.ai.domain.analytics.ApiUsageLog;
-import cloud.xcan.angus.core.ai.domain.analytics.ApiUsageLogRepo;
+import cloud.xcan.angus.core.ai.application.cmd.analytics.ChatUsageLogCmd;
+import cloud.xcan.angus.core.ai.domain.chat.ChatUsageLog;
+import cloud.xcan.angus.core.ai.domain.chat.ChatUsageLogRepo;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
 import cloud.xcan.angus.spec.principal.Principal;
@@ -12,14 +12,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class ApiUsageLogCmdImpl extends CommCmd<ApiUsageLog, Long> implements ApiUsageLogCmd {
+public class ChatUsageLogCmdImpl extends CommCmd<ChatUsageLog, Long> implements ChatUsageLogCmd {
 
   @Resource
-  private ApiUsageLogRepo apiUsageLogRepo;
+  private ChatUsageLogRepo chatUsageLogRepo;
 
   @Override
   @Transactional
-  public void create(ApiUsageLog usageLog, Principal principal) {
+  public void create(ChatUsageLog usageLog, Principal principal) {
     usageLog.setId(usageLog.getId());
     usageLog.setIpAddress(principal.getRemoteAddress());
     usageLog.setUserAgent(principal.getUserAgent());
@@ -36,7 +36,7 @@ public class ApiUsageLogCmdImpl extends CommCmd<ApiUsageLog, Long> implements Ap
   }
 
   @Override
-  protected BaseRepository<ApiUsageLog, Long> getRepository() {
-    return apiUsageLogRepo;
+  protected BaseRepository<ChatUsageLog, Long> getRepository() {
+    return chatUsageLogRepo;
   }
 }

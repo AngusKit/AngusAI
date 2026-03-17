@@ -1,10 +1,11 @@
 package cloud.xcan.angus.core.ai.interfaces.dashboard.facade.internal;
 
 import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.toLong;
+import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.DATE_FMT;
 import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.parseTimeRange;
 import static cloud.xcan.angus.spec.principal.PrincipalContext.getUserId;
 
-import cloud.xcan.angus.core.ai.application.query.analytics.AnalyticsQuery;
+import cloud.xcan.angus.core.ai.application.query.analytics.ChatAnalyticsQuery;
 import cloud.xcan.angus.core.ai.application.query.application.ApplicationQuery;
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.domain.application.AIApplication;
@@ -27,10 +28,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class DashboardFacadeImpl implements DashboardFacade {
 
-  private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
   @Resource
-  private AnalyticsQuery analyticsQuery;
+  private ChatAnalyticsQuery chatAnalyticsQuery;
 
   @Resource
   private ApplicationQuery applicationQuery;
@@ -43,11 +42,11 @@ public class DashboardFacadeImpl implements DashboardFacade {
     var timeRange = parseTimeRange(dto.getTimeRange() != null ? dto.getTimeRange() : "7days");
     int limit = dto.getLimit() != null ? dto.getLimit() : 5;
 
-    List<Map<String, Object>> appDist = analyticsQuery.getAppDistribution(
+    List<Map<String, Object>> appDist = chatAnalyticsQuery.getAppDistribution(
         timeRange.start, timeRange.end, limit);
-    List<Map<String, Object>> topApis = analyticsQuery.getTopEndpoints(
+    List<Map<String, Object>> topApis = chatAnalyticsQuery.getTopEndpoints(
         timeRange.start, timeRange.end, limit, "calls");
-    List<Map<String, Object>> costModels = analyticsQuery.getModelDistributionByCost(
+    List<Map<String, Object>> costModels = chatAnalyticsQuery.getModelDistributionByCost(
         timeRange.start, timeRange.end, limit);
 
     List<Long> appIds = appDist.stream()
@@ -88,13 +87,13 @@ public class DashboardFacadeImpl implements DashboardFacade {
     LocalDateTime thisMonthStart = now.minusDays(30);
     LocalDateTime lastMonthStart = now.minusDays(60);
 
-    Map<String, Object> thisWeek = analyticsQuery.getOverviewStatsForRange(thisWeekStart, now,
+    Map<String, Object> thisWeek = chatAnalyticsQuery.getOverviewStatsForRange(thisWeekStart, now,
         null);
-    Map<String, Object> lastWeek = analyticsQuery.getOverviewStatsForRange(lastWeekStart,
+    Map<String, Object> lastWeek = chatAnalyticsQuery.getOverviewStatsForRange(lastWeekStart,
         thisWeekStart, null);
-    Map<String, Object> thisMonth = analyticsQuery.getOverviewStatsForRange(thisMonthStart, now,
+    Map<String, Object> thisMonth = chatAnalyticsQuery.getOverviewStatsForRange(thisMonthStart, now,
         null);
-    Map<String, Object> lastMonth = analyticsQuery.getOverviewStatsForRange(lastMonthStart,
+    Map<String, Object> lastMonth = chatAnalyticsQuery.getOverviewStatsForRange(lastMonthStart,
         thisMonthStart, null);
 
     long totalApps = 0L;
@@ -112,7 +111,7 @@ public class DashboardFacadeImpl implements DashboardFacade {
     int offset = dto.getOffset() != null && dto.getOffset() >= 0 ? dto.getOffset() : 0;
     LocalDateTime since = LocalDateTime.now().minusDays(30);
 
-    List<Map<String, Object>> usageStats = analyticsQuery.getRecentAppUsageStats(
+    List<Map<String, Object>> usageStats = chatAnalyticsQuery.getRecentAppUsageStats(
         since, limit, offset);
 
     List<Long> appIds = usageStats.stream()
