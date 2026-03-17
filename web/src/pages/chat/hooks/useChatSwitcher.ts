@@ -74,9 +74,18 @@ export function useChatSwitcher({
   const modelScrollRef = useRef<HTMLDivElement>(null);
   const modelLoadingRef = useRef(false);
 
-  // 用 apps 解析 selection，切换 session 时避免因 selection 仅有 ids 无对象而闪动
+  // 当 selection.appId 不在 apps 中时，单独拉取的应用（用于正确展示）
+  const [extraApp, setExtraApp] = useState<ApplicationListVo | null>(null);
+  // 当 selection.modelId 不在 models 中时，单独拉取的模型（用于正确展示）
+  const [extraModel, setExtraModel] = useState<ModelListVo | null>(null);
+
+  // 用 apps + extraApp 解析 selection，切换 session 时避免因 selection 仅有 ids 无对象而闪动
   const resolvedApp =
-    selection.app ?? (selection.appId ? apps.find((a) => String(a.id) === selection.appId) : undefined);
+    selection.app ??
+    (selection.appId
+      ? apps.find((a) => String(a.id) === selection.appId) ??
+        (extraApp && String(extraApp.id) === selection.appId ? extraApp : undefined)
+      : undefined);
   const agents = resolvedApp?.agents ?? [];
   const defaultAgent = resolvedApp?.defaultAgent;
   const selectedAgent =
@@ -89,7 +98,9 @@ export function useChatSwitcher({
   const selectedModelId = selection.modelId || defaultModel?.id;
   const resolvedModel =
     selection.model ??
-    (defaultModel && String(defaultModel.id) === String(selectedModelId ?? '') ? defaultModel : undefined);
+    (defaultModel && String(defaultModel.id) === String(selectedModelId ?? '') ? defaultModel : undefined) ??
+    (extraModel && selectedModelId && String(extraModel.id) === String(selectedModelId) ? extraModel : undefined) ??
+    (selectedModelId ? models.find((m) => String(m.id) === String(selectedModelId)) : undefined);
 
   const loadApps = useCallback(
     async (page: number, append: boolean) => {
@@ -186,58 +197,88 @@ export function useChatSwitcher({
     }
   }, [modelOpen, debouncedModelKw, loadModels]);
 
-  // 进入对话页面后，应用列表加载完成时：优先根据会话的 appId/agentId/modelId 匹配，匹配不到再选中第一个应用
-  const needAutoSelect =
-    !appLoading &&
-    apps.length > 0 &&
-    (!selection.appId || !selection.app || !apps.some((a) => String(a.id) === selection.appId));
+  // 当 selection.appId 存在但不在 apps 中时，按 id 单独拉取应用
+  useEffect(() => {
+    const appId = selection.appId?.trim();
+    if (!appId || apps.some((a) => String(a.id) === appId)) {
+      setExtraApp(null);
+      return;
+    }
+    let cancelled = false;
+    Applications.getApplicationDetail(appId)
+      .then((res) => {
+        if (cancelled) return;
+        const data = (res as any)?.data;
+        if (data && String(data.id) === appId) {
+          setExtraApp(data as ApplicationListVo);
+        } else {
+          setExtraApp(null);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setExtraApp(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [selection.appId, apps]);
+
+  // 当 selection.modelId 存在但无法从 agent.defaultModel 或 models 解析时，按 id 单独拉取模型
+  useEffect(() => {
+    const modelId = selection.modelId?.trim();
+    if (!modelId) {
+      setExtraModel(null);
+      return;
+    }
+    const fromDefault = defaultModel && String(defaultModel.id) === modelId;
+    const fromList = models.some((m) => String(m.id) === modelId);
+    if (fromDefault || fromList) {
+      setExtraModel(null);
+      return;
+    }
+    let cancelled = false;
+    Models.getModelDetail(modelId)
+      .then((res) => {
+        if (cancelled) return;
+        const data = (res as any)?.data;
+        if (data && String(data.id) === modelId) {
+          setExtraModel(data as ModelListVo);
+        } else {
+          setExtraModel(null);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setExtraModel(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [selection.modelId, models, defaultModel?.id]);
+
+  // 进入对话页面后，仅当无 selection.appId 时自动选中第一个应用；有 appId 时不再错误覆盖
+  const needAutoSelect = !appLoading && apps.length > 0 && !selection.appId;
   useEffect(() => {
     if (!needAutoSelect) return;
-    // 1. 优先匹配会话的 appId，否则用第一个应用
-    const app = (selection.appId && apps.some((a) => String(a.id) === selection.appId))
-      ? (apps.find((a) => String(a.id) === selection.appId) ?? apps[0])
-      : apps[0];
+    const app = apps[0];
     if (!app) return;
     const agentsList = app.agents ?? [];
     const defAgent = app.defaultAgent;
     const firstActive = agentsList.find((a) => a.status === AgentStatusEnum.ACTIVE);
-    // 2. 若 app 匹配到会话，则优先匹配会话的 agentId；否则用默认/第一个活跃智能体
     const agent =
-      selection.appId && String(app.id) === selection.appId && selection.agentId
-        ? (agentsList.find((a) => String(a?.id) === selection.agentId) ??
-           (defAgent && agentsList.some((a) => a?.id === defAgent?.id) ? defAgent : firstActive ?? agentsList[0]))
-        : defAgent && agentsList.some((a) => a?.id === defAgent?.id)
-          ? defAgent
-          : firstActive ?? agentsList[0];
-    // 3. 若 agent 匹配到会话，优先用会话的 modelId，且 agent.defaultModel 匹配时带出 model 对象；否则用 agent.defaultModel
-    const modelId = selection.modelId || agent?.defaultModel?.id;
-    const model =
-      agent?.defaultModel && String(agent.defaultModel.id) === String(modelId ?? '')
-        ? agent.defaultModel
-        : undefined;
-    const nextAppId = String(app.id ?? '');
-    const nextAgentId = agent ? String(agent.id ?? '') : '';
-    const nextModelId = modelId ? String(modelId) : '';
-    // 仅当值发生变化时才更新，避免切换 session 时因同值刷新而闪动
-    if (
-      selection.appId === nextAppId &&
-      selection.agentId === nextAgentId &&
-      selection.modelId === nextModelId &&
-      selection.app &&
-      selection.agent
-    ) {
-      return;
-    }
+      defAgent && agentsList.some((a) => a?.id === defAgent?.id)
+        ? defAgent
+        : firstActive ?? agentsList[0];
+    const model = agent?.defaultModel;
     onSelectionChange({
-      appId: nextAppId,
-      agentId: nextAgentId,
-      modelId: nextModelId,
+      appId: String(app.id ?? ''),
+      agentId: agent ? String(agent.id ?? '') : '',
+      modelId: model ? String(model.id ?? '') : '',
       app,
       agent: agent ?? undefined,
       model: model as ModelListVo | undefined,
     });
     setAppOpen(false);
-  }, [needAutoSelect, apps, selection.appId, selection.agentId, selection.modelId, selection.app, selection.agent, onSelectionChange]);
+  }, [needAutoSelect, apps, onSelectionChange]);
 
   const handleAppScroll = useCallback(() => {
     const el = appScrollRef.current;

@@ -55,6 +55,7 @@ export function ChatSwitcher({ selection, onSelectionChange, sessionId, onSwitch
     appScrollRef,
     modelScrollRef,
     agents,
+    selectedAgent,
     displayApp,
     selectedModelId,
     handleAppScroll,
@@ -233,13 +234,13 @@ export function ChatSwitcher({ selection, onSelectionChange, sessionId, onSwitch
 
       <div className='w-px h-6 bg-gray-200 dark:bg-gray-700' />
 
-      {/* 模型选择 */}
+      {/* 模型选择：有 agentId、selectedAgent 或（会话+应用）时启用，避免会话列表未返回 agentId 时模型下拉不可用 */}
       <DropdownMenu open={modelOpen} onOpenChange={setModelOpen}>
         <DropdownMenuTrigger asChild>
           <Button
             variant='ghost'
             className='gap-2 h-9 max-w-[180px]'
-            disabled={!selection.agentId}
+            disabled={!(selection.agentId || selectedAgent || (sessionId && selection.appId))}
           >
             <Cpu className='w-4 h-4 text-blue-500' />
             <span className='dark:text-white truncate'>{modelDisplayName}</span>
