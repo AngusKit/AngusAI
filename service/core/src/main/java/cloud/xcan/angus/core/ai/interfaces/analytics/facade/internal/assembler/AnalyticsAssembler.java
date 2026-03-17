@@ -327,8 +327,8 @@ public class AnalyticsAssembler {
       sumAvg += avgTimeMs / 1000.0;
       double p95Sec = p95Ms / 1000.0;
       double p99Sec = p99Ms / 1000.0;
-      if (p95Sec > maxP95) maxP95 = p95Sec;
-      if (p99Sec > maxP99) maxP99 = p99Sec;
+      if (p95Sec > maxP95) maxP95 = (int) p95Sec;
+      if (p99Sec > maxP99) maxP99 = (int) p99Sec;
       itemCount++;
     }
 
@@ -336,8 +336,8 @@ public class AnalyticsAssembler {
 
     ResponseTimeAnalysisVo.SummaryVo summary = new ResponseTimeAnalysisVo.SummaryVo();
     summary.setOverallAvg(itemCount > 0 ? sumAvg / itemCount : 0.0);
-    summary.setOverallP95(maxP95);
-    summary.setOverallP99(maxP99);
+    summary.setOverallP95((double) maxP95);
+    summary.setOverallP99((double) maxP99);
 
     ResponseTimeAnalysisVo.SlowestEndpointVo slowest = null;
     if (slowestEndpoint != null && !slowestEndpoint.isEmpty() && slowestEndpoint.get("endpoint") != null) {
