@@ -2,6 +2,8 @@ package cloud.xcan.angus.core.ai.infra.util;
 
 import cloud.xcan.angus.core.ai.domain.dataset.DatasetDataType;
 import cloud.xcan.angus.core.ai.domain.knowledgebase.DocumentType;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
@@ -26,10 +28,8 @@ public class CommonUtils {
    * 格式化百分比为2位小数（输入已乘以100，如 25.567 表示 25.567%）
    */
   public static Double formatPercentageTo2Decimals(Double percentage) {
-    if (percentage == null) {
-      return 0.0;
-    }
-    return Math.round(percentage * 100) / 100.0;
+    double value = percentage == null ? 0.0 : percentage.doubleValue();
+    return BigDecimal.valueOf(value).setScale(2, RoundingMode.HALF_UP).doubleValue();
   }
 
   /**

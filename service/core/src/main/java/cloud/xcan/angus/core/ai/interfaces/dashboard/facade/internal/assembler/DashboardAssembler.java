@@ -2,6 +2,7 @@ package cloud.xcan.angus.core.ai.interfaces.dashboard.facade.internal.assembler;
 
 import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatLargeNumber;
 import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatNumber;
+import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatPercentageTo2Decimals;
 import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatResponseTime;
 import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.toDouble;
 import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.toLocalDateTime;
@@ -60,9 +61,9 @@ public class DashboardAssembler {
       item.setEndpoint((String) d.getOrDefault("endpoint", "-"));
       item.setMethod((String) d.getOrDefault("method", "GET"));
       item.setCallCount(toLong(d.get("calls"), 0L));
-      item.setPercentage(totalApiCalls > 0
+      item.setPercentage(formatPercentageTo2Decimals(totalApiCalls > 0
           ? toLong(d.get("calls"), 0L) * 100.0 / totalApiCalls
-          : 0.0);
+          : 0.0));
       topApiList.add(item);
     }
     vo.setTopApis(topApiList);
@@ -76,7 +77,7 @@ public class DashboardAssembler {
       long cost = toLong(d.get("cost"), 0L);
       item.setCost(cost);
       item.setCostDisplay("¥" + String.format("%.2f", cost / 100.0));
-      item.setPercentage(toDouble(d.get("percentage"), 0.0));
+      item.setPercentage(formatPercentageTo2Decimals(toDouble(d.get("percentage"), 0.0)));
       costModelList.add(item);
     }
     vo.setCostModels(costModelList);
