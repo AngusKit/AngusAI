@@ -145,7 +145,7 @@ export function RecentApplications({ onNavigate }: { onNavigate?: (page: string)
                   ))}
                 </div>
 
-                <div className='flex items-center justify-between text-xs text-gray-400 dark:text-gray-500'>
+                <div className='border-t border-gray-200 dark:border-gray-600 pt-4 mt-4 flex items-center justify-between text-xs text-gray-400 dark:text-gray-500'>
                   <span>{app.usage}</span>
                   <span>
                     {t('recentApps.lastAccess')}：{formatLastUsedDisplay(app.lastUsed)}
