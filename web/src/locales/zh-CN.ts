@@ -597,7 +597,6 @@ export const zhCN = {
       apiCalls: 'API调用',
       tokenUsage: 'Token使用量',
       activeUsers: '活跃用户',
-      activeConversations: '进行中对话',
     },
   },
 

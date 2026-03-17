@@ -74,7 +74,6 @@ const TYPE_TO_ICON: Record<string, any> = {
   apiCalls: Zap,
   tokenUsage: Coins,
   activeUsers: Users,
-  activeConversations: MessageSquare,
 };
 
 const TYPE_TO_ICON_BG: Record<string, string> = {
@@ -82,7 +81,6 @@ const TYPE_TO_ICON_BG: Record<string, string> = {
   apiCalls: 'bg-emerald-500',
   tokenUsage: 'bg-orange-500',
   activeUsers: 'bg-purple-500',
-  activeConversations: 'bg-cyan-500',
 };
 
 function toStatData(vo: StatItemVo, t: (key: string) => string): StatData {
