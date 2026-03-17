@@ -474,6 +474,22 @@ public class ChatAnalyticsQueryImpl implements ChatAnalyticsQuery {
         analysis.put("byStatusCode", byStatusCode);
         analysis.put("totalErrors", totalErrors);
 
+        // 最近10次接口错误
+        List<ChatUsageLog> recentLogs = chatUsageLogRepo.findRecentErrors(
+            start, end, appId, PageRequest.of(0, 10));
+        List<Map<String, Object>> recentErrors = new ArrayList<>();
+        for (ChatUsageLog log : recentLogs) {
+          Map<String, Object> item = new HashMap<>();
+          item.put("endpoint", log.getEndpoint());
+          item.put("method", log.getMethod());
+          item.put("statusCode", log.getStatusCode());
+          item.put("errorMessage", log.getErrorMessage());
+          item.put("requestTime", log.getRequestTime());
+          item.put("responseTimeMs", log.getResponseTimeMs());
+          recentErrors.add(item);
+        }
+        analysis.put("recentErrors", recentErrors);
+
         return analysis;
       }
     }.execute();

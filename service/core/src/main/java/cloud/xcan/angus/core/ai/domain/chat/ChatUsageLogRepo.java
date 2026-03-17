@@ -160,6 +160,19 @@ public interface ChatUsageLogRepo extends BaseRepository<ChatUsageLog, Long> {
       @Param("end") LocalDateTime end);
 
   /**
+   * 最近N次接口错误（按请求时间倒序）
+   *
+   * @param appId 可为 null，为 null 时不过滤应用
+   */
+  @Query("""
+      SELECT l FROM ChatUsageLog l
+      WHERE l.isSuccessful = false AND l.requestTime BETWEEN :start AND :end
+      AND (:appId IS NULL OR l.appId = :appId)
+      ORDER BY l.requestTime DESC""")
+  List<ChatUsageLog> findRecentErrors(@Param("start") LocalDateTime start,
+      @Param("end") LocalDateTime end, @Param("appId") Long appId, Pageable pageable);
+
+  /**
    * 应用概览统计（一次聚合：总调用、成功数、token、成本、平均响应时间） 返回 Object[]: [totalCalls, successfulCalls, totalTokens,
    * totalCost, avgResponseTime]。cost 单位：美元(USD)
    */

@@ -11,11 +11,8 @@ public class ErrorAnalysisVo {
   @Schema(description = "按状态码统计")
   private List<ErrorByStatusCodeVo> byStatusCode;
 
-  @Schema(description = "按接口统计错误")
-  private List<ErrorByEndpointVo> byEndpoint;
-
-  @Schema(description = "错误趋势")
-  private List<ErrorTrendItemVo> errorTrend;
+  @Schema(description = "最近10次接口错误")
+  private List<RecentErrorItemVo> recentErrors;
 
   @Schema(description = "汇总统计")
   private SummaryVo summary;
@@ -47,40 +44,26 @@ public class ErrorAnalysisVo {
   }
 
   @Data
-  @Schema(description = "按接口统计错误")
-  public static class ErrorByEndpointVo {
+  @Schema(description = "最近接口错误记录")
+  public static class RecentErrorItemVo {
 
     @Schema(description = "接口路径")
     private String endpoint;
 
-    @Schema(description = "错误次数")
-    private Long errors;
+    @Schema(description = "HTTP方法")
+    private String method;
 
-    @Schema(description = "错误率")
-    private Double errorRate;
+    @Schema(description = "状态码")
+    private Integer statusCode;
 
-    @Schema(description = "最常见错误码")
-    private Integer topErrorCode;
-  }
+    @Schema(description = "错误信息")
+    private String errorMessage;
 
-  @Data
-  @Schema(description = "错误趋势数据点")
-  public static class ErrorTrendItemVo {
+    @Schema(description = "请求时间")
+    private java.time.LocalDateTime requestTime;
 
-    @Schema(description = "时间戳")
-    private Long datetime;
-
-    @Schema(description = "日期显示")
-    private String date;
-
-    @Schema(description = "总错误数")
-    private Integer total;
-
-    @Schema(description = "4xx错误数")
-    private Integer code4xx;
-
-    @Schema(description = "5xx错误数")
-    private Integer code5xx;
+    @Schema(description = "响应时间(ms)")
+    private Integer responseTimeMs;
   }
 
   @Data

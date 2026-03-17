@@ -407,21 +407,40 @@ public class AnalyticsAssembler {
     List<Map<String, Object>> byStatusCodeData = (List<Map<String, Object>>) analysisData.get(
         "byStatusCode");
     List<ErrorAnalysisVo.ErrorByStatusCodeVo> byStatusCode = new ArrayList<>();
-
-    for (Map<String, Object> data : byStatusCodeData) {
-      ErrorAnalysisVo.ErrorByStatusCodeVo item = new ErrorAnalysisVo.ErrorByStatusCodeVo();
-      item.setStatusCode((Integer) data.get("statusCode"));
-      item.setName((String) data.get("name"));
-      item.setCount((Long) data.get("count"));
-      Double percentage = (Double) data.get("percentage");
-      item.setPercentageValue(percentage);
-      item.setPercentage(PERCENTAGE_FORMAT.format(percentage) + "%");
-      item.setTrend("up"); // 简化处理
-      item.setChange("+0%");
-
-      byStatusCode.add(item);
+    if (byStatusCodeData != null) {
+      for (Map<String, Object> data : byStatusCodeData) {
+        ErrorAnalysisVo.ErrorByStatusCodeVo item = new ErrorAnalysisVo.ErrorByStatusCodeVo();
+        item.setStatusCode((Integer) data.get("statusCode"));
+        item.setName((String) data.get("name"));
+        item.setCount((Long) data.get("count"));
+        Double percentage = (Double) data.get("percentage");
+        item.setPercentageValue(percentage);
+        item.setPercentage(percentage != null ? PERCENTAGE_FORMAT.format(percentage) + "%" : null);
+        item.setTrend("up");
+        item.setChange("+0%");
+        byStatusCode.add(item);
+      }
     }
     vo.setByStatusCode(byStatusCode);
+
+    // 最近10次接口错误
+    @SuppressWarnings("unchecked")
+    List<Map<String, Object>> recentErrorsData = (List<Map<String, Object>>) analysisData.get(
+        "recentErrors");
+    List<ErrorAnalysisVo.RecentErrorItemVo> recentErrors = new ArrayList<>();
+    if (recentErrorsData != null) {
+      for (Map<String, Object> data : recentErrorsData) {
+        ErrorAnalysisVo.RecentErrorItemVo item = new ErrorAnalysisVo.RecentErrorItemVo();
+        item.setEndpoint((String) data.get("endpoint"));
+        item.setMethod((String) data.get("method"));
+        item.setStatusCode((Integer) data.get("statusCode"));
+        item.setErrorMessage((String) data.get("errorMessage"));
+        item.setRequestTime((java.time.LocalDateTime) data.get("requestTime"));
+        item.setResponseTimeMs((Integer) data.get("responseTimeMs"));
+        recentErrors.add(item);
+      }
+    }
+    vo.setRecentErrors(recentErrors);
 
     // 汇总统计
     ErrorAnalysisVo.SummaryVo summary = new ErrorAnalysisVo.SummaryVo();

@@ -704,7 +704,49 @@ export function UsageAnalytics() {
                       </div>
                     </div>
                   ))}
+              </div>
+              <div className='mt-8 pt-6 border-t border-gray-200 dark:border-gray-700'>
+                <h3 className='text-base dark:text-white mb-3'>近10次接口错误</h3>
+                <p className='text-sm text-gray-600 dark:text-gray-400 mb-4'>
+                  按时间倒序展示最近的接口错误记录
+                </p>
+                <div className='space-y-3'>
+                  {(errorAnalysis?.recentErrors ?? []).length === 0 ? (
+                    <div className='py-8 text-center text-gray-500 dark:text-gray-400 text-sm'>
+                      无错误记录
+                    </div>
+                  ) : (
+                    (errorAnalysis?.recentErrors ?? []).map((err, index) => (
+                      <div
+                        key={index}
+                        className='flex flex-col gap-2 p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50/50 dark:bg-gray-700/30'
+                      >
+                        <div className='flex items-center justify-between flex-wrap gap-2'>
+                          <code className='text-sm bg-gray-200 dark:bg-gray-600 px-2 py-0.5 rounded'>
+                            {(err as { method?: string }).method ?? 'POST'} {(err as { endpoint?: string }).endpoint ?? '-'}
+                          </code>
+                          <Badge variant='destructive' className='text-xs'>
+                            {(err as { statusCode?: number }).statusCode ?? '-'}
+                          </Badge>
+                        </div>
+                        {(err as { errorMessage?: string }).errorMessage && (
+                          <div className='text-sm text-gray-600 dark:text-gray-400 line-clamp-2'>
+                            {(err as { errorMessage?: string }).errorMessage}
+                          </div>
+                        )}
+                        <div className='flex items-center gap-4 text-xs text-gray-500 dark:text-gray-500'>
+                          <span>
+                            请求时间: {(err as { requestTime?: string }).requestTime ?? '-'}
+                          </span>
+                          {(err as { responseTimeMs?: number }).responseTimeMs != null && (
+                            <span>响应: {(err as { responseTimeMs?: number }).responseTimeMs}ms</span>
+                          )}
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
+              </div>
             </Card>
           </TabsContent>
         </Tabs>

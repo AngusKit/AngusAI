@@ -357,12 +357,26 @@ export interface TotalVo {
 export interface ErrorAnalysisVo {
   /** 按状态码统计 */
   byStatusCode?: ErrorByStatusCodeVo[];
-  /** 按接口统计错误 */
-  byEndpoint?: ErrorByEndpointVo[];
-  /** 错误趋势 */
-  errorTrend?: ErrorTrendItemVo[];
+  /** 最近10次接口错误 */
+  recentErrors?: RecentErrorItemVo[];
   /** 汇总统计 */
   summary?: SummaryVo;
+}
+
+/** 最近接口错误记录 */
+export interface RecentErrorItemVo {
+  /** 接口路径 */
+  endpoint?: string;
+  /** HTTP方法 */
+  method?: string;
+  /** 状态码 */
+  statusCode?: number;
+  /** 错误信息 */
+  errorMessage?: string;
+  /** 请求时间 */
+  requestTime?: string;
+  /** 响应时间(ms) */
+  responseTimeMs?: number;
 }
 
 /** The API response result of supporting international message. */
@@ -370,27 +384,6 @@ export type ErrorAnalysisResult = ApiLocaleResult & {
   /** Actual response data or error details. */
   data?: ErrorAnalysisVo;
 };
-
-/** 按接口统计错误 */
-export interface ErrorByEndpointVo {
-  /** 接口路径 */
-  endpoint?: string;
-  /**
-   * 错误次数
-   * @format int64
-   */
-  errors?: number;
-  /**
-   * 错误率
-   * @format double
-   */
-  errorRate?: number;
-  /**
-   * 最常见错误码
-   * @format int32
-   */
-  topErrorCode?: number;
-}
 
 /** 按状态码统计 */
 export interface ErrorByStatusCodeVo {
@@ -427,32 +420,6 @@ export interface ErrorByStatusCodeVo {
    * @example "+12%"
    */
   change?: string;
-}
-
-/** 错误趋势数据点 */
-export interface ErrorTrendItemVo {
-  /**
-   * 时间戳
-   * @format int64
-   */
-  datetime?: number;
-  /** 日期显示 */
-  date?: string;
-  /**
-   * 总错误数
-   * @format int32
-   */
-  total?: number;
-  /**
-   * 4xx错误数
-   * @format int32
-   */
-  code4xx?: number;
-  /**
-   * 5xx错误数
-   * @format int32
-   */
-  code5xx?: number;
 }
 
 /** 应用使用分布 */
