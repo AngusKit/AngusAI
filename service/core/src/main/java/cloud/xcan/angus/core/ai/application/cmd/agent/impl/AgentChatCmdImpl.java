@@ -103,15 +103,14 @@ public class AgentChatCmdImpl implements AgentChatCmd {
             STREAMING_PLACEHOLDER, userMessage.getId());
         messageCmd.setStreaming(assistantMessage, true);
 
-        // Model 仅查询一次，复用给 getChatConfigOverride 和 saveApiUsageLog
-        Model model = agent.getDefaultModelId() != null
-            ? modelQuery.findById(agent.getDefaultModelId()).orElse(null) : null;
+        // Model 优先从会话取 modelId，其次从 agent 取 defaultModelId
+        Long modelId = sessionDb.getModelId() != null ? sessionDb.getModelId() : agent.getDefaultModelId();
+        Model model = modelId != null ? modelQuery.findById(modelId).orElse(null) : null;
 
         // 合并请求/会话/智能体/模型配置，得到最终覆盖参数
         ChatConfigOverride override = getChatConfigOverride(agent, config, sessionDb, model);
         String agentIdStr = String.valueOf(sessionDb.getAgentId());
-        String defaultModelIdStr = agent.getDefaultModelId() != null
-            ? String.valueOf(agent.getDefaultModelId()) : null;
+        String modelIdStr = modelId != null ? String.valueOf(modelId) : null;
 
         // 执行对话请求
         long startMs = System.currentTimeMillis();
@@ -121,9 +120,9 @@ public class AgentChatCmdImpl implements AgentChatCmd {
           // 异步执行 LLM 调用，有 override 时指定模型与配置
           // 注意：可以改为在主线程直接调用 agentRegistry.chat()，但建议保留 executor，便于控制 LLM 并发。
           // 若需要 Java 层超时，可改用 future.get(timeout, unit)
-          reply = override != null && agent.getDefaultModelId() != null
+          reply = override != null && modelId != null
               ? agentRegistry.chat(agentIdStr, sessionDb.getSessionId(), message,
-              defaultModelIdStr, override)
+              modelIdStr, override)
               : agentRegistry.chat(agentIdStr, sessionDb.getSessionId(), message);
         } catch (Exception e) {
           chatError = e;
@@ -158,9 +157,9 @@ public class AgentChatCmdImpl implements AgentChatCmd {
 
       @Override
       protected SseEmitter process() {
-        // Model 仅查询一次，复用给 getChatConfigOverride 和 saveApiUsageLog
-        Model model = agent.getDefaultModelId() != null
-            ? modelQuery.findById(agent.getDefaultModelId()).orElse(null) : null;
+        // Model 优先从会话取 modelId，其次从 agent 取 defaultModelId
+        Long modelId = sessionDb.getModelId() != null ? sessionDb.getModelId() : agent.getDefaultModelId();
+        Model model = modelId != null ? modelQuery.findById(modelId).orElse(null) : null;
 
         // 按照优先级获取会话配置
         ChatConfigOverride override = getChatConfigOverride(agent, config, sessionDb, model);
@@ -182,7 +181,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
 
         // 合并配置，得到最终覆盖参数
         String agentIdStr = String.valueOf(sessionDb.getAgentId());
-        String defaultModelId = String.valueOf(agent.getDefaultModelId());
+        String modelIdStr = modelId != null ? String.valueOf(modelId) : null;
 
         // 异步执行流式调用，通过 SSE 推送 token
         // 注意：必须保持使用 sseEmitterChatExecutor，否则会破坏 SSE 的流式模型和整体稳定性
@@ -193,9 +192,9 @@ public class AgentChatCmdImpl implements AgentChatCmd {
           StringBuilder fullContent = new StringBuilder();
           long streamStartMs = System.currentTimeMillis();
           try {
-            TokenStream stream = agent.getDefaultModelId() != null
+            TokenStream stream = modelId != null
                 ? agentRegistry.chatStream(agentIdStr, sessionDb.getSessionId(), message,
-                defaultModelId, override)
+                modelIdStr, override)
                 : agentRegistry.chatStream(agentIdStr, sessionDb.getSessionId(), message);
             stream.onPartialResponse(token -> {
                   fullContent.append(token);
@@ -265,13 +264,16 @@ public class AgentChatCmdImpl implements AgentChatCmd {
   /**
    * 合并请求/会话/智能体/模型配置，生成 ChatConfigOverride。 合并优先级：请求 config > 会话 config > 智能体 config > 模型 config。
    *
-   * @param model 已查询的模型，可为 null；为 null 时内部会按需查询
+   * @param model 已查询的模型，可为 null；为 null 时内部会按需查询（优先用 session.modelId，其次 agent.defaultModelId）
    */
   private ChatConfigOverride getChatConfigOverride(Agent agent, SessionConfig config,
       Session session, Model model) {
+    Long modelId = model != null ? model.getId()
+        : (session != null && session.getModelId() != null ? session.getModelId()
+            : (agent != null && agent.getDefaultModelId() != null ? agent.getDefaultModelId()
+                : null));
     Model m = model != null ? model
-        : (agent.getDefaultModelId() != null ? modelQuery.findById(agent.getDefaultModelId())
-            .orElse(null) : null);
+        : (modelId != null ? modelQuery.findById(modelId).orElse(null) : null);
     SessionConfig merged = ChatConfigMergeUtils.merge(config, session, agent, m);
     return toChatConfigOverride(merged);
   }
@@ -288,10 +290,12 @@ public class AgentChatCmdImpl implements AgentChatCmd {
     try {
       int responseTimeMs = (int) (System.currentTimeMillis() - startMs);
       BigDecimal cost = calculateCost(agent, model, inputTokens, outputTokens);
+      Long logModelId = session != null && session.getModelId() != null ? session.getModelId()
+          : (agent != null ? agent.getDefaultModelId() : null);
       ChatUsageLog usageLog = new ChatUsageLog()
           .setAppId(session != null ? session.getAppId() : null)
           .setAgentId(agent != null ? agent.getId() : null)
-          .setModelId(agent != null ? agent.getDefaultModelId() : null)
+          .setModelId(logModelId)
           .setEndpoint(endpoint)
           .setMethod("POST")
           .setStatusCode(isSuccessful ? 200 : 500)
@@ -314,16 +318,17 @@ public class AgentChatCmdImpl implements AgentChatCmd {
    * Calculate cost in USD from model pricing. Uses BigDecimal to preserve decimals
    * and avoid rounding to zero when token count is very small.
    *
-   * @param model model already loaded, or null to load by agent.defaultModelId
+   * @param model model already loaded, or null to load by session.modelId / agent.defaultModelId
    */
   private BigDecimal calculateCost(Agent agent, Model model, Integer inputTokens,
       Integer outputTokens) {
-    if (agent == null || agent.getDefaultModelId() == null || (inputTokens == null
-        && outputTokens == null)) {
+    if (model == null && agent == null) {
       return null;
     }
-    Model m = model != null ? model
-        : modelQuery.findById(agent.getDefaultModelId()).orElse(null);
+    if ((inputTokens == null && outputTokens == null)) {
+      return null;
+    }
+    Model m = model;
     if (m == null || m.getConfig() == null) {
       return null;
     }
