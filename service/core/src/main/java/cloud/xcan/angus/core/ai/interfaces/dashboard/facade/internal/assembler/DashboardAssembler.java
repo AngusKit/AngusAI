@@ -45,7 +45,7 @@ public class DashboardAssembler {
       item.setRank(i + 1);
       item.setAppName((String) d.getOrDefault("appName", "未知应用"));
       item.setCallCount(toLong(d.get("calls"), 0L));
-      item.setPercentage(toDouble(d.get("percentage"), 0.0));
+      item.setPercentage(formatPercentageTo2Decimals(toDouble(d.get("percentage"), 0.0)));
       hotApps.add(item);
     }
     vo.setHotApps(hotApps);
@@ -76,7 +76,7 @@ public class DashboardAssembler {
       item.setModelName((String) d.getOrDefault("modelName", "未知模型"));
       long cost = toLong(d.get("cost"), 0L);
       item.setCost(cost);
-      item.setCostDisplay("¥" + String.format("%.2f", cost / 100.0));
+      item.setCostDisplay("$" + String.format("%.2f", cost / 100.0));
       item.setPercentage(formatPercentageTo2Decimals(toDouble(d.get("percentage"), 0.0)));
       costModelList.add(item);
     }

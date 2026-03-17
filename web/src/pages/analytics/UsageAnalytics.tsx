@@ -41,7 +41,8 @@ import {
   mapTokenUsageToChartData,
   mapResponseTimeToChartData,
   mapTopEndpointsToList,
-  mapDistributionToChartData,
+  mapAppDistributionToChartData,
+  mapModelDistributionToChartData,
   mapErrorAnalysisToList,
 } from './hooks/useUsageAnalytics';
 import { TimeRangeEnum } from '@/enums/enums';
@@ -106,13 +107,15 @@ const DEFAULT_TOP_ENDPOINTS = [
   { endpoint: '/api/v1/agents/stream', calls: 0, avgTime: '-', successRate: '-' },
 ];
 
-const DEFAULT_APP_DISTRIBUTION = [
-  { name: '暂无数据', value: 100, calls: 0, color: '#6b7280' },
-];
+const DEFAULT_APP_DISTRIBUTION = {
+  items: [{ name: '暂无数据', value: 100, calls: 0, tokens: 0, color: '#6b7280' }],
+  total: { apps: 0, calls: 0, tokens: 0 },
+};
 
-const DEFAULT_MODEL_DISTRIBUTION = [
-  { name: '暂无数据', value: 100, calls: 0, color: '#6b7280' },
-];
+const DEFAULT_MODEL_DISTRIBUTION = {
+  items: [{ name: '暂无数据', value: 100, calls: 0, tokens: 0, color: '#6b7280' }],
+  total: { models: 0, calls: 0, tokens: 0, cost: 0 },
+};
 
 const DEFAULT_ERROR_ANALYSIS = [
   { statusCode: 0, name: '暂无错误数据', count: 0, percentage: '0%', percentageValue: 0 },
@@ -142,16 +145,16 @@ export function UsageAnalytics() {
   const tokenUsageChartData = mapTokenUsageToChartData(tokenUsageTrend);
   const responseTimeChartData = mapResponseTimeToChartData(responseTimeAnalysis);
   const topEndpointsListData = mapTopEndpointsToList(topEndpoints);
-  const appDistChartData = mapDistributionToChartData(appDistribution);
-  const modelDistChartData = mapDistributionToChartData(modelDistribution);
+  const appDistData = mapAppDistributionToChartData(appDistribution);
+  const modelDistData = mapModelDistributionToChartData(modelDistribution);
   const errorListData = mapErrorAnalysisToList(errorAnalysis);
 
   const displayApiCallsData = apiCallsChartData.length > 0 ? apiCallsChartData : DEFAULT_API_CALLS_DATA;
   const displayTokenData = tokenUsageChartData.length > 0 ? tokenUsageChartData : DEFAULT_TOKEN_USAGE_DATA;
   const displayResponseTimeData = responseTimeChartData.length > 0 ? responseTimeChartData : DEFAULT_RESPONSE_TIME_DATA;
   const displayTopEndpoints = topEndpointsListData.length > 0 ? topEndpointsListData : DEFAULT_TOP_ENDPOINTS;
-  const displayAppDist = appDistChartData.length > 0 ? appDistChartData : DEFAULT_APP_DISTRIBUTION;
-  const displayModelDist = modelDistChartData.length > 0 ? modelDistChartData : DEFAULT_MODEL_DISTRIBUTION;
+  const displayAppDist = appDistData.items.length > 0 ? appDistData : DEFAULT_APP_DISTRIBUTION;
+  const displayModelDist = modelDistData.items.length > 0 ? modelDistData : DEFAULT_MODEL_DISTRIBUTION;
   const displayErrorList = errorListData.length > 0 ? errorListData : DEFAULT_ERROR_ANALYSIS;
 
   const statsFromOverview = overview?.stats
@@ -483,22 +486,42 @@ export function UsageAnalytics() {
               <Card className='p-6 dark:bg-gray-800 dark:border-gray-700'>
                 <div className='mb-6'>
                   <h2 className='text-lg dark:text-white mb-2'>应用使用分布</h2>
-                  <p className='text-sm text-gray-600 dark:text-gray-400'>
-                    各应用调用占比
+                  <p className='text-sm text-gray-600 dark:text-gray-400 mb-4'>
+                    各应用 Token 消耗占比
                   </p>
+                  <div className='grid grid-cols-3 gap-3'>
+                    <div className='rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 px-4 py-3'>
+                      <div className='text-xs text-gray-500 dark:text-gray-400 mb-0.5'>应用数</div>
+                      <div className='text-lg font-semibold text-gray-900 dark:text-white'>
+                        {displayAppDist.total.apps.toLocaleString()}
+                      </div>
+                    </div>
+                    <div className='rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 px-4 py-3'>
+                      <div className='text-xs text-gray-500 dark:text-gray-400 mb-0.5'>调用</div>
+                      <div className='text-lg font-semibold text-gray-900 dark:text-white'>
+                        {displayAppDist.total.calls.toLocaleString()}
+                      </div>
+                    </div>
+                    <div className='rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 px-4 py-3'>
+                      <div className='text-xs text-gray-500 dark:text-gray-400 mb-0.5'>Token</div>
+                      <div className='text-lg font-semibold text-gray-900 dark:text-white'>
+                        {displayAppDist.total.tokens.toLocaleString()}
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <div className='space-y-4'>
-                  {displayAppDist.map((app, index) => (
+                  {displayAppDist.items.map((app, index) => (
                     <div key={index}>
                       <div className='flex items-center justify-between mb-2'>
                         <span className='text-sm dark:text-gray-300'>{app.name}</span>
                         <span className='text-sm text-gray-600 dark:text-gray-400'>
-                          {app.value}% ({app.calls.toLocaleString()})
+                          {app.value}% ({app.tokens.toLocaleString()} Token)
                         </span>
                       </div>
-                      <div className='w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2'>
+                      <div className='w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5'>
                         <div
-                          className='h-2 rounded-full'
+                          className='h-2.5 rounded-full transition-all duration-300'
                           style={{
                             width: `${app.value}%`,
                             backgroundColor: app.color,
@@ -513,23 +536,47 @@ export function UsageAnalytics() {
               <Card className='p-6 dark:bg-gray-800 dark:border-gray-700'>
                 <div className='mb-6'>
                   <h2 className='text-lg dark:text-white mb-2'>模型使用分布</h2>
-                  <p className='text-sm text-gray-600 dark:text-gray-400'>
-                    各模型调用占比
+                  <p className='text-sm text-gray-600 dark:text-gray-400 mb-4'>
+                    各模型 Token 消耗占比
                   </p>
+                  <div className='grid grid-cols-3 gap-3'>
+                    <div className='rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 px-4 py-3'>
+                      <div className='text-xs text-gray-500 dark:text-gray-400 mb-0.5'>模型数</div>
+                      <div className='text-lg font-semibold text-gray-900 dark:text-white'>
+                        {displayModelDist.total.models.toLocaleString()}
+                      </div>
+                    </div>
+                    <div className='rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 px-4 py-3'>
+                      <div className='text-xs text-gray-500 dark:text-gray-400 mb-0.5'>调用</div>
+                      <div className='text-lg font-semibold text-gray-900 dark:text-white'>
+                        {displayModelDist.total.calls.toLocaleString()}
+                      </div>
+                    </div>
+                    <div className='rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 px-4 py-3'>
+                      <div className='text-xs text-gray-500 dark:text-gray-400 mb-0.5'>费用</div>
+                      <div className='text-lg font-semibold text-gray-900 dark:text-white'>
+                        ¥{(displayModelDist.total.cost / 100).toFixed(2)}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <ResponsiveContainer width='100%' height={200}>
-                  <PieChart>
+                <ResponsiveContainer width='100%' height={240}>
+                  <PieChart margin={{ right: 120 }}>
                     <Pie
-                      data={displayModelDist}
-                      cx='50%'
+                      data={displayModelDist.items}
+                      cx='40%'
                       cy='50%'
-                      innerRadius={60}
-                      outerRadius={80}
-                      paddingAngle={5}
+                      innerRadius={55}
+                      outerRadius={90}
+                      paddingAngle={2}
+                      cornerRadius={8}
                       dataKey='value'
+                      nameKey='name'
+                      stroke='#1f2937'
+                      strokeWidth={2}
                     >
-                      {displayModelDist.map((entry, idx) => (
-                        <Cell key={`cell-${idx}`} fill={entry.color} />
+                      {displayModelDist.items.map((entry, idx) => (
+                        <Cell key={`cell-${idx}`} fill={entry.color} strokeOpacity={1} />
                       ))}
                     </Pie>
                     <Tooltip
@@ -538,23 +585,26 @@ export function UsageAnalytics() {
                         border: '1px solid #374151',
                         borderRadius: '8px',
                         color: '#fff',
+                        boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
                       }}
+                      formatter={(value: number, name: string, props: { payload?: { tokens?: number; calls?: number } }) => [
+                        `${value}% (${(props.payload?.tokens ?? 0).toLocaleString()} Token)`,
+                        name,
+                      ]}
+                    />
+                    <Legend
+                      layout='vertical'
+                      align='right'
+                      verticalAlign='middle'
+                      wrapperStyle={{ paddingLeft: '16px' }}
+                      formatter={(value, entry) => (
+                        <span className='text-sm dark:text-gray-300'>
+                          {value} ({(entry.payload as { value?: number })?.value ?? 0}%)
+                        </span>
+                      )}
                     />
                   </PieChart>
                 </ResponsiveContainer>
-                <div className='grid grid-cols-2 gap-3 mt-4'>
-                  {displayModelDist.map((model, index) => (
-                    <div key={index} className='flex items-center gap-2'>
-                      <div
-                        className='w-3 h-3 rounded-full'
-                        style={{ backgroundColor: model.color }}
-                      />
-                      <span className='text-sm dark:text-gray-300'>
-                        {model.name} ({model.value}%)
-                      </span>
-                    </div>
-                  ))}
-                </div>
               </Card>
             </div>
           </TabsContent>

@@ -248,16 +248,71 @@ export function mapTopEndpointsToList(topEndpoints: TopEndpointsVo | null): Endp
   return topEndpoints?.items ?? [];
 }
 
-/** 将应用/模型分布转为图表数据 */
+/** 应用分布图表数据（进度以 tokens 计算比例） */
+export function mapAppDistributionToChartData(appDistribution: AppDistributionVo | null) {
+  const items = (appDistribution?.items ?? []) as DistributionItemVo[];
+  const total = appDistribution?.total;
+  const totalTokens = Number(total?.tokens) || 0;
+  const COLORS = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#6b7280'];
+  const chartItems = items.map((item, index) => {
+    const tokens = Number(item.tokens) || 0;
+    const value = totalTokens > 0 ? Math.round((tokens / totalTokens) * 10000) / 100 : 0;
+    return {
+      name: item.appName ?? item.modelName ?? '未知',
+      value,
+      calls: Number(item.calls) || 0,
+      tokens,
+      color: item.color ?? COLORS[index % COLORS.length],
+    };
+  });
+  return {
+    items: chartItems,
+    total: {
+      apps: Number(total?.apps) ?? 0,
+      calls: Number(total?.calls) ?? 0,
+      tokens: Number(total?.tokens) ?? 0,
+    },
+  };
+}
+
+/** 模型分布图表数据（饼图以 tokens 计算比例） */
+export function mapModelDistributionToChartData(modelDistribution: ModelDistributionVo | null) {
+  const items = (modelDistribution?.items ?? []) as DistributionItemVo[];
+  const total = modelDistribution?.total;
+  const totalTokens = Number(total?.tokens) || 0;
+  const COLORS = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#6b7280'];
+  const chartItems = items.map((item, index) => {
+    const tokens = Number(item.tokens) || 0;
+    const value = totalTokens > 0 ? Math.round((tokens / totalTokens) * 10000) / 100 : 0;
+    return {
+      name: item.appName ?? item.modelName ?? '未知',
+      value,
+      calls: Number(item.calls) || 0,
+      tokens,
+      color: item.color ?? COLORS[index % COLORS.length],
+    };
+  });
+  return {
+    items: chartItems,
+    total: {
+      models: Number(total?.models) ?? 0,
+      calls: Number(total?.calls) ?? 0,
+      tokens: Number(total?.tokens) ?? 0,
+      cost: Number(total?.cost) ?? 0,
+    },
+  };
+}
+
+/** @deprecated 使用 mapAppDistributionToChartData / mapModelDistributionToChartData */
 export function mapDistributionToChartData(
   distribution: ModelDistributionVo | AppDistributionVo | null
 ) {
   const items = (distribution?.items ?? []) as DistributionItemVo[];
   const COLORS = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#6b7280'];
   return items.map((item, index) => ({
-    name: item.modelName ?? '未知',
-    value: item.percentage ?? 0,
-    calls: item.calls ?? 0,
+    name: item.appName ?? item.modelName ?? '未知',
+    value: Number(item.percentage) || 0,
+    calls: Number(item.calls) || 0,
     color: item.color ?? COLORS[index % COLORS.length],
   }));
 }

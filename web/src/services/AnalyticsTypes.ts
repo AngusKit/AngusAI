@@ -247,6 +247,15 @@ export interface SuccessRateVo {
 /** 分布项 */
 export interface DistributionItemVo {
   /**
+   * 应用ID（应用分布）
+   * @format int64
+   */
+  appId?: string;
+  /**
+   * 应用名称（应用分布）
+   */
+  appName?: string;
+  /**
    * 模型ID
    * @format int64
    */
@@ -301,6 +310,11 @@ export type ModelDistributionResult = ApiLocaleResult & {
 
 /** 总计 */
 export interface TotalVo {
+  /**
+   * 应用总数（应用分布）
+   * @format int32
+   */
+  apps?: number;
   /**
    * 模型总数
    * @format int32
