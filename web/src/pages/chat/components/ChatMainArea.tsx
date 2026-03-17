@@ -32,6 +32,11 @@ export interface ChatMainAreaProps {
   onBack: () => void;
   chatSelection: ChatSwitcherSelection;
   onSelectionChange: (s: ChatSwitcherSelection) => void;
+  /** 切换应用/智能体/模型时调用的 API（有 currentSessionId 时由 ChatSwitcher 调用） */
+  onSwitchSession?: (
+    type: 'app' | 'agent' | 'model',
+    payload: { appId?: string; agentId?: string; modelId?: string }
+  ) => Promise<{ data?: import('@/services/ChatTypes').SessionDetailVo } | null>;
   /** 是否显示提示词库入口，默认 true */
   enablePromptLibrary?: boolean;
   /** 是否显示应用切换器，默认 true */
@@ -90,6 +95,7 @@ export function ChatMainArea({
                                onBack,
                                chatSelection,
                                onSelectionChange,
+                               onSwitchSession,
                                enablePromptLibrary = true,
                                enableSwitchApp = true,
                                enableFileUpload = true,
@@ -205,7 +211,12 @@ export function ChatMainArea({
           </Button>
           <div className='w-px h-6 bg-gray-200 dark:bg-gray-700' />
           {enableSwitchApp ? (
-            <ChatSwitcher selection={chatSelection} onSelectionChange={onSelectionChange} />
+            <ChatSwitcher
+              selection={chatSelection}
+              onSelectionChange={onSelectionChange}
+              sessionId={currentSessionId}
+              onSwitch={currentSessionId ? onSwitchSession : undefined}
+            />
           ) : (
             <span className='text-sm font-medium text-gray-700 dark:text-gray-200 truncate max-w-[180px]'>
               {appDisplayName}

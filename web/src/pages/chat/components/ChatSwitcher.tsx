@@ -17,16 +17,23 @@ import { Input } from '@/components/ui/input.tsx';
 import { Badge } from '@/components/ui/badge.tsx';
 import { cn } from '@/components/ui/utils.ts';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
-import { useChatSwitcher, type ChatSwitcherSelection } from '../hooks/useChatSwitcher.ts';
+import { useChatSwitcher, type ChatSwitcherSelection, type SwitchSessionResult } from '../hooks/useChatSwitcher.ts';
 
 export type { ChatSwitcherSelection };
 
 interface ChatSwitcherProps {
   selection: ChatSwitcherSelection;
   onSelectionChange: (s: ChatSwitcherSelection) => void;
+  /** 当前会话 ID，有值时切换会调用后端 API */
+  sessionId?: string;
+  /** 切换应用/智能体/模型时调用的 API */
+  onSwitch?: (
+    type: 'app' | 'agent' | 'model',
+    payload: { appId?: string; agentId?: string; modelId?: string }
+  ) => Promise<SwitchSessionResult>;
 }
 
-export function ChatSwitcher({ selection, onSelectionChange }: ChatSwitcherProps) {
+export function ChatSwitcher({ selection, onSelectionChange, sessionId, onSwitch }: ChatSwitcherProps) {
   const { t } = useLanguage();
   const {
     appOpen,
@@ -58,7 +65,7 @@ export function ChatSwitcher({ selection, onSelectionChange }: ChatSwitcherProps
     appDisplayName,
     agentDisplayName,
     modelDisplayName,
-  } = useChatSwitcher({ selection, onSelectionChange });
+  } = useChatSwitcher({ selection, onSelectionChange, sessionId, onSwitch });
 
   return (
     <div className='flex items-center gap-2'>

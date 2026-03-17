@@ -8,6 +8,7 @@ import type {
   ModelInfoVo,
 } from '@/services/ApplicationsTypes';
 import type { ModelListVo } from '@/services/ModelsTypes';
+import type { SessionDetailVo } from '@/services/ChatTypes';
 import {
   ApplicationStatusEnum,
   AgentStatusEnum,
@@ -27,12 +28,27 @@ export interface ChatSwitcherSelection {
   model?: ModelListVo | ModelInfoVo;
 }
 
+/** 切换 API 返回结果，用于根据后端返回的 agentId/modelId 更新选中项 */
+export type SwitchSessionResult = { data?: SessionDetailVo } | null;
+
 interface UseChatSwitcherProps {
   selection: ChatSwitcherSelection;
   onSelectionChange: (s: ChatSwitcherSelection) => void;
+  /** 当前会话 ID，有值时切换会调用后端 API */
+  sessionId?: string;
+  /** 切换应用/智能体/模型时调用的 API，返回更新后的会话详情 */
+  onSwitch?: (
+    type: 'app' | 'agent' | 'model',
+    payload: { appId?: string; agentId?: string; modelId?: string }
+  ) => Promise<SwitchSessionResult>;
 }
 
-export function useChatSwitcher({ selection, onSelectionChange }: UseChatSwitcherProps) {
+export function useChatSwitcher({
+  selection,
+  onSelectionChange,
+  sessionId,
+  onSwitch,
+}: UseChatSwitcherProps) {
   const [appOpen, setAppOpen] = useState(false);
   const [agentOpen, setAgentOpen] = useState(false);
   const [modelOpen, setModelOpen] = useState(false);
@@ -244,7 +260,39 @@ export function useChatSwitcher({ selection, onSelectionChange }: UseChatSwitche
   }, [modelPage, models.length, modelTotal, modelLoadMore, modelLoading, loadModels]);
 
   const handleSelectApp = useCallback(
-    (app: ApplicationListVo) => {
+    async (app: ApplicationListVo) => {
+      setAppOpen(false);
+      if (sessionId && onSwitch) {
+        try {
+          const res = await onSwitch('app', { appId: String(app.id ?? '') });
+          const d = res?.data;
+          if (!d) return;
+          // 根据返回的 agentId、modelId 选中对应智能体和模型
+          const agentsList = app.agents ?? [];
+          const agent =
+            d.agentId != null
+              ? agentsList.find((a) => String(a?.id) === String(d.agentId))
+              : undefined;
+          const modelId = d.modelId != null ? String(d.modelId) : '';
+          const model =
+            agent?.defaultModel && String(agent.defaultModel.id) === modelId
+              ? agent.defaultModel
+              : models.find((m) => String(m.id) === modelId) ??
+                (d.modelName ? { id: modelId, name: d.modelName } : undefined);
+          onSelectionChange({
+            appId: String(app.id ?? ''),
+            agentId: d.agentId != null ? String(d.agentId) : '',
+            modelId,
+            app,
+            agent: agent ?? undefined,
+            model: model as ModelListVo | undefined,
+          });
+          toast.success('已切换应用');
+        } catch {
+          // onSwitch 内部已 toast.error
+        }
+        return;
+      }
       const agentsList = app.agents ?? [];
       const defAgent = app.defaultAgent;
       const firstActive = agentsList.find((a) => a.status === AgentStatusEnum.ACTIVE);
@@ -261,14 +309,39 @@ export function useChatSwitcher({ selection, onSelectionChange }: UseChatSwitche
         agent: agent ?? undefined,
         model: model as ModelListVo | undefined,
       });
-      setAppOpen(false);
     },
-    [onSelectionChange]
+    [sessionId, onSwitch, onSelectionChange, models]
   );
 
   const handleSelectAgent = useCallback(
-    (agent: AgentInfoVo) => {
+    async (agent: AgentInfoVo) => {
       if (agent.status !== AgentStatusEnum.ACTIVE) return;
+      setAgentOpen(false);
+      if (sessionId && onSwitch) {
+        try {
+          const res = await onSwitch('agent', { agentId: String(agent.id ?? '') });
+          const d = res?.data;
+          if (!d) return;
+          // 根据返回的 modelId 选中对应模型
+          const modelId = d.modelId != null ? String(d.modelId) : '';
+          const model =
+            agent.defaultModel && String(agent.defaultModel.id) === modelId
+              ? agent.defaultModel
+              : models.find((m) => String(m.id) === modelId) ??
+                (d.modelName ? { id: modelId, name: d.modelName } : undefined);
+          onSelectionChange({
+            ...selection,
+            agentId: String(agent.id ?? ''),
+            modelId,
+            agent,
+            model: model as ModelListVo | undefined,
+          });
+          toast.success('已切换智能体');
+        } catch {
+          // onSwitch 内部已 toast.error
+        }
+        return;
+      }
       const model = agent.defaultModel;
       onSelectionChange({
         ...selection,
@@ -277,21 +350,36 @@ export function useChatSwitcher({ selection, onSelectionChange }: UseChatSwitche
         agent,
         model: model as ModelListVo | undefined,
       });
-      setAgentOpen(false);
     },
-    [selection, onSelectionChange]
+    [sessionId, onSwitch, selection, onSelectionChange, models]
   );
 
   const handleSelectModel = useCallback(
-    (model: ModelListVo) => {
+    async (model: ModelListVo) => {
+      setModelOpen(false);
+      if (sessionId && onSwitch) {
+        try {
+          const res = await onSwitch('model', { modelId: String(model.id ?? '') });
+          const d = res?.data;
+          if (!d) return;
+          onSelectionChange({
+            ...selection,
+            modelId: String(model.id ?? ''),
+            model,
+          });
+          toast.success('已切换模型');
+        } catch {
+          // onSwitch 内部已 toast.error
+        }
+        return;
+      }
       onSelectionChange({
         ...selection,
         modelId: String(model.id ?? ''),
         model,
       });
-      setModelOpen(false);
     },
-    [selection, onSelectionChange]
+    [sessionId, onSwitch, selection, onSelectionChange]
   );
 
   const appDisplayName = resolvedApp?.name ?? '选择应用';

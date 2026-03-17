@@ -426,6 +426,28 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     [sessions, currentSessionId, deleteSession, navigate]
   );
 
+  const onSwitchSession = useCallback(
+    async (type: 'app' | 'agent' | 'model', payload: { appId?: string; agentId?: string; modelId?: string }) => {
+      if (!currentSessionId) return null;
+      try {
+        if (type === 'app' && payload.appId) {
+          return (await ChatApi.switchApp(currentSessionId, { appId: payload.appId })) as { data?: import('@/services/ChatTypes').SessionDetailVo };
+        }
+        if (type === 'agent' && payload.agentId) {
+          return (await ChatApi.switchAgent(currentSessionId, { agentId: payload.agentId })) as { data?: import('@/services/ChatTypes').SessionDetailVo };
+        }
+        if (type === 'model' && payload.modelId) {
+          return (await ChatApi.switchModel(currentSessionId, { modelId: payload.modelId })) as { data?: import('@/services/ChatTypes').SessionDetailVo };
+        }
+      } catch (e) {
+        console.error('Switch session failed:', e);
+        toast.error('切换失败');
+      }
+      return null;
+    },
+    [currentSessionId]
+  );
+
   const updateSessionSelection = (s: ChatSwitcherSelection) => {
     // 仅当会话列表已加载完毕且确认为空时，才自动创建会话（避免 loadApps 先于 loadSessions 完成时误创建）
     if (!sessionsLoading && sessions.length === 0 && s.appId) {
@@ -505,6 +527,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
         onBack={handleBack}
         chatSelection={chatSelection}
         onSelectionChange={updateSessionSelection}
+        onSwitchSession={onSwitchSession}
         enablePromptLibrary={enablePromptLibrary}
         enableSwitchApp={enableSwitchApp}
         enableFileUpload={enableFileUpload}
