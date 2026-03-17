@@ -60,7 +60,7 @@ export interface CostModelItemVo {
    * @format int64
    */
   cost?: number;
-  /** 费用展示（如 ¥125.80） */
+  /** 费用展示（如 $125.80） */
   costDisplay?: string;
   /**
    * 占比百分比

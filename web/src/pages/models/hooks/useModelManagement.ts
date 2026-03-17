@@ -495,9 +495,12 @@ export const useModelManagement = (): UseModelManagementReturn => {
     const averageLatencySec = stats?.averageLatencySec;
 
     const totalModelsValue = formatNumber(stats?.totalModels);
-    const totalCostValue = stats?.totalCost !== undefined ? formatCurrency(stats?.totalCost, language) : '--';
+    const totalCostValue = stats?.totalCost !== undefined ? formatCurrency(stats?.totalCost, 'en-US') : '--';
     const totalCallsValue = formatNumber(stats?.totalCalls);
-    const latencyValue = averageLatencySec !== undefined && averageLatencySec !== null ? `${averageLatencySec.toFixed(2)}s` : '--';
+    const latencyValue =
+      averageLatencySec != null && !Number.isNaN(Number(averageLatencySec))
+        ? `${Number(averageLatencySec).toFixed(2)}s`
+        : '--';
 
     return [
       {
@@ -520,12 +523,12 @@ export const useModelManagement = (): UseModelManagementReturn => {
         subtext:
           today?.addedCost !== undefined || today?.addedCostDisplay
             ? t('models.stats.addedToday', {
-                value: today?.addedCostDisplay ?? formatCurrency(today?.addedCost, language) ?? '0',
+                value: today?.addedCostDisplay ?? formatCurrency(today?.addedCost, 'en-US') ?? '0',
               })
             : t('models.stats.noDailyData'),
         icon: Activity,
         iconBg: 'bg-green-500',
-        trend: lastMonth?.addedCostDisplay ?? (lastMonth?.addedCost !== undefined ? `+${formatCurrency(lastMonth.addedCost, language)}` : undefined),
+        trend: lastMonth?.addedCostDisplay ?? (lastMonth?.addedCost !== undefined ? `+${formatCurrency(lastMonth.addedCost, 'en-US')}` : undefined),
         trendUp: (lastMonth?.addedCost ?? 0) >= 0,
       },
       {
