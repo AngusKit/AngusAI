@@ -10,6 +10,7 @@ import cloud.xcan.angus.core.ai.application.cmd.model.ModelCmd;
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.domain.model.Model;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.ModelFacade;
+import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelFindDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelTestDto;
@@ -24,7 +25,10 @@ import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.PageResult;
 import cloud.xcan.angus.remote.dto.SimpleStatisticsDto;
 import jakarta.annotation.Resource;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
@@ -96,7 +100,22 @@ public class ModelFacadeImpl implements ModelFacade {
     GenericSpecification<Model> spec = ModelAssembler.getSpecification(dto);
     Page<Model> page = modelQuery.find(spec, dto.tranPage(), dto.fullTextSearch,
         getMatchSearchFields(dto.getClass()));
-    return buildVoPageResult(page, ModelAssembler::toListVo);
+
+    // 批量获取今日统计，填充列表卡片展示字段，避免前端 N+1 调用 detail 接口
+    LocalDate today = LocalDate.now();
+    LocalDateTime todayStart = today.atStartOfDay();
+    LocalDateTime todayEnd = today.plusDays(1).atStartOfDay();
+    List<Long> modelIds = page.getContent().stream()
+        .map(Model::getId)
+        .filter(id -> id != null)
+        .toList();
+    Map<Long, ModelQuery.ModelDetailStats> statsMap = modelQuery.getDetailStatsForModelIds(
+        modelIds, todayStart, todayEnd);
+
+    return buildVoPageResult(page, model -> {
+      ModelQuery.ModelDetailStats stats = model.getId() != null ? statsMap.get(model.getId()) : null;
+      return ModelAssembler.toListVo(model, stats);
+    });
   }
 
   @Override

@@ -8,6 +8,8 @@ import cloud.xcan.agentx.core.model.ModelConfigDefinition;
 import cloud.xcan.angus.core.ai.domain.model.Model;
 import cloud.xcan.angus.core.ai.domain.model.ModelStats;
 import cloud.xcan.angus.core.ai.domain.model.ModelStatus;
+import cloud.xcan.angus.core.ai.application.query.model.ModelQuery.ModelDetailStats;
+import cloud.xcan.angus.core.ai.domain.model.ModelPerformance;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelFindDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelUpdateDto;
@@ -158,6 +160,13 @@ public class ModelAssembler {
   }
 
   public static ModelListVo toListVo(Model model) {
+    return toListVo(model, null);
+  }
+
+  /**
+   * 转换为列表 VO，支持填充 stats、performance、maxTokens（用于卡片展示）
+   */
+  public static ModelListVo toListVo(Model model, ModelDetailStats detailStats) {
     ModelListVo vo = new ModelListVo();
     vo.setId(model.getId());
     vo.setName(model.getName());
@@ -172,6 +181,29 @@ public class ModelAssembler {
     vo.setCreatedDate(model.getCreatedDate());
     vo.setModifiedBy(model.getModifiedBy());
     vo.setModifiedDate(model.getModifiedDate());
+
+    // 填充 stats、performance、maxTokens（用于列表卡片展示）
+    if (detailStats != null) {
+      ModelStats stats = new ModelStats();
+      stats.setTotalCalls(detailStats.totalCalls());
+      stats.setTotalTokens(detailStats.totalTokens());
+      stats.setTotalCost(detailStats.totalCost());
+      stats.setTotalCostDisplay(detailStats.totalCostDisplay());
+      vo.setStats(stats);
+
+      if (detailStats.avgResponseTimeMs() != null) {
+        ModelPerformance perf = new ModelPerformance();
+        perf.setLatencyMs(detailStats.avgResponseTimeMs());
+        double sec = detailStats.avgResponseTimeMs() / 1000.0;
+        perf.setLatency(sec >= 1 ? String.format("%.2fs", sec) : (int) Math.round(detailStats.avgResponseTimeMs()) + "ms");
+        vo.setPerformance(perf);
+      }
+    }
+
+    if (model.getConfig() != null && model.getConfig().getMaxTokens() != null) {
+      vo.setMaxTokens(model.getConfig().getMaxTokens());
+    }
+
     return vo;
   }
 

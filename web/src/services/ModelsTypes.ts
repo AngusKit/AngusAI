@@ -340,6 +340,12 @@ export interface ModelListVo extends TenantAuditingVo {
   provider?: ModelProviderEnum;
   /** 模型状态 */
   status?: ModelStatusEnum;
+  /** 统计数据（今日调用、成本等，列表接口已填充） */
+  stats?: ModelStats;
+  /** 性能指标（延迟等） */
+  performance?: ModelPerformance;
+  /** 最大Token数 */
+  maxTokens?: number;
 }
 
 export interface PageModelListVo {

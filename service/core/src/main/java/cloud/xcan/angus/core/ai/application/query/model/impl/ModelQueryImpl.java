@@ -1,6 +1,5 @@
 package cloud.xcan.angus.core.ai.application.query.model.impl;
 
-import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatCost;
 import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatCostFromDollars;
 import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.getDouble;
 import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.getLong;
@@ -9,6 +8,7 @@ import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.parseStartDate;
 
 import cloud.xcan.angus.core.ai.application.query.analytics.ChatAnalyticsQuery;
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
+import cloud.xcan.angus.core.ai.domain.chat.ChatUsageLogRepo;
 import cloud.xcan.angus.core.ai.domain.model.LastMonthGrowthTrend;
 import cloud.xcan.angus.core.ai.domain.model.Model;
 import cloud.xcan.angus.core.ai.domain.model.ModelRepo;
@@ -25,6 +25,7 @@ import jakarta.annotation.Resource;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -45,6 +46,9 @@ public class ModelQueryImpl implements ModelQuery {
 
   @Resource
   private ChatAnalyticsQuery chatAnalyticsQuery;
+
+  @Resource
+  private ChatUsageLogRepo chatUsageLogRepo;
 
   @Override
   public Model findAndCheck(Long id) {
@@ -136,13 +140,13 @@ public class ModelQueryImpl implements ModelQuery {
     LastMonthGrowthTrend lm = new LastMonthGrowthTrend();
 
     long callsLast30 = getLong(lmStats, "totalCalls");
-    long costCents = getLong(lmStats, "totalCostCents");
+    double totalCost = getDouble(lmStats, "totalCost");
     long tokensLast30 = getLong(lmStats, "totalTokens");
     Double avgResponseTimeMs = (Double) lmStats.get("avgResponseTimeMs");
 
     lm.setAddedCalls(callsLast30);
-    lm.setAddedCost(costCents / 100.0);
-    lm.setAddedCostDisplay(formatCost(costCents));
+    lm.setAddedCost(totalCost);
+    lm.setAddedCostDisplay(formatCostFromDollars(totalCost));
     lm.setAddedTokens(tokensLast30);
 
     Set<SearchCriteria> addedFilters = SearchCriteria.merge(SearchCriteria.criteria(),
@@ -212,6 +216,29 @@ public class ModelQueryImpl implements ModelQuery {
     }
     GenericSpecification<Model> spec = new GenericSpecification<>(filters);
     return modelRepo.findAll(spec);
+  }
+
+  @Override
+  public Map<Long, ModelDetailStats> getDetailStatsForModelIds(List<Long> modelIds,
+      LocalDateTime start, LocalDateTime end) {
+    Map<Long, ModelDetailStats> result = new HashMap<>();
+    if (modelIds == null || modelIds.isEmpty()) {
+      return result;
+    }
+    List<Object[]> rows = chatUsageLogRepo.groupByModelIds(modelIds, start, end);
+    for (Object[] row : rows) {
+      Long modelId = row[0] != null ? ((Number) row[0]).longValue() : null;
+      if (modelId == null) {
+        continue;
+      }
+      long calls = row[1] != null ? ((Number) row[1]).longValue() : 0L;
+      long tokens = row[2] != null ? ((Number) row[2]).longValue() : 0L;
+      Double avgResponseTimeMs = row[3] != null ? ((Number) row[3]).doubleValue() : null;
+      double cost = row[4] != null ? ((Number) row[4]).doubleValue() : 0.0;
+      String costDisplay = formatCostFromDollars(cost);
+      result.put(modelId, new ModelDetailStats(calls, tokens, cost, costDisplay, avgResponseTimeMs));
+    }
+    return result;
   }
 
   @Getter

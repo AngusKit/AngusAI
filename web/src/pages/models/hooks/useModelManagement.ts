@@ -161,8 +161,9 @@ export const useModelManagement = (): UseModelManagementReturn => {
       const typeConfig = getModelTypeConfig(item.type);
       const statusConfig = getModelStatusConfig(item.status);
       const providerLabel = getEnumDescription(ModelProviderEnum, item.provider ?? detail?.provider ?? '');
-      const detailStats = detail?.stats;
-      const performance = detail?.performance;
+      // 优先使用列表接口返回的 stats（后端已批量填充），否则用 detail
+      const detailStats = item.stats ?? detail?.stats;
+      const performance = item.performance ?? detail?.performance;
       const tokens = detailStats?.totalTokensConsumed ?? detailStats?.totalTokens;
       const createdDate = detail?.createdDate ?? item.createdDate;
       const deployed = formatDate(createdDate, language);
@@ -195,9 +196,11 @@ export const useModelManagement = (): UseModelManagementReturn => {
         cost: detailStats?.totalCostDisplay ?? (detailStats?.totalCost !== undefined ? formatCurrency(detailStats.totalCost, language) : '--'),
         tokens: tokens !== undefined ? formatNumber(tokens) : undefined,
         maxTokens:
-          detail?.config?.maxTokens !== undefined && detail.config.maxTokens != null
-            ? String(detail.config.maxTokens)
-            : undefined,
+          item.maxTokens != null
+            ? String(item.maxTokens)
+            : (detail?.config?.maxTokens !== undefined && detail.config.maxTokens != null
+                ? String(detail.config.maxTokens)
+                : undefined),
         deployed,
         detail,
       };
@@ -236,21 +239,8 @@ export const useModelManagement = (): UseModelManagementReturn => {
 
       setModelsTotal(responseData?.total ?? listData?.length ?? 0);
 
-      const normalized = await Promise.all(
-        (listData ?? []).map(async item => {
-          const itemId = item.id !== undefined && item.id !== null ? String(item.id) : '';
-          let detail: ModelDetailVo | undefined;
-          if (itemId) {
-            try {
-              const detailResponse = await ModelsService.getModelDetail(itemId);
-              detail = (detailResponse as any)?.data;
-            } catch (detailError) {
-              console.error('Failed to load model detail:', detailError);
-            }
-          }
-          return buildModelListItem(item, detail);
-        })
-      );
+      // 列表接口已返回 stats、performance、maxTokens，无需再调用 detail 接口
+      const normalized = (listData ?? []).map(item => buildModelListItem(item));
 
       setModels(normalized.filter(Boolean) as ModelListItem[]);
     } catch (error: any) {

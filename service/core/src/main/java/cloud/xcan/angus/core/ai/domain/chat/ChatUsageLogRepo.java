@@ -100,6 +100,17 @@ public interface ChatUsageLogRepo extends BaseRepository<ChatUsageLog, Long> {
   List<Object[]> groupByModel(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
   /**
+   * 按指定模型ID列表聚合统计 返回 [modelId, calls, tokens, avgResponseTimeMs, cost]
+   * cost 单位：美元(USD)。modelIds 为空时返回空列表。
+   */
+  @Query(
+      "SELECT l.modelId, COUNT(l), COALESCE(SUM(l.totalTokens), 0), AVG(l.responseTimeMs), COALESCE(SUM(l.cost), 0) "
+          + "FROM ChatUsageLog l WHERE l.modelId IN :modelIds AND l.requestTime BETWEEN :start AND :end "
+          + "GROUP BY l.modelId")
+  List<Object[]> groupByModelIds(@Param("modelIds") List<Long> modelIds,
+      @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+
+  /**
    * 按模型分组统计（按费用降序，用于费用成本 TOP5） 返回 cost 单位：美分(cents)
    */
   @Query("SELECT l.modelId, COUNT(l), COALESCE(SUM(l.totalTokens), 0), COALESCE(SUM(l.cost), 0) " +

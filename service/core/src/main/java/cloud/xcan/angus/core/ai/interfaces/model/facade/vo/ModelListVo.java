@@ -1,7 +1,9 @@
 package cloud.xcan.angus.core.ai.interfaces.model.facade.vo;
 
 import cloud.xcan.agentx.core.model.ModelProvider;
+import cloud.xcan.angus.core.ai.domain.model.ModelPerformance;
 import cloud.xcan.angus.core.ai.domain.model.ModelStatus;
+import cloud.xcan.angus.core.ai.domain.model.ModelStats;
 import cloud.xcan.angus.remote.vo.TenantAuditingVo;
 import dev.langchain4j.model.catalog.ModelType;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -30,5 +32,14 @@ public class ModelListVo extends TenantAuditingVo {
 
   @Schema(description = "模型状态")
   private ModelStatus status;
+
+  @Schema(description = "统计数据（今日调用、成本等，用于列表卡片展示）")
+  private ModelStats stats;
+
+  @Schema(description = "性能指标（延迟等）")
+  private ModelPerformance performance;
+
+  @Schema(description = "最大Token数")
+  private Integer maxTokens;
 
 }

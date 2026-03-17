@@ -4,8 +4,10 @@ import cloud.xcan.angus.core.ai.domain.model.Model;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelStatisticsVo;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.dto.SimpleStatisticsDto;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -56,5 +58,22 @@ public interface ModelQuery {
    */
   List<Model> findModelsForConfig(String tenantId);
 
+  /**
+   * 批量获取模型在指定时间范围内的调用统计（calls、tokens、cost、avgResponseTimeMs）
+   *
+   * @param modelIds 模型ID列表，为空时返回空 Map
+   * @param start    开始时间
+   * @param end      结束时间
+   * @return modelId -> 统计信息（totalCalls, totalTokens, totalCost, totalCostDisplay, avgResponseTimeMs）
+   */
+  Map<Long, ModelDetailStats> getDetailStatsForModelIds(List<Long> modelIds,
+      LocalDateTime start, LocalDateTime end);
+
+  /**
+   * 模型详情统计（用于列表卡片展示）
+   */
+  record ModelDetailStats(long totalCalls, long totalTokens, double totalCost,
+      String totalCostDisplay, Double avgResponseTimeMs) {
+  }
 
 }
