@@ -1,4 +1,5 @@
 import { MessageSquare, ExternalLink, Edit, Clock, BarChart, Settings, Layers } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog.tsx';
@@ -39,6 +40,7 @@ function ApplicationSkeleton() {
 
 export function RecentApplications({ onNavigate }: { onNavigate?: (page: string) => void }) {
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const { applications, isLoading } = useRecentApplications();
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
 
@@ -58,6 +60,11 @@ export function RecentApplications({ onNavigate }: { onNavigate?: (page: string)
     toast.success(t('recentApps.shareLinkCopied'));
   };
 
+  const handleEditApp = (app: Application) => {
+    setSelectedApp(null);
+    navigate(`/apps/${app.id}/edit`);
+  };
+
   return (
     <div>
       <div className='flex items-center justify-between mb-4'>
@@ -65,9 +72,15 @@ export function RecentApplications({ onNavigate }: { onNavigate?: (page: string)
           <div className='w-2 h-6 bg-blue-500 rounded-full'></div>
           <h2 className='text-lg dark:text-white'>{t('recentApps.title')}</h2>
         </div>
-        <Button variant='link' className='text-blue-500 dark:text-blue-400'>
-          {t('recentApps.viewAll')} →
-        </Button>
+        {applications.length > 6 && (
+          <Button
+            variant='link'
+            className='text-blue-500 dark:text-blue-400'
+            onClick={() => navigate('/apps')}
+          >
+            {t('recentApps.viewAll')} →
+          </Button>
+        )}
       </div>
 
       <div className='grid grid-cols-1 lg:grid-cols-3 gap-4'>
