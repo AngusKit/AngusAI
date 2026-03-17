@@ -517,21 +517,6 @@ export const useModelManagement = (): UseModelManagementReturn => {
         trendUp: (lastMonth?.addedModels ?? 0) >= 0,
       },
       {
-        key: 'totalCost',
-        label: t('models.stats.totalCost'),
-        value: totalCostValue,
-        subtext:
-          today?.addedCost !== undefined || today?.addedCostDisplay
-            ? t('models.stats.addedToday', {
-                value: today?.addedCostDisplay ?? formatCurrency(today?.addedCost, 'en-US') ?? '0',
-              })
-            : t('models.stats.noDailyData'),
-        icon: Activity,
-        iconBg: 'bg-green-500',
-        trend: lastMonth?.addedCostDisplay ?? (lastMonth?.addedCost !== undefined ? `+${formatCurrency(lastMonth.addedCost, 'en-US')}` : undefined),
-        trendUp: (lastMonth?.addedCost ?? 0) >= 0,
-      },
-      {
         key: 'totalCalls',
         label: t('models.stats.totalCalls'),
         value: totalCallsValue,
@@ -546,7 +531,7 @@ export const useModelManagement = (): UseModelManagementReturn => {
       },
       {
         key: 'latency',
-        label: t('models.stats.avgLatency'),
+        label: t('models.stats.todayLatency'),
         value: latencyValue,
         subtext:
           today?.latencyDecreaseFromYesterdayMs !== undefined
@@ -559,6 +544,21 @@ export const useModelManagement = (): UseModelManagementReturn => {
             ? `-${today.latencyDecreaseFromYesterdayMs}ms`
             : undefined,
         trendUp: true,
+      },
+      {
+        key: 'totalCost',
+        label: t('models.stats.totalCost'),
+        value: totalCostValue,
+        subtext:
+          today?.addedCost !== undefined || today?.addedCostDisplay
+            ? t('models.stats.addedToday', {
+                value: today?.addedCostDisplay ?? formatCurrency(today?.addedCost, 'en-US') ?? '0',
+              })
+            : t('models.stats.noDailyData'),
+        icon: Activity,
+        iconBg: 'bg-green-500',
+        trend: lastMonth?.addedCostDisplay ?? (lastMonth?.addedCost !== undefined ? `+${formatCurrency(lastMonth.addedCost, 'en-US')}` : undefined),
+        trendUp: (lastMonth?.addedCost ?? 0) >= 0,
       },
     ];
   }, [language, stats, t]);

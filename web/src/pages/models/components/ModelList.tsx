@@ -164,16 +164,16 @@ export function ModelList({
                           <span className='dark:text-white'>{model.maxTokens}</span>
                         </div>
                       )}
-                      <div className='flex items-center justify-between'>
-                        <span className='text-gray-500 dark:text-gray-400'>{t('models.table.latency')}</span>
-                        <span className='dark:text-white'>{model.performance.latency}</span>
-                      </div>
                     </div>
 
-                    <div className='flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700 text-sm'>
+                    <div className='flex items-center justify-between gap-4 pt-4 border-t border-gray-200 dark:border-gray-700 text-sm'>
                       <div>
                         <div className='text-gray-500 dark:text-gray-400 text-xs'>{t('models.table.todayCalls')}</div>
                         <div className='dark:text-white'>{model.calls}</div>
+                      </div>
+                      <div>
+                        <div className='text-gray-500 dark:text-gray-400 text-xs'>{t('models.table.todayLatency')}</div>
+                        <div className='dark:text-white'>{model.performance.latency}</div>
                       </div>
                       <div className='text-right'>
                         <div className='text-gray-500 dark:text-gray-400 text-xs'>{t('models.table.todayCost')}</div>
@@ -266,7 +266,7 @@ export function ModelList({
                     <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>{t('models.table.type')}</th>
                     <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>{t('models.table.maxTokens')}</th>
                     <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>{t('models.table.performance')}</th>
-                    <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>{t('models.table.callsCost')}</th>
+                    <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400'>{t('models.table.callsLatencyCost')}</th>
                     <th className='px-6 py-3 text-left text-xs text-gray-600 dark:text-gray-400 w-[120px]'>{t('models.table.actions')}</th>
                   </tr>
                 </thead>
@@ -294,11 +294,11 @@ export function ModelList({
                         <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{model.type}</td>
                         <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>{model.maxTokens ?? '--'}</td>
                         <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>
-                          <div>{model.performance.latency}</div>
                           <div className='text-xs'>{model.performance.accuracy}</div>
                         </td>
                         <td className='px-6 py-4 text-sm text-gray-600 dark:text-gray-400'>
                           <div>{model.calls}</div>
+                          <div className='text-xs dark:text-white'>{model.performance.latency}</div>
                           <div className='text-xs dark:text-white'>{model.cost}</div>
                         </td>
                         <td className='px-6 py-4 w-[120px]'>
