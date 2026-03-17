@@ -153,6 +153,7 @@ public class ModelQueryImpl implements ModelQuery {
         ModelCallRecord.class, LongTotalView.class, callFilters, "tokens");
     long totalTokens =
         (tokensView == null || tokensView.getTotal() == null) ? 0L : tokensView.getTotal();
+    vo.setTotalTokens(totalTokens);
     vo.setTotalTokensConsumed(totalTokens);
 
     DoubleTotalView costView = modelCallRecordQuery.sumByFilters(
@@ -170,11 +171,12 @@ public class ModelQueryImpl implements ModelQuery {
 
     DoubleTotalView rtSum = modelCallRecordQuery.sumByFilters(
         ModelCallRecord.class, DoubleTotalView.class, callFilters, "responseTimeMs");
-    double avgLatency = 0.0;
+    double avgLatencySec = 0.0;
     if (totalCalls > 0 && rtSum != null && rtSum.getTotal() != null) {
-      avgLatency = rtSum.getTotal() / (double) totalCalls;
+      double avgLatencyMs = rtSum.getTotal() / (double) totalCalls;
+      avgLatencySec = avgLatencyMs / 1000.0;
     }
-    vo.setAverageLatencyMs(avgLatency);
+    vo.setAverageLatencySec(avgLatencySec);
   }
 
   private void buildLastMonthTrend(ModelStatisticsVo vo, LocalDateTime start,
@@ -203,7 +205,8 @@ public class ModelQueryImpl implements ModelQuery {
     DoubleTotalView rtSum = modelCallRecordQuery.sumByFilters(
         ModelCallRecord.class, DoubleTotalView.class, callFilters, "responseTimeMs");
     if (callsLast30 > 0 && rtSum != null && rtSum.getTotal() != null) {
-      lm.setAverageLatencyMs(rtSum.getTotal() / (double) callsLast30);
+      double avgLatencyMs = rtSum.getTotal() / (double) callsLast30;
+      lm.setAverageLatencySec(avgLatencyMs / 1000.0);
     }
 
     vo.setLastMonthGrowthTrend(lm);
@@ -235,7 +238,8 @@ public class ModelQueryImpl implements ModelQuery {
     DoubleTotalView rtSum = modelCallRecordQuery.sumByFilters(
         ModelCallRecord.class, DoubleTotalView.class, callFilters, "responseTimeMs");
     if (callsToday > 0 && rtSum != null && rtSum.getTotal() != null) {
-      today.setAverageLatencyMs(rtSum.getTotal() / (double) callsToday);
+      double avgLatencyMs = rtSum.getTotal() / (double) callsToday;
+      today.setAverageLatencySec(avgLatencyMs / 1000.0);
     }
     vo.setTodayGrowthTrend(today);
   }

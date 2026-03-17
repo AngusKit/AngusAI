@@ -39,8 +39,8 @@ public class ModelStatisticsVo {
   @Schema(description = "累计消耗的 tokens 数量")
   private Long totalTokensConsumed;
 
-  @Schema(description = "平均延迟（毫秒）")
-  private Double averageLatencyMs;
+  @Schema(description = "平均延迟（秒）")
+  private Double averageLatencySec;
 
   @Schema(description = "近一月增长趋势")
   private LastMonthGrowthTrend lastMonthGrowthTrend;

@@ -145,7 +145,7 @@ export function AgentDetailPage() {
               </Button>
               <Button size="sm" onClick={() => navigate(`/agents/${id}/edit`)} className="bg-blue-500 hover:bg-blue-600">
                 <Edit className="w-4 h-4 mr-1.5" />
-                编辑
+                编辑智能体
               </Button>
             </div>
           </div>

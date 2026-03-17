@@ -22,8 +22,8 @@ public class TodayGrowthTrend {
   @Schema(description = "今日新增调用次数")
   private Long addedCalls;
 
-  @Schema(description = "今日平均延迟（毫秒）")
-  private Double averageLatencyMs;
+  @Schema(description = "今日平均延迟（秒）")
+  private Double averageLatencySec;
 
   @Schema(description = "较昨日延迟降低（毫秒），正值表示延迟降低的毫秒数")
   private Long latencyDecreaseFromYesterdayMs;

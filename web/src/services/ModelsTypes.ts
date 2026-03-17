@@ -29,10 +29,10 @@ export interface LastMonthGrowthTrend {
    */
   addedCalls?: number;
   /**
-   * 本月平均延迟（毫秒）
+   * 本月平均延迟（秒）
    * @format double
    */
-  averageLatencyMs?: number;
+  averageLatencySec?: number;
   /**
    * 较上月延迟降低（毫秒），正值表示延迟降低的毫秒数
    * @format int64
@@ -65,10 +65,10 @@ export interface TodayGrowthTrend {
    */
   addedCalls?: number;
   /**
-   * 今日平均延迟（毫秒）
+   * 今日平均延迟（秒）
    * @format double
    */
-  averageLatencyMs?: number;
+  averageLatencySec?: number;
   /**
    * 较昨日延迟降低（毫秒），正值表示延迟降低的毫秒数
    * @format int64
@@ -169,10 +169,10 @@ export interface ModelStats {
    */
   totalTokensConsumed?: number;
   /**
-   * 平均延迟（毫秒）
+   * 平均延迟（秒）
    * @format double
    */
-  averageLatencyMs?: number;
+  averageLatencySec?: number;
   /** 近一月增长趋势 */
   lastMonthGrowthTrend?: LastMonthGrowthTrend;
   /** 今天增长趋势 */
@@ -409,10 +409,10 @@ export interface ModelStatisticsVo {
    */
   totalTokensConsumed?: number;
   /**
-   * 平均延迟（毫秒）
+   * 平均延迟（秒）
    * @format double
    */
-  averageLatencyMs?: number;
+  averageLatencySec?: number;
   /** 近一月增长趋势 */
   lastMonthGrowthTrend?: LastMonthGrowthTrend;
   /** 今天增长趋势 */

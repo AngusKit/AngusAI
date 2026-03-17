@@ -22,8 +22,8 @@ public class LastMonthGrowthTrend {
   @Schema(description = "本月新增调用次数")
   private Long addedCalls;
 
-  @Schema(description = "本月平均延迟（毫秒）")
-  private Double averageLatencyMs;
+  @Schema(description = "本月平均延迟（秒）")
+  private Double averageLatencySec;
 
   @Schema(description = "较上月延迟降低（毫秒），正值表示延迟降低的毫秒数")
   private Long latencyDecreaseFromLastMonthMs;

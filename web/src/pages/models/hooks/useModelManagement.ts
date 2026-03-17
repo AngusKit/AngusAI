@@ -492,12 +492,12 @@ export const useModelManagement = (): UseModelManagementReturn => {
   const statsCards = useMemo(() => {
     const today = stats?.todayGrowthTrend;
     const lastMonth = stats?.lastMonthGrowthTrend;
-    const averageLatency = stats?.averageLatencyMs;
+    const averageLatencySec = stats?.averageLatencySec;
 
     const totalModelsValue = formatNumber(stats?.totalModels);
     const totalCostValue = stats?.totalCost !== undefined ? formatCurrency(stats?.totalCost, language) : '--';
     const totalCallsValue = formatNumber(stats?.totalCalls);
-    const latencyValue = averageLatency !== undefined && averageLatency !== null ? `${averageLatency}ms` : '--';
+    const latencyValue = averageLatencySec !== undefined && averageLatencySec !== null ? `${averageLatencySec.toFixed(2)}s` : '--';
 
     return [
       {
