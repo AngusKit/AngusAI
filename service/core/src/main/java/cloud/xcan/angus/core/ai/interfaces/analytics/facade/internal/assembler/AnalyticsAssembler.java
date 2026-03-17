@@ -222,19 +222,19 @@ public class AnalyticsAssembler {
 
     for (Map<String, Object> data : distributionData) {
       AppDistributionVo.DistributionItemVo item = new AppDistributionVo.DistributionItemVo();
-      item.setAppId((Long) data.get("appId"));
+      item.setAppId(toLong(data.get("appId"), null));
       item.setAppName((String) data.getOrDefault("appName", "Unknown"));
-      item.setCalls((Long) data.get("calls"));
+      item.setCalls(toLong(data.get("calls"), 0L));
       Double pct = toDouble(data.get("percentage"), 0.0);
       item.setPercentage(formatPercentageTo2Decimals(pct));
-      item.setTokens((Long) data.getOrDefault("tokens", 0L));
-      item.setCost((Long) data.getOrDefault("cost", 0L));
-      item.setAvgResponseTime((Double) data.getOrDefault("avgResponseTime", 0.0));
+      item.setTokens(toLong(data.get("tokens"), 0L));
+      item.setCost(toLong(data.get("cost"), 0L));
+      item.setAvgResponseTime(toDouble(data.get("avgResponseTime"), 0.0));
 
       items.add(item);
 
-      totalCalls += item.getCalls();
-      totalTokens += item.getTokens();
+      totalCalls += item.getCalls() != null ? item.getCalls() : 0L;
+      totalTokens += item.getTokens() != null ? item.getTokens() : 0L;
     }
 
     vo.setItems(items);
@@ -260,27 +260,22 @@ public class AnalyticsAssembler {
     long totalTokens = 0;
     long totalCost = 0;
 
-    String[] colors = {"#3b82f6", "#8b5cf6", "#10b981", "#f59e0b", "#ef4444", "#6b7280"};
-
-    int colorIndex = 0;
     for (Map<String, Object> data : distributionData) {
       ModelDistributionVo.DistributionItemVo item = new ModelDistributionVo.DistributionItemVo();
-      item.setModelId((Long) data.get("modelId"));
+      item.setModelId(toLong(data.get("modelId"), null));
       item.setModelName((String) data.getOrDefault("modelName", "Unknown"));
-      item.setCalls((Long) data.get("calls"));
+      item.setCalls(toLong(data.get("calls"), 0L));
       Double pct = toDouble(data.get("percentage"), 0.0);
       item.setPercentage(formatPercentageTo2Decimals(pct));
-      item.setTokens((Long) data.getOrDefault("tokens", 0L));
-      item.setCost((Long) data.getOrDefault("cost", 0L));
-      item.setAvgResponseTime((Double) data.getOrDefault("avgResponseTime", 0.0));
-      item.setColor(colors[colorIndex % colors.length]);
+      item.setTokens(toLong(data.get("tokens"), 0L));
+      item.setCost(toLong(data.get("cost"), 0L));
+      item.setAvgResponseTime(toDouble(data.get("avgResponseTime"), 0.0));
 
       items.add(item);
 
-      totalCalls += item.getCalls();
-      totalTokens += item.getTokens();
-      totalCost += item.getCost();
-      colorIndex++;
+      totalCalls += item.getCalls() != null ? item.getCalls() : 0L;
+      totalTokens += item.getTokens() != null ? item.getTokens() : 0L;
+      totalCost += item.getCost() != null ? item.getCost() : 0L;
     }
 
     vo.setItems(items);
@@ -314,24 +309,26 @@ public class AnalyticsAssembler {
       item.setDatetime(dtObj instanceof Number ? ((Number) dtObj).longValue() : null);
       item.setDate((String) data.get("date"));
 
-      int avgTime = data.get("avgTime") != null ? ((Number) data.get("avgTime")).intValue() : 0;
-      int p50 = data.get("p50") != null ? ((Number) data.get("p50")).intValue() : 0;
-      int p95 = data.get("p95") != null ? ((Number) data.get("p95")).intValue() : 0;
-      int p99 = data.get("p99") != null ? ((Number) data.get("p99")).intValue() : 0;
-      int minTime = data.get("minTime") != null ? ((Number) data.get("minTime")).intValue() : 0;
-      int maxTime = data.get("maxTime") != null ? ((Number) data.get("maxTime")).intValue() : 0;
+      int avgTimeMs = data.get("avgTime") != null ? ((Number) data.get("avgTime")).intValue() : 0;
+      int p50Ms = data.get("p50") != null ? ((Number) data.get("p50")).intValue() : 0;
+      int p95Ms = data.get("p95") != null ? ((Number) data.get("p95")).intValue() : 0;
+      int p99Ms = data.get("p99") != null ? ((Number) data.get("p99")).intValue() : 0;
+      int minTimeMs = data.get("minTime") != null ? ((Number) data.get("minTime")).intValue() : 0;
+      int maxTimeMs = data.get("maxTime") != null ? ((Number) data.get("maxTime")).intValue() : 0;
 
-      item.setAvgTime(avgTime);
-      item.setP50(p50);
-      item.setP95(p95);
-      item.setP99(p99);
-      item.setMinTime(minTime);
-      item.setMaxTime(maxTime);
+      item.setAvgTime(avgTimeMs / 1000.0);
+      item.setP50(p50Ms / 1000.0);
+      item.setP95(p95Ms / 1000.0);
+      item.setP99(p99Ms / 1000.0);
+      item.setMinTime(minTimeMs / 1000.0);
+      item.setMaxTime(maxTimeMs / 1000.0);
       items.add(item);
 
-      sumAvg += avgTime;
-      if (p95 > maxP95) maxP95 = p95;
-      if (p99 > maxP99) maxP99 = p99;
+      sumAvg += avgTimeMs / 1000.0;
+      double p95Sec = p95Ms / 1000.0;
+      double p99Sec = p99Ms / 1000.0;
+      if (p95Sec > maxP95) maxP95 = p95Sec;
+      if (p99Sec > maxP99) maxP99 = p99Sec;
       itemCount++;
     }
 
@@ -347,7 +344,7 @@ public class AnalyticsAssembler {
       slowest = new ResponseTimeAnalysisVo.SlowestEndpointVo();
       slowest.setEndpoint((String) slowestEndpoint.get("endpoint"));
       Object avgMs = slowestEndpoint.get("avgTimeMs");
-      slowest.setAvgTime(avgMs != null ? ((Number) avgMs).intValue() : 0);
+      slowest.setAvgTime(avgMs != null ? ((Number) avgMs).doubleValue() / 1000.0 : 0.0);
     }
     summary.setSlowestEndpoint(slowest);
     vo.setSummary(summary);

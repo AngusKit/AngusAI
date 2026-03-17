@@ -69,16 +69,16 @@ public interface ApiUsageLogRepo extends BaseRepository<ApiUsageLog, Long> {
       @Param("end") LocalDateTime end);
 
   /**
-   * 按应用分组统计
+   * 按应用分组统计 返回 [appId, calls, tokens, avgResponseTime, cost]
    */
-  @Query("SELECT l.appId, COUNT(l), SUM(l.totalTokens), AVG(l.responseTimeMs) " +
+  @Query("SELECT l.appId, COUNT(l), COALESCE(SUM(l.totalTokens), 0), AVG(l.responseTimeMs), COALESCE(SUM(l.cost), 0) " +
       "FROM ApiUsageLog l WHERE l.requestTime BETWEEN :start AND :end GROUP BY l.appId ORDER BY COUNT(l) DESC")
   List<Object[]> groupByApp(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
   /**
-   * 按模型分组统计
+   * 按模型分组统计 返回 [modelId, calls, tokens, avgResponseTime, cost]
    */
-  @Query("SELECT l.modelId, COUNT(l), SUM(l.totalTokens) " +
+  @Query("SELECT l.modelId, COUNT(l), COALESCE(SUM(l.totalTokens), 0), AVG(l.responseTimeMs), COALESCE(SUM(l.cost), 0) " +
       "FROM ApiUsageLog l WHERE l.requestTime BETWEEN :start AND :end GROUP BY l.modelId ORDER BY COUNT(l) DESC")
   List<Object[]> groupByModel(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 

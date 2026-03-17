@@ -287,6 +287,7 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
           item.put("calls", result[1]);
           item.put("tokens", result[2]);
           item.put("avgResponseTime", result[3]);
+          item.put("cost", result.length > 4 ? result[4] : 0L);
           item.put("percentage",
               total > 0 ? (((Number) result[1]).doubleValue() / total * 100) : 0.0);
 
@@ -313,6 +314,8 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
           item.put("modelId", result[0]);
           item.put("calls", result[1]);
           item.put("tokens", result[2]);
+          item.put("avgResponseTime", result.length > 3 ? result[3] : null);
+          item.put("cost", result.length > 4 ? result[4] : 0L);
           item.put("percentage", totalCalls > 0
               ? (((Number) result[1]).doubleValue() / totalCalls * 100) : 0.0);
 

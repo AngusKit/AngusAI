@@ -26,8 +26,9 @@ interface ApiCallsTrendItem extends TrendItemVo {
   failedCalls?: number;
 }
 
-/** 响应时间趋势数据点（扩展 TrendItemVo） */
+/** 响应时间趋势数据点（扩展 TrendItemVo，后端返回秒） */
 interface ResponseTimeTrendItem extends TrendItemVo {
+  avgTime?: number;
   avgResponseTime?: number;
   p50?: number;
   p95?: number;
@@ -232,14 +233,14 @@ export function mapTokenUsageToChartData(tokenUsageTrend: TokenUsageTrendVo | nu
   }));
 }
 
-/** 将响应时间分析转为图表数据 */
+/** 将响应时间分析转为图表数据（后端已返回秒，无需转换） */
 export function mapResponseTimeToChartData(responseTimeAnalysis: ResponseTimeAnalysisVo | null) {
   const items = (responseTimeAnalysis?.items ?? []) as ResponseTimeTrendItem[];
   return items.map((item) => ({
     date: item.date ?? String(item.datetime ?? ''),
-    avgTime: (item.avgResponseTime ?? item.totalTokens ?? 0) / 1000,
-    p95: (item.p95 ?? 0) / 1000,
-    p99: (item.p99 ?? 0) / 1000,
+    avgTime: item.avgTime ?? item.avgResponseTime ?? 0,
+    p95: item.p95 ?? 0,
+    p99: item.p99 ?? 0,
   }));
 }
 
@@ -289,7 +290,7 @@ export function mapModelDistributionToChartData(modelDistribution: ModelDistribu
       value,
       calls: Number(item.calls) || 0,
       tokens,
-      color: item.color ?? COLORS[index % COLORS.length],
+      color: COLORS[index % COLORS.length],
     };
   });
   return {
@@ -313,7 +314,7 @@ export function mapDistributionToChartData(
     name: item.appName ?? item.modelName ?? '未知',
     value: Number(item.percentage) || 0,
     calls: Number(item.calls) || 0,
-    color: item.color ?? COLORS[index % COLORS.length],
+    color: COLORS[index % COLORS.length],
   }));
 }
 

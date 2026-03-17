@@ -108,6 +108,8 @@ export interface TrendItemVo {
   datetime?: number;
   /** 日期显示 */
   date?: string;
+  /** 平均响应时间(秒)，用于响应时间分析 */
+  avgTime?: number;
   /**
    * 输入Token
    * @format int64
@@ -290,8 +292,6 @@ export interface DistributionItemVo {
    * @format double
    */
   avgResponseTime?: number;
-  /** 图表颜色 */
-  color?: string;
 }
 
 /** 模型使用分布 */

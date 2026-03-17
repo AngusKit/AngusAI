@@ -38,9 +38,6 @@ public class ModelDistributionVo {
 
     @Schema(description = "平均响应时间(毫秒)")
     private Double avgResponseTime;
-
-    @Schema(description = "图表颜色")
-    private String color;
   }
 
   @Data
