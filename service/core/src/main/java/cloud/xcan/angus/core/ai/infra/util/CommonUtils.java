@@ -2,10 +2,10 @@ package cloud.xcan.angus.core.ai.infra.util;
 
 import cloud.xcan.angus.core.ai.domain.dataset.DatasetDataType;
 import cloud.xcan.angus.core.ai.domain.knowledgebase.DocumentType;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
@@ -22,7 +22,9 @@ public class CommonUtils {
 
   public static final DecimalFormat NUMBER_FORMAT = new DecimalFormat("#,###");
   public static final DecimalFormat PERCENTAGE_FORMAT = new DecimalFormat("0.0");
-  /** 百分比格式（2位小数，已乘以100的值如 25.5 表示 25.5%） */
+  /**
+   * 百分比格式（2位小数，已乘以100的值如 25.5 表示 25.5%）
+   */
   public static final DecimalFormat PERCENTAGE_2DECIMAL_FORMAT = new DecimalFormat("0.00");
 
   /**

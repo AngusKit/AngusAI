@@ -98,8 +98,9 @@ public class KnowledgeBaseAssembler {
     stats.setTotalDocuments(knowledgeBase.getDocumentsCount());
     stats.setActiveDocuments(knowledgeBase.getActiveDocuments());
     stats.setTotalChunks(knowledgeBase.getTotalChunks());
-    stats.setAvgChunkSize(knowledgeBase.getTotalChunks() != null && knowledgeBase.getTotalChunks() > 0
-        ? knowledgeBase.getConfig().getChunkSize() : 0);
+    stats.setAvgChunkSize(
+        knowledgeBase.getTotalChunks() != null && knowledgeBase.getTotalChunks() > 0
+            ? knowledgeBase.getConfig().getChunkSize() : 0);
     stats.setTotalSize(formatFileSize(knowledgeBase.getTotalSize()));
     vo.setStats(stats);
 

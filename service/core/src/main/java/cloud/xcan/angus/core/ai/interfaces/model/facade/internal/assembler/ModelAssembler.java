@@ -1,11 +1,10 @@
 package cloud.xcan.angus.core.ai.interfaces.model.facade.internal.assembler;
 
+import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatCostFromDollars;
 import static cloud.xcan.angus.core.utils.PrincipalContextUtils.getOptTenantId;
 import static cloud.xcan.angus.spec.utils.ObjectUtils.nullSafe;
 
 import cloud.xcan.agentx.core.model.ModelConfigDefinition;
-import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatCostFromDollars;
-
 import cloud.xcan.angus.core.ai.domain.model.Model;
 import cloud.xcan.angus.core.ai.domain.model.ModelStats;
 import cloud.xcan.angus.core.ai.domain.model.ModelStatus;
@@ -139,7 +138,8 @@ public class ModelAssembler {
     if (stats != null && stats.getLastMonthGrowthTrend() != null
         && stats.getLastMonthGrowthTrend().getAddedCost() != null) {
       stats.getLastMonthGrowthTrend()
-          .setAddedCostDisplay(formatCostFromDollars(stats.getLastMonthGrowthTrend().getAddedCost()));
+          .setAddedCostDisplay(
+              formatCostFromDollars(stats.getLastMonthGrowthTrend().getAddedCost()));
     }
     if (stats != null && stats.getTodayGrowthTrend() != null
         && stats.getTodayGrowthTrend().getAddedCost() != null) {
