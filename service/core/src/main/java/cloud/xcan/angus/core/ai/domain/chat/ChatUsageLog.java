@@ -36,6 +36,12 @@ public class ChatUsageLog extends TenantEntity<ChatUsageLog, Long> {
   @Column(name = "session_id", length = 36)
   private String sessionId;
 
+  /**
+   * 用户消息ID，关联 ai_chat_message 中的 USER 消息
+   */
+  @Column(name = "user_message_id")
+  private Long userMessageId;
+
   @Column(name = "user_id")
   private Long userId;
 

@@ -15,6 +15,11 @@ public interface MessageCmd {
   Message create0(Session session, MessageRole role, String content);
 
   /**
+   * 创建消息，可指定父消息ID（用于 ASSISTANT 关联对应的 USER 消息）
+   */
+  Message create0(Session session, MessageRole role, String content, Long parentMessageId);
+
+  /**
    * 添加消息反馈
    */
   void addFeedback(Long id, String feedbackType, String feedbackComment);

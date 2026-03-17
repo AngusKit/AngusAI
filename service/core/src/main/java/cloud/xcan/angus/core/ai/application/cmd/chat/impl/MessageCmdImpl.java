@@ -31,6 +31,13 @@ public class MessageCmdImpl extends CommCmd<Message, Long> implements MessageCmd
   @Transactional
   public Message create0(@NonNullable Session session, @NonNullable MessageRole role,
       @NonNullable String content) {
+    return create0(session, role, content, null);
+  }
+
+  @Override
+  @Transactional
+  public Message create0(@NonNullable Session session, @NonNullable MessageRole role,
+      @NonNullable String content, Long parentMessageId) {
     Message message = new Message();
     message.setId(uidGenerator.getUID());
     message.setSessionEntityId(session.getId());
@@ -38,6 +45,7 @@ public class MessageCmdImpl extends CommCmd<Message, Long> implements MessageCmd
     message.setRole(role);
     message.setContent(content);
     message.setIsStreaming(false);
+    message.setParentMessageId(parentMessageId);
 
     Message savedMessage = messageRepo.save(message);
     sessionCmd.incrementMessageCount(session.getId());

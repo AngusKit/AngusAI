@@ -36,8 +36,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.concurrent.Executor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -48,6 +47,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
  * 对话、Session、Message 统一使用 sessionId(UUID) 关联；入参 sessionId 为空时业务层初始化 Session。
  * </p>
  */
+@Slf4j
 @Service
 public class AgentChatCmdImpl implements AgentChatCmd {
 
@@ -55,7 +55,6 @@ public class AgentChatCmdImpl implements AgentChatCmd {
    * 流式助手消息占位内容，用于满足 MessageCmd 非空校验，最终由 updateContent 覆盖
    */
   private static final String STREAMING_PLACEHOLDER = ".";
-  private static final Logger log = LoggerFactory.getLogger(AgentChatCmdImpl.class);
 
   @Resource
   private AgentCmd agentCmd;
@@ -97,7 +96,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
       protected AgentChatResult process() {
         agentCmd.ensureRegistered(agent);
         // 有会话时先落库用户消息
-        messageCmd.create0(sessionDb, MessageRole.USER, message);
+        Message userMessage = messageCmd.create0(sessionDb, MessageRole.USER, message);
 
         // Model 仅查询一次，复用给 getChatConfigOverride 和 saveApiUsageLog
         Model model = agent.getDefaultModelId() != null
@@ -129,11 +128,11 @@ public class AgentChatCmdImpl implements AgentChatCmd {
           int estOutput = chatError == null ? estimateTokens(reply) : 0;
           saveApiUsageLog(get(), agent, sessionDb, model, "/api/v1/agents/chat", startMs,
               chatError == null, chatError != null ? chatError.getMessage() : null, estInput,
-              estOutput, estInput + estOutput);
+              estOutput, estInput + estOutput, userMessage.getId());
         }
 
-        // 落库助手回复
-        messageCmd.create0(sessionDb, MessageRole.ASSISTANT, reply);
+        // 落库助手回复，关联对应的 USER 消息 ID
+        messageCmd.create0(sessionDb, MessageRole.ASSISTANT, reply, userMessage.getId());
         return new AgentChatResult(reply, sessionDb.getSessionId());
       }
     }.execute();
@@ -168,11 +167,11 @@ public class AgentChatCmdImpl implements AgentChatCmd {
         agentCmd.ensureRegistered(agent);
 
         // 落库用户消息
-        messageCmd.create0(sessionDb, MessageRole.USER, message);
+        Message userMessage = messageCmd.create0(sessionDb, MessageRole.USER, message);
 
-        // 预创建占位助手消息并标记为流式
+        // 预创建占位助手消息并标记为流式，关联对应的 USER 消息 ID
         assistantMessage = messageCmd.create0(sessionDb, MessageRole.ASSISTANT,
-            STREAMING_PLACEHOLDER);
+            STREAMING_PLACEHOLDER, userMessage.getId());
         messageCmd.setStreaming(assistantMessage, true);
 
         // 合并配置，得到最终覆盖参数
@@ -182,6 +181,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
         // 异步执行流式调用，通过 SSE 推送 token
         // 注意：必须保持使用 sseEmitterChatExecutor，否则会破坏 SSE 的流式模型和整体稳定性
         final Model modelForAsync = model;
+        final Long userMessageIdForLog = userMessage.getId();
         Principal principal = PrincipalContext.get();
         sseEmitterChatExecutor.execute(() -> {
           StringBuilder fullContent = new StringBuilder();
@@ -228,7 +228,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
                   }
                   saveApiUsageLog(principal, agent, sessionDb, modelForAsync,
                       "/api/v1/agents/chat/stream", streamStartMs, true, null,
-                      inTokens, outTokens, total);
+                      inTokens, outTokens, total, userMessageIdForLog);
                   try {
                     emitter.send(SseEmitter.event().data("data: [DONE]\n\n"));
                   } catch (Exception ignored) {
@@ -239,7 +239,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
                   messageCmd.setStreaming(assistantMessage, false);
                   saveApiUsageLog(principal, agent, sessionDb, modelForAsync,
                       "/api/v1/agents/chat/stream", streamStartMs, false, e.getMessage(),
-                      null, null, null);
+                      null, null, null, userMessageIdForLog);
                   emitter.completeWithError(e);
                 });
             stream.start();
@@ -247,7 +247,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
             messageCmd.setStreaming(assistantMessage, false);
             saveApiUsageLog(principal, agent, sessionDb, modelForAsync,
                 "/api/v1/agents/chat/stream", streamStartMs, false, e.getMessage(), null, null,
-                null);
+                null, userMessageIdForLog);
             emitter.completeWithError(e);
           }
         });
@@ -274,10 +274,11 @@ public class AgentChatCmdImpl implements AgentChatCmd {
    * 保存 API 使用日志，关联对话
    *
    * @param model 已查询的模型，可为 null；为 null 时 calculateCost 内部会按需查询
+   * @param userMessageId 用户消息ID，可为 null
    */
   private void saveApiUsageLog(Principal principal, Agent agent, Session session, Model model,
       String endpoint, long startMs, boolean isSuccessful, String errorMessage,
-      Integer inputTokens, Integer outputTokens, Integer totalTokens) {
+      Integer inputTokens, Integer outputTokens, Integer totalTokens, Long userMessageId) {
     try {
       int responseTimeMs = (int) (System.currentTimeMillis() - startMs);
       BigDecimal cost = calculateCost(agent, model, inputTokens, outputTokens);
@@ -295,7 +296,8 @@ public class AgentChatCmdImpl implements AgentChatCmd {
           .setCost(cost)
           .setIsSuccessful(isSuccessful)
           .setErrorMessage(lengthSafe(errorMessage, 1000))
-          .setSessionId(session != null ? session.getSessionId() : null);
+          .setSessionId(session != null ? session.getSessionId() : null)
+          .setUserMessageId(userMessageId);
       chatUsageLogCmd.create(usageLog, principal);
     } catch (Exception e) {
       log.error(e.getMessage());
