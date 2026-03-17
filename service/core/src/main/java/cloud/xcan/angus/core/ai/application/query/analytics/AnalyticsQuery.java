@@ -36,6 +36,11 @@ public interface AnalyticsQuery {
       Long appId, String granularity);
 
   /**
+   * 获取最慢接口（按平均响应时间降序取第一条）
+   */
+  Map<String, Object> getSlowestEndpoint(LocalDateTime start, LocalDateTime end, Long appId);
+
+  /**
    * 获取应用使用分布
    */
   List<Map<String, Object>> getAppDistribution(LocalDateTime start, LocalDateTime end,

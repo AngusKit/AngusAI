@@ -3,6 +3,7 @@ package cloud.xcan.angus.core.ai.domain.analytics;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.query.Param;
@@ -96,8 +97,7 @@ public interface ApiUsageLogRepo extends BaseRepository<ApiUsageLog, Long> {
       "SELECT app_id, MAX(request_time) AS last_used, COUNT(*) AS total_calls, AVG(response_time_ms) AS avg_response_ms "
           + "FROM ai_api_usage_log WHERE request_time >= :since AND app_id IS NOT NULL "
           + "GROUP BY app_id ORDER BY MAX(request_time) DESC", nativeQuery = true)
-  List<Object[]> getRecentAppUsageStats(@Param("since") java.time.LocalDateTime since,
-      org.springframework.data.domain.Pageable pageable);
+  List<Object[]> getRecentAppUsageStats(@Param("since") LocalDateTime since, Pageable pageable);
 
   /**
    * 按接口分组统计
@@ -107,6 +107,15 @@ public interface ApiUsageLogRepo extends BaseRepository<ApiUsageLog, Long> {
       "FROM ApiUsageLog l WHERE l.requestTime BETWEEN :start AND :end GROUP BY l.endpoint, l.method ORDER BY COUNT(l) DESC")
   List<Object[]> groupByEndpoint(@Param("start") LocalDateTime start,
       @Param("end") LocalDateTime end);
+
+  /**
+   * 按接口分组统计（按平均响应时间降序，用于获取最慢接口） 返回 [endpoint, method, calls, avgTimeMs, successfulCalls, totalTokens]
+   */
+  @Query("SELECT l.endpoint, l.method, COUNT(l), AVG(l.responseTimeMs), " +
+      "SUM(CASE WHEN l.isSuccessful = true THEN 1 ELSE 0 END), COALESCE(SUM(l.totalTokens), 0) " +
+      "FROM ApiUsageLog l WHERE l.requestTime BETWEEN :start AND :end GROUP BY l.endpoint, l.method ORDER BY AVG(l.responseTimeMs) DESC")
+  List<Object[]> groupByEndpointOrderByAvgTime(@Param("start") LocalDateTime start,
+      @Param("end") LocalDateTime end, Pageable pageable);
 
   /**
    * 按状态码分组统计错误
@@ -150,7 +159,6 @@ public interface ApiUsageLogRepo extends BaseRepository<ApiUsageLog, Long> {
       + "WHERE l.appId = :appId AND l.requestTime BETWEEN :start AND :end AND l.userId IS NOT NULL "
       + "GROUP BY l.userId ORDER BY COUNT(l) DESC")
   List<Object[]> getTopUsersByAppId(@Param("appId") Long appId, @Param("start") LocalDateTime start,
-      @Param("end") LocalDateTime end,
-      org.springframework.data.domain.Pageable pageable);
+      @Param("end") LocalDateTime end, Pageable pageable);
 
 }

@@ -19,6 +19,18 @@ public class CommonUtils {
 
   public static final DecimalFormat NUMBER_FORMAT = new DecimalFormat("#,###");
   public static final DecimalFormat PERCENTAGE_FORMAT = new DecimalFormat("0.0");
+  /** 百分比格式（2位小数，已乘以100的值如 25.5 表示 25.5%） */
+  public static final DecimalFormat PERCENTAGE_2DECIMAL_FORMAT = new DecimalFormat("0.00");
+
+  /**
+   * 格式化百分比为2位小数（输入已乘以100，如 25.567 表示 25.567%）
+   */
+  public static Double formatPercentageTo2Decimals(Double percentage) {
+    if (percentage == null) {
+      return 0.0;
+    }
+    return Math.round(percentage * 100) / 100.0;
+  }
 
   /**
    * 格式化数字(千位分隔)

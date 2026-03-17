@@ -4,6 +4,7 @@ import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.PERCENTAGE_FORMAT;
 import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatLargeNumber;
 import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatNumber;
 import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatPercentage;
+import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatPercentageTo2Decimals;
 import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatResponseTime;
 import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.getTrend;
 
@@ -12,6 +13,7 @@ import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.ApiCallsTrendVo;
 import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.AppDistributionVo;
 import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.ErrorAnalysisVo;
 import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.ModelDistributionVo;
+import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.ResponseTimeAnalysisVo;
 import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.TokenUsageTrendVo;
 import cloud.xcan.angus.core.ai.interfaces.analytics.facade.vo.TopEndpointsVo;
 import java.util.ArrayList;
@@ -223,7 +225,8 @@ public class AnalyticsAssembler {
       item.setAppId((Long) data.get("appId"));
       item.setAppName((String) data.getOrDefault("appName", "Unknown"));
       item.setCalls((Long) data.get("calls"));
-      item.setPercentage((Double) data.get("percentage"));
+      Double pct = toDouble(data.get("percentage"), 0.0);
+      item.setPercentage(formatPercentageTo2Decimals(pct));
       item.setTokens((Long) data.getOrDefault("tokens", 0L));
       item.setCost((Long) data.getOrDefault("cost", 0L));
       item.setAvgResponseTime((Double) data.getOrDefault("avgResponseTime", 0.0));
@@ -265,7 +268,8 @@ public class AnalyticsAssembler {
       item.setModelId((Long) data.get("modelId"));
       item.setModelName((String) data.getOrDefault("modelName", "Unknown"));
       item.setCalls((Long) data.get("calls"));
-      item.setPercentage((Double) data.get("percentage"));
+      Double pct = toDouble(data.get("percentage"), 0.0);
+      item.setPercentage(formatPercentageTo2Decimals(pct));
       item.setTokens((Long) data.getOrDefault("tokens", 0L));
       item.setCost((Long) data.getOrDefault("cost", 0L));
       item.setAvgResponseTime((Double) data.getOrDefault("avgResponseTime", 0.0));
@@ -287,6 +291,66 @@ public class AnalyticsAssembler {
     total.setTokens(totalTokens);
     total.setCost(totalCost);
     vo.setTotal(total);
+
+    return vo;
+  }
+
+  /**
+   * 转换响应时间分析数据
+   */
+  public static ResponseTimeAnalysisVo toResponseTimeAnalysisVo(
+      List<Map<String, Object>> analysisData, Map<String, Object> slowestEndpoint) {
+    ResponseTimeAnalysisVo vo = new ResponseTimeAnalysisVo();
+    List<ResponseTimeAnalysisVo.TrendItemVo> items = new ArrayList<>();
+
+    double sumAvg = 0;
+    int maxP95 = 0;
+    int maxP99 = 0;
+    int itemCount = 0;
+
+    for (Map<String, Object> data : analysisData) {
+      ResponseTimeAnalysisVo.TrendItemVo item = new ResponseTimeAnalysisVo.TrendItemVo();
+      Object dtObj = data.get("datetime");
+      item.setDatetime(dtObj instanceof Number ? ((Number) dtObj).longValue() : null);
+      item.setDate((String) data.get("date"));
+
+      int avgTime = data.get("avgTime") != null ? ((Number) data.get("avgTime")).intValue() : 0;
+      int p50 = data.get("p50") != null ? ((Number) data.get("p50")).intValue() : 0;
+      int p95 = data.get("p95") != null ? ((Number) data.get("p95")).intValue() : 0;
+      int p99 = data.get("p99") != null ? ((Number) data.get("p99")).intValue() : 0;
+      int minTime = data.get("minTime") != null ? ((Number) data.get("minTime")).intValue() : 0;
+      int maxTime = data.get("maxTime") != null ? ((Number) data.get("maxTime")).intValue() : 0;
+
+      item.setAvgTime(avgTime);
+      item.setP50(p50);
+      item.setP95(p95);
+      item.setP99(p99);
+      item.setMinTime(minTime);
+      item.setMaxTime(maxTime);
+      items.add(item);
+
+      sumAvg += avgTime;
+      if (p95 > maxP95) maxP95 = p95;
+      if (p99 > maxP99) maxP99 = p99;
+      itemCount++;
+    }
+
+    vo.setItems(items);
+
+    ResponseTimeAnalysisVo.SummaryVo summary = new ResponseTimeAnalysisVo.SummaryVo();
+    summary.setOverallAvg(itemCount > 0 ? sumAvg / itemCount : 0.0);
+    summary.setOverallP95(maxP95);
+    summary.setOverallP99(maxP99);
+
+    ResponseTimeAnalysisVo.SlowestEndpointVo slowest = null;
+    if (slowestEndpoint != null && !slowestEndpoint.isEmpty() && slowestEndpoint.get("endpoint") != null) {
+      slowest = new ResponseTimeAnalysisVo.SlowestEndpointVo();
+      slowest.setEndpoint((String) slowestEndpoint.get("endpoint"));
+      Object avgMs = slowestEndpoint.get("avgTimeMs");
+      slowest.setAvgTime(avgMs != null ? ((Number) avgMs).intValue() : 0);
+    }
+    summary.setSlowestEndpoint(slowest);
+    vo.setSummary(summary);
 
     return vo;
   }

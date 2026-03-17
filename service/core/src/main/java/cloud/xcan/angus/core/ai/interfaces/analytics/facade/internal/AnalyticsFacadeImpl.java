@@ -4,9 +4,11 @@ import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.determineGranul
 import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.parseTimeRange;
 import static cloud.xcan.angus.spec.principal.PrincipalContext.getUserId;
 
+import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
 import cloud.xcan.angus.core.ai.application.query.analytics.AnalyticsQuery;
 import cloud.xcan.angus.core.ai.application.query.application.ApplicationQuery;
 import cloud.xcan.angus.core.ai.application.query.chat.SessionQuery;
+import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.application.query.notification.NotificationQuery;
 import cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.TimeRange;
 import cloud.xcan.angus.core.ai.interfaces.analytics.facade.AnalyticsFacade;
@@ -25,6 +27,7 @@ import jakarta.annotation.Resource;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -35,6 +38,12 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
 
   @Resource
   private ApplicationQuery applicationQuery;
+
+  @Resource
+  private AgentQuery agentQuery;
+
+  @Resource
+  private ModelQuery modelQuery;
 
   @Resource
   private SessionQuery sessionQuery;
@@ -81,11 +90,10 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
 
     List<Map<String, Object>> analysisData = analyticsQuery.getResponseTimeAnalysis(
         timeRange.start, timeRange.end, dto.getAppId(), granularity);
+    Map<String, Object> slowestEndpoint = analyticsQuery.getSlowestEndpoint(
+        timeRange.start, timeRange.end, dto.getAppId());
 
-    // 简化实现：创建基本VO结构
-    ResponseTimeAnalysisVo vo = new ResponseTimeAnalysisVo();
-    // TODO: 使用AnalyticsConverter添加完整转换方法
-    return vo;
+    return AnalyticsAssembler.toResponseTimeAnalysisVo(analysisData, slowestEndpoint);
   }
 
   @Override
@@ -94,7 +102,7 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
 
     List<Map<String, Object>> distributionData = analyticsQuery.getAppDistribution(
         timeRange.start, timeRange.end, limit != null ? limit : 10);
-    return AnalyticsAssembler.toAppDistributionVo(distributionData);
+    return AnalyticsAssembler.toAppDistributionVo(fillAppNames(distributionData));
   }
 
   @Override
@@ -103,7 +111,7 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
 
     List<Map<String, Object>> distributionData = analyticsQuery.getModelDistribution(
         timeRange.start, timeRange.end);
-    return AnalyticsAssembler.toModelDistributionVo(distributionData);
+    return AnalyticsAssembler.toModelDistributionVo(fillModelNames(distributionData));
   }
 
   @Override
@@ -133,6 +141,67 @@ public class AnalyticsFacadeImpl implements AnalyticsFacade {
         userId != null ? applicationQuery.getCurrentUserCounts().getTotal() : 0L);
     vo.setNotificationCount(notificationQuery.countUnread(userId));
     return vo;
+  }
+
+  /**
+   * 批量查询并填充 appName（appId 可能是应用或智能体）
+   */
+  private List<Map<String, Object>> fillAppNames(List<Map<String, Object>> distributionData) {
+    List<Long> appIds = distributionData.stream()
+        .map(d -> (Long) d.get("appId"))
+        .filter(id -> id != null)
+        .distinct()
+        .collect(Collectors.toList());
+    if (appIds.isEmpty()) {
+      return distributionData;
+    }
+
+    List<cloud.xcan.angus.core.ai.domain.application.AIApplication> applications =
+        applicationQuery.findByIds(appIds);
+    Map<Long, String> appNameMap = applications.stream()
+        .collect(Collectors.toMap(a -> a.getId(), a -> a.getName()));
+
+    List<Long> remainingIds = appIds.stream()
+        .filter(id -> !appNameMap.containsKey(id))
+        .collect(Collectors.toList());
+    if (!remainingIds.isEmpty()) {
+      List<cloud.xcan.angus.core.ai.domain.agent.Agent> agents = agentQuery.findByIds(remainingIds);
+      agents.forEach(a -> appNameMap.put(a.getId(), a.getName()));
+    }
+
+    for (Map<String, Object> data : distributionData) {
+      Long appId = (Long) data.get("appId");
+      if (appId != null) {
+        data.put("appName", appNameMap.getOrDefault(appId, "Unknown"));
+      }
+    }
+    return distributionData;
+  }
+
+  /**
+   * 批量查询并填充 modelName
+   */
+  private List<Map<String, Object>> fillModelNames(List<Map<String, Object>> distributionData) {
+    List<Long> modelIds = distributionData.stream()
+        .map(d -> (Long) d.get("modelId"))
+        .filter(id -> id != null)
+        .distinct()
+        .collect(Collectors.toList());
+    if (modelIds.isEmpty()) {
+      return distributionData;
+    }
+
+    List<cloud.xcan.angus.core.ai.domain.model.Model> models = modelQuery.findByIds(modelIds);
+    Map<Long, String> modelNameMap = models.stream()
+        .collect(Collectors.toMap(m -> m.getId(), m -> m.getName()));
+
+    for (Map<String, Object> data : distributionData) {
+      Long modelId = (Long) data.get("modelId");
+      if (modelId != null) {
+        data.put("modelName", modelNameMap.getOrDefault(modelId, "Unknown"));
+      }
+    }
+    return distributionData;
   }
 
 }

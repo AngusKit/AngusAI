@@ -12,11 +12,13 @@ import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationDeta
 import cloud.xcan.angus.core.biz.BizTemplate;
 import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -227,12 +229,38 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
             dataPoint.put("p99", p99);
             dataPoint.put("minTime", minTime);
             dataPoint.put("maxTime", maxTime);
-            dataPoint.put("datetime", groupLogs.get(0).getRequestTime().toString());
-
+            dataPoint.put("datetime",
+                groupLogs.get(0).getRequestTime().atZone(ZoneId.systemDefault()).toInstant()
+                    .toEpochMilli());
             trend.add(dataPoint);
           }
         }
         return trend;
+      }
+    }.execute();
+  }
+
+  @Override
+  public Map<String, Object> getSlowestEndpoint(LocalDateTime start, LocalDateTime end,
+      Long appId) {
+    return new BizTemplate<Map<String, Object>>() {
+      @Override
+      protected Map<String, Object> process() {
+        List<Object[]> results = apiUsageLogRepo.groupByEndpointOrderByAvgTime(start, end,
+            PageRequest.of(0, 1));
+        if (results.isEmpty()) {
+          return new HashMap<>();
+        }
+        Object[] r = results.get(0);
+        Map<String, Object> map = new HashMap<>();
+        map.put("endpoint", r[0]);
+        map.put("method", r[1]);
+        map.put("calls", r[2]);
+        double avgMs = r[3] != null ? ((Number) r[3]).doubleValue() : 0.0;
+        map.put("avgTimeMs", (int) avgMs);
+        map.put("successfulCalls", r[4]);
+        map.put("totalTokens", r[5]);
+        return map;
       }
     }.execute();
   }
@@ -278,15 +306,15 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
         List<Object[]> results = apiUsageLogRepo.groupByModel(start, end);
         List<Map<String, Object>> distribution = new ArrayList<>();
 
-        long total = results.stream().mapToLong(r -> ((Number) r[2]).longValue()).sum();
+        long totalCalls = results.stream().mapToLong(r -> ((Number) r[1]).longValue()).sum();
 
         for (Object[] result : results) {
           Map<String, Object> item = new HashMap<>();
           item.put("modelId", result[0]);
           item.put("calls", result[1]);
           item.put("tokens", result[2]);
-          item.put("percentage", total > 0
-              ? (((Number) result[1]).doubleValue() / total * 100) : 0.0);
+          item.put("percentage", totalCalls > 0
+              ? (((Number) result[1]).doubleValue() / totalCalls * 100) : 0.0);
 
           distribution.add(item);
         }
@@ -319,7 +347,8 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
           item.put("tokens", result[2] != null ? result[2] : 0L);
           item.put("cost", result[3] != null ? result[3] : 0L);
           item.put("percentage",
-              totalCost > 0 ? (((Number) result[3]).longValue() * 100.0 / totalCost) : 0.0);
+              totalCost > 0 ? (((Number) Objects.requireNonNull(result[3])).longValue() * 100.0
+                  / totalCost) : 0.0);
 
           distribution.add(item);
           count++;
