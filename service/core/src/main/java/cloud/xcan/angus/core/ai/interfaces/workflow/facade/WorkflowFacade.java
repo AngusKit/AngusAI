@@ -68,6 +68,6 @@ public interface WorkflowFacade {
   /**
    * 获取工作流统计
    */
-  WorkflowStatisticsVo getStatistics(String period);
+  WorkflowStatisticsVo getStatistics();
 
 }

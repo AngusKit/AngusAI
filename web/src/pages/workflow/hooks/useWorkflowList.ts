@@ -67,7 +67,7 @@ export function useWorkflowList() {
   const loadStatistics = useCallback(async () => {
     setStatsLoading(true);
     try {
-      const res = await Workflows.getWorkflowStatistics({ period: 'month' });
+      const res = await Workflows.getWorkflowStatistics();
       const data = (res as { data?: WorkflowStatisticsVo }).data;
       setStatistics(data ?? null);
     } catch (e: unknown) {

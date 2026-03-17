@@ -60,7 +60,8 @@ public class ChatAnalyticsQueryImpl implements ChatAnalyticsQuery {
       protected Map<String, Object> process() {
         Object[] row = chatUsageLogRepo.getGlobalOverviewStats(start, end);
         Map<String, Object> stats = new HashMap<>();
-        if (row == null || row[0] == null) {
+        Object[] data = unwrapRow(row);
+        if (data == null || data.length < 5) {
           stats.put("totalCalls", 0L);
           stats.put("successfulCalls", 0L);
           stats.put("failedCalls", 0L);
@@ -69,11 +70,11 @@ public class ChatAnalyticsQueryImpl implements ChatAnalyticsQuery {
           stats.put("avgResponseTimeMs", null);
           return stats;
         }
-        long totalCalls = row[0] != null ? ((Number) row[0]).longValue() : 0L;
-        long successfulCalls = row[1] != null ? ((Number) row[1]).longValue() : 0L;
-        long totalTokens = row[2] != null ? ((Number) row[2]).longValue() : 0L;
-        long totalCostCents = row[3] != null ? ((Number) row[3]).longValue() : 0L;
-        Double avgResponseTimeMs = row[4] != null ? ((Number) row[4]).doubleValue() : null;
+        long totalCalls = data[0] != null ? ((Number) data[0]).longValue() : 0L;
+        long successfulCalls = data[1] != null ? ((Number) data[1]).longValue() : 0L;
+        long totalTokens = data[2] != null ? ((Number) data[2]).longValue() : 0L;
+        long totalCostCents = data[3] != null ? ((Number) data[3]).longValue() : 0L;
+        Double avgResponseTimeMs = data[4] != null ? ((Number) data[4]).doubleValue() : null;
 
         stats.put("totalCalls", totalCalls);
         stats.put("successfulCalls", successfulCalls);
@@ -82,6 +83,17 @@ public class ChatAnalyticsQueryImpl implements ChatAnalyticsQuery {
         stats.put("totalCostCents", totalCostCents);
         stats.put("avgResponseTimeMs", avgResponseTimeMs);
         return stats;
+      }
+
+      /** JPQL 聚合可能返回 Object[1]{Object[5]} 的嵌套结构，需解包 */
+      private Object[] unwrapRow(Object[] row) {
+        if (row == null || row.length == 0) {
+          return null;
+        }
+        if (row[0] instanceof Object[]) {
+          return (Object[]) row[0];
+        }
+        return row;
       }
     }.execute();
   }

@@ -222,17 +222,10 @@ export class Workflows<SecurityDataType = unknown> {
    * @request GET:/api/v1/workflows/stats
    * @secure
    */
-  getWorkflowStatistics = (
-    query?: {
-      /** 统计周期 */
-      period?: string;
-    },
-    params: RequestParams = {}
-  ) =>
+  getWorkflowStatistics = (params: RequestParams = {}) =>
     this.http.request<WorkflowStatisticsResult>({
       path: `${AI}/workflows/stats`,
       method: 'GET',
-      query: query,
       secure: true,
       ...params,
     });

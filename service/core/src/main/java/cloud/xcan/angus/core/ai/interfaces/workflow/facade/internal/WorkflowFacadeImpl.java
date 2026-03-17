@@ -106,7 +106,7 @@ public class WorkflowFacadeImpl implements WorkflowFacade {
   }
 
   @Override
-  public WorkflowStatisticsVo getStatistics(String period) {
+  public WorkflowStatisticsVo getStatistics() {
     WorkflowStatisticsVo statistics = new WorkflowStatisticsVo();
     statistics.setTotalWorkflows(workflowQuery.count());
     statistics.setRunningWorkflows(workflowQuery.countByStatus(WorkflowStatus.RUNNING));
