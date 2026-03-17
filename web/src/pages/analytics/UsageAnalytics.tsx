@@ -114,7 +114,7 @@ const DEFAULT_APP_DISTRIBUTION = {
 
 const DEFAULT_MODEL_DISTRIBUTION = {
   items: [{ name: '暂无数据', value: 100, calls: 0, tokens: 0, color: '#6b7280' }],
-  total: { models: 0, calls: 0, tokens: 0, cost: 0 },
+  total: { models: 0, calls: 0, tokens: 0, cost: 0, costDisplay: '$0.00' },
 };
 
 const DEFAULT_ERROR_ANALYSIS = [
@@ -555,7 +555,7 @@ export function UsageAnalytics() {
                     <div className='rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 px-4 py-3'>
                       <div className='text-xs text-gray-500 dark:text-gray-400 mb-0.5'>费用</div>
                       <div className='text-lg font-semibold text-gray-900 dark:text-white'>
-                        ¥{(displayModelDist.total.cost / 100).toFixed(2)}
+                        {displayModelDist.total.costDisplay ?? '$0.00'}
                       </div>
                     </div>
                   </div>

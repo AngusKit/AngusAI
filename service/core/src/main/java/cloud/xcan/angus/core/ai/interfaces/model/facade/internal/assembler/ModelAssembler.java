@@ -4,7 +4,10 @@ import static cloud.xcan.angus.core.utils.PrincipalContextUtils.getOptTenantId;
 import static cloud.xcan.angus.spec.utils.ObjectUtils.nullSafe;
 
 import cloud.xcan.agentx.core.model.ModelConfigDefinition;
+import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatCostFromDollars;
+
 import cloud.xcan.angus.core.ai.domain.model.Model;
+import cloud.xcan.angus.core.ai.domain.model.ModelStats;
 import cloud.xcan.angus.core.ai.domain.model.ModelStatus;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelFindDto;
@@ -129,7 +132,21 @@ public class ModelAssembler {
     // 设置性能指标
     vo.setPerformance(model.getPerformance());
     // 设置统计数据
-    vo.setStats(model.getStats());
+    ModelStats stats = model.getStats();
+    if (stats != null && stats.getTotalCost() != null) {
+      stats.setTotalCostDisplay(formatCostFromDollars(stats.getTotalCost()));
+    }
+    if (stats != null && stats.getLastMonthGrowthTrend() != null
+        && stats.getLastMonthGrowthTrend().getAddedCost() != null) {
+      stats.getLastMonthGrowthTrend()
+          .setAddedCostDisplay(formatCostFromDollars(stats.getLastMonthGrowthTrend().getAddedCost()));
+    }
+    if (stats != null && stats.getTodayGrowthTrend() != null
+        && stats.getTodayGrowthTrend().getAddedCost() != null) {
+      stats.getTodayGrowthTrend()
+          .setAddedCostDisplay(formatCostFromDollars(stats.getTodayGrowthTrend().getAddedCost()));
+    }
+    vo.setStats(stats);
 
     // 设置审计信息
     vo.setTenantId(model.getTenantId());

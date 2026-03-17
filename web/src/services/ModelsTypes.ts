@@ -12,10 +12,12 @@ export interface LastMonthGrowthTrend {
    */
   addedModels?: number;
   /**
-   * 本月新增成本，单位货币
+   * 本月新增成本（美元）
    * @format double
    */
   addedCost?: number;
+  /** 本月新增成本展示，如 $12.34 */
+  addedCostDisplay?: string;
   /**
    * 本月新增Tokens
    * @format int64
@@ -46,10 +48,12 @@ export interface TodayGrowthTrend {
    */
   addedModels?: number;
   /**
-   * 今日新增成本，单位货币
+   * 今日新增成本（美元）
    * @format double
    */
   addedCost?: number;
+  /** 今日新增成本展示，如 $12.34 */
+  addedCostDisplay?: string;
   /**
    * 今日新增Tokens
    * @format int64
@@ -148,10 +152,12 @@ export interface ModelStats {
    */
   totalTokens?: number;
   /**
-   * 总成本（货币单位由业务侧定义）
+   * 总成本（美元）
    * @format double
    */
   totalCost?: number;
+  /** 总成本展示，如 $12.34，后端已格式化 */
+  totalCostDisplay?: string;
   /**
    * 成功率（0-100%），可由 successfulCalls/totalCalls 计算
    * @format double
@@ -353,7 +359,7 @@ export type PageResultModelListResult = ApiLocaleResult & {
   data?: PageModelListVo;
 };
 
-/** 模型统计响应 */
+/** 模型统计响应（全局） */
 export interface ModelStatisticsVo {
   /**
    * 总模型数
@@ -386,10 +392,12 @@ export interface ModelStatisticsVo {
    */
   totalTokens?: number;
   /**
-   * 总成本（货币单位由业务侧定义）
+   * 总成本（美元）
    * @format double
    */
   totalCost?: number;
+  /** 总成本展示，如 $12.34，后端已格式化 */
+  totalCostDisplay?: string;
   /**
    * 成功率（0-100%），可由 successfulCalls/totalCalls 计算
    * @format double

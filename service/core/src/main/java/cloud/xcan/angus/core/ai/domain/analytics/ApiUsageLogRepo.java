@@ -70,6 +70,7 @@ public interface ApiUsageLogRepo extends BaseRepository<ApiUsageLog, Long> {
 
   /**
    * 按应用分组统计 返回 [appId, calls, tokens, avgResponseTime, cost]
+   * cost 单位：美分(cents)
    */
   @Query("SELECT l.appId, COUNT(l), COALESCE(SUM(l.totalTokens), 0), AVG(l.responseTimeMs), COALESCE(SUM(l.cost), 0) " +
       "FROM ApiUsageLog l WHERE l.requestTime BETWEEN :start AND :end GROUP BY l.appId ORDER BY COUNT(l) DESC")
@@ -77,6 +78,7 @@ public interface ApiUsageLogRepo extends BaseRepository<ApiUsageLog, Long> {
 
   /**
    * 按模型分组统计 返回 [modelId, calls, tokens, avgResponseTime, cost]
+   * cost 单位：美分(cents)
    */
   @Query("SELECT l.modelId, COUNT(l), COALESCE(SUM(l.totalTokens), 0), AVG(l.responseTimeMs), COALESCE(SUM(l.cost), 0) " +
       "FROM ApiUsageLog l WHERE l.requestTime BETWEEN :start AND :end GROUP BY l.modelId ORDER BY COUNT(l) DESC")
@@ -84,6 +86,7 @@ public interface ApiUsageLogRepo extends BaseRepository<ApiUsageLog, Long> {
 
   /**
    * 按模型分组统计（按费用降序，用于费用成本 TOP5）
+   * 返回 cost 单位：美分(cents)
    */
   @Query("SELECT l.modelId, COUNT(l), COALESCE(SUM(l.totalTokens), 0), COALESCE(SUM(l.cost), 0) " +
       "FROM ApiUsageLog l WHERE l.requestTime BETWEEN :start AND :end GROUP BY l.modelId ORDER BY COALESCE(SUM(l.cost), 0) DESC")

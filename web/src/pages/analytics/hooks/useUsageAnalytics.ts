@@ -300,6 +300,7 @@ export function mapModelDistributionToChartData(modelDistribution: ModelDistribu
       calls: Number(total?.calls) ?? 0,
       tokens: Number(total?.tokens) ?? 0,
       cost: Number(total?.cost) ?? 0,
+      costDisplay: total?.costDisplay ?? '$0.00',
     },
   };
 }

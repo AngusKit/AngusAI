@@ -80,10 +80,14 @@ export interface SummaryVo {
    */
   totalTokens?: number;
   /**
-   * 总费用
+   * 总费用，单位：美分
    * @format int64
    */
   totalCost?: number;
+  /**
+   * 总费用展示，后端已格式化，如 $125.80，前端直接展示
+   */
+  costDisplay?: string;
   /**
    * 平均每次调用Token
    * @format double
@@ -126,10 +130,14 @@ export interface TrendItemVo {
    */
   totalTokens?: number;
   /**
-   * 费用(分)
+   * 费用，单位：美分
    * @format int64
    */
   cost?: number;
+  /**
+   * 费用展示，后端已格式化，如 $125.80，前端直接展示
+   */
+  costDisplay?: string;
 }
 
 /** The API response result of supporting international message. */
@@ -283,10 +291,14 @@ export interface DistributionItemVo {
    */
   tokens?: number;
   /**
-   * 费用
+   * 费用，单位：美分
    * @format int64
    */
   cost?: number;
+  /**
+   * 费用展示，后端已格式化，如 $125.80，前端直接展示
+   */
+  costDisplay?: string;
   /**
    * 平均响应时间(毫秒)
    * @format double
@@ -331,10 +343,14 @@ export interface TotalVo {
    */
   tokens?: number;
   /**
-   * 总费用
+   * 总费用，单位：美分
    * @format int64
    */
   cost?: number;
+  /**
+   * 总费用展示，后端已格式化，如 $125.80，前端直接展示
+   */
+  costDisplay?: string;
 }
 
 /** 错误分析 */

@@ -33,8 +33,11 @@ public class ModelDistributionVo {
     @Schema(description = "Token数")
     private Long tokens;
 
-    @Schema(description = "费用")
+    @Schema(description = "费用，单位：美分(cents)；展示请用 costDisplay")
     private Long cost;
+
+    @Schema(description = "费用展示字符串，如 $125.80，后端已格式化，前端直接展示")
+    private String costDisplay;
 
     @Schema(description = "平均响应时间(毫秒)")
     private Double avgResponseTime;
@@ -53,8 +56,11 @@ public class ModelDistributionVo {
     @Schema(description = "总Token数")
     private Long tokens;
 
-    @Schema(description = "总费用")
+    @Schema(description = "总费用，单位：美分(cents)；展示请用 costDisplay")
     private Long cost;
+
+    @Schema(description = "总费用展示字符串，如 $125.80，后端已格式化，前端直接展示")
+    private String costDisplay;
   }
 
 }

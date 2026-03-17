@@ -60,7 +60,8 @@ public class ApiUsageLog extends TenantEntity<ApiUsageLog, Long> {
   private Integer totalTokens;
 
   /**
-   * 费用(美元、分)
+   * 费用，单位：美分(cents)。
+   * <p>存储最小货币单位避免浮点精度问题，如 1234 表示 $12.34。
    */
   @Column(name = "cost")
   private Integer cost;

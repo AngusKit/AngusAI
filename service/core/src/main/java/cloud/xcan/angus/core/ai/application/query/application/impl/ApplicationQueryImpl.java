@@ -1,5 +1,6 @@
 package cloud.xcan.angus.core.ai.application.query.application.impl;
 
+import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatCost;
 import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.parseEndDate;
 import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.parseStartDate;
 import static cloud.xcan.angus.spec.principal.PrincipalContext.getUserId;
@@ -285,6 +286,7 @@ public class ApplicationQueryImpl implements ApplicationQuery {
       overview.setTotalCalls(0L);
       overview.setTotalTokens(0L);
       overview.setTotalCost(0.0);
+      overview.setTotalCostDisplay(formatCost(0L));
       overview.setAvgResponseTime(0L);
       overview.setSuccessRate(0.0);
     } else {
@@ -299,6 +301,7 @@ public class ApplicationQueryImpl implements ApplicationQuery {
       overview.setTotalCalls(totalCalls);
       overview.setTotalTokens(totalTokens);
       overview.setTotalCost(costCents / 100.0);
+      overview.setTotalCostDisplay(formatCost((long) costCents));
       overview.setAvgResponseTime(avgResponseTime);
       overview.setSuccessRate(
           totalCalls > 0 ? Math.round(successfulCalls * 10000.0 / totalCalls) / 100.0 : 0.0);

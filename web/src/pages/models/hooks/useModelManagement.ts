@@ -192,7 +192,7 @@ export const useModelManagement = (): UseModelManagementReturn => {
           gpu: '--',
         },
         calls: formatNumber(detailStats?.totalCalls),
-        cost: detailStats?.totalCost !== undefined ? formatCurrency(detailStats.totalCost, language) : '--',
+        cost: detailStats?.totalCostDisplay ?? (detailStats?.totalCost !== undefined ? formatCurrency(detailStats.totalCost, language) : '--'),
         tokens: tokens !== undefined ? formatNumber(tokens) : undefined,
         maxTokens:
           detail?.config?.maxTokens !== undefined && detail.config.maxTokens != null
@@ -518,12 +518,14 @@ export const useModelManagement = (): UseModelManagementReturn => {
         label: t('models.stats.totalCost'),
         value: totalCostValue,
         subtext:
-          today?.addedCost !== undefined
-            ? t('models.stats.addedToday', { value: formatCurrency(today.addedCost, language) })
+          today?.addedCost !== undefined || today?.addedCostDisplay
+            ? t('models.stats.addedToday', {
+                value: today?.addedCostDisplay ?? formatCurrency(today?.addedCost, language) ?? '0',
+              })
             : t('models.stats.noDailyData'),
         icon: Activity,
         iconBg: 'bg-green-500',
-        trend: lastMonth?.addedCost !== undefined ? `+${formatCurrency(lastMonth.addedCost, language)}` : undefined,
+        trend: lastMonth?.addedCostDisplay ?? (lastMonth?.addedCost !== undefined ? `+${formatCurrency(lastMonth.addedCost, language)}` : undefined),
         trendUp: (lastMonth?.addedCost ?? 0) >= 0,
       },
       {

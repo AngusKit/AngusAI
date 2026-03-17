@@ -27,8 +27,11 @@ public class ApplicationStatisticsVo {
     @Schema(description = "总token数")
     private Long totalTokens;
 
-    @Schema(description = "总成本")
+    @Schema(description = "总成本（美元），展示请用 totalCostDisplay")
     private Double totalCost;
+
+    @Schema(description = "总成本展示字符串，如 $125.80，后端已格式化，前端直接展示")
+    private String totalCostDisplay;
 
     @Schema(description = "平均响应时间（秒）")
     private Long avgResponseTime;

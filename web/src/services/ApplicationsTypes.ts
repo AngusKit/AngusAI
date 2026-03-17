@@ -541,10 +541,14 @@ export interface OverviewStatsVo {
    */
   totalTokens?: number;
   /**
-   * 总成本
+   * 总成本（美元）
    * @format double
    */
   totalCost?: number;
+  /**
+   * 总成本展示，后端已格式化，如 $125.80，前端直接展示
+   */
+  totalCostDisplay?: string;
   /**
    * 平均响应时间
    * @format double

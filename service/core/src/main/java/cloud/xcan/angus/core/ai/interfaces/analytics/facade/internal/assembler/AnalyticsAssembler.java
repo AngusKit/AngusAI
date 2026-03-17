@@ -1,6 +1,7 @@
 package cloud.xcan.angus.core.ai.interfaces.analytics.facade.internal.assembler;
 
 import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.PERCENTAGE_FORMAT;
+import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatCost;
 import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatLargeNumber;
 import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatNumber;
 import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatPercentage;
@@ -187,6 +188,7 @@ public class AnalyticsAssembler {
       item.setOutputTokens(outputTokens);
       item.setTotalTokens(tokens);
       item.setCost(cost);
+      item.setCostDisplay(formatCost(cost));
 
       items.add(item);
 
@@ -204,6 +206,7 @@ public class AnalyticsAssembler {
     summary.setTotalOutput(totalOutput);
     summary.setTotalTokens(totalTokens);
     summary.setTotalCost(totalCost);
+    summary.setCostDisplay(formatCost(totalCost));
     summary.setAvgTokensPerCall(!items.isEmpty() ? (double) totalTokens / items.size() : 0.0);
     vo.setSummary(summary);
 
@@ -228,7 +231,9 @@ public class AnalyticsAssembler {
       Double pct = toDouble(data.get("percentage"), 0.0);
       item.setPercentage(formatPercentageTo2Decimals(pct));
       item.setTokens(toLong(data.get("tokens"), 0L));
-      item.setCost(toLong(data.get("cost"), 0L));
+      Long cost = toLong(data.get("cost"), 0L);
+      item.setCost(cost);
+      item.setCostDisplay(formatCost(cost));
       item.setAvgResponseTime(toDouble(data.get("avgResponseTime"), 0.0));
 
       items.add(item);
@@ -268,7 +273,9 @@ public class AnalyticsAssembler {
       Double pct = toDouble(data.get("percentage"), 0.0);
       item.setPercentage(formatPercentageTo2Decimals(pct));
       item.setTokens(toLong(data.get("tokens"), 0L));
-      item.setCost(toLong(data.get("cost"), 0L));
+      Long cost = toLong(data.get("cost"), 0L);
+      item.setCost(cost);
+      item.setCostDisplay(formatCost(cost));
       item.setAvgResponseTime(toDouble(data.get("avgResponseTime"), 0.0));
 
       items.add(item);
@@ -285,6 +292,7 @@ public class AnalyticsAssembler {
     total.setCalls(totalCalls);
     total.setTokens(totalTokens);
     total.setCost(totalCost);
+    total.setCostDisplay(formatCost(totalCost));
     vo.setTotal(total);
 
     return vo;

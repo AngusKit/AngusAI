@@ -10,8 +10,11 @@ public class TodayGrowthTrend {
   @Schema(description = "今日新增模型数量")
   private Long addedModels;
 
-  @Schema(description = "今日新增成本，单位货币")
+  @Schema(description = "今日新增成本（美元）；展示请用 addedCostDisplay")
   private Double addedCost;
+
+  @Schema(description = "今日新增成本展示，如 $12.34，后端已格式化")
+  private String addedCostDisplay;
 
   @Schema(description = "今日新增Tokens")
   private Long addedTokens;

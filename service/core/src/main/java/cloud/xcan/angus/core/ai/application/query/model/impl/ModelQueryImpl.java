@@ -1,5 +1,6 @@
 package cloud.xcan.angus.core.ai.application.query.model.impl;
 
+import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatCostFromDollars;
 import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.parseEndDate;
 import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.parseStartDate;
 
@@ -159,6 +160,7 @@ public class ModelQueryImpl implements ModelQuery {
     double totalCost =
         (costView == null || costView.getTotal() == null) ? 0.0 : costView.getTotal();
     vo.setTotalCost(totalCost);
+    vo.setTotalCostDisplay(formatCostFromDollars(totalCost));
 
     if (totalCalls > 0) {
       vo.setSuccessRate((double) successCalls * 100.0 / (double) totalCalls);
@@ -192,8 +194,10 @@ public class ModelQueryImpl implements ModelQuery {
         : tokensLast30View.getTotal();
 
     lm.setAddedCalls(callsLast30);
-    lm.setAddedCost(
-        costLast30 == null || costLast30.getTotal() == null ? 0.0 : costLast30.getTotal());
+    double addedCostLast30 =
+        costLast30 == null || costLast30.getTotal() == null ? 0.0 : costLast30.getTotal();
+    lm.setAddedCost(addedCostLast30);
+    lm.setAddedCostDisplay(formatCostFromDollars(addedCostLast30));
     lm.setAddedTokens(tokensLast30);
 
     DoubleTotalView rtSum = modelCallRecordQuery.sumByFilters(
@@ -222,8 +226,10 @@ public class ModelQueryImpl implements ModelQuery {
         : tokensTodayView.getTotal();
 
     today.setAddedCalls(callsToday);
-    today.setAddedCost(
-        costToday == null || costToday.getTotal() == null ? 0.0 : costToday.getTotal());
+    double addedCostToday =
+        costToday == null || costToday.getTotal() == null ? 0.0 : costToday.getTotal();
+    today.setAddedCost(addedCostToday);
+    today.setAddedCostDisplay(formatCostFromDollars(addedCostToday));
     today.setAddedTokens(tokensToday);
 
     DoubleTotalView rtSum = modelCallRecordQuery.sumByFilters(

@@ -43,6 +43,34 @@ public class CommonUtils {
   }
 
   /**
+   * 格式化费用为展示字符串。
+   * <p>费用在系统中以美分(cents)存储，此方法将美分转为美元展示，如 "$12.34"。
+   *
+   * @param costCents 费用（美分），可为 null
+   * @return 格式化字符串，如 "$12.34"；null 时返回 "$0.00"
+   */
+  public static String formatCost(Long costCents) {
+    if (costCents == null) {
+      return "$0.00";
+    }
+    return "$" + String.format(Locale.US, "%.2f", costCents / 100.0);
+  }
+
+  /**
+   * 格式化费用为展示字符串（输入为美元）。
+   * <p>用于 ModelCallRecord 等以美元存储的 cost 字段。
+   *
+   * @param costDollars 费用（美元），可为 null
+   * @return 格式化字符串，如 "$12.34"；null 时返回 "$0.00"
+   */
+  public static String formatCostFromDollars(Double costDollars) {
+    if (costDollars == null) {
+      return "$0.00";
+    }
+    return "$" + String.format(Locale.US, "%.2f", costDollars);
+  }
+
+  /**
    * 格式化大数字(使用K、M简化)
    */
   public static String formatLargeNumber(Long number) {

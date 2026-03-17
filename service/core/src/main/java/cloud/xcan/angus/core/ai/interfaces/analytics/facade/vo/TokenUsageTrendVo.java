@@ -33,8 +33,11 @@ public class TokenUsageTrendVo {
     @Schema(description = "总Token")
     private Long totalTokens;
 
-    @Schema(description = "费用(分)")
+    @Schema(description = "费用，单位：美分(cents)；展示请用 costDisplay")
     private Long cost;
+
+    @Schema(description = "费用展示字符串，如 $125.80，后端已格式化，前端直接展示")
+    private String costDisplay;
   }
 
   @Data
@@ -50,8 +53,11 @@ public class TokenUsageTrendVo {
     @Schema(description = "总Token")
     private Long totalTokens;
 
-    @Schema(description = "总费用")
+    @Schema(description = "总费用，单位：美分(cents)；展示请用 costDisplay")
     private Long totalCost;
+
+    @Schema(description = "总费用展示字符串，如 $125.80，后端已格式化，前端直接展示")
+    private String costDisplay;
 
     @Schema(description = "平均每次调用Token")
     private Double avgTokensPerCall;

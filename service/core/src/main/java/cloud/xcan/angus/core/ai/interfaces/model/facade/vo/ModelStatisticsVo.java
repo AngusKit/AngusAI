@@ -27,8 +27,11 @@ public class ModelStatisticsVo {
   @Schema(description = "总Token消耗数")
   private Long totalTokens = 0L;
 
-  @Schema(description = "总成本（货币单位由业务侧定义）")
+  @Schema(description = "总成本（美元）；展示请用 totalCostDisplay")
   private Double totalCost = 0.0;
+
+  @Schema(description = "总成本展示字符串，如 $125.80，后端已格式化，前端直接展示")
+  private String totalCostDisplay;
 
   @Schema(description = "成功率（0-100%），可由 successfulCalls/totalCalls 计算")
   private Double successRate = 0.0;
