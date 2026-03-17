@@ -165,10 +165,10 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     LocalDateTime start = parseStartDate(dto.getStartDate());
     LocalDateTime end = parseEndDate(dto.getEndDate());
 
-    // 如果开始时间为默认值（1970），则使用近一月作为默认范围
-    if (start.equals(LocalDateTime.of(1970, 1, 1, 0, 0))) {
-      start = now.minusMonths(DEFAULT_MONTHS).toLocalDate().atStartOfDay();
-    }
+    //    // 如果开始时间为默认值（1970），则使用近一月作为默认范围
+    //    if (start.equals(LocalDateTime.of(1970, 1, 1, 0, 0))) {
+    //      start = now.minusMonths(DEFAULT_MONTHS).toLocalDate().atStartOfDay();
+    //    }
 
     // 近一月时间范围（用于lastMonthGrowthTrend）
     LocalDateTime oneMonthAgoStart = now.minusMonths(DEFAULT_MONTHS).toLocalDate().atStartOfDay();

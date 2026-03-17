@@ -1,19 +1,18 @@
 package cloud.xcan.angus.core.ai.application.query.model.impl;
 
-import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatCostFromDollars;
+import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.formatCost;
+import static cloud.xcan.angus.core.ai.infra.util.CommonUtils.getLong;
 import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.parseEndDate;
 import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.parseStartDate;
 
-import cloud.xcan.angus.core.ai.application.query.model.ModelCallRecordQuery;
+import cloud.xcan.angus.core.ai.application.query.analytics.AnalyticsQuery;
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.domain.model.LastMonthGrowthTrend;
 import cloud.xcan.angus.core.ai.domain.model.Model;
-import cloud.xcan.angus.core.ai.domain.model.ModelCallRecord;
 import cloud.xcan.angus.core.ai.domain.model.ModelRepo;
 import cloud.xcan.angus.core.ai.domain.model.ModelSearchRepo;
 import cloud.xcan.angus.core.ai.domain.model.ModelStatus;
 import cloud.xcan.angus.core.ai.domain.model.TodayGrowthTrend;
-import cloud.xcan.angus.core.ai.domain.plugin.LongTotalView;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelStatisticsVo;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
@@ -25,6 +24,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import lombok.Getter;
@@ -35,8 +35,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class ModelQueryImpl implements ModelQuery {
 
-  private static final int DEFAULT_MONTHS = 1;
-
   @Resource
   private ModelRepo modelRepo;
 
@@ -44,7 +42,7 @@ public class ModelQueryImpl implements ModelQuery {
   private ModelSearchRepo modelSearchRepo;
 
   @Resource
-  private ModelCallRecordQuery modelCallRecordQuery;
+  private AnalyticsQuery analyticsQuery;
 
   @Override
   public Model findAndCheck(Long id) {
@@ -79,17 +77,108 @@ public class ModelQueryImpl implements ModelQuery {
     LocalDateTime start = parseStartDate(dto != null ? dto.getStartDate() : null);
     LocalDateTime end = parseEndDate(dto != null ? dto.getEndDate() : null);
 
-    if (start.equals(LocalDateTime.of(1970, 1, 1, 0, 0))) {
-      start = now.minusMonths(DEFAULT_MONTHS).toLocalDate().atStartOfDay();
-    }
+    //    // 如果开始时间为默认值（1970），则使用近一月作为默认范围
+    //    if (start.equals(LocalDateTime.of(1970, 1, 1, 0, 0))) {
+    //      start = now.minusMonths(DEFAULT_MONTHS).toLocalDate().atStartOfDay();
+    //    }
 
-    LocalDateTime oneMonthAgoStart = now.minusMonths(DEFAULT_MONTHS).toLocalDate().atStartOfDay();
+    LocalDateTime oneMonthAgoStart = now.minusMonths(1).toLocalDate().atStartOfDay();
 
     ModelStatisticsVo vo = new ModelStatisticsVo();
     buildOverview(vo, start, end);
     buildLastMonthTrend(vo, oneMonthAgoStart, now);
     buildTodayTrend(vo, todayStart, now);
     return vo;
+  }
+
+  private void buildOverview(ModelStatisticsVo vo, LocalDateTime start, LocalDateTime end) {
+    long totalModels = modelRepo.countAllByFilters(SearchCriteria.criteria());
+    vo.setTotalModels(totalModels);
+
+    Set<SearchCriteria> activeFilters = SearchCriteria.merge(SearchCriteria.criteria(),
+        SearchCriteria.equal("status", ModelStatus.ACTIVE.getValue()));
+    long activeModels = modelRepo.countAllByFilters(activeFilters);
+    vo.setActiveModels(activeModels);
+
+    Map<String, Object> overview = analyticsQuery.getModelOverviewStatsForRange(start, end);
+    long totalCalls = getLong(overview, "totalCalls");
+    long successCalls = getLong(overview, "successfulCalls");
+    long failedCalls = getLong(overview, "failedCalls");
+    long totalTokens = getLong(overview, "totalTokens");
+    long costCents = getLong(overview, "totalCostCents");
+    Double avgResponseTimeMs = (Double) overview.get("avgResponseTimeMs");
+
+    vo.setTotalCalls(totalCalls);
+    vo.setSuccessfulCalls(successCalls);
+    vo.setFailedCalls(failedCalls);
+    vo.setTotalTokens(totalTokens);
+    vo.setTotalTokensConsumed(totalTokens);
+    vo.setTotalCost(costCents / 100.0);
+    vo.setTotalCostDisplay(formatCost(costCents));
+
+    if (totalCalls > 0) {
+      vo.setSuccessRate((double) successCalls * 100.0 / (double) totalCalls);
+    } else {
+      vo.setSuccessRate(0.0);
+    }
+
+    if (totalCalls > 0 && avgResponseTimeMs != null) {
+      vo.setAverageLatencySec(avgResponseTimeMs / 1000.0);
+    } else {
+      vo.setAverageLatencySec(0.0);
+    }
+  }
+
+  private void buildLastMonthTrend(ModelStatisticsVo vo, LocalDateTime start, LocalDateTime end) {
+    Map<String, Object> lmStats = analyticsQuery.getModelOverviewStatsForRange(start, end);
+    LastMonthGrowthTrend lm = new LastMonthGrowthTrend();
+
+    long callsLast30 = getLong(lmStats, "totalCalls");
+    long costCents = getLong(lmStats, "totalCostCents");
+    long tokensLast30 = getLong(lmStats, "totalTokens");
+    Double avgResponseTimeMs = (Double) lmStats.get("avgResponseTimeMs");
+
+    lm.setAddedCalls(callsLast30);
+    lm.setAddedCost(costCents / 100.0);
+    lm.setAddedCostDisplay(formatCost(costCents));
+    lm.setAddedTokens(tokensLast30);
+
+    Set<SearchCriteria> addedFilters = SearchCriteria.merge(SearchCriteria.criteria(),
+        SearchCriteria.greaterThanEqual("createdDate", start),
+        SearchCriteria.lessThanEqual("createdDate", end));
+    lm.setAddedModels(modelRepo.countAllByFilters(addedFilters));
+
+    if (callsLast30 > 0 && avgResponseTimeMs != null) {
+      lm.setAverageLatencySec(avgResponseTimeMs / 1000.0);
+    }
+
+    vo.setLastMonthGrowthTrend(lm);
+  }
+
+  private void buildTodayTrend(ModelStatisticsVo vo, LocalDateTime start, LocalDateTime end) {
+    Map<String, Object> todayStats = analyticsQuery.getModelOverviewStatsForRange(start, end);
+    TodayGrowthTrend trend = new TodayGrowthTrend();
+
+    long callsToday = getLong(todayStats, "totalCalls");
+    long costCents = getLong(todayStats, "totalCostCents");
+    long tokensToday = getLong(todayStats, "totalTokens");
+    Double avgResponseTimeMs = (Double) todayStats.get("avgResponseTimeMs");
+
+    trend.setAddedCalls(callsToday);
+    trend.setAddedCost(costCents / 100.0);
+    trend.setAddedCostDisplay(formatCost(costCents));
+    trend.setAddedTokens(tokensToday);
+
+    Set<SearchCriteria> addedFilters = SearchCriteria.merge(SearchCriteria.criteria(),
+        SearchCriteria.greaterThanEqual("createdDate", start),
+        SearchCriteria.lessThanEqual("createdDate", end));
+    trend.setAddedModels(modelRepo.countAllByFilters(addedFilters));
+
+    if (callsToday > 0 && avgResponseTimeMs != null) {
+      trend.setAverageLatencySec(avgResponseTimeMs / 1000.0);
+    }
+
+    vo.setTodayGrowthTrend(trend);
   }
 
   @Override
@@ -121,127 +210,6 @@ public class ModelQueryImpl implements ModelQuery {
     }
     GenericSpecification<Model> spec = new GenericSpecification<>(filters);
     return modelRepo.findAll(spec);
-  }
-
-  private void buildOverview(ModelStatisticsVo vo, LocalDateTime start, LocalDateTime end) {
-    Set<SearchCriteria> callFilters = SearchCriteria.criteria();
-    if (start != null && end != null) {
-      callFilters = SearchCriteria.merge(callFilters,
-          SearchCriteria.greaterThanEqual("createdDate", start),
-          SearchCriteria.lessThanEqual("createdDate", end));
-    }
-
-    long totalModels = modelRepo.countAllByFilters(SearchCriteria.criteria());
-    vo.setTotalModels(totalModels);
-
-    Set<SearchCriteria> activeFilters = SearchCriteria.merge(SearchCriteria.criteria(),
-        SearchCriteria.equal("status", ModelStatus.ACTIVE.getValue()));
-    long activeModels = modelRepo.countAllByFilters(activeFilters);
-    vo.setActiveModels(activeModels);
-
-    long totalCalls = modelCallRecordQuery.countAllByFilters(callFilters);
-    vo.setTotalCalls(totalCalls);
-
-    long successCalls = modelCallRecordQuery.countAllByFilters(
-        SearchCriteria.merge(callFilters, SearchCriteria.equal("success", true)));
-    long failedCalls = modelCallRecordQuery.countAllByFilters(
-        SearchCriteria.merge(callFilters, SearchCriteria.equal("success", false)));
-    vo.setSuccessfulCalls(successCalls);
-    vo.setFailedCalls(failedCalls);
-
-    LongTotalView tokensView = modelCallRecordQuery.sumByFilters(
-        ModelCallRecord.class, LongTotalView.class, callFilters, "tokens");
-    long totalTokens =
-        (tokensView == null || tokensView.getTotal() == null) ? 0L : tokensView.getTotal();
-    vo.setTotalTokens(totalTokens);
-    vo.setTotalTokensConsumed(totalTokens);
-
-    DoubleTotalView costView = modelCallRecordQuery.sumByFilters(
-        ModelCallRecord.class, DoubleTotalView.class, callFilters, "cost");
-    double totalCost =
-        (costView == null || costView.getTotal() == null) ? 0.0 : costView.getTotal();
-    vo.setTotalCost(totalCost);
-    vo.setTotalCostDisplay(formatCostFromDollars(totalCost));
-
-    if (totalCalls > 0) {
-      vo.setSuccessRate((double) successCalls * 100.0 / (double) totalCalls);
-    } else {
-      vo.setSuccessRate(0.0);
-    }
-
-    DoubleTotalView rtSum = modelCallRecordQuery.sumByFilters(
-        ModelCallRecord.class, DoubleTotalView.class, callFilters, "responseTimeMs");
-    double avgLatencySec = 0.0;
-    if (totalCalls > 0 && rtSum != null && rtSum.getTotal() != null) {
-      double avgLatencyMs = rtSum.getTotal() / (double) totalCalls;
-      avgLatencySec = avgLatencyMs / 1000.0;
-    }
-    vo.setAverageLatencySec(avgLatencySec);
-  }
-
-  private void buildLastMonthTrend(ModelStatisticsVo vo, LocalDateTime start,
-      LocalDateTime end) {
-    Set<SearchCriteria> callFilters = SearchCriteria.merge(SearchCriteria.criteria(),
-        SearchCriteria.greaterThanEqual("createdDate", start),
-        SearchCriteria.lessThanEqual("createdDate", end));
-
-    LastMonthGrowthTrend lm = new LastMonthGrowthTrend();
-
-    long callsLast30 = modelCallRecordQuery.countAllByFilters(callFilters);
-    DoubleTotalView costLast30 = modelCallRecordQuery.sumByFilters(
-        ModelCallRecord.class, DoubleTotalView.class, callFilters, "cost");
-    LongTotalView tokensLast30View = modelCallRecordQuery.sumByFilters(
-        ModelCallRecord.class, LongTotalView.class, callFilters, "tokens");
-    long tokensLast30 = (tokensLast30View == null || tokensLast30View.getTotal() == null) ? 0L
-        : tokensLast30View.getTotal();
-
-    lm.setAddedCalls(callsLast30);
-    double addedCostLast30 =
-        costLast30 == null || costLast30.getTotal() == null ? 0.0 : costLast30.getTotal();
-    lm.setAddedCost(addedCostLast30);
-    lm.setAddedCostDisplay(formatCostFromDollars(addedCostLast30));
-    lm.setAddedTokens(tokensLast30);
-
-    DoubleTotalView rtSum = modelCallRecordQuery.sumByFilters(
-        ModelCallRecord.class, DoubleTotalView.class, callFilters, "responseTimeMs");
-    if (callsLast30 > 0 && rtSum != null && rtSum.getTotal() != null) {
-      double avgLatencyMs = rtSum.getTotal() / (double) callsLast30;
-      lm.setAverageLatencySec(avgLatencyMs / 1000.0);
-    }
-
-    vo.setLastMonthGrowthTrend(lm);
-  }
-
-  private void buildTodayTrend(ModelStatisticsVo vo, LocalDateTime start,
-      LocalDateTime end) {
-    Set<SearchCriteria> callFilters = SearchCriteria.merge(SearchCriteria.criteria(),
-        SearchCriteria.greaterThanEqual("createdDate", start),
-        SearchCriteria.lessThanEqual("createdDate", end));
-
-    TodayGrowthTrend today = new TodayGrowthTrend();
-
-    long callsToday = modelCallRecordQuery.countAllByFilters(callFilters);
-    DoubleTotalView costToday = modelCallRecordQuery.sumByFilters(
-        ModelCallRecord.class, DoubleTotalView.class, callFilters, "cost");
-    LongTotalView tokensTodayView = modelCallRecordQuery.sumByFilters(
-        ModelCallRecord.class, LongTotalView.class, callFilters, "tokens");
-    long tokensToday = (tokensTodayView == null || tokensTodayView.getTotal() == null) ? 0L
-        : tokensTodayView.getTotal();
-
-    today.setAddedCalls(callsToday);
-    double addedCostToday =
-        costToday == null || costToday.getTotal() == null ? 0.0 : costToday.getTotal();
-    today.setAddedCost(addedCostToday);
-    today.setAddedCostDisplay(formatCostFromDollars(addedCostToday));
-    today.setAddedTokens(tokensToday);
-
-    DoubleTotalView rtSum = modelCallRecordQuery.sumByFilters(
-        ModelCallRecord.class, DoubleTotalView.class, callFilters, "responseTimeMs");
-    if (callsToday > 0 && rtSum != null && rtSum.getTotal() != null) {
-      double avgLatencyMs = rtSum.getTotal() / (double) callsToday;
-      today.setAverageLatencySec(avgLatencyMs / 1000.0);
-    }
-    vo.setTodayGrowthTrend(today);
   }
 
   @Getter

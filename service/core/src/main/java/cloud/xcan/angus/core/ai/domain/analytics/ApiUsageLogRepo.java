@@ -69,6 +69,19 @@ public interface ApiUsageLogRepo extends BaseRepository<ApiUsageLog, Long> {
       @Param("end") LocalDateTime end);
 
   /**
+   * 全局概览统计（一次聚合，用于模型统计等） 返回 [totalCalls, successfulCalls, totalTokens, totalCost,
+   * avgResponseTimeMs]。cost 单位：美分(cents)
+   */
+  @Query("SELECT COUNT(l), "
+      + "SUM(CASE WHEN l.isSuccessful = true THEN 1 ELSE 0 END), "
+      + "COALESCE(SUM(l.totalTokens), 0), "
+      + "COALESCE(SUM(l.cost), 0), "
+      + "AVG(l.responseTimeMs) "
+      + "FROM ApiUsageLog l WHERE l.requestTime BETWEEN :start AND :end")
+  Object[] getGlobalOverviewStats(@Param("start") LocalDateTime start,
+      @Param("end") LocalDateTime end);
+
+  /**
    * 按应用分组统计 返回 [appId, calls, tokens, avgResponseTime, cost]
    * cost 单位：美分(cents)
    */

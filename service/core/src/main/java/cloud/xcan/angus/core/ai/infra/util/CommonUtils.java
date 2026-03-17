@@ -15,6 +15,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import org.springframework.web.multipart.MultipartFile;
 
 public class CommonUtils {
@@ -83,6 +84,14 @@ public class CommonUtils {
       return PERCENTAGE_FORMAT.format(number / 1_000.0) + "K";
     }
     return NUMBER_FORMAT.format(number);
+  }
+
+  public static long getLong(Map<String, Object> map, String key) {
+    Object v = map.get(key);
+    if (v == null) {
+      return 0L;
+    }
+    return v instanceof Number ? ((Number) v).longValue() : 0L;
   }
 
   public static Long toLong(Object value, Long defaultValue) {

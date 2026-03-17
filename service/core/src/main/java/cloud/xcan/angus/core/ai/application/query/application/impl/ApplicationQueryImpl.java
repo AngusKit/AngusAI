@@ -219,12 +219,11 @@ public class ApplicationQueryImpl implements ApplicationQuery {
       protected ApplicationStatisticsVo process() {
         LocalDateTime start = parseStartDate(startDate);
         LocalDateTime end = parseEndDate(endDate);
-        // 若开始或结束时间为空/无效，默认查询近30天
-        if (startDate == null || startDate.isBlank() || endDate == null || endDate.isBlank()
-            || start.equals(LocalDateTime.of(1970, 1, 1, 0, 0))) {
-          end = LocalDateTime.now();
-          start = LocalDateTime.now().minusDays(30).toLocalDate().atStartOfDay();
-        }
+
+        //    // 如果开始时间为默认值（1970），则使用近一月作为默认范围
+        //    if (start.equals(LocalDateTime.of(1970, 1, 1, 0, 0))) {
+        //      start = now.minusMonths(DEFAULT_MONTHS).toLocalDate().atStartOfDay();
+        //    }
 
         ApplicationStatisticsVo vo = new ApplicationStatisticsVo();
         buildOverview(vo, id, start, end);

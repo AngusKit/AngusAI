@@ -23,6 +23,7 @@ import cloud.xcan.angus.core.biz.NameJoin;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.remote.PageResult;
 import jakarta.annotation.Resource;
+import java.time.LocalDate;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
@@ -109,7 +110,7 @@ public class WorkflowFacadeImpl implements WorkflowFacade {
     WorkflowStatisticsVo statistics = new WorkflowStatisticsVo();
     statistics.setTotalWorkflows(workflowQuery.count());
     statistics.setRunningWorkflows(workflowQuery.countByStatus(WorkflowStatus.RUNNING));
-    var today = java.time.LocalDate.now();
+    var today = LocalDate.now();
     long todayCalls = workflowExecutionQuery.countByDate(today);
     long todaySuccess = workflowExecutionQuery.countSuccessByDate(today);
     statistics.setTodayCalls(todayCalls);

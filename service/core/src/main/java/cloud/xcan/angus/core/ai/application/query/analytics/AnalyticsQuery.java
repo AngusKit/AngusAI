@@ -18,6 +18,12 @@ public interface AnalyticsQuery {
   Map<String, Object> getOverviewStatsForRange(LocalDateTime start, LocalDateTime end, Long appId);
 
   /**
+   * 获取模型维度全局概览统计（appId=null，一次聚合：调用数、成功数、Token、成本、平均响应时间）
+   * <p>性能优化：单次 DB 查询返回全部统计字段，cost 单位：美分(cents)
+   */
+  Map<String, Object> getModelOverviewStatsForRange(LocalDateTime start, LocalDateTime end);
+
+  /**
    * 获取API调用趋势数据
    */
   List<Map<String, Object>> getApiCallsTrend(LocalDateTime start, LocalDateTime end, Long appId,

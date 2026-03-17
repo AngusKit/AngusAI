@@ -132,10 +132,10 @@ public class KnowledgeBaseFacadeImpl implements KnowledgeBaseFacade {
     LocalDateTime start = parseStartDate(dto != null ? dto.getStartDate() : null);
     LocalDateTime end = parseEndDate(dto != null ? dto.getEndDate() : null);
 
-    // 如果开始时间为默认值（1970），则使用近一月作为默认范围
-    if (start.equals(LocalDateTime.of(1970, 1, 1, 0, 0))) {
-      start = now.minusMonths(DEFAULT_MONTHS).toLocalDate().atStartOfDay();
-    }
+    //    // 如果开始时间为默认值（1970），则使用近一月作为默认范围
+    //    if (start.equals(LocalDateTime.of(1970, 1, 1, 0, 0))) {
+    //      start = now.minusMonths(DEFAULT_MONTHS).toLocalDate().atStartOfDay();
+    //    }
 
     // 近一月时间范围（用于lastMonthGrowthTrend，固定使用近一月数据）
     LocalDateTime oneMonthAgoStart = now.minusMonths(DEFAULT_MONTHS).toLocalDate().atStartOfDay();

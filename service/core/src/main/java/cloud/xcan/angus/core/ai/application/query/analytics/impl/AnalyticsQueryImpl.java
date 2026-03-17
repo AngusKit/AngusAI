@@ -54,6 +54,39 @@ public class AnalyticsQueryImpl implements AnalyticsQuery {
   }
 
   @Override
+  public Map<String, Object> getModelOverviewStatsForRange(LocalDateTime start, LocalDateTime end) {
+    return new BizTemplate<Map<String, Object>>() {
+      @Override
+      protected Map<String, Object> process() {
+        Object[] row = apiUsageLogRepo.getGlobalOverviewStats(start, end);
+        Map<String, Object> stats = new HashMap<>();
+        if (row == null || row[0] == null) {
+          stats.put("totalCalls", 0L);
+          stats.put("successfulCalls", 0L);
+          stats.put("failedCalls", 0L);
+          stats.put("totalTokens", 0L);
+          stats.put("totalCostCents", 0L);
+          stats.put("avgResponseTimeMs", null);
+          return stats;
+        }
+        long totalCalls = row[0] != null ? ((Number) row[0]).longValue() : 0L;
+        long successfulCalls = row[1] != null ? ((Number) row[1]).longValue() : 0L;
+        long totalTokens = row[2] != null ? ((Number) row[2]).longValue() : 0L;
+        long totalCostCents = row[3] != null ? ((Number) row[3]).longValue() : 0L;
+        Double avgResponseTimeMs = row[4] != null ? ((Number) row[4]).doubleValue() : null;
+
+        stats.put("totalCalls", totalCalls);
+        stats.put("successfulCalls", successfulCalls);
+        stats.put("failedCalls", totalCalls - successfulCalls);
+        stats.put("totalTokens", totalTokens);
+        stats.put("totalCostCents", totalCostCents);
+        stats.put("avgResponseTimeMs", avgResponseTimeMs);
+        return stats;
+      }
+    }.execute();
+  }
+
+  @Override
   public Map<String, Object> getOverviewStats(LocalDateTime start, LocalDateTime end, Long appId) {
     return new BizTemplate<Map<String, Object>>() {
       @Override
