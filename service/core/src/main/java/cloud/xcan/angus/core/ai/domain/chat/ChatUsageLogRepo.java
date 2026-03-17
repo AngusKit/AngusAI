@@ -112,7 +112,7 @@ public interface ChatUsageLogRepo extends BaseRepository<ChatUsageLog, Long> {
    */
   @Query(value =
       "SELECT app_id, MAX(request_time) AS last_used, COUNT(*) AS total_calls, AVG(response_time_ms) AS avg_response_ms "
-          + "FROM ai_api_usage_log WHERE request_time >= :since AND app_id IS NOT NULL "
+          + "FROM ai_chat_usage_log WHERE request_time >= :since AND app_id IS NOT NULL "
           + "GROUP BY app_id ORDER BY MAX(request_time) DESC", nativeQuery = true)
   List<Object[]> getRecentAppUsageStats(@Param("since") LocalDateTime since, Pageable pageable);
 
@@ -164,7 +164,7 @@ public interface ChatUsageLogRepo extends BaseRepository<ChatUsageLog, Long> {
   @Query(value = "SELECT CAST(l.request_time AS date) AS d, COUNT(*), "
       + "COALESCE(SUM(l.total_tokens), 0), "
       + "AVG(l.response_time_ms) "
-      + "FROM ai_api_usage_log l "
+      + "FROM ai_chat_usage_log l "
       + "WHERE l.app_id = :appId AND l.request_time >= :start AND l.request_time <= :end "
       + "GROUP BY CAST(l.request_time AS date) ORDER BY d ASC", nativeQuery = true)
   List<Object[]> getAppTrendByDay(@Param("appId") Long appId, @Param("start") LocalDateTime start,

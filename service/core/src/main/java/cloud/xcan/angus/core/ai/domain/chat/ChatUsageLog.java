@@ -12,7 +12,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 @Entity
-@Table(name = "ai_api_usage_log")
+@Table(name = "ai_chat_usage_log")
 @Setter
 @Getter
 @Accessors(chain = true)
