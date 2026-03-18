@@ -176,6 +176,9 @@ public class ApplicationDetailVo extends TenantAuditingVo {
 
     @Schema(description = "启用外观设置：开启后用户可以在对话页面进行外观主题等设置")
     private Boolean enableAppearanceSettings;
+
+    @Schema(description = "用户最大同时进行的对话数（多会话并发流式生成），不配置时使用默认值 3")
+    private Integer maxConcurrentChats;
   }
 
   @Data

@@ -35,6 +35,7 @@ export function useAppSettings() {
   const [enableSwitchApp, setEnableSwitchApp] = useState(true);
   const [enableSessionSettings, setEnableSessionSettings] = useState(true);
   const [enableAppearanceSettings, setEnableAppearanceSettings] = useState(true);
+  const [maxConcurrentChats, setMaxConcurrentChats] = useState('');
 
   // 安全与隐私
   const [enableContentFilter, setEnableContentFilter] = useState(true);
@@ -83,6 +84,7 @@ export function useAppSettings() {
         setEnableSwitchApp(f.enableSwitchApp ?? true);
         setEnableSessionSettings(f.enableSessionSettings ?? true);
         setEnableAppearanceSettings(f.enableAppearanceSettings ?? true);
+        setMaxConcurrentChats(f.maxConcurrentChats != null ? String(f.maxConcurrentChats) : '');
       }
       const s = d.config?.security;
       if (s) {
@@ -173,8 +175,15 @@ export function useAppSettings() {
   };
 
   /** 保存功能设置 */
-  const handleSaveFeatures = () =>
-    saveConfig(
+  const handleSaveFeatures = () => {
+    if (maxConcurrentChats.trim()) {
+      const n = parseInt(maxConcurrentChats, 10);
+      if (isNaN(n) || n < 1) {
+        toast.error('最大并发对话数须大于等于 1');
+        return;
+      }
+    }
+    return saveConfig(
       {
         features: {
           enableFileUpload,
@@ -185,11 +194,13 @@ export function useAppSettings() {
           enableSwitchApp,
           enableSessionSettings,
           enableAppearanceSettings,
+          ...(maxConcurrentChats.trim() ? { maxConcurrentChats: parseInt(maxConcurrentChats, 10) } : {}),
         },
       },
       setSavingFeatures,
       '功能设置已保存'
     );
+  };
 
   /** 保存安全设置 */
   const handleSaveSecurity = () => {
@@ -267,6 +278,8 @@ export function useAppSettings() {
     setEnableSessionSettings,
     enableAppearanceSettings,
     setEnableAppearanceSettings,
+    maxConcurrentChats,
+    setMaxConcurrentChats,
     enableContentFilter,
     setEnableContentFilter,
     enableDataEncryption,

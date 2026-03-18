@@ -18,6 +18,7 @@ import {
   LayoutGrid,
   Settings2,
   Palette,
+  MessageSquare,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -177,6 +178,24 @@ export function ApplicationSettingsPage() {
               <FeatureSwitch icon={<Settings className="w-5 h-5 text-gray-600 dark:text-gray-400" />} title="会话设置" desc="用户可以在对话页面进行温度、最大token等参数设置" checked={hook.enableSessionSettings} onCheckedChange={hook.setEnableSessionSettings} />
               <Separator className="dark:bg-gray-700" />
               <FeatureSwitch icon={<Palette className="w-5 h-5 text-gray-600 dark:text-gray-400" />} title="外观设置" desc="用户可以在对话页面进行主题、外观等设置" checked={hook.enableAppearanceSettings} onCheckedChange={hook.setEnableAppearanceSettings} />
+              <Separator className="dark:bg-gray-700" />
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <MessageSquare className="w-5 h-5 text-gray-600 dark:text-gray-400 shrink-0" />
+                  <div>
+                    <div className="dark:text-white">最大并发对话数</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">用户最多可同时进行的流式对话数，不填则默认 3</div>
+                  </div>
+                </div>
+                <Input
+                  type="number"
+                  min={1}
+                  placeholder="默认 3"
+                  value={hook.maxConcurrentChats}
+                  onChange={e => hook.setMaxConcurrentChats(e.target.value)}
+                  className="w-24 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                />
+              </div>
               <div className="flex justify-end pt-4">
                 <Button onClick={hook.handleSaveFeatures} disabled={hook.savingFeatures} className="dark:bg-blue-600 dark:hover:bg-blue-700">
                   <Save className="w-4 h-4 mr-2" />

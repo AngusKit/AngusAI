@@ -467,6 +467,7 @@ export function ApplicationDetailPage() {
                       <ConfigItem label="切换应用" value={config.features?.enableSwitchApp} />
                       <ConfigItem label="会话设置" value={config.features?.enableSessionSettings} />
                       <ConfigItem label="外观设置" value={config.features?.enableAppearanceSettings} />
+                      <ConfigItem label="最大并发对话数" value={config.features?.maxConcurrentChats ?? '默认 3'} />
                     </div>
                   </div>
                   <div>
