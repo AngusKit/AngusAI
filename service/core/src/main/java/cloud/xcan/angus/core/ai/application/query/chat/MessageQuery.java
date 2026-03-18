@@ -61,4 +61,18 @@ public interface MessageQuery {
    * 统计进行中对话数量：当前有消息正在流式生成的会话数
    */
   long countActiveSessions();
+
+  /**
+   * 活动统计：10 分钟内正在流式生成的消息、会话、应用、助手、模型、用户的数量
+   *
+   * @return Map 键: messages, sessions, apps, agents, models, users
+   */
+  Map<String, Long> countActive();
+
+  /**
+   * 总统计：总消息数、总会话数、去重应用/助手/模型数、总用户数
+   *
+   * @return Map 键: messages, sessions, apps, agents, models, users
+   */
+  Map<String, Long> getTotalStats();
 }

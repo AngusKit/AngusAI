@@ -1,24 +1,16 @@
 package cloud.xcan.angus.core.ai.application.query.monitor.impl;
 
 import cloud.xcan.angus.api.enums.Month;
-import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
-import cloud.xcan.angus.core.ai.application.query.application.ApplicationQuery;
 import cloud.xcan.angus.core.ai.application.query.chat.MessageQuery;
-import cloud.xcan.angus.core.ai.application.query.chat.SessionQuery;
-import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.application.query.monitor.ChatMonitorQuery;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRepo;
 import cloud.xcan.angus.core.ai.domain.chat.SessionRepo;
-import cloud.xcan.angus.core.ai.interfaces.agent.facade.vo.AgentCountVo;
-import cloud.xcan.angus.core.ai.interfaces.application.facade.vo.ApplicationCountVo;
-import cloud.xcan.angus.core.ai.interfaces.model.facade.vo.ModelStatisticsVo;
 import cloud.xcan.angus.core.ai.interfaces.monitor.facade.dto.ChatMonitorChartQueryDto;
 import cloud.xcan.angus.core.ai.interfaces.monitor.facade.vo.ChatMonitorOverviewVo;
 import cloud.xcan.angus.core.ai.interfaces.monitor.facade.vo.ChatMonitorOverviewVo.DualStatsVo;
 import cloud.xcan.angus.core.ai.interfaces.monitor.facade.vo.ChatMonitorOverviewVo.FeedbackStatsVo;
 import cloud.xcan.angus.core.ai.interfaces.monitor.facade.vo.ChatMonitorOverviewVo.ThroughputStatsVo;
 import cloud.xcan.angus.core.ai.interfaces.monitor.facade.vo.ChartDataPointVo;
-import cloud.xcan.angus.remote.dto.SimpleStatisticsDto;
 import jakarta.annotation.Resource;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -44,19 +36,7 @@ public class ChatMonitorQueryImpl implements ChatMonitorQuery {
   private MessageRepo messageRepo;
 
   @Resource
-  private SessionQuery sessionQuery;
-
-  @Resource
   private MessageQuery messageQuery;
-
-  @Resource
-  private ApplicationQuery applicationQuery;
-
-  @Resource
-  private AgentQuery agentQuery;
-
-  @Resource
-  private ModelQuery modelQuery;
 
   @Override
   public ChatMonitorOverviewVo getOverview() {
@@ -65,13 +45,15 @@ public class ChatMonitorQueryImpl implements ChatMonitorQuery {
     LocalDateTime todayStart = today.atStartOfDay();
     LocalDateTime todayEnd = today.atTime(LocalTime.MAX);
 
-    // 今日/近期统计
-    long sessionsActive = sessionRepo.countByCreatedDateBetween(todayStart, todayEnd);
-    long sessionsTotal = sessionQuery.countAll() != null ? sessionQuery.countAll() : 0L;
-    long messagesActive = messageRepo.countByCreatedDateBetween(todayStart, todayEnd);
-    long messagesTotal = messageQuery.countAll() != null ? messageQuery.countAll() : 0L;
-    long usersActive = sessionRepo.countDistinctCreatedByByCreatedDateBetween(todayStart, todayEnd);
-    long usersTotal = sessionRepo.countDistinctCreatedBy();
+    // 活动/总数统计：统一从 MessageQuery 获取（活动=10分钟内流式中，总=历史）
+    Map<String, Long> activeStats = messageQuery.countActive();
+    Map<String, Long> totalStats = messageQuery.getTotalStats();
+    long sessionsActive = activeStats.getOrDefault("sessions", 0L);
+    long sessionsTotal = totalStats.getOrDefault("sessions", 0L);
+    long messagesActive = activeStats.getOrDefault("messages", 0L);
+    long messagesTotal = totalStats.getOrDefault("messages", 0L);
+    long usersActive = activeStats.getOrDefault("users", 0L);
+    long usersTotal = totalStats.getOrDefault("users", 0L);
 
     // 反馈统计（全量）
     long likeCount = messageRepo.countByFeedbackType("like");
@@ -80,22 +62,18 @@ public class ChatMonitorQueryImpl implements ChatMonitorQuery {
     // 吞吐量：当天按分钟分组统计，0 填充，当前为完整近一分钟
     ThroughputStatsVo throughput = buildThroughputStats(todayStart, todayEnd, now);
 
-    // 应用、智能体、模型
-    ApplicationCountVo appCounts = applicationQuery.getCurrentUserCounts();
-    AgentCountVo agentCounts = agentQuery.getCurrentUserCounts();
-    ModelStatisticsVo modelStats = modelQuery.getStatistics(new SimpleStatisticsDto());
-
     ChatMonitorOverviewVo vo = new ChatMonitorOverviewVo();
     vo.setThroughput(throughput);
     vo.setSessions(new DualStatsVo(sessionsActive, sessionsTotal));
     vo.setMessages(new DualStatsVo(messagesActive, messagesTotal));
     vo.setUsers(new DualStatsVo(usersActive, usersTotal));
     vo.setFeedback(new FeedbackStatsVo(likeCount, dislikeCount, likeCount + dislikeCount));
-    vo.setApplications(new DualStatsVo(appCounts.getPublished(), appCounts.getTotal()));
-    vo.setAgents(new DualStatsVo(agentCounts.getActive(), agentCounts.getTotal()));
+    vo.setApplications(new DualStatsVo(
+        activeStats.getOrDefault("apps", 0L), totalStats.getOrDefault("apps", 0L)));
+    vo.setAgents(new DualStatsVo(
+        activeStats.getOrDefault("agents", 0L), totalStats.getOrDefault("agents", 0L)));
     vo.setModels(new DualStatsVo(
-        modelStats.getActiveModels() != null ? modelStats.getActiveModels() : 0,
-        modelStats.getTotalModels() != null ? modelStats.getTotalModels() : 0));
+        activeStats.getOrDefault("models", 0L), totalStats.getOrDefault("models", 0L)));
     return vo;
   }
 

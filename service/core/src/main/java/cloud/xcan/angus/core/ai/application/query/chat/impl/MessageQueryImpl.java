@@ -8,6 +8,7 @@ import cloud.xcan.angus.core.ai.domain.chat.SessionRepo;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.ChatStatisticsVo.UsageTrend;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
+import cloud.xcan.angus.core.ai.infra.util.CommonUtils;
 import cloud.xcan.angus.core.utils.PrincipalContextUtils;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import jakarta.annotation.Resource;
@@ -173,25 +174,39 @@ public class MessageQueryImpl implements MessageQuery {
     }.execute();
   }
 
-  // 参考countActiveSessions，实现活动消息、活动会话、活动模型、活动智能体、活动应用统计
   @Override
   public Map<String, Long> countActive() {
     return new BizTemplate<Map<String, Long>>() {
       @Override
       protected Map<String, Long> process() {
-        return null;
+        LocalDateTime cutoff = LocalDateTime.now().minusMinutes(10);
+        Object[] row = messageRepo.countActiveBreakdown(cutoff);
+        Map<String, Long> result = new HashMap<>();
+        result.put("messages", CommonUtils.toLong(row != null && row.length > 0 ? row[0] : null, 0L));
+        result.put("sessions", CommonUtils.toLong(row != null && row.length > 1 ? row[1] : null, 0L));
+        result.put("apps", CommonUtils.toLong(row != null && row.length > 2 ? row[2] : null, 0L));
+        result.put("agents", CommonUtils.toLong(row != null && row.length > 3 ? row[3] : null, 0L));
+        result.put("models", CommonUtils.toLong(row != null && row.length > 4 ? row[4] : null, 0L));
+        result.put("users", CommonUtils.toLong(row != null && row.length > 5 ? row[5] : null, 0L));
+        return result;
       }
     }.execute();
   }
 
-    // 实现总消息、总会话、总模型、总智能体、总应用统计
-    @Override
-    public Map<String, Long> countAll() {
-      return new BizTemplate<Map<String, Long>>() {
-        @Override
-        protected Map<String, Long> process() {
-          return null;
-        }
-      }.execute();
-    }
+  @Override
+  public Map<String, Long> getTotalStats() {
+    return new BizTemplate<Map<String, Long>>() {
+      @Override
+      protected Map<String, Long> process() {
+        Map<String, Long> result = new HashMap<>();
+        result.put("messages", messageRepo.count());
+        result.put("sessions", sessionRepo.count());
+        result.put("apps", messageRepo.countDistinctAppId());
+        result.put("agents", messageRepo.countDistinctAgentId());
+        result.put("models", messageRepo.countDistinctModelId());
+        result.put("users", sessionRepo.countDistinctCreatedBy());
+        return result;
+      }
+    }.execute();
+  }
 }

@@ -47,6 +47,32 @@ public interface MessageRepo extends BaseRepository<Message, Long> {
   long countActiveSessions(@Param("cutoff") LocalDateTime cutoff);
 
   /**
+   * 活动统计：在 cutoff 之后且 is_streaming=true 的消息中，统计消息数、去重会话数、去重应用/助手/模型/用户数。
+   * 返回 Object[]: [messages, sessions, apps, agents, models, users]
+   */
+  @Query("SELECT COUNT(m), COUNT(DISTINCT m.sessionId), COUNT(DISTINCT m.appId), COUNT(DISTINCT m.agentId), COUNT(DISTINCT m.modelId), COUNT(DISTINCT m.createdBy) "
+      + "FROM Message m WHERE m.isStreaming = true AND m.sessionId IS NOT NULL AND m.createdDate >= :cutoff")
+  Object[] countActiveBreakdown(@Param("cutoff") LocalDateTime cutoff);
+
+  /**
+   * 消息表中去重应用数（历史消息中使用过的不同 app_id 数）
+   */
+  @Query("SELECT COUNT(DISTINCT m.appId) FROM Message m WHERE m.appId IS NOT NULL")
+  long countDistinctAppId();
+
+  /**
+   * 消息表中去重助手数
+   */
+  @Query("SELECT COUNT(DISTINCT m.agentId) FROM Message m WHERE m.agentId IS NOT NULL")
+  long countDistinctAgentId();
+
+  /**
+   * 消息表中去重模型数
+   */
+  @Query("SELECT COUNT(DISTINCT m.modelId) FROM Message m WHERE m.modelId IS NOT NULL")
+  long countDistinctModelId();
+
+  /**
    * 批量查询多个会话各自的最后一条消息（一次 SQL，兼容 MySQL 5.7）
    */
   @Query(
