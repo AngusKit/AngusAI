@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { MonitorLazySelect } from './MonitorLazySelect';
 import { MonitorLineChart } from './MonitorLineChart';
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
+import { Pagination } from '@/components/gm/Pagination';
 import { Eye, Trash2, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { cn } from '@/components/ui/utils';
 
@@ -300,35 +300,13 @@ export function MonitorMessagesTab(props: MonitorMessagesTabProps) {
           </table>
         </div>
         {pagination && pagination.total > pagination.pageSize && (
-          <div className="flex justify-center p-4 border-t border-gray-200 dark:border-gray-700">
-            <Pagination>
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious
-                    onClick={() => pagination.onPageChange(Math.max(1, pagination.page - 1))}
-                    className={pagination.page === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                  />
-                </PaginationItem>
-                {Array.from({ length: Math.ceil(pagination.total / pagination.pageSize) }, (_, i) => i + 1).map((p) => (
-                  <PaginationItem key={p}>
-                    <PaginationLink
-                      onClick={() => pagination.onPageChange(p)}
-                      isActive={pagination.page === p}
-                      className="cursor-pointer"
-                    >
-                      {p}
-                    </PaginationLink>
-                  </PaginationItem>
-                ))}
-                <PaginationItem>
-                  <PaginationNext
-                    onClick={() => pagination.onPageChange(Math.min(Math.ceil(pagination.total / pagination.pageSize), pagination.page + 1))}
-                    className={pagination.page >= Math.ceil(pagination.total / pagination.pageSize) ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
-          </div>
+          <Pagination
+            currentPage={pagination.page}
+            totalPages={Math.ceil(pagination.total / pagination.pageSize)}
+            onPageChange={pagination.onPageChange}
+            totalItems={pagination.total}
+            pageSize={pagination.pageSize}
+          />
         )}
       </Card>
     </div>

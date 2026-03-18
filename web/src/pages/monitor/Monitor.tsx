@@ -17,10 +17,10 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { cn } from '@/components/ui/utils';
+import { Pagination } from '@/components/gm/Pagination';
 import {
   MonitorOverview,
   MonitorSessionsTab,
@@ -413,13 +413,13 @@ export function Monitor() {
     return { list: list.map((a) => ({ id: String(a.id ?? ''), name: a.name ?? '-' })), total: data?.total ?? list.length };
   }, []);
   const messageModelFetcher = useCallback<LazySelectFetcher>(async ({ pageNo, pageSize, keyword }) => {
-    const res = await Models.getModelList({ pageNo, pageSize, name: keyword } as Record<string, unknown>);
+    const res = await Models.getModelList({ pageNo, pageSize, keyword } as Record<string, unknown>);
     const data = (res as { data?: { list?: Array<{ id?: string | number; name?: string }>; total?: number } })?.data;
     const list = data?.list ?? [];
     return { list: list.map((m) => ({ id: String(m.id ?? ''), name: m.name ?? '-' })), total: data?.total ?? list.length };
   }, []);
   const messageSessionFetcher = useCallback<LazySelectFetcher>(async ({ pageNo, pageSize, keyword }) => {
-    const res = await SessionService.getSessionList({ pageNo, pageSize, title: keyword } as Record<string, unknown>);
+    const res = await SessionService.getSessionList({ pageNo, pageSize, keyword } as Record<string, unknown>);
     const data = (res as { data?: { list?: Array<{ id?: string; sessionId?: string; title?: string }>; total?: number } })?.data;
     const list = data?.list ?? [];
     return {
@@ -428,7 +428,7 @@ export function Monitor() {
     };
   }, []);
   const messageUserFetcher = useCallback<LazySelectFetcher>(async ({ pageNo, pageSize, keyword }) => {
-    const res = await Member.list({ pageNo, pageSize, name: keyword });
+    const res = await Member.list({ pageNo, pageSize, keyword });
     const data = (res as { data?: { list?: Array<{ id?: string | number; name?: string; username?: string }>; total?: number } })?.data;
     const list = data?.list ?? [];
     return {
@@ -875,35 +875,13 @@ export function Monitor() {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex justify-center pt-4">
-                <Pagination>
-                  <PaginationContent>
-                    <PaginationItem>
-                      <PaginationPrevious 
-                        onClick={() => setSessionMessagePage(prev => Math.max(1, prev - 1))}
-                        className={sessionMessagePage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                      />
-                    </PaginationItem>
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                      <PaginationItem key={page}>
-                        <PaginationLink
-                          onClick={() => setSessionMessagePage(page)}
-                          isActive={sessionMessagePage === page}
-                          className="cursor-pointer"
-                        >
-                          {page}
-                        </PaginationLink>
-                      </PaginationItem>
-                    ))}
-                    <PaginationItem>
-                      <PaginationNext 
-                        onClick={() => setSessionMessagePage(prev => Math.min(totalPages, prev + 1))}
-                        className={sessionMessagePage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                      />
-                    </PaginationItem>
-                  </PaginationContent>
-                </Pagination>
-              </div>
+              <Pagination
+                currentPage={sessionMessagePage}
+                totalPages={totalPages}
+                onPageChange={setSessionMessagePage}
+                totalItems={sessionMessagesTotal}
+                pageSize={PAGE_SIZE}
+              />
             )}
           </div>
         </Card>
