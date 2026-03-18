@@ -70,6 +70,7 @@ public final class ChatConfigMergeUtils {
 
     Long timeoutMs = firstNonNull(
         getRequestTimeoutMs(requestConfig),
+        getSessionTimeoutMs(session),
         getModelTimeoutMs(model),
         CHAT_DEFAULT_TIMEOUT_MS);
 
@@ -152,6 +153,13 @@ public final class ChatConfigMergeUtils {
 
   private static Integer getModelMaxTokens(Model m) {
     return m != null && m.getConfig() != null ? m.getConfig().getMaxTokens() : null;
+  }
+
+  private static Long getSessionTimeoutMs(Session m) {
+    if (m == null || m.getConfig() == null || m.getConfig().getTimeoutMs() == null) {
+      return null;
+    }
+    return m.getConfig().getTimeoutMs();
   }
 
   private static Long getModelTimeoutMs(Model m) {

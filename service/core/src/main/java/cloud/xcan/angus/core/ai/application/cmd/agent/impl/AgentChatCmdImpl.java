@@ -82,7 +82,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
   private Executor sseEmitterChatExecutor;
 
   @Override
-  public AgentChatResult chat(Session sessionDb, String message, SessionConfig config) {
+  public AgentChatResult chat(Session sessionDb, String message, SessionConfig requestConfig) {
     return new BizTemplate<AgentChatResult>() {
       Agent agent;
 
@@ -106,12 +106,12 @@ public class AgentChatCmdImpl implements AgentChatCmd {
         messageCmd.setStreaming(assistantMessage, true);
 
         // Model 优先从会话取 modelId，其次从 agent 取 defaultModelId
-        Long modelId =
-            sessionDb.getModelId() != null ? sessionDb.getModelId() : agent.getDefaultModelId();
+        Long modelId = sessionDb.getModelId() != null
+            ? sessionDb.getModelId() : agent.getDefaultModelId();
         Model model = modelId != null ? modelQuery.findById(modelId).orElse(null) : null;
 
         // 合并请求/会话/智能体/模型配置，得到最终覆盖参数
-        ChatConfigOverride override = getChatConfigOverride(agent, config, sessionDb, model);
+        ChatConfigOverride override = getChatConfigOverride(agent, requestConfig, sessionDb, model);
         String agentIdStr = String.valueOf(sessionDb.getAgentId());
         String modelIdStr = modelId != null ? String.valueOf(modelId) : null;
 
@@ -147,7 +147,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
   }
 
   @Override
-  public SseEmitter chatStream(Session sessionDb, String message, SessionConfig config) {
+  public SseEmitter chatStream(Session sessionDb, String message, SessionConfig requestConfig) {
     return new BizTemplate<SseEmitter>() {
       Agent agent;
       Message assistantMessage;
@@ -166,7 +166,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
         Model model = modelId != null ? modelQuery.findById(modelId).orElse(null) : null;
 
         // 按照优先级获取会话配置
-        ChatConfigOverride override = getChatConfigOverride(agent, config, sessionDb, model);
+        ChatConfigOverride override = getChatConfigOverride(agent, requestConfig, sessionDb, model);
         Long timeoutMs = nullSafe(override.getTimeoutMs(), CHAT_DEFAULT_TIMEOUT_MS);
 
         // 构造SseEmitter
@@ -289,7 +289,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
    *
    * @param model 已查询的模型，可为 null；为 null 时内部会按需查询（优先用 session.modelId，其次 agent.defaultModelId）
    */
-  private ChatConfigOverride getChatConfigOverride(Agent agent, SessionConfig config,
+  private ChatConfigOverride getChatConfigOverride(Agent agent, SessionConfig requestConfig,
       Session session, Model model) {
     Long modelId = model != null ? model.getId()
         : (session != null && session.getModelId() != null ? session.getModelId()
@@ -297,7 +297,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
                 : null));
     Model m = model != null ? model
         : (modelId != null ? modelQuery.findById(modelId).orElse(null) : null);
-    SessionConfig merged = ChatConfigMergeUtils.merge(config, session, agent, m);
+    SessionConfig merged = ChatConfigMergeUtils.merge(requestConfig, session, agent, m);
     return toChatConfigOverride(merged);
   }
 

@@ -36,15 +36,23 @@ export function detectContentFormat(content: string): ContentFormat {
   const trimmed = content.trim();
   if (!trimmed) return 'plain';
 
-  // 若包含 Markdown 代码块，则代码块内的 HTML 不参与格式判断（视为 Markdown）
-  const withoutCodeBlocks = stripCodeBlocks(trimmed);
+  // 若包含 Markdown 代码块（```...```），优先判为 Markdown，避免代码块内的 HTML 被误判为整条消息为 HTML
+  if (/```[\s\S]*?```/.test(trimmed)) {
+    return 'markdown';
+  }
 
-  // 检测 HTML：仅在非代码块区域包含完整标签时判为 HTML
+  // 流式输出时代码块可能未闭合，若出现 ```lang 形式也视为 Markdown
+  if (/^```[\w]*\s*\n/m.test(trimmed)) {
+    return 'markdown';
+  }
+
+  // 移除代码块后再检测：仅当非代码块区域包含 HTML 标签时判为 HTML
+  const withoutCodeBlocks = stripCodeBlocks(trimmed);
   if (withoutCodeBlocks && HTML_TAG_REGEX.test(withoutCodeBlocks)) {
     return 'html';
   }
 
-  // 检测 Markdown 特征
+  // 检测其他 Markdown 特征
   for (const pattern of MARKDOWN_PATTERNS) {
     if (pattern.test(trimmed)) {
       return 'markdown';
