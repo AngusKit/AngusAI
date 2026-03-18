@@ -1,5 +1,6 @@
 package cloud.xcan.angus.core.ai.domain.chat;
 
+import cloud.xcan.angus.core.biz.ResourceName;
 import cloud.xcan.angus.core.jpa.multitenancy.TenantAuditingEntity;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.Column;
@@ -29,6 +30,7 @@ public class Session extends TenantAuditingEntity<Session, Long> {
   @Column(name = "session_id", unique = true, length = 36)
   private String sessionId;
 
+  @ResourceName
   @Column(nullable = false, length = 200)
   private String title;
 
