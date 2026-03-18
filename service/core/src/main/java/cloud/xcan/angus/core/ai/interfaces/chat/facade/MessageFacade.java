@@ -41,7 +41,7 @@ public interface MessageFacade {
   /**
    * 获取消息历史
    */
-  PageResult<MessageVo> listMessages(String sessionId, MessageFindDto dto);
+  PageResult<MessageVo> list(MessageFindDto dto);
 
   /**
    * 获取对话统计

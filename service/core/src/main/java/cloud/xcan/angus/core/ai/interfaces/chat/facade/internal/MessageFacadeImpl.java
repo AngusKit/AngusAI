@@ -1,5 +1,7 @@
 package cloud.xcan.angus.core.ai.interfaces.chat.facade.internal;
 
+import static cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder.getMatchSearchFields;
+import static cloud.xcan.angus.core.utils.CoreUtils.buildVoPageResult;
 import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.parsePeriodDays;
 
 import cloud.xcan.angus.core.ai.application.cmd.chat.MessageCmd;
@@ -12,15 +14,14 @@ import cloud.xcan.angus.core.ai.interfaces.chat.facade.MessageFacade;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.MessageFeedbackDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.MessageFindDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.internal.assembler.MessageAssembler;
+import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.AttachmentUploadVo;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.ChatStatisticsVo;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.MessageVo;
 import cloud.xcan.angus.remote.PageResult;
 import jakarta.annotation.Resource;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -99,13 +100,11 @@ public class MessageFacadeImpl implements MessageFacade {
   }
 
   @Override
-  public PageResult<MessageVo> listMessages(String sessionId, MessageFindDto dto) {
-    PageRequest pageable = PageRequest.of(dto.getPageNo() - 1, dto.getPageSize());
-    Page<Message> page = messageQuery.findBySessionId(sessionId, pageable);
-    List<MessageVo> content = page.getContent().stream()
-        .map(MessageAssembler::toMessageVo)
-        .collect(Collectors.toList());
-    return PageResult.of(page.getTotalElements(), content);
+  public PageResult<MessageVo> list(MessageFindDto dto) {
+    GenericSpecification<Message> spec = MessageAssembler.getSpecification(dto);
+    Page<Message> page = messageQuery.find(spec, dto.tranPage(), dto.fullTextSearch,
+        getMatchSearchFields(dto.getClass()));
+    return buildVoPageResult(page, MessageAssembler::toMessageVo);
   }
 
   @Override

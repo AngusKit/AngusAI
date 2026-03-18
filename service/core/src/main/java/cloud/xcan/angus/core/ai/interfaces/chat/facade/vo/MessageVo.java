@@ -8,9 +8,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Data;
 
-/**
- * 消息VO
- */
 @Data
 @Schema(description = "消息视图")
 public class MessageVo {

@@ -1,7 +1,12 @@
 package cloud.xcan.angus.core.ai.interfaces.chat.facade.internal.assembler;
 
 import cloud.xcan.angus.core.ai.domain.chat.Message;
+import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.MessageFindDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.MessageVo;
+import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
+import cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder;
+import cloud.xcan.angus.remote.search.SearchCriteria;
+import java.util.Set;
 
 public class MessageAssembler {
 
@@ -22,6 +27,16 @@ public class MessageAssembler {
     vo.setFeedbackType(message.getFeedbackType());
     vo.setFeedbackComment(message.getFeedbackComment());
     return vo;
+  }
+
+  public static GenericSpecification<Message> getSpecification(MessageFindDto dto) {
+    Set<SearchCriteria> filters = new SearchCriteriaBuilder<>(dto)
+        .rangeSearchFields("id", "createdDate", "modifiedDate")
+        .orderByFields("id", "sessionId", "role", "createdDate", "modifiedDate")
+        .matchSearchFields("content", "feedbackComment")
+        .inAndNotFields("sessionId", "role", "isStreaming", "feedbackType")
+        .build();
+    return new GenericSpecification<>(filters);
   }
 
 }

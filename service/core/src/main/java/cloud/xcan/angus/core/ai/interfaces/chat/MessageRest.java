@@ -10,6 +10,8 @@ import cloud.xcan.angus.remote.ApiLocaleResult;
 import cloud.xcan.angus.remote.PageResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
@@ -30,7 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Tag(name = "ChatMessages", description = "对话消息管理 - 消息文件解析、对话反馈、历史查询、反馈等功能")
 @Validated
 @RestController
-@RequestMapping("/api/v1/chat/sessions")
+@RequestMapping("/api/v1/chat/messages")
 public class MessageRest {
 
   @Resource
@@ -75,12 +77,14 @@ public class MessageRest {
     messageFacade.deleteAttachment(id);
   }
 
-  @Operation(operationId = "getMessageHistory", summary = "获取消息历史", description = "获取会话的消息历史")
-  @GetMapping("/{sessionId}/messages")
-  public ApiLocaleResult<PageResult<MessageVo>> getMessages(
-      @Parameter(description = "会话ID(UUID)") @PathVariable String sessionId,
+  @Operation(operationId = "getMessageList", summary = "获取消息列表", description = "获取消息列表，支持分页、搜索和筛选（按会话、角色、流式状态、反馈类型等）")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "消息列表获取成功")
+  })
+  @GetMapping
+  public ApiLocaleResult<PageResult<MessageVo>> list(
       @Valid @ParameterObject MessageFindDto dto) {
-    return ApiLocaleResult.success(messageFacade.listMessages(sessionId, dto));
+    return ApiLocaleResult.success(messageFacade.list(dto));
   }
 
   @Operation(operationId = "voiceToText", summary = "语音输入", description = "语音转文字")

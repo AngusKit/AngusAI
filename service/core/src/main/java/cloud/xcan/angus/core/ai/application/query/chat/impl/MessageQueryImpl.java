@@ -3,9 +3,11 @@ package cloud.xcan.angus.core.ai.application.query.chat.impl;
 import cloud.xcan.angus.core.ai.application.query.chat.MessageQuery;
 import cloud.xcan.angus.core.ai.domain.chat.Message;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRepo;
+import cloud.xcan.angus.core.ai.domain.chat.MessageSearchRepo;
 import cloud.xcan.angus.core.ai.domain.chat.SessionRepo;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.ChatStatisticsVo.UsageTrend;
 import cloud.xcan.angus.core.biz.BizTemplate;
+import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.core.utils.PrincipalContextUtils;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import jakarta.annotation.Resource;
@@ -32,6 +34,9 @@ public class MessageQueryImpl implements MessageQuery {
   @Resource
   private SessionRepo sessionRepo;
 
+  @Resource
+  private MessageSearchRepo messageSearchRepo;
+
   @Override
   public Message findById(Long id) {
     return new BizTemplate<Message>() {
@@ -54,11 +59,14 @@ public class MessageQueryImpl implements MessageQuery {
   }
 
   @Override
-  public Page<Message> findBySessionId(String sessionId, PageRequest pageable) {
+  public Page<Message> find(GenericSpecification<Message> spec, PageRequest pageable,
+      boolean fullTextSearch, String[] match) {
     return new BizTemplate<Page<Message>>() {
       @Override
       protected Page<Message> process() {
-        return messageRepo.findBySessionIdOrderByCreatedDateAsc(sessionId, pageable);
+        return fullTextSearch
+            ? messageSearchRepo.find(spec.getCriteria(), pageable, Message.class, match)
+            : messageRepo.findAll(spec, pageable);
       }
     }.execute();
   }

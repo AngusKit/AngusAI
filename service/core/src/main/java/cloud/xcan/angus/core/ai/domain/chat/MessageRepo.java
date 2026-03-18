@@ -44,11 +44,6 @@ public interface MessageRepo extends BaseRepository<Message, Long> {
   long countActiveConversations();
 
   /**
-   * 根据会话ID(UUID)分页查询消息
-   */
-  Page<Message> findBySessionIdOrderByCreatedDateAsc(String sessionId, Pageable pageable);
-
-  /**
    * 批量查询多个会话各自的最后一条消息（一次 SQL，兼容 MySQL 5.7）
    */
   @Query(
