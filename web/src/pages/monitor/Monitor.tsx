@@ -21,16 +21,12 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { toast } from 'sonner';
 import { cn } from '@/components/ui/utils';
 import { Pagination } from '@/components/gm/Pagination';
-import {
-  MonitorOverview,
-  MonitorSessionsTab,
-  MonitorMessagesTab,
-  MonitorFeedbackTab,
-  type MonitorSession,
-  type MonitorMessage,
-  type MonitorFeedback,
-  type LazySelectFetcher,
-} from './components';
+import { MonitorOverview } from './components/MonitorOverview';
+import { MonitorSessionsTab } from './components/MonitorSessionsTab';
+import { MonitorMessagesTab } from './components/MonitorMessagesTab';
+import { MonitorFeedbackTab } from './components/MonitorFeedbackTab';
+import type { MonitorSession, MonitorMessage, MonitorFeedback } from './components/MonitorTypes';
+import type { LazySelectFetcher } from './components/MonitorLazySelect';
 
 interface ThroughputStats {
   current: number;
@@ -129,7 +125,6 @@ export function Monitor() {
   const [messageUserFilter, setMessageUserFilter] = useState('all');
   
   // Feedback filters: keyword search + 全部应用、全部智能体、全部模型、全部会话、全部用户
-  const [feedbackKeywordSearch, setFeedbackKeywordSearch] = useState('');
   const [feedbackAppFilter, setFeedbackAppFilter] = useState('all');
   const [feedbackAgentFilter, setFeedbackAgentFilter] = useState('all');
   const [feedbackModelFilter, setFeedbackModelFilter] = useState('all');
@@ -334,7 +329,7 @@ export function Monitor() {
     setSessionsListLoading(true);
     try {
       const query: Record<string, unknown> = { pageNo, pageSize: PAGE_SIZE };
-      if (sessionKeywordSearch.trim()) query.title = sessionKeywordSearch.trim();
+      if (sessionKeywordSearch.trim()) query.keyword = sessionKeywordSearch.trim();
       if (sessionAppFilter !== 'all') query.appId = sessionAppFilter;
       if (sessionAgentFilter !== 'all') query.agentId = sessionAgentFilter;
       if (sessionModelFilter !== 'all') query.modelId = sessionModelFilter;
@@ -445,7 +440,6 @@ export function Monitor() {
         pageSize: PAGE_SIZE,
         filters: [{ key: 'feedbackType', op: SearchCriteria.OpEnum.IsNotNull }],
       };
-      if (feedbackKeywordSearch.trim()) query.keyword = feedbackKeywordSearch.trim();
       if (feedbackAppFilter !== 'all') query.appId = feedbackAppFilter;
       if (feedbackAgentFilter !== 'all') query.agentId = feedbackAgentFilter;
       if (feedbackModelFilter !== 'all') query.modelId = feedbackModelFilter;
@@ -480,7 +474,6 @@ export function Monitor() {
       setFeedbacksListLoading(false);
     }
   }, [
-    feedbackKeywordSearch,
     feedbackAppFilter,
     feedbackAgentFilter,
     feedbackModelFilter,
@@ -1234,8 +1227,6 @@ export function Monitor() {
             onChartDayChange={setFeedbackSelectedDay}
             chartData={feedbackChartData}
             chartLoading={feedbackChartLoading}
-            keywordSearch={feedbackKeywordSearch}
-            onKeywordSearchChange={setFeedbackKeywordSearch}
             appFilter={feedbackAppFilter}
             agentFilter={feedbackAgentFilter}
             modelFilter={feedbackModelFilter}

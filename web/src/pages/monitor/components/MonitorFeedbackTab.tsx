@@ -6,7 +6,6 @@ import type { LazySelectFetcher } from './MonitorLazySelect';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
 import { MonitorLazySelect } from './MonitorLazySelect';
 import { MonitorLineChart } from './MonitorLineChart';
 import { Pagination } from '@/components/gm/Pagination';
@@ -24,8 +23,6 @@ export interface MonitorFeedbackTabProps {
   onChartDayChange: (v: string) => void;
   chartData: ChartDataPointVo[];
   chartLoading?: boolean;
-  keywordSearch: string;
-  onKeywordSearchChange: (v: string) => void;
   appFilter: string;
   agentFilter: string;
   modelFilter: string;
@@ -62,8 +59,6 @@ export function MonitorFeedbackTab(props: MonitorFeedbackTabProps) {
     onChartDayChange,
     chartData,
     chartLoading,
-    keywordSearch,
-    onKeywordSearchChange,
     appFilter,
     agentFilter,
     modelFilter,
@@ -124,14 +119,7 @@ export function MonitorFeedbackTab(props: MonitorFeedbackTabProps) {
         lineName={language === 'zh-CN' ? '反馈数' : 'Feedbacks'}
       />
 
-      <div className="flex items-center gap-3">
-        <Input
-          placeholder={language === 'zh-CN' ? '关键字搜索...' : 'Keyword search...'}
-          value={keywordSearch}
-          onChange={(e) => onKeywordSearchChange(e.target.value)}
-          className="w-[300px] dark:bg-gray-900 dark:border-gray-700"
-        />
-        <div className="flex-1 flex items-center justify-end gap-3">
+      <div className="flex items-center justify-end gap-3">
           <MonitorLazySelect
             value={appFilter}
             onValueChange={onAppFilterChange}
@@ -172,7 +160,6 @@ export function MonitorFeedbackTab(props: MonitorFeedbackTabProps) {
             allOptionLabel={language === 'zh-CN' ? '全部用户' : 'All Users'}
             className="w-40 dark:bg-gray-900 dark:border-gray-700"
           />
-        </div>
       </div>
 
       <Card className="dark:bg-gray-800 dark:border-gray-700">
