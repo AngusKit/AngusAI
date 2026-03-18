@@ -5,6 +5,7 @@ import {
   ChatStatisticsResult,
   ClearMessagesResult,
   MessageFeedbackDto,
+  MessageFindDto,
   MessageResult,
   PageMessageResult,
   PageSessionListResult,
@@ -95,32 +96,22 @@ export class Chat<SecurityDataType = unknown> {
       ...params,
     });
   /**
-   * @description 获取会话的消息历史
+   * @description 获取消息列表，支持分页、搜索和筛选（按会话、角色、流式状态、反馈类型等）
    *
    * @tags 对话消息
-   * @name GetMessageHistory
-   * @summary 获取消息历史
-   * @request GET:/api/v1/chat/sessions/{sessionId}/messages
+   * @name GetMessageList
+   * @summary 获取消息列表
+   * @request GET:/api/v1/chat/sessions
    * @secure
    */
-  getMessageHistory = (
-    sessionId: string,
-    query?: {
-      /** 页码，默认 1 */
-      pageNo?: number;
-      /** 每页大小，默认 20 */
-      pageSize?: number;
-      /** 获取指定消息之前的消息 */
-      beforeId?: string;
-      /** 获取指定消息之后的消息 */
-      afterId?: string;
-    },
+  getMessageList = (
+    query?: MessageFindDto,
     params: RequestParams = {}
   ) =>
     this.http.request<PageMessageResult>({
-      path: `${AI}/chat/sessions/${sessionId}/messages`,
+      path: `${AI}/chat/sessions`,
       method: 'GET',
-      query: query,
+      query: query as unknown as QueryParamsType,
       secure: true,
       ...params,
     });

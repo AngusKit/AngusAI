@@ -32,7 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Tag(name = "ChatMessages", description = "对话消息管理 - 消息文件解析、对话反馈、历史查询、反馈等功能")
 @Validated
 @RestController
-@RequestMapping("/api/v1/chat/messages")
+@RequestMapping("/api/v1/chat/sessions")
 public class MessageRest {
 
   @Resource

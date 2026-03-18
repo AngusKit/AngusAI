@@ -1,4 +1,4 @@
-import { ApiLocaleResult, TenantAuditingVo } from '@xcan-angus/infra';
+import { ApiLocaleResult, PageQuery, TenantAuditingVo } from '@xcan-angus/infra';
 import { MessageRoleEnum } from '@/enums/enums.ts';
 
 /** 会话/对话配置（合并原 AgentChatConfig 与 SessionConfig） */
@@ -191,16 +191,20 @@ export interface SessionBatchDeleteDto {
   sessionIds: string[];
 }
 
-/** 查询消息请求参数 */
-export interface MessageFindDto {
-  /** 页码，默认 1 */
-  pageNo?: number;
-  /** 每页大小，默认 20 */
-  pageSize?: number;
-  /** 获取指定消息之前的消息 */
-  beforeId?: string;
-  /** 获取指定消息之后的消息 */
-  afterId?: string;
+/** 查询消息请求参数（与后端 MessageFindDto 一致） */
+export interface MessageFindDto extends PageQuery {
+  /** 消息ID */
+  id?: string;
+  /** 会话ID(UUID) */
+  sessionId?: string;
+  /** 所属会话实体 ID */
+  sessionEntityId?: string;
+  /** 消息角色 */
+  role?: MessageRoleEnum;
+  /** 是否正在流式生成 */
+  isStreaming?: boolean;
+  /** 反馈类型：like或dislike */
+  feedbackType?: string;
 }
 
 /** 附件上传响应 */
