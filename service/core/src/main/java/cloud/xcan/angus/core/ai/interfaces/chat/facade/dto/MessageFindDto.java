@@ -17,6 +17,9 @@ public class MessageFindDto extends PageQuery {
   @Schema(description = "会话ID")
   private String sessionId;
 
+  @Schema(description = "所属会话实体 ID")
+  private Long sessionEntityId;
+
   @Schema(description = "消息角色")
   private MessageRole role;
 

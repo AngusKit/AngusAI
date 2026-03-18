@@ -3,20 +3,31 @@ package cloud.xcan.angus.core.ai.interfaces.chat.facade.vo;
 import cloud.xcan.angus.core.ai.domain.chat.MessageAttachment;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRole;
 import cloud.xcan.angus.core.ai.domain.chat.MessageUsage;
+import cloud.xcan.angus.remote.NameJoinField;
+import cloud.xcan.angus.remote.vo.AuditingVo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Schema(description = "消息视图")
-public class MessageVo {
+public class MessageVo extends AuditingVo {
 
   @Schema(description = "消息ID")
   private Long id;
 
   @Schema(description = "会话ID")
   private String sessionId;
+
+  @Schema(description = "所属会话实体 ID")
+  private Long sessionEntityId;
+
+  @Schema(description = "会话名称")
+  @NameJoinField(id = "sessionEntityId", repository = "sessionRepo")
+  private String sessionName;
 
   @Schema(description = "消息角色")
   private MessageRole role;

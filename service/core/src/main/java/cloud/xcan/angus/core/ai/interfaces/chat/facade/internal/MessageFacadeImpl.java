@@ -14,6 +14,7 @@ import cloud.xcan.angus.core.ai.interfaces.chat.facade.MessageFacade;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.MessageFeedbackDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.dto.MessageFindDto;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.internal.assembler.MessageAssembler;
+import cloud.xcan.angus.core.biz.NameJoin;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.AttachmentUploadVo;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.ChatStatisticsVo;
@@ -62,6 +63,7 @@ public class MessageFacadeImpl implements MessageFacade {
     return null;
   }
 
+  @NameJoin
   @Override
   public MessageVo feedbackMessage(String sessionId, Long messageId, MessageFeedbackDto dto) {
     // 添加消息反馈
@@ -72,6 +74,7 @@ public class MessageFacadeImpl implements MessageFacade {
     return MessageAssembler.toMessageVo(message);
   }
 
+  @NameJoin
   @Override
   public MessageVo stopGeneration(String sessionId) {
     // 查找正在流式生成的消息
@@ -99,6 +102,7 @@ public class MessageFacadeImpl implements MessageFacade {
     // fileStorageService.deleteFile(id);
   }
 
+  @NameJoin
   @Override
   public PageResult<MessageVo> list(MessageFindDto dto) {
     GenericSpecification<Message> spec = MessageAssembler.getSpecification(dto);

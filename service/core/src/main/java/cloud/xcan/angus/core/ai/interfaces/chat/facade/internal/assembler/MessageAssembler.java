@@ -18,6 +18,7 @@ public class MessageAssembler {
     MessageVo vo = new MessageVo();
     vo.setId(message.identity());
     vo.setSessionId(message.getSessionId());
+    vo.setSessionEntityId(message.getSessionEntityId());
     vo.setRole(message.getRole());
     vo.setContent(message.getContent());
     vo.setAttachments(message.getAttachments());
@@ -26,6 +27,12 @@ public class MessageAssembler {
     vo.setDatetime(message.getCreatedDate());
     vo.setFeedbackType(message.getFeedbackType());
     vo.setFeedbackComment(message.getFeedbackComment());
+
+    // 设置审计字段
+    vo.setCreatedBy(message.getCreatedBy());
+    vo.setCreatedDate(message.getCreatedDate());
+    vo.setModifiedBy(message.getModifiedBy());
+    vo.setModifiedDate(message.getModifiedDate());
     return vo;
   }
 
