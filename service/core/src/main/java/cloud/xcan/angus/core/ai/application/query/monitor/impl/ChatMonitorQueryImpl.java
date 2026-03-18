@@ -11,6 +11,7 @@ import cloud.xcan.angus.core.ai.interfaces.monitor.facade.vo.ChatMonitorOverview
 import cloud.xcan.angus.core.ai.interfaces.monitor.facade.vo.ChatMonitorOverviewVo.DualStatsVo;
 import cloud.xcan.angus.core.ai.interfaces.monitor.facade.vo.ChatMonitorOverviewVo.FeedbackStatsVo;
 import cloud.xcan.angus.core.ai.interfaces.monitor.facade.vo.ChatMonitorOverviewVo.ThroughputStatsVo;
+import cloud.xcan.angus.core.biz.BizTemplate;
 import jakarta.annotation.Resource;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -40,41 +41,79 @@ public class ChatMonitorQueryImpl implements ChatMonitorQuery {
 
   @Override
   public ChatMonitorOverviewVo getOverview() {
-    LocalDateTime now = LocalDateTime.now();
-    LocalDate today = now.toLocalDate();
-    LocalDateTime todayStart = today.atStartOfDay();
-    LocalDateTime todayEnd = today.atTime(LocalTime.MAX);
+    return new BizTemplate<ChatMonitorOverviewVo>() {
+      @Override
+      protected ChatMonitorOverviewVo process() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDate today = now.toLocalDate();
+        LocalDateTime todayStart = today.atStartOfDay();
+        LocalDateTime todayEnd = today.atTime(LocalTime.MAX);
 
-    // 活动/总数统计：统一从 MessageQuery 获取（活动=10分钟内流式中，总=历史）
-    Map<String, Long> activeStats = messageQuery.countActive();
-    Map<String, Long> totalStats = messageQuery.getTotalStats();
-    long sessionsActive = activeStats.getOrDefault("sessions", 0L);
-    long sessionsTotal = totalStats.getOrDefault("sessions", 0L);
-    long messagesActive = activeStats.getOrDefault("messages", 0L);
-    long messagesTotal = totalStats.getOrDefault("messages", 0L);
-    long usersActive = activeStats.getOrDefault("users", 0L);
-    long usersTotal = totalStats.getOrDefault("users", 0L);
+        // 活动/总数统计：统一从 MessageQuery 获取（活动=10分钟内流式中，总=历史）
+        Map<String, Long> activeStats = messageQuery.countActive();
+        Map<String, Long> totalStats = messageQuery.getTotalStats();
+        long sessionsActive = activeStats.getOrDefault("sessions", 0L);
+        long sessionsTotal = totalStats.getOrDefault("sessions", 0L);
+        long messagesActive = activeStats.getOrDefault("messages", 0L);
+        long messagesTotal = totalStats.getOrDefault("messages", 0L);
+        long usersActive = activeStats.getOrDefault("users", 0L);
+        long usersTotal = totalStats.getOrDefault("users", 0L);
 
-    // 反馈统计（全量）
-    long likeCount = messageRepo.countByFeedbackType("like");
-    long dislikeCount = messageRepo.countByFeedbackType("dislike");
+        // 反馈统计（全量）
+        long likeCount = messageRepo.countByFeedbackType("like");
+        long dislikeCount = messageRepo.countByFeedbackType("dislike");
 
-    // 吞吐量：当天按分钟分组统计，0 填充，当前为完整近一分钟
-    ThroughputStatsVo throughput = buildThroughputStats(todayStart, todayEnd, now);
+        // 吞吐量：当天按分钟分组统计，0 填充，当前为完整近一分钟
+        ThroughputStatsVo throughput = buildThroughputStats(todayStart, todayEnd, now);
 
-    ChatMonitorOverviewVo vo = new ChatMonitorOverviewVo();
-    vo.setThroughput(throughput);
-    vo.setSessions(new DualStatsVo(sessionsActive, sessionsTotal));
-    vo.setMessages(new DualStatsVo(messagesActive, messagesTotal));
-    vo.setUsers(new DualStatsVo(usersActive, usersTotal));
-    vo.setFeedback(new FeedbackStatsVo(likeCount, dislikeCount, likeCount + dislikeCount));
-    vo.setApplications(new DualStatsVo(
-        activeStats.getOrDefault("apps", 0L), totalStats.getOrDefault("apps", 0L)));
-    vo.setAgents(new DualStatsVo(
-        activeStats.getOrDefault("agents", 0L), totalStats.getOrDefault("agents", 0L)));
-    vo.setModels(new DualStatsVo(
-        activeStats.getOrDefault("models", 0L), totalStats.getOrDefault("models", 0L)));
-    return vo;
+        ChatMonitorOverviewVo vo = new ChatMonitorOverviewVo();
+        vo.setThroughput(throughput);
+        vo.setSessions(new DualStatsVo(sessionsActive, sessionsTotal));
+        vo.setMessages(new DualStatsVo(messagesActive, messagesTotal));
+        vo.setUsers(new DualStatsVo(usersActive, usersTotal));
+        vo.setFeedback(new FeedbackStatsVo(likeCount, dislikeCount, likeCount + dislikeCount));
+        vo.setApplications(new DualStatsVo(
+            activeStats.getOrDefault("apps", 0L), totalStats.getOrDefault("apps", 0L)));
+        vo.setAgents(new DualStatsVo(
+            activeStats.getOrDefault("agents", 0L), totalStats.getOrDefault("agents", 0L)));
+        vo.setModels(new DualStatsVo(
+            activeStats.getOrDefault("models", 0L), totalStats.getOrDefault("models", 0L)));
+        return vo;
+      }
+    }.execute();
+  }
+
+  @Override
+  public List<ChartDataPointVo> getSessionsChartData(ChatMonitorChartQueryDto dto) {
+    return new BizTemplate<List<ChartDataPointVo>>() {
+      @Override
+      protected List<ChartDataPointVo> process() {
+        return buildChartDataFromBatch(dto, sessionRepo::countByMonthForYear,
+            sessionRepo::countByDayForMonth, sessionRepo::countByHourForDay, "sess");
+      }
+    }.execute();
+  }
+
+  @Override
+  public List<ChartDataPointVo> getMessagesChartData(ChatMonitorChartQueryDto dto) {
+    return new BizTemplate<List<ChartDataPointVo>>() {
+      @Override
+      protected List<ChartDataPointVo> process() {
+        return buildChartDataFromBatch(dto, messageRepo::countByMonthForYear,
+            messageRepo::countByDayForMonth, messageRepo::countByHourForDay, "msg");
+      }
+    }.execute();
+  }
+
+  @Override
+  public List<ChartDataPointVo> getFeedbackChartData(ChatMonitorChartQueryDto dto) {
+    return new BizTemplate<List<ChartDataPointVo>>() {
+      @Override
+      protected List<ChartDataPointVo> process() {
+        return buildChartDataFromBatch(dto, messageRepo::countFeedbackByMonthForYear,
+            messageRepo::countFeedbackByDayForMonth, messageRepo::countFeedbackByHourForDay, "fb");
+      }
+    }.execute();
   }
 
   /**
@@ -96,8 +135,7 @@ public class ChatMonitorQueryImpl implements ChatMonitorQuery {
     double sum = 0;
     int filledCount = 0;
     for (int m = 0; m < totalMinutes; m++) {
-      long count = minuteToCount.getOrDefault(m, 0L);
-      double val = count;
+      double val = minuteToCount.getOrDefault(m, 0L);
       if (val < throughputMin) {
         throughputMin = val;
       }
@@ -115,8 +153,8 @@ public class ChatMonitorQueryImpl implements ChatMonitorQuery {
     // 当前吞吐量：完整近一分钟（上一分钟）内的消息数
     LocalDateTime lastMinuteStart = now.minusMinutes(1).withSecond(0).withNano(0);
     LocalDateTime lastMinuteEnd = lastMinuteStart.plusMinutes(1).minusNanos(1);
-    long currentCount = messageRepo.countByCreatedDateBetween(lastMinuteStart, lastMinuteEnd);
-    double throughputCurrent = currentCount;
+    double throughputCurrent = messageRepo.countByCreatedDateBetween(lastMinuteStart,
+        lastMinuteEnd);
 
     ThroughputStatsVo vo = new ThroughputStatsVo();
     vo.setCurrent(throughputCurrent);
@@ -124,24 +162,6 @@ public class ChatMonitorQueryImpl implements ChatMonitorQuery {
     vo.setMax(throughputMax);
     vo.setAverage(throughputAvg);
     return vo;
-  }
-
-  @Override
-  public List<ChartDataPointVo> getSessionsChartData(ChatMonitorChartQueryDto dto) {
-    return buildChartDataFromBatch(dto, sessionRepo::countByMonthForYear,
-        sessionRepo::countByDayForMonth, sessionRepo::countByHourForDay, "sess");
-  }
-
-  @Override
-  public List<ChartDataPointVo> getMessagesChartData(ChatMonitorChartQueryDto dto) {
-    return buildChartDataFromBatch(dto, messageRepo::countByMonthForYear,
-        messageRepo::countByDayForMonth, messageRepo::countByHourForDay, "msg");
-  }
-
-  @Override
-  public List<ChartDataPointVo> getFeedbackChartData(ChatMonitorChartQueryDto dto) {
-    return buildChartDataFromBatch(dto, messageRepo::countFeedbackByMonthForYear,
-        messageRepo::countFeedbackByDayForMonth, messageRepo::countFeedbackByHourForDay, "fb");
   }
 
   private interface CountByMonth {
