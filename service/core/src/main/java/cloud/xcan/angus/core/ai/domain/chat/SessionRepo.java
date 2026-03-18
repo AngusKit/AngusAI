@@ -1,6 +1,7 @@
 package cloud.xcan.angus.core.ai.domain.chat;
 
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
+import cloud.xcan.angus.core.jpa.repository.NameJoinRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -9,11 +10,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.query.Param;
 
-/**
- * 会话仓储接口
- */
 @NoRepositoryBean
-public interface SessionRepo extends BaseRepository<Session, Long> {
+public interface SessionRepo extends NameJoinRepository<Session, Long>,
+    BaseRepository<Session, Long> {
 
   /**
    * 根据会话ID(UUID)查询
