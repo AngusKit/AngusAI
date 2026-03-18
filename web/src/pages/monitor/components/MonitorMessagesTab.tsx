@@ -1,5 +1,5 @@
 import { useLanguage } from '@/components/LanguageProvider';
-import type { Message, Session, SelectOption } from './MonitorTypes';
+import type { MonitorMessage, MonitorSession, SelectOption } from './MonitorTypes';
 import type { ChartDataPointVo } from '@/services/MonitorTypes';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -46,12 +46,12 @@ export interface MonitorMessagesTabProps {
   applications: SelectOption[];
   agents: SelectOption[];
   models: SelectOption[];
-  sessions: Session[];
+  sessions: MonitorSession[];
   users: SelectOption[];
-  messages: Message[];
-  onViewSession: (session: Session) => void;
-  onViewMessage: (message: Message) => void;
-  onDeleteMessage: (id: number) => void;
+  messages: MonitorMessage[];
+  onViewSession: (session: MonitorSession) => void;
+  onViewMessage: (message: MonitorMessage) => void;
+  onDeleteMessage: (messageId: string) => void;
 }
 
 export function MonitorMessagesTab(props: MonitorMessagesTabProps) {
@@ -177,8 +177,8 @@ export function MonitorMessagesTab(props: MonitorMessagesTabProps) {
                 <Input placeholder={language === 'zh-CN' ? '搜索...' : 'Search...'} value={sessionSearch} onChange={(e) => onSessionSearchChange(e.target.value)} className="mb-2 dark:bg-gray-900 dark:border-gray-700" />
               </div>
               <SelectItem value="all">{language === 'zh-CN' ? '全部会话' : 'All Sessions'}</SelectItem>
-              {sessions.filter((s) => s.title.toLowerCase().includes(sessionSearch.toLowerCase()) || s.sessionId.toLowerCase().includes(sessionSearch.toLowerCase())).map((s) => (
-                <SelectItem key={s.sessionId} value={s.sessionId}>{s.title}</SelectItem>
+              {sessions.filter((s) => (s.title ?? '').toLowerCase().includes(sessionSearch.toLowerCase()) || (s.sessionId ?? '').toLowerCase().includes(sessionSearch.toLowerCase())).map((s) => (
+                <SelectItem key={s.sessionId ?? s.id ?? ''} value={s.sessionId ?? s.id ?? ''}>{s.title ?? '-'}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -229,22 +229,22 @@ export function MonitorMessagesTab(props: MonitorMessagesTabProps) {
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
               {messages.map((message) => (
-                <tr key={message.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                <tr key={message.id ?? message.messageId ?? ''} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                   <td className="px-4 py-3">
                     <code className="text-xs font-mono bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded">
-                      {message.messageId}
+                      {message.messageId ?? message.id ?? '-'}
                     </code>
                   </td>
                   <td className="px-4 py-3">
                     <button
                       onClick={() => {
-                        const session = sessions.find((s) => s.sessionId === message.sessionId);
+                        const session = sessions.find((s) => (s.sessionId ?? s.id) === message.sessionId);
                         if (session) onViewSession(session);
                       }}
                       className="text-left"
                     >
                       <div className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline">
-                        {message.sessionTitle}
+                        {message.sessionTitle ?? message.sessionId ?? '-'}
                       </div>
                       <div className="text-xs text-gray-500 dark:text-gray-400 font-mono">
                         {message.sessionId}
@@ -255,12 +255,12 @@ export function MonitorMessagesTab(props: MonitorMessagesTabProps) {
                     <Badge
                       className={cn(
                         'border-0',
-                        message.role === 'user'
+                        (message.role ?? '').toUpperCase() === 'USER'
                           ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
                           : 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'
                       )}
                     >
-                      {message.role === 'user'
+                      {(message.role ?? '').toUpperCase() === 'USER'
                         ? language === 'zh-CN'
                           ? '用户'
                           : 'User'
@@ -273,23 +273,23 @@ export function MonitorMessagesTab(props: MonitorMessagesTabProps) {
                     <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">{message.content}</p>
                   </td>
                   <td className="px-4 py-3">
-                    {message.feedbackType ? (
+                    {(message.feedbackType ?? '').toLowerCase() ? (
                       <Badge
                         className={cn(
                           'border-0',
-                          message.feedbackType === 'like'
+                          (message.feedbackType ?? '').toLowerCase() === 'like'
                             ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
                             : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
                         )}
                       >
-                        {message.feedbackType === 'like' ? <ThumbsUp className="h-3 w-3 mr-1" /> : <ThumbsDown className="h-3 w-3 mr-1" />}
-                        {message.feedbackType === 'like' ? (language === 'zh-CN' ? '好评' : 'Like') : language === 'zh-CN' ? '差评' : 'Dislike'}
+                        {(message.feedbackType ?? '').toLowerCase() === 'like' ? <ThumbsUp className="h-3 w-3 mr-1" /> : <ThumbsDown className="h-3 w-3 mr-1" />}
+                        {(message.feedbackType ?? '').toLowerCase() === 'like' ? (language === 'zh-CN' ? '好评' : 'Like') : language === 'zh-CN' ? '差评' : 'Dislike'}
                       </Badge>
                     ) : (
                       <span className="text-sm text-gray-400 dark:text-gray-500">-</span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">{message.createdAt}</td>
+                  <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">{(message as { createdAt?: string }).createdAt ?? message.datetime ?? '-'}</td>
                   <td className="px-4 py-3 text-right">
                     <div className="flex items-center justify-end gap-2">
                       <Button variant="ghost" size="sm" onClick={() => onViewMessage(message)}>
@@ -298,7 +298,7 @@ export function MonitorMessagesTab(props: MonitorMessagesTabProps) {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => onDeleteMessage(message.id)}
+                        onClick={() => onDeleteMessage(message.id ?? message.messageId ?? '')}
                         className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
                       >
                         <Trash2 className="h-4 w-4" />

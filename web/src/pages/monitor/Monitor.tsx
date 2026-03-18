@@ -1,7 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useLanguage } from '@/components/LanguageProvider';
 import MonitorService from '@/services/Monitor';
+import SessionService from '@/services/Session';
+import MessageService from '@/services/Message';
 import type { ChartDataPointVo, ChatMonitorOverviewVo } from '@/services/MonitorTypes';
+import type { MessageVo } from '@/services/MessageTypes';
 import { MessageSquare, FileText, ThumbsUp, ThumbsDown, ChevronLeft, BarChart3, Search, Users, Bot } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -18,9 +21,9 @@ import {
   MonitorSessionsTab,
   MonitorMessagesTab,
   MonitorFeedbackTab,
-  type Session,
-  type Message,
-  type Feedback,
+  type MonitorSession,
+  type MonitorMessage,
+  type MonitorFeedback,
 } from './components';
 
 interface ThroughputStats {
@@ -50,23 +53,6 @@ interface OverviewStats {
   applications: DualStats;
   agents: DualStats;
   models: DualStats;
-}
-
-interface SessionMessage {
-  id: number;
-  messageId: string;
-  role: 'user' | 'assistant' | 'system';
-  content: string;
-  userId: number;
-  userName: string;
-  feedbackType?: 'like' | 'dislike';
-  feedbackComment?: string;
-  createdAt: string;
-  tokenUsage?: {
-    promptTokens: number;
-    completionTokens: number;
-    totalTokens: number;
-  };
 }
 
 /** 月份枚举到前端展示的映射（后端返回 JANUARY 等，国际化由前端处理） */
@@ -159,18 +145,18 @@ export function Monitor() {
   const [feedbackUserSearch, setFeedbackUserSearch] = useState('');
   
   // Session detail
-  const [selectedSession, setSelectedSession] = useState<Session | null>(null);
+  const [selectedSession, setSelectedSession] = useState<MonitorSession | null>(null);
   const [sessionMessageSearch, setSessionMessageSearch] = useState('');
   const [sessionMessagePage, setSessionMessagePage] = useState(1);
   
   // Message detail
-  const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
+  const [selectedMessage, setSelectedMessage] = useState<MonitorMessage | null>(null);
   
   // Delete confirmation
   const [showDeleteConfirmDialog, setShowDeleteConfirmDialog] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState<{ type: 'session' | 'message' | 'feedback'; id: number } | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ type: 'session' | 'message' | 'feedback'; id: string } | null>(null);
 
-  // Mock data - Applications
+  // Mock data - 过滤下拉选项（应用、智能体、模型、用户），过滤条件交互下一阶段实现
   const applications = [
     { id: 1, name: language === 'zh-CN' ? '智能客服助手' : 'Smart Customer Service' },
     { id: 2, name: language === 'zh-CN' ? '内容创作工具' : 'Content Creation Tool' },
@@ -199,200 +185,15 @@ export function Monitor() {
     { id: 3, name: 'Gemini-Pro' },
   ];
 
-  // Mock data - Sessions
-  const sessions: Session[] = [
-    {
-      id: 1,
-      sessionId: 'sess_abc123',
-      title: language === 'zh-CN' ? '产品咨询对话' : 'Product Inquiry',
-      appId: 1,
-      appName: applications[0]?.name ?? '',
-      agentId: 1,
-      agentName: agents[0]?.name ?? '',
-      modelId: 1,
-      modelName: models[0]?.name ?? '',
-      userId: 1,
-      userName: 'Alice Chen',
-      messageCount: 12,
-      isStarred: true,
-      isArchived: false,
-      isPinned: true,
-      createdAt: '2024-03-15 10:30:00',
-      updatedAt: '2024-03-15 11:45:00',
-    },
-    {
-      id: 2,
-      sessionId: 'sess_def456',
-      title: language === 'zh-CN' ? '技术支持会话' : 'Technical Support',
-      appId: 1,
-      appName: applications[0]?.name ?? '',
-      agentId: 2,
-      agentName: agents[1]?.name ?? '',
-      modelId: 2,
-      modelName: models[1]?.name ?? '',
-      userId: 2,
-      userName: 'Bob Wang',
-      messageCount: 8,
-      isStarred: false,
-      isArchived: false,
-      isPinned: false,
-      createdAt: '2024-03-15 09:15:00',
-      updatedAt: '2024-03-15 10:20:00',
-    },
-    {
-      id: 3,
-      sessionId: 'sess_ghi789',
-      title: language === 'zh-CN' ? '内容创作咨询' : 'Content Creation Inquiry',
-      appId: 2,
-      appName: applications[1]?.name ?? '',
-      agentId: 3,
-      agentName: agents[2]?.name ?? '',
-      modelId: 3,
-      modelName: models[2]?.name ?? '',
-      userId: 3,
-      userName: 'Charlie Liu',
-      messageCount: 15,
-      isStarred: true,
-      isArchived: false,
-      isPinned: false,
-      createdAt: '2024-03-14 16:20:00',
-      updatedAt: '2024-03-14 17:30:00',
-    },
-  ];
-
-  // Mock data - Session Messages (for session detail page)
-  const sessionMessages: SessionMessage[] = [
-    {
-      id: 1,
-      messageId: 'msg_001',
-      role: 'user',
-      content: language === 'zh-CN' ? '你好，我想了解一下你们的产品功能' : 'Hello, I want to learn about your product features',
-      userId: 1,
-      userName: 'Alice Chen',
-      createdAt: '2024-03-15 10:30:00',
-      tokenUsage: { promptTokens: 15, completionTokens: 0, totalTokens: 15 },
-    },
-    {
-      id: 2,
-      messageId: 'msg_002',
-      role: 'assistant',
-      content: language === 'zh-CN' ? '您好！我很高兴为您介绍我们的产品。我们的产品具有以下主要功能：\n1. 智能对话能力\n2. 多语言支持\n3. 知识库集成\n4. 数据分析功能\n\n您对哪个功能特别感兴趣呢？' : 'Hello! I\'m glad to introduce our product. Our product has the following main features:\n1. Intelligent conversation capabilities\n2. Multi-language support\n3. Knowledge base integration\n4. Data analysis functionality\n\nWhich feature are you particularly interested in?',
-      userId: 0,
-      userName: 'AI Assistant',
-      feedbackType: 'like',
-      createdAt: '2024-03-15 10:30:15',
-      tokenUsage: { promptTokens: 15, completionTokens: 120, totalTokens: 135 },
-    },
-    {
-      id: 3,
-      messageId: 'msg_003',
-      role: 'user',
-      content: language === 'zh-CN' ? '知识库集成这个功能很有意思，能详细说说吗？' : 'The knowledge base integration feature is interesting, can you tell me more?',
-      userId: 1,
-      userName: 'Alice Chen',
-      createdAt: '2024-03-15 10:32:00',
-      tokenUsage: { promptTokens: 25, completionTokens: 0, totalTokens: 25 },
-    },
-  ];
-
-  // Mock data - Messages
-  const messages: Message[] = [
-    {
-      id: 1,
-      messageId: 'msg_001',
-      sessionId: 'sess_abc123',
-      sessionTitle: language === 'zh-CN' ? '产品咨询对话' : 'Product Inquiry',
-      role: 'user',
-      content: language === 'zh-CN' ? '你好，我想了解一下你们的产品功能' : 'Hello, I want to learn about your product features',
-      userId: 1,
-      userName: 'Alice Chen',
-      appId: 1,
-      appName: applications[0]?.name ?? '',
-      agentId: 1,
-      agentName: agents[0]?.name ?? '',
-      modelId: 1,
-      modelName: models[0]?.name ?? '',
-      createdAt: '2024-03-15 10:30:00',
-      tokenUsage: { promptTokens: 15, completionTokens: 0, totalTokens: 15 },
-    },
-    {
-      id: 2,
-      messageId: 'msg_002',
-      sessionId: 'sess_abc123',
-      sessionTitle: language === 'zh-CN' ? '产品咨询对话' : 'Product Inquiry',
-      role: 'assistant',
-      content: language === 'zh-CN' ? '您好！我很高兴为您介绍我们的产品...' : 'Hello! I\'m glad to introduce our product...',
-      userId: 0,
-      userName: 'AI Assistant',
-      appId: 1,
-      appName: applications[0]?.name ?? '',
-      agentId: 1,
-      agentName: agents[0]?.name ?? '',
-      modelId: 1,
-      modelName: models[0]?.name ?? '',
-      feedbackType: 'like',
-      createdAt: '2024-03-15 10:30:15',
-      tokenUsage: { promptTokens: 15, completionTokens: 120, totalTokens: 135 },
-    },
-    {
-      id: 3,
-      messageId: 'msg_003',
-      sessionId: 'sess_def456',
-      sessionTitle: language === 'zh-CN' ? '技术支持会话' : 'Technical Support',
-      role: 'user',
-      content: language === 'zh-CN' ? '我遇到了一个技术问题需要帮助' : 'I encountered a technical issue and need help',
-      userId: 2,
-      userName: 'Bob Wang',
-      appId: 1,
-      appName: applications[0]?.name ?? '',
-      agentId: 2,
-      agentName: agents[1]?.name ?? '',
-      modelId: 2,
-      modelName: models[1]?.name ?? '',
-      createdAt: '2024-03-15 09:15:00',
-      tokenUsage: { promptTokens: 12, completionTokens: 0, totalTokens: 12 },
-    },
-  ];
-
-  // Mock data - Feedbacks
-  const feedbacks: Feedback[] = [
-    {
-      id: 1,
-      messageId: 'msg_002',
-      sessionId: 'sess_abc123',
-      sessionTitle: language === 'zh-CN' ? '产品咨询对话' : 'Product Inquiry',
-      feedbackType: 'like',
-      feedbackComment: language === 'zh-CN' ? '回答很详细，很有帮助' : 'Very detailed and helpful answer',
-      userId: 1,
-      userName: 'Alice Chen',
-      appId: 1,
-      appName: applications[0]?.name ?? '',
-      agentId: 1,
-      agentName: agents[0]?.name ?? '',
-      modelId: 1,
-      modelName: models[0]?.name ?? '',
-      messageContent: language === 'zh-CN' ? '您好！我很高兴为您介绍我们的产品...' : 'Hello! I\'m glad to introduce our product...',
-      createdAt: '2024-03-15 10:31:00',
-    },
-    {
-      id: 2,
-      messageId: 'msg_005',
-      sessionId: 'sess_def456',
-      sessionTitle: language === 'zh-CN' ? '技术支持会话' : 'Technical Support',
-      feedbackType: 'dislike',
-      feedbackComment: language === 'zh-CN' ? '回答不够准确' : 'Answer is not accurate enough',
-      userId: 2,
-      userName: 'Bob Wang',
-      appId: 1,
-      appName: applications[0]?.name ?? '',
-      agentId: 2,
-      agentName: agents[1]?.name ?? '',
-      modelId: 2,
-      modelName: models[1]?.name ?? '',
-      messageContent: language === 'zh-CN' ? '这个问题可能需要您提供更多信息...' : 'This issue may require more information...',
-      createdAt: '2024-03-15 09:45:00',
-    },
-  ];
+  // API 数据 - 会话、消息、反馈列表
+  const [sessions, setSessions] = useState<MonitorSession[]>([]);
+  const [sessionsListLoading, setSessionsListLoading] = useState(false);
+  const [messages, setMessages] = useState<MonitorMessage[]>([]);
+  const [messagesListLoading, setMessagesListLoading] = useState(false);
+  const [feedbacks, setFeedbacks] = useState<MonitorFeedback[]>([]);
+  const [feedbacksListLoading, setFeedbacksListLoading] = useState(false);
+  const [sessionMessages, setSessionMessages] = useState<MessageVo[]>([]);
+  const [sessionMessagesLoading, setSessionMessagesLoading] = useState(false);
 
   const [overviewStats, setOverviewStats] = useState<OverviewStats>(DEFAULT_OVERVIEW_STATS);
   const [overviewStatsLoading, setOverviewStatsLoading] = useState(true);
@@ -565,69 +366,175 @@ export function Monitor() {
     loadFeedbackChart();
   }, [loadFeedbackChart]);
 
+  const loadSessionsList = useCallback(async () => {
+    setSessionsListLoading(true);
+    try {
+      const res = await SessionService.getSessionList({ pageNo: 1, pageSize: 100 });
+      const list = (res as { data?: { list?: MonitorSession[] } })?.data?.list ?? [];
+      setSessions(list);
+    } catch {
+      setSessions([]);
+    } finally {
+      setSessionsListLoading(false);
+    }
+  }, []);
+
+  const mapMessageToMonitor = useCallback((m: MessageVo, sessionTitle?: string): MonitorMessage => ({
+    ...m,
+    messageId: m.id ?? '',
+    sessionTitle: sessionTitle ?? m.sessionId,
+    userName: '-',
+  }), []);
+
+  const loadMessagesList = useCallback(async () => {
+    setMessagesListLoading(true);
+    try {
+      const res = await MessageService.getMessageList({ pageNo: 1, pageSize: 100 });
+      const list = (res as { data?: { list?: MessageVo[] } })?.data?.list ?? [];
+      setMessages(list.map((m) => mapMessageToMonitor(m)));
+    } catch {
+      setMessages([]);
+    } finally {
+      setMessagesListLoading(false);
+    }
+  }, [mapMessageToMonitor]);
+
+  const loadFeedbacksList = useCallback(async () => {
+    setFeedbacksListLoading(true);
+    try {
+      const [likeRes, dislikeRes] = await Promise.all([
+        MessageService.getMessageList({ pageNo: 1, pageSize: 50, feedbackType: 'like' }),
+        MessageService.getMessageList({ pageNo: 1, pageSize: 50, feedbackType: 'dislike' }),
+      ]);
+      const likeList = (likeRes as { data?: { list?: MessageVo[] } })?.data?.list ?? [];
+      const dislikeList = (dislikeRes as { data?: { list?: MessageVo[] } })?.data?.list ?? [];
+      const sessionMap = new Map(sessions.map((s) => [s.sessionId ?? s.id ?? '', s.title ?? '']));
+      const toFeedback = (m: MessageVo): MonitorFeedback => ({
+        id: m.id ?? '',
+        messageId: m.id ?? '',
+        sessionId: m.sessionId,
+        sessionTitle: sessionMap.get(m.sessionId ?? '') ?? m.sessionId,
+        feedbackType: ((m.feedbackType ?? '').toLowerCase() === 'like' ? 'like' : 'dislike') as 'like' | 'dislike',
+        feedbackComment: m.feedbackComment,
+        appId: m.appId,
+        appName: m.appName,
+        agentId: m.agentId,
+        agentName: m.agentName,
+        modelId: m.modelId,
+        modelName: m.modelName,
+        messageContent: m.content,
+        createdAt: m.datetime,
+      });
+      setFeedbacks([...likeList.map(toFeedback), ...dislikeList.map(toFeedback)]);
+    } catch {
+      setFeedbacks([]);
+    } finally {
+      setFeedbacksListLoading(false);
+    }
+  }, [sessions]);
+
+  const loadSessionMessages = useCallback(async (sessionId: string) => {
+    setSessionMessagesLoading(true);
+    try {
+      const res = await MessageService.getMessageList({ sessionId, pageNo: 1, pageSize: 200 });
+      const list = (res as { data?: { list?: MessageVo[] } })?.data?.list ?? [];
+      setSessionMessages(list);
+    } catch {
+      setSessionMessages([]);
+    } finally {
+      setSessionMessagesLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadSessionsList();
+  }, [loadSessionsList]);
+
+  useEffect(() => {
+    loadMessagesList();
+  }, [loadMessagesList]);
+
+  useEffect(() => {
+    loadFeedbacksList();
+  }, [loadFeedbacksList]);
+
+  useEffect(() => {
+    if (selectedSession?.sessionId ?? selectedSession?.id) {
+      loadSessionMessages(selectedSession.sessionId ?? selectedSession.id ?? '');
+    } else {
+      setSessionMessages([]);
+    }
+  }, [selectedSession, loadSessionMessages]);
+
   // Filter functions
   const getFilteredSessions = () => {
-    return sessions.filter(session => {
+    return sessions.filter((session) => {
       if (sessionKeywordSearch) {
         const kw = sessionKeywordSearch.toLowerCase();
-        if (!session.title.toLowerCase().includes(kw) && !session.sessionId.toLowerCase().includes(kw)) return false;
+        if (!(session.title ?? '').toLowerCase().includes(kw) && !(session.sessionId ?? '').toLowerCase().includes(kw)) return false;
       }
-      if (sessionAppFilter !== 'all' && session.appId !== parseInt(sessionAppFilter)) return false;
-      if (sessionAgentFilter !== 'all' && session.agentId !== parseInt(sessionAgentFilter)) return false;
-      if (sessionModelFilter !== 'all' && session.modelId !== parseInt(sessionModelFilter)) return false;
-      if (sessionUserFilter !== 'all' && session.userId !== parseInt(sessionUserFilter)) return false;
+      if (sessionAppFilter !== 'all' && (session.appId ?? '') !== sessionAppFilter) return false;
+      if (sessionAgentFilter !== 'all' && (session.agentId ?? '') !== sessionAgentFilter) return false;
+      if (sessionModelFilter !== 'all' && (session.modelId ?? '') !== sessionModelFilter) return false;
+      if (sessionUserFilter !== 'all') return false;
       return true;
     });
   };
 
   const getFilteredMessages = () => {
-    return messages.filter(message => {
+    return messages.filter((message) => {
       if (messageKeywordSearch) {
         const kw = messageKeywordSearch.toLowerCase();
-        if (!message.content.toLowerCase().includes(kw) && !message.sessionTitle.toLowerCase().includes(kw) && !message.messageId.toLowerCase().includes(kw)) return false;
+        const content = (message.content ?? '').toLowerCase();
+        const sessionTitle = (message.sessionTitle ?? message.sessionId ?? '').toLowerCase();
+        const msgId = (message.messageId ?? message.id ?? '').toLowerCase();
+        if (!content.includes(kw) && !sessionTitle.includes(kw) && !msgId.includes(kw)) return false;
       }
-      if (messageAppFilter !== 'all' && message.appId !== parseInt(messageAppFilter)) return false;
-      if (messageAgentFilter !== 'all' && message.agentId !== parseInt(messageAgentFilter)) return false;
-      if (messageModelFilter !== 'all' && message.modelId !== parseInt(messageModelFilter)) return false;
-      if (messageSessionFilter !== 'all' && message.sessionId !== messageSessionFilter) return false;
-      if (messageUserFilter !== 'all' && message.userId !== parseInt(messageUserFilter)) return false;
+      if (messageAppFilter !== 'all' && (message.appId ?? '') !== messageAppFilter) return false;
+      if (messageAgentFilter !== 'all' && (message.agentId ?? '') !== messageAgentFilter) return false;
+      if (messageModelFilter !== 'all' && (message.modelId ?? '') !== messageModelFilter) return false;
+      if (messageSessionFilter !== 'all' && (message.sessionId ?? '') !== messageSessionFilter) return false;
+      if (messageUserFilter !== 'all') return false;
       return true;
     });
   };
 
   const getFilteredFeedbacks = () => {
-    return feedbacks.filter(feedback => {
+    return feedbacks.filter((feedback) => {
       if (feedbackKeywordSearch) {
         const kw = feedbackKeywordSearch.toLowerCase();
-        if (!feedback.feedbackComment?.toLowerCase().includes(kw) && !feedback.messageContent.toLowerCase().includes(kw) && !feedback.sessionTitle.toLowerCase().includes(kw)) return false;
+        const comment = (feedback.feedbackComment ?? '').toLowerCase();
+        const content = (feedback.messageContent ?? '').toLowerCase();
+        const title = (feedback.sessionTitle ?? '').toLowerCase();
+        if (!comment.includes(kw) && !content.includes(kw) && !title.includes(kw)) return false;
       }
-      if (feedbackAppFilter !== 'all' && feedback.appId !== parseInt(feedbackAppFilter)) return false;
-      if (feedbackAgentFilter !== 'all' && feedback.agentId !== parseInt(feedbackAgentFilter)) return false;
-      if (feedbackModelFilter !== 'all' && feedback.modelId !== parseInt(feedbackModelFilter)) return false;
-      if (feedbackSessionFilter !== 'all' && feedback.sessionId !== feedbackSessionFilter) return false;
-      if (feedbackUserFilter !== 'all' && feedback.userId !== parseInt(feedbackUserFilter)) return false;
+      if (feedbackAppFilter !== 'all' && (feedback.appId ?? '') !== feedbackAppFilter) return false;
+      if (feedbackAgentFilter !== 'all' && (feedback.agentId ?? '') !== feedbackAgentFilter) return false;
+      if (feedbackModelFilter !== 'all' && (feedback.modelId ?? '') !== feedbackModelFilter) return false;
+      if (feedbackSessionFilter !== 'all' && (feedback.sessionId ?? '') !== feedbackSessionFilter) return false;
+      if (feedbackUserFilter !== 'all') return false;
       return true;
     });
   };
 
   const getFilteredSessionMessages = () => {
-    return sessionMessages.filter(message => {
+    return sessionMessages.filter((message) => {
       if (sessionMessageSearch) {
-        return message.content.toLowerCase().includes(sessionMessageSearch.toLowerCase());
+        return (message.content ?? '').toLowerCase().includes(sessionMessageSearch.toLowerCase());
       }
       return true;
     });
   };
 
   // Handlers
-  const handleViewSessionDetail = (session: Session) => {
+  const handleViewSessionDetail = (session: MonitorSession) => {
     setSelectedSession(session);
     setCurrentView('session-detail');
     setSessionMessagePage(1);
     setSessionMessageSearch('');
   };
 
-  const handleViewMessageDetail = (message: Message) => {
+  const handleViewMessageDetail = (message: MonitorMessage) => {
     setSelectedMessage(message);
     setCurrentView('message-detail');
   };
@@ -638,28 +545,41 @@ export function Monitor() {
     setSelectedMessage(null);
   };
 
-  const handleDeleteSession = (id: number) => {
-    setDeleteTarget({ type: 'session', id });
+  const handleDeleteSession = (sessionId: string) => {
+    setDeleteTarget({ type: 'session', id: sessionId });
     setShowDeleteConfirmDialog(true);
   };
 
-  const handleDeleteMessage = (id: number) => {
-    setDeleteTarget({ type: 'message', id });
+  const handleDeleteMessage = (messageId: string) => {
+    setDeleteTarget({ type: 'message', id: messageId });
     setShowDeleteConfirmDialog(true);
   };
 
-  const handleDeleteFeedback = (id: number) => {
-    setDeleteTarget({ type: 'feedback', id });
+  const handleDeleteFeedback = (feedbackId: string) => {
+    setDeleteTarget({ type: 'feedback', id: feedbackId });
     setShowDeleteConfirmDialog(true);
   };
 
-  const confirmDelete = () => {
-    if (deleteTarget) {
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    try {
+      if (deleteTarget.type === 'session') {
+        await SessionService.deleteSession(deleteTarget.id);
+      }
       toast.success(
-        language === 'zh-CN' 
-          ? `${deleteTarget.type === 'session' ? '会话' : deleteTarget.type === 'message' ? '消息' : '反馈'}已删除` 
+        language === 'zh-CN'
+          ? `${deleteTarget.type === 'session' ? '会话' : deleteTarget.type === 'message' ? '消息' : '反馈'}已删除`
           : `${deleteTarget.type} deleted successfully`
       );
+      if (deleteTarget.type === 'session') {
+        setSessions((prev) => prev.filter((s) => (s.sessionId ?? s.id) !== deleteTarget.id));
+        if (selectedSession && (selectedSession.sessionId ?? selectedSession.id) === deleteTarget.id) {
+          handleBackToList();
+        }
+      }
+    } catch {
+      toast.error(language === 'zh-CN' ? '删除失败' : 'Delete failed');
+    } finally {
       setShowDeleteConfirmDialog(false);
       setDeleteTarget(null);
     }
@@ -737,7 +657,7 @@ export function Monitor() {
                 <Label className="text-xs text-gray-500 dark:text-gray-400">
                   {language === 'zh-CN' ? '用户' : 'User'}
                 </Label>
-                <p className="text-sm font-medium dark:text-white mt-1">{selectedSession.userName}</p>
+                <p className="text-sm font-medium dark:text-white mt-1">{(selectedSession as { userName?: string }).userName ?? '-'}</p>
               </div>
               <div>
                 <Label className="text-xs text-gray-500 dark:text-gray-400">
@@ -749,13 +669,13 @@ export function Monitor() {
                 <Label className="text-xs text-gray-500 dark:text-gray-400">
                   {language === 'zh-CN' ? '创建时间' : 'Created At'}
                 </Label>
-                <p className="text-sm font-medium dark:text-white mt-1">{selectedSession.createdAt}</p>
+                <p className="text-sm font-medium dark:text-white mt-1">{(selectedSession as { createdAt?: string; createdDate?: string }).createdAt ?? (selectedSession as { createdDate?: string }).createdDate ?? '-'}</p>
               </div>
               <div>
                 <Label className="text-xs text-gray-500 dark:text-gray-400">
                   {language === 'zh-CN' ? '更新时间' : 'Updated At'}
                 </Label>
-                <p className="text-sm font-medium dark:text-white mt-1">{selectedSession.updatedAt}</p>
+                <p className="text-sm font-medium dark:text-white mt-1">{(selectedSession as { updatedAt?: string; lastModifiedDate?: string }).updatedAt ?? (selectedSession as { lastModifiedDate?: string }).lastModifiedDate ?? '-'}</p>
               </div>
             </div>
           </div>
@@ -787,17 +707,17 @@ export function Monitor() {
             <div className="space-y-3">
               {paginatedMessages.map((message) => (
                 <div
-                  key={message.id}
+                  key={message.id ?? ''}
                   className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
                 >
                   <div className="flex items-start gap-3">
                     <div className={cn(
                       "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0",
-                      message.role === 'user' 
-                        ? "bg-blue-100 dark:bg-blue-900/30" 
+                      (message.role ?? '').toUpperCase() === 'USER'
+                        ? "bg-blue-100 dark:bg-blue-900/30"
                         : "bg-purple-100 dark:bg-purple-900/30"
                     )}>
-                      {message.role === 'user' ? (
+                      {(message.role ?? '').toUpperCase() === 'USER' ? (
                         <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                       ) : (
                         <Bot className="h-4 w-4 text-purple-600 dark:text-purple-400" />
@@ -806,24 +726,24 @@ export function Monitor() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-sm font-medium dark:text-white">
-                          {message.role === 'user' ? message.userName : 'AI Assistant'}
+                          {(message.role ?? '').toUpperCase() === 'USER' ? ((message as { userName?: string }).userName ?? '-') : 'AI Assistant'}
                         </span>
                         <Badge variant="secondary" className="text-xs font-mono">
-                          {message.messageId}
+                          {message.id ?? ''}
                         </Badge>
-                        {message.feedbackType && (
+                        {(message.feedbackType ?? '').toLowerCase() && (
                           <Badge className={cn(
                             "text-xs border-0",
-                            message.feedbackType === 'like'
+                            (message.feedbackType ?? '').toLowerCase() === 'like'
                               ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
                               : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
                           )}>
-                            {message.feedbackType === 'like' ? (
+                            {(message.feedbackType ?? '').toLowerCase() === 'like' ? (
                               <ThumbsUp className="h-3 w-3 mr-1" />
                             ) : (
                               <ThumbsDown className="h-3 w-3 mr-1" />
                             )}
-                            {message.feedbackType === 'like' 
+                            {(message.feedbackType ?? '').toLowerCase() === 'like' 
                               ? (language === 'zh-CN' ? '好评' : 'Like')
                               : (language === 'zh-CN' ? '差评' : 'Dislike')
                             }
@@ -834,11 +754,11 @@ export function Monitor() {
                         {message.content}
                       </p>
                       <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
-                        <span>{message.createdAt}</span>
-                        {message.tokenUsage && (
+                        <span>{message.datetime ?? (message as { createdAt?: string }).createdAt ?? '-'}</span>
+                        {message.usage && (
                           <span>
                             {language === 'zh-CN' ? 'Token: ' : 'Tokens: '}
-                            {message.tokenUsage.totalTokens}
+                            {message.usage.totalTokens ?? 0}
                           </span>
                         )}
                       </div>
@@ -916,11 +836,11 @@ export function Monitor() {
             <div className="flex items-start gap-4">
               <div className={cn(
                 "w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0",
-                selectedMessage.role === 'user' 
+                (selectedMessage.role ?? '').toUpperCase() === 'USER' 
                   ? "bg-blue-100 dark:bg-blue-900/30" 
                   : "bg-purple-100 dark:bg-purple-900/30"
               )}>
-                {selectedMessage.role === 'user' ? (
+                {(selectedMessage.role ?? '').toUpperCase() === 'USER' ? (
                   <Users className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                 ) : (
                   <Bot className="h-6 w-6 text-purple-600 dark:text-purple-400" />
@@ -929,20 +849,20 @@ export function Monitor() {
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
                   <h3 className="text-lg font-semibold dark:text-white">
-                    {selectedMessage.role === 'user' ? selectedMessage.userName : 'AI Assistant'}
+                    {(selectedMessage.role ?? '').toUpperCase() === 'USER' ? selectedMessage.userName : 'AI Assistant'}
                   </h3>
                   <Badge variant="secondary" className="font-mono">
-                    {selectedMessage.messageId}
+                    {selectedMessage.messageId ?? selectedMessage.id ?? ''}
                   </Badge>
                 </div>
                 <div className="flex items-center gap-2">
                   <Badge className={cn(
-                    selectedMessage.role === 'user'
+                    (selectedMessage.role ?? '').toUpperCase() === 'USER'
                       ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
                       : "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
                     "border-0"
                   )}>
-                    {selectedMessage.role === 'user' 
+                    {(selectedMessage.role ?? '').toUpperCase() === 'USER' 
                       ? (language === 'zh-CN' ? '用户消息' : 'User Message')
                       : (language === 'zh-CN' ? '助手回复' : 'Assistant Reply')
                     }
@@ -990,7 +910,7 @@ export function Monitor() {
                 <div className="mt-1">
                   <button
                     onClick={() => {
-                      const session = sessions.find(s => s.sessionId === selectedMessage.sessionId);
+                      const session = sessions.find((s) => (s.sessionId ?? s.id) === selectedMessage.sessionId);
                       if (session) handleViewSessionDetail(session);
                     }}
                     className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline"
@@ -1018,16 +938,16 @@ export function Monitor() {
                 <Label className="text-xs text-gray-500 dark:text-gray-400">
                   {language === 'zh-CN' ? '创建时间' : 'Created At'}
                 </Label>
-                <p className="text-sm font-medium dark:text-white mt-1">{selectedMessage.createdAt}</p>
+                <p className="text-sm font-medium dark:text-white mt-1">{selectedMessage.datetime ?? (selectedMessage as { createdAt?: string }).createdAt ?? '-'}</p>
               </div>
-              {selectedMessage.tokenUsage && (
+              {selectedMessage.usage && (
                 <>
                   <div>
                     <Label className="text-xs text-gray-500 dark:text-gray-400">
                       {language === 'zh-CN' ? '输入Token' : 'Prompt Tokens'}
                     </Label>
                     <p className="text-sm font-medium dark:text-white mt-1">
-                      {selectedMessage.tokenUsage.promptTokens}
+                      {selectedMessage.usage?.promptTokens ?? 0}
                     </p>
                   </div>
                   <div>
@@ -1035,7 +955,7 @@ export function Monitor() {
                       {language === 'zh-CN' ? '输出Token' : 'Completion Tokens'}
                     </Label>
                     <p className="text-sm font-medium dark:text-white mt-1">
-                      {selectedMessage.tokenUsage.completionTokens}
+                      {selectedMessage.usage?.completionTokens ?? 0}
                     </p>
                   </div>
                   <div>
@@ -1043,7 +963,7 @@ export function Monitor() {
                       {language === 'zh-CN' ? '总Token' : 'Total Tokens'}
                     </Label>
                     <p className="text-sm font-medium dark:text-white mt-1">
-                      {selectedMessage.tokenUsage.totalTokens}
+                      {selectedMessage.usage?.totalTokens ?? 0}
                     </p>
                   </div>
                 </>

@@ -1,66 +1,42 @@
-/** 监控页面组件共享类型 */
+/**
+ * 监控页面组件共享类型
+ * 优先使用 API 类型，此处仅补充 UI 展示需要的适配类型
+ */
 
-export interface Session {
-  id: number;
-  sessionId: string;
-  title: string;
-  appId: number;
-  appName: string;
-  agentId: number;
-  agentName: string;
-  modelId?: number;
-  modelName?: string;
-  userId: number;
-  userName: string;
-  messageCount: number;
-  isStarred: boolean;
-  isArchived: boolean;
-  isPinned: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
+import type { SessionListVo } from '@/services/SessionTypes';
+import type { MessageVo } from '@/services/MessageTypes';
 
-export interface Message {
-  id: number;
+/** 会话展示：基于 SessionListVo */
+export type MonitorSession = SessionListVo;
+
+/** 消息展示：基于 MessageVo，补充展示用字段 */
+export type MonitorMessage = MessageVo & {
+  messageId?: string;
+  sessionTitle?: string;
+  userName?: string;
+};
+
+/** 反馈展示：从 MessageVo（有 feedbackType）映射，用于反馈管理 Tab */
+export interface MonitorFeedback {
+  id: string;
   messageId: string;
-  sessionId: string;
-  sessionTitle: string;
-  role: 'user' | 'assistant' | 'system';
-  content: string;
-  userId: number;
-  userName: string;
-  appId: number;
-  appName: string;
-  agentId: number;
-  agentName: string;
-  modelId?: number;
-  modelName?: string;
-  feedbackType?: 'like' | 'dislike';
-  feedbackComment?: string;
-  createdAt: string;
-  tokenUsage?: { promptTokens: number; completionTokens: number; totalTokens: number };
-}
-
-export interface Feedback {
-  id: number;
-  messageId: string;
-  sessionId: string;
-  sessionTitle: string;
+  sessionId?: string;
+  sessionTitle?: string;
   feedbackType: 'like' | 'dislike';
   feedbackComment?: string;
-  userId: number;
-  userName: string;
-  appId: number;
-  appName: string;
-  agentId: number;
-  agentName: string;
-  modelId?: number;
+  userName?: string;
+  appId?: string;
+  appName?: string;
+  agentId?: string;
+  agentName?: string;
+  modelId?: string;
   modelName?: string;
-  messageContent: string;
-  createdAt: string;
+  messageContent?: string;
+  createdAt?: string;
 }
 
+/** 下拉选项（应用、智能体、模型、用户等） */
 export interface SelectOption {
-  id: number;
+  id: string | number;
   name: string;
 }

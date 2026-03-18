@@ -1,5 +1,5 @@
 import { useLanguage } from '@/components/LanguageProvider';
-import type { Session, SelectOption } from './MonitorTypes';
+import type { MonitorSession, SelectOption } from './MonitorTypes';
 import type { ChartDataPointVo } from '@/services/MonitorTypes';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -42,9 +42,9 @@ export interface MonitorSessionsTabProps {
   agents: SelectOption[];
   models: SelectOption[];
   users: SelectOption[];
-  sessions: Session[];
-  onViewSession: (session: Session) => void;
-  onDeleteSession: (id: number) => void;
+  sessions: MonitorSession[];
+  onViewSession: (session: MonitorSession) => void;
+  onDeleteSession: (sessionId: string) => void;
 }
 
 export function MonitorSessionsTab({
@@ -85,6 +85,11 @@ export function MonitorSessionsTab({
   onDeleteSession,
 }: MonitorSessionsTabProps) {
   const { language } = useLanguage();
+
+  const formatSessionDate = (s: MonitorSession) => {
+    const d = (s as { createdAt?: string; createdDate?: string }).createdAt ?? (s as { createdDate?: string }).createdDate;
+    return d ? (typeof d === 'string' ? d : new Date(d).toLocaleString()) : '-';
+  };
 
   return (
     <div className="space-y-4">
@@ -221,7 +226,7 @@ export function MonitorSessionsTab({
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
               {sessions.map((session) => (
-                <tr key={session.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                <tr key={session.sessionId ?? session.id ?? ''} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                   <td className="px-4 py-3">
                     <button onClick={() => onViewSession(session)} className="text-left">
                       <div className="flex items-center gap-2">
@@ -239,13 +244,13 @@ export function MonitorSessionsTab({
                       </div>
                     </button>
                   </td>
-                  <td className="px-4 py-3 text-sm dark:text-gray-300">{session.appName}</td>
-                  <td className="px-4 py-3 text-sm dark:text-gray-300">{session.userName}</td>
-                  <td className="px-4 py-3 text-sm dark:text-gray-300">{session.agentName}</td>
+                  <td className="px-4 py-3 text-sm dark:text-gray-300">{session.appName ?? '-'}</td>
+                  <td className="px-4 py-3 text-sm dark:text-gray-300">-</td>
+                  <td className="px-4 py-3 text-sm dark:text-gray-300">{session.agentName ?? '-'}</td>
                   <td className="px-4 py-3">
                     <Badge variant="secondary">{session.messageCount}</Badge>
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">{session.createdAt}</td>
+                  <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">{formatSessionDate(session)}</td>
                   <td className="px-4 py-3 text-right">
                     <div className="flex items-center justify-end gap-2">
                       <Button variant="ghost" size="sm" onClick={() => onViewSession(session)}>
@@ -254,7 +259,7 @@ export function MonitorSessionsTab({
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => onDeleteSession(session.id)}
+                        onClick={() => onDeleteSession(session.sessionId ?? session.id ?? '')}
                         className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
                       >
                         <Trash2 className="h-4 w-4" />

@@ -1,5 +1,5 @@
 import { useLanguage } from '@/components/LanguageProvider';
-import type { Feedback, Message, Session, SelectOption } from './MonitorTypes';
+import type { MonitorFeedback, MonitorMessage, MonitorSession, SelectOption } from './MonitorTypes';
 import type { ChartDataPointVo } from '@/services/MonitorTypes';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -46,13 +46,13 @@ export interface MonitorFeedbackTabProps {
   applications: SelectOption[];
   agents: SelectOption[];
   models: SelectOption[];
-  sessions: Session[];
+  sessions: MonitorSession[];
   users: SelectOption[];
-  feedbacks: Feedback[];
-  messages: Message[];
-  onViewSession: (session: Session) => void;
-  onViewMessage: (message: Message) => void;
-  onDeleteFeedback: (id: number) => void;
+  feedbacks: MonitorFeedback[];
+  messages: MonitorMessage[];
+  onViewSession: (session: MonitorSession) => void;
+  onViewMessage: (message: MonitorMessage) => void;
+  onDeleteFeedback: (feedbackId: string) => void;
 }
 
 export function MonitorFeedbackTab(props: MonitorFeedbackTabProps) {
@@ -179,8 +179,8 @@ export function MonitorFeedbackTab(props: MonitorFeedbackTabProps) {
                 <Input placeholder={language === 'zh-CN' ? '搜索...' : 'Search...'} value={sessionSearch} onChange={(e) => onSessionSearchChange(e.target.value)} className="mb-2 dark:bg-gray-900 dark:border-gray-700" />
               </div>
               <SelectItem value="all">{language === 'zh-CN' ? '全部会话' : 'All Sessions'}</SelectItem>
-              {sessions.filter((s) => s.title.toLowerCase().includes(sessionSearch.toLowerCase()) || s.sessionId.toLowerCase().includes(sessionSearch.toLowerCase())).map((s) => (
-                <SelectItem key={s.sessionId} value={s.sessionId}>{s.title}</SelectItem>
+              {sessions.filter((s) => (s.title ?? '').toLowerCase().includes(sessionSearch.toLowerCase()) || (s.sessionId ?? '').toLowerCase().includes(sessionSearch.toLowerCase())).map((s) => (
+                <SelectItem key={s.sessionId ?? s.id ?? ''} value={s.sessionId ?? s.id ?? ''}>{s.title ?? '-'}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -235,7 +235,7 @@ export function MonitorFeedbackTab(props: MonitorFeedbackTabProps) {
                   <td className="px-4 py-3">
                     <button
                       onClick={() => {
-                        const message = messages.find((m) => m.messageId === feedback.messageId);
+                        const message = messages.find((m) => (m.messageId ?? m.id) === feedback.messageId);
                         if (message) onViewMessage(message);
                       }}
                       className="text-xs font-mono bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors"
@@ -246,7 +246,7 @@ export function MonitorFeedbackTab(props: MonitorFeedbackTabProps) {
                   <td className="px-4 py-3">
                     <button
                       onClick={() => {
-                        const session = sessions.find((s) => s.sessionId === feedback.sessionId);
+                        const session = sessions.find((s) => (s.sessionId ?? s.id) === feedback.sessionId);
                         if (session) onViewSession(session);
                       }}
                       className="text-left"
@@ -272,7 +272,7 @@ export function MonitorFeedbackTab(props: MonitorFeedbackTabProps) {
                       {feedback.feedbackType === 'like' ? (language === 'zh-CN' ? '好评' : 'Like') : language === 'zh-CN' ? '差评' : 'Dislike'}
                     </Badge>
                   </td>
-                  <td className="px-4 py-3 text-sm dark:text-gray-300">{feedback.userName}</td>
+                  <td className="px-4 py-3 text-sm dark:text-gray-300">{feedback.userName ?? '-'}</td>
                   <td className="px-4 py-3 max-w-md">
                     <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
                       {feedback.feedbackComment || '-'}
