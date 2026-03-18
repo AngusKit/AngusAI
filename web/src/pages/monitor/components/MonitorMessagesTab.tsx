@@ -1,11 +1,13 @@
+import { useMemo } from 'react';
 import { useLanguage } from '@/components/LanguageProvider';
-import type { MonitorMessage, MonitorSession, SelectOption } from './MonitorTypes';
+import type { MonitorMessage, MonitorSession } from './MonitorTypes';
 import type { ChartDataPointVo } from '@/services/MonitorTypes';
+import type { LazySelectFetcher } from './MonitorLazySelect';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { MonitorLazySelect } from './MonitorLazySelect';
 import { MonitorLineChart } from './MonitorLineChart';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { Eye, Trash2, ThumbsUp, ThumbsDown } from 'lucide-react';
@@ -24,6 +26,8 @@ export interface MonitorMessagesTabProps {
   chartLoading?: boolean;
   keywordSearch: string;
   onKeywordSearchChange: (v: string) => void;
+  /** 按 Enter 立即搜索 */
+  onKeywordSubmit?: () => void;
   appFilter: string;
   agentFilter: string;
   modelFilter: string;
@@ -34,21 +38,11 @@ export interface MonitorMessagesTabProps {
   onModelFilterChange: (v: string) => void;
   onSessionFilterChange: (v: string) => void;
   onUserFilterChange: (v: string) => void;
-  appSearch: string;
-  agentSearch: string;
-  modelSearch: string;
-  sessionSearch: string;
-  userSearch: string;
-  onAppSearchChange: (v: string) => void;
-  onAgentSearchChange: (v: string) => void;
-  onModelSearchChange: (v: string) => void;
-  onSessionSearchChange: (v: string) => void;
-  onUserSearchChange: (v: string) => void;
-  applications: SelectOption[];
-  agents: SelectOption[];
-  models: SelectOption[];
-  sessions: MonitorSession[];
-  users: SelectOption[];
+  appFetcher: LazySelectFetcher;
+  agentFetcher: LazySelectFetcher;
+  modelFetcher: LazySelectFetcher;
+  sessionFetcher: LazySelectFetcher;
+  userFetcher: LazySelectFetcher;
   messages: MonitorMessage[];
   messagesLoading?: boolean;
   pagination?: { page: number; total: number; pageSize: number; onPageChange: (page: number) => void };
@@ -71,6 +65,7 @@ export function MonitorMessagesTab(props: MonitorMessagesTabProps) {
     chartLoading,
     keywordSearch,
     onKeywordSearchChange,
+    onKeywordSubmit,
     appFilter,
     agentFilter,
     modelFilter,
@@ -81,21 +76,11 @@ export function MonitorMessagesTab(props: MonitorMessagesTabProps) {
     onModelFilterChange,
     onSessionFilterChange,
     onUserFilterChange,
-    appSearch,
-    agentSearch,
-    modelSearch,
-    sessionSearch,
-    userSearch,
-    onAppSearchChange,
-    onAgentSearchChange,
-    onModelSearchChange,
-    onSessionSearchChange,
-    onUserSearchChange,
-    applications,
-    agents,
-    models,
-    sessions,
-    users,
+    appFetcher,
+    agentFetcher,
+    modelFetcher,
+    sessionFetcher,
+    userFetcher,
     messages,
     messagesLoading,
     pagination,
@@ -104,6 +89,23 @@ export function MonitorMessagesTab(props: MonitorMessagesTabProps) {
     onDeleteMessage,
   } = props;
   const { language } = useLanguage();
+
+  // 从消息列表推导会话列表，用于表格中的「查看会话」链接
+  const sessionsFromMessages = useMemo(() => {
+    const map = new Map<string, MonitorSession>();
+    messages.forEach((m) => {
+      const sid = m.sessionId ?? '';
+      if (sid && !map.has(sid)) {
+        map.set(sid, {
+          sessionId: sid,
+          id: sid,
+          title: m.sessionName ?? m.sessionId ?? '-',
+          sessionName: m.sessionName ?? m.sessionId,
+        } as MonitorSession);
+      }
+    });
+    return Array.from(map.values());
+  }, [messages]);
 
   return (
     <div className="space-y-4">
@@ -128,79 +130,50 @@ export function MonitorMessagesTab(props: MonitorMessagesTabProps) {
           placeholder={language === 'zh-CN' ? '关键字搜索...' : 'Keyword search...'}
           value={keywordSearch}
           onChange={(e) => onKeywordSearchChange(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && onKeywordSubmit?.()}
           className="w-[300px] dark:bg-gray-900 dark:border-gray-700"
         />
         <div className="flex-1 flex items-center justify-end gap-3">
-          <Select value={appFilter} onValueChange={onAppFilterChange}>
-            <SelectTrigger className="w-40 dark:bg-gray-900 dark:border-gray-700">
-              <SelectValue placeholder={language === 'zh-CN' ? '全部应用' : 'All Apps'} />
-            </SelectTrigger>
-            <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-              <div className="p-2">
-                <Input placeholder={language === 'zh-CN' ? '搜索...' : 'Search...'} value={appSearch} onChange={(e) => onAppSearchChange(e.target.value)} className="mb-2 dark:bg-gray-900 dark:border-gray-700" />
-              </div>
-              <SelectItem value="all">{language === 'zh-CN' ? '全部应用' : 'All Applications'}</SelectItem>
-              {applications.filter((a) => a.name.toLowerCase().includes(appSearch.toLowerCase())).map((a) => (
-                <SelectItem key={a.id} value={a.id.toString()}>{a.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={agentFilter} onValueChange={onAgentFilterChange}>
-            <SelectTrigger className="w-40 dark:bg-gray-900 dark:border-gray-700">
-              <SelectValue placeholder={language === 'zh-CN' ? '全部智能体' : 'All Agents'} />
-            </SelectTrigger>
-            <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-              <div className="p-2">
-                <Input placeholder={language === 'zh-CN' ? '搜索...' : 'Search...'} value={agentSearch} onChange={(e) => onAgentSearchChange(e.target.value)} className="mb-2 dark:bg-gray-900 dark:border-gray-700" />
-              </div>
-              <SelectItem value="all">{language === 'zh-CN' ? '全部智能体' : 'All Agents'}</SelectItem>
-              {agents.filter((a) => a.name.toLowerCase().includes(agentSearch.toLowerCase())).map((a) => (
-                <SelectItem key={a.id} value={a.id.toString()}>{a.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={modelFilter} onValueChange={onModelFilterChange}>
-            <SelectTrigger className="w-40 dark:bg-gray-900 dark:border-gray-700">
-              <SelectValue placeholder={language === 'zh-CN' ? '全部模型' : 'All Models'} />
-            </SelectTrigger>
-            <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-              <div className="p-2">
-                <Input placeholder={language === 'zh-CN' ? '搜索...' : 'Search...'} value={modelSearch} onChange={(e) => onModelSearchChange(e.target.value)} className="mb-2 dark:bg-gray-900 dark:border-gray-700" />
-              </div>
-              <SelectItem value="all">{language === 'zh-CN' ? '全部模型' : 'All Models'}</SelectItem>
-              {models.filter((m) => m.name.toLowerCase().includes(modelSearch.toLowerCase())).map((m) => (
-                <SelectItem key={m.id} value={m.id.toString()}>{m.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={sessionFilter} onValueChange={onSessionFilterChange}>
-            <SelectTrigger className="w-40 dark:bg-gray-900 dark:border-gray-700">
-              <SelectValue placeholder={language === 'zh-CN' ? '全部会话' : 'All Sessions'} />
-            </SelectTrigger>
-            <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-              <div className="p-2">
-                <Input placeholder={language === 'zh-CN' ? '搜索...' : 'Search...'} value={sessionSearch} onChange={(e) => onSessionSearchChange(e.target.value)} className="mb-2 dark:bg-gray-900 dark:border-gray-700" />
-              </div>
-              <SelectItem value="all">{language === 'zh-CN' ? '全部会话' : 'All Sessions'}</SelectItem>
-              {sessions.filter((s) => (s.title ?? '').toLowerCase().includes(sessionSearch.toLowerCase()) || (s.sessionId ?? '').toLowerCase().includes(sessionSearch.toLowerCase())).map((s) => (
-                <SelectItem key={s.sessionId ?? s.id ?? ''} value={s.sessionId ?? s.id ?? ''}>{s.title ?? '-'}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={userFilter} onValueChange={onUserFilterChange}>
-            <SelectTrigger className="w-40 dark:bg-gray-900 dark:border-gray-700">
-              <SelectValue placeholder={language === 'zh-CN' ? '全部用户' : 'All Users'} />
-            </SelectTrigger>
-            <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-              <div className="p-2">
-                <Input placeholder={language === 'zh-CN' ? '搜索...' : 'Search...'} value={userSearch} onChange={(e) => onUserSearchChange(e.target.value)} className="mb-2 dark:bg-gray-900 dark:border-gray-700" />
-              </div>
-              <SelectItem value="all">{language === 'zh-CN' ? '全部用户' : 'All Users'}</SelectItem>
-              {users.filter((u) => u.name.toLowerCase().includes(userSearch.toLowerCase())).map((u) => (
-                <SelectItem key={u.id} value={u.id.toString()}>{u.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <MonitorLazySelect
+            value={appFilter}
+            onValueChange={onAppFilterChange}
+            fetcher={appFetcher}
+            placeholder={language === 'zh-CN' ? '全部应用' : 'All Apps'}
+            allOptionLabel={language === 'zh-CN' ? '全部应用' : 'All Applications'}
+            className="w-40 dark:bg-gray-900 dark:border-gray-700"
+          />
+          <MonitorLazySelect
+            value={agentFilter}
+            onValueChange={onAgentFilterChange}
+            fetcher={agentFetcher}
+            placeholder={language === 'zh-CN' ? '全部智能体' : 'All Agents'}
+            allOptionLabel={language === 'zh-CN' ? '全部智能体' : 'All Agents'}
+            className="w-40 dark:bg-gray-900 dark:border-gray-700"
+          />
+          <MonitorLazySelect
+            value={modelFilter}
+            onValueChange={onModelFilterChange}
+            fetcher={modelFetcher}
+            placeholder={language === 'zh-CN' ? '全部模型' : 'All Models'}
+            allOptionLabel={language === 'zh-CN' ? '全部模型' : 'All Models'}
+            className="w-40 dark:bg-gray-900 dark:border-gray-700"
+          />
+          <MonitorLazySelect
+            value={sessionFilter}
+            onValueChange={onSessionFilterChange}
+            fetcher={sessionFetcher}
+            placeholder={language === 'zh-CN' ? '全部会话' : 'All Sessions'}
+            allOptionLabel={language === 'zh-CN' ? '全部会话' : 'All Sessions'}
+            className="w-40 dark:bg-gray-900 dark:border-gray-700"
+          />
+          <MonitorLazySelect
+            value={userFilter}
+            onValueChange={onUserFilterChange}
+            fetcher={userFetcher}
+            placeholder={language === 'zh-CN' ? '全部用户' : 'All Users'}
+            allOptionLabel={language === 'zh-CN' ? '全部用户' : 'All Users'}
+            className="w-40 dark:bg-gray-900 dark:border-gray-700"
+          />
         </div>
       </div>
 
@@ -249,7 +222,7 @@ export function MonitorMessagesTab(props: MonitorMessagesTabProps) {
                   <td className="px-4 py-3">
                     <button
                       onClick={() => {
-                        const session = sessions.find((s) => (s.sessionId ?? s.id) === message.sessionId);
+                        const session = sessionsFromMessages.find((s) => (s.sessionId ?? s.id) === message.sessionId);
                         if (session) onViewSession(session);
                       }}
                       className="text-left"

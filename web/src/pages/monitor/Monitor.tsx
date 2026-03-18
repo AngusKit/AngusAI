@@ -4,8 +4,12 @@ import { useLanguage } from '@/components/LanguageProvider';
 import MonitorService from '@/services/Monitor';
 import SessionService from '@/services/Session';
 import MessageService from '@/services/Message';
+import Applications from '@/services/Applications';
+import Agents from '@/services/Agents';
+import Models from '@/services/Models';
+import Member from '@/services/Member';
 import type { ChartDataPointVo, ChatMonitorOverviewVo } from '@/services/MonitorTypes';
-import type { MessageVo } from '@/services/MessageTypes';
+import type { MessageVo, MessageFindDto } from '@/services/MessageTypes';
 import { MessageSquare, FileText, ThumbsUp, ThumbsDown, ChevronLeft, BarChart3, Search, Users, Bot } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -25,6 +29,7 @@ import {
   type MonitorSession,
   type MonitorMessage,
   type MonitorFeedback,
+  type LazySelectFetcher,
 } from './components';
 
 interface ThroughputStats {
@@ -114,10 +119,6 @@ export function Monitor() {
   const [sessionAgentFilter, setSessionAgentFilter] = useState('all');
   const [sessionModelFilter, setSessionModelFilter] = useState('all');
   const [sessionUserFilter, setSessionUserFilter] = useState('all');
-  const [sessionAppSearch, setSessionAppSearch] = useState('');
-  const [sessionAgentSearch, setSessionAgentSearch] = useState('');
-  const [sessionModelSearch, setSessionModelSearch] = useState('');
-  const [sessionUserSearch, setSessionUserSearch] = useState('');
   
   // Message filters: keyword search + 全部应用、全部智能体、全部模型、全部会话、全部用户
   const [messageKeywordSearch, setMessageKeywordSearch] = useState('');
@@ -126,11 +127,6 @@ export function Monitor() {
   const [messageModelFilter, setMessageModelFilter] = useState('all');
   const [messageSessionFilter, setMessageSessionFilter] = useState('all');
   const [messageUserFilter, setMessageUserFilter] = useState('all');
-  const [messageAppSearch, setMessageAppSearch] = useState('');
-  const [messageAgentSearch, setMessageAgentSearch] = useState('');
-  const [messageModelSearch, setMessageModelSearch] = useState('');
-  const [messageSessionSearch, setMessageSessionSearch] = useState('');
-  const [messageUserSearch, setMessageUserSearch] = useState('');
   
   // Feedback filters: keyword search + 全部应用、全部智能体、全部模型、全部会话、全部用户
   const [feedbackKeywordSearch, setFeedbackKeywordSearch] = useState('');
@@ -139,11 +135,6 @@ export function Monitor() {
   const [feedbackModelFilter, setFeedbackModelFilter] = useState('all');
   const [feedbackSessionFilter, setFeedbackSessionFilter] = useState('all');
   const [feedbackUserFilter, setFeedbackUserFilter] = useState('all');
-  const [feedbackAppSearch, setFeedbackAppSearch] = useState('');
-  const [feedbackAgentSearch, setFeedbackAgentSearch] = useState('');
-  const [feedbackModelSearch, setFeedbackModelSearch] = useState('');
-  const [feedbackSessionSearch, setFeedbackSessionSearch] = useState('');
-  const [feedbackUserSearch, setFeedbackUserSearch] = useState('');
   
   // Session detail
   const [selectedSession, setSelectedSession] = useState<MonitorSession | null>(null);
@@ -157,34 +148,8 @@ export function Monitor() {
   const [showDeleteConfirmDialog, setShowDeleteConfirmDialog] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<{ type: 'session' | 'message' | 'feedback'; id: string } | null>(null);
 
-  // Mock data - 过滤下拉选项（应用、智能体、模型、用户），过滤条件交互下一阶段实现
-  const applications = [
-    { id: 1, name: language === 'zh-CN' ? '智能客服助手' : 'Smart Customer Service' },
-    { id: 2, name: language === 'zh-CN' ? '内容创作工具' : 'Content Creation Tool' },
-    { id: 3, name: language === 'zh-CN' ? '数据分析助手' : 'Data Analysis Assistant' },
-  ];
-
-  // Mock data - Users
-  const users = [
-    { id: 1, name: 'Alice Chen' },
-    { id: 2, name: 'Bob Wang' },
-    { id: 3, name: 'Charlie Liu' },
-    { id: 4, name: 'David Zhang' },
-  ];
-
-  // Mock data - Agents
-  const agents = [
-    { id: 1, name: language === 'zh-CN' ? 'GPT-4 助手' : 'GPT-4 Assistant' },
-    { id: 2, name: language === 'zh-CN' ? 'Claude 助手' : 'Claude Assistant' },
-    { id: 3, name: language === 'zh-CN' ? '自定义助手' : 'Custom Assistant' },
-  ];
-
-  // Mock data - Models
-  const models = [
-    { id: 1, name: 'GPT-4o' },
-    { id: 2, name: 'Claude-3' },
-    { id: 3, name: 'Gemini-Pro' },
-  ];
+  // 关键字防抖：输入停止后 400ms 才触发搜索
+  const [messageKeywordApplied, setMessageKeywordApplied] = useState('');
 
   // API 数据 - 会话、消息、反馈列表
   const [sessions, setSessions] = useState<MonitorSession[]>([]);
@@ -368,7 +333,12 @@ export function Monitor() {
   const loadSessionsList = useCallback(async (pageNo = 1) => {
     setSessionsListLoading(true);
     try {
-      const res = await SessionService.getSessionList({ pageNo, pageSize: PAGE_SIZE });
+      const query: Record<string, unknown> = { pageNo, pageSize: PAGE_SIZE };
+      if (sessionKeywordSearch.trim()) query.title = sessionKeywordSearch.trim();
+      if (sessionAppFilter !== 'all') query.appId = sessionAppFilter;
+      if (sessionAgentFilter !== 'all') query.agentId = sessionAgentFilter;
+      if (sessionModelFilter !== 'all') query.modelId = sessionModelFilter;
+      const res = await SessionService.getSessionList(query as Parameters<typeof SessionService.getSessionList>[0]);
       const data = (res as { data?: { list?: MonitorSession[]; total?: number } })?.data;
       const list = data?.list ?? [];
       setSessions(list);
@@ -379,7 +349,7 @@ export function Monitor() {
     } finally {
       setSessionsListLoading(false);
     }
-  }, []);
+  }, [sessionKeywordSearch, sessionAppFilter, sessionAgentFilter, sessionModelFilter]);
 
   const mapMessageToMonitor = useCallback((m: MessageVo, sessionTitle?: string): MonitorMessage => ({
     ...m,
@@ -391,7 +361,14 @@ export function Monitor() {
   const loadMessagesList = useCallback(async (pageNo = 1) => {
     setMessagesListLoading(true);
     try {
-      const res = await MessageService.getMessageList({ pageNo, pageSize: PAGE_SIZE });
+      const query: MessageFindDto = { pageNo, pageSize: PAGE_SIZE };
+      if (messageKeywordApplied.trim()) query.keyword = messageKeywordApplied.trim();
+      if (messageAppFilter !== 'all') query.appId = messageAppFilter;
+      if (messageAgentFilter !== 'all') query.agentId = messageAgentFilter;
+      if (messageModelFilter !== 'all') query.modelId = messageModelFilter;
+      if (messageSessionFilter !== 'all') query.sessionId = messageSessionFilter;
+      if (messageUserFilter !== 'all') query.createdBy = Number(messageUserFilter);
+      const res = await MessageService.getMessageList(query);
       const data = (res as { data?: { list?: MessageVo[]; total?: number } })?.data;
       const list = data?.list ?? [];
       setMessages(list.map((m) => mapMessageToMonitor(m)));
@@ -402,24 +379,86 @@ export function Monitor() {
     } finally {
       setMessagesListLoading(false);
     }
-  }, [mapMessageToMonitor]);
+  }, [
+    mapMessageToMonitor,
+    messageKeywordApplied,
+    messageAppFilter,
+    messageAgentFilter,
+    messageModelFilter,
+    messageSessionFilter,
+    messageUserFilter,
+  ]);
+
+  // 关键字防抖：输入停止 400ms 后触发搜索，并重置到第一页
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setMessageKeywordApplied(messageKeywordSearch);
+      setMessagesPage(1);
+    }, 400);
+    return () => clearTimeout(t);
+  }, [messageKeywordSearch]);
+
+  // 消息 Tab 下拉懒加载 fetchers（每页 10 条，后端搜索）
+  const messageAppFetcher = useCallback<LazySelectFetcher>(async ({ pageNo, pageSize, keyword }) => {
+    const res = await Applications.getApplicationList({ pageNo, pageSize, keyword } as Record<string, unknown>);
+    const data = (res as { data?: Array<{ id?: string | number; name?: string }> | { list?: Array<{ id?: string | number; name?: string }>; total?: number } })?.data;
+    const list = Array.isArray(data) ? data : (data as { list?: Array<{ id?: string | number; name?: string }> })?.list ?? [];
+    const total = Array.isArray(data) ? data.length : (data as { total?: number })?.total ?? list.length;
+    return { list: list.map((a) => ({ id: String(a.id ?? ''), name: a.name ?? '-' })), total };
+  }, []);
+  const messageAgentFetcher = useCallback<LazySelectFetcher>(async ({ pageNo, pageSize, keyword }) => {
+    const res = await Agents.getAgentList({ pageNo, pageSize, keyword });
+    const data = (res as { data?: { list?: Array<{ id?: string | number; name?: string }>; total?: number } })?.data;
+    const list = data?.list ?? [];
+    return { list: list.map((a) => ({ id: String(a.id ?? ''), name: a.name ?? '-' })), total: data?.total ?? list.length };
+  }, []);
+  const messageModelFetcher = useCallback<LazySelectFetcher>(async ({ pageNo, pageSize, keyword }) => {
+    const res = await Models.getModelList({ pageNo, pageSize, name: keyword } as Record<string, unknown>);
+    const data = (res as { data?: { list?: Array<{ id?: string | number; name?: string }>; total?: number } })?.data;
+    const list = data?.list ?? [];
+    return { list: list.map((m) => ({ id: String(m.id ?? ''), name: m.name ?? '-' })), total: data?.total ?? list.length };
+  }, []);
+  const messageSessionFetcher = useCallback<LazySelectFetcher>(async ({ pageNo, pageSize, keyword }) => {
+    const res = await SessionService.getSessionList({ pageNo, pageSize, title: keyword } as Record<string, unknown>);
+    const data = (res as { data?: { list?: Array<{ id?: string; sessionId?: string; title?: string }>; total?: number } })?.data;
+    const list = data?.list ?? [];
+    return {
+      list: list.map((s) => ({ id: String(s.sessionId ?? s.id ?? ''), name: s.title ?? '-' })),
+      total: data?.total ?? list.length,
+    };
+  }, []);
+  const messageUserFetcher = useCallback<LazySelectFetcher>(async ({ pageNo, pageSize, keyword }) => {
+    const res = await Member.list({ pageNo, pageSize, name: keyword });
+    const data = (res as { data?: { list?: Array<{ id?: string | number; name?: string; username?: string }>; total?: number } })?.data;
+    const list = data?.list ?? [];
+    return {
+      list: list.map((u) => ({ id: String(u.id ?? ''), name: u.name ?? u.username ?? '-' })),
+      total: data?.total ?? list.length,
+    };
+  }, []);
 
   const loadFeedbacksList = useCallback(async (pageNo = 1) => {
     setFeedbacksListLoading(true);
     try {
-      const res = await MessageService.getMessageList({
+      const query: Record<string, unknown> = {
         pageNo,
         pageSize: PAGE_SIZE,
-        filters: [{ key: 'feedbackType', op: SearchCriteria.OpEnum.IsNotNull }], 
-      });
+        filters: [{ key: 'feedbackType', op: SearchCriteria.OpEnum.IsNotNull }],
+      };
+      if (feedbackKeywordSearch.trim()) query.keyword = feedbackKeywordSearch.trim();
+      if (feedbackAppFilter !== 'all') query.appId = feedbackAppFilter;
+      if (feedbackAgentFilter !== 'all') query.agentId = feedbackAgentFilter;
+      if (feedbackModelFilter !== 'all') query.modelId = feedbackModelFilter;
+      if (feedbackSessionFilter !== 'all') query.sessionId = feedbackSessionFilter;
+      if (feedbackUserFilter !== 'all') query.createdBy = Number(feedbackUserFilter);
+      const res = await MessageService.getMessageList(query as Parameters<typeof MessageService.getMessageList>[0]);
       const data = (res as { data?: { list?: MessageVo[]; total?: number } })?.data;
       const list = data?.list ?? [];
-      const sessionMap = new Map(sessions.map((s) => [s.sessionId ?? s.id ?? '', s.title ?? '']));
       const toFeedback = (m: MessageVo): MonitorFeedback => ({
         id: m.id ?? '',
         messageId: m.id ?? '',
         sessionId: m.sessionId,
-        sessionTitle: m.sessionName ?? sessionMap.get(m.sessionId ?? '') ?? m.sessionId,
+        sessionTitle: m.sessionName ?? m.sessionId ?? '',
         feedbackType: ((m.feedbackType ?? '').toLowerCase() === 'like' ? 'like' : 'dislike') as 'like' | 'dislike',
         feedbackComment: m.feedbackComment,
         appId: m.appId,
@@ -440,7 +479,14 @@ export function Monitor() {
     } finally {
       setFeedbacksListLoading(false);
     }
-  }, [sessions]);
+  }, [
+    feedbackKeywordSearch,
+    feedbackAppFilter,
+    feedbackAgentFilter,
+    feedbackModelFilter,
+    feedbackSessionFilter,
+    feedbackUserFilter,
+  ]);
 
   const loadSessionMessages = useCallback(async (sessionId: string, pageNo = 1, keyword?: string) => {
     setSessionMessagesLoading(true);
@@ -463,27 +509,42 @@ export function Monitor() {
     }
   }, []);
 
-  // 按需加载：仅在切换到对应 Tab 时加载
+  // 按需加载：Chart 与 List 分离，下拉变更不触发 Chart 重载；三个 Tab 下拉均为 LazySelect 懒加载
   useEffect(() => {
     if (activeTab === 'sessions') {
       loadSessionsChart();
+    }
+  }, [activeTab, loadSessionsChart]);
+
+  useEffect(() => {
+    if (activeTab === 'sessions') {
       loadSessionsList(sessionsPage);
     }
-  }, [activeTab, loadSessionsChart, loadSessionsList, sessionsPage]);
+  }, [activeTab, loadSessionsList, sessionsPage]);
 
   useEffect(() => {
     if (activeTab === 'messages') {
       loadMessagesChart();
+    }
+  }, [activeTab, loadMessagesChart]);
+
+  useEffect(() => {
+    if (activeTab === 'messages') {
       loadMessagesList(messagesPage);
     }
-  }, [activeTab, loadMessagesChart, loadMessagesList, messagesPage]);
+  }, [activeTab, loadMessagesList, messagesPage]);
 
   useEffect(() => {
     if (activeTab === 'feedback') {
       loadFeedbackChart();
+    }
+  }, [activeTab, loadFeedbackChart]);
+
+  useEffect(() => {
+    if (activeTab === 'feedback') {
       loadFeedbacksList(feedbacksPage);
     }
-  }, [activeTab, loadFeedbackChart, loadFeedbacksList, feedbacksPage]);
+  }, [activeTab, loadFeedbacksList, feedbacksPage]);
 
   useEffect(() => {
     if (selectedSession?.sessionId ?? selectedSession?.id) {
@@ -529,6 +590,68 @@ export function Monitor() {
   const handleDeleteFeedback = (feedbackId: string) => {
     setDeleteTarget({ type: 'feedback', id: feedbackId });
     setShowDeleteConfirmDialog(true);
+  };
+
+  // 会话 Tab 筛选变更时重置到第一页
+  const handleSessionAppFilterChange = (v: string) => {
+    setSessionAppFilter(v);
+    setSessionsPage(1);
+  };
+  const handleSessionAgentFilterChange = (v: string) => {
+    setSessionAgentFilter(v);
+    setSessionsPage(1);
+  };
+  const handleSessionModelFilterChange = (v: string) => {
+    setSessionModelFilter(v);
+    setSessionsPage(1);
+  };
+  const handleSessionUserFilterChange = (v: string) => {
+    setSessionUserFilter(v);
+    setSessionsPage(1);
+  };
+
+  // 消息 Tab 筛选变更时重置到第一页
+  const handleMessageAppFilterChange = (v: string) => {
+    setMessageAppFilter(v);
+    setMessagesPage(1);
+  };
+  const handleMessageAgentFilterChange = (v: string) => {
+    setMessageAgentFilter(v);
+    setMessagesPage(1);
+  };
+  const handleMessageModelFilterChange = (v: string) => {
+    setMessageModelFilter(v);
+    setMessagesPage(1);
+  };
+  const handleMessageSessionFilterChange = (v: string) => {
+    setMessageSessionFilter(v);
+    setMessagesPage(1);
+  };
+  const handleMessageUserFilterChange = (v: string) => {
+    setMessageUserFilter(v);
+    setMessagesPage(1);
+  };
+
+  // 反馈 Tab 筛选变更时重置到第一页
+  const handleFeedbackAppFilterChange = (v: string) => {
+    setFeedbackAppFilter(v);
+    setFeedbacksPage(1);
+  };
+  const handleFeedbackAgentFilterChange = (v: string) => {
+    setFeedbackAgentFilter(v);
+    setFeedbacksPage(1);
+  };
+  const handleFeedbackModelFilterChange = (v: string) => {
+    setFeedbackModelFilter(v);
+    setFeedbacksPage(1);
+  };
+  const handleFeedbackSessionFilterChange = (v: string) => {
+    setFeedbackSessionFilter(v);
+    setFeedbacksPage(1);
+  };
+  const handleFeedbackUserFilterChange = (v: string) => {
+    setFeedbackUserFilter(v);
+    setFeedbacksPage(1);
   };
 
   const confirmDelete = async () => {
@@ -1051,22 +1174,14 @@ export function Monitor() {
             agentFilter={sessionAgentFilter}
             modelFilter={sessionModelFilter}
             userFilter={sessionUserFilter}
-            onAppFilterChange={setSessionAppFilter}
-            onAgentFilterChange={setSessionAgentFilter}
-            onModelFilterChange={setSessionModelFilter}
-            onUserFilterChange={setSessionUserFilter}
-            appSearch={sessionAppSearch}
-            agentSearch={sessionAgentSearch}
-            modelSearch={sessionModelSearch}
-            userSearch={sessionUserSearch}
-            onAppSearchChange={setSessionAppSearch}
-            onAgentSearchChange={setSessionAgentSearch}
-            onModelSearchChange={setSessionModelSearch}
-            onUserSearchChange={setSessionUserSearch}
-            applications={applications}
-            agents={agents}
-            models={models}
-            users={users}
+            onAppFilterChange={handleSessionAppFilterChange}
+            onAgentFilterChange={handleSessionAgentFilterChange}
+            onModelFilterChange={handleSessionModelFilterChange}
+            onUserFilterChange={handleSessionUserFilterChange}
+            appFetcher={messageAppFetcher}
+            agentFetcher={messageAgentFetcher}
+            modelFetcher={messageModelFetcher}
+            userFetcher={messageUserFetcher}
             sessions={sessions}
             sessionsLoading={sessionsListLoading}
             pagination={{
@@ -1095,31 +1210,25 @@ export function Monitor() {
             chartLoading={messagesChartLoading}
             keywordSearch={messageKeywordSearch}
             onKeywordSearchChange={setMessageKeywordSearch}
+            onKeywordSubmit={() => {
+              setMessageKeywordApplied(messageKeywordSearch);
+              setMessagesPage(1);
+            }}
             appFilter={messageAppFilter}
             agentFilter={messageAgentFilter}
             modelFilter={messageModelFilter}
             sessionFilter={messageSessionFilter}
             userFilter={messageUserFilter}
-            onAppFilterChange={setMessageAppFilter}
-            onAgentFilterChange={setMessageAgentFilter}
-            onModelFilterChange={setMessageModelFilter}
-            onSessionFilterChange={setMessageSessionFilter}
-            onUserFilterChange={setMessageUserFilter}
-            appSearch={messageAppSearch}
-            agentSearch={messageAgentSearch}
-            modelSearch={messageModelSearch}
-            sessionSearch={messageSessionSearch}
-            userSearch={messageUserSearch}
-            onAppSearchChange={setMessageAppSearch}
-            onAgentSearchChange={setMessageAgentSearch}
-            onModelSearchChange={setMessageModelSearch}
-            onSessionSearchChange={setMessageSessionSearch}
-            onUserSearchChange={setMessageUserSearch}
-            applications={applications}
-            agents={agents}
-            models={models}
-            sessions={sessions}
-            users={users}
+            onAppFilterChange={handleMessageAppFilterChange}
+            onAgentFilterChange={handleMessageAgentFilterChange}
+            onModelFilterChange={handleMessageModelFilterChange}
+            onSessionFilterChange={handleMessageSessionFilterChange}
+            onUserFilterChange={handleMessageUserFilterChange}
+            appFetcher={messageAppFetcher}
+            agentFetcher={messageAgentFetcher}
+            modelFetcher={messageModelFetcher}
+            sessionFetcher={messageSessionFetcher}
+            userFetcher={messageUserFetcher}
             messages={messages}
             messagesLoading={messagesListLoading}
             pagination={{
@@ -1154,26 +1263,16 @@ export function Monitor() {
             modelFilter={feedbackModelFilter}
             sessionFilter={feedbackSessionFilter}
             userFilter={feedbackUserFilter}
-            onAppFilterChange={setFeedbackAppFilter}
-            onAgentFilterChange={setFeedbackAgentFilter}
-            onModelFilterChange={setFeedbackModelFilter}
-            onSessionFilterChange={setFeedbackSessionFilter}
-            onUserFilterChange={setFeedbackUserFilter}
-            appSearch={feedbackAppSearch}
-            agentSearch={feedbackAgentSearch}
-            modelSearch={feedbackModelSearch}
-            sessionSearch={feedbackSessionSearch}
-            userSearch={feedbackUserSearch}
-            onAppSearchChange={setFeedbackAppSearch}
-            onAgentSearchChange={setFeedbackAgentSearch}
-            onModelSearchChange={setFeedbackModelSearch}
-            onSessionSearchChange={setFeedbackSessionSearch}
-            onUserSearchChange={setFeedbackUserSearch}
-            applications={applications}
-            agents={agents}
-            models={models}
-            sessions={sessions}
-            users={users}
+            onAppFilterChange={handleFeedbackAppFilterChange}
+            onAgentFilterChange={handleFeedbackAgentFilterChange}
+            onModelFilterChange={handleFeedbackModelFilterChange}
+            onSessionFilterChange={handleFeedbackSessionFilterChange}
+            onUserFilterChange={handleFeedbackUserFilterChange}
+            appFetcher={messageAppFetcher}
+            agentFetcher={messageAgentFetcher}
+            modelFetcher={messageModelFetcher}
+            sessionFetcher={messageSessionFetcher}
+            userFetcher={messageUserFetcher}
             feedbacks={feedbacks}
             feedbacksLoading={feedbacksListLoading}
             pagination={{
