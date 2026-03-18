@@ -57,7 +57,8 @@ public class KnowledgeBaseDocFacadeImpl implements KnowledgeBaseDocFacade {
   @Override
   public KnowledgeBaseDocStatusVo reprocessDocument(Long knowledgeBaseId, Long documentId) {
     KnowledgeBaseDoc document = documentCmd.reprocessDocument(knowledgeBaseId, documentId);
-    activityCmd.recordActivity(FullResourceType.KNOWLEDGE_BASE_DOC, document.getId(), document.getName(),
+    activityCmd.recordActivity(FullResourceType.KNOWLEDGE_BASE_DOC, document.getId(),
+        document.getName(),
         ActivityActions.ACTIVITY_KNOWLEDGE_BASE_DOC_REPROCESSED);
     return KnowledgeBaseDocAssembler.toDocumentStatusVo(document);
   }
@@ -67,7 +68,8 @@ public class KnowledgeBaseDocFacadeImpl implements KnowledgeBaseDocFacade {
       KnowledgeBaseDocToggleDto dto) {
     KnowledgeBaseDoc document = documentCmd.toggleDocument(knowledgeBaseId, documentId,
         dto.getEnabled());
-    activityCmd.recordActivity(FullResourceType.KNOWLEDGE_BASE_DOC, document.getId(), document.getName(),
+    activityCmd.recordActivity(FullResourceType.KNOWLEDGE_BASE_DOC, document.getId(),
+        document.getName(),
         ActivityActions.ACTIVITY_KNOWLEDGE_BASE_DOC_TOGGLED);
     return KnowledgeBaseDocAssembler.toDocumentStatusVo(document);
   }

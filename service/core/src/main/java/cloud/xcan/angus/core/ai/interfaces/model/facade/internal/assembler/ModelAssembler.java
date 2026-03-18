@@ -5,11 +5,11 @@ import static cloud.xcan.angus.core.utils.PrincipalContextUtils.getOptTenantId;
 import static cloud.xcan.angus.spec.utils.ObjectUtils.nullSafe;
 
 import cloud.xcan.agentx.core.model.ModelConfigDefinition;
+import cloud.xcan.angus.core.ai.application.query.model.ModelQuery.ModelDetailStats;
 import cloud.xcan.angus.core.ai.domain.model.Model;
+import cloud.xcan.angus.core.ai.domain.model.ModelPerformance;
 import cloud.xcan.angus.core.ai.domain.model.ModelStats;
 import cloud.xcan.angus.core.ai.domain.model.ModelStatus;
-import cloud.xcan.angus.core.ai.application.query.model.ModelQuery.ModelDetailStats;
-import cloud.xcan.angus.core.ai.domain.model.ModelPerformance;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelFindDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelUpdateDto;
@@ -195,7 +195,8 @@ public class ModelAssembler {
         ModelPerformance perf = new ModelPerformance();
         perf.setLatencyMs(detailStats.avgResponseTimeMs());
         double sec = detailStats.avgResponseTimeMs() / 1000.0;
-        perf.setLatency(sec >= 1 ? String.format("%.2fs", sec) : (int) Math.round(detailStats.avgResponseTimeMs()) + "ms");
+        perf.setLatency(sec >= 1 ? String.format("%.2fs", sec)
+            : (int) Math.round(detailStats.avgResponseTimeMs()) + "ms");
         vo.setPerformance(perf);
       }
     }

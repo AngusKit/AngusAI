@@ -9,8 +9,8 @@ import cloud.xcan.agentx.core.model.ModelProvider;
 import cloud.xcan.angus.api.commonlink.FullResourceType;
 import cloud.xcan.angus.core.ai.application.cmd.activity.ActivityCmd;
 import cloud.xcan.angus.core.ai.application.cmd.model.ModelCmd;
-import cloud.xcan.angus.core.ai.domain.activity.ActivityActions;
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
+import cloud.xcan.angus.core.ai.domain.activity.ActivityActions;
 import cloud.xcan.angus.core.ai.domain.model.Model;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.ModelFacade;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelCreateDto;
@@ -129,7 +129,8 @@ public class ModelFacadeImpl implements ModelFacade {
         modelIds, todayStart, todayEnd);
 
     return buildVoPageResult(page, model -> {
-      ModelQuery.ModelDetailStats stats = model.getId() != null ? statsMap.get(model.getId()) : null;
+      ModelQuery.ModelDetailStats stats =
+          model.getId() != null ? statsMap.get(model.getId()) : null;
       return ModelAssembler.toListVo(model, stats);
     });
   }

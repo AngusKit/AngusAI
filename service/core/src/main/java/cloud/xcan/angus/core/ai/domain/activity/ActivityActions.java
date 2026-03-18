@@ -16,7 +16,9 @@ public interface ActivityActions {
   String ACTIVITY_APPLICATION_STAR_ADDED = "activity.ai.application.star.added";
   String ACTIVITY_APPLICATION_STAR_REMOVED = "activity.ai.application.star.removed";
   String ACTIVITY_APPLICATION_CONFIG_UPDATED = "activity.ai.application.config.updated";
-  /** 应用活动格式，参数：{0}=应用名称 */
+  /**
+   * 应用活动格式，参数：{0}=应用名称
+   */
   String ACTIVITY_APPLICATION_FORMAT = "activity.ai.application.format";
 
   // ========== 智能体相关 ==========

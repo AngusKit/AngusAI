@@ -9,11 +9,11 @@ import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
 import cloud.xcan.angus.core.ai.application.query.analytics.ChatAnalyticsQuery;
 import cloud.xcan.angus.core.ai.application.query.application.ApplicationQuery;
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
+import cloud.xcan.angus.core.ai.domain.activity.ActivityActions;
 import cloud.xcan.angus.core.ai.domain.agent.Agent;
 import cloud.xcan.angus.core.ai.domain.application.AIApplication;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationAgent;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationConfig;
-import cloud.xcan.angus.core.ai.domain.activity.ActivityActions;
 import cloud.xcan.angus.core.ai.domain.application.ApplicationStatus;
 import cloud.xcan.angus.core.ai.domain.model.Model;
 import cloud.xcan.angus.core.ai.interfaces.application.facade.ApplicationFacade;
@@ -157,7 +157,7 @@ public class ApplicationFacadeImpl implements ApplicationFacade {
     String appName = app != null ? app.getName() : String.valueOf(id);
     applicationCmd.delete(id);
     activityCmd.recordApplicationActivity(id, appName,
-      ActivityActions.ACTIVITY_APPLICATION_DELETED, appName);
+        ActivityActions.ACTIVITY_APPLICATION_DELETED, appName);
   }
 
   @NameJoin

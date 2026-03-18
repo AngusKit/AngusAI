@@ -5,10 +5,10 @@ import cloud.xcan.angus.core.ai.domain.chat.Message;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRepo;
 import cloud.xcan.angus.core.ai.domain.chat.MessageSearchRepo;
 import cloud.xcan.angus.core.ai.domain.chat.SessionRepo;
+import cloud.xcan.angus.core.ai.infra.util.CommonUtils;
 import cloud.xcan.angus.core.ai.interfaces.chat.facade.vo.ChatStatisticsVo.UsageTrend;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.core.jpa.criteria.GenericSpecification;
-import cloud.xcan.angus.core.ai.infra.util.CommonUtils;
 import cloud.xcan.angus.core.utils.PrincipalContextUtils;
 import cloud.xcan.angus.remote.message.http.ResourceNotFound;
 import jakarta.annotation.Resource;
@@ -182,8 +182,10 @@ public class MessageQueryImpl implements MessageQuery {
         LocalDateTime cutoff = LocalDateTime.now().minusMinutes(10);
         Object[] row = messageRepo.countActiveBreakdown(cutoff);
         Map<String, Long> result = new HashMap<>();
-        result.put("messages", CommonUtils.toLong(row != null && row.length > 0 ? row[0] : null, 0L));
-        result.put("sessions", CommonUtils.toLong(row != null && row.length > 1 ? row[1] : null, 0L));
+        result.put("messages",
+            CommonUtils.toLong(row != null && row.length > 0 ? row[0] : null, 0L));
+        result.put("sessions",
+            CommonUtils.toLong(row != null && row.length > 1 ? row[1] : null, 0L));
         result.put("apps", CommonUtils.toLong(row != null && row.length > 2 ? row[2] : null, 0L));
         result.put("agents", CommonUtils.toLong(row != null && row.length > 3 ? row[3] : null, 0L));
         result.put("models", CommonUtils.toLong(row != null && row.length > 4 ? row[4] : null, 0L));

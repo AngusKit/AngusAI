@@ -99,8 +99,8 @@ public interface ChatUsageLogRepo extends BaseRepository<ChatUsageLog, Long> {
   List<Object[]> groupByModel(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
   /**
-   * 按指定模型ID列表聚合统计 返回 [modelId, calls, tokens, avgResponseTimeMs, cost]
-   * cost 单位：美元(USD)。modelIds 为空时返回空列表。
+   * 按指定模型ID列表聚合统计 返回 [modelId, calls, tokens, avgResponseTimeMs, cost] cost 单位：美元(USD)。modelIds
+   * 为空时返回空列表。
    */
   @Query(
       "SELECT l.modelId, COUNT(l), COALESCE(SUM(l.totalTokens), 0), AVG(l.responseTimeMs), COALESCE(SUM(l.cost), 0) "

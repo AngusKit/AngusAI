@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.data.repository.NoRepositoryBean;
+import org.springframework.data.repository.query.Param;
 
 /**
  * 会话仓储接口
@@ -79,8 +79,7 @@ public interface SessionRepo extends BaseRepository<Session, Long> {
   int deleteByIdIn(List<Long> ids);
 
   /**
-   * 按月份分组统计指定年份的会话数。
-   * 返回 List&lt;Object[]&gt;: [month, count]，month 为 1-12。
+   * 按月份分组统计指定年份的会话数。 返回 List&lt;Object[]&gt;: [month, count]，month 为 1-12。
    */
   @Query(value = "SELECT MONTH(s.created_date) AS mth, COUNT(*) FROM ai_chat_session s "
       + "WHERE s.created_date >= :yearStart AND s.created_date <= :yearEnd "
@@ -89,8 +88,7 @@ public interface SessionRepo extends BaseRepository<Session, Long> {
       @Param("yearEnd") LocalDateTime yearEnd);
 
   /**
-   * 按日分组统计指定月份的会话数。
-   * 返回 List&lt;Object[]&gt;: [day, count]。
+   * 按日分组统计指定月份的会话数。 返回 List&lt;Object[]&gt;: [day, count]。
    */
   @Query(value = "SELECT DAY(s.created_date) AS d, COUNT(*) FROM ai_chat_session s "
       + "WHERE s.created_date >= :monthStart AND s.created_date <= :monthEnd "
@@ -99,8 +97,7 @@ public interface SessionRepo extends BaseRepository<Session, Long> {
       @Param("monthEnd") LocalDateTime monthEnd);
 
   /**
-   * 按小时分组统计指定日期的会话数。
-   * 返回 List&lt;Object[]&gt;: [hour, count]。
+   * 按小时分组统计指定日期的会话数。 返回 List&lt;Object[]&gt;: [hour, count]。
    */
   @Query(value = "SELECT HOUR(s.created_date) AS h, COUNT(*) FROM ai_chat_session s "
       + "WHERE s.created_date >= :dayStart AND s.created_date <= :dayEnd "

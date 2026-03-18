@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -129,7 +128,8 @@ public class ChatAnalyticsQueryImpl implements ChatAnalyticsQuery {
 
         Long prevActiveUsers = chatUsageLogRepo.countDistinctUsersByTimeRange(prevStart, prevEnd);
         Long prevTotalTokens = chatUsageLogRepo.sumTokensByTimeRange(prevStart, prevEnd);
-        Double prevAvgResponseTime = chatUsageLogRepo.avgResponseTimeByTimeRange(prevStart, prevEnd);
+        Double prevAvgResponseTime = chatUsageLogRepo.avgResponseTimeByTimeRange(prevStart,
+            prevEnd);
 
         stats.put("totalCalls", totalCalls);
         stats.put("successfulCalls", successfulCalls);
@@ -333,7 +333,8 @@ public class ChatAnalyticsQueryImpl implements ChatAnalyticsQuery {
           item.put("calls", result[1]);
           item.put("tokens", result[2]);
           item.put("avgResponseTime", result[3]);
-          item.put("cost", result.length > 4 && result[4] != null ? ((Number) result[4]).doubleValue() : 0.0);
+          item.put("cost",
+              result.length > 4 && result[4] != null ? ((Number) result[4]).doubleValue() : 0.0);
           item.put("percentage",
               total > 0 ? (((Number) result[1]).doubleValue() / total * 100) : 0.0);
 
@@ -361,7 +362,8 @@ public class ChatAnalyticsQueryImpl implements ChatAnalyticsQuery {
           item.put("calls", result[1]);
           item.put("tokens", result[2]);
           item.put("avgResponseTime", result.length > 3 ? result[3] : null);
-          item.put("cost", result.length > 4 && result[4] != null ? ((Number) result[4]).doubleValue() : 0.0);
+          item.put("cost",
+              result.length > 4 && result[4] != null ? ((Number) result[4]).doubleValue() : 0.0);
           item.put("percentage", totalCalls > 0
               ? (((Number) result[1]).doubleValue() / totalCalls * 100) : 0.0);
 

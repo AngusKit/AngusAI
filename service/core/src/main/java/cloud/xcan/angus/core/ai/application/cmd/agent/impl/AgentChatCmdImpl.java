@@ -104,7 +104,8 @@ public class AgentChatCmdImpl implements AgentChatCmd {
         messageCmd.setStreaming(assistantMessage, true);
 
         // Model 优先从会话取 modelId，其次从 agent 取 defaultModelId
-        Long modelId = sessionDb.getModelId() != null ? sessionDb.getModelId() : agent.getDefaultModelId();
+        Long modelId =
+            sessionDb.getModelId() != null ? sessionDb.getModelId() : agent.getDefaultModelId();
         Model model = modelId != null ? modelQuery.findById(modelId).orElse(null) : null;
 
         // 合并请求/会话/智能体/模型配置，得到最终覆盖参数
@@ -158,7 +159,8 @@ public class AgentChatCmdImpl implements AgentChatCmd {
       @Override
       protected SseEmitter process() {
         // Model 优先从会话取 modelId，其次从 agent 取 defaultModelId
-        Long modelId = sessionDb.getModelId() != null ? sessionDb.getModelId() : agent.getDefaultModelId();
+        Long modelId =
+            sessionDb.getModelId() != null ? sessionDb.getModelId() : agent.getDefaultModelId();
         Model model = modelId != null ? modelQuery.findById(modelId).orElse(null) : null;
 
         // 按照优先级获取会话配置
@@ -281,7 +283,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
   /**
    * 保存 API 使用日志，关联对话
    *
-   * @param model 已查询的模型，可为 null；为 null 时 calculateCost 内部会按需查询
+   * @param model         已查询的模型，可为 null；为 null 时 calculateCost 内部会按需查询
    * @param userMessageId 用户消息ID，可为 null
    */
   private void saveApiUsageLog(Principal principal, Agent agent, Session session, Model model,
@@ -315,8 +317,8 @@ public class AgentChatCmdImpl implements AgentChatCmd {
   }
 
   /**
-   * Calculate cost in USD from model pricing. Uses BigDecimal to preserve decimals
-   * and avoid rounding to zero when token count is very small.
+   * Calculate cost in USD from model pricing. Uses BigDecimal to preserve decimals and avoid
+   * rounding to zero when token count is very small.
    *
    * @param model model already loaded, or null to load by session.modelId / agent.defaultModelId
    */
@@ -352,7 +354,8 @@ public class AgentChatCmdImpl implements AgentChatCmd {
           BigDecimal.valueOf(out).divide(BigDecimal.valueOf(1_000_000), 8, RoundingMode.HALF_UP)
               .multiply(BigDecimal.valueOf(outputPrice)));
     }
-    return costUsd.compareTo(BigDecimal.ZERO) > 0 ? costUsd.setScale(8, RoundingMode.HALF_UP) : null;
+    return costUsd.compareTo(BigDecimal.ZERO) > 0 ? costUsd.setScale(8, RoundingMode.HALF_UP)
+        : null;
   }
 
   /**

@@ -64,7 +64,8 @@ public interface ModelQuery {
    * @param modelIds 模型ID列表，为空时返回空 Map
    * @param start    开始时间
    * @param end      结束时间
-   * @return modelId -> 统计信息（totalCalls, totalTokens, totalCost, totalCostDisplay, avgResponseTimeMs）
+   * @return modelId -> 统计信息（totalCalls, totalTokens, totalCost, totalCostDisplay,
+   * avgResponseTimeMs）
    */
   Map<Long, ModelDetailStats> getDetailStatsForModelIds(List<Long> modelIds,
       LocalDateTime start, LocalDateTime end);
@@ -73,7 +74,8 @@ public interface ModelQuery {
    * 模型详情统计（用于列表卡片展示）
    */
   record ModelDetailStats(long totalCalls, long totalTokens, double totalCost,
-      String totalCostDisplay, Double avgResponseTimeMs) {
+                          String totalCostDisplay, Double avgResponseTimeMs) {
+
   }
 
 }

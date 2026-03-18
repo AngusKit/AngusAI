@@ -236,7 +236,8 @@ public class ModelQueryImpl implements ModelQuery {
       Double avgResponseTimeMs = row[3] != null ? ((Number) row[3]).doubleValue() : null;
       double cost = row[4] != null ? ((Number) row[4]).doubleValue() : 0.0;
       String costDisplay = formatCostFromDollars(cost);
-      result.put(modelId, new ModelDetailStats(calls, tokens, cost, costDisplay, avgResponseTimeMs));
+      result.put(modelId,
+          new ModelDetailStats(calls, tokens, cost, costDisplay, avgResponseTimeMs));
     }
     return result;
   }

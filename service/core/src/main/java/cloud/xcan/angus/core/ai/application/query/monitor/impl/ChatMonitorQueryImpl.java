@@ -6,11 +6,11 @@ import cloud.xcan.angus.core.ai.application.query.monitor.ChatMonitorQuery;
 import cloud.xcan.angus.core.ai.domain.chat.MessageRepo;
 import cloud.xcan.angus.core.ai.domain.chat.SessionRepo;
 import cloud.xcan.angus.core.ai.interfaces.monitor.facade.dto.ChatMonitorChartQueryDto;
+import cloud.xcan.angus.core.ai.interfaces.monitor.facade.vo.ChartDataPointVo;
 import cloud.xcan.angus.core.ai.interfaces.monitor.facade.vo.ChatMonitorOverviewVo;
 import cloud.xcan.angus.core.ai.interfaces.monitor.facade.vo.ChatMonitorOverviewVo.DualStatsVo;
 import cloud.xcan.angus.core.ai.interfaces.monitor.facade.vo.ChatMonitorOverviewVo.FeedbackStatsVo;
 import cloud.xcan.angus.core.ai.interfaces.monitor.facade.vo.ChatMonitorOverviewVo.ThroughputStatsVo;
-import cloud.xcan.angus.core.ai.interfaces.monitor.facade.vo.ChartDataPointVo;
 import jakarta.annotation.Resource;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -78,8 +78,7 @@ public class ChatMonitorQueryImpl implements ChatMonitorQuery {
   }
 
   /**
-   * 吞吐量：当天时间范围内按分钟分组，无值用 0 填充，计算 min/max/avg，
-   * 当前吞吐量 = 完整近一分钟内的消息数。
+   * 吞吐量：当天时间范围内按分钟分组，无值用 0 填充，计算 min/max/avg， 当前吞吐量 = 完整近一分钟内的消息数。
    */
   private ThroughputStatsVo buildThroughputStats(LocalDateTime todayStart, LocalDateTime todayEnd,
       LocalDateTime now) {
@@ -146,14 +145,17 @@ public class ChatMonitorQueryImpl implements ChatMonitorQuery {
   }
 
   private interface CountByMonth {
+
     List<Object[]> count(LocalDateTime start, LocalDateTime end);
   }
 
   private interface CountByDay {
+
     List<Object[]> count(LocalDateTime start, LocalDateTime end);
   }
 
   private interface CountByHour {
+
     List<Object[]> count(LocalDateTime start, LocalDateTime end);
   }
 
@@ -170,7 +172,8 @@ public class ChatMonitorQueryImpl implements ChatMonitorQuery {
       LocalDateTime yearEnd = LocalDate.of(year, 12, 31).atTime(LocalTime.MAX);
       List<Object[]> rows = countByMonth.count(yearStart, yearEnd);
       Map<Integer, Long> monthToCount = rows.stream()
-          .collect(Collectors.toMap(r -> ((Number) r[0]).intValue(), r -> ((Number) r[1]).longValue()));
+          .collect(
+              Collectors.toMap(r -> ((Number) r[0]).intValue(), r -> ((Number) r[1]).longValue()));
       for (int m = 1; m <= 12; m++) {
         long value = monthToCount.getOrDefault(m, 0L);
         String dateLabel = Month.of(m).name();
@@ -182,7 +185,8 @@ public class ChatMonitorQueryImpl implements ChatMonitorQuery {
       LocalDateTime monthEnd = ym.atEndOfMonth().atTime(LocalTime.MAX);
       List<Object[]> rows = countByDay.count(monthStart, monthEnd);
       Map<Integer, Long> dayToCount = rows.stream()
-          .collect(Collectors.toMap(r -> ((Number) r[0]).intValue(), r -> ((Number) r[1]).longValue()));
+          .collect(
+              Collectors.toMap(r -> ((Number) r[0]).intValue(), r -> ((Number) r[1]).longValue()));
       int days = ym.lengthOfMonth();
       for (int d = 1; d <= days; d++) {
         long value = dayToCount.getOrDefault(d, 0L);
@@ -194,7 +198,8 @@ public class ChatMonitorQueryImpl implements ChatMonitorQuery {
       LocalDateTime dayEnd = date.atTime(LocalTime.MAX);
       List<Object[]> rows = countByHour.count(dayStart, dayEnd);
       Map<Integer, Long> hourToCount = rows.stream()
-          .collect(Collectors.toMap(r -> ((Number) r[0]).intValue(), r -> ((Number) r[1]).longValue()));
+          .collect(
+              Collectors.toMap(r -> ((Number) r[0]).intValue(), r -> ((Number) r[1]).longValue()));
       for (int h = 0; h < 24; h++) {
         long value = hourToCount.getOrDefault(h, 0L);
         result.add(new ChartDataPointVo(prefix + "-d-" + h, h + ":00", value));

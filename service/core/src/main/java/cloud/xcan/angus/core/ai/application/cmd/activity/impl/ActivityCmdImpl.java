@@ -85,7 +85,8 @@ public class ActivityCmdImpl extends CommCmd<Activity, Long> implements Activity
       return;
     }
     Long userId = getUserId();
-    Object[] msgArgs = args != null && args.length > 0 ? args : new Object[]{stringSafe(resourceName, "")};
+    Object[] msgArgs =
+        args != null && args.length > 0 ? args : new Object[]{stringSafe(resourceName, "")};
     String description = getMessage(userId, actionKey, msgArgs);
     Activity activity = new Activity()
         .setId(getCachedUidGenerator().getUID())
@@ -106,7 +107,8 @@ public class ActivityCmdImpl extends CommCmd<Activity, Long> implements Activity
     if (actionKey == null) {
       return ActionType.UPDATE;
     }
-    if (actionKey.contains("created") || actionKey.contains("duplicated") || actionKey.contains("cloned")
+    if (actionKey.contains("created") || actionKey.contains("duplicated") || actionKey.contains(
+        "cloned")
         || actionKey.contains("uploaded") || actionKey.contains("imported")) {
       return ActionType.CREATE;
     }
