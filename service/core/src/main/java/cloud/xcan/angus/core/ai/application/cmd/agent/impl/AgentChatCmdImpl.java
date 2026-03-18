@@ -94,7 +94,9 @@ public class AgentChatCmdImpl implements AgentChatCmd {
 
       @Override
       protected AgentChatResult process() {
+        // 注册智能体
         agentCmd.ensureRegistered(agent);
+
         // 有会话时先落库用户消息
         Message userMessage = messageCmd.create0(sessionDb, MessageRole.USER, message);
 
@@ -191,6 +193,8 @@ public class AgentChatCmdImpl implements AgentChatCmd {
         final Long userMessageIdForLog = userMessage.getId();
         Principal principal = PrincipalContext.get();
         sseEmitterChatExecutor.execute(() -> {
+          log.info("Chat [{}]-[{}] start sseEmitterChatExecutor, override: {}",
+              sessionDb.getSessionId(), userMessage.getId(), override);
           StringBuilder fullContent = new StringBuilder();
           long streamStartMs = System.currentTimeMillis();
           final boolean[] isFirstChunk = {true};
@@ -201,40 +205,41 @@ public class AgentChatCmdImpl implements AgentChatCmd {
                 : agentRegistry.chatStream(agentIdStr, sessionDb.getSessionId(), message);
             stream.onPartialResponse(token -> {
                   fullContent.append(token);
+                  OpenAIChatCompletionChunk chunk;
+                  if (isFirstChunk[0]) {
+                    isFirstChunk[0] = false;
+                    chunk = OpenAIChatCompletionChunk.builder()
+                        .id("chatcmpl-stream")
+                        .sessionId(sessionDb.getSessionId())
+                        .object("chat.completion.chunk")
+                        .created(System.currentTimeMillis() / 1000)
+                        .model(agent.getEncoding())
+                        .choices(List.of(new OpenAIChatCompletionChunk.ChunkChoice(null,
+                            new OpenAIChatCompletionsResponse.Delta(null, token),
+                            null)))
+                        .build();
+
+                  } else {
+                    chunk = OpenAIChatCompletionChunk.builder()
+                        .choices(List.of(new OpenAIChatCompletionChunk.ChunkChoice(null,
+                            new OpenAIChatCompletionsResponse.Delta(null, token),
+                            null)))
+                        .build();
+                  }
                   try {
-                    if (isFirstChunk[0]) {
-                      isFirstChunk[0] = false;
-                      OpenAIChatCompletionChunk chunk = OpenAIChatCompletionChunk.builder()
-                          .id("chatcmpl-stream")
-                          .sessionId(sessionDb.getSessionId())
-                          .object("chat.completion.chunk")
-                          .created(System.currentTimeMillis() / 1000)
-                          .model(agent.getEncoding())
-                          .choices(List.of(new OpenAIChatCompletionChunk.ChunkChoice(null,
-                              new OpenAIChatCompletionsResponse.Delta(null, token),
-                              null)))
-                          .build();
-                      try {
-                        emitter.send(SseEmitter.event().data(toJson(chunk)));
-                      } catch (Exception e) {
-                        // org.springframework.web.context.request.async.AsyncRequestTimeoutException: null
-                        // org.springframework.web.context.request.async.AsyncRequestNotUsableException: ServletOutputStream failed to write: Broken pipe
-                        emitter.completeWithError(e);
-                      }
-                    } else {
-                      OpenAIChatCompletionChunk chunk = OpenAIChatCompletionChunk.builder()
-                          .choices(List.of(new OpenAIChatCompletionChunk.ChunkChoice(null,
-                              new OpenAIChatCompletionsResponse.Delta(null, token),
-                              null)))
-                          .build();
-                      emitter.send(SseEmitter.event().data(toJson(chunk)));
-                    }
+                    emitter.send(SseEmitter.event().data(toJson(chunk)));
                   } catch (Exception e) {
+                    log.error("Chat [{}]-[{}] error sending chunk: {}", sessionDb.getSessionId(),
+                        userMessage.getId(), e.getMessage());
+                    // org.springframework.web.context.request.async.AsyncRequestTimeoutException: null
+                    // org.springframework.web.context.request.async.AsyncRequestNotUsableException: ServletOutputStream failed to write: Broken pipe
                     emitter.completeWithError(e);
                   }
                 })
                 // 流结束：用完整内容覆盖占位消息，关闭流式标记，记录 ChatUsageLog（含 token 用量与成本）
                 .onCompleteResponse(r -> {
+                  log.info("Chat [{}]-[{}] complete response", sessionDb.getSessionId(),
+                      userMessage.getId());
                   assistantMessage.setContent(fullContent.toString());
                   messageCmd.setStreaming(assistantMessage, false);
                   Integer inTokens = null;
@@ -255,6 +260,8 @@ public class AgentChatCmdImpl implements AgentChatCmd {
                   emitter.complete();
                 })
                 .onError(e -> {
+                  log.error("Chat [{}]-[{}] error: {}", sessionDb.getSessionId(),
+                      userMessage.getId(), e.getMessage());
                   messageCmd.setStreaming(assistantMessage, false);
                   saveApiUsageLog(principal, agent, sessionDb, modelForAsync,
                       "/api/v1/agents/chat/stream", streamStartMs, false, e.getMessage(),
@@ -263,6 +270,8 @@ public class AgentChatCmdImpl implements AgentChatCmd {
                 });
             stream.start();
           } catch (Exception e) {
+            log.error("Chat [{}]-[{}] error: {}", sessionDb.getSessionId(), userMessage.getId(),
+                e.getMessage());
             messageCmd.setStreaming(assistantMessage, false);
             saveApiUsageLog(principal, agent, sessionDb, modelForAsync,
                 "/api/v1/agents/chat/stream", streamStartMs, false, e.getMessage(), null, null,

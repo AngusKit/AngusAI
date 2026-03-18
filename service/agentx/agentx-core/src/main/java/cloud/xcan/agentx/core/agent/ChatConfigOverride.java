@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
  * 对话配置覆盖 — 用于单次请求覆盖模型参数
@@ -13,6 +14,7 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatConfigOverride {
