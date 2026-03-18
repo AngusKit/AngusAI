@@ -79,6 +79,28 @@ public class MessageCmdImpl extends CommCmd<Message, Long> implements MessageCmd
 
   @Override
   @Transactional
+  public void clearFeedback(Long id) {
+    new BizTemplate<Void>() {
+      Message message;
+
+      @Override
+      protected void checkParams() {
+        message = messageRepo.findById(id)
+            .orElseThrow(() -> ResourceNotFound.of("消息「{0}」不存在", new Object[]{id}));
+      }
+
+      @Override
+      protected Void process() {
+        message.setFeedbackType(null);
+        message.setFeedbackComment(null);
+        messageRepo.save(message);
+        return null;
+      }
+    }.execute();
+  }
+
+  @Override
+  @Transactional
   public void delete(Long id) {
     new BizTemplate<Void>() {
       @Override

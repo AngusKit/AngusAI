@@ -382,7 +382,7 @@ export function Monitor() {
   const mapMessageToMonitor = useCallback((m: MessageVo, sessionTitle?: string): MonitorMessage => ({
     ...m,
     messageId: m.id ?? '',
-    sessionTitle: sessionTitle ?? m.sessionId,
+    sessionTitle: sessionTitle ?? m.sessionName ?? m.sessionId,
     userName: '-',
   }), []);
 
@@ -413,7 +413,7 @@ export function Monitor() {
         id: m.id ?? '',
         messageId: m.id ?? '',
         sessionId: m.sessionId,
-        sessionTitle: sessionMap.get(m.sessionId ?? '') ?? m.sessionId,
+        sessionTitle: m.sessionName ?? sessionMap.get(m.sessionId ?? '') ?? m.sessionId,
         feedbackType: ((m.feedbackType ?? '').toLowerCase() === 'like' ? 'like' : 'dislike') as 'like' | 'dislike',
         feedbackComment: m.feedbackComment,
         appId: m.appId,
@@ -486,7 +486,7 @@ export function Monitor() {
       if (messageKeywordSearch) {
         const kw = messageKeywordSearch.toLowerCase();
         const content = (message.content ?? '').toLowerCase();
-        const sessionTitle = (message.sessionTitle ?? message.sessionId ?? '').toLowerCase();
+        const sessionTitle = (message.sessionName ?? message.sessionTitle ?? message.sessionId ?? '').toLowerCase();
         const msgId = (message.messageId ?? message.id ?? '').toLowerCase();
         if (!content.includes(kw) && !sessionTitle.includes(kw) && !msgId.includes(kw)) return false;
       }
@@ -565,18 +565,25 @@ export function Monitor() {
     try {
       if (deleteTarget.type === 'session') {
         await SessionService.deleteSession(deleteTarget.id);
+        setSessions((prev) => prev.filter((s) => (s.sessionId ?? s.id) !== deleteTarget!.id));
+        if (selectedSession && (selectedSession.sessionId ?? selectedSession.id) === deleteTarget.id) {
+          handleBackToList();
+        }
+      } else if (deleteTarget.type === 'message') {
+        await MessageService.deleteMessage(deleteTarget.id);
+        setMessages((prev) => prev.filter((m) => (m.id ?? m.messageId ?? '') !== deleteTarget!.id));
+        if (selectedMessage && (selectedMessage.id ?? selectedMessage.messageId) === deleteTarget.id) {
+          handleBackToList();
+        }
+      } else if (deleteTarget.type === 'feedback') {
+        await MessageService.deleteFeedback(deleteTarget.id);
+        setFeedbacks((prev) => prev.filter((f) => f.id !== deleteTarget!.id));
       }
       toast.success(
         language === 'zh-CN'
           ? `${deleteTarget.type === 'session' ? '会话' : deleteTarget.type === 'message' ? '消息' : '反馈'}已删除`
           : `${deleteTarget.type} deleted successfully`
       );
-      if (deleteTarget.type === 'session') {
-        setSessions((prev) => prev.filter((s) => (s.sessionId ?? s.id) !== deleteTarget.id));
-        if (selectedSession && (selectedSession.sessionId ?? selectedSession.id) === deleteTarget.id) {
-          handleBackToList();
-        }
-      }
     } catch {
       toast.error(language === 'zh-CN' ? '删除失败' : 'Delete failed');
     } finally {

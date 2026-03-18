@@ -25,6 +25,11 @@ public interface MessageCmd {
   void addFeedback(Long id, String feedbackType, String feedbackComment);
 
   /**
+   * 清除消息反馈（将 feedbackType、feedbackComment 置空）
+   */
+  void clearFeedback(Long id);
+
+  /**
    * 删除消息
    */
   void delete(Long id);

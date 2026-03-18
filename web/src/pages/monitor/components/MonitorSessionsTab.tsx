@@ -245,7 +245,7 @@ export function MonitorSessionsTab({
                     </button>
                   </td>
                   <td className="px-4 py-3 text-sm dark:text-gray-300">{session.appName ?? '-'}</td>
-                  <td className="px-4 py-3 text-sm dark:text-gray-300">-</td>
+                  <td className="px-4 py-3 text-sm dark:text-gray-300">{(session as { creator?: string }).creator ?? '-'}</td>
                   <td className="px-4 py-3 text-sm dark:text-gray-300">{session.agentName ?? '-'}</td>
                   <td className="px-4 py-3">
                     <Badge variant="secondary">{session.messageCount}</Badge>

@@ -85,6 +85,16 @@ public class MessageFacadeImpl implements MessageFacade {
   }
 
   @Override
+  public void clearFeedback(Long messageId) {
+    messageCmd.clearFeedback(messageId);
+  }
+
+  @Override
+  public void deleteMessage(Long messageId) {
+    messageCmd.delete(messageId);
+  }
+
+  @Override
   public Integer clearSessionMessages(String sessionId) {
     Session session = sessionQuery.findAndCheckBySessionId(sessionId);
     return sessionCmd.clearMessages(session.getId());

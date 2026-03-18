@@ -55,6 +55,22 @@ public class MessageRest {
     return ApiLocaleResult.success(messageFacade.feedbackMessage(messageId, dto));
   }
 
+  @Operation(operationId = "deleteFeedback", summary = "删除反馈", description = "根据消息ID清除该消息的反馈相关字段（feedbackType、feedbackComment）")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @DeleteMapping("/{messageId}/feedback")
+  public void deleteFeedback(
+      @Parameter(description = "消息ID") @PathVariable Long messageId) {
+    messageFacade.clearFeedback(messageId);
+  }
+
+  @Operation(operationId = "deleteMessage", summary = "删除消息", description = "根据消息ID删除单条消息")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @DeleteMapping("/{messageId}")
+  public void deleteMessage(
+      @Parameter(description = "消息ID") @PathVariable Long messageId) {
+    messageFacade.deleteMessage(messageId);
+  }
+
   @Operation(operationId = "stopGeneration", summary = "停止生成", description = "停止当前正在生成的消息")
   @PostMapping("/stop")
   public ApiLocaleResult<MessageVo> stop(

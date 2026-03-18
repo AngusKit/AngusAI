@@ -31,6 +31,10 @@ export interface MessageVo {
    * 会话ID(UUID)
    */
   sessionId?: string;
+  /**
+   * 会话名称
+   */
+  sessionName?: string;
   /** 关联的应用ID */
   appId?: string;
   /** 应用名称 */

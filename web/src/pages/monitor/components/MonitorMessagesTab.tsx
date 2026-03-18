@@ -244,7 +244,7 @@ export function MonitorMessagesTab(props: MonitorMessagesTabProps) {
                       className="text-left"
                     >
                       <div className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline">
-                        {message.sessionTitle ?? message.sessionId ?? '-'}
+                        {message.sessionName ?? message.sessionId ?? '-'}
                       </div>
                       <div className="text-xs text-gray-500 dark:text-gray-400 font-mono">
                         {message.sessionId}

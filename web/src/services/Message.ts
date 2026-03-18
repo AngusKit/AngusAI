@@ -62,6 +62,40 @@ export class Message<SecurityDataType = unknown> {
     });
 
   /**
+   * @description 删除消息的反馈（清空 feedbackType、feedbackComment）
+   *
+   * @tags 对话消息
+   * @name DeleteFeedback
+   * @summary 删除反馈
+   * @request DELETE:/api/v1/chat/messages/{messageId}/feedback
+   * @secure
+   */
+  deleteFeedback = (messageId: string | number, params: RequestParams = {}) =>
+    this.http.request<void>({
+      path: `${AI}/chat/messages/${messageId}/feedback`,
+      method: 'DELETE',
+      secure: true,
+      ...params,
+    });
+
+  /**
+   * @description 根据消息ID删除单条消息
+   *
+   * @tags 对话消息
+   * @name DeleteMessage
+   * @summary 删除消息
+   * @request DELETE:/api/v1/chat/messages/{messageId}
+   * @secure
+   */
+  deleteMessage = (messageId: string | number, params: RequestParams = {}) =>
+    this.http.request<void>({
+      path: `${AI}/chat/messages/${messageId}`,
+      method: 'DELETE',
+      secure: true,
+      ...params,
+    });
+
+  /**
    * @description 对AI消息进行反馈（点赞/点踩）
    *
    * @tags 对话消息

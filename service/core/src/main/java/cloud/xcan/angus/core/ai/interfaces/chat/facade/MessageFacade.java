@@ -24,6 +24,16 @@ public interface MessageFacade {
   MessageVo feedbackMessage(Long messageId, MessageFeedbackDto dto);
 
   /**
+   * 清除消息反馈（将 feedbackType、feedbackComment 置空）
+   */
+  void clearFeedback(Long messageId);
+
+  /**
+   * 删除消息
+   */
+  void deleteMessage(Long messageId);
+
+  /**
    * 停止生成
    */
   MessageVo stopGeneration(Long messageId);
