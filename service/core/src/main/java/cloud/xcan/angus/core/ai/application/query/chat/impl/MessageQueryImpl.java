@@ -179,17 +179,19 @@ public class MessageQueryImpl implements MessageQuery {
     return new BizTemplate<Map<String, Long>>() {
       @Override
       protected Map<String, Long> process() {
-        LocalDateTime cutoff = LocalDateTime.now().minusMinutes(10);
-        Object[] row = messageRepo.countActiveBreakdown(cutoff);
         Map<String, Long> result = new HashMap<>();
-        result.put("messages",
-            CommonUtils.toLong(row != null && row.length > 0 ? row[0] : null, 0L));
-        result.put("sessions",
-            CommonUtils.toLong(row != null && row.length > 1 ? row[1] : null, 0L));
-        result.put("apps", CommonUtils.toLong(row != null && row.length > 2 ? row[2] : null, 0L));
-        result.put("agents", CommonUtils.toLong(row != null && row.length > 3 ? row[3] : null, 0L));
-        result.put("models", CommonUtils.toLong(row != null && row.length > 4 ? row[4] : null, 0L));
-        result.put("users", CommonUtils.toLong(row != null && row.length > 5 ? row[5] : null, 0L));
+        LocalDateTime cutoff = LocalDateTime.now().minusMinutes(10);
+        Object[] rows = messageRepo.countActiveBreakdown(cutoff);
+        if(rows == null || rows[0] == null){
+          return result;
+        }
+        Object[] row = (Object[]) rows[0];
+        result.put("messages", CommonUtils.toLong(row.length > 0 ? row[0] : null, 0L));
+        result.put("sessions", CommonUtils.toLong(row.length > 1 ? row[1] : null, 0L));
+        result.put("apps", CommonUtils.toLong(row.length > 2 ? row[2] : null, 0L));
+        result.put("agents", CommonUtils.toLong(row.length > 3 ? row[3] : null, 0L));
+        result.put("models", CommonUtils.toLong(row.length > 4 ? row[4] : null, 0L));
+        result.put("users", CommonUtils.toLong(row.length > 5 ? row[5] : null, 0L));
         return result;
       }
     }.execute();

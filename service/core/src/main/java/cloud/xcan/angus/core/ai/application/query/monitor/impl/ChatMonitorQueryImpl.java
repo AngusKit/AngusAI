@@ -11,6 +11,7 @@ import cloud.xcan.angus.core.ai.interfaces.monitor.facade.vo.ChatMonitorOverview
 import cloud.xcan.angus.core.ai.interfaces.monitor.facade.vo.ChatMonitorOverviewVo.DualStatsVo;
 import cloud.xcan.angus.core.ai.interfaces.monitor.facade.vo.ChatMonitorOverviewVo.FeedbackStatsVo;
 import cloud.xcan.angus.core.ai.interfaces.monitor.facade.vo.ChatMonitorOverviewVo.ThroughputStatsVo;
+import cloud.xcan.angus.core.ai.infra.util.CommonUtils;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import jakarta.annotation.Resource;
 import java.time.LocalDate;
@@ -157,10 +158,10 @@ public class ChatMonitorQueryImpl implements ChatMonitorQuery {
         lastMinuteEnd);
 
     ThroughputStatsVo vo = new ThroughputStatsVo();
-    vo.setCurrent(throughputCurrent);
-    vo.setMin(throughputMin);
-    vo.setMax(throughputMax);
-    vo.setAverage(throughputAvg);
+    vo.setCurrent(CommonUtils.formatPercentageTo2Decimals(throughputCurrent));
+    vo.setMin(CommonUtils.formatPercentageTo2Decimals(throughputMin));
+    vo.setMax(CommonUtils.formatPercentageTo2Decimals(throughputMax));
+    vo.setAverage(CommonUtils.formatPercentageTo2Decimals(throughputAvg));
     return vo;
   }
 

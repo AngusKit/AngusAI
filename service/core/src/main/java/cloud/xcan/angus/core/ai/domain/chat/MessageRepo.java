@@ -93,7 +93,7 @@ public interface MessageRepo extends BaseRepository<Message, Long> {
   int deleteBySessionEntityIdIn(List<Long> ids);
 
   /**
-   * 按分钟分组统计当天消息数（用于吞吐量）。 返回 List&lt;Object[]&gt;: [minuteOfDay, count]，minuteOfDay 为 0-1439。 MySQL:
+   * 按分钟分组统计当天消息数（用于吞吐量）。 返回 List<Object[]>: [minuteOfDay, count]，minuteOfDay 为 0-1439。 MySQL:
    * 使用 HOUR*60+MINUTE
    */
   @Query(value =
@@ -104,7 +104,7 @@ public interface MessageRepo extends BaseRepository<Message, Long> {
       @Param("dayEnd") LocalDateTime dayEnd);
 
   /**
-   * 按月份分组统计指定年份的消息数。 返回 List&lt;Object[]&gt;: [month, count]，month 为 1-12。
+   * 按月份分组统计指定年份的消息数。 返回 List<Object[]>: [month, count]，month 为 1-12。
    */
   @Query(value = "SELECT MONTH(m.created_date) AS mth, COUNT(*) FROM ai_chat_message m "
       + "WHERE m.created_date >= :yearStart AND m.created_date <= :yearEnd "
@@ -113,7 +113,7 @@ public interface MessageRepo extends BaseRepository<Message, Long> {
       @Param("yearEnd") LocalDateTime yearEnd);
 
   /**
-   * 按日分组统计指定月份的消息数。 返回 List&lt;Object[]&gt;: [day, count]，day 为 1-31。
+   * 按日分组统计指定月份的消息数。 返回 List<Object[]>: [day, count]，day 为 1-31。
    */
   @Query(value = "SELECT DAY(m.created_date) AS d, COUNT(*) FROM ai_chat_message m "
       + "WHERE m.created_date >= :monthStart AND m.created_date <= :monthEnd "
@@ -122,7 +122,7 @@ public interface MessageRepo extends BaseRepository<Message, Long> {
       @Param("monthEnd") LocalDateTime monthEnd);
 
   /**
-   * 按小时分组统计指定日期的消息数。 返回 List&lt;Object[]&gt;: [hour, count]，hour 为 0-23。
+   * 按小时分组统计指定日期的消息数。 返回 List<Object[]>: [hour, count]，hour 为 0-23。
    */
   @Query(value = "SELECT HOUR(m.created_date) AS h, COUNT(*) FROM ai_chat_message m "
       + "WHERE m.created_date >= :dayStart AND m.created_date <= :dayEnd "
@@ -131,7 +131,7 @@ public interface MessageRepo extends BaseRepository<Message, Long> {
       @Param("dayEnd") LocalDateTime dayEnd);
 
   /**
-   * 按月份分组统计指定年份的反馈数（like+dislike）。 返回 List&lt;Object[]&gt;: [month, count]，month 为 1-12。
+   * 按月份分组统计指定年份的反馈数（like+dislike）。 返回 List<Object[]>: [month, count]，month 为 1-12。
    */
   @Query(value = "SELECT MONTH(m.created_date) AS mth, COUNT(*) FROM ai_chat_message m "
       + "WHERE m.feedback_type IN ('like', 'dislike') AND m.created_date >= :yearStart AND m.created_date <= :yearEnd "
@@ -140,7 +140,7 @@ public interface MessageRepo extends BaseRepository<Message, Long> {
       @Param("yearEnd") LocalDateTime yearEnd);
 
   /**
-   * 按日分组统计指定月份的反馈数。 返回 List&lt;Object[]&gt;: [day, count]。
+   * 按日分组统计指定月份的反馈数。 返回 List<Object[]>: [day, count]。
    */
   @Query(value = "SELECT DAY(m.created_date) AS d, COUNT(*) FROM ai_chat_message m "
       + "WHERE m.feedback_type IN ('like', 'dislike') AND m.created_date >= :monthStart AND m.created_date <= :monthEnd "
@@ -149,7 +149,7 @@ public interface MessageRepo extends BaseRepository<Message, Long> {
       @Param("monthEnd") LocalDateTime monthEnd);
 
   /**
-   * 按小时分组统计指定日期的反馈数。 返回 List&lt;Object[]&gt;: [hour, count]。
+   * 按小时分组统计指定日期的反馈数。 返回 List<Object[]>: [hour, count]。
    */
   @Query(value = "SELECT HOUR(m.created_date) AS h, COUNT(*) FROM ai_chat_message m "
       + "WHERE m.feedback_type IN ('like', 'dislike') AND m.created_date >= :dayStart AND m.created_date <= :dayEnd "
