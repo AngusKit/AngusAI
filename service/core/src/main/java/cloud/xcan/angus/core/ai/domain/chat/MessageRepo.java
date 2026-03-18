@@ -25,12 +25,6 @@ public interface MessageRepo extends BaseRepository<Message, Long> {
   long countByFeedbackType(String feedbackType);
 
   /**
-   * 统计指定反馈类型且在时间范围内的消息数
-   */
-  long countByFeedbackTypeAndCreatedDateBetween(String feedbackType, LocalDateTime start,
-      LocalDateTime end);
-
-  /**
    * 查询正在流式生成的消息（按会话ID UUID）
    */
   List<Message> findBySessionIdAndIsStreamingTrue(String sessionId);
@@ -75,18 +69,14 @@ public interface MessageRepo extends BaseRepository<Message, Long> {
    * 批量查询多个会话各自的最后一条消息（一次 SQL，兼容 MySQL 5.7）
    */
   @Query(
-      value =
-          "SELECT m.id, m.session_id, m.session_id_uuid, m.parent_message_id, m.role, m.content,"
-              + " m.attachments, m.usage, m.is_streaming, m.feedback_type, m.feedback_comment,"
-              + " m.tenant_id, m.created_by, m.modified_by, m.created_date, m.modified_date"
-              + " FROM ai_chat_message m"
-              + " INNER JOIN ("
-              + "   SELECT session_id_uuid, MAX(id) AS max_id"
-              + "   FROM ai_chat_message"
-              + "   WHERE session_id_uuid IN (:sessionIds)"
-              + "   GROUP BY session_id_uuid"
-              + " ) latest ON m.session_id_uuid = latest.session_id_uuid AND m.id = latest.max_id"
-              + " WHERE m.session_id_uuid IN (:sessionIds)",
+      value = "SELECT m.* FROM ai_chat_message m"
+          + " INNER JOIN ("
+          + "   SELECT session_id_uuid, MAX(id) AS max_id"
+          + "   FROM ai_chat_message"
+          + "   WHERE session_id_uuid IN (:sessionIds)"
+          + "   GROUP BY session_id_uuid"
+          + " ) latest ON m.session_id_uuid = latest.session_id_uuid AND m.id = latest.max_id"
+          + " WHERE m.session_id_uuid IN (:sessionIds)",
       nativeQuery = true)
   List<Message> findLastMessageBySessionIds(@Param("sessionIds") List<String> sessionIds);
 
