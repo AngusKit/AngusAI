@@ -38,4 +38,8 @@ public class MessageFindDto extends PageQuery {
   @Schema(description = "反馈类型：like或dislike", allowableValues = {"like", "dislike"})
   private String feedbackType;
 
+  @Override
+  public String getDefaultOrderBy() {
+    return "createdDate";
+  }
 }

@@ -30,4 +30,9 @@ public class SessionFindDto extends PageQuery {
 
   @Schema(description = "是否已置顶")
   private Boolean isPinned;
+
+  @Override
+  public String getDefaultOrderBy() {
+    return "createdDate";
+  }
 }
