@@ -43,11 +43,11 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
     { id: 'resource-sharing', icon: Share2, label: t('sidebar.nav.sharing') },
     { id: 'notifications', icon: Bell, label: t('sidebar.nav.notifications'), badge: formatBadge(notificationCount) },
     { id: 'activity-log', icon: Activity, label: t('sidebar.nav.activityLog') },
-    { id: 'monitor', icon: Monitor, label: t('sidebar.nav.monitor') },
   ];
 
   const systemMenuItems: MenuItem[] = [
-    { id: 'usage-analytics', icon: BarChart3, label: t('analytics.title') },
+    { id: 'usage-analytics', icon: BarChart3, label: t('sidebar.nav.analytics') },
+    { id: 'monitor', icon: Monitor, label: t('sidebar.nav.monitor') },
     { id: 'plugins', icon: Package, label: t('sidebar.nav.plugins') },
     { id: 'models', icon: Settings, label: t('sidebar.nav.models') },
     { id: 'vector-store', icon: Server, label: t('sidebar.nav.vectorStore') },
