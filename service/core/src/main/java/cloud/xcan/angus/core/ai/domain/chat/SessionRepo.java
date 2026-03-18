@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.data.repository.NoRepositoryBean;
 
 /**
@@ -40,6 +41,19 @@ public interface SessionRepo extends BaseRepository<Session, Long> {
   long countByCreatedDateBetween(LocalDateTime start, LocalDateTime end);
 
   /**
+   * 统计指定时间范围内去重用户数（按 created_by）
+   */
+  @Query("SELECT COUNT(DISTINCT s.createdBy) FROM Session s WHERE s.createdDate BETWEEN :start AND :end")
+  long countDistinctCreatedByByCreatedDateBetween(@Param("start") LocalDateTime start,
+      @Param("end") LocalDateTime end);
+
+  /**
+   * 统计历史去重用户总数（按 created_by）
+   */
+  @Query("SELECT COUNT(DISTINCT s.createdBy) FROM Session s")
+  long countDistinctCreatedBy();
+
+  /**
    * 统计应用的使用次数
    */
   long countByAppId(Long appId);
@@ -63,4 +77,34 @@ public interface SessionRepo extends BaseRepository<Session, Long> {
    */
   @Modifying
   int deleteByIdIn(List<Long> ids);
+
+  /**
+   * 按月份分组统计指定年份的会话数。
+   * 返回 List&lt;Object[]&gt;: [month, count]，month 为 1-12。
+   */
+  @Query(value = "SELECT MONTH(s.created_date) AS mth, COUNT(*) FROM ai_chat_session s "
+      + "WHERE s.created_date >= :yearStart AND s.created_date <= :yearEnd "
+      + "GROUP BY MONTH(s.created_date) ORDER BY mth", nativeQuery = true)
+  List<Object[]> countByMonthForYear(@Param("yearStart") LocalDateTime yearStart,
+      @Param("yearEnd") LocalDateTime yearEnd);
+
+  /**
+   * 按日分组统计指定月份的会话数。
+   * 返回 List&lt;Object[]&gt;: [day, count]。
+   */
+  @Query(value = "SELECT DAY(s.created_date) AS d, COUNT(*) FROM ai_chat_session s "
+      + "WHERE s.created_date >= :monthStart AND s.created_date <= :monthEnd "
+      + "GROUP BY DAY(s.created_date) ORDER BY d", nativeQuery = true)
+  List<Object[]> countByDayForMonth(@Param("monthStart") LocalDateTime monthStart,
+      @Param("monthEnd") LocalDateTime monthEnd);
+
+  /**
+   * 按小时分组统计指定日期的会话数。
+   * 返回 List&lt;Object[]&gt;: [hour, count]。
+   */
+  @Query(value = "SELECT HOUR(s.created_date) AS h, COUNT(*) FROM ai_chat_session s "
+      + "WHERE s.created_date >= :dayStart AND s.created_date <= :dayEnd "
+      + "GROUP BY HOUR(s.created_date) ORDER BY h", nativeQuery = true)
+  List<Object[]> countByHourForDay(@Param("dayStart") LocalDateTime dayStart,
+      @Param("dayEnd") LocalDateTime dayEnd);
 }

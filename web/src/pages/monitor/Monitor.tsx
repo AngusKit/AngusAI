@@ -1,5 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useLanguage } from '@/components/LanguageProvider';
+import MonitorService from '@/services/Monitor';
+import type { ChatMonitorOverviewVo, ChartDataPointVo } from '@/services/MonitorTypes';
 import { 
   Activity, 
   Search, 
@@ -160,6 +162,33 @@ interface ChartDataPoint {
   date: string;
   value: number;
 }
+
+/** 月份枚举到前端展示的映射（后端返回 JANUARY 等，国际化由前端处理） */
+const MONTH_LABELS: Record<string, { zh: string; en: string }> = {
+  JANUARY: { zh: '1月', en: 'Jan' },
+  FEBRUARY: { zh: '2月', en: 'Feb' },
+  MARCH: { zh: '3月', en: 'Mar' },
+  APRIL: { zh: '4月', en: 'Apr' },
+  MAY: { zh: '5月', en: 'May' },
+  JUNE: { zh: '6月', en: 'Jun' },
+  JULY: { zh: '7月', en: 'Jul' },
+  AUGUST: { zh: '8月', en: 'Aug' },
+  SEPTEMBER: { zh: '9月', en: 'Sep' },
+  OCTOBER: { zh: '10月', en: 'Oct' },
+  NOVEMBER: { zh: '11月', en: 'Nov' },
+  DECEMBER: { zh: '12月', en: 'Dec' },
+};
+
+const DEFAULT_OVERVIEW_STATS: OverviewStats = {
+  throughput: { current: 0, min: 0, max: 0, average: 0 },
+  sessions: { active: 0, total: 0 },
+  messages: { active: 0, total: 0 },
+  users: { active: 0, total: 0 },
+  feedback: { like: 0, dislike: 0, total: 0 },
+  applications: { active: 0, total: 0 },
+  agents: { active: 0, total: 0 },
+  models: { active: 0, total: 0 },
+};
 
 export function Monitor() {
   const { language } = useLanguage();
@@ -425,141 +454,176 @@ export function Monitor() {
     },
   ];
 
-  // Mock overview statistics
-  const overviewStats: OverviewStats = {
-    throughput: {
-      current: 45.2,
-      min: 12.5,
-      max: 89.3,
-      average: 52.8,
-    },
-    sessions: {
-      active: 156,
-      total: 1248,
-    },
-    messages: {
-      active: 892,
-      total: 8934,
-    },
-    users: {
-      active: 89,
-      total: 342,
-    },
-    feedback: {
-      like: 423,
-      dislike: 144,
-      total: 567,
-    },
-    applications: {
-      active: 3,
-      total: 8,
-    },
-    agents: {
-      active: 5,
-      total: 12,
-    },
-    models: {
-      active: 4,
-      total: 10,
-    },
-  };
+  const [overviewStats, setOverviewStats] = useState<OverviewStats>(DEFAULT_OVERVIEW_STATS);
+  const [overviewStatsLoading, setOverviewStatsLoading] = useState(true);
+  const [sessionsChartData, setSessionsChartData] = useState<ChartDataPointVo[]>([]);
+  const [sessionsChartLoading, setSessionsChartLoading] = useState(true);
+  const [messagesChartData, setMessagesChartData] = useState<ChartDataPointVo[]>([]);
+  const [messagesChartLoading, setMessagesChartLoading] = useState(true);
+  const [feedbackChartData, setFeedbackChartData] = useState<ChartDataPointVo[]>([]);
+  const [feedbackChartLoading, setFeedbackChartLoading] = useState(true);
 
-  // Mock chart data
-  const sessionsChartData = useMemo(() => {
-    const range = sessionsChartRange;
-    if (range === 'year') {
-      return [
-        { id: 'sess-y-1', date: language === 'zh-CN' ? '1月' : 'Jan', value: 850 },
-        { id: 'sess-y-2', date: language === 'zh-CN' ? '2月' : 'Feb', value: 920 },
-        { id: 'sess-y-3', date: language === 'zh-CN' ? '3月' : 'Mar', value: 1100 },
-        { id: 'sess-y-4', date: language === 'zh-CN' ? '4月' : 'Apr', value: 980 },
-        { id: 'sess-y-5', date: language === 'zh-CN' ? '5月' : 'May', value: 1250 },
-        { id: 'sess-y-6', date: language === 'zh-CN' ? '6月' : 'Jun', value: 1400 },
-        { id: 'sess-y-7', date: language === 'zh-CN' ? '7月' : 'Jul', value: 1350 },
-        { id: 'sess-y-8', date: language === 'zh-CN' ? '8月' : 'Aug', value: 1550 },
-        { id: 'sess-y-9', date: language === 'zh-CN' ? '9月' : 'Sep', value: 1680 },
-        { id: 'sess-y-10', date: language === 'zh-CN' ? '10月' : 'Oct', value: 1820 },
-        { id: 'sess-y-11', date: language === 'zh-CN' ? '11月' : 'Nov', value: 1950 },
-        { id: 'sess-y-12', date: language === 'zh-CN' ? '12月' : 'Dec', value: 2100 },
-      ];
-    } else if (range === 'month') {
-      return Array.from({ length: 30 }, (_, i) => ({
-        id: `sess-m-${i}`,
-        date: `${i + 1}${language === 'zh-CN' ? '日' : ''}`,
-        value: Math.floor(Math.random() * 100) + 50,
-      }));
-    } else {
-      return Array.from({ length: 24 }, (_, i) => ({
-        id: `sess-d-${i}`,
-        date: `${i}:00`,
-        value: Math.floor(Math.random() * 50) + 10,
-      }));
-    }
-  }, [sessionsChartRange, language]);
+  const buildChartQuery = useCallback(
+    (range: 'year' | 'month' | 'day', year: string, month: string, day: string) => {
+      const q: Record<string, string> = { range };
+      if (range === 'year' || range === 'month') q.year = year;
+      if (range === 'month') q.month = month;
+      if (range === 'day') {
+        q.year = year;
+        q.month = month;
+        q.day = day;
+      }
+      return q;
+    },
+    []
+  );
 
-  const messagesChartData = useMemo(() => {
-    const range = messagesChartRange;
-    if (range === 'year') {
-      return [
-        { id: 'msg-y-1', date: language === 'zh-CN' ? '1月' : 'Jan', value: 3200 },
-        { id: 'msg-y-2', date: language === 'zh-CN' ? '2月' : 'Feb', value: 3800 },
-        { id: 'msg-y-3', date: language === 'zh-CN' ? '3月' : 'Mar', value: 4500 },
-        { id: 'msg-y-4', date: language === 'zh-CN' ? '4月' : 'Apr', value: 4200 },
-        { id: 'msg-y-5', date: language === 'zh-CN' ? '5月' : 'May', value: 5100 },
-        { id: 'msg-y-6', date: language === 'zh-CN' ? '6月' : 'Jun', value: 5800 },
-        { id: 'msg-y-7', date: language === 'zh-CN' ? '7月' : 'Jul', value: 5500 },
-        { id: 'msg-y-8', date: language === 'zh-CN' ? '8月' : 'Aug', value: 6300 },
-        { id: 'msg-y-9', date: language === 'zh-CN' ? '9月' : 'Sep', value: 6900 },
-        { id: 'msg-y-10', date: language === 'zh-CN' ? '10月' : 'Oct', value: 7400 },
-        { id: 'msg-y-11', date: language === 'zh-CN' ? '11月' : 'Nov', value: 8100 },
-        { id: 'msg-y-12', date: language === 'zh-CN' ? '12月' : 'Dec', value: 8934 },
-      ];
-    } else if (range === 'month') {
-      return Array.from({ length: 30 }, (_, i) => ({
-        id: `msg-m-${i}`,
-        date: `${i + 1}${language === 'zh-CN' ? '日' : ''}`,
-        value: Math.floor(Math.random() * 400) + 200,
-      }));
-    } else {
-      return Array.from({ length: 24 }, (_, i) => ({
-        id: `msg-d-${i}`,
-        date: `${i}:00`,
-        value: Math.floor(Math.random() * 200) + 50,
-      }));
-    }
-  }, [messagesChartRange, language]);
+  const mapOverviewFromApi = useCallback((vo: ChatMonitorOverviewVo | null): OverviewStats => {
+    if (!vo) return DEFAULT_OVERVIEW_STATS;
+    return {
+      throughput: {
+        current: vo.throughput?.current ?? 0,
+        min: vo.throughput?.min ?? 0,
+        max: vo.throughput?.max ?? 0,
+        average: vo.throughput?.average ?? 0,
+      },
+      sessions: { active: vo.sessions?.active ?? 0, total: vo.sessions?.total ?? 0 },
+      messages: { active: vo.messages?.active ?? 0, total: vo.messages?.total ?? 0 },
+      users: { active: vo.users?.active ?? 0, total: vo.users?.total ?? 0 },
+      feedback: {
+        like: vo.feedback?.like ?? 0,
+        dislike: vo.feedback?.dislike ?? 0,
+        total: vo.feedback?.total ?? 0,
+      },
+      applications: { active: vo.applications?.active ?? 0, total: vo.applications?.total ?? 0 },
+      agents: { active: vo.agents?.active ?? 0, total: vo.agents?.total ?? 0 },
+      models: { active: vo.models?.active ?? 0, total: vo.models?.total ?? 0 },
+    };
+  }, []);
 
-  const feedbackChartData = useMemo(() => {
-    const range = feedbackChartRange;
-    if (range === 'year') {
-      return [
-        { id: 'fb-y-1', date: language === 'zh-CN' ? '1月' : 'Jan', value: 25 },
-        { id: 'fb-y-2', date: language === 'zh-CN' ? '2月' : 'Feb', value: 32 },
-        { id: 'fb-y-3', date: language === 'zh-CN' ? '3月' : 'Mar', value: 45 },
-        { id: 'fb-y-4', date: language === 'zh-CN' ? '4月' : 'Apr', value: 38 },
-        { id: 'fb-y-5', date: language === 'zh-CN' ? '5月' : 'May', value: 52 },
-        { id: 'fb-y-6', date: language === 'zh-CN' ? '6月' : 'Jun', value: 61 },
-        { id: 'fb-y-7', date: language === 'zh-CN' ? '7月' : 'Jul', value: 58 },
-        { id: 'fb-y-8', date: language === 'zh-CN' ? '8月' : 'Aug', value: 68 },
-        { id: 'fb-y-9', date: language === 'zh-CN' ? '9月' : 'Sep', value: 75 },
-        { id: 'fb-y-10', date: language === 'zh-CN' ? '10月' : 'Oct', value: 82 },
-        { id: 'fb-y-11', date: language === 'zh-CN' ? '11月' : 'Nov', value: 89 },
-        { id: 'fb-y-12', date: language === 'zh-CN' ? '12月' : 'Dec', value: 95 },
-      ];
-    } else if (range === 'month') {
-      return Array.from({ length: 30 }, (_, i) => ({
-        id: `fb-m-${i}`,
-        date: `${i + 1}${language === 'zh-CN' ? '日' : ''}`,
-        value: Math.floor(Math.random() * 20) + 5,
-      }));
-    } else {
-      return Array.from({ length: 24 }, (_, i) => ({
-        id: `fb-d-${i}`,
-        date: `${i}:00`,
-        value: Math.floor(Math.random() * 10) + 1,
-      }));
+  const loadOverview = useCallback(async () => {
+    setOverviewStatsLoading(true);
+    try {
+      const res = await MonitorService.getOverview();
+      const data = (res as { data?: ChatMonitorOverviewVo })?.data;
+      setOverviewStats(mapOverviewFromApi(data ?? null));
+    } catch {
+      setOverviewStats(DEFAULT_OVERVIEW_STATS);
+    } finally {
+      setOverviewStatsLoading(false);
     }
-  }, [feedbackChartRange, language]);
+  }, [mapOverviewFromApi]);
+
+  const formatChartDate = useCallback((date: string) => {
+    const labels = MONTH_LABELS[date];
+    return labels ? (language === 'zh-CN' ? labels.zh : labels.en) : date;
+  }, [language]);
+
+  const loadSessionsChart = useCallback(async () => {
+    setSessionsChartLoading(true);
+    try {
+      const query = buildChartQuery(
+        sessionsChartRange,
+        sessionsSelectedYear,
+        sessionsSelectedMonth,
+        sessionsSelectedDay
+      );
+      const res = await MonitorService.getSessionsChartData(query);
+      const list = (res as { data?: ChartDataPointVo[] })?.data ?? [];
+      setSessionsChartData(list.map((p) => ({
+        ...p,
+        value: Number(p.value),
+        date: formatChartDate(p.date),
+      })));
+    } catch {
+      setSessionsChartData([]);
+    } finally {
+      setSessionsChartLoading(false);
+    }
+  }, [
+    sessionsChartRange,
+    sessionsSelectedYear,
+    sessionsSelectedMonth,
+    sessionsSelectedDay,
+    buildChartQuery,
+    formatChartDate,
+  ]);
+
+  const loadMessagesChart = useCallback(async () => {
+    setMessagesChartLoading(true);
+    try {
+      const query = buildChartQuery(
+        messagesChartRange,
+        messagesSelectedYear,
+        messagesSelectedMonth,
+        messagesSelectedDay
+      );
+      const res = await MonitorService.getMessagesChartData(query);
+      const list = (res as { data?: ChartDataPointVo[] })?.data ?? [];
+      setMessagesChartData(list.map((p) => ({
+        ...p,
+        value: Number(p.value),
+        date: formatChartDate(p.date),
+      })));
+    } catch {
+      setMessagesChartData([]);
+    } finally {
+      setMessagesChartLoading(false);
+    }
+  }, [
+    messagesChartRange,
+    messagesSelectedYear,
+    messagesSelectedMonth,
+    messagesSelectedDay,
+    buildChartQuery,
+    formatChartDate,
+  ]);
+
+  const loadFeedbackChart = useCallback(async () => {
+    setFeedbackChartLoading(true);
+    try {
+      const query = buildChartQuery(
+        feedbackChartRange,
+        feedbackSelectedYear,
+        feedbackSelectedMonth,
+        feedbackSelectedDay
+      );
+      const res = await MonitorService.getFeedbackChartData(query);
+      const list = (res as { data?: ChartDataPointVo[] })?.data ?? [];
+      setFeedbackChartData(list.map((p) => ({
+        ...p,
+        value: Number(p.value),
+        date: formatChartDate(p.date),
+      })));
+    } catch {
+      setFeedbackChartData([]);
+    } finally {
+      setFeedbackChartLoading(false);
+    }
+  }, [
+    feedbackChartRange,
+    feedbackSelectedYear,
+    feedbackSelectedMonth,
+    feedbackSelectedDay,
+    buildChartQuery,
+    formatChartDate,
+  ]);
+
+  useEffect(() => {
+    loadOverview();
+  }, [loadOverview]);
+
+  useEffect(() => {
+    loadSessionsChart();
+  }, [loadSessionsChart]);
+
+  useEffect(() => {
+    loadMessagesChart();
+  }, [loadMessagesChart]);
+
+  useEffect(() => {
+    loadFeedbackChart();
+  }, [loadFeedbackChart]);
 
   // Filter functions
   const getFilteredSessions = () => {
@@ -1107,6 +1171,11 @@ export function Monitor() {
 
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-6">
+          {overviewStatsLoading && (
+            <div className="text-sm text-gray-500 dark:text-gray-400">
+              {language === 'zh-CN' ? '加载概览中...' : 'Loading overview...'}
+            </div>
+          )}
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Throughput Card */}
@@ -1427,6 +1496,11 @@ export function Monitor() {
               </div>
             </div>
             <ResponsiveContainer width="100%" height={300} key={`sessions-container-${sessionsChartRange}-${language}`}>
+              {sessionsChartLoading ? (
+                <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">
+                  {language === 'zh-CN' ? '加载中...' : 'Loading...'}
+                </div>
+              ) : (
               <LineChart data={sessionsChartData}>
                 <CartesianGrid key="sessions-grid" strokeDasharray="3 3" className="stroke-gray-300 dark:stroke-gray-700" />
                 <XAxis 
@@ -1461,6 +1535,7 @@ export function Monitor() {
                   activeDot={{ r: 6 }}
                 />
               </LineChart>
+              )}
             </ResponsiveContainer>
           </Card>
 
@@ -1710,6 +1785,11 @@ export function Monitor() {
               </div>
             </div>
             <ResponsiveContainer width="100%" height={300} key={`messages-container-${messagesChartRange}-${language}`}>
+              {messagesChartLoading ? (
+                <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">
+                  {language === 'zh-CN' ? '加载中...' : 'Loading...'}
+                </div>
+              ) : (
               <LineChart data={messagesChartData}>
                 <CartesianGrid key="messages-grid" strokeDasharray="3 3" className="stroke-gray-300 dark:stroke-gray-700" />
                 <XAxis 
@@ -1744,6 +1824,7 @@ export function Monitor() {
                   activeDot={{ r: 6 }}
                 />
               </LineChart>
+              )}
             </ResponsiveContainer>
           </Card>
 
@@ -2028,6 +2109,11 @@ export function Monitor() {
               </div>
             </div>
             <ResponsiveContainer width="100%" height={300} key={`feedback-container-${feedbackChartRange}-${language}`}>
+              {feedbackChartLoading ? (
+                <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">
+                  {language === 'zh-CN' ? '加载中...' : 'Loading...'}
+                </div>
+              ) : (
               <LineChart data={feedbackChartData}>
                 <CartesianGrid key="feedback-grid" strokeDasharray="3 3" className="stroke-gray-300 dark:stroke-gray-700" />
                 <XAxis 
@@ -2062,6 +2148,7 @@ export function Monitor() {
                   activeDot={{ r: 6 }}
                 />
               </LineChart>
+              )}
             </ResponsiveContainer>
           </Card>
 
