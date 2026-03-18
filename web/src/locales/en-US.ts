@@ -186,6 +186,7 @@ export const enUS = {
       plugins: 'Plugin',
       agents: 'Agents',
       activityLog: 'Activities',
+      monitor: 'Conversation Monitoring',
       notifications: 'Notifications',
     }
   },

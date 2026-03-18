@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, FileText, Workflow, BookOpen, Package, Database, Settings, Users, Share2, BarChart3, Key, CreditCard, MessageSquare, Sparkles, Code2, Server, Activity, Bell, Bot } from 'lucide-react';
+import { Home, FileText, Workflow, BookOpen, Package, Database, Settings, Users, Share2, BarChart3, Key, CreditCard, MessageSquare, Sparkles, Code2, Server, Activity, Bell, Bot, Monitor } from 'lucide-react';
 import { Button } from '@/components/ui/button.tsx';
 import { Badge } from '@/components/ui/badge.tsx';
 import { AppNavigator } from './AppNavigator.tsx';
@@ -43,6 +43,7 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
     { id: 'resource-sharing', icon: Share2, label: t('sidebar.nav.sharing') },
     { id: 'notifications', icon: Bell, label: t('sidebar.nav.notifications'), badge: formatBadge(notificationCount) },
     { id: 'activity-log', icon: Activity, label: t('sidebar.nav.activityLog') },
+    { id: 'monitor', icon: Monitor, label: t('sidebar.nav.monitor') },
   ];
 
   const systemMenuItems: MenuItem[] = [

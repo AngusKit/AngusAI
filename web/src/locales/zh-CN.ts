@@ -185,6 +185,7 @@ export const zhCN = {
       plugins: '插件',
       agents: '智能体',
       activityLog: '活动',
+      monitor: '对话监控',
       notifications: '通知',
     }
   },

@@ -30,6 +30,7 @@ import { BillingSubscription } from '@/pages/subscription/BillingSubscription.ts
 import { PromptLibrary } from '@/pages/prompt/PromptLibrary.tsx';
 import { Chat } from '@/pages/chat/Chat';
 import { ActivityLog } from '@/pages/activity/ActivityLog.tsx';
+import { Monitor } from '@/pages/monitor/Monitor.tsx';
 import { Notifications } from '@/pages/notifications/Notifications.tsx';
 import { NotFoundPage } from '@/components/NotFoundPage';
 
@@ -64,6 +65,7 @@ export function AppRoutes() {
         <Route path='notifications' element={<Notifications />} />
         <Route path='team-members' element={<Members />} />
         <Route path='activity-log' element={<ActivityLog />} />
+        <Route path='monitor' element={<Monitor />} />
         <Route path='resource-sharing' element={<ResourceSharing />} />
         <Route path='usage-analytics' element={<UsageAnalytics />} />
         <Route path='api-keys' element={<APIKeys />} />
