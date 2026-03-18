@@ -19,36 +19,30 @@ import { toast } from 'sonner';
 
 const PAGE_SIZE = 5;
 
-/** 按 sessionId 缓存的 ChatSwitcher 数据，切换会话时复用 */
-const CHAT_SWITCHER_CACHE_MAX = 30;
-const chatSwitcherCache = new Map<
-  string,
-  {
-    apps: ApplicationListVo[];
-    appPage: number;
-    appTotal: number;
-    appKeyword: string;
-    models: ModelListVo[];
-    modelPage: number;
-    modelTotal: number;
-    modelKeyword: string;
-  }
->();
+/** 应用列表按 keyword 全局缓存，切换会话时复用（应用列表与 session 无关） */
+const appsListCache = new Map<string, { list: ApplicationListVo[]; page: number; total: number }>();
 
-function getCacheKey(sessionId?: string): string {
-  return sessionId && !sessionId.startsWith('pending-') ? sessionId : '_global';
+/** 模型列表按 keyword 全局缓存，切换会话时复用 */
+const modelsListCache = new Map<string, { list: ModelListVo[]; page: number; total: number }>();
+
+/** 应用详情按 appId 缓存，切换会话时复用 */
+const appDetailCache = new Map<string, ApplicationListVo>();
+
+/** 会话删除时清理对应缓存，供外部调用（当前全局缓存不按 session 清理，保留空实现以便扩展） */
+export function clearChatSwitcherCacheForSession(_sessionId: string) {
+  // 应用/模型列表已改为全局 keyword 缓存，与 session 无关，无需清理
 }
 
-function pruneChatSwitcherCache() {
-  if (chatSwitcherCache.size > CHAT_SWITCHER_CACHE_MAX) {
-    const firstKey = chatSwitcherCache.keys().next().value;
-    if (firstKey) chatSwitcherCache.delete(firstKey);
-  }
-}
+/** 按 modelId 缓存的模型详情，切换会话时复用，避免重复 getModelDetail */
+const modelDetailCache = new Map<string, ModelListVo>();
+const MODEL_DETAIL_CACHE_MAX = 50;
+const modelDetailFetching = new Set<string>();
 
-/** 会话删除时清理对应缓存，供外部调用 */
-export function clearChatSwitcherCacheForSession(sessionId: string) {
-  chatSwitcherCache.delete(sessionId);
+function pruneModelDetailCache() {
+  if (modelDetailCache.size > MODEL_DETAIL_CACHE_MAX) {
+    const firstKey = modelDetailCache.keys().next().value;
+    if (firstKey) modelDetailCache.delete(firstKey);
+  }
 }
 
 export interface ChatSwitcherSelection {
@@ -137,13 +131,12 @@ export function useChatSwitcher({
   const loadApps = useCallback(
     async (page: number, append: boolean) => {
       if (appLoadingRef.current) return;
-      const cacheKey = getCacheKey(sessionId);
-      const cacheEntry = append ? undefined : chatSwitcherCache.get(cacheKey);
       const kw = debouncedAppKw.trim();
-      if (!append && cacheEntry && cacheEntry.apps.length > 0 && cacheEntry.appKeyword === kw) {
-        setApps(cacheEntry.apps);
-        setAppPage(cacheEntry.appPage);
-        setAppTotal(cacheEntry.appTotal);
+      const cacheEntry = append ? undefined : appsListCache.get(`apps_${kw}`);
+      if (!append && cacheEntry && cacheEntry.list.length > 0 && cacheEntry.page === page) {
+        setApps(cacheEntry.list);
+        setAppPage(cacheEntry.page);
+        setAppTotal(cacheEntry.total);
         return;
       }
       appLoadingRef.current = true;
@@ -154,7 +147,7 @@ export function useChatSwitcher({
           status: ApplicationStatusEnum.PUBLISHED,
           pageNo: page,
           pageSize: PAGE_SIZE,
-          keyword: debouncedAppKw.trim() || undefined,
+          keyword: kw || undefined,
         } as any);
         const data = (res as any)?.data;
         const list: ApplicationListVo[] = data?.list ?? (Array.isArray(data) ? data : []);
@@ -170,24 +163,7 @@ export function useChatSwitcher({
         setAppPage(page);
         setAppTotal(total);
         if (!append) {
-          const prev = chatSwitcherCache.get(cacheKey);
-          chatSwitcherCache.set(cacheKey, {
-            ...(prev ?? {
-              apps: [],
-              appPage: 1,
-              appTotal: 0,
-              appKeyword: '',
-              models: [],
-              modelPage: 1,
-              modelTotal: 0,
-              modelKeyword: '',
-            }),
-            apps: list,
-            appPage: page,
-            appTotal: total,
-            appKeyword: kw,
-          });
-          pruneChatSwitcherCache();
+          appsListCache.set(`apps_${kw}`, { list, page, total });
         }
       } catch (e) {
         console.error('Load apps failed:', e);
@@ -198,19 +174,18 @@ export function useChatSwitcher({
         setAppLoadMore(false);
       }
     },
-    [debouncedAppKw, sessionId]
+    [debouncedAppKw]
   );
 
   const loadModels = useCallback(
     async (page: number, append: boolean) => {
       if (modelLoadingRef.current) return;
-      const cacheKey = getCacheKey(sessionId);
-      const cacheEntry = append ? undefined : chatSwitcherCache.get(cacheKey);
       const kw = debouncedModelKw.trim();
-      if (!append && cacheEntry && cacheEntry.models.length > 0 && cacheEntry.modelKeyword === kw) {
-        setModels(cacheEntry.models);
-        setModelPage(cacheEntry.modelPage);
-        setModelTotal(cacheEntry.modelTotal);
+      const cacheEntry = append ? undefined : modelsListCache.get(`models_${kw}`);
+      if (!append && cacheEntry && cacheEntry.list.length > 0 && cacheEntry.page === page) {
+        setModels(cacheEntry.list);
+        setModelPage(cacheEntry.page);
+        setModelTotal(cacheEntry.total);
         return;
       }
       modelLoadingRef.current = true;
@@ -222,7 +197,7 @@ export function useChatSwitcher({
           status: ModelStatusEnum.ACTIVE,
           pageNo: page,
           pageSize: PAGE_SIZE,
-          keyword: debouncedModelKw.trim() || undefined,
+          keyword: kw || undefined,
         } as any);
         const data = (res as any)?.data;
         const list: ModelListVo[] = data?.list ?? (Array.isArray(data) ? data : []);
@@ -238,24 +213,7 @@ export function useChatSwitcher({
         setModelPage(page);
         setModelTotal(total);
         if (!append) {
-          const prev = chatSwitcherCache.get(cacheKey);
-          chatSwitcherCache.set(cacheKey, {
-            ...(prev ?? {
-              apps: [],
-              appPage: 1,
-              appTotal: 0,
-              appKeyword: '',
-              models: [],
-              modelPage: 1,
-              modelTotal: 0,
-              modelKeyword: '',
-            }),
-            models: list,
-            modelPage: page,
-            modelTotal: total,
-            modelKeyword: kw,
-          });
-          pruneChatSwitcherCache();
+          modelsListCache.set(`models_${kw}`, { list, page, total });
         }
       } catch (e) {
         console.error('Load models failed:', e);
@@ -266,7 +224,7 @@ export function useChatSwitcher({
         setModelLoadMore(false);
       }
     },
-    [debouncedModelKw, sessionId]
+    [debouncedModelKw]
   );
 
   // 进入对话页面后自动加载应用列表
@@ -289,11 +247,16 @@ export function useChatSwitcher({
     }
   }, [modelOpen, debouncedModelKw, loadModels]);
 
-  // 当 selection.appId 存在但不在 apps 中时，按 id 单独拉取应用
+  // 当 selection.appId 存在但不在 apps 中时，按 id 单独拉取应用；优先用 appDetailCache 避免重复请求
   useEffect(() => {
     const appId = selection.appId?.trim();
     if (!appId || apps.some((a) => String(a.id) === appId)) {
       setExtraApp(null);
+      return;
+    }
+    const cached = appDetailCache.get(appId);
+    if (cached) {
+      setExtraApp(cached);
       return;
     }
     let cancelled = false;
@@ -302,7 +265,9 @@ export function useChatSwitcher({
         if (cancelled) return;
         const data = (res as any)?.data;
         if (data && String(data.id) === appId) {
-          setExtraApp(data as ApplicationListVo);
+          const app = data as ApplicationListVo;
+          appDetailCache.set(appId, app);
+          setExtraApp(app);
         } else {
           setExtraApp(null);
         }
@@ -316,9 +281,14 @@ export function useChatSwitcher({
   }, [selection.appId, apps]);
 
   // 当 selection.modelId 存在但无法从 agent.defaultModel 或 models 解析时，按 id 单独拉取模型
+  // 优先用 selection.model、modelDetailCache，避免切换会话时重复请求
   useEffect(() => {
     const modelId = selection.modelId?.trim();
     if (!modelId) {
+      setExtraModel(null);
+      return;
+    }
+    if (selection.model && String(selection.model.id) === modelId) {
       setExtraModel(null);
       return;
     }
@@ -328,19 +298,32 @@ export function useChatSwitcher({
       setExtraModel(null);
       return;
     }
+    const cached = modelDetailCache.get(modelId);
+    if (cached) {
+      setExtraModel(cached);
+      return;
+    }
+    if (modelDetailFetching.has(modelId)) return;
+    modelDetailFetching.add(modelId);
     let cancelled = false;
     Models.getModelDetail(modelId)
       .then((res) => {
         if (cancelled) return;
         const data = (res as any)?.data;
         if (data && String(data.id) === modelId) {
-          setExtraModel(data as ModelListVo);
+          const model = data as ModelListVo;
+          modelDetailCache.set(modelId, model);
+          pruneModelDetailCache();
+          setExtraModel(model);
         } else {
           setExtraModel(null);
         }
       })
       .catch(() => {
         if (!cancelled) setExtraModel(null);
+      })
+      .finally(() => {
+        modelDetailFetching.delete(modelId);
       });
     return () => {
       cancelled = true;
