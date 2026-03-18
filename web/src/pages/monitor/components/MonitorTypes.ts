@@ -41,3 +41,33 @@ export interface SelectOption {
   id: string | number;
   name: string;
 }
+
+
+export interface ThroughputStats {
+  current: number;
+  min: number;
+  max: number;
+  average: number;
+}
+
+export interface DualStats {
+  active: number;
+  total: number;
+}
+
+export interface FeedbackStats {
+  like: number;
+  dislike: number;
+  total: number;
+}
+
+export interface OverviewStats {
+  throughput: ThroughputStats;
+  sessions: DualStats;
+  messages: DualStats;
+  users: DualStats;
+  feedback: FeedbackStats;
+  applications: DualStats;
+  agents: DualStats;
+  models: DualStats;
+}

@@ -390,4 +390,18 @@ export const enumTranslations = {
     WARNING: '警告',
     PENDING: '待处理',
   },
+  MonthEnum: {
+    JANUARY: '1月',
+    FEBRUARY: '2月',
+    MARCH: '3月',
+    APRIL: '4月',
+    MAY: '5月',
+    JUNE: '6月',
+    JULY: '7月',
+    AUGUST: '8月',
+    SEPTEMBER: '9月',
+    OCTOBER: '10月',
+    NOVEMBER: '11月',
+    DECEMBER: '12月',
+  },
 };

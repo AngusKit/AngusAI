@@ -503,6 +503,22 @@ export enum ActivityStatusEnum {
   PENDING = 'PENDING',
 }
 
+/** 月份枚举（后端返回 JANUARY 等，用于监控图表等场景） */
+export enum MonthEnum {
+  JANUARY = 'JANUARY',
+  FEBRUARY = 'FEBRUARY',
+  MARCH = 'MARCH',
+  APRIL = 'APRIL',
+  MAY = 'MAY',
+  JUNE = 'JUNE',
+  JULY = 'JULY',
+  AUGUST = 'AUGUST',
+  SEPTEMBER = 'SEPTEMBER',
+  OCTOBER = 'OCTOBER',
+  NOVEMBER = 'NOVEMBER',
+  DECEMBER = 'DECEMBER',
+}
+
 /** 角色效果：ALLOW-允许, DENY-拒绝 */
 export enum RoleEffectEnum {
   ALLOW = 'ALLOW',
@@ -578,4 +594,5 @@ export const enumNamespaceMap = new Map<any, string>([
   [FullResourceTypeEnum, 'enum.FullResourceTypeEnum'],
   [ActivityActionTypeEnum, 'enum.ActivityActionTypeEnum'],
   [ActivityStatusEnum, 'enum.ActivityStatusEnum'],
+  [MonthEnum, 'enum.MonthEnum'],
 ]);

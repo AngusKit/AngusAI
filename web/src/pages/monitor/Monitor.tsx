@@ -25,53 +25,9 @@ import { MonitorOverview } from './components/MonitorOverview';
 import { MonitorSessionsTab } from './components/MonitorSessionsTab';
 import { MonitorMessagesTab } from './components/MonitorMessagesTab';
 import { MonitorFeedbackTab } from './components/MonitorFeedbackTab';
-import type { MonitorSession, MonitorMessage, MonitorFeedback } from './components/MonitorTypes';
+import type { MonitorSession, MonitorMessage, MonitorFeedback, OverviewStats } from './components/MonitorTypes';
 import type { LazySelectFetcher } from './components/MonitorLazySelect';
-
-interface ThroughputStats {
-  current: number;
-  min: number;
-  max: number;
-  average: number;
-}
-
-interface DualStats {
-  active: number;
-  total: number;
-}
-
-interface FeedbackStats {
-  like: number;
-  dislike: number;
-  total: number;
-}
-
-interface OverviewStats {
-  throughput: ThroughputStats;
-  sessions: DualStats;
-  messages: DualStats;
-  users: DualStats;
-  feedback: FeedbackStats;
-  applications: DualStats;
-  agents: DualStats;
-  models: DualStats;
-}
-
-/** 月份枚举到前端展示的映射（后端返回 JANUARY 等，国际化由前端处理） */
-const MONTH_LABELS: Record<string, { zh: string; en: string }> = {
-  JANUARY: { zh: '1月', en: 'Jan' },
-  FEBRUARY: { zh: '2月', en: 'Feb' },
-  MARCH: { zh: '3月', en: 'Mar' },
-  APRIL: { zh: '4月', en: 'Apr' },
-  MAY: { zh: '5月', en: 'May' },
-  JUNE: { zh: '6月', en: 'Jun' },
-  JULY: { zh: '7月', en: 'Jul' },
-  AUGUST: { zh: '8月', en: 'Aug' },
-  SEPTEMBER: { zh: '9月', en: 'Sep' },
-  OCTOBER: { zh: '10月', en: 'Oct' },
-  NOVEMBER: { zh: '11月', en: 'Nov' },
-  DECEMBER: { zh: '12月', en: 'Dec' },
-};
+import { MonthEnum } from '@/enums/enums';
 
 const DEFAULT_OVERVIEW_STATS: OverviewStats = {
   throughput: { current: 0, min: 0, max: 0, average: 0 },
@@ -85,7 +41,7 @@ const DEFAULT_OVERVIEW_STATS: OverviewStats = {
 };
 
 export function Monitor() {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const [activeTab, setActiveTab] = useState('overview');
   const [currentView, setCurrentView] = useState<'list' | 'session-detail' | 'message-detail'>('list');
   
@@ -216,10 +172,16 @@ export function Monitor() {
     }
   }, [mapOverviewFromApi]);
 
-  const formatChartDate = useCallback((date: string) => {
-    const labels = MONTH_LABELS[date];
-    return labels ? (language === 'zh-CN' ? labels.zh : labels.en) : date;
-  }, [language]);
+  const formatChartDate = useCallback(
+    (date: string) => {
+      if (Object.values(MonthEnum).includes(date as MonthEnum)) {
+        const translated = t(`enum.MonthEnum.${date}`);
+        return translated.startsWith('enum.') ? date : translated;
+      }
+      return date;
+    },
+    [t]
+  );
 
   const loadSessionsChart = useCallback(async () => {
     setSessionsChartLoading(true);
