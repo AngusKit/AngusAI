@@ -1,49 +1,27 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useLanguage } from '@/components/LanguageProvider';
 import MonitorService from '@/services/Monitor';
-import type { ChatMonitorOverviewVo, ChartDataPointVo } from '@/services/MonitorTypes';
-import { 
-  Activity, 
-  Search, 
-  Filter,
-  MessageSquare,
-  Users,
-  Brain,
-  Bot,
-  ThumbsUp,
-  ThumbsDown,
-  Trash2,
-  Eye,
-  Calendar,
-  Clock,
-  AlertCircle,
-  TrendingUp,
-  BarChart3,
-  Database,
-  FileText,
-  X,
-  ChevronDown,
-  ArrowLeft,
-  ChevronLeft,
-  Zap,
-  Cpu,
-  TrendingDown,
-  Layers
-} from 'lucide-react';
+import type { ChartDataPointVo, ChatMonitorOverviewVo } from '@/services/MonitorTypes';
+import { MessageSquare, FileText, ThumbsUp, ThumbsDown, ChevronLeft, BarChart3, Search, Users, Bot } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { toast } from 'sonner';
 import { cn } from '@/components/ui/utils';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import {
+  MonitorOverview,
+  MonitorSessionsTab,
+  MonitorMessagesTab,
+  MonitorFeedbackTab,
+  type Session,
+  type Message,
+  type Feedback,
+} from './components';
 
 interface ThroughputStats {
   current: number;
@@ -74,32 +52,6 @@ interface OverviewStats {
   models: DualStats;
 }
 
-interface StatCard {
-  title: string;
-  value: number;
-  trend?: number;
-  icon: any;
-  color: string;
-}
-
-interface Session {
-  id: number;
-  sessionId: string;
-  title: string;
-  appId: number;
-  appName: string;
-  agentId: number;
-  agentName: string;
-  userId: number;
-  userName: string;
-  messageCount: number;
-  isStarred: boolean;
-  isArchived: boolean;
-  isPinned: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
 interface SessionMessage {
   id: number;
   messageId: string;
@@ -115,52 +67,6 @@ interface SessionMessage {
     completionTokens: number;
     totalTokens: number;
   };
-}
-
-interface Message {
-  id: number;
-  messageId: string;
-  sessionId: string;
-  sessionTitle: string;
-  role: 'user' | 'assistant' | 'system';
-  content: string;
-  userId: number;
-  userName: string;
-  appId: number;
-  appName: string;
-  agentId: number;
-  agentName: string;
-  feedbackType?: 'like' | 'dislike';
-  feedbackComment?: string;
-  createdAt: string;
-  tokenUsage?: {
-    promptTokens: number;
-    completionTokens: number;
-    totalTokens: number;
-  };
-}
-
-interface Feedback {
-  id: number;
-  messageId: string;
-  sessionId: string;
-  sessionTitle: string;
-  feedbackType: 'like' | 'dislike';
-  feedbackComment?: string;
-  userId: number;
-  userName: string;
-  appId: number;
-  appName: string;
-  agentId: number;
-  agentName: string;
-  messageContent: string;
-  createdAt: string;
-}
-
-interface ChartDataPoint {
-  id: string;
-  date: string;
-  value: number;
 }
 
 /** 月份枚举到前端展示的映射（后端返回 JANUARY 等，国际化由前端处理） */
@@ -215,31 +121,42 @@ export function Monitor() {
   const [feedbackSelectedMonth, setFeedbackSelectedMonth] = useState((new Date().getMonth() + 1).toString());
   const [feedbackSelectedDay, setFeedbackSelectedDay] = useState(new Date().getDate().toString());
   
-  // Session filters
+  // Session filters: keyword search + 全部应用、全部智能体、全部模型、全部用户
+  const [sessionKeywordSearch, setSessionKeywordSearch] = useState('');
   const [sessionAppFilter, setSessionAppFilter] = useState('all');
-  const [sessionUserFilter, setSessionUserFilter] = useState('all');
   const [sessionAgentFilter, setSessionAgentFilter] = useState('all');
+  const [sessionModelFilter, setSessionModelFilter] = useState('all');
+  const [sessionUserFilter, setSessionUserFilter] = useState('all');
   const [sessionAppSearch, setSessionAppSearch] = useState('');
-  const [sessionUserSearch, setSessionUserSearch] = useState('');
   const [sessionAgentSearch, setSessionAgentSearch] = useState('');
+  const [sessionModelSearch, setSessionModelSearch] = useState('');
+  const [sessionUserSearch, setSessionUserSearch] = useState('');
   
-  // Message filters
+  // Message filters: keyword search + 全部应用、全部智能体、全部模型、全部会话、全部用户
+  const [messageKeywordSearch, setMessageKeywordSearch] = useState('');
   const [messageAppFilter, setMessageAppFilter] = useState('all');
-  const [messageUserFilter, setMessageUserFilter] = useState('all');
   const [messageAgentFilter, setMessageAgentFilter] = useState('all');
+  const [messageModelFilter, setMessageModelFilter] = useState('all');
+  const [messageSessionFilter, setMessageSessionFilter] = useState('all');
+  const [messageUserFilter, setMessageUserFilter] = useState('all');
   const [messageAppSearch, setMessageAppSearch] = useState('');
-  const [messageUserSearch, setMessageUserSearch] = useState('');
   const [messageAgentSearch, setMessageAgentSearch] = useState('');
+  const [messageModelSearch, setMessageModelSearch] = useState('');
+  const [messageSessionSearch, setMessageSessionSearch] = useState('');
+  const [messageUserSearch, setMessageUserSearch] = useState('');
   
-  // Feedback filters
+  // Feedback filters: keyword search + 全部应用、全部智能体、全部模型、全部会话、全部用户
+  const [feedbackKeywordSearch, setFeedbackKeywordSearch] = useState('');
   const [feedbackAppFilter, setFeedbackAppFilter] = useState('all');
-  const [feedbackUserFilter, setFeedbackUserFilter] = useState('all');
   const [feedbackAgentFilter, setFeedbackAgentFilter] = useState('all');
+  const [feedbackModelFilter, setFeedbackModelFilter] = useState('all');
   const [feedbackSessionFilter, setFeedbackSessionFilter] = useState('all');
+  const [feedbackUserFilter, setFeedbackUserFilter] = useState('all');
   const [feedbackAppSearch, setFeedbackAppSearch] = useState('');
-  const [feedbackUserSearch, setFeedbackUserSearch] = useState('');
   const [feedbackAgentSearch, setFeedbackAgentSearch] = useState('');
+  const [feedbackModelSearch, setFeedbackModelSearch] = useState('');
   const [feedbackSessionSearch, setFeedbackSessionSearch] = useState('');
+  const [feedbackUserSearch, setFeedbackUserSearch] = useState('');
   
   // Session detail
   const [selectedSession, setSelectedSession] = useState<Session | null>(null);
@@ -275,6 +192,13 @@ export function Monitor() {
     { id: 3, name: language === 'zh-CN' ? '自定义助手' : 'Custom Assistant' },
   ];
 
+  // Mock data - Models
+  const models = [
+    { id: 1, name: 'GPT-4o' },
+    { id: 2, name: 'Claude-3' },
+    { id: 3, name: 'Gemini-Pro' },
+  ];
+
   // Mock data - Sessions
   const sessions: Session[] = [
     {
@@ -282,9 +206,11 @@ export function Monitor() {
       sessionId: 'sess_abc123',
       title: language === 'zh-CN' ? '产品咨询对话' : 'Product Inquiry',
       appId: 1,
-      appName: applications[0].name,
+      appName: applications[0]?.name ?? '',
       agentId: 1,
-      agentName: agents[0].name,
+      agentName: agents[0]?.name ?? '',
+      modelId: 1,
+      modelName: models[0]?.name ?? '',
       userId: 1,
       userName: 'Alice Chen',
       messageCount: 12,
@@ -299,9 +225,11 @@ export function Monitor() {
       sessionId: 'sess_def456',
       title: language === 'zh-CN' ? '技术支持会话' : 'Technical Support',
       appId: 1,
-      appName: applications[0].name,
+      appName: applications[0]?.name ?? '',
       agentId: 2,
-      agentName: agents[1].name,
+      agentName: agents[1]?.name ?? '',
+      modelId: 2,
+      modelName: models[1]?.name ?? '',
       userId: 2,
       userName: 'Bob Wang',
       messageCount: 8,
@@ -316,9 +244,11 @@ export function Monitor() {
       sessionId: 'sess_ghi789',
       title: language === 'zh-CN' ? '内容创作咨询' : 'Content Creation Inquiry',
       appId: 2,
-      appName: applications[1].name,
+      appName: applications[1]?.name ?? '',
       agentId: 3,
-      agentName: agents[2].name,
+      agentName: agents[2]?.name ?? '',
+      modelId: 3,
+      modelName: models[2]?.name ?? '',
       userId: 3,
       userName: 'Charlie Liu',
       messageCount: 15,
@@ -377,9 +307,11 @@ export function Monitor() {
       userId: 1,
       userName: 'Alice Chen',
       appId: 1,
-      appName: applications[0].name,
+      appName: applications[0]?.name ?? '',
       agentId: 1,
-      agentName: agents[0].name,
+      agentName: agents[0]?.name ?? '',
+      modelId: 1,
+      modelName: models[0]?.name ?? '',
       createdAt: '2024-03-15 10:30:00',
       tokenUsage: { promptTokens: 15, completionTokens: 0, totalTokens: 15 },
     },
@@ -393,9 +325,11 @@ export function Monitor() {
       userId: 0,
       userName: 'AI Assistant',
       appId: 1,
-      appName: applications[0].name,
+      appName: applications[0]?.name ?? '',
       agentId: 1,
-      agentName: agents[0].name,
+      agentName: agents[0]?.name ?? '',
+      modelId: 1,
+      modelName: models[0]?.name ?? '',
       feedbackType: 'like',
       createdAt: '2024-03-15 10:30:15',
       tokenUsage: { promptTokens: 15, completionTokens: 120, totalTokens: 135 },
@@ -410,9 +344,11 @@ export function Monitor() {
       userId: 2,
       userName: 'Bob Wang',
       appId: 1,
-      appName: applications[0].name,
+      appName: applications[0]?.name ?? '',
       agentId: 2,
-      agentName: agents[1].name,
+      agentName: agents[1]?.name ?? '',
+      modelId: 2,
+      modelName: models[1]?.name ?? '',
       createdAt: '2024-03-15 09:15:00',
       tokenUsage: { promptTokens: 12, completionTokens: 0, totalTokens: 12 },
     },
@@ -430,9 +366,11 @@ export function Monitor() {
       userId: 1,
       userName: 'Alice Chen',
       appId: 1,
-      appName: applications[0].name,
+      appName: applications[0]?.name ?? '',
       agentId: 1,
-      agentName: agents[0].name,
+      agentName: agents[0]?.name ?? '',
+      modelId: 1,
+      modelName: models[0]?.name ?? '',
       messageContent: language === 'zh-CN' ? '您好！我很高兴为您介绍我们的产品...' : 'Hello! I\'m glad to introduce our product...',
       createdAt: '2024-03-15 10:31:00',
     },
@@ -446,9 +384,11 @@ export function Monitor() {
       userId: 2,
       userName: 'Bob Wang',
       appId: 1,
-      appName: applications[0].name,
+      appName: applications[0]?.name ?? '',
       agentId: 2,
-      agentName: agents[1].name,
+      agentName: agents[1]?.name ?? '',
+      modelId: 2,
+      modelName: models[1]?.name ?? '',
       messageContent: language === 'zh-CN' ? '这个问题可能需要您提供更多信息...' : 'This issue may require more information...',
       createdAt: '2024-03-15 09:45:00',
     },
@@ -628,28 +568,44 @@ export function Monitor() {
   // Filter functions
   const getFilteredSessions = () => {
     return sessions.filter(session => {
+      if (sessionKeywordSearch) {
+        const kw = sessionKeywordSearch.toLowerCase();
+        if (!session.title.toLowerCase().includes(kw) && !session.sessionId.toLowerCase().includes(kw)) return false;
+      }
       if (sessionAppFilter !== 'all' && session.appId !== parseInt(sessionAppFilter)) return false;
-      if (sessionUserFilter !== 'all' && session.userId !== parseInt(sessionUserFilter)) return false;
       if (sessionAgentFilter !== 'all' && session.agentId !== parseInt(sessionAgentFilter)) return false;
+      if (sessionModelFilter !== 'all' && session.modelId !== parseInt(sessionModelFilter)) return false;
+      if (sessionUserFilter !== 'all' && session.userId !== parseInt(sessionUserFilter)) return false;
       return true;
     });
   };
 
   const getFilteredMessages = () => {
     return messages.filter(message => {
+      if (messageKeywordSearch) {
+        const kw = messageKeywordSearch.toLowerCase();
+        if (!message.content.toLowerCase().includes(kw) && !message.sessionTitle.toLowerCase().includes(kw) && !message.messageId.toLowerCase().includes(kw)) return false;
+      }
       if (messageAppFilter !== 'all' && message.appId !== parseInt(messageAppFilter)) return false;
-      if (messageUserFilter !== 'all' && message.userId !== parseInt(messageUserFilter)) return false;
       if (messageAgentFilter !== 'all' && message.agentId !== parseInt(messageAgentFilter)) return false;
+      if (messageModelFilter !== 'all' && message.modelId !== parseInt(messageModelFilter)) return false;
+      if (messageSessionFilter !== 'all' && message.sessionId !== messageSessionFilter) return false;
+      if (messageUserFilter !== 'all' && message.userId !== parseInt(messageUserFilter)) return false;
       return true;
     });
   };
 
   const getFilteredFeedbacks = () => {
     return feedbacks.filter(feedback => {
+      if (feedbackKeywordSearch) {
+        const kw = feedbackKeywordSearch.toLowerCase();
+        if (!feedback.feedbackComment?.toLowerCase().includes(kw) && !feedback.messageContent.toLowerCase().includes(kw) && !feedback.sessionTitle.toLowerCase().includes(kw)) return false;
+      }
       if (feedbackAppFilter !== 'all' && feedback.appId !== parseInt(feedbackAppFilter)) return false;
-      if (feedbackUserFilter !== 'all' && feedback.userId !== parseInt(feedbackUserFilter)) return false;
       if (feedbackAgentFilter !== 'all' && feedback.agentId !== parseInt(feedbackAgentFilter)) return false;
+      if (feedbackModelFilter !== 'all' && feedback.modelId !== parseInt(feedbackModelFilter)) return false;
       if (feedbackSessionFilter !== 'all' && feedback.sessionId !== feedbackSessionFilter) return false;
+      if (feedbackUserFilter !== 'all' && feedback.userId !== parseInt(feedbackUserFilter)) return false;
       return true;
     });
   };
@@ -1171,1212 +1127,143 @@ export function Monitor() {
 
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-6">
-          {overviewStatsLoading && (
-            <div className="text-sm text-gray-500 dark:text-gray-400">
-              {language === 'zh-CN' ? '加载概览中...' : 'Loading overview...'}
-            </div>
-          )}
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Throughput Card */}
-            <Card className="p-6 dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow duration-200 border-l-4 border-l-blue-500">
-              <div className="flex items-center justify-between mb-5">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                    {language === 'zh-CN' ? '吞吐量' : 'Throughput'}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-500">
-                    {language === 'zh-CN' ? '今天每分钟消息数' : 'Messages per minute today'}
-                  </p>
-                </div>
-                <div className="p-3 rounded-xl bg-blue-50 dark:bg-blue-900/20">
-                  <Zap className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-                </div>
-              </div>
-              <div className="space-y-3">
-                <div className="flex items-end gap-2">
-                  <span className="text-3xl font-bold dark:text-white">
-                    {overviewStats.throughput.current}
-                  </span>
-                  <span className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-                    {language === 'zh-CN' ? '条/分' : 'msg/min'}
-                  </span>
-                </div>
-                <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
-                  <div className="grid grid-cols-3 gap-2 text-center">
-                    <div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                        {language === 'zh-CN' ? '最小' : 'Min'}
-                      </p>
-                      <p className="text-sm font-semibold dark:text-gray-300">{overviewStats.throughput.min}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                        {language === 'zh-CN' ? '平均' : 'Avg'}
-                      </p>
-                      <p className="text-sm font-semibold dark:text-gray-300">{overviewStats.throughput.average}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                        {language === 'zh-CN' ? '最大' : 'Max'}
-                      </p>
-                      <p className="text-sm font-semibold dark:text-gray-300">{overviewStats.throughput.max}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Card>
-
-            {/* Sessions Card */}
-            <Card className="p-6 dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow duration-200 border-l-4 border-l-green-500">
-              <div className="flex items-center justify-between mb-5">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                    {language === 'zh-CN' ? '会话' : 'Sessions'}
-                  </p>
-                </div>
-                <div className="p-3 rounded-xl bg-green-50 dark:bg-green-900/20">
-                  <MessageSquare className="w-6 h-6 text-green-600 dark:text-green-400" />
-                </div>
-              </div>
-              <div className="space-y-3">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-green-600 dark:text-green-400">
-                    {overviewStats.sessions.active}
-                  </span>
-                  <span className="text-xl text-gray-400 dark:text-gray-500">/</span>
-                  <span className="text-2xl font-semibold text-gray-600 dark:text-gray-400">
-                    {overviewStats.sessions.total}
-                  </span>
-                </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {language === 'zh-CN' ? '对话中 / 总会话' : 'Active / Total Sessions'}
-                </p>
-              </div>
-            </Card>
-
-            {/* Messages Card */}
-            <Card className="p-6 dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow duration-200 border-l-4 border-l-purple-500">
-              <div className="flex items-center justify-between mb-5">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                    {language === 'zh-CN' ? '消息' : 'Messages'}
-                  </p>
-                </div>
-                <div className="p-3 rounded-xl bg-purple-50 dark:bg-purple-900/20">
-                  <FileText className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-                </div>
-              </div>
-              <div className="space-y-3">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-purple-600 dark:text-purple-400">
-                    {overviewStats.messages.active}
-                  </span>
-                  <span className="text-xl text-gray-400 dark:text-gray-500">/</span>
-                  <span className="text-2xl font-semibold text-gray-600 dark:text-gray-400">
-                    {overviewStats.messages.total}
-                  </span>
-                </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {language === 'zh-CN' ? '对话中 / 总消息' : 'Active / Total Messages'}
-                </p>
-              </div>
-            </Card>
-
-            {/* Users Card */}
-            <Card className="p-6 dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow duration-200 border-l-4 border-l-orange-500">
-              <div className="flex items-center justify-between mb-5">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                    {language === 'zh-CN' ? '用户' : 'Users'}
-                  </p>
-                </div>
-                <div className="p-3 rounded-xl bg-orange-50 dark:bg-orange-900/20">
-                  <Users className="w-6 h-6 text-orange-600 dark:text-orange-400" />
-                </div>
-              </div>
-              <div className="space-y-3">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-orange-600 dark:text-orange-400">
-                    {overviewStats.users.active}
-                  </span>
-                  <span className="text-xl text-gray-400 dark:text-gray-500">/</span>
-                  <span className="text-2xl font-semibold text-gray-600 dark:text-gray-400">
-                    {overviewStats.users.total}
-                  </span>
-                </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {language === 'zh-CN' ? '对话中 / 总用户' : 'Active / Total Users'}
-                </p>
-              </div>
-            </Card>
-
-            {/* Feedback Card */}
-            <Card className="p-6 dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow duration-200 border-l-4 border-l-yellow-500">
-              <div className="flex items-center justify-between mb-5">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                    {language === 'zh-CN' ? '反馈' : 'Feedback'}
-                  </p>
-                </div>
-                <div className="p-3 rounded-xl bg-yellow-50 dark:bg-yellow-900/20">
-                  <ThumbsUp className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
-                </div>
-              </div>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <ThumbsUp className="w-4 h-4 text-green-600 dark:text-green-400" />
-                    <span className="text-2xl font-bold text-green-600 dark:text-green-400">{overviewStats.feedback.like}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <ThumbsDown className="w-4 h-4 text-red-600 dark:text-red-400" />
-                    <span className="text-2xl font-bold text-red-600 dark:text-red-400">{overviewStats.feedback.dislike}</span>
-                  </div>
-                </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {language === 'zh-CN' ? `总计: ${overviewStats.feedback.total} 条反馈` : `Total: ${overviewStats.feedback.total} feedbacks`}
-                </p>
-              </div>
-            </Card>
-
-            {/* Applications Card */}
-            <Card className="p-6 dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow duration-200 border-l-4 border-l-indigo-500">
-              <div className="flex items-center justify-between mb-5">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                    {language === 'zh-CN' ? '应用' : 'Applications'}
-                  </p>
-                </div>
-                <div className="p-3 rounded-xl bg-indigo-50 dark:bg-indigo-900/20">
-                  <Layers className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
-                </div>
-              </div>
-              <div className="space-y-3">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">
-                    {overviewStats.applications.active}
-                  </span>
-                  <span className="text-xl text-gray-400 dark:text-gray-500">/</span>
-                  <span className="text-2xl font-semibold text-gray-600 dark:text-gray-400">
-                    {overviewStats.applications.total}
-                  </span>
-                </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {language === 'zh-CN' ? '对话中 / 总应用' : 'Active / Total Apps'}
-                </p>
-              </div>
-            </Card>
-
-            {/* Agents Card */}
-            <Card className="p-6 dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow duration-200 border-l-4 border-l-pink-500">
-              <div className="flex items-center justify-between mb-5">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                    {language === 'zh-CN' ? '智能体' : 'Agents'}
-                  </p>
-                </div>
-                <div className="p-3 rounded-xl bg-pink-50 dark:bg-pink-900/20">
-                  <Bot className="w-6 h-6 text-pink-600 dark:text-pink-400" />
-                </div>
-              </div>
-              <div className="space-y-3">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-pink-600 dark:text-pink-400">
-                    {overviewStats.agents.active}
-                  </span>
-                  <span className="text-xl text-gray-400 dark:text-gray-500">/</span>
-                  <span className="text-2xl font-semibold text-gray-600 dark:text-gray-400">
-                    {overviewStats.agents.total}
-                  </span>
-                </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {language === 'zh-CN' ? '对话中 / 总智能体' : 'Active / Total Agents'}
-                </p>
-              </div>
-            </Card>
-
-            {/* Models Card */}
-            <Card className="p-6 dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-shadow duration-200 border-l-4 border-l-teal-500">
-              <div className="flex items-center justify-between mb-5">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                    {language === 'zh-CN' ? '模型' : 'Models'}
-                  </p>
-                </div>
-                <div className="p-3 rounded-xl bg-teal-50 dark:bg-teal-900/20">
-                  <Cpu className="w-6 h-6 text-teal-600 dark:text-teal-400" />
-                </div>
-              </div>
-              <div className="space-y-3">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-teal-600 dark:text-teal-400">
-                    {overviewStats.models.active}
-                  </span>
-                  <span className="text-xl text-gray-400 dark:text-gray-500">/</span>
-                  <span className="text-2xl font-semibold text-gray-600 dark:text-gray-400">
-                    {overviewStats.models.total}
-                  </span>
-                </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {language === 'zh-CN' ? '对话中 / 总模型' : 'Active / Total Models'}
-                </p>
-              </div>
-            </Card>
-          </div>
+          <MonitorOverview stats={overviewStats} loading={overviewStatsLoading} />
         </TabsContent>
 
         {/* Sessions Tab */}
         <TabsContent value="sessions" className="space-y-4">
-          {/* Chart */}
-          <Card className="p-6 dark:bg-gray-800 dark:border-gray-700">
-            <div className="mb-6">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold dark:text-white">
-                  {language === 'zh-CN' ? '会话趋势' : 'Session Trends'}
-                </h3>
-                
-                {/* Time Range and Date Selectors */}
-                <div className="flex items-center gap-3">
-                  <Select value={sessionsChartRange} onValueChange={(v: any) => setSessionsChartRange(v)}>
-                    <SelectTrigger className="w-32 dark:bg-gray-900 dark:border-gray-700">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                      <SelectItem value="year">{language === 'zh-CN' ? '按年' : 'Yearly'}</SelectItem>
-                      <SelectItem value="month">{language === 'zh-CN' ? '按月' : 'Monthly'}</SelectItem>
-                      <SelectItem value="day">{language === 'zh-CN' ? '按天' : 'Daily'}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  
-                  {/* Year Selector - always shown */}
-                  <Select value={sessionsSelectedYear} onValueChange={setSessionsSelectedYear}>
-                    <SelectTrigger className="w-32 dark:bg-gray-900 dark:border-gray-700">
-                      <SelectValue placeholder={language === 'zh-CN' ? '年份' : 'Year'} />
-                    </SelectTrigger>
-                    <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                      {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i).map(year => (
-                        <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  
-                  {/* Month Selector - shown for month and day */}
-                  {(sessionsChartRange === 'month' || sessionsChartRange === 'day') && (
-                    <Select value={sessionsSelectedMonth} onValueChange={setSessionsSelectedMonth}>
-                      <SelectTrigger className="w-32 dark:bg-gray-900 dark:border-gray-700">
-                        <SelectValue placeholder={language === 'zh-CN' ? '月份' : 'Month'} />
-                      </SelectTrigger>
-                      <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                        {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
-                          <SelectItem key={month} value={month.toString()}>
-                            {language === 'zh-CN' ? `${month}月` : new Date(2000, month - 1).toLocaleString('en', { month: 'long' })}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                  
-                  {/* Day Selector - only shown for day */}
-                  {sessionsChartRange === 'day' && (
-                    <Select value={sessionsSelectedDay} onValueChange={setSessionsSelectedDay}>
-                      <SelectTrigger className="w-32 dark:bg-gray-900 dark:border-gray-700">
-                        <SelectValue placeholder={language === 'zh-CN' ? '日期' : 'Day'} />
-                      </SelectTrigger>
-                      <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                        {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
-                          <SelectItem key={day} value={day.toString()}>
-                            {language === 'zh-CN' ? `${day}日` : day}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                </div>
-              </div>
-            </div>
-            <ResponsiveContainer width="100%" height={300} key={`sessions-container-${sessionsChartRange}-${language}`}>
-              {sessionsChartLoading ? (
-                <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">
-                  {language === 'zh-CN' ? '加载中...' : 'Loading...'}
-                </div>
-              ) : (
-              <LineChart data={sessionsChartData}>
-                <CartesianGrid key="sessions-grid" strokeDasharray="3 3" className="stroke-gray-300 dark:stroke-gray-700" />
-                <XAxis 
-                  key="sessions-xaxis"
-                  dataKey="date" 
-                  className="text-xs dark:text-gray-400"
-                  stroke="currentColor"
-                />
-                <YAxis 
-                  key="sessions-yaxis"
-                  className="text-xs dark:text-gray-400"
-                  stroke="currentColor"
-                />
-                <Tooltip 
-                  key="sessions-tooltip"
-                  contentStyle={{ 
-                    backgroundColor: 'var(--background)',
-                    border: '1px solid var(--border)',
-                    borderRadius: '8px',
-                  }}
-                  labelClassName="dark:text-white"
-                />
-                <Legend key="sessions-legend" />
-                <Line 
-                  key="sessions-line"
-                  type="monotone" 
-                  dataKey="value" 
-                  name={language === 'zh-CN' ? '会话数' : 'Sessions'}
-                  stroke="#3b82f6" 
-                  strokeWidth={2}
-                  dot={{ fill: '#3b82f6', r: 4 }}
-                  activeDot={{ r: 6 }}
-                />
-              </LineChart>
-              )}
-            </ResponsiveContainer>
-          </Card>
-
-          {/* Filters */}
-          <div className="flex items-center justify-end gap-3">
-            {/* App Filter */}
-            <Select value={sessionAppFilter} onValueChange={setSessionAppFilter}>
-              <SelectTrigger className="w-48 dark:bg-gray-900 dark:border-gray-700">
-                <SelectValue placeholder={language === 'zh-CN' ? '应用筛选' : 'Application Filter'} />
-              </SelectTrigger>
-              <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                <div className="p-2">
-                  <Input
-                    placeholder={language === 'zh-CN' ? '搜索应用...' : 'Search app...'}
-                    value={sessionAppSearch}
-                    onChange={(e) => setSessionAppSearch(e.target.value)}
-                    className="mb-2 dark:bg-gray-900 dark:border-gray-700"
-                  />
-                </div>
-                <SelectItem value="all">
-                  {language === 'zh-CN' ? '全部应用' : 'All Applications'}
-                </SelectItem>
-                {applications
-                  .filter(app => app.name.toLowerCase().includes(sessionAppSearch.toLowerCase()))
-                  .map(app => (
-                    <SelectItem key={app.id} value={app.id.toString()}>
-                      {app.name}
-                    </SelectItem>
-                  ))
-                }
-              </SelectContent>
-            </Select>
-
-            {/* User Filter */}
-            <Select value={sessionUserFilter} onValueChange={setSessionUserFilter}>
-              <SelectTrigger className="w-48 dark:bg-gray-900 dark:border-gray-700">
-                <SelectValue placeholder={language === 'zh-CN' ? '用户筛选' : 'User Filter'} />
-              </SelectTrigger>
-              <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                <div className="p-2">
-                  <Input
-                    placeholder={language === 'zh-CN' ? '搜索用户...' : 'Search user...'}
-                    value={sessionUserSearch}
-                    onChange={(e) => setSessionUserSearch(e.target.value)}
-                    className="mb-2 dark:bg-gray-900 dark:border-gray-700"
-                  />
-                </div>
-                <SelectItem value="all">
-                  {language === 'zh-CN' ? '全部用户' : 'All Users'}
-                </SelectItem>
-                {users
-                  .filter(user => user.name.toLowerCase().includes(sessionUserSearch.toLowerCase()))
-                  .map(user => (
-                    <SelectItem key={user.id} value={user.id.toString()}>
-                      {user.name}
-                    </SelectItem>
-                  ))
-                }
-              </SelectContent>
-            </Select>
-
-            {/* Agent Filter */}
-            <Select value={sessionAgentFilter} onValueChange={setSessionAgentFilter}>
-              <SelectTrigger className="w-48 dark:bg-gray-900 dark:border-gray-700">
-                <SelectValue placeholder={language === 'zh-CN' ? '智能体筛选' : 'Agent Filter'} />
-              </SelectTrigger>
-              <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                <div className="p-2">
-                  <Input
-                    placeholder={language === 'zh-CN' ? '搜索智能体...' : 'Search agent...'}
-                    value={sessionAgentSearch}
-                    onChange={(e) => setSessionAgentSearch(e.target.value)}
-                    className="mb-2 dark:bg-gray-900 dark:border-gray-700"
-                  />
-                </div>
-                <SelectItem value="all">
-                  {language === 'zh-CN' ? '全部智能体' : 'All Agents'}
-                </SelectItem>
-                {agents
-                  .filter(agent => agent.name.toLowerCase().includes(sessionAgentSearch.toLowerCase()))
-                  .map(agent => (
-                    <SelectItem key={agent.id} value={agent.id.toString()}>
-                      {agent.name}
-                    </SelectItem>
-                  ))
-                }
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Sessions List */}
-          <Card className="dark:bg-gray-800 dark:border-gray-700">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50 dark:bg-gray-900">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      {language === 'zh-CN' ? '会话标题' : 'Session Title'}
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      {language === 'zh-CN' ? '应用' : 'App'}
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      {language === 'zh-CN' ? '用户' : 'User'}
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      {language === 'zh-CN' ? '智能体' : 'Agent'}
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      {language === 'zh-CN' ? '消息数' : 'Messages'}
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      {language === 'zh-CN' ? '创建时间' : 'Created'}
-                    </th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      {language === 'zh-CN' ? '操作' : 'Actions'}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                  {getFilteredSessions().map((session) => (
-                    <tr 
-                      key={session.id}
-                      className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
-                    >
-                      <td className="px-4 py-3">
-                        <button
-                          onClick={() => handleViewSessionDetail(session)}
-                          className="text-left"
-                        >
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline">
-                              {session.title}
-                            </span>
-                            {session.isPinned && (
-                              <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border-0 text-xs">
-                                {language === 'zh-CN' ? '置顶' : 'Pinned'}
-                              </Badge>
-                            )}
-                          </div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400 font-mono mt-0.5">
-                            {session.sessionId}
-                          </div>
-                        </button>
-                      </td>
-                      <td className="px-4 py-3 text-sm dark:text-gray-300">{session.appName}</td>
-                      <td className="px-4 py-3 text-sm dark:text-gray-300">{session.userName}</td>
-                      <td className="px-4 py-3 text-sm dark:text-gray-300">{session.agentName}</td>
-                      <td className="px-4 py-3">
-                        <Badge variant="secondary">{session.messageCount}</Badge>
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
-                        {session.createdAt}
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleViewSessionDetail(session)}
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDeleteSession(session.id)}
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </Card>
+          <MonitorSessionsTab
+            chartRange={sessionsChartRange}
+            chartSelectedYear={sessionsSelectedYear}
+            chartSelectedMonth={sessionsSelectedMonth}
+            chartSelectedDay={sessionsSelectedDay}
+            onChartRangeChange={setSessionsChartRange}
+            onChartYearChange={setSessionsSelectedYear}
+            onChartMonthChange={setSessionsSelectedMonth}
+            onChartDayChange={setSessionsSelectedDay}
+            chartData={sessionsChartData}
+            chartLoading={sessionsChartLoading}
+            keywordSearch={sessionKeywordSearch}
+            onKeywordSearchChange={setSessionKeywordSearch}
+            appFilter={sessionAppFilter}
+            agentFilter={sessionAgentFilter}
+            modelFilter={sessionModelFilter}
+            userFilter={sessionUserFilter}
+            onAppFilterChange={setSessionAppFilter}
+            onAgentFilterChange={setSessionAgentFilter}
+            onModelFilterChange={setSessionModelFilter}
+            onUserFilterChange={setSessionUserFilter}
+            appSearch={sessionAppSearch}
+            agentSearch={sessionAgentSearch}
+            modelSearch={sessionModelSearch}
+            userSearch={sessionUserSearch}
+            onAppSearchChange={setSessionAppSearch}
+            onAgentSearchChange={setSessionAgentSearch}
+            onModelSearchChange={setSessionModelSearch}
+            onUserSearchChange={setSessionUserSearch}
+            applications={applications}
+            agents={agents}
+            models={models}
+            users={users}
+            sessions={getFilteredSessions()}
+            onViewSession={handleViewSessionDetail}
+            onDeleteSession={handleDeleteSession}
+          />
         </TabsContent>
 
         {/* Messages Tab */}
         <TabsContent value="messages" className="space-y-4">
-          {/* Chart */}
-          <Card className="p-6 dark:bg-gray-800 dark:border-gray-700">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold dark:text-white">
-                {language === 'zh-CN' ? '消息趋势' : 'Message Trends'}
-              </h3>
-              
-              {/* Time Range and Date Selectors */}
-              <div className="flex items-center gap-3">
-                <Select value={messagesChartRange} onValueChange={(v: any) => setMessagesChartRange(v)}>
-                  <SelectTrigger className="w-32 dark:bg-gray-900 dark:border-gray-700">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                    <SelectItem value="year">{language === 'zh-CN' ? '按年' : 'Yearly'}</SelectItem>
-                    <SelectItem value="month">{language === 'zh-CN' ? '按月' : 'Monthly'}</SelectItem>
-                    <SelectItem value="day">{language === 'zh-CN' ? '按天' : 'Daily'}</SelectItem>
-                  </SelectContent>
-                </Select>
-                
-                {/* Year Selector - always shown */}
-                <Select value={messagesSelectedYear} onValueChange={setMessagesSelectedYear}>
-                  <SelectTrigger className="w-32 dark:bg-gray-900 dark:border-gray-700">
-                    <SelectValue placeholder={language === 'zh-CN' ? '年份' : 'Year'} />
-                  </SelectTrigger>
-                  <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                    {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i).map(year => (
-                      <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                
-                {/* Month Selector - shown for month and day */}
-                {(messagesChartRange === 'month' || messagesChartRange === 'day') && (
-                  <Select value={messagesSelectedMonth} onValueChange={setMessagesSelectedMonth}>
-                    <SelectTrigger className="w-32 dark:bg-gray-900 dark:border-gray-700">
-                      <SelectValue placeholder={language === 'zh-CN' ? '月份' : 'Month'} />
-                    </SelectTrigger>
-                    <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                      {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
-                        <SelectItem key={month} value={month.toString()}>
-                          {language === 'zh-CN' ? `${month}月` : new Date(2000, month - 1).toLocaleString('en', { month: 'long' })}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-                
-                {/* Day Selector - only shown for day */}
-                {messagesChartRange === 'day' && (
-                  <Select value={messagesSelectedDay} onValueChange={setMessagesSelectedDay}>
-                    <SelectTrigger className="w-32 dark:bg-gray-900 dark:border-gray-700">
-                      <SelectValue placeholder={language === 'zh-CN' ? '日期' : 'Day'} />
-                    </SelectTrigger>
-                    <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                      {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
-                        <SelectItem key={day} value={day.toString()}>
-                          {language === 'zh-CN' ? `${day}日` : day}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              </div>
-            </div>
-            <ResponsiveContainer width="100%" height={300} key={`messages-container-${messagesChartRange}-${language}`}>
-              {messagesChartLoading ? (
-                <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">
-                  {language === 'zh-CN' ? '加载中...' : 'Loading...'}
-                </div>
-              ) : (
-              <LineChart data={messagesChartData}>
-                <CartesianGrid key="messages-grid" strokeDasharray="3 3" className="stroke-gray-300 dark:stroke-gray-700" />
-                <XAxis 
-                  key="messages-xaxis"
-                  dataKey="date" 
-                  className="text-xs dark:text-gray-400"
-                  stroke="currentColor"
-                />
-                <YAxis 
-                  key="messages-yaxis"
-                  className="text-xs dark:text-gray-400"
-                  stroke="currentColor"
-                />
-                <Tooltip 
-                  key="messages-tooltip"
-                  contentStyle={{ 
-                    backgroundColor: 'var(--background)',
-                    border: '1px solid var(--border)',
-                    borderRadius: '8px',
-                  }}
-                  labelClassName="dark:text-white"
-                />
-                <Legend key="messages-legend" />
-                <Line 
-                  key="messages-line"
-                  type="monotone" 
-                  dataKey="value" 
-                  name={language === 'zh-CN' ? '消息数' : 'Messages'}
-                  stroke="#8b5cf6" 
-                  strokeWidth={2}
-                  dot={{ fill: '#8b5cf6', r: 4 }}
-                  activeDot={{ r: 6 }}
-                />
-              </LineChart>
-              )}
-            </ResponsiveContainer>
-          </Card>
-
-          {/* Filters */}
-          <div className="flex items-center justify-end gap-3">
-            {/* App Filter */}
-            <Select value={messageAppFilter} onValueChange={setMessageAppFilter}>
-              <SelectTrigger className="w-48 dark:bg-gray-900 dark:border-gray-700">
-                <SelectValue placeholder={language === 'zh-CN' ? '应用筛选' : 'Application Filter'} />
-              </SelectTrigger>
-              <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                <div className="p-2">
-                  <Input
-                    placeholder={language === 'zh-CN' ? '搜索应用...' : 'Search app...'}
-                    value={messageAppSearch}
-                    onChange={(e) => setMessageAppSearch(e.target.value)}
-                    className="mb-2 dark:bg-gray-900 dark:border-gray-700"
-                  />
-                </div>
-                <SelectItem value="all">
-                  {language === 'zh-CN' ? '全部应用' : 'All Applications'}
-                </SelectItem>
-                {applications
-                  .filter(app => app.name.toLowerCase().includes(messageAppSearch.toLowerCase()))
-                  .map(app => (
-                    <SelectItem key={app.id} value={app.id.toString()}>
-                      {app.name}
-                    </SelectItem>
-                  ))
-                }
-              </SelectContent>
-            </Select>
-
-            {/* User Filter */}
-            <Select value={messageUserFilter} onValueChange={setMessageUserFilter}>
-              <SelectTrigger className="w-48 dark:bg-gray-900 dark:border-gray-700">
-                <SelectValue placeholder={language === 'zh-CN' ? '用户筛选' : 'User Filter'} />
-              </SelectTrigger>
-              <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                <div className="p-2">
-                  <Input
-                    placeholder={language === 'zh-CN' ? '搜索用户...' : 'Search user...'}
-                    value={messageUserSearch}
-                    onChange={(e) => setMessageUserSearch(e.target.value)}
-                    className="mb-2 dark:bg-gray-900 dark:border-gray-700"
-                  />
-                </div>
-                <SelectItem value="all">
-                  {language === 'zh-CN' ? '全部用户' : 'All Users'}
-                </SelectItem>
-                {users
-                  .filter(user => user.name.toLowerCase().includes(messageUserSearch.toLowerCase()))
-                  .map(user => (
-                    <SelectItem key={user.id} value={user.id.toString()}>
-                      {user.name}
-                    </SelectItem>
-                  ))
-                }
-              </SelectContent>
-            </Select>
-
-            {/* Agent Filter */}
-            <Select value={messageAgentFilter} onValueChange={setMessageAgentFilter}>
-              <SelectTrigger className="w-48 dark:bg-gray-900 dark:border-gray-700">
-                <SelectValue placeholder={language === 'zh-CN' ? '智能体筛选' : 'Agent Filter'} />
-              </SelectTrigger>
-              <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                <div className="p-2">
-                  <Input
-                    placeholder={language === 'zh-CN' ? '搜索智能体...' : 'Search agent...'}
-                    value={messageAgentSearch}
-                    onChange={(e) => setMessageAgentSearch(e.target.value)}
-                    className="mb-2 dark:bg-gray-900 dark:border-gray-700"
-                  />
-                </div>
-                <SelectItem value="all">
-                  {language === 'zh-CN' ? '全部智能体' : 'All Agents'}
-                </SelectItem>
-                {agents
-                  .filter(agent => agent.name.toLowerCase().includes(messageAgentSearch.toLowerCase()))
-                  .map(agent => (
-                    <SelectItem key={agent.id} value={agent.id.toString()}>
-                      {agent.name}
-                    </SelectItem>
-                  ))
-                }
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Messages List */}
-          <Card className="dark:bg-gray-800 dark:border-gray-700">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50 dark:bg-gray-900">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      {language === 'zh-CN' ? '消息ID' : 'Message ID'}
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      {language === 'zh-CN' ? '会话' : 'Session'}
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      {language === 'zh-CN' ? '角色' : 'Role'}
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      {language === 'zh-CN' ? '内容' : 'Content'}
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      {language === 'zh-CN' ? '反馈' : 'Feedback'}
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      {language === 'zh-CN' ? '创建时间' : 'Created'}
-                    </th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      {language === 'zh-CN' ? '操作' : 'Actions'}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                  {getFilteredMessages().map((message) => (
-                    <tr 
-                      key={message.id}
-                      className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
-                    >
-                      <td className="px-4 py-3">
-                        <code className="text-xs font-mono bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded">
-                          {message.messageId}
-                        </code>
-                      </td>
-                      <td className="px-4 py-3">
-                        <button
-                          onClick={() => {
-                            const session = sessions.find(s => s.sessionId === message.sessionId);
-                            if (session) handleViewSessionDetail(session);
-                          }}
-                          className="text-left"
-                        >
-                          <div className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline">
-                            {message.sessionTitle}
-                          </div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400 font-mono">
-                            {message.sessionId}
-                          </div>
-                        </button>
-                      </td>
-                      <td className="px-4 py-3">
-                        <Badge className={cn(
-                          "border-0",
-                          message.role === 'user'
-                            ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
-                            : "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400"
-                        )}>
-                          {message.role === 'user' 
-                            ? (language === 'zh-CN' ? '用户' : 'User')
-                            : (language === 'zh-CN' ? '助手' : 'Assistant')
-                          }
-                        </Badge>
-                      </td>
-                      <td className="px-4 py-3 max-w-md">
-                        <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
-                          {message.content}
-                        </p>
-                      </td>
-                      <td className="px-4 py-3">
-                        {message.feedbackType ? (
-                          <Badge className={cn(
-                            "border-0",
-                            message.feedbackType === 'like'
-                              ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                              : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
-                          )}>
-                            {message.feedbackType === 'like' ? (
-                              <ThumbsUp className="h-3 w-3 mr-1" />
-                            ) : (
-                              <ThumbsDown className="h-3 w-3 mr-1" />
-                            )}
-                            {message.feedbackType === 'like' 
-                              ? (language === 'zh-CN' ? '好评' : 'Like')
-                              : (language === 'zh-CN' ? '差评' : 'Dislike')
-                            }
-                          </Badge>
-                        ) : (
-                          <span className="text-sm text-gray-400 dark:text-gray-500">-</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
-                        {message.createdAt}
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleViewMessageDetail(message)}
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDeleteMessage(message.id)}
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </Card>
+          <MonitorMessagesTab
+            chartRange={messagesChartRange}
+            chartSelectedYear={messagesSelectedYear}
+            chartSelectedMonth={messagesSelectedMonth}
+            chartSelectedDay={messagesSelectedDay}
+            onChartRangeChange={setMessagesChartRange}
+            onChartYearChange={setMessagesSelectedYear}
+            onChartMonthChange={setMessagesSelectedMonth}
+            onChartDayChange={setMessagesSelectedDay}
+            chartData={messagesChartData}
+            chartLoading={messagesChartLoading}
+            keywordSearch={messageKeywordSearch}
+            onKeywordSearchChange={setMessageKeywordSearch}
+            appFilter={messageAppFilter}
+            agentFilter={messageAgentFilter}
+            modelFilter={messageModelFilter}
+            sessionFilter={messageSessionFilter}
+            userFilter={messageUserFilter}
+            onAppFilterChange={setMessageAppFilter}
+            onAgentFilterChange={setMessageAgentFilter}
+            onModelFilterChange={setMessageModelFilter}
+            onSessionFilterChange={setMessageSessionFilter}
+            onUserFilterChange={setMessageUserFilter}
+            appSearch={messageAppSearch}
+            agentSearch={messageAgentSearch}
+            modelSearch={messageModelSearch}
+            sessionSearch={messageSessionSearch}
+            userSearch={messageUserSearch}
+            onAppSearchChange={setMessageAppSearch}
+            onAgentSearchChange={setMessageAgentSearch}
+            onModelSearchChange={setMessageModelSearch}
+            onSessionSearchChange={setMessageSessionSearch}
+            onUserSearchChange={setMessageUserSearch}
+            applications={applications}
+            agents={agents}
+            models={models}
+            sessions={sessions}
+            users={users}
+            messages={getFilteredMessages()}
+            onViewSession={handleViewSessionDetail}
+            onViewMessage={handleViewMessageDetail}
+            onDeleteMessage={handleDeleteMessage}
+          />
         </TabsContent>
 
         {/* Feedback Tab */}
         <TabsContent value="feedback" className="space-y-4">
-          {/* Chart */}
-          <Card className="p-6 dark:bg-gray-800 dark:border-gray-700">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold dark:text-white">
-                {language === 'zh-CN' ? '反馈趋势' : 'Feedback Trends'}
-              </h3>
-              
-              {/* Time Range and Date Selectors */}
-              <div className="flex items-center gap-3">
-                <Select value={feedbackChartRange} onValueChange={(v: any) => setFeedbackChartRange(v)}>
-                  <SelectTrigger className="w-32 dark:bg-gray-900 dark:border-gray-700">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                    <SelectItem value="year">{language === 'zh-CN' ? '按年' : 'Yearly'}</SelectItem>
-                    <SelectItem value="month">{language === 'zh-CN' ? '按月' : 'Monthly'}</SelectItem>
-                    <SelectItem value="day">{language === 'zh-CN' ? '按天' : 'Daily'}</SelectItem>
-                  </SelectContent>
-                </Select>
-                
-                {/* Year Selector - always shown */}
-                <Select value={feedbackSelectedYear} onValueChange={setFeedbackSelectedYear}>
-                  <SelectTrigger className="w-32 dark:bg-gray-900 dark:border-gray-700">
-                    <SelectValue placeholder={language === 'zh-CN' ? '年份' : 'Year'} />
-                  </SelectTrigger>
-                  <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                    {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i).map(year => (
-                      <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                
-                {/* Month Selector - shown for month and day */}
-                {(feedbackChartRange === 'month' || feedbackChartRange === 'day') && (
-                  <Select value={feedbackSelectedMonth} onValueChange={setFeedbackSelectedMonth}>
-                    <SelectTrigger className="w-32 dark:bg-gray-900 dark:border-gray-700">
-                      <SelectValue placeholder={language === 'zh-CN' ? '月份' : 'Month'} />
-                    </SelectTrigger>
-                    <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                      {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
-                        <SelectItem key={month} value={month.toString()}>
-                          {language === 'zh-CN' ? `${month}月` : new Date(2000, month - 1).toLocaleString('en', { month: 'long' })}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-                
-                {/* Day Selector - only shown for day */}
-                {feedbackChartRange === 'day' && (
-                  <Select value={feedbackSelectedDay} onValueChange={setFeedbackSelectedDay}>
-                    <SelectTrigger className="w-32 dark:bg-gray-900 dark:border-gray-700">
-                      <SelectValue placeholder={language === 'zh-CN' ? '日期' : 'Day'} />
-                    </SelectTrigger>
-                    <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                      {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
-                        <SelectItem key={day} value={day.toString()}>
-                          {language === 'zh-CN' ? `${day}日` : day}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              </div>
-            </div>
-            <ResponsiveContainer width="100%" height={300} key={`feedback-container-${feedbackChartRange}-${language}`}>
-              {feedbackChartLoading ? (
-                <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">
-                  {language === 'zh-CN' ? '加载中...' : 'Loading...'}
-                </div>
-              ) : (
-              <LineChart data={feedbackChartData}>
-                <CartesianGrid key="feedback-grid" strokeDasharray="3 3" className="stroke-gray-300 dark:stroke-gray-700" />
-                <XAxis 
-                  key="feedback-xaxis"
-                  dataKey="date" 
-                  className="text-xs dark:text-gray-400"
-                  stroke="currentColor"
-                />
-                <YAxis 
-                  key="feedback-yaxis"
-                  className="text-xs dark:text-gray-400"
-                  stroke="currentColor"
-                />
-                <Tooltip 
-                  key="feedback-tooltip"
-                  contentStyle={{ 
-                    backgroundColor: 'var(--background)',
-                    border: '1px solid var(--border)',
-                    borderRadius: '8px',
-                  }}
-                  labelClassName="dark:text-white"
-                />
-                <Legend key="feedback-legend" />
-                <Line 
-                  key="feedback-line"
-                  type="monotone" 
-                  dataKey="value" 
-                  name={language === 'zh-CN' ? '反馈数' : 'Feedbacks'}
-                  stroke="#f59e0b" 
-                  strokeWidth={2}
-                  dot={{ fill: '#f59e0b', r: 4 }}
-                  activeDot={{ r: 6 }}
-                />
-              </LineChart>
-              )}
-            </ResponsiveContainer>
-          </Card>
-
-          {/* Filters */}
-          <div className="flex items-center justify-end gap-3">
-            {/* App Filter */}
-            <Select value={feedbackAppFilter} onValueChange={setFeedbackAppFilter}>
-              <SelectTrigger className="w-48 dark:bg-gray-900 dark:border-gray-700">
-                <SelectValue placeholder={language === 'zh-CN' ? '应用筛选' : 'Application Filter'} />
-              </SelectTrigger>
-              <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                <div className="p-2">
-                  <Input
-                    placeholder={language === 'zh-CN' ? '搜索应用...' : 'Search app...'}
-                    value={feedbackAppSearch}
-                    onChange={(e) => setFeedbackAppSearch(e.target.value)}
-                    className="mb-2 dark:bg-gray-900 dark:border-gray-700"
-                  />
-                </div>
-                <SelectItem value="all">
-                  {language === 'zh-CN' ? '全部应用' : 'All Applications'}
-                </SelectItem>
-                {applications
-                  .filter(app => app.name.toLowerCase().includes(feedbackAppSearch.toLowerCase()))
-                  .map(app => (
-                    <SelectItem key={app.id} value={app.id.toString()}>
-                      {app.name}
-                    </SelectItem>
-                  ))
-                }
-              </SelectContent>
-            </Select>
-
-            {/* User Filter */}
-            <Select value={feedbackUserFilter} onValueChange={setFeedbackUserFilter}>
-              <SelectTrigger className="w-48 dark:bg-gray-900 dark:border-gray-700">
-                <SelectValue placeholder={language === 'zh-CN' ? '用户筛选' : 'User Filter'} />
-              </SelectTrigger>
-              <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                <div className="p-2">
-                  <Input
-                    placeholder={language === 'zh-CN' ? '搜索用户...' : 'Search user...'}
-                    value={feedbackUserSearch}
-                    onChange={(e) => setFeedbackUserSearch(e.target.value)}
-                    className="mb-2 dark:bg-gray-900 dark:border-gray-700"
-                  />
-                </div>
-                <SelectItem value="all">
-                  {language === 'zh-CN' ? '全部用户' : 'All Users'}
-                </SelectItem>
-                {users
-                  .filter(user => user.name.toLowerCase().includes(feedbackUserSearch.toLowerCase()))
-                  .map(user => (
-                    <SelectItem key={user.id} value={user.id.toString()}>
-                      {user.name}
-                    </SelectItem>
-                  ))
-                }
-              </SelectContent>
-            </Select>
-
-            {/* Agent Filter */}
-            <Select value={feedbackAgentFilter} onValueChange={setFeedbackAgentFilter}>
-              <SelectTrigger className="w-48 dark:bg-gray-900 dark:border-gray-700">
-                <SelectValue placeholder={language === 'zh-CN' ? '智能体筛选' : 'Agent Filter'} />
-              </SelectTrigger>
-              <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                <div className="p-2">
-                  <Input
-                    placeholder={language === 'zh-CN' ? '搜索智能体...' : 'Search agent...'}
-                    value={feedbackAgentSearch}
-                    onChange={(e) => setFeedbackAgentSearch(e.target.value)}
-                    className="mb-2 dark:bg-gray-900 dark:border-gray-700"
-                  />
-                </div>
-                <SelectItem value="all">
-                  {language === 'zh-CN' ? '全部智能体' : 'All Agents'}
-                </SelectItem>
-                {agents
-                  .filter(agent => agent.name.toLowerCase().includes(feedbackAgentSearch.toLowerCase()))
-                  .map(agent => (
-                    <SelectItem key={agent.id} value={agent.id.toString()}>
-                      {agent.name}
-                    </SelectItem>
-                  ))
-                }
-              </SelectContent>
-            </Select>
-
-            {/* Session Filter */}
-            <Select value={feedbackSessionFilter} onValueChange={setFeedbackSessionFilter}>
-              <SelectTrigger className="w-48 dark:bg-gray-900 dark:border-gray-700">
-                <SelectValue placeholder={language === 'zh-CN' ? '会话筛选' : 'Session Filter'} />
-              </SelectTrigger>
-              <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                <div className="p-2">
-                  <Input
-                    placeholder={language === 'zh-CN' ? '搜索会话...' : 'Search session...'}
-                    value={feedbackSessionSearch}
-                    onChange={(e) => setFeedbackSessionSearch(e.target.value)}
-                    className="mb-2 dark:bg-gray-900 dark:border-gray-700"
-                  />
-                </div>
-                <SelectItem value="all">
-                  {language === 'zh-CN' ? '全部会话' : 'All Sessions'}
-                </SelectItem>
-                {sessions
-                  .filter(session => 
-                    session.title.toLowerCase().includes(feedbackSessionSearch.toLowerCase()) ||
-                    session.sessionId.toLowerCase().includes(feedbackSessionSearch.toLowerCase())
-                  )
-                  .map(session => (
-                    <SelectItem key={session.sessionId} value={session.sessionId}>
-                      {session.title}
-                    </SelectItem>
-                  ))
-                }
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Feedbacks List */}
-          <Card className="dark:bg-gray-800 dark:border-gray-700">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50 dark:bg-gray-900">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      {language === 'zh-CN' ? '消息ID' : 'Message ID'}
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      {language === 'zh-CN' ? '会话' : 'Session'}
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      {language === 'zh-CN' ? '反馈类型' : 'Type'}
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      {language === 'zh-CN' ? '用户' : 'User'}
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      {language === 'zh-CN' ? '评论' : 'Comment'}
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      {language === 'zh-CN' ? '创建时间' : 'Created'}
-                    </th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      {language === 'zh-CN' ? '操作' : 'Actions'}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                  {getFilteredFeedbacks().map((feedback) => (
-                    <tr 
-                      key={feedback.id}
-                      className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
-                    >
-                      <td className="px-4 py-3">
-                        <button
-                          onClick={() => {
-                            const message = messages.find(m => m.messageId === feedback.messageId);
-                            if (message) handleViewMessageDetail(message);
-                          }}
-                          className="text-xs font-mono bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors"
-                        >
-                          {feedback.messageId}
-                        </button>
-                      </td>
-                      <td className="px-4 py-3">
-                        <button
-                          onClick={() => {
-                            const session = sessions.find(s => s.sessionId === feedback.sessionId);
-                            if (session) handleViewSessionDetail(session);
-                          }}
-                          className="text-left"
-                        >
-                          <div className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline">
-                            {feedback.sessionTitle}
-                          </div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400 font-mono">
-                            {feedback.sessionId}
-                          </div>
-                        </button>
-                      </td>
-                      <td className="px-4 py-3">
-                        <Badge className={cn(
-                          "border-0",
-                          feedback.feedbackType === 'like'
-                            ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                            : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
-                        )}>
-                          {feedback.feedbackType === 'like' ? (
-                            <ThumbsUp className="h-3 w-3 mr-1" />
-                          ) : (
-                            <ThumbsDown className="h-3 w-3 mr-1" />
-                          )}
-                          {feedback.feedbackType === 'like' 
-                            ? (language === 'zh-CN' ? '好评' : 'Like')
-                            : (language === 'zh-CN' ? '差评' : 'Dislike')
-                          }
-                        </Badge>
-                      </td>
-                      <td className="px-4 py-3 text-sm dark:text-gray-300">
-                        {feedback.userName}
-                      </td>
-                      <td className="px-4 py-3 max-w-md">
-                        <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
-                          {feedback.feedbackComment || '-'}
-                        </p>
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
-                        {feedback.createdAt}
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteFeedback(feedback.id)}
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </Card>
+          <MonitorFeedbackTab
+            chartRange={feedbackChartRange}
+            chartSelectedYear={feedbackSelectedYear}
+            chartSelectedMonth={feedbackSelectedMonth}
+            chartSelectedDay={feedbackSelectedDay}
+            onChartRangeChange={setFeedbackChartRange}
+            onChartYearChange={setFeedbackSelectedYear}
+            onChartMonthChange={setFeedbackSelectedMonth}
+            onChartDayChange={setFeedbackSelectedDay}
+            chartData={feedbackChartData}
+            chartLoading={feedbackChartLoading}
+            keywordSearch={feedbackKeywordSearch}
+            onKeywordSearchChange={setFeedbackKeywordSearch}
+            appFilter={feedbackAppFilter}
+            agentFilter={feedbackAgentFilter}
+            modelFilter={feedbackModelFilter}
+            sessionFilter={feedbackSessionFilter}
+            userFilter={feedbackUserFilter}
+            onAppFilterChange={setFeedbackAppFilter}
+            onAgentFilterChange={setFeedbackAgentFilter}
+            onModelFilterChange={setFeedbackModelFilter}
+            onSessionFilterChange={setFeedbackSessionFilter}
+            onUserFilterChange={setFeedbackUserFilter}
+            appSearch={feedbackAppSearch}
+            agentSearch={feedbackAgentSearch}
+            modelSearch={feedbackModelSearch}
+            sessionSearch={feedbackSessionSearch}
+            userSearch={feedbackUserSearch}
+            onAppSearchChange={setFeedbackAppSearch}
+            onAgentSearchChange={setFeedbackAgentSearch}
+            onModelSearchChange={setFeedbackModelSearch}
+            onSessionSearchChange={setFeedbackSessionSearch}
+            onUserSearchChange={setFeedbackUserSearch}
+            applications={applications}
+            agents={agents}
+            models={models}
+            sessions={sessions}
+            users={users}
+            feedbacks={getFilteredFeedbacks()}
+            messages={messages}
+            onViewSession={handleViewSessionDetail}
+            onViewMessage={handleViewMessageDetail}
+            onDeleteFeedback={handleDeleteFeedback}
+          />
         </TabsContent>
       </Tabs>
 
