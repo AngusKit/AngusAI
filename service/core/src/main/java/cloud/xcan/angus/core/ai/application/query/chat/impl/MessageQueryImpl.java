@@ -164,12 +164,34 @@ public class MessageQueryImpl implements MessageQuery {
   }
 
   @Override
-  public long countActiveConversations() {
+  public long countActiveSessions() {
     return new BizTemplate<Long>() {
       @Override
       protected Long process() {
-        return messageRepo.countActiveConversations();
+        return messageRepo.countActiveSessions(LocalDateTime.now().minusMinutes(10));
       }
     }.execute();
   }
+
+  // 参考countActiveSessions，实现活动消息、活动会话、活动模型、活动智能体、活动应用统计
+  @Override
+  public Map<String, Long> countActive() {
+    return new BizTemplate<Map<String, Long>>() {
+      @Override
+      protected Map<String, Long> process() {
+        return null;
+      }
+    }.execute();
+  }
+
+    // 实现总消息、总会话、总模型、总智能体、总应用统计
+    @Override
+    public Map<String, Long> countAll() {
+      return new BizTemplate<Map<String, Long>>() {
+        @Override
+        protected Map<String, Long> process() {
+          return null;
+        }
+      }.execute();
+    }
 }

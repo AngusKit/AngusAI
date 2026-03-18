@@ -19,6 +19,9 @@ public class SessionFindDto extends PageQuery {
   @Schema(description = "筛选使用的智能体")
   private Long agentId;
 
+  @Schema(description = "筛选使用的模型")
+  private Long modelId;
+
   @Schema(description = "是否已归档")
   private Boolean isArchived;
 

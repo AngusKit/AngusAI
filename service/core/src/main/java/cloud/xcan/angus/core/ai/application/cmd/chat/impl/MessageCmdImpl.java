@@ -42,6 +42,9 @@ public class MessageCmdImpl extends CommCmd<Message, Long> implements MessageCmd
     message.setId(uidGenerator.getUID());
     message.setSessionEntityId(session.getId());
     message.setSessionId(session.getSessionId());
+    message.setAppId(session.getAppId());
+    message.setAgentId(session.getAgentId());
+    message.setModelId(session.getModelId());
     message.setRole(role);
     message.setContent(content);
     message.setIsStreaming(false);

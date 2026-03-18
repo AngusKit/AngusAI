@@ -38,6 +38,24 @@ public class Message extends TenantAuditingEntity<Message, Long> {
   private String sessionId;
 
   /**
+   * 冗余：所属会话的应用ID（来自 Session.appId）
+   */
+  @Column(name = "app_id")
+  private Long appId;
+
+  /**
+   * 冗余：所属会话的助手ID（来自 Session.agentId）
+   */
+  @Column(name = "agent_id")
+  private Long agentId;
+
+  /**
+   * 冗余：所属会话的模型ID（来自 Session.modelId）
+   */
+  @Column(name = "model_id")
+  private Long modelId;
+
+  /**
    * 父消息ID（用于重新生成）
    */
   @Column(name = "parent_message_id")

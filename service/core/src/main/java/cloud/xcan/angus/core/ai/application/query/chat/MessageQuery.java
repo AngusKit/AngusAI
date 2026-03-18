@@ -60,5 +60,5 @@ public interface MessageQuery {
   /**
    * 统计进行中对话数量：当前有消息正在流式生成的会话数
    */
-  long countActiveConversations();
+  long countActiveSessions();
 }

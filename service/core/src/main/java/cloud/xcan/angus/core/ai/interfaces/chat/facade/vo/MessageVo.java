@@ -29,6 +29,27 @@ public class MessageVo extends AuditingVo {
   @NameJoinField(id = "sessionEntityId", repository = "sessionRepo")
   private String sessionName;
 
+  @Schema(description = "关联的应用ID")
+  private Long appId;
+
+  @Schema(description = "应用名称")
+  @NameJoinField(id = "appId", repository = "aiApplicationRepo")
+  private String appName;
+
+  @Schema(description = "使用的智能体ID")
+  private Long agentId;
+
+  @Schema(description = "使用的智能体名称")
+  @NameJoinField(id = "agentId", repository = "agentRepo")
+  private String agentName;
+
+  @Schema(description = "使用的模型ID")
+  private Long modelId;
+
+  @Schema(description = "模型名称")
+  @NameJoinField(id = "modelId", repository = "modelRepo")
+  private String modelName;
+
   @Schema(description = "消息角色")
   private MessageRole role;
 

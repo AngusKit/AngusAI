@@ -1,6 +1,5 @@
 import { ApiLocaleResult, PageQuery } from '@xcan-angus/infra';
 import { MessageRoleEnum } from '@/enums/enums.ts';
-import type { SessionConfig } from './SessionTypes.ts';
 
 /** 消息附件 */
 export interface MessageAttachment {
@@ -32,6 +31,18 @@ export interface MessageVo {
    * 会话ID(UUID)
    */
   sessionId?: string;
+  /** 关联的应用ID */
+  appId?: string;
+  /** 应用名称 */
+  appName?: string;
+  /** 使用的智能体ID */
+  agentId?: string;
+  /** 使用的智能体名称 */
+  agentName?: string;
+  /** 使用的模型ID */
+  modelId?: string;
+  /** 模型名称 */
+  modelName?: string;
   /** 消息角色 */
   role?: MessageRoleEnum;
   /** 消息内容 */
@@ -59,21 +70,6 @@ export type MessageResult = ApiLocaleResult & {
   data?: MessageVo;
 };
 
-/** 发送消息请求 */
-export interface MessageSendDto {
-  /** 消息内容 */
-  content: string;
-  /** 附件列表 */
-  attachments?: MessageAttachment[];
-  /** 覆盖会话配置 */
-  overrideConfig?: SessionConfig;
-  /**
-   * 应用的提示词ID，用于统计分析
-   * @format int64
-   */
-  promptId?: string;
-}
-
 /** 消息反馈请求 */
 export interface MessageFeedbackDto {
   /** 反馈类型：like或dislike */
@@ -89,7 +85,13 @@ export interface MessageFindDto extends PageQuery {
   /** 会话ID(UUID) */
   sessionId?: string;
   /** 所属会话实体 ID */
-  sessionEntityId?: number;
+  sessionEntityId?: string;
+  /** 筛选指定应用 */
+  appId?: string;
+  /** 筛选使用的模型 */
+  modelId?: string;
+  /** 筛选使用的智能体 */
+  agentId?: string;
   /** 消息角色 */
   role?: MessageRoleEnum;
   /** 是否正在流式生成 */

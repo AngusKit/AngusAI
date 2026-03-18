@@ -51,6 +51,7 @@ public class SessionAssembler {
     vo.setSessionId(session.getSessionId());
     vo.setTitle(session.getTitle());
     vo.setAppId(session.getAppId());
+    vo.setAgentId(session.getAgentId());
     vo.setModelId(session.getModelId());
     vo.setMessageCount(session.getMessageCount());
     vo.setIsStarred(session.getIsStarred());
@@ -88,6 +89,7 @@ public class SessionAssembler {
     vo.setSessionId(session.getSessionId());
     vo.setTitle(session.getTitle());
     vo.setAppId(session.getAppId());
+    vo.setAgentId(session.getAgentId());
     vo.setModelId(session.getModelId());
     vo.setMessageCount(session.getMessageCount());
     vo.setIsStarred(session.getIsStarred());

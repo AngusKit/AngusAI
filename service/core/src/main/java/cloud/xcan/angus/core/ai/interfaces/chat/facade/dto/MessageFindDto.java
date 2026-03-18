@@ -20,6 +20,15 @@ public class MessageFindDto extends PageQuery {
   @Schema(description = "所属会话实体 ID")
   private Long sessionEntityId;
 
+  @Schema(description = "筛选指定应用")
+  private Long appId;
+
+  @Schema(description = "筛选使用的智能体")
+  private Long agentId;
+
+  @Schema(description = "筛选使用的模型")
+  private Long modelId;
+
   @Schema(description = "消息角色")
   private MessageRole role;
 

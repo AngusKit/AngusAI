@@ -19,6 +19,9 @@ public class MessageAssembler {
     vo.setId(message.identity());
     vo.setSessionId(message.getSessionId());
     vo.setSessionEntityId(message.getSessionEntityId());
+    vo.setAppId(message.getAppId());
+    vo.setAgentId(message.getAgentId());
+    vo.setModelId(message.getModelId());
     vo.setRole(message.getRole());
     vo.setContent(message.getContent());
     vo.setAttachments(message.getAttachments());
@@ -40,8 +43,8 @@ public class MessageAssembler {
     Set<SearchCriteria> filters = new SearchCriteriaBuilder<>(dto)
         .rangeSearchFields("id", "createdDate", "modifiedDate")
         .orderByFields("id", "sessionId", "role", "createdDate", "modifiedDate")
-        .matchSearchFields("content", "feedbackComment")
         .inAndNotFields("sessionId", "role", "isStreaming", "feedbackType")
+        .matchSearchFields("content", "feedbackComment")
         .build();
     return new GenericSpecification<>(filters);
   }

@@ -38,10 +38,13 @@ public interface MessageRepo extends BaseRepository<Message, Long> {
   List<Message> findBySessionIdAndIsStreamingTrue(String sessionId);
 
   /**
-   * 统计进行中对话数量：当前有消息正在流式生成的会话数（is_streaming=true 的 distinct session）
+   * 统计进行中对话数量：当前有消息正在流式生成的会话数（is_streaming=true 的 distinct session）。
+   * 仅统计 createdDate 在 cutoff 之后的消息，超过 cutoff 的视为超时对话，不计入进行中。
+   *
+   * @param cutoff 截止时间，通常为 now().minusMinutes(10)，即 10 分钟内的消息才计入
    */
-  @Query("SELECT COUNT(DISTINCT m.sessionId) FROM Message m WHERE m.isStreaming = true AND m.sessionId IS NOT NULL")
-  long countActiveConversations();
+  @Query("SELECT COUNT(DISTINCT m.sessionId) FROM Message m WHERE m.isStreaming = true AND m.sessionId IS NOT NULL AND m.createdDate >= :cutoff")
+  long countActiveSessions(@Param("cutoff") LocalDateTime cutoff);
 
   /**
    * 批量查询多个会话各自的最后一条消息（一次 SQL，兼容 MySQL 5.7）

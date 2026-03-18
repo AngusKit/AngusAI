@@ -114,9 +114,11 @@ export interface SessionFindDto extends PageQuery {
   /** 会话标题（搜索） */
   title?: string;
   /** 筛选指定应用 */
-  appId?: string | number;
+  appId?: string;
+  /** 筛选使用的模型 */
+  modelId?: string;
   /** 筛选使用的智能体 */
-  agentId?: string | number;
+  agentId?: string;
   /** 是否已归档 */
   isArchived?: boolean;
   /** 是否已收藏（星标） */
