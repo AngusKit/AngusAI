@@ -212,7 +212,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
                             new OpenAIChatCompletionsResponse.Delta(null, token),
                             null)))
                         .build();
-                    emitter.send(SseEmitter.event().data("data: " + toJson(chunk) + "\n\n"));
+                    emitter.send(SseEmitter.event().data(toJson(chunk)));
                   } catch (Exception e) {
                     emitter.completeWithError(e);
                   }
@@ -236,10 +236,6 @@ public class AgentChatCmdImpl implements AgentChatCmd {
                   saveApiUsageLog(principal, agent, sessionDb, modelForAsync,
                       "/api/v1/agents/chat/stream", streamStartMs, true, null,
                       inTokens, outTokens, total, userMessageIdForLog);
-                  try {
-                    emitter.send(SseEmitter.event().data("data: [DONE]\n\n"));
-                  } catch (Exception ignored) {
-                  }
                   emitter.complete();
                 })
                 .onError(e -> {
