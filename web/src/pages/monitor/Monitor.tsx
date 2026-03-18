@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { SearchCriteria } from '@xcan-angus/infra';
 import { useLanguage } from '@/components/LanguageProvider';
 import MonitorService from '@/services/Monitor';
 import SessionService from '@/services/Session';
@@ -350,30 +351,31 @@ export function Monitor() {
     formatChartDate,
   ]);
 
+  // 分页状态：会话、消息、反馈、会话详情消息
+  const [sessionsPage, setSessionsPage] = useState(1);
+  const [sessionsTotal, setSessionsTotal] = useState(0);
+  const [messagesPage, setMessagesPage] = useState(1);
+  const [messagesTotal, setMessagesTotal] = useState(0);
+  const [feedbacksPage, setFeedbacksPage] = useState(1);
+  const [feedbacksTotal, setFeedbacksTotal] = useState(0);
+  const [sessionMessagesTotal, setSessionMessagesTotal] = useState(0);
+  const PAGE_SIZE = 10;
+
   useEffect(() => {
     loadOverview();
   }, [loadOverview]);
 
-  useEffect(() => {
-    loadSessionsChart();
-  }, [loadSessionsChart]);
-
-  useEffect(() => {
-    loadMessagesChart();
-  }, [loadMessagesChart]);
-
-  useEffect(() => {
-    loadFeedbackChart();
-  }, [loadFeedbackChart]);
-
-  const loadSessionsList = useCallback(async () => {
+  const loadSessionsList = useCallback(async (pageNo = 1) => {
     setSessionsListLoading(true);
     try {
-      const res = await SessionService.getSessionList({ pageNo: 1, pageSize: 100 });
-      const list = (res as { data?: { list?: MonitorSession[] } })?.data?.list ?? [];
+      const res = await SessionService.getSessionList({ pageNo, pageSize: PAGE_SIZE });
+      const data = (res as { data?: { list?: MonitorSession[]; total?: number } })?.data;
+      const list = data?.list ?? [];
       setSessions(list);
+      setSessionsTotal(data?.total ?? list.length);
     } catch {
       setSessions([]);
+      setSessionsTotal(0);
     } finally {
       setSessionsListLoading(false);
     }
@@ -383,31 +385,35 @@ export function Monitor() {
     ...m,
     messageId: m.id ?? '',
     sessionTitle: sessionTitle ?? m.sessionName ?? m.sessionId,
-    userName: '-',
+    userName: (m as { creator?: string }).creator ?? '-',
   }), []);
 
-  const loadMessagesList = useCallback(async () => {
+  const loadMessagesList = useCallback(async (pageNo = 1) => {
     setMessagesListLoading(true);
     try {
-      const res = await MessageService.getMessageList({ pageNo: 1, pageSize: 100 });
-      const list = (res as { data?: { list?: MessageVo[] } })?.data?.list ?? [];
+      const res = await MessageService.getMessageList({ pageNo, pageSize: PAGE_SIZE });
+      const data = (res as { data?: { list?: MessageVo[]; total?: number } })?.data;
+      const list = data?.list ?? [];
       setMessages(list.map((m) => mapMessageToMonitor(m)));
+      setMessagesTotal(data?.total ?? list.length);
     } catch {
       setMessages([]);
+      setMessagesTotal(0);
     } finally {
       setMessagesListLoading(false);
     }
   }, [mapMessageToMonitor]);
 
-  const loadFeedbacksList = useCallback(async () => {
+  const loadFeedbacksList = useCallback(async (pageNo = 1) => {
     setFeedbacksListLoading(true);
     try {
-      const [likeRes, dislikeRes] = await Promise.all([
-        MessageService.getMessageList({ pageNo: 1, pageSize: 50, feedbackType: 'like' }),
-        MessageService.getMessageList({ pageNo: 1, pageSize: 50, feedbackType: 'dislike' }),
-      ]);
-      const likeList = (likeRes as { data?: { list?: MessageVo[] } })?.data?.list ?? [];
-      const dislikeList = (dislikeRes as { data?: { list?: MessageVo[] } })?.data?.list ?? [];
+      const res = await MessageService.getMessageList({
+        pageNo,
+        pageSize: PAGE_SIZE,
+        filters: [{ key: 'feedbackType', op: SearchCriteria.OpEnum.IsNotNull }], 
+      });
+      const data = (res as { data?: { list?: MessageVo[]; total?: number } })?.data;
+      const list = data?.list ?? [];
       const sessionMap = new Map(sessions.map((s) => [s.sessionId ?? s.id ?? '', s.title ?? '']));
       const toFeedback = (m: MessageVo): MonitorFeedback => ({
         id: m.id ?? '',
@@ -423,108 +429,73 @@ export function Monitor() {
         modelId: m.modelId,
         modelName: m.modelName,
         messageContent: m.content,
+        userName: (m as { creator?: string }).creator,
         createdAt: m.datetime,
       });
-      setFeedbacks([...likeList.map(toFeedback), ...dislikeList.map(toFeedback)]);
+      setFeedbacks(list.map(toFeedback));
+      setFeedbacksTotal(data?.total ?? list.length);
     } catch {
       setFeedbacks([]);
+      setFeedbacksTotal(0);
     } finally {
       setFeedbacksListLoading(false);
     }
   }, [sessions]);
 
-  const loadSessionMessages = useCallback(async (sessionId: string) => {
+  const loadSessionMessages = useCallback(async (sessionId: string, pageNo = 1, keyword?: string) => {
     setSessionMessagesLoading(true);
     try {
-      const res = await MessageService.getMessageList({ sessionId, pageNo: 1, pageSize: 200 });
-      const list = (res as { data?: { list?: MessageVo[] } })?.data?.list ?? [];
+      const res = await MessageService.getMessageList({
+        sessionId,
+        pageNo,
+        pageSize: PAGE_SIZE,
+        ...(keyword ? { keyword } : {}),
+      });
+      const data = (res as { data?: { list?: MessageVo[]; total?: number } })?.data;
+      const list = data?.list ?? [];
       setSessionMessages(list);
+      setSessionMessagesTotal(data?.total ?? list.length);
     } catch {
       setSessionMessages([]);
+      setSessionMessagesTotal(0);
     } finally {
       setSessionMessagesLoading(false);
     }
   }, []);
 
+  // 按需加载：仅在切换到对应 Tab 时加载
   useEffect(() => {
-    loadSessionsList();
-  }, [loadSessionsList]);
+    if (activeTab === 'sessions') {
+      loadSessionsChart();
+      loadSessionsList(sessionsPage);
+    }
+  }, [activeTab, loadSessionsChart, loadSessionsList, sessionsPage]);
 
   useEffect(() => {
-    loadMessagesList();
-  }, [loadMessagesList]);
+    if (activeTab === 'messages') {
+      loadMessagesChart();
+      loadMessagesList(messagesPage);
+    }
+  }, [activeTab, loadMessagesChart, loadMessagesList, messagesPage]);
 
   useEffect(() => {
-    loadFeedbacksList();
-  }, [loadFeedbacksList]);
+    if (activeTab === 'feedback') {
+      loadFeedbackChart();
+      loadFeedbacksList(feedbacksPage);
+    }
+  }, [activeTab, loadFeedbackChart, loadFeedbacksList, feedbacksPage]);
 
   useEffect(() => {
     if (selectedSession?.sessionId ?? selectedSession?.id) {
-      loadSessionMessages(selectedSession.sessionId ?? selectedSession.id ?? '');
+      loadSessionMessages(
+        selectedSession.sessionId ?? selectedSession.id ?? '',
+        sessionMessagePage,
+        sessionMessageSearch || undefined
+      );
     } else {
       setSessionMessages([]);
     }
-  }, [selectedSession, loadSessionMessages]);
-
-  // Filter functions
-  const getFilteredSessions = () => {
-    return sessions.filter((session) => {
-      if (sessionKeywordSearch) {
-        const kw = sessionKeywordSearch.toLowerCase();
-        if (!(session.title ?? '').toLowerCase().includes(kw) && !(session.sessionId ?? '').toLowerCase().includes(kw)) return false;
-      }
-      if (sessionAppFilter !== 'all' && (session.appId ?? '') !== sessionAppFilter) return false;
-      if (sessionAgentFilter !== 'all' && (session.agentId ?? '') !== sessionAgentFilter) return false;
-      if (sessionModelFilter !== 'all' && (session.modelId ?? '') !== sessionModelFilter) return false;
-      if (sessionUserFilter !== 'all') return false;
-      return true;
-    });
-  };
-
-  const getFilteredMessages = () => {
-    return messages.filter((message) => {
-      if (messageKeywordSearch) {
-        const kw = messageKeywordSearch.toLowerCase();
-        const content = (message.content ?? '').toLowerCase();
-        const sessionTitle = (message.sessionName ?? message.sessionTitle ?? message.sessionId ?? '').toLowerCase();
-        const msgId = (message.messageId ?? message.id ?? '').toLowerCase();
-        if (!content.includes(kw) && !sessionTitle.includes(kw) && !msgId.includes(kw)) return false;
-      }
-      if (messageAppFilter !== 'all' && (message.appId ?? '') !== messageAppFilter) return false;
-      if (messageAgentFilter !== 'all' && (message.agentId ?? '') !== messageAgentFilter) return false;
-      if (messageModelFilter !== 'all' && (message.modelId ?? '') !== messageModelFilter) return false;
-      if (messageSessionFilter !== 'all' && (message.sessionId ?? '') !== messageSessionFilter) return false;
-      if (messageUserFilter !== 'all') return false;
-      return true;
-    });
-  };
-
-  const getFilteredFeedbacks = () => {
-    return feedbacks.filter((feedback) => {
-      if (feedbackKeywordSearch) {
-        const kw = feedbackKeywordSearch.toLowerCase();
-        const comment = (feedback.feedbackComment ?? '').toLowerCase();
-        const content = (feedback.messageContent ?? '').toLowerCase();
-        const title = (feedback.sessionTitle ?? '').toLowerCase();
-        if (!comment.includes(kw) && !content.includes(kw) && !title.includes(kw)) return false;
-      }
-      if (feedbackAppFilter !== 'all' && (feedback.appId ?? '') !== feedbackAppFilter) return false;
-      if (feedbackAgentFilter !== 'all' && (feedback.agentId ?? '') !== feedbackAgentFilter) return false;
-      if (feedbackModelFilter !== 'all' && (feedback.modelId ?? '') !== feedbackModelFilter) return false;
-      if (feedbackSessionFilter !== 'all' && (feedback.sessionId ?? '') !== feedbackSessionFilter) return false;
-      if (feedbackUserFilter !== 'all') return false;
-      return true;
-    });
-  };
-
-  const getFilteredSessionMessages = () => {
-    return sessionMessages.filter((message) => {
-      if (sessionMessageSearch) {
-        return (message.content ?? '').toLowerCase().includes(sessionMessageSearch.toLowerCase());
-      }
-      return true;
-    });
-  };
+  }, [selectedSession, sessionMessagePage, sessionMessageSearch, loadSessionMessages]);
 
   // Handlers
   const handleViewSessionDetail = (session: MonitorSession) => {
@@ -596,13 +567,7 @@ export function Monitor() {
   const renderSessionDetail = () => {
     if (!selectedSession) return null;
 
-    const filteredMessages = getFilteredSessionMessages();
-    const messagesPerPage = 10;
-    const totalPages = Math.ceil(filteredMessages.length / messagesPerPage);
-    const paginatedMessages = filteredMessages.slice(
-      (sessionMessagePage - 1) * messagesPerPage,
-      sessionMessagePage * messagesPerPage
-    );
+    const totalPages = Math.max(1, Math.ceil(sessionMessagesTotal / PAGE_SIZE));
 
     return (
       <div className="space-y-6">
@@ -705,14 +670,24 @@ export function Monitor() {
                       setSessionMessageSearch(e.target.value);
                       setSessionMessagePage(1);
                     }}
+                    onKeyDown={(e) => e.key === 'Enter' && loadSessionMessages(
+                      selectedSession.sessionId ?? selectedSession.id ?? '',
+                      1,
+                      sessionMessageSearch || undefined
+                    )}
                     className="pl-10 dark:bg-gray-900 dark:border-gray-700"
                   />
                 </div>
               </div>
             </div>
 
+            {sessionMessagesLoading && sessionMessages.length === 0 && (
+              <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+                {language === 'zh-CN' ? '加载中...' : 'Loading...'}
+              </div>
+            )}
             <div className="space-y-3">
-              {paginatedMessages.map((message) => (
+              {sessionMessages.map((message) => (
                 <div
                   key={message.id ?? ''}
                   className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
@@ -733,7 +708,7 @@ export function Monitor() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-sm font-medium dark:text-white">
-                          {(message.role ?? '').toUpperCase() === 'USER' ? ((message as { userName?: string }).userName ?? '-') : 'AI Assistant'}
+                          {(message.role ?? '').toUpperCase() === 'USER' ? ((message as { creator?: string }).creator ?? '-') : 'AI Assistant'}
                         </span>
                         <Badge variant="secondary" className="text-xs font-mono">
                           {message.id ?? ''}
@@ -1092,7 +1067,14 @@ export function Monitor() {
             agents={agents}
             models={models}
             users={users}
-            sessions={getFilteredSessions()}
+            sessions={sessions}
+            sessionsLoading={sessionsListLoading}
+            pagination={{
+              page: sessionsPage,
+              total: sessionsTotal,
+              pageSize: PAGE_SIZE,
+              onPageChange: (p) => setSessionsPage(p),
+            }}
             onViewSession={handleViewSessionDetail}
             onDeleteSession={handleDeleteSession}
           />
@@ -1138,7 +1120,14 @@ export function Monitor() {
             models={models}
             sessions={sessions}
             users={users}
-            messages={getFilteredMessages()}
+            messages={messages}
+            messagesLoading={messagesListLoading}
+            pagination={{
+              page: messagesPage,
+              total: messagesTotal,
+              pageSize: PAGE_SIZE,
+              onPageChange: (p) => setMessagesPage(p),
+            }}
             onViewSession={handleViewSessionDetail}
             onViewMessage={handleViewMessageDetail}
             onDeleteMessage={handleDeleteMessage}
@@ -1185,7 +1174,14 @@ export function Monitor() {
             models={models}
             sessions={sessions}
             users={users}
-            feedbacks={getFilteredFeedbacks()}
+            feedbacks={feedbacks}
+            feedbacksLoading={feedbacksListLoading}
+            pagination={{
+              page: feedbacksPage,
+              total: feedbacksTotal,
+              pageSize: PAGE_SIZE,
+              onPageChange: (p) => setFeedbacksPage(p),
+            }}
             messages={messages}
             onViewSession={handleViewSessionDetail}
             onViewMessage={handleViewMessageDetail}

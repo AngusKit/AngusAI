@@ -1,4 +1,4 @@
-import { ApiLocaleResult, PageQuery } from '@xcan-angus/infra';
+import { ApiLocaleResult, AuditingVo, PageQuery } from '@xcan-angus/infra';
 import { MessageRoleEnum } from '@/enums/enums.ts';
 
 /** 消息附件 */
@@ -23,10 +23,12 @@ export interface MessageUsage {
   cost?: number;
 }
 
-/** 消息视图 */
-export interface MessageVo {
+/** 消息视图（继承 AuditingVo，NameJoin 会填充 creator） */
+export interface MessageVo extends AuditingVo {
   /** 消息ID */
   id?: string;
+  /** 创建者姓名（NameJoin 填充） */
+  creator?: string;
   /**
    * 会话ID(UUID)
    */

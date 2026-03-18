@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MonitorLineChart } from './MonitorLineChart';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { Eye, Trash2, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { cn } from '@/components/ui/utils';
 
@@ -49,6 +50,8 @@ export interface MonitorMessagesTabProps {
   sessions: MonitorSession[];
   users: SelectOption[];
   messages: MonitorMessage[];
+  messagesLoading?: boolean;
+  pagination?: { page: number; total: number; pageSize: number; onPageChange: (page: number) => void };
   onViewSession: (session: MonitorSession) => void;
   onViewMessage: (message: MonitorMessage) => void;
   onDeleteMessage: (messageId: string) => void;
@@ -94,6 +97,8 @@ export function MonitorMessagesTab(props: MonitorMessagesTabProps) {
     sessions,
     users,
     messages,
+    messagesLoading,
+    pagination,
     onViewSession,
     onViewMessage,
     onDeleteMessage,
@@ -200,6 +205,9 @@ export function MonitorMessagesTab(props: MonitorMessagesTabProps) {
       </div>
 
       <Card className="dark:bg-gray-800 dark:border-gray-700">
+        {(messagesLoading && messages.length === 0) && (
+          <div className="p-8 text-center text-gray-500 dark:text-gray-400">{language === 'zh-CN' ? '加载中...' : 'Loading...'}</div>
+        )}
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 dark:bg-gray-900">
@@ -231,9 +239,12 @@ export function MonitorMessagesTab(props: MonitorMessagesTabProps) {
               {messages.map((message) => (
                 <tr key={message.id ?? message.messageId ?? ''} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                   <td className="px-4 py-3">
-                    <code className="text-xs font-mono bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded">
+                    <button
+                      onClick={() => onViewMessage(message)}
+                      className="text-xs font-mono bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded hover:bg-gray-200 dark:hover:bg-gray-800 text-blue-600 dark:text-blue-400 hover:underline"
+                    >
                       {message.messageId ?? message.id ?? '-'}
-                    </code>
+                    </button>
                   </td>
                   <td className="px-4 py-3">
                     <button
@@ -252,22 +263,27 @@ export function MonitorMessagesTab(props: MonitorMessagesTabProps) {
                     </button>
                   </td>
                   <td className="px-4 py-3">
-                    <Badge
-                      className={cn(
-                        'border-0',
-                        (message.role ?? '').toUpperCase() === 'USER'
-                          ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
-                          : 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'
+                    <div className="space-y-0.5">
+                      <Badge
+                        className={cn(
+                          'border-0',
+                          (message.role ?? '').toUpperCase() === 'USER'
+                            ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+                            : 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'
+                        )}
+                      >
+                        {(message.role ?? '').toUpperCase() === 'USER'
+                          ? language === 'zh-CN'
+                            ? '用户'
+                            : 'User'
+                          : language === 'zh-CN'
+                            ? '助手'
+                            : 'Assistant'}
+                      </Badge>
+                      {(message.role ?? '').toUpperCase() === 'USER' && ((message as { creator?: string }).creator ?? message.userName) && (
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{(message as { creator?: string }).creator ?? message.userName}</p>
                       )}
-                    >
-                      {(message.role ?? '').toUpperCase() === 'USER'
-                        ? language === 'zh-CN'
-                          ? '用户'
-                          : 'User'
-                        : language === 'zh-CN'
-                          ? '助手'
-                          : 'Assistant'}
-                    </Badge>
+                    </div>
                   </td>
                   <td className="px-4 py-3 max-w-md">
                     <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">{message.content}</p>
@@ -310,6 +326,37 @@ export function MonitorMessagesTab(props: MonitorMessagesTabProps) {
             </tbody>
           </table>
         </div>
+        {pagination && pagination.total > pagination.pageSize && (
+          <div className="flex justify-center p-4 border-t border-gray-200 dark:border-gray-700">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={() => pagination.onPageChange(Math.max(1, pagination.page - 1))}
+                    className={pagination.page === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
+                </PaginationItem>
+                {Array.from({ length: Math.ceil(pagination.total / pagination.pageSize) }, (_, i) => i + 1).map((p) => (
+                  <PaginationItem key={p}>
+                    <PaginationLink
+                      onClick={() => pagination.onPageChange(p)}
+                      isActive={pagination.page === p}
+                      className="cursor-pointer"
+                    >
+                      {p}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={() => pagination.onPageChange(Math.min(Math.ceil(pagination.total / pagination.pageSize), pagination.page + 1))}
+                    className={pagination.page >= Math.ceil(pagination.total / pagination.pageSize) ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
       </Card>
     </div>
   );

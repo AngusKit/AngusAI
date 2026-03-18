@@ -14,6 +14,7 @@ export type MonitorMessage = MessageVo & {
   messageId?: string;
   sessionTitle?: string;
   userName?: string;
+  creator?: string;
 };
 
 /** 反馈展示：从 MessageVo（有 feedbackType）映射，用于反馈管理 Tab */

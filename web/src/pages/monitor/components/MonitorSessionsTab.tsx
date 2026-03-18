@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MonitorLineChart } from './MonitorLineChart';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { Eye, Trash2 } from 'lucide-react';
 
 export interface MonitorSessionsTabProps {
@@ -43,6 +44,8 @@ export interface MonitorSessionsTabProps {
   models: SelectOption[];
   users: SelectOption[];
   sessions: MonitorSession[];
+  sessionsLoading?: boolean;
+  pagination?: { page: number; total: number; pageSize: number; onPageChange: (page: number) => void };
   onViewSession: (session: MonitorSession) => void;
   onDeleteSession: (sessionId: string) => void;
 }
@@ -81,6 +84,8 @@ export function MonitorSessionsTab({
   models,
   users,
   sessions,
+  sessionsLoading,
+  pagination,
   onViewSession,
   onDeleteSession,
 }: MonitorSessionsTabProps) {
@@ -197,6 +202,9 @@ export function MonitorSessionsTab({
       </div>
 
       <Card className="dark:bg-gray-800 dark:border-gray-700">
+        {(sessionsLoading && sessions.length === 0) && (
+          <div className="p-8 text-center text-gray-500 dark:text-gray-400">{language === 'zh-CN' ? '加载中...' : 'Loading...'}</div>
+        )}
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 dark:bg-gray-900">
@@ -271,6 +279,37 @@ export function MonitorSessionsTab({
             </tbody>
           </table>
         </div>
+        {pagination && pagination.total > pagination.pageSize && (
+          <div className="flex justify-center p-4 border-t border-gray-200 dark:border-gray-700">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={() => pagination.onPageChange(Math.max(1, pagination.page - 1))}
+                    className={pagination.page === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
+                </PaginationItem>
+                {Array.from({ length: Math.ceil(pagination.total / pagination.pageSize) }, (_, i) => i + 1).map((p) => (
+                  <PaginationItem key={p}>
+                    <PaginationLink
+                      onClick={() => pagination.onPageChange(p)}
+                      isActive={pagination.page === p}
+                      className="cursor-pointer"
+                    >
+                      {p}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={() => pagination.onPageChange(Math.min(Math.ceil(pagination.total / pagination.pageSize), pagination.page + 1))}
+                    className={pagination.page >= Math.ceil(pagination.total / pagination.pageSize) ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
       </Card>
     </div>
   );
