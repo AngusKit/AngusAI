@@ -27,6 +27,9 @@ export function truncateForTitle(text: string, maxLen = SESSION_TITLE_MAX_LENGTH
   return lastSpace > 0 ? cut.slice(0, lastSpace).trim() : cut;
 }
 
+/** 最大同时进行的对话数（多个 session 可并发流式生成） */
+export const MAX_CONCURRENT_CHATS = 3;
+
 /** 默认值常量（用于 Slider 回退等） */
 export const DEFAULT_TEMPERATURE = DEFAULT_CHAT_SETTINGS.temperature ?? 0.7;
 export const DEFAULT_MAX_TOKENS = DEFAULT_CHAT_SETTINGS.maxTokens ?? 2000;

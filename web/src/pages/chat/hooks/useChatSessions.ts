@@ -271,7 +271,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
       const trimmed = newTitle.trim();
       if (!trimmed || trimmed === (session?.title ?? '').trim()) return;
       try {
-        await Chat.updateSession(sid, { title: trimmed });
+        await Session.updateSession(sid, { title: trimmed });
         setSessions((prev) =>
           prev.map((s) =>
             (s.sessionId === sessionId || s.id === sessionId)
@@ -345,7 +345,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
     });
   }, []);
 
-  /** 更新指定消息内容（用于流式响应、反馈等） */
+  /** 更新指定消息内容（用于流式响应、反馈等）；流式生成期间仅更新 sessionMessages，避免频繁更新 sessions 导致侧边栏闪动 */
   const updateMessage = useCallback(
     (sessionId: string, messageId: string, patch: Partial<Pick<Message, 'content' | 'isStreaming' | 'feedbackType'>>) => {
       setSessionMessages((prev) => {
@@ -357,11 +357,14 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
           ),
         };
       });
-      setSessions((prev) =>
-        prev.map((s) =>
-          s.sessionId === sessionId ? { ...s, updatedAt: new Date() } : s
-        )
-      );
+      // 仅当流式结束或反馈变更时更新 sessions.updatedAt，避免流式期间每 token 都触发侧边栏重渲染
+      if (patch.feedbackType != null || patch.isStreaming === false) {
+        setSessions((prev) =>
+          prev.map((s) =>
+            s.sessionId === sessionId ? { ...s, updatedAt: new Date() } : s
+          )
+        );
+      }
     },
     []
   );

@@ -10,7 +10,7 @@ import { SettingsDialog } from './components/SettingsDialog.tsx';
 import { ThemeDialog, CHAT_TEMPLATES, type TemplateType } from './components/ThemeDialog.tsx';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { SessionConfig } from '@/services/SessionTypes';
-import { DEFAULT_CHAT_SETTINGS, DEFAULT_SESSION_TITLE, truncateForTitle } from './constants';
+import { DEFAULT_CHAT_SETTINGS, DEFAULT_SESSION_TITLE, MAX_CONCURRENT_CHATS, truncateForTitle } from './constants';
 import SessionApi from '@/services/Session';
 import MessageApi from '@/services/Message';
 
@@ -40,6 +40,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     selectSession,
     ensureSessionLoaded,
     addSessionFromChat,
+    sessionMessages,
     appendMessages,
     removeLastAssistantMessage,
     updateMessage,
@@ -113,18 +114,30 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     navigate(`/chat/${currentSessionId}`, { replace: true });
   }, [currentSessionId, sessionIdFromUrl, navigate]);
 
-  const handleSessionSelect = (sessionId: string) => {
+  const handleSessionSelect = useCallback((sessionId: string) => {
     selectSession(sessionId);
     navigate(`/chat/${sessionId}`);
-  };
+  }, [selectSession, navigate]);
 
-  const [isSending, setIsSending] = useState(false);
+  // 统计正在流式生成的会话数（支持多会话并发）
+  const streamingSessionCount = Object.values(sessionMessages).filter((msgs) =>
+    (msgs ?? []).some((m) => m.isStreaming)
+  ).length;
+  // 最大并发数：优先从当前会话的应用配置读取
+  const maxConcurrentChats =
+    (sessionSelections[currentSessionId ?? ''] ?? { app: undefined })?.app?.features?.maxConcurrentChats ??
+    MAX_CONCURRENT_CHATS;
 
   const handleSendMessage = async (userContent: string, files: File[]) => {
     if (!userContent.trim() && files.length === 0) return;
-    // 防止重复发送：发送中或有流式消息时不再发送
-    if (isSending || currentMessages.some((m) => m.isStreaming)) {
+    // 当前会话已有流式消息时不再发送
+    if (currentMessages.some((m) => m.isStreaming)) {
       toast.error('请等待当前消息发送完成');
+      return;
+    }
+    // 达到最大并发数时不再发送
+    if (streamingSessionCount >= maxConcurrentChats) {
+      toast.error(`最多同时进行 ${maxConcurrentChats} 个对话，请等待其他对话完成`);
       return;
     }
 
@@ -182,7 +195,6 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     // 只提交最后一条用户消息，上下文由后端根据 sessionId 从会话历史中获取
     const messages = [{ role: 'user' as const, content: userContent }];
 
-    setIsSending(true);
     const effectiveKeyRef = { current: displayKey };
 
     try {
@@ -248,8 +260,6 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
         isStreaming: false,
       });
       toast.error(msg);
-    } finally {
-      setIsSending(false);
     }
   };
 
@@ -264,6 +274,15 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     const userContent = lastUserMsg.content?.trim();
     if (!userContent) return;
 
+    // 达到最大并发数时不再重新生成
+    const streamingCount = Object.values(sessionMessages).filter((m) =>
+      (m ?? []).some((msg) => msg.isStreaming)
+    ).length;
+    if (streamingCount >= maxConcurrentChats) {
+      toast.error(`最多同时进行 ${maxConcurrentChats} 个对话，请等待其他对话完成`);
+      return;
+    }
+
     scrollAfterSendRef.current = true;
     removeLastAssistantMessage(currentSessionId);
     const assistantId = `assistant-${Date.now()}`;
@@ -275,7 +294,6 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
       isStreaming: true,
     };
     appendMessages(currentSessionId, [aiPlaceholder]);
-    setIsSending(true);
     const configPayload = {
       temperature: settings.temperature,
       maxTokens: settings.maxTokens,
@@ -315,17 +333,17 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
         isStreaming: false,
       });
       toast.error(msg);
-    } finally {
-      setIsSending(false);
     }
   }, [
     currentSessionId,
     currentSession,
     currentMessages,
+    sessionMessages,
     removeLastAssistantMessage,
     appendMessages,
     updateMessage,
     settings,
+    maxConcurrentChats,
   ]);
 
   const handleFeedback = useCallback(async (messageId: string, feedbackType: 'like' | 'dislike', comment?: string) => {
@@ -560,7 +578,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
         lastCompositionEndRef={lastCompositionEndRef}
         onCompositionStart={handleCompositionStart}
         onCompositionEnd={handleCompositionEnd}
-        isSending={isSending || currentMessages.some((m) => m.isStreaming)}
+        isSending={currentMessages.some((m) => m.isStreaming)}
         scrollAfterSendRef={scrollAfterSendRef}
         onRegenerate={handleRegenerate}
         onFeedback={handleFeedback}

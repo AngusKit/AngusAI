@@ -2,7 +2,7 @@ import { MessageSquare, Plus, Trash2, MoreVertical, ChevronLeft, Search, Clock, 
 import { Button } from '@/components/ui/button.tsx';
 import { Input } from '@/components/ui/input.tsx';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from '@/components/ui/dropdown-menu.tsx';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, memo, useCallback, useMemo } from 'react';
 import { cn } from '@/components/ui/utils.ts';
 
 interface Session {
@@ -17,6 +17,155 @@ interface Session {
   updatedAt: Date;
   isStarred?: boolean;
 }
+
+/** 提取到外部，避免 ChatSidebar 重渲染时组件引用变化导致会话列表闪动 */
+interface SessionItemProps {
+  session: Session;
+  isSelected: boolean;
+  renamingId: string | null;
+  renameValue: string;
+  onSessionSelect: (id: string) => void;
+  onToggleStar: (id: string) => void;
+  onDeleteSession: (id: string) => void;
+  onRenameStart: (id: string, title: string) => void;
+  onRenameSubmit: (id: string, title: string) => void;
+  onRenameCancel: () => void;
+  onRenameValueChange: (v: string) => void;
+}
+
+const SessionItem = memo(function SessionItem({
+  session,
+  isSelected,
+  renamingId,
+  renameValue,
+  onSessionSelect,
+  onToggleStar,
+  onDeleteSession,
+  onRenameStart,
+  onRenameSubmit,
+  onRenameCancel,
+  onRenameValueChange,
+}: SessionItemProps) {
+  return (
+    <div
+      onClick={() => !renamingId && onSessionSelect(session.id)}
+      className={cn(
+        'group flex items-center gap-2 px-2 py-1 rounded-lg cursor-pointer transition-colors',
+        isSelected
+          ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
+          : 'hover:bg-gray-100 dark:hover:bg-gray-750 text-gray-700 dark:text-gray-300'
+      )}
+    >
+      {session.isStarred && <Star className='w-4 h-4 flex-shrink-0 fill-yellow-400 text-yellow-400' />}
+      {!session.isStarred && <MessageSquare className='w-4 h-4 flex-shrink-0' />}
+      <div className='flex-1 min-w-0'>
+        {renamingId === session.id ? (
+          <Input
+            value={renameValue}
+            onChange={e => onRenameValueChange(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter') onRenameSubmit(session.id, session.title);
+              else if (e.key === 'Escape') onRenameCancel();
+            }}
+            onBlur={() => onRenameSubmit(session.id, session.title)}
+            className='h-7 text-sm'
+            autoFocus
+            onClick={e => e.stopPropagation()}
+          />
+        ) : (
+          <>
+            <p className='text-sm truncate'>{session.title}</p>
+            <p className='text-xs text-gray-500 dark:text-gray-400'>
+              {(session.messageCount ?? session.messages?.length ?? 0)} 条消息
+            </p>
+          </>
+        )}
+      </div>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant='ghost' size='icon' className='h-8 w-8 opacity-0 group-hover:opacity-100' onClick={e => e.stopPropagation()}>
+            <MoreVertical className='w-4 h-4' />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align='end'>
+          <DropdownMenuItem onClick={e => { e.stopPropagation(); onToggleStar(session.id); }}>
+            <Star className={cn('w-4 h-4 mr-2', session.isStarred && 'fill-yellow-400 text-yellow-400')} />
+            {session.isStarred ? '取消收藏' : '收藏'}
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={e => { e.stopPropagation(); onRenameStart(session.id, session.title); }}>
+            <MessageSquare className='w-4 h-4 mr-2' />
+            重命名
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            className='text-red-600 dark:text-red-400'
+            onSelect={e => { e.stopPropagation(); onDeleteSession(session.id); }}
+          >
+            <Trash2 className='w-4 h-4 mr-2' />
+            删除
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+  );
+});
+
+interface SessionGroupProps {
+  title: string;
+  sessions: Session[];
+  currentSessionId: string;
+  renamingId: string | null;
+  renameValue: string;
+  onSessionSelect: (id: string) => void;
+  onToggleStar: (id: string) => void;
+  onDeleteSession: (id: string) => void;
+  onRenameStart: (id: string, title: string) => void;
+  onRenameSubmit: (id: string, title: string) => void;
+  onRenameCancel: () => void;
+  onRenameValueChange: (v: string) => void;
+}
+
+const SessionGroup = memo(function SessionGroup({
+  title,
+  sessions,
+  currentSessionId,
+  renamingId,
+  renameValue,
+  onSessionSelect,
+  onToggleStar,
+  onDeleteSession,
+  onRenameStart,
+  onRenameSubmit,
+  onRenameCancel,
+  onRenameValueChange,
+}: SessionGroupProps) {
+  if (sessions.length === 0) return null;
+  return (
+    <div className='mb-2'>
+      <h3 className='text-xs text-gray-500 dark:text-gray-400 px-2 mb-1 flex items-center gap-1.5'>
+        <Clock className='w-2.5 h-2.5' />
+        {title}
+      </h3>
+      <div className='space-y-0.5'>
+        {sessions.map(s => (
+          <SessionItem
+            key={s.id}
+            session={s}
+            isSelected={currentSessionId === s.id}
+            renamingId={renamingId}
+            renameValue={renameValue}
+            onSessionSelect={onSessionSelect}
+            onToggleStar={onToggleStar}
+            onDeleteSession={onDeleteSession}
+            onRenameStart={onRenameStart}
+            onRenameSubmit={onRenameSubmit}
+            onRenameCancel={onRenameCancel}
+            onRenameValueChange={onRenameValueChange}
+          />
+        ))}
+      </div>
+    </div>
+  );
+});
 
 interface ChatSidebarProps {
   sessions: Session[];
@@ -81,14 +230,7 @@ export function ChatSidebar({
     }
   };
 
-  const filteredSessions = sessions;
-
-  const groupedSessions = {
-    today: filteredSessions.filter(s => isToday(s.updatedAt)),
-    yesterday: filteredSessions.filter(s => isYesterday(s.updatedAt)),
-    lastWeek: filteredSessions.filter(s => isLastWeek(s.updatedAt)),
-    older: filteredSessions.filter(s => !isToday(s.updatedAt) && !isYesterday(s.updatedAt) && !isLastWeek(s.updatedAt)),
-  };
+  const filteredSessions = sessions ?? [];
 
   function isToday(date: Date) {
     const today = new Date();
@@ -109,124 +251,67 @@ export function ChatSidebar({
     return date > weekAgo && date < yesterday;
   }
 
-  const handleRename = (sessionId: string, currentTitle: string) => {
+  const groupedSessions = useMemo(
+    () => {
+      const list = filteredSessions;
+      return {
+        today: list.filter(s => isToday(s.updatedAt)),
+        yesterday: list.filter(s => isYesterday(s.updatedAt)),
+        lastWeek: list.filter(s => isLastWeek(s.updatedAt)),
+        older: list.filter(s => !isToday(s.updatedAt) && !isYesterday(s.updatedAt) && !isLastWeek(s.updatedAt)),
+      };
+    },
+    [sessions]
+  );
+
+  const handleRename = useCallback((sessionId: string, currentTitle: string) => {
     setRenamingId(sessionId);
     setRenameValue(currentTitle);
-  };
+  }, []);
 
-  const submitRename = (sessionId: string, currentTitle: string) => {
+  const submitRename = useCallback((sessionId: string, currentTitle: string) => {
     const newTitle = renameValue.trim();
     if (newTitle && newTitle !== currentTitle.trim()) {
       onRenameSession(sessionId, newTitle);
     }
     setRenamingId(null);
     setRenameValue('');
-  };
+  }, [renameValue, onRenameSession]);
 
-  const SessionItem = ({ session }: { session: Session }) => (
-    <div
-      onClick={() => !renamingId && onSessionSelect(session.id)}
-      className={cn(
-        'group flex items-center gap-2 px-2 py-1 rounded-lg cursor-pointer transition-colors',
-        currentSessionId === session.id
-          ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
-          : 'hover:bg-gray-100 dark:hover:bg-gray-750 text-gray-700 dark:text-gray-300'
-      )}
-    >
-      {session.isStarred && <Star className='w-4 h-4 flex-shrink-0 fill-yellow-400 text-yellow-400' />}
-      {!session.isStarred && <MessageSquare className='w-4 h-4 flex-shrink-0' />}
-      <div className='flex-1 min-w-0'>
-        {renamingId === session.id ? (
-          <Input
-            value={renameValue}
-            onChange={e => setRenameValue(e.target.value)}
-            onKeyDown={e => {
-              if (e.key === 'Enter') {
-                submitRename(session.id, session.title);
-              } else if (e.key === 'Escape') {
-                setRenamingId(null);
-                setRenameValue('');
-              }
-            }}
-            onBlur={() => submitRename(session.id, session.title)}
-            className='h-7 text-sm'
-            autoFocus
-            onClick={e => e.stopPropagation()}
-          />
-        ) : (
-          <>
-            <p className='text-sm truncate'>{session.title}</p>
-            <p className='text-xs text-gray-500 dark:text-gray-400'>
-              {(session.messageCount ?? session.messages?.length ?? 0)} 条消息
-            </p>
-          </>
-        )}
-      </div>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant='ghost'
-            size='icon'
-            className='h-8 w-8 opacity-0 group-hover:opacity-100'
-            onClick={e => e.stopPropagation()}
-          >
-            <MoreVertical className='w-4 h-4' />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align='end'>
-          <DropdownMenuItem
-            onClick={e => {
-              e.stopPropagation();
-              onToggleStar(session.id);
-            }}
-          >
-            <Star className={cn('w-4 h-4 mr-2', session.isStarred && 'fill-yellow-400 text-yellow-400')} />
-            {session.isStarred ? '取消收藏' : '收藏'}
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={e => {
-              e.stopPropagation();
-              handleRename(session.id, session.title);
-            }}
-          >
-            <MessageSquare className='w-4 h-4 mr-2' />
-            重命名
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            className='text-red-600 dark:text-red-400'
-            onSelect={e => {
-              e.stopPropagation();
-              const id = session.id;
-              const now = Date.now();
-              if (deleteGuardRef.current.id === id && now - deleteGuardRef.current.t < 800) return;
-              deleteGuardRef.current = { id, t: now };
-              onDeleteSession(id);
-            }}
-          >
-            <Trash2 className='w-4 h-4 mr-2' />
-            删除
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
-  );
+  const handleDeleteSession = useCallback((sessionId: string) => {
+    const now = Date.now();
+    if (deleteGuardRef.current.id === sessionId && now - deleteGuardRef.current.t < 800) return;
+    deleteGuardRef.current = { id: sessionId, t: now };
+    onDeleteSession(sessionId);
+  }, [onDeleteSession]);
 
-  const SessionGroup = ({ title, sessions }: { title: string; sessions: Session[] }) => {
-    if (sessions.length === 0) return null;
-    return (
-      <div className='mb-2'>
-        <h3 className='text-xs text-gray-500 dark:text-gray-400 px-2 mb-1 flex items-center gap-1.5'>
-          <Clock className='w-2.5 h-2.5' />
-          {title}
-        </h3>
-        <div className='space-y-0.5'>
-          {sessions.map(session => (
-            <SessionItem key={session.id} session={session} />
-          ))}
-        </div>
-      </div>
-    );
-  };
+  const handleRenameCancel = useCallback(() => {
+    setRenamingId(null);
+    setRenameValue('');
+  }, []);
+
+  const sessionListProps = useMemo(() => ({
+    currentSessionId,
+    renamingId,
+    renameValue,
+    onSessionSelect,
+    onToggleStar,
+    onDeleteSession: handleDeleteSession,
+    onRenameStart: handleRename,
+    onRenameSubmit: submitRename,
+    onRenameCancel: handleRenameCancel,
+    onRenameValueChange: setRenameValue,
+  }), [
+    currentSessionId,
+    renamingId,
+    renameValue,
+    onSessionSelect,
+    onToggleStar,
+    handleDeleteSession,
+    handleRename,
+    submitRename,
+    handleRenameCancel,
+  ]);
 
   if (!isOpen) {
     return (
@@ -283,10 +368,10 @@ export function ChatSidebar({
           onScroll={handleSessionListScroll}
         >
           <div className='p-2'>
-            <SessionGroup title='今天' sessions={groupedSessions.today} />
-            <SessionGroup title='昨天' sessions={groupedSessions.yesterday} />
-            <SessionGroup title='最近7天' sessions={groupedSessions.lastWeek} />
-            <SessionGroup title='更早' sessions={groupedSessions.older} />
+            <SessionGroup title='今天' sessions={groupedSessions.today} {...sessionListProps} />
+            <SessionGroup title='昨天' sessions={groupedSessions.yesterday} {...sessionListProps} />
+            <SessionGroup title='最近7天' sessions={groupedSessions.lastWeek} {...sessionListProps} />
+            <SessionGroup title='更早' sessions={groupedSessions.older} {...sessionListProps} />
             {sessionsLoadMore && (
               <div className='py-3 text-center text-xs text-gray-500 dark:text-gray-400'>加载中...</div>
             )}

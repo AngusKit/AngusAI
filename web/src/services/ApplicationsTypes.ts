@@ -237,6 +237,8 @@ export interface FeaturesConfigVo {
   enableSessionList?: boolean;
   /** 启用切换应用：开启后允许切换应用、默认智能体、默认模型，关闭时隐藏应用切换 */
   enableSwitchApp?: boolean;
+  /** 最大同时进行的对话数（多会话并发流式生成），不配置时使用默认值 3 */
+  maxConcurrentChats?: number;
 }
 
 /** 安全设置 */
@@ -317,6 +319,8 @@ export interface FeaturesConfig {
   enableSessionList?: boolean;
   /** 启用切换应用：开启后允许切换应用、默认智能体、默认模型，关闭时隐藏应用切换 */
   enableSwitchApp?: boolean;
+  /** 最大同时进行的对话数（多会话并发流式生成），不配置时使用默认值 3 */
+  maxConcurrentChats?: number;
 }
 
 /** 提示词配置 */
