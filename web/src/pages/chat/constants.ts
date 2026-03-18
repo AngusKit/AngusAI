@@ -1,4 +1,4 @@
-import type { SessionConfig } from '@/services/ChatTypes';
+import type { SessionConfig } from '@/services/SessionTypes';
 
 /** 默认对话配置 */
 export const DEFAULT_CHAT_SETTINGS: SessionConfig = {

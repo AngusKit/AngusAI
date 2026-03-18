@@ -42,7 +42,7 @@ public class MessageFacadeImpl implements MessageFacade {
   private SessionQuery sessionQuery;
 
   @Override
-  public AttachmentUploadVo uploadAttachment(MultipartFile file, String sessionId) {
+  public AttachmentUploadVo uploadAttachment(MultipartFile file, Long messageId) {
     //    // 1. 验证文件类型
     //    if (!fileStorageService.isValidFileType(file.getContentType())) {
     //      throw new IllegalArgumentException("不支持的文件类型: " + file.getContentType());
@@ -65,7 +65,7 @@ public class MessageFacadeImpl implements MessageFacade {
 
   @NameJoin
   @Override
-  public MessageVo feedbackMessage(String sessionId, Long messageId, MessageFeedbackDto dto) {
+  public MessageVo feedbackMessage(Long messageId, MessageFeedbackDto dto) {
     // 添加消息反馈
     messageCmd.addFeedback(messageId, dto.getFeedbackType(), dto.getComment());
 
@@ -76,18 +76,13 @@ public class MessageFacadeImpl implements MessageFacade {
 
   @NameJoin
   @Override
-  public MessageVo stopGeneration(String sessionId) {
-    // 查找正在流式生成的消息
-    List<Message> streamingMessages = messageQuery.findStreamingMessages(sessionId);
-
-    if (!streamingMessages.isEmpty()) {
-      Message message = streamingMessages.get(0);
-      // 停止流式生成
+  public MessageVo stopGeneration(Long messageId) {
+    Message message = messageQuery.findAndCheck(messageId);
+    if (Boolean.TRUE.equals(message.getIsStreaming())) {
       messageCmd.setStreaming(message, false);
-      // 返回当前消息状态
       return MessageAssembler.toMessageVo(message);
     }
-    return new MessageVo();
+    return MessageAssembler.toMessageVo(message);
   }
 
   @Override

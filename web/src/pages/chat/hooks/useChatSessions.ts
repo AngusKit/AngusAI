@@ -1,8 +1,10 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import { useDebounce } from '@/hooks/useDebounce';
-import Chat from '@/services/Chat';
-import type { SessionListVo, SessionDetailVo, MessageVo, SessionConfig } from '@/services/ChatTypes';
+import Session from '@/services/Session';
+import Message from '@/services/Message';
+import type { SessionListVo, SessionDetailVo, SessionConfig } from '@/services/SessionTypes';
+import type { MessageVo } from '@/services/MessageTypes';
 import { MessageRoleEnum } from '@/enums/enums';
 
 export interface Message {
@@ -110,7 +112,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
       if (append) setSessionsLoadMore(true);
       else setSessionsLoading(true);
       try {
-        const res = await Chat.getSessionList({
+        const res = await Session.getSessionList({
           pageNo: page,
           pageSize: SESSION_PAGE_SIZE,
           keyword: debouncedSessionKeyword.trim() || undefined,
@@ -164,7 +166,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
     loadedMessagesRef.current.add(sessionId);
     setMessagesLoading(true);
     try {
-      const res = await Chat.getMessageList({ sessionId, pageNo: 1, pageSize: 200 });
+      const res = await Message.getMessageList({ sessionId, pageNo: 1, pageSize: 200 });
       const data = (res as any)?.data;
       const list: MessageVo[] = data?.list ?? [];
       const msgs = list.map(messageVoToMessage);
@@ -198,7 +200,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
         return null;
       }
       try {
-        const res = await Chat.createSession({
+        const res = await Session.createSession({
           appId,
           modelId: modelId?.trim() || undefined,
           agentId: agentId?.trim() || undefined,
@@ -238,7 +240,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
       deletingRef.current.add(sid);
       recentlyDeletedRef.current.add(sid);
       try {
-        await Chat.deleteSession(sid);
+        await Session.deleteSession(sid);
         setSessions((prev) => prev.filter((s) => s.sessionId !== sid && s.id !== sid));
         if (currentSessionId === sid) {
           const remaining = sessions.filter((s) => s.sessionId !== sid);
@@ -291,7 +293,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
       const idToUse = session?.sessionId ?? sessionId;
       const nextStarred = !session?.isStarred;
       try {
-        await Chat.starSession(idToUse, { isStarred: nextStarred });
+        await Session.starSession(idToUse, { isStarred: nextStarred });
         setSessions((prev) =>
           prev.map((s) =>
             (s.sessionId === sessionId || s.id === sessionId)
@@ -386,7 +388,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
           ...config,
           systemPrompt: (session?.config as any)?.systemPrompt ?? '',
         };
-        await Chat.updateSession(sid, { config: mergedConfig });
+        await Session.updateSession(sid, { config: mergedConfig });
         setSessions((prev) =>
           prev.map((s) =>
             s.sessionId === sessionId || s.id === sessionId
@@ -412,7 +414,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
 
   const clearSessionMessages = useCallback(async (sessionId: string) => {
     try {
-      await Chat.clearMessages(sessionId);
+      await Message.clearMessages(sessionId);
       setSessionMessages((prev) => ({ ...prev, [sessionId]: [] }));
       setSessions((prev) =>
         prev.map((s) => (s.sessionId === sessionId ? { ...s, messageCount: 0, updatedAt: new Date() } : s))
@@ -434,7 +436,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
       const existing = sessions.find((s) => s.sessionId === sessionId || s.id === sessionId);
       if (existing) return existing;
       try {
-        const res = await Chat.getSessionDetail(sessionId);
+        const res = await Session.getSessionDetail(sessionId);
         const data = (res as any)?.data as SessionDetailVo;
         if (!data) return null;
         const session = voToSession(data);

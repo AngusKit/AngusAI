@@ -36,7 +36,7 @@ export interface ChatMainAreaProps {
   onSwitchSession?: (
     type: 'app' | 'agent' | 'model',
     payload: { appId?: string; agentId?: string; modelId?: string }
-  ) => Promise<{ data?: import('@/services/ChatTypes').SessionDetailVo } | null>;
+  ) => Promise<{ data?: import('@/services/SessionTypes').SessionDetailVo } | null>;
   /** 是否显示提示词库入口，默认 true */
   enablePromptLibrary?: boolean;
   /** 是否显示应用切换器，默认 true */

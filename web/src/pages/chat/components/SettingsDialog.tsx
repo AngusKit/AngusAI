@@ -3,7 +3,7 @@ import { Label } from '@/components/ui/label.tsx';
 import { Slider } from '@/components/ui/slider.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { toast } from 'sonner';
-import type { SessionConfig } from '@/services/ChatTypes';
+import type { SessionConfig } from '@/services/SessionTypes';
 import {
   DEFAULT_FREQUENCY_PENALTY,
   DEFAULT_MAX_TOKENS,

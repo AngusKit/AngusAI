@@ -8,7 +8,7 @@ import type {
   ModelInfoVo,
 } from '@/services/ApplicationsTypes';
 import type { ModelListVo } from '@/services/ModelsTypes';
-import type { SessionDetailVo } from '@/services/ChatTypes';
+import type { SessionDetailVo } from '@/services/SessionTypes';
 import {
   ApplicationStatusEnum,
   AgentStatusEnum,

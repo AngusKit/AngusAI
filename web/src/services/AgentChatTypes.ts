@@ -1,5 +1,5 @@
 import { ApiLocaleResult } from '@xcan-angus/infra';
-import type { SessionConfig } from '@/services/ChatTypes';
+import type { SessionConfig } from '@/services/SessionTypes';
 
 /** OpenAI 格式消息：role + content */
 export interface ChatMessage {

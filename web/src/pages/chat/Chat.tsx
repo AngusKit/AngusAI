@@ -9,9 +9,10 @@ import { type ChatSwitcherSelection } from './components/ChatSwitcher.tsx';
 import { SettingsDialog } from './components/SettingsDialog.tsx';
 import { ThemeDialog, CHAT_TEMPLATES, type TemplateType } from './components/ThemeDialog.tsx';
 import { useNavigate, useParams } from 'react-router-dom';
-import type { SessionConfig } from '@/services/ChatTypes';
+import type { SessionConfig } from '@/services/SessionTypes';
 import { DEFAULT_CHAT_SETTINGS, DEFAULT_SESSION_TITLE, truncateForTitle } from './constants';
-import ChatApi from '@/services/Chat';
+import SessionApi from '@/services/Session';
+import MessageApi from '@/services/Message';
 
 interface ChatProps {
   content?: string;
@@ -330,7 +331,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
   const handleFeedback = useCallback(async (messageId: string, feedbackType: 'like' | 'dislike', comment?: string) => {
     if (!currentSessionId) return;
     try {
-      await ChatApi.feedbackMessage(currentSessionId, messageId, {
+      await MessageApi.feedbackMessage(messageId, {
         feedbackType,
         ...(comment ? { comment } : {}),
       });
@@ -431,13 +432,13 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
       if (!currentSessionId) return null;
       try {
         if (type === 'app' && payload.appId) {
-          return (await ChatApi.switchApp(currentSessionId, { appId: payload.appId })) as { data?: import('@/services/ChatTypes').SessionDetailVo };
+          return (await SessionApi.switchApp(currentSessionId, { appId: payload.appId })) as { data?: import('@/services/SessionTypes').SessionDetailVo };
         }
         if (type === 'agent' && payload.agentId) {
-          return (await ChatApi.switchAgent(currentSessionId, { agentId: payload.agentId })) as { data?: import('@/services/ChatTypes').SessionDetailVo };
+          return (await SessionApi.switchAgent(currentSessionId, { agentId: payload.agentId })) as { data?: import('@/services/SessionTypes').SessionDetailVo };
         }
         if (type === 'model' && payload.modelId) {
-          return (await ChatApi.switchModel(currentSessionId, { modelId: payload.modelId })) as { data?: import('@/services/ChatTypes').SessionDetailVo };
+          return (await SessionApi.switchModel(currentSessionId, { modelId: payload.modelId })) as { data?: import('@/services/SessionTypes').SessionDetailVo };
         }
       } catch (e) {
         console.error('Switch session failed:', e);

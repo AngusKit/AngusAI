@@ -16,17 +16,17 @@ public interface MessageFacade {
   /**
    * 上传附件
    */
-  AttachmentUploadVo uploadAttachment(MultipartFile file, String sessionId);
+  AttachmentUploadVo uploadAttachment(MultipartFile file, Long messageId);
 
   /**
    * 消息反馈
    */
-  MessageVo feedbackMessage(String sessionId, Long messageId, MessageFeedbackDto dto);
+  MessageVo feedbackMessage(Long messageId, MessageFeedbackDto dto);
 
   /**
    * 停止生成
    */
-  MessageVo stopGeneration(String sessionId);
+  MessageVo stopGeneration(Long messageId);
 
   /**
    * 清空会话消息

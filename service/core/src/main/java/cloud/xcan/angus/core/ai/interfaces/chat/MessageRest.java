@@ -32,7 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Tag(name = "ChatMessages", description = "对话消息管理 - 消息文件解析、对话反馈、历史查询、反馈等功能")
 @Validated
 @RestController
-@RequestMapping("/api/v1/chat/sessions")
+@RequestMapping("/api/v1/chat/messages")
 public class MessageRest {
 
   @Resource
@@ -43,30 +43,29 @@ public class MessageRest {
   @PostMapping("/attachments")
   public ApiLocaleResult<AttachmentUploadVo> uploadAttachment(
       @Parameter(description = "文件") @RequestParam("file") MultipartFile file,
-      @Parameter(description = "关联会话ID(UUID)") @RequestParam(required = false) String sessionId) {
-    return ApiLocaleResult.success(messageFacade.uploadAttachment(file, sessionId));
+      @Parameter(description = "关联消息ID") @RequestParam(required = false) Long messageId) {
+    return ApiLocaleResult.success(messageFacade.uploadAttachment(file, messageId));
   }
 
   @Operation(operationId = "feedbackMessage", summary = "消息反馈", description = "对AI消息进行反馈（点赞/点踩）")
-  @PostMapping("/{sessionId}/messages/{messageId}/feedback")
+  @PostMapping("/{messageId}/feedback")
   public ApiLocaleResult<MessageVo> feedback(
-      @Parameter(description = "会话ID(UUID)") @PathVariable String sessionId,
       @Parameter(description = "消息ID") @PathVariable Long messageId,
       @Valid @RequestBody MessageFeedbackDto dto) {
-    return ApiLocaleResult.success(messageFacade.feedbackMessage(sessionId, messageId, dto));
+    return ApiLocaleResult.success(messageFacade.feedbackMessage(messageId, dto));
   }
 
   @Operation(operationId = "stopGeneration", summary = "停止生成", description = "停止当前正在生成的消息")
-  @PostMapping("/{sessionId}/stop")
+  @PostMapping("/stop")
   public ApiLocaleResult<MessageVo> stop(
-      @Parameter(description = "会话ID(UUID)") @PathVariable String sessionId) {
-    return ApiLocaleResult.success(messageFacade.stopGeneration(sessionId));
+      @Parameter(description = "消息ID") @RequestParam Long messageId) {
+    return ApiLocaleResult.success(messageFacade.stopGeneration(messageId));
   }
 
   @Operation(operationId = "clearMessages", summary = "清空当前对话", description = "清空指定会话的所有消息")
-  @DeleteMapping("/{sessionId}/messages")
+  @DeleteMapping
   public ApiLocaleResult<Integer> clearMessages(
-      @Parameter(description = "会话ID(UUID)") @PathVariable String sessionId) {
+      @Parameter(description = "会话ID(UUID)") @RequestParam String sessionId) {
     return ApiLocaleResult.success(messageFacade.clearSessionMessages(sessionId));
   }
 

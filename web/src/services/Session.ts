@@ -1,27 +1,24 @@
 import { PageQuery, AI } from '@xcan-angus/infra';
 import {
-  AttachmentUploadResult,
   BatchDeleteSessionsResult,
-  ChatStatisticsResult,
-  ClearMessagesResult,
-  MessageFeedbackDto,
-  MessageFindDto,
-  MessageResult,
-  PageMessageResult,
   PageSessionListResult,
   SessionBatchDeleteDto,
   SessionCreateDto,
   SessionDetailResult,
+  SessionFindDto,
   SessionStarDto,
   SessionSwitchAgentDto,
   SessionSwitchAppDto,
   SessionSwitchModelDto,
   SessionUpdateDto,
-  VoiceToTextResult,
-} from './ChatTypes.ts';
+} from './SessionTypes.ts';
 import http, { ContentType, HttpClient, QueryParamsType, RequestParams } from './HttpClient.ts';
 
-export class Chat<SecurityDataType = unknown> {
+/**
+ * 会话 API 服务（对应后端 SessionRest）
+ * 会话列表、创建、更新、删除、切换应用/智能体/模型、收藏等
+ */
+export class Session<SecurityDataType = unknown> {
   http: HttpClient<SecurityDataType>;
 
   constructor(http: HttpClient<SecurityDataType>) {
@@ -38,20 +35,7 @@ export class Chat<SecurityDataType = unknown> {
    * @secure
    */
   getSessionList = (
-    query?: PageQuery & {
-      /** 会话标题（搜索） */
-      title?: string;
-      /** 筛选指定应用 */
-      appId?: string;
-      /** 筛选使用的智能体 */
-      agentId?: string;
-      /** 是否已归档 */
-      isArchived?: boolean;
-      /** 是否已收藏（星标） */
-      isStarred?: boolean;
-      /** 是否已置顶 */
-      isPinned?: boolean;
-    },
+    query?: SessionFindDto | (PageQuery & { title?: string; appId?: string; agentId?: string; isArchived?: boolean; isStarred?: boolean; isPinned?: boolean }),
     params: RequestParams = {}
   ) =>
     this.http.request<PageSessionListResult>({
@@ -61,6 +45,7 @@ export class Chat<SecurityDataType = unknown> {
       secure: true,
       ...params,
     });
+
   /**
    * @description 创建新的对话会话
    *
@@ -79,106 +64,7 @@ export class Chat<SecurityDataType = unknown> {
       type: ContentType.Json,
       ...params,
     });
-  /**
-   * @description 停止当前正在生成的消息
-   *
-   * @tags 对话消息
-   * @name StopGeneration
-   * @summary 停止生成
-   * @request POST:/api/v1/chat/sessions/{sessionId}/stop
-   * @secure
-   */
-  stopGeneration = (sessionId: string, params: RequestParams = {}) =>
-    this.http.request<MessageResult>({
-      path: `${AI}/chat/sessions/${sessionId}/stop`,
-      method: 'POST',
-      secure: true,
-      ...params,
-    });
-  /**
-   * @description 获取消息列表，支持分页、搜索和筛选（按会话、角色、流式状态、反馈类型等）
-   *
-   * @tags 对话消息
-   * @name GetMessageList
-   * @summary 获取消息列表
-   * @request GET:/api/v1/chat/sessions
-   * @secure
-   */
-  getMessageList = (
-    query?: MessageFindDto,
-    params: RequestParams = {}
-  ) =>
-    this.http.request<PageMessageResult>({
-      path: `${AI}/chat/sessions`,
-      method: 'GET',
-      query: query as unknown as QueryParamsType,
-      secure: true,
-      ...params,
-    });
-  /**
-   * @description 清空指定会话的所有消息
-   *
-   * @tags 对话消息
-   * @name ClearMessages
-   * @summary 清空当前对话
-   * @request DELETE:/api/v1/chat/sessions/{sessionId}/messages
-   * @secure
-   */
-  clearMessages = (sessionId: string, params: RequestParams = {}) =>
-    this.http.request<ClearMessagesResult>({
-      path: `${AI}/chat/sessions/${sessionId}/messages`,
-      method: 'DELETE',
-      secure: true,
-      ...params,
-    });
-  /**
-   * @description 对AI消息进行反馈（点赞/点踩）
-   *
-   * @tags 对话消息
-   * @name FeedbackMessage
-   * @summary 消息反馈
-   * @request POST:/api/v1/chat/sessions/{sessionId}/messages/{messageId}/feedback
-   * @secure
-   */
-  feedbackMessage = (sessionId: string, messageId: string, data: MessageFeedbackDto, params: RequestParams = {}) =>
-    this.http.request<MessageResult>({
-      path: `${AI}/chat/sessions/${sessionId}/messages/${messageId}/feedback`,
-      method: 'POST',
-      body: data,
-      secure: true,
-      type: ContentType.Json,
-      ...params,
-    });
-  /**
-   * @description 语音转文字
-   *
-   * @tags 对话消息
-   * @name VoiceToText
-   * @summary 语音输入
-   * @request POST:/api/v1/chat/sessions/voice-to-text
-   * @secure
-   */
-  voiceToText = (
-    data: FormData | { audio: File; language?: string },
-    params: RequestParams = {}
-  ) => {
-    const formData = data instanceof FormData
-      ? data
-      : (() => {
-          const fd = new FormData();
-          fd.append('audio', data.audio);
-          if (data.language) fd.append('language', data.language);
-          return fd;
-        })();
-    return this.http.request<VoiceToTextResult>({
-      path: `${AI}/chat/sessions/voice-to-text`,
-      method: 'POST',
-      body: formData,
-      secure: true,
-      type: ContentType.FormData,
-      ...params,
-    });
-  };
+
   /**
    * @description 批量删除会话
    *
@@ -197,32 +83,7 @@ export class Chat<SecurityDataType = unknown> {
       type: ContentType.Json,
       ...params,
     });
-  /**
-   * @description 上传消息附件
-   *
-   * @tags 对话消息
-   * @name UploadAttachment
-   * @summary 上传附件
-   * @request POST:/api/v1/chat/sessions/attachments
-   * @secure
-   */
-  uploadAttachment = (
-    file: File,
-    sessionId?: string,
-    params: RequestParams = {}
-  ) => {
-    const formData = new FormData();
-    formData.append('file', file);
-    return this.http.request<AttachmentUploadResult>({
-      path: `${AI}/chat/sessions/attachments`,
-      method: 'POST',
-      query: sessionId ? { sessionId } : undefined,
-      body: formData,
-      secure: true,
-      type: ContentType.FormData,
-      ...params,
-    });
-  };
+
   /**
    * @description 切换会话使用的AI模型
    *
@@ -241,6 +102,7 @@ export class Chat<SecurityDataType = unknown> {
       type: ContentType.Json,
       ...params,
     });
+
   /**
    * @description 切换会话使用的智能体（需验证智能体已绑定到当前应用）
    *
@@ -259,6 +121,7 @@ export class Chat<SecurityDataType = unknown> {
       type: ContentType.Json,
       ...params,
     });
+
   /**
    * @description 切换会话使用的应用
    *
@@ -277,6 +140,7 @@ export class Chat<SecurityDataType = unknown> {
       type: ContentType.Json,
       ...params,
     });
+
   /**
    * @description 收藏或取消收藏会话（前端显示为星标）
    *
@@ -295,6 +159,7 @@ export class Chat<SecurityDataType = unknown> {
       type: ContentType.Json,
       ...params,
     });
+
   /**
    * @description 获取指定会话的详细信息
    *
@@ -311,6 +176,7 @@ export class Chat<SecurityDataType = unknown> {
       secure: true,
       ...params,
     });
+
   /**
    * @description 删除指定会话
    *
@@ -327,6 +193,7 @@ export class Chat<SecurityDataType = unknown> {
       secure: true,
       ...params,
     });
+
   /**
    * @description 更新会话基本信息
    *
@@ -345,6 +212,7 @@ export class Chat<SecurityDataType = unknown> {
       type: ContentType.Json,
       ...params,
     });
+
   /**
    * @description 导出会话内容
    *
@@ -372,48 +240,6 @@ export class Chat<SecurityDataType = unknown> {
       secure: true,
       ...params,
     });
-  /**
-   * @description 获取对话模块统计数据
-   *
-   * @tags 对话消息
-   * @name GetChatStatistics
-   * @summary 获取对话统计
-   * @request GET:/api/v1/chat/sessions/stats
-   * @secure
-   */
-  getChatStatistics = (
-    query?: {
-      /**
-       * 统计周期
-       * @default "month"
-       */
-      period?: string;
-    },
-    params: RequestParams = {}
-  ) =>
-    this.http.request<ChatStatisticsResult>({
-      path: `${AI}/chat/sessions/stats`,
-      method: 'GET',
-      query: query,
-      secure: true,
-      ...params,
-    });
-  /**
-   * @description 删除附件
-   *
-   * @tags 对话消息
-   * @name DeleteAttachment
-   * @summary 删除附件
-   * @request DELETE:/api/v1/chat/sessions/attachments/{id}
-   * @secure
-   */
-  deleteAttachment = (id: string, params: RequestParams = {}) =>
-    this.http.request<void>({
-      path: `${AI}/chat/sessions/attachments/${id}`,
-      method: 'DELETE',
-      secure: true,
-      ...params,
-    });
 }
 
-export default new Chat(http);
+export default new Session(http);

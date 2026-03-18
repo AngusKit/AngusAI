@@ -5,6 +5,8 @@ export * from '../services/AnalyticsTypes.ts';
 export * from '../services/ApiCollectionsTypes.ts';
 export * from '../services/ApplicationsTypes.ts';
 export * from '../services/ChatTypes.ts';
+export * from '../services/SessionTypes.ts';
+export * from '../services/MessageTypes.ts';
 export * from '../services/DatasetsTypes.ts';
 export * from '../services/DatasetsDataTypes.ts';
 export * from '../services/DocumentsTypes.ts';
