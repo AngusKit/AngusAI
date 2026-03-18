@@ -193,6 +193,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
         sseEmitterChatExecutor.execute(() -> {
           StringBuilder fullContent = new StringBuilder();
           long streamStartMs = System.currentTimeMillis();
+          final boolean[] isFirstChunk = {true};
           try {
             TokenStream stream = modelId != null
                 ? agentRegistry.chatStream(agentIdStr, sessionDb.getSessionId(), message,
@@ -201,18 +202,27 @@ public class AgentChatCmdImpl implements AgentChatCmd {
             stream.onPartialResponse(token -> {
                   fullContent.append(token);
                   try {
-                    OpenAIChatCompletionChunk chunk = OpenAIChatCompletionChunk.builder()
-                        .id("chatcmpl-stream")
-                        .sessionId(sessionDb.getSessionId())
-                        .object("chat.completion.chunk")
-                        .created(System.currentTimeMillis() / 1000)
-                        .model(agent.getEncoding())
-                        .choices(List.of(new OpenAIChatCompletionChunk.ChunkChoice(
-                            0,
-                            new OpenAIChatCompletionsResponse.Delta(null, token),
-                            null)))
-                        .build();
-                    emitter.send(SseEmitter.event().data(toJson(chunk)));
+                    if (isFirstChunk[0]) {
+                      isFirstChunk[0] = false;
+                      OpenAIChatCompletionChunk chunk = OpenAIChatCompletionChunk.builder()
+                          .id("chatcmpl-stream")
+                          .sessionId(sessionDb.getSessionId())
+                          .object("chat.completion.chunk")
+                          .created(System.currentTimeMillis() / 1000)
+                          .model(agent.getEncoding())
+                          .choices(List.of(new OpenAIChatCompletionChunk.ChunkChoice(null,
+                              new OpenAIChatCompletionsResponse.Delta(null, token),
+                              null)))
+                          .build();
+                      emitter.send(SseEmitter.event().data(toJson(chunk)));
+                    } else {
+                      OpenAIChatCompletionChunk chunk = OpenAIChatCompletionChunk.builder()
+                          .choices(List.of(new OpenAIChatCompletionChunk.ChunkChoice(null,
+                              new OpenAIChatCompletionsResponse.Delta(null, token),
+                              null)))
+                          .build();
+                      emitter.send(SseEmitter.event().data(toJson(chunk)));
+                    }
                   } catch (Exception e) {
                     emitter.completeWithError(e);
                   }

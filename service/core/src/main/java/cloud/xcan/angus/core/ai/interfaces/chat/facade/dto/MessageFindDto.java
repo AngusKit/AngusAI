@@ -1,6 +1,9 @@
 package cloud.xcan.angus.core.ai.interfaces.chat.facade.dto;
 
+import static cloud.xcan.angus.remote.ApiConstant.DEFAULT_ORDER_SORT;
+
 import cloud.xcan.angus.core.ai.domain.chat.MessageRole;
+import cloud.xcan.angus.remote.OrderSort;
 import cloud.xcan.angus.remote.PageQuery;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -41,5 +44,9 @@ public class MessageFindDto extends PageQuery {
   @Override
   public String getDefaultOrderBy() {
     return "createdDate";
+  }
+
+  public OrderSort getDefaultOrderSort() {
+    return OrderSort.ASC;
   }
 }
