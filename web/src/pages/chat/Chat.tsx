@@ -11,7 +11,13 @@ import { SettingsDialog } from './components/SettingsDialog.tsx';
 import { ThemeDialog, CHAT_TEMPLATES, type TemplateType } from './components/ThemeDialog.tsx';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { SessionConfig } from '@/services/SessionTypes';
-import { DEFAULT_CHAT_SETTINGS, DEFAULT_SESSION_TITLE, MAX_CONCURRENT_CHATS, truncateForTitle } from './constants';
+import {
+  DEFAULT_CHAT_SETTINGS,
+  DEFAULT_SESSION_TITLE,
+  DEFAULT_TIMEOUT_MS,
+  MAX_CONCURRENT_CHATS,
+  truncateForTitle,
+} from './constants';
 import SessionApi from '@/services/Session';
 import MessageApi from '@/services/Message';
 
@@ -29,6 +35,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     currentSessionId,
     currentSession,
     currentMessages,
+    messagesLoading,
     sessionsLoading,
     sessionsLoadMore,
     hasMoreSessions,
@@ -85,6 +92,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
       topP: c?.topP ?? DEFAULT_CHAT_SETTINGS.topP,
       frequencyPenalty: c?.frequencyPenalty ?? DEFAULT_CHAT_SETTINGS.frequencyPenalty,
       presencePenalty: c?.presencePenalty ?? DEFAULT_CHAT_SETTINGS.presencePenalty,
+      timeoutMs: c?.timeoutMs ?? DEFAULT_CHAT_SETTINGS.timeoutMs,
     });
   }, [currentSessionId, currentSession?.config]);
 
@@ -565,6 +573,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
         onShareChat={shareChat}
         onClearChat={clearCurrentChat}
         currentMessages={currentMessages}
+        messagesLoading={messagesLoading}
         currentSessionId={currentSessionId ?? undefined}
         hasAgentPlaceholder={hasAgentPlaceholder}
         welcomeMessage={welcomeMessage}
@@ -608,6 +617,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
             topP: s.topP,
             frequencyPenalty: s.frequencyPenalty,
             presencePenalty: s.presencePenalty,
+            timeoutMs: s.timeoutMs ?? DEFAULT_TIMEOUT_MS,
           });
           if (ok) setSettings(s);
           return ok;

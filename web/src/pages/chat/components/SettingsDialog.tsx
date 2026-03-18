@@ -1,5 +1,12 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog.tsx';
 import { Label } from '@/components/ui/label.tsx';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select.tsx';
 import { Slider } from '@/components/ui/slider.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { toast } from 'sonner';
@@ -9,7 +16,9 @@ import {
   DEFAULT_MAX_TOKENS,
   DEFAULT_PRESENCE_PENALTY,
   DEFAULT_TEMPERATURE,
+  DEFAULT_TIMEOUT_MS,
   DEFAULT_TOP_P,
+  TIMEOUT_OPTIONS,
 } from '../constants.ts';
 import { useState } from 'react';
 
@@ -137,6 +146,27 @@ export function SettingsDialog({ open, onOpenChange, settings, onSettingsChange,
               className='w-full'
             />
             <p className='text-xs text-gray-500'>增加模型谈论新话题的可能性。</p>
+          </div>
+
+          {/* Timeout */}
+          <div className='space-y-2'>
+            <Label>请求超时 (Timeout)</Label>
+            <Select
+              value={String(settings.timeoutMs ?? DEFAULT_TIMEOUT_MS)}
+              onValueChange={(v) => onSettingsChange({ ...settings, timeoutMs: Number(v) })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder='默认 5 分钟' />
+              </SelectTrigger>
+              <SelectContent>
+                {TIMEOUT_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.value} value={String(opt.value)}>
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className='text-xs text-gray-500'>模型请求超时时间，优先级高于模型默认配置。</p>
           </div>
         </div>
 

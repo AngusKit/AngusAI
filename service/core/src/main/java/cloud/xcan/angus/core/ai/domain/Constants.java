@@ -99,9 +99,9 @@ public interface Constants {
   double CHAT_DEFAULT_PRESENCE_PENALTY = 0.0;
 
   /**
-   * 模型请求默认超时（毫秒），120 秒
+   * 模型请求默认超时（毫秒），300 秒
    */
-  long CHAT_DEFAULT_TIMEOUT_MS = 120_000L;
+  long CHAT_DEFAULT_TIMEOUT_MS = 300_000L;
 
   // ==================== 会话配额常量 ====================
 

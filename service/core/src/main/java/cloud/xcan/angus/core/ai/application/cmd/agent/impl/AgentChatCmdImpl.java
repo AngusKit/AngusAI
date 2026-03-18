@@ -159,8 +159,8 @@ public class AgentChatCmdImpl implements AgentChatCmd {
       @Override
       protected SseEmitter process() {
         // Model 优先从会话取 modelId，其次从 agent 取 defaultModelId
-        Long modelId = sessionDb.getModelId() != null 
-          ? sessionDb.getModelId() : agent.getDefaultModelId();
+        Long modelId = sessionDb.getModelId() != null
+            ? sessionDb.getModelId() : agent.getDefaultModelId();
         Model model = modelId != null ? modelQuery.findById(modelId).orElse(null) : null;
 
         // 按照优先级获取会话配置
@@ -214,7 +214,13 @@ public class AgentChatCmdImpl implements AgentChatCmd {
                               new OpenAIChatCompletionsResponse.Delta(null, token),
                               null)))
                           .build();
-                      emitter.send(SseEmitter.event().data(toJson(chunk)));
+                      try {
+                        emitter.send(SseEmitter.event().data(toJson(chunk)));
+                      } catch (Exception e) {
+                        // org.springframework.web.context.request.async.AsyncRequestTimeoutException: null
+                        // org.springframework.web.context.request.async.AsyncRequestNotUsableException: ServletOutputStream failed to write: Broken pipe
+                        emitter.completeWithError(e);
+                      }
                     } else {
                       OpenAIChatCompletionChunk chunk = OpenAIChatCompletionChunk.builder()
                           .choices(List.of(new OpenAIChatCompletionChunk.ChunkChoice(null,

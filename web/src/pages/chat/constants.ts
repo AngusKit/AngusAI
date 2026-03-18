@@ -7,6 +7,7 @@ export const DEFAULT_CHAT_SETTINGS: SessionConfig = {
   topP: 0.9,
   frequencyPenalty: 0,
   presencePenalty: 0,
+  timeoutMs: 300_000,
 };
 
 /** 默认会话名称（创建会话时的初始标题） */
@@ -36,3 +37,17 @@ export const DEFAULT_MAX_TOKENS = DEFAULT_CHAT_SETTINGS.maxTokens ?? 2000;
 export const DEFAULT_TOP_P = DEFAULT_CHAT_SETTINGS.topP ?? 0.9;
 export const DEFAULT_FREQUENCY_PENALTY = DEFAULT_CHAT_SETTINGS.frequencyPenalty ?? 0;
 export const DEFAULT_PRESENCE_PENALTY = DEFAULT_CHAT_SETTINGS.presencePenalty ?? 0;
+
+/** 模型请求超时默认值（毫秒），5分钟 */
+export const DEFAULT_TIMEOUT_MS = 300_000;
+
+/** 超时选项（毫秒 -> 显示文案） */
+export const TIMEOUT_OPTIONS: { value: number; label: string }[] = [
+  { value: 30_000, label: '30 秒' },
+  { value: 60_000, label: '1 分钟' },
+  { value: 120_000, label: '2 分钟' },
+  { value: 300_000, label: '5 分钟' },
+  { value: 600_000, label: '10 分钟' },
+  { value: 1_800_000, label: '30 分钟' },
+  { value: 3_600_000, label: '60 分钟' },
+];

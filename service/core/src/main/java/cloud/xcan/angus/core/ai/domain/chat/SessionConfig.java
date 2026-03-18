@@ -67,7 +67,8 @@ public class SessionConfig implements Serializable {
   /**
    * 模型请求超时（毫秒），请求级，优先级高于模型配置
    */
-  @Schema(description = "模型请求超时（毫秒），请求级，优先级高于模型配置", example = "60000")
-  @Min(1000)
+  @Schema(description = "模型请求超时（毫秒），请求级，优先级高于模型配置，默认5分钟", example = "300000")
+  @Min(10_000)
+  @Max(3600_000)
   private Long timeoutMs;
 }

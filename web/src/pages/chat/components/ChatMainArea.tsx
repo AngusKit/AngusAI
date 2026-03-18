@@ -1,6 +1,7 @@
 import { useRef, useEffect } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import {
+  Loader2,
   MoreVertical,
   Sparkles,
   BookmarkPlus,
@@ -61,6 +62,8 @@ export interface ChatMainAreaProps {
   onShareChat: () => void;
   onClearChat: () => void;
   currentMessages: Message[];
+  /** 消息列表加载中 */
+  messagesLoading?: boolean;
   /** 当前会话 ID，用于进入/切换会话时滚动到底部 */
   currentSessionId?: string;
   hasAgentPlaceholder: boolean;
@@ -112,6 +115,7 @@ export function ChatMainArea({
                                onShareChat,
                                onClearChat,
                                currentMessages,
+                               messagesLoading = false,
                                currentSessionId,
                                hasAgentPlaceholder,
                                welcomeMessage,
@@ -281,7 +285,12 @@ export function ChatMainArea({
       {/* Messages Area */}
       <div ref={messagesContainerRef} className='flex-1 overflow-y-auto px-4 py-10'>
         <div className='max-w-4xl mx-auto pt-6 pb-6 space-y-6'>
-          {currentMessages.length === 0 ? (
+          {messagesLoading && currentMessages.length === 0 ? (
+            <div className='flex flex-col items-center justify-center py-20'>
+              <Loader2 className='w-10 h-10 animate-spin text-blue-500 dark:text-blue-400 mb-4' />
+              <p className='text-gray-500 dark:text-gray-400'>加载中...</p>
+            </div>
+          ) : currentMessages.length === 0 ? (
             hasAgentPlaceholder ? (
               <div className='flex flex-col items-center justify-center h-full text-center py-20'>
                 <div
