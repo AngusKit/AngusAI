@@ -159,8 +159,8 @@ public class AgentChatCmdImpl implements AgentChatCmd {
       @Override
       protected SseEmitter process() {
         // Model 优先从会话取 modelId，其次从 agent 取 defaultModelId
-        Long modelId =
-            sessionDb.getModelId() != null ? sessionDb.getModelId() : agent.getDefaultModelId();
+        Long modelId = sessionDb.getModelId() != null 
+          ? sessionDb.getModelId() : agent.getDefaultModelId();
         Model model = modelId != null ? modelQuery.findById(modelId).orElse(null) : null;
 
         // 按照优先级获取会话配置

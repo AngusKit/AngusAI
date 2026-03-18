@@ -19,6 +19,38 @@ import { toast } from 'sonner';
 
 const PAGE_SIZE = 5;
 
+/** 按 sessionId 缓存的 ChatSwitcher 数据，切换会话时复用 */
+const CHAT_SWITCHER_CACHE_MAX = 30;
+const chatSwitcherCache = new Map<
+  string,
+  {
+    apps: ApplicationListVo[];
+    appPage: number;
+    appTotal: number;
+    appKeyword: string;
+    models: ModelListVo[];
+    modelPage: number;
+    modelTotal: number;
+    modelKeyword: string;
+  }
+>();
+
+function getCacheKey(sessionId?: string): string {
+  return sessionId && !sessionId.startsWith('pending-') ? sessionId : '_global';
+}
+
+function pruneChatSwitcherCache() {
+  if (chatSwitcherCache.size > CHAT_SWITCHER_CACHE_MAX) {
+    const firstKey = chatSwitcherCache.keys().next().value;
+    if (firstKey) chatSwitcherCache.delete(firstKey);
+  }
+}
+
+/** 会话删除时清理对应缓存，供外部调用 */
+export function clearChatSwitcherCacheForSession(sessionId: string) {
+  chatSwitcherCache.delete(sessionId);
+}
+
 export interface ChatSwitcherSelection {
   appId: string;
   agentId: string;
@@ -105,6 +137,15 @@ export function useChatSwitcher({
   const loadApps = useCallback(
     async (page: number, append: boolean) => {
       if (appLoadingRef.current) return;
+      const cacheKey = getCacheKey(sessionId);
+      const cacheEntry = append ? undefined : chatSwitcherCache.get(cacheKey);
+      const kw = debouncedAppKw.trim();
+      if (!append && cacheEntry && cacheEntry.apps.length > 0 && cacheEntry.appKeyword === kw) {
+        setApps(cacheEntry.apps);
+        setAppPage(cacheEntry.appPage);
+        setAppTotal(cacheEntry.appTotal);
+        return;
+      }
       appLoadingRef.current = true;
       if (append) setAppLoadMore(true);
       else setAppLoading(true);
@@ -126,7 +167,28 @@ export function useChatSwitcher({
         } else {
           setApps(list);
         }
+        setAppPage(page);
         setAppTotal(total);
+        if (!append) {
+          const prev = chatSwitcherCache.get(cacheKey);
+          chatSwitcherCache.set(cacheKey, {
+            ...(prev ?? {
+              apps: [],
+              appPage: 1,
+              appTotal: 0,
+              appKeyword: '',
+              models: [],
+              modelPage: 1,
+              modelTotal: 0,
+              modelKeyword: '',
+            }),
+            apps: list,
+            appPage: page,
+            appTotal: total,
+            appKeyword: kw,
+          });
+          pruneChatSwitcherCache();
+        }
       } catch (e) {
         console.error('Load apps failed:', e);
         toast.error('加载应用失败');
@@ -136,12 +198,21 @@ export function useChatSwitcher({
         setAppLoadMore(false);
       }
     },
-    [debouncedAppKw]
+    [debouncedAppKw, sessionId]
   );
 
   const loadModels = useCallback(
     async (page: number, append: boolean) => {
       if (modelLoadingRef.current) return;
+      const cacheKey = getCacheKey(sessionId);
+      const cacheEntry = append ? undefined : chatSwitcherCache.get(cacheKey);
+      const kw = debouncedModelKw.trim();
+      if (!append && cacheEntry && cacheEntry.models.length > 0 && cacheEntry.modelKeyword === kw) {
+        setModels(cacheEntry.models);
+        setModelPage(cacheEntry.modelPage);
+        setModelTotal(cacheEntry.modelTotal);
+        return;
+      }
       modelLoadingRef.current = true;
       if (append) setModelLoadMore(true);
       else setModelLoading(true);
@@ -164,7 +235,28 @@ export function useChatSwitcher({
         } else {
           setModels(list);
         }
+        setModelPage(page);
         setModelTotal(total);
+        if (!append) {
+          const prev = chatSwitcherCache.get(cacheKey);
+          chatSwitcherCache.set(cacheKey, {
+            ...(prev ?? {
+              apps: [],
+              appPage: 1,
+              appTotal: 0,
+              appKeyword: '',
+              models: [],
+              modelPage: 1,
+              modelTotal: 0,
+              modelKeyword: '',
+            }),
+            models: list,
+            modelPage: page,
+            modelTotal: total,
+            modelKeyword: kw,
+          });
+          pruneChatSwitcherCache();
+        }
       } catch (e) {
         console.error('Load models failed:', e);
         toast.error('加载模型失败');
@@ -174,7 +266,7 @@ export function useChatSwitcher({
         setModelLoadMore(false);
       }
     },
-    [debouncedModelKw]
+    [debouncedModelKw, sessionId]
   );
 
   // 进入对话页面后自动加载应用列表

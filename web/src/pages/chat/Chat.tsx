@@ -6,6 +6,7 @@ import { ChatMainArea } from './components/ChatMainArea.tsx';
 import { useChatSessions, type Message } from './hooks/useChatSessions';
 import { PromptLibraryDialog } from './components/PromptLibraryDialog.tsx';
 import { type ChatSwitcherSelection } from './components/ChatSwitcher.tsx';
+import { clearChatSwitcherCacheForSession } from './hooks/useChatSwitcher.ts';
 import { SettingsDialog } from './components/SettingsDialog.tsx';
 import { ThemeDialog, CHAT_TEMPLATES, type TemplateType } from './components/ThemeDialog.tsx';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -441,6 +442,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
         navigate(nextSessionId ? `/chat/${nextSessionId}` : '/chat', { replace: true });
       }
       await deleteSession(sessionId);
+      clearChatSwitcherCacheForSession(sessionId);
     },
     [sessions, currentSessionId, deleteSession, navigate]
   );

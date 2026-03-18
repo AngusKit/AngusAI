@@ -161,6 +161,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
     loadSessions(sessionPage + 1, true);
   }, [sessions.length, sessionTotal, sessionPage, sessionsLoadMore, sessionsLoading, loadSessions]);
 
+  /** 按 sessionId 内存缓存消息（sessionMessages + loadedMessagesRef），切换会话时优先用缓存，避免重复请求 */
   const loadMessages = useCallback(async (sessionId: string) => {
     if (loadedMessagesRef.current.has(sessionId)) return;
     loadedMessagesRef.current.add(sessionId);
