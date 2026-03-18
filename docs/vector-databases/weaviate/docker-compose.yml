@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+  weaviate:
+    image: cr.weaviate.io/semitechnologies/weaviate:latest
+    container_name: weaviate
+    restart: unless-stopped
+    ports:
+      - "8080:8080"     # REST API
+      - "50051:50051"   # gRPC API
+    volumes:
+      - weaviate_data:/var/lib/weaviate
+    environment:
+      QUERY_DEFAULTS_LIMIT: 25
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: "true"
+      PERSISTENCE_DATA_PATH: "/var/lib/weaviate"
+      CLUSTER_HOSTNAME: "node1"
+      DEFAULT_VECTORIZER_MODULE: "none"
+      # 按需启用向量化模块
+      # ENABLE_MODULES: "text2vec-openai,generative-openai"
+      LOG_LEVEL: "info"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/v1/.well-known/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  weaviate_data:
+    driver: local

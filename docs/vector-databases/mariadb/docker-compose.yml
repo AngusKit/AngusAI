@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  mariadb:
+    image: mariadb:11.7
+    container_name: mariadb-vector
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:-root123}
+      MARIADB_DATABASE: ${MARIADB_DATABASE:-vectordb}
+      MARIADB_USER: ${MARIADB_USER:-vector}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD:-vector123}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      - ./init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mariadb_data:
+    driver: local

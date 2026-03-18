@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.17.0
+    container_name: elasticsearch
+    restart: unless-stopped
+    environment:
+      - node.name=es-vector
+      - cluster.name=vector-cluster
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=${ES_JAVA_OPTS:--Xms1g -Xmx1g}"
+      # 开发环境关闭安全认证，生产环境请开启
+      - xpack.security.enabled=false
+      - xpack.security.http.ssl.enabled=false
+      # 取消注释以启用安全认证
+      # - xpack.security.enabled=true
+      # - ELASTIC_PASSWORD=${ELASTIC_PASSWORD:-elastic123}
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  es_data:
+    driver: local
