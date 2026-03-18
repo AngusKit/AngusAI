@@ -10,7 +10,10 @@ import static cloud.xcan.angus.spec.utils.ObjectUtils.nullSafe;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM;
 
+import cloud.xcan.angus.api.commonlink.FullResourceType;
+import cloud.xcan.angus.core.ai.application.cmd.activity.ActivityCmd;
 import cloud.xcan.angus.core.ai.application.cmd.apis.ApiCollectionCmd;
+import cloud.xcan.angus.core.ai.domain.activity.ActivityActions;
 import cloud.xcan.angus.core.ai.application.query.apis.ApiCollectionQuery;
 import cloud.xcan.angus.core.ai.application.query.apis.ApiEndpointCallLogQuery;
 import cloud.xcan.angus.core.ai.application.query.apis.ApiEndpointQuery;
@@ -71,6 +74,9 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
   @Resource
   private ApiEndpointCallLogQuery apiEndpointCallLogQuery;
 
+  @Resource
+  private ActivityCmd activityCmd;
+
   private static final int TOP_N = 10;
   private static final int DEFAULT_MONTHS = 1; // 默认统计近一月
 
@@ -87,6 +93,8 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
   public ApiCollectionDetailVo update(Long id, ApiCollectionUpdateDto dto) {
     ApiCollection collection = ApiCollectionAssembler.toUpdateDomain(id, dto);
     ApiCollection saved = apiCollectionCmd.update(collection);
+    activityCmd.recordActivity(FullResourceType.API_COLLECTION, saved.getId(), saved.getName(),
+        ActivityActions.ACTIVITY_API_COLLECTION_UPDATED);
     // 设置统计信息
     setDetailInfo(saved);
     return ApiCollectionAssembler.toDetailVo(saved);
@@ -94,7 +102,10 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
 
   @Override
   public void delete(Long id, Boolean force) {
+    ApiCollection existing = apiCollectionQuery.findAndCheck(id);
     apiCollectionCmd.delete(id, force != null ? force : false);
+    activityCmd.recordActivity(FullResourceType.API_COLLECTION, id, existing.getName(),
+        ActivityActions.ACTIVITY_API_COLLECTION_DELETED);
   }
 
   @NameJoin
@@ -138,6 +149,8 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
   public ApiCollectionDetailVo importCollection(Long id, ApiCollectionImportDto dto) {
     ApiCollection saved = apiCollectionCmd.imports(id, dto.getType(), dto.getContent(),
         dto.getFile(), dto.getConflictStrategy(), dto.getEnableByDefault());
+    activityCmd.recordActivity(FullResourceType.API_COLLECTION, saved.getId(), saved.getName(),
+        ActivityActions.ACTIVITY_API_COLLECTION_IMPORTED);
     // 设置统计信息
     setDetailInfo(saved);
     return ApiCollectionAssembler.toDetailVo(saved);

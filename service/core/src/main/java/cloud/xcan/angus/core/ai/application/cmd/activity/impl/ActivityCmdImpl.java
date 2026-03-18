@@ -74,17 +74,24 @@ public class ActivityCmdImpl extends CommCmd<Activity, Long> implements Activity
   @Transactional(rollbackFor = Exception.class)
   public void recordApplicationActivity(Long applicationId, String applicationName,
       String actionKey, Object... args) {
+    recordActivity(FullResourceType.APPLICATION, applicationId, applicationName, actionKey, args);
+  }
+
+  @Override
+  @Transactional(rollbackFor = Exception.class)
+  public void recordActivity(FullResourceType resourceType, Long resourceId, String resourceName,
+      String actionKey, Object... args) {
     if (!PrincipalContextUtils.isUserAction()) {
       return;
     }
     Long userId = getUserId();
-    Object[] msgArgs = args != null && args.length > 0 ? args : new Object[]{stringSafe(applicationName, "")};
+    Object[] msgArgs = args != null && args.length > 0 ? args : new Object[]{stringSafe(resourceName, "")};
     String description = getMessage(userId, actionKey, msgArgs);
     Activity activity = new Activity()
         .setId(getCachedUidGenerator().getUID())
-        .setResourceId(applicationId)
-        .setResourceType(FullResourceType.APPLICATION)
-        .setResourceName(stringSafe(applicationName, ""))
+        .setResourceId(resourceId)
+        .setResourceType(resourceType)
+        .setResourceName(stringSafe(resourceName, ""))
         .setUserId(nullSafe(userId, -1L))
         .setActionType(resolveActionType(actionKey))
         .setStatus(ActivityStatus.SUCCESS)
@@ -99,13 +106,15 @@ public class ActivityCmdImpl extends CommCmd<Activity, Long> implements Activity
     if (actionKey == null) {
       return ActionType.UPDATE;
     }
-    if (actionKey.contains("created") || actionKey.contains("duplicated")) {
+    if (actionKey.contains("created") || actionKey.contains("duplicated") || actionKey.contains("cloned")
+        || actionKey.contains("uploaded") || actionKey.contains("imported")) {
       return ActionType.CREATE;
     }
     if (actionKey.contains("deleted")) {
       return ActionType.DELETE;
     }
-    if (actionKey.contains("star")) {
+    if (actionKey.contains("star") || actionKey.contains("toggled") || actionKey.contains("started")
+        || actionKey.contains("stopped")) {
       return ActionType.CONFIGURE;
     }
     return ActionType.UPDATE;

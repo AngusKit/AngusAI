@@ -24,6 +24,18 @@ public interface ActivityCmd {
   void recordApplicationActivity(Long applicationId, String applicationName, String actionKey,
       Object... args);
 
+  /**
+   * 记录资源操作活动（国际化，通用方法）
+   *
+   * @param resourceType 资源类型
+   * @param resourceId   资源ID
+   * @param resourceName 资源名称
+   * @param actionKey    活动消息键（ActivityActions 中定义）
+   * @param args         消息参数
+   */
+  void recordActivity(FullResourceType resourceType, Long resourceId, String resourceName,
+      String actionKey, Object... args);
+
 }
 
 

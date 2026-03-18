@@ -3,7 +3,10 @@ package cloud.xcan.angus.core.ai.interfaces.prompt.facade.internal;
 import static cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder.getMatchSearchFields;
 import static cloud.xcan.angus.core.utils.CoreUtils.buildVoPageResult;
 
+import cloud.xcan.angus.api.commonlink.FullResourceType;
+import cloud.xcan.angus.core.ai.application.cmd.activity.ActivityCmd;
 import cloud.xcan.angus.core.ai.application.cmd.prompt.PromptCmd;
+import cloud.xcan.angus.core.ai.domain.activity.ActivityActions;
 import cloud.xcan.angus.core.ai.application.query.prompt.PromptQuery;
 import cloud.xcan.angus.core.ai.domain.prompt.Prompt;
 import cloud.xcan.angus.core.ai.interfaces.prompt.facade.PromptFacade;
@@ -30,6 +33,9 @@ public class PromptFacadeImpl implements PromptFacade {
 
   @Resource
   private PromptQuery promptQuery;
+
+  @Resource
+  private ActivityCmd activityCmd;
 
   @Override
   public PromptDetailVo create(PromptCreateDto dto) {
@@ -65,7 +71,10 @@ public class PromptFacadeImpl implements PromptFacade {
 
   @Override
   public void delete(Long id) {
+    Prompt existing = promptQuery.findAndCheck(id);
     promptCmd.delete(id);
+    activityCmd.recordActivity(FullResourceType.PROMPT, id, existing.getTitle(),
+        ActivityActions.ACTIVITY_PROMPT_DELETED);
   }
 
   @Override

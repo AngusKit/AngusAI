@@ -6,11 +6,13 @@ import static cloud.xcan.angus.core.utils.CoreUtils.buildVoPageResult;
 import cloud.xcan.agentx.core.model.ModelConfigDefinition;
 import cloud.xcan.agentx.core.model.ModelFactory;
 import cloud.xcan.agentx.core.model.ModelProvider;
+import cloud.xcan.angus.api.commonlink.FullResourceType;
+import cloud.xcan.angus.core.ai.application.cmd.activity.ActivityCmd;
 import cloud.xcan.angus.core.ai.application.cmd.model.ModelCmd;
+import cloud.xcan.angus.core.ai.domain.activity.ActivityActions;
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.domain.model.Model;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.ModelFacade;
-import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelCreateDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelFindDto;
 import cloud.xcan.angus.core.ai.interfaces.model.facade.dto.ModelTestDto;
@@ -45,11 +47,16 @@ public class ModelFacadeImpl implements ModelFacade {
   @Resource
   private List<ModelFactory> modelFactories;
 
+  @Resource
+  private ActivityCmd activityCmd;
+
   @NameJoin
   @Override
   public ModelDetailVo create(ModelCreateDto dto) {
     Model model = ModelAssembler.toDomain(dto);
     Model saved = modelCmd.create(model);
+    activityCmd.recordActivity(FullResourceType.MODEL, saved.getId(), saved.getName(),
+        ActivityActions.ACTIVITY_MODEL_CREATED);
     return ModelAssembler.toDetailVo(saved);
   }
 
@@ -58,6 +65,8 @@ public class ModelFacadeImpl implements ModelFacade {
   public ModelDetailVo update(Long id, ModelUpdateDto dto) {
     Model model = ModelAssembler.updateDomain(id, dto);
     Model saved = modelCmd.update(model);
+    activityCmd.recordActivity(FullResourceType.MODEL, saved.getId(), saved.getName(),
+        ActivityActions.ACTIVITY_MODEL_UPDATED);
     return ModelAssembler.toDetailVo(saved);
   }
 
@@ -65,6 +74,8 @@ public class ModelFacadeImpl implements ModelFacade {
   @Override
   public ModelDetailVo updateConfig(Long id, ModelConfigDefinition config) {
     Model saved = modelCmd.updateConfig(id, config);
+    activityCmd.recordActivity(FullResourceType.MODEL, saved.getId(), saved.getName(),
+        ActivityActions.ACTIVITY_MODEL_CONFIG_UPDATED);
     return ModelAssembler.toDetailVo(saved);
   }
 
@@ -72,6 +83,8 @@ public class ModelFacadeImpl implements ModelFacade {
   @Override
   public ModelDetailVo updateStatus(Long id, ModelUpdateStatusDto dto) {
     Model saved = modelCmd.updateStatus(id, dto.getStatus());
+    activityCmd.recordActivity(FullResourceType.MODEL, saved.getId(), saved.getName(),
+        ActivityActions.ACTIVITY_MODEL_STATUS_UPDATED);
     return ModelAssembler.toDetailVo(saved);
   }
 
@@ -84,7 +97,10 @@ public class ModelFacadeImpl implements ModelFacade {
 
   @Override
   public void delete(Long id) {
+    Model existing = modelQuery.findAndCheck(id);
     modelCmd.delete(id);
+    activityCmd.recordActivity(FullResourceType.MODEL, id, existing.getName(),
+        ActivityActions.ACTIVITY_MODEL_DELETED);
   }
 
   @NameJoin

@@ -4,7 +4,10 @@ import static cloud.xcan.angus.core.ai.interfaces.sharing.facade.internal.assemb
 import static cloud.xcan.angus.core.utils.CoreUtils.buildVoPageResult;
 
 import cloud.xcan.angus.api.manager.UserManager;
+import cloud.xcan.angus.api.commonlink.FullResourceType;
+import cloud.xcan.angus.core.ai.application.cmd.activity.ActivityCmd;
 import cloud.xcan.angus.core.ai.application.cmd.sharing.ResourceSharingCmd;
+import cloud.xcan.angus.core.ai.domain.activity.ActivityActions;
 import cloud.xcan.angus.core.ai.application.query.sharing.ResourceSharingQuery;
 import cloud.xcan.angus.core.ai.domain.ResourceType;
 import cloud.xcan.angus.core.ai.domain.StatisticsPeriod;
@@ -46,11 +49,16 @@ public class ResourceSharingFacadeImpl implements ResourceSharingFacade {
   @Resource
   private UserManager userManager;
 
+  @Resource
+  private ActivityCmd activityCmd;
+
   @NameJoin
   @Override
   public ResourceSharingDetailVo create(ResourceSharingCreateDto dto) {
     ResourceSharing sharing = ResourceSharingAssembler.toCreateDomain(dto);
     ResourceSharing saved = resourceSharingCmd.create(sharing);
+    activityCmd.recordActivity(FullResourceType.RESOURCE_SHARDING, saved.getId(),
+        saved.getResourceName(), ActivityActions.ACTIVITY_SHARING_CREATED);
     return assembleResourceSharingDetailVo(sharing.getId(), saved);
   }
 
@@ -59,6 +67,8 @@ public class ResourceSharingFacadeImpl implements ResourceSharingFacade {
   public ResourceSharingDetailVo update(Long id, ResourceSharingUpdateDto dto) {
     ResourceSharing saved = resourceSharingCmd.update(id, dto.getSharedWith(),
         dto.getPermission(), dto.getMemberIds());
+    activityCmd.recordActivity(FullResourceType.RESOURCE_SHARDING, id, saved.getResourceName(),
+        ActivityActions.ACTIVITY_SHARING_UPDATED);
     return assembleResourceSharingDetailVo(id, saved);
   }
 
@@ -66,12 +76,17 @@ public class ResourceSharingFacadeImpl implements ResourceSharingFacade {
   @Override
   public ResourceSharingDetailVo toggle(Long id, ResourceSharingToggleDto dto) {
     ResourceSharing saved = resourceSharingCmd.toggle(id, dto.getEnabled());
+    activityCmd.recordActivity(FullResourceType.RESOURCE_SHARDING, id, saved.getResourceName(),
+        ActivityActions.ACTIVITY_SHARING_TOGGLED);
     return assembleResourceSharingDetailVo(id, saved);
   }
 
   @Override
   public void delete(Long id) {
+    ResourceSharing existing = resourceSharingQuery.findAndCheck(id);
     resourceSharingCmd.delete(id);
+    activityCmd.recordActivity(FullResourceType.RESOURCE_SHARDING, id, existing.getResourceName(),
+        ActivityActions.ACTIVITY_SHARING_DELETED);
   }
 
   @NameJoin

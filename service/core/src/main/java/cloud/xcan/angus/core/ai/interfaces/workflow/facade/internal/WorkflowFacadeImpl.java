@@ -3,7 +3,10 @@ package cloud.xcan.angus.core.ai.interfaces.workflow.facade.internal;
 import static cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder.getMatchSearchFields;
 import static cloud.xcan.angus.core.utils.CoreUtils.buildVoPageResult;
 
+import cloud.xcan.angus.api.commonlink.FullResourceType;
+import cloud.xcan.angus.core.ai.application.cmd.activity.ActivityCmd;
 import cloud.xcan.angus.core.ai.application.cmd.workflow.WorkflowCmd;
+import cloud.xcan.angus.core.ai.domain.activity.ActivityActions;
 import cloud.xcan.angus.core.ai.application.query.workflow.WorkflowExecutionQuery;
 import cloud.xcan.angus.core.ai.application.query.workflow.WorkflowQuery;
 import cloud.xcan.angus.core.ai.domain.Visibility;
@@ -39,10 +42,15 @@ public class WorkflowFacadeImpl implements WorkflowFacade {
   @Resource
   private WorkflowExecutionQuery workflowExecutionQuery;
 
+  @Resource
+  private ActivityCmd activityCmd;
+
   @Override
   public WorkflowDetailVo create(WorkflowCreateDto dto) {
     Workflow workflow = WorkflowAssembler.toDomain(dto);
     Workflow saved = workflowCmd.create(workflow);
+    activityCmd.recordActivity(FullResourceType.WORKFLOW, saved.getId(), saved.getName(),
+        ActivityActions.ACTIVITY_WORKFLOW_CREATED);
     return WorkflowAssembler.toDetailVo(saved);
   }
 
@@ -50,6 +58,8 @@ public class WorkflowFacadeImpl implements WorkflowFacade {
   public WorkflowDetailVo update(Long id, WorkflowUpdateDto dto) {
     Workflow workflow = WorkflowAssembler.updateDomain(id, dto);
     Workflow saved = workflowCmd.update(workflow);
+    activityCmd.recordActivity(FullResourceType.WORKFLOW, saved.getId(), saved.getName(),
+        ActivityActions.ACTIVITY_WORKFLOW_UPDATED);
     return WorkflowAssembler.toDetailVo(saved);
   }
 
@@ -57,35 +67,48 @@ public class WorkflowFacadeImpl implements WorkflowFacade {
   public WorkflowDetailVo updateConfig(Long id, WorkflowConfigUpdateDto dto) {
     WorkflowConfig config = WorkflowAssembler.toConfig(dto);
     Workflow saved = workflowCmd.updateConfig(id, config);
+    activityCmd.recordActivity(FullResourceType.WORKFLOW, saved.getId(), saved.getName(),
+        ActivityActions.ACTIVITY_WORKFLOW_CONFIG_UPDATED);
     return WorkflowAssembler.toDetailVo(saved);
   }
 
   @Override
   public WorkflowDetailVo modifyVisibility(Long id, Visibility visibility) {
     Workflow saved = workflowCmd.modifyVisibility(id, visibility);
+    activityCmd.recordActivity(FullResourceType.WORKFLOW, saved.getId(), saved.getName(),
+        ActivityActions.ACTIVITY_WORKFLOW_VISIBILITY_UPDATED);
     return WorkflowAssembler.toDetailVo(saved);
   }
 
   @Override
   public WorkflowDetailVo start(Long id) {
     Workflow saved = workflowCmd.start(id);
+    activityCmd.recordActivity(FullResourceType.WORKFLOW, saved.getId(), saved.getName(),
+        ActivityActions.ACTIVITY_WORKFLOW_STARTED);
     return WorkflowAssembler.toDetailVo(saved);
   }
 
   @Override
   public WorkflowDetailVo stop(Long id) {
     Workflow saved = workflowCmd.stop(id);
+    activityCmd.recordActivity(FullResourceType.WORKFLOW, saved.getId(), saved.getName(),
+        ActivityActions.ACTIVITY_WORKFLOW_STOPPED);
     return WorkflowAssembler.toDetailVo(saved);
   }
 
   @Override
   public void delete(Long id) {
+    Workflow existing = workflowQuery.findAndCheck(id);
     workflowCmd.delete(id);
+    activityCmd.recordActivity(FullResourceType.WORKFLOW, id, existing.getName(),
+        ActivityActions.ACTIVITY_WORKFLOW_DELETED);
   }
 
   @Override
   public WorkflowDetailVo clone(Long id) {
     var saved = workflowCmd.clone(id);
+    activityCmd.recordActivity(FullResourceType.WORKFLOW, saved.getId(), saved.getName(),
+        ActivityActions.ACTIVITY_WORKFLOW_CLONED);
     return WorkflowAssembler.toDetailVo(saved);
   }
 

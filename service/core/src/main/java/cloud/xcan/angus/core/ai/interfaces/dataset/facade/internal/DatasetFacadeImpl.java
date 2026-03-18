@@ -7,7 +7,10 @@ import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.parseStartDate;
 import static cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder.getMatchSearchFields;
 import static cloud.xcan.angus.core.utils.CoreUtils.buildVoPageResult;
 
+import cloud.xcan.angus.api.commonlink.FullResourceType;
+import cloud.xcan.angus.core.ai.application.cmd.activity.ActivityCmd;
 import cloud.xcan.angus.core.ai.application.cmd.dataset.DatasetCmd;
+import cloud.xcan.angus.core.ai.domain.activity.ActivityActions;
 import cloud.xcan.angus.core.ai.application.query.dataset.DatasetDataQuery;
 import cloud.xcan.angus.core.ai.application.query.dataset.DatasetDataStats;
 import cloud.xcan.angus.core.ai.application.query.dataset.DatasetQuery;
@@ -64,6 +67,8 @@ public class DatasetFacadeImpl implements DatasetFacade {
   @Resource
   private DatasetDataQuery datasetDataQuery;
 
+  private ActivityCmd activityCmd;
+
   private static final int TOP_N = 10;
   private static final int DEFAULT_MONTHS = 1; // 默认统计近一月
 
@@ -72,6 +77,8 @@ public class DatasetFacadeImpl implements DatasetFacade {
   public DatasetDetailVo create(DatasetCreateDto dto) {
     Dataset dataset = DatasetAssembler.toCreateDomain(dto);
     Dataset saved = datasetCmd.create(dataset);
+    activityCmd.recordActivity(FullResourceType.DATASET, saved.getId(), saved.getName(),
+        ActivityActions.ACTIVITY_DATASET_CREATED);
     fillStats(List.of(saved));
     return DatasetAssembler.toDetailVo(saved);
   }
@@ -81,6 +88,8 @@ public class DatasetFacadeImpl implements DatasetFacade {
   public DatasetDetailVo update(Long id, DatasetUpdateDto dto) {
     Dataset dataset = DatasetAssembler.toUpdateDomain(id, dto);
     Dataset saved = datasetCmd.update(dataset);
+    activityCmd.recordActivity(FullResourceType.DATASET, saved.getId(), saved.getName(),
+        ActivityActions.ACTIVITY_DATASET_UPDATED);
     fillStats(List.of(saved));
     return DatasetAssembler.toDetailVo(saved);
   }
@@ -89,6 +98,8 @@ public class DatasetFacadeImpl implements DatasetFacade {
   @Override
   public DatasetDetailVo toggle(Long id, DatasetToggleDto dto) {
     Dataset saved = datasetCmd.toggle(id, dto.getEnabled());
+    activityCmd.recordActivity(FullResourceType.DATASET, saved.getId(), saved.getName(),
+        ActivityActions.ACTIVITY_DATASET_TOGGLED);
     fillStats(List.of(saved));
     return DatasetAssembler.toDetailVo(saved);
   }
@@ -97,6 +108,8 @@ public class DatasetFacadeImpl implements DatasetFacade {
   @Override
   public DatasetDetailVo modifyVisibility(Long id, Visibility visibility) {
     Dataset saved = datasetCmd.modifyVisibility(id, visibility);
+    activityCmd.recordActivity(FullResourceType.DATASET, saved.getId(), saved.getName(),
+        ActivityActions.ACTIVITY_DATASET_VISIBILITY_UPDATED);
     fillStats(List.of(saved));
     return DatasetAssembler.toDetailVo(saved);
   }
@@ -105,6 +118,8 @@ public class DatasetFacadeImpl implements DatasetFacade {
   public DatasourceConfigVo modifyDataSource(Long id, DataSourceUpdateDto dto) {
     Dataset saved = datasetCmd.modifyDataSource(id,
         DatasetAssembler.toDatasourceConfig(dto));
+    activityCmd.recordActivity(FullResourceType.DATASET, saved.getId(), saved.getName(),
+        ActivityActions.ACTIVITY_DATASET_DATASOURCE_UPDATED);
     return DatasetAssembler.toDatasourceConfigVo(saved.getConfig());
   }
 
@@ -117,12 +132,18 @@ public class DatasetFacadeImpl implements DatasetFacade {
 
   @Override
   public void deleteDataSource(Long id) {
+    Dataset existing = datasetQuery.findAndCheck(id);
     datasetCmd.deleteDataSource(id);
+    activityCmd.recordActivity(FullResourceType.DATASET, id, existing.getName(),
+        ActivityActions.ACTIVITY_DATASET_DATASOURCE_DELETED);
   }
 
   @Override
   public void delete(Long id) {
+    Dataset existing = datasetQuery.findAndCheck(id);
     datasetCmd.delete(id);
+    activityCmd.recordActivity(FullResourceType.DATASET, id, existing.getName(),
+        ActivityActions.ACTIVITY_DATASET_DELETED);
   }
 
   @NameJoin

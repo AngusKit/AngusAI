@@ -7,7 +7,10 @@ import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.parseStartDate;
 import static cloud.xcan.angus.core.jpa.criteria.SearchCriteriaBuilder.getMatchSearchFields;
 import static cloud.xcan.angus.core.utils.CoreUtils.buildVoPageResult;
 
+import cloud.xcan.angus.api.commonlink.FullResourceType;
+import cloud.xcan.angus.core.ai.application.cmd.activity.ActivityCmd;
 import cloud.xcan.angus.core.ai.application.cmd.knowledgebase.KnowledgeBaseCmd;
+import cloud.xcan.angus.core.ai.domain.activity.ActivityActions;
 import cloud.xcan.angus.core.ai.application.query.knowledgebase.KnowledgeBaseDocQuery;
 import cloud.xcan.angus.core.ai.application.query.knowledgebase.KnowledgeBaseDocStats;
 import cloud.xcan.angus.core.ai.application.query.knowledgebase.KnowledgeBaseDocUsageLogQuery;
@@ -55,6 +58,9 @@ public class KnowledgeBaseFacadeImpl implements KnowledgeBaseFacade {
   @Resource
   private KnowledgeBaseDocQuery knowledgeBaseDocQuery;
 
+  @Resource
+  private ActivityCmd activityCmd;
+
   private static final int TOP_N = 10;
   private static final int DEFAULT_MONTHS = 1; // 默认统计近一月
 
@@ -63,6 +69,8 @@ public class KnowledgeBaseFacadeImpl implements KnowledgeBaseFacade {
   public KnowledgeBaseDetailVo create(KnowledgeBaseCreateDto dto) {
     KnowledgeBase knowledgeBase = KnowledgeBaseAssembler.toCreateDomain(dto);
     KnowledgeBase saved = knowledgeBaseCmd.create(knowledgeBase);
+    activityCmd.recordActivity(FullResourceType.KNOWLEDGE_BASE, saved.getId(), saved.getName(),
+        ActivityActions.ACTIVITY_KNOWLEDGE_BASE_CREATED);
     fillStats(List.of(saved));
     return KnowledgeBaseAssembler.toDetailVo(saved);
   }
@@ -72,6 +80,8 @@ public class KnowledgeBaseFacadeImpl implements KnowledgeBaseFacade {
   public KnowledgeBaseDetailVo update(Long id, KnowledgeBaseUpdateDto dto) {
     KnowledgeBase knowledgeBase = KnowledgeBaseAssembler.toUpdateDomain(id, dto);
     KnowledgeBase saved = knowledgeBaseCmd.update(knowledgeBase);
+    activityCmd.recordActivity(FullResourceType.KNOWLEDGE_BASE, saved.getId(), saved.getName(),
+        ActivityActions.ACTIVITY_KNOWLEDGE_BASE_UPDATED);
     fillStats(List.of(saved));
     return KnowledgeBaseAssembler.toDetailVo(saved);
   }
@@ -80,6 +90,8 @@ public class KnowledgeBaseFacadeImpl implements KnowledgeBaseFacade {
   @Override
   public KnowledgeBaseDetailVo toggle(Long id, KnowledgeBaseToggleDto dto) {
     KnowledgeBase knowledgeBase = knowledgeBaseCmd.toggle(id, dto.getEnabled());
+    activityCmd.recordActivity(FullResourceType.KNOWLEDGE_BASE, knowledgeBase.getId(),
+        knowledgeBase.getName(), ActivityActions.ACTIVITY_KNOWLEDGE_BASE_TOGGLED);
     fillStats(List.of(knowledgeBase));
     return KnowledgeBaseAssembler.toDetailVo(knowledgeBase);
   }
@@ -88,13 +100,18 @@ public class KnowledgeBaseFacadeImpl implements KnowledgeBaseFacade {
   @Override
   public KnowledgeBaseDetailVo modifyVisibility(Long id, Visibility visibility) {
     KnowledgeBase knowledgeBase = knowledgeBaseCmd.modifyVisibility(id, visibility);
+    activityCmd.recordActivity(FullResourceType.KNOWLEDGE_BASE, knowledgeBase.getId(),
+        knowledgeBase.getName(), ActivityActions.ACTIVITY_KNOWLEDGE_BASE_VISIBILITY_UPDATED);
     fillStats(List.of(knowledgeBase));
     return KnowledgeBaseAssembler.toDetailVo(knowledgeBase);
   }
 
   @Override
   public void delete(Long id) {
+    KnowledgeBase existing = knowledgeBaseQuery.findAndCheck(id);
     knowledgeBaseCmd.delete(id);
+    activityCmd.recordActivity(FullResourceType.KNOWLEDGE_BASE, id, existing.getName(),
+        ActivityActions.ACTIVITY_KNOWLEDGE_BASE_DELETED);
   }
 
   @NameJoin

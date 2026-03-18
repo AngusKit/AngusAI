@@ -5,7 +5,10 @@ import static cloud.xcan.angus.core.utils.CoreUtils.buildVoPageResult;
 
 import cloud.xcan.agentx.core.vectorstore.VectorStoreFactory;
 import cloud.xcan.agentx.core.vectorstore.VectorStoreType;
+import cloud.xcan.angus.api.commonlink.FullResourceType;
+import cloud.xcan.angus.core.ai.application.cmd.activity.ActivityCmd;
 import cloud.xcan.angus.core.ai.application.cmd.vector.VectorStoreCmd;
+import cloud.xcan.angus.core.ai.domain.activity.ActivityActions;
 import cloud.xcan.angus.core.ai.application.query.vector.VectorStoreQuery;
 import cloud.xcan.angus.core.ai.domain.vector.VectorStore;
 import cloud.xcan.angus.core.ai.interfaces.vector.facade.VectorStoreFacade;
@@ -42,11 +45,16 @@ public class VectorStoreFacadeImpl implements VectorStoreFacade {
   @Resource
   private List<VectorStoreFactory> vectorStoreFactories;
 
+  @Resource
+  private ActivityCmd activityCmd;
+
   @NameJoin
   @Override
   public VectorStoreVo create(VectorStoreCreateDto dto) {
     VectorStore vectorStore = VectorStoreAssembler.toCreateDomain(dto);
     VectorStore saved = vectorStoreCmd.create(vectorStore);
+    activityCmd.recordActivity(FullResourceType.VECTOR_STORE, saved.getId(), saved.getName(),
+        ActivityActions.ACTIVITY_VECTOR_STORE_CREATED);
     return VectorStoreAssembler.toVo(saved);
   }
 
@@ -55,6 +63,8 @@ public class VectorStoreFacadeImpl implements VectorStoreFacade {
   public VectorStoreVo update(Long id, VectorStoreUpdateDto dto) {
     VectorStore vectorStore = VectorStoreAssembler.toUpdateDomain(id, dto);
     VectorStore saved = vectorStoreCmd.update(vectorStore);
+    activityCmd.recordActivity(FullResourceType.VECTOR_STORE, saved.getId(), saved.getName(),
+        ActivityActions.ACTIVITY_VECTOR_STORE_UPDATED);
     return VectorStoreAssembler.toVo(saved);
   }
 
@@ -62,6 +72,8 @@ public class VectorStoreFacadeImpl implements VectorStoreFacade {
   @Override
   public VectorStoreVo toggleEnabled(Long id, Boolean enabled) {
     VectorStore saved = vectorStoreCmd.toggleEnabled(id, enabled);
+    activityCmd.recordActivity(FullResourceType.VECTOR_STORE, saved.getId(), saved.getName(),
+        ActivityActions.ACTIVITY_VECTOR_STORE_TOGGLED);
     return VectorStoreAssembler.toVo(saved);
   }
 
@@ -73,7 +85,10 @@ public class VectorStoreFacadeImpl implements VectorStoreFacade {
 
   @Override
   public void delete(Long id, Boolean force) {
+    VectorStore existing = vectorStoreQuery.findAndCheck(id);
     vectorStoreCmd.delete(id, force != null ? force : false);
+    activityCmd.recordActivity(FullResourceType.VECTOR_STORE, id, existing.getName(),
+        ActivityActions.ACTIVITY_VECTOR_STORE_DELETED);
   }
 
   @NameJoin

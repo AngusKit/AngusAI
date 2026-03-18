@@ -8,7 +8,10 @@ import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 
+import cloud.xcan.angus.api.commonlink.FullResourceType;
+import cloud.xcan.angus.core.ai.application.cmd.activity.ActivityCmd;
 import cloud.xcan.angus.core.ai.application.cmd.agent.AgentCmd;
+import cloud.xcan.angus.core.ai.domain.activity.ActivityActions;
 import cloud.xcan.angus.core.ai.application.query.agent.AgentQuery;
 import cloud.xcan.angus.core.ai.application.query.apis.ApiCollectionQuery;
 import cloud.xcan.angus.core.ai.application.query.dataset.DatasetQuery;
@@ -70,11 +73,16 @@ public class AgentFacadeImpl implements AgentFacade {
   @Resource
   private ModelQuery modelQuery;
 
+  @Resource
+  private ActivityCmd activityCmd;
+
   @NameJoin
   @Override
   public AgentDetailVo create(AgentCreateDto dto) {
     Agent agent = AgentAssembler.toDomain(dto);
     Agent saved = agentCmd.create(agent);
+    activityCmd.recordActivity(FullResourceType.AGENT, saved.getId(), saved.getName(),
+        ActivityActions.ACTIVITY_AGENT_CREATED);
     return AgentAssembler.toDetailVo(saved, getAgentResourcesVo(saved), getDefaultModelVo(saved));
   }
 
@@ -84,6 +92,8 @@ public class AgentFacadeImpl implements AgentFacade {
     Agent existing = agentQuery.findAndCheck(id);
     AgentAssembler.mergeUpdate(existing, dto);
     Agent saved = agentCmd.update(existing);
+    activityCmd.recordActivity(FullResourceType.AGENT, saved.getId(), saved.getName(),
+        ActivityActions.ACTIVITY_AGENT_UPDATED);
     return AgentAssembler.toDetailVo(saved, getAgentResourcesVo(saved), getDefaultModelVo(saved));
   }
 
@@ -91,13 +101,18 @@ public class AgentFacadeImpl implements AgentFacade {
   @Override
   public AgentDetailVo updateStatus(Long id, AgentStatus status) {
     Agent updated = agentCmd.updateStatus(id, status);
+    activityCmd.recordActivity(FullResourceType.AGENT, updated.getId(), updated.getName(),
+        ActivityActions.ACTIVITY_AGENT_STATUS_UPDATED);
     return AgentAssembler.toDetailVo(updated, getAgentResourcesVo(updated),
         getDefaultModelVo(updated));
   }
 
   @Override
   public void delete(Long id) {
+    Agent existing = agentQuery.findAndCheck(id);
     agentCmd.delete(id);
+    activityCmd.recordActivity(FullResourceType.AGENT, id, existing.getName(),
+        ActivityActions.ACTIVITY_AGENT_DELETED);
   }
 
   @NameJoin
