@@ -195,10 +195,12 @@ export const useVectorStoreForm = (): UseVectorStoreFormReturn => {
   const populateFormFromStore = useCallback((store: VectorStoreItem) => {
     const cfg = store.config;
     const extra = (cfg as any)?.extraProperties ?? {};
+    const typeRaw = store.type ?? '';
+    const typeNormalized = typeRaw ? (String(typeRaw).toUpperCase() as VectorStoreTypeEnum) : ('' as any);
     setFormData({
       ...DEFAULT_FORM_DATA,
       name: store.name ?? '',
-      type: store.type ?? ('' as any),
+      type: typeNormalized,
       description: store.description === '--' ? '' : (store.description ?? ''),
       endpoint: cfg?.endpoint ?? cfg?.url ?? '',
       url: cfg?.url ?? '',
