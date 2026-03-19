@@ -44,7 +44,8 @@ export class Message<SecurityDataType = unknown> {
     });
 
   /**
-   * @description 根据消息ID查询单条消息详情，用于 SSE 断开后轮询等待生成完成
+   * @description 根据消息ID查询单条消息详情，用于 SSE 断开后轮询等待生成完成。
+   * 调用方必须在首个 SSE chunk 返回后（拿到真实 message_id）才能发起轮询，否则占位 id 会导致 404。
    *
    * @tags 对话消息
    * @name GetMessage

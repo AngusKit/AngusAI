@@ -72,8 +72,8 @@ export interface OpenAIChatCompletionChunk {
   id?: string;
   /** 会话 ID，无会话模式时首块携带，供前端建立关联 */
   session_id?: string;
-  /** 助手消息 DB ID，首块携带，供前端停止生成和轮询使用 */
-  message_id?: number;
+  /** 助手消息 DB ID，首块携带，供前端停止生成和轮询使用；后端 long 序列化为 string 避免精度丢失 */
+  message_id?: string;
   /** 对象类型，流式固定为 chat.completion.chunk */
   object?: string;
   /** 创建时间（Unix 秒） */

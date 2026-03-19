@@ -34,6 +34,15 @@ async function buildStreamRequest(path: string, _body: unknown): Promise<{ url: 
 }
 
 /**
+ * 从原始 JSON 字符串中提取 messageId，避免大数（>2^53-1）经 JSON.parse 后精度丢失导致 404
+ * 兼容 messageId / message_id 两种字段名
+ */
+function extractMessageIdFromRaw(payload: string): string | null {
+  const m = payload.match(/"message_?[iI]d"\s*:\s*"(\d+)"|"message_?[iI]d"\s*:\s*(\d+)/);
+  return m ? (m[1] ?? m[2] ?? null) : null;
+}
+
+/**
  * 剥离行首的 data: 前缀（支持后端可能返回的 data:data: 双重前缀）
  */
 function peelDataPrefix(line: string): string {
@@ -107,11 +116,15 @@ export async function chatStream(
         if (!payload) continue;
         if (payload === '[DONE]') continue;
         try {
+          const midStr = extractMessageIdFromRaw(payload);
+          if (midStr) callbacks.onMessageId?.(midStr);
           const obj = JSON.parse(payload) as OpenAIChatCompletionChunk & { sessionId?: string; messageId?: number };
           const sid = obj?.session_id ?? obj?.sessionId;
           if (sid) callbacks.onSessionId?.(sid);
-          const mid = obj?.message_id ?? obj?.messageId;
-          if (mid != null) callbacks.onMessageId?.(String(mid));
+          if (!midStr) {
+            const mid = obj?.message_id ?? obj?.messageId;
+            if (mid != null) callbacks.onMessageId?.(String(mid));
+          }
           const content = obj?.choices?.[0]?.delta?.content;
           if (content) callbacks.onToken(content);
         } catch {
@@ -126,11 +139,15 @@ export async function chatStream(
         const payload = peelDataPrefix(rawLine);
         if (payload && payload !== '[DONE]') {
           try {
+            const midStr = extractMessageIdFromRaw(payload);
+            if (midStr) callbacks.onMessageId?.(midStr);
             const obj = JSON.parse(payload) as OpenAIChatCompletionChunk & { sessionId?: string; messageId?: number };
             const sid = obj?.session_id ?? obj?.sessionId;
             if (sid) callbacks.onSessionId?.(sid);
-            const mid = obj?.message_id ?? obj?.messageId;
-            if (mid != null) callbacks.onMessageId?.(String(mid));
+            if (!midStr) {
+              const mid = obj?.message_id ?? obj?.messageId;
+              if (mid != null) callbacks.onMessageId?.(String(mid));
+            }
             const content = obj?.choices?.[0]?.delta?.content;
             if (content) callbacks.onToken(content);
           } catch {

@@ -397,12 +397,13 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     }
   }, [currentSessionId, updateMessage]);
 
-  /** SSE 断开后轮询：若最后一条助手消息在流式生成中，每 3 秒拉取详情直到完成 */
+  /** SSE 断开后轮询：若最后一条助手消息在流式生成中，每 3 秒拉取详情直到完成。必须在首个 SSE chunk 返回后（已有真实 message_id）才可轮询，否则会用占位 id 导致 404 */
   const POLL_INTERVAL_MS = 3000;
+  const isRealMessageId = (id: string) => id && !String(id).startsWith('assistant-');
   useEffect(() => {
     if (!currentSessionId || messagesLoading) return;
     const last = currentMessages[currentMessages.length - 1];
-    if (!last || last.role !== 'assistant' || !last.isStreaming || !last.id) return;
+    if (!last || last.role !== 'assistant' || !last.isStreaming || !last.id || !isRealMessageId(last.id)) return;
     const timer = setInterval(async () => {
       try {
         const res = await MessageApi.getMessage(last.id!);
