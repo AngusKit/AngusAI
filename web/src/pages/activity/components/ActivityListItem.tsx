@@ -72,15 +72,6 @@ export function ActivityListItem({ activity, language, onClick }: ActivityListIt
             </span>
             <span className='dark:text-white'>{resourceName || '--'}</span>
           </div>
-
-          {activity.detail && (
-            <div className='mt-2 flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400'>
-              <Info className='w-4 h-4' />
-              <span>
-                {language === 'zh-CN' ? '点击查看详细信息' : 'Click to view more details'}
-              </span>
-            </div>
-          )}
         </div>
 
         <ChevronRight className='w-5 h-5 text-gray-400 dark:text-gray-600 flex-shrink-0' />

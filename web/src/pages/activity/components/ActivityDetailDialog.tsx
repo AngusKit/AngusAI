@@ -96,7 +96,7 @@ export function ActivityDetailDialog({
 
               <div>
                 <Label className='text-sm text-gray-600 dark:text-gray-400'>
-                  {language === 'zh-CN' ? '目标类型' : 'Target Type'}
+                  {language === 'zh-CN' ? '资源类型' : 'Target Type'}
                 </Label>
                 <div className='flex items-center gap-2 mt-1'>
                   <TargetIcon
@@ -110,14 +110,14 @@ export function ActivityDetailDialog({
 
               <div>
                 <Label className='text-sm text-gray-600 dark:text-gray-400'>
-                  {language === 'zh-CN' ? '目标名称' : 'Target Name'}
+                  {language === 'zh-CN' ? '资源名称' : 'Target Name'}
                 </Label>
                 <p className='dark:text-white mt-1'>{resourceName || '--'}</p>
               </div>
 
               <div>
                 <Label className='text-sm text-gray-600 dark:text-gray-400'>
-                  {language === 'zh-CN' ? '目标ID' : 'Target ID'}
+                  {language === 'zh-CN' ? '资源ID' : 'Target ID'}
                 </Label>
                 <p className='dark:text-white mt-1'>{resourceId ?? '--'}</p>
               </div>
