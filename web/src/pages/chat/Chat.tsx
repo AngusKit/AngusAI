@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { useTheme } from '@/components/ThemeProvider.tsx';
 import { toast } from 'sonner';
@@ -66,8 +66,12 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     setSessionKeyword,
   } = useChatSessions(undefined, undefined, sessionIdFromUrl);
   const [sessionSelections, setSessionSelections] = useState<Record<string, ChatSwitcherSelection>>({});
-  const defaultContent = content || sessionStorage.getItem('chatContent') || '';
-  sessionStorage.removeItem('chatContent');
+  // sessionStorage 读取仅在首次渲染时执行，避免每次渲染都读取 sessionStorage
+  const [defaultContent] = useState(() => {
+    const stored = content || sessionStorage.getItem('chatContent') || '';
+    sessionStorage.removeItem('chatContent');
+    return stored;
+  });
   const [isRecording, setIsRecording] = useState(false);
   const inputBarRef = useRef<{ insertText: (text: string) => void; focus: () => void } | null>(null);
   const [showPromptLibrary, setShowPromptLibrary] = useState(false);
@@ -133,10 +137,13 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     navigate(`/chat/${sessionId}`);
   }, [selectSession, navigate]);
 
-  // 统计正在流式生成的会话数（支持多会话并发）
-  const streamingSessionCount = Object.values(sessionMessages).filter((msgs) =>
-    (msgs ?? []).some((m) => m.isStreaming)
-  ).length;
+  // 统计正在流式生成的会话数（支持多会话并发），使用 useMemo 避免每次渲染遍历所有消息
+  const streamingSessionCount = useMemo(
+    () => Object.values(sessionMessages).filter((msgs) =>
+      (msgs ?? []).some((m) => m.isStreaming)
+    ).length,
+    [sessionMessages]
+  );
   // 最大并发数：优先从当前会话的应用配置读取
   const maxConcurrentChats =
     (sessionSelections[currentSessionId ?? ''] ?? { app: undefined })?.app?.features?.maxConcurrentChats ??
@@ -296,10 +303,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     if (!userContent) return;
 
     // 达到最大并发数时不再重新生成
-    const streamingCount = Object.values(sessionMessages).filter((m) =>
-      (m ?? []).some((msg) => msg.isStreaming)
-    ).length;
-    if (streamingCount >= maxConcurrentChats) {
+    if (streamingSessionCount >= maxConcurrentChats) {
       toast.error(`最多同时进行 ${maxConcurrentChats} 个对话，请等待其他对话完成`);
       return;
     }
@@ -366,7 +370,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     currentSessionId,
     currentSession,
     currentMessages,
-    sessionMessages,
+    streamingSessionCount,
     removeLastAssistantMessage,
     appendMessages,
     updateMessage,
@@ -450,15 +454,18 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     }
   };
 
-  const baseSelection: ChatSwitcherSelection = {
+  const baseSelection: ChatSwitcherSelection = useMemo(() => ({
     appId: currentSession?.appId ?? '',
     agentId: currentSession?.agentId ?? '',
     modelId: currentSession?.modelId ?? '',
     app: undefined,
     agent: undefined,
     model: undefined,
-  };
-  const chatSelection = sessionSelections[currentSessionId ?? ''] ?? baseSelection;
+  }), [currentSession?.appId, currentSession?.agentId, currentSession?.modelId]);
+  const chatSelection = useMemo(
+    () => sessionSelections[currentSessionId ?? ''] ?? baseSelection,
+    [sessionSelections, currentSessionId, baseSelection]
+  );
 
   // 应用功能配置（来自应用列表 app.features，undefined 时默认全部展示）
   const appFeatures = chatSelection.app?.features;
@@ -477,8 +484,17 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     chatSelection.app?.agents?.find((a) => String(a?.id) === chatSelection.agentId) ??
     chatSelection.app?.defaultAgent;
   const welcomeMessage = currentAgent?.welcomeMessage?.trim() ?? '';
-  const suggestedQuestions = (currentAgent?.suggestedQuestions ?? []).filter((q) => q?.trim());
+  const suggestedQuestions = useMemo(
+    () => (currentAgent?.suggestedQuestions ?? []).filter((q) => q?.trim()),
+    [currentAgent?.suggestedQuestions]
+  );
   const hasAgentPlaceholder = welcomeMessage !== '' || suggestedQuestions.length > 0;
+
+  // 使用 useMemo 避免每次渲染遍历 currentMessages 计算 isSending
+  const isSending = useMemo(
+    () => currentMessages.some((m) => m.isStreaming),
+    [currentMessages]
+  );
 
   const createNewSession = async () => {
     const sel = chatSelection;
@@ -650,7 +666,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
         lastCompositionEndRef={lastCompositionEndRef}
         onCompositionStart={handleCompositionStart}
         onCompositionEnd={handleCompositionEnd}
-        isSending={currentMessages.some((m) => m.isStreaming)}
+        isSending={isSending}
         scrollAfterSendRef={scrollAfterSendRef}
         onRegenerate={handleRegenerate}
         onFeedback={handleFeedback}

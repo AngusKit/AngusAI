@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { toast } from 'sonner';
 import { useDebounce } from '@/hooks/useDebounce';
 import Session from '@/services/Session';
@@ -86,6 +86,10 @@ function messageVoToMessage(vo: MessageVo): Message {
 }
 
 const SESSION_PAGE_SIZE = 10;
+/** 最大缓存消息的会话数量，超出时淘汰最早访问的会话消息，防止内存无限增长导致浏览器崩溃 */
+const MAX_CACHED_MESSAGE_SESSIONS = 20;
+/** 用于 currentMessages 无消息时的稳定引用，避免每次渲染创建新空数组导致子组件重渲染 */
+const EMPTY_MESSAGES: Message[] = [];
 
 export function useChatSessions(initialAppId?: string, initialModelId?: string, initialSessionId?: string) {
   const [sessions, setSessions] = useState<Session[]>([]);
@@ -96,6 +100,15 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
   const [sessionKeyword, setSessionKeyword] = useState('');
   const debouncedSessionKeyword = useDebounce(sessionKeyword, 500);
   const loadedMessagesRef = useRef<Set<string>>(new Set());
+
+  // 使用 ref 持有 sessions 最新值，避免 deleteSession/renameSession/toggleStar 等回调因
+  // sessions 引用变化而重建，从而减少依赖这些回调的子组件的级联重渲染
+  const sessionsRef = useRef(sessions);
+  sessionsRef.current = sessions;
+  const currentSessionIdRef = useRef(currentSessionId);
+  currentSessionIdRef.current = currentSessionId;
+  /** 记录消息缓存的访问顺序（最近访问的在末尾），用于 LRU 淘汰 */
+  const messageCacheOrderRef = useRef<string[]>([]);
 
   const [sessionPage, setSessionPage] = useState(1);
   const [sessionTotal, setSessionTotal] = useState(0);
@@ -163,17 +176,41 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
 
   /** 按 sessionId 内存缓存消息（sessionMessages + loadedMessagesRef），切换会话时优先用缓存，避免重复请求 */
   const loadMessages = useCallback(async (sessionId: string) => {
-    if (loadedMessagesRef.current.has(sessionId)) return;
+    if (loadedMessagesRef.current.has(sessionId)) {
+      // 更新 LRU 访问顺序：将当前 sessionId 移到末尾
+      const order = messageCacheOrderRef.current;
+      const idx = order.indexOf(sessionId);
+      if (idx >= 0) order.splice(idx, 1);
+      order.push(sessionId);
+      return;
+    }
     loadedMessagesRef.current.add(sessionId);
+    // 记录 LRU 访问顺序
+    messageCacheOrderRef.current.push(sessionId);
     setMessagesLoading(true);
     try {
       const res = await Message.getMessageList({ sessionId, pageNo: 1, pageSize: 200 });
       const data = (res as any)?.data;
       const list: MessageVo[] = data?.list ?? [];
       const msgs = list.map(messageVoToMessage);
-      setSessionMessages((prev) => ({ ...prev, [sessionId]: msgs }));
+      setSessionMessages((prev) => {
+        const next = { ...prev, [sessionId]: msgs };
+        // LRU 淘汰：当缓存会话数超过上限时，移除最早访问且非当前会话的消息
+        const order = messageCacheOrderRef.current;
+        while (order.length > MAX_CACHED_MESSAGE_SESSIONS) {
+          const oldest = order.shift();
+          if (oldest && oldest !== currentSessionIdRef.current) {
+            delete next[oldest];
+            loadedMessagesRef.current.delete(oldest);
+          }
+        }
+        return next;
+      });
     } catch (e) {
       loadedMessagesRef.current.delete(sessionId);
+      const order = messageCacheOrderRef.current;
+      const idx = order.indexOf(sessionId);
+      if (idx >= 0) order.splice(idx, 1);
       console.error('Load messages failed:', e);
       toast.error('加载消息历史失败');
     } finally {
@@ -191,8 +228,14 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
     loadMessages(currentSessionId);
   }, [currentSessionId, loadMessages]);
 
-  const currentSession = sessions.find((s) => s.sessionId === currentSessionId);
-  const currentMessages = currentSessionId ? sessionMessages[currentSessionId] ?? [] : [];
+  const currentSession = useMemo(
+    () => sessions.find((s) => s.sessionId === currentSessionId),
+    [sessions, currentSessionId]
+  );
+  const currentMessages = useMemo(
+    () => (currentSessionId ? sessionMessages[currentSessionId] ?? EMPTY_MESSAGES : EMPTY_MESSAGES),
+    [currentSessionId, sessionMessages]
+  );
 
   const createSession = useCallback(
     async (appId: string, modelId?: string, agentId?: string) => {
@@ -235,7 +278,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
 
   const deleteSession = useCallback(
     async (sessionId: string) => {
-      const session = sessions.find((s) => s.sessionId === sessionId || s.id === sessionId);
+      const session = sessionsRef.current.find((s) => s.sessionId === sessionId || s.id === sessionId);
       const sid = session?.sessionId ?? sessionId;
       if (deletingRef.current.has(sid)) return;
       deletingRef.current.add(sid);
@@ -243,8 +286,8 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
       try {
         await Session.deleteSession(sid);
         setSessions((prev) => prev.filter((s) => s.sessionId !== sid && s.id !== sid));
-        if (currentSessionId === sid) {
-          const remaining = sessions.filter((s) => s.sessionId !== sid);
+        if (currentSessionIdRef.current === sid) {
+          const remaining = sessionsRef.current.filter((s) => s.sessionId !== sid);
           setCurrentSessionId(remaining[0]?.sessionId ?? '');
         }
         setSessionTotal((prev) => Math.max(0, Number(prev) - 1));
@@ -262,12 +305,12 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
         deletingRef.current.delete(sid);
       }
     },
-    [sessions, currentSessionId]
+    []
   );
 
   const renameSession = useCallback(
     async (sessionId: string, newTitle: string) => {
-      const session = sessions.find((s) => s.sessionId === sessionId || s.id === sessionId);
+      const session = sessionsRef.current.find((s) => s.sessionId === sessionId || s.id === sessionId);
       const sid = session?.sessionId ?? sessionId;
       const trimmed = newTitle.trim();
       if (!trimmed || trimmed === (session?.title ?? '').trim()) return;
@@ -285,12 +328,12 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
         toast.error('重命名失败');
       }
     },
-    [sessions]
+    []
   );
 
   const toggleStar = useCallback(
     async (sessionId: string) => {
-      const session = sessions.find((s) => s.sessionId === sessionId || s.id === sessionId);
+      const session = sessionsRef.current.find((s) => s.sessionId === sessionId || s.id === sessionId);
       const idToUse = session?.sessionId ?? sessionId;
       const nextStarred = !session?.isStarred;
       try {
@@ -308,7 +351,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
         toast.error('操作失败');
       }
     },
-    [sessions]
+    []
   );
 
   const selectSession = useCallback(
@@ -384,7 +427,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
   /** 更新会话配置（温度、maxTokens 等），持久化到后端 */
   const updateSessionConfig = useCallback(
     async (sessionId: string, config: Partial<SessionConfig>): Promise<boolean> => {
-      const session = sessions.find((s) => s.sessionId === sessionId || s.id === sessionId);
+      const session = sessionsRef.current.find((s) => s.sessionId === sessionId || s.id === sessionId);
       const sid = session?.sessionId ?? sessionId;
       try {
         const mergedConfig: SessionConfig = {
@@ -407,7 +450,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
         return false;
       }
     },
-    [sessions]
+    []
   );
 
   const hasMoreSessions = sessions.length < sessionTotal;
@@ -437,7 +480,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
         recentlyDeletedRef.current.delete(sessionId);
         return null;
       }
-      const existing = sessions.find((s) => s.sessionId === sessionId || s.id === sessionId);
+      const existing = sessionsRef.current.find((s) => s.sessionId === sessionId || s.id === sessionId);
       if (existing) return existing;
       try {
         const res = await Session.getSessionDetail(sessionId);
@@ -449,7 +492,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
           if (seen.has(session.sessionId)) return prev;
           return [session, ...prev].sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
         });
-        setSessionTotal((prev) => Math.max(prev, sessions.length + 1));
+        setSessionTotal((prev) => Math.max(prev, sessionsRef.current.length + 1));
         return session;
       } catch (e) {
         console.error('Fetch session detail failed:', e);
@@ -457,7 +500,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
         return null;
       }
     },
-    [sessions]
+    []
   );
 
   /**

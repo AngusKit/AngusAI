@@ -147,8 +147,8 @@ export function ChatMainArea({
   const SCROLL_THROTTLE_MS = 200;
   /** 距底部小于此像素视为「在底部」，才自动滚动；否则用户已向上查看历史，不打断 */
   const BOTTOM_THRESHOLD_PX = 350;
-  /** 消息数超过此阈值时启用虚拟列表；提高阈值以减少滚动时 Markdown 的 mount/unmount 闪烁 */
-  const VIRTUAL_THRESHOLD = 24;
+  /** 消息数超过此阈值时启用虚拟列表；较低阈值可更早启用虚拟化，减少切换会话时一次性渲染大量 Markdown 的卡顿 */
+  const VIRTUAL_THRESHOLD = 10;
 
   const useVirtual = currentMessages.length > VIRTUAL_THRESHOLD;
   const virtualizer = useVirtualizer({
@@ -156,7 +156,7 @@ export function ChatMainArea({
     getScrollElement: () => messagesContainerRef.current,
     estimateSize: () => 180,
     gap: 24,
-    overscan: 5,
+    overscan: 8,
     getItemKey: (i) => currentMessages[i]?.id ?? String(i),
   });
   const virtualItems = useVirtual ? virtualizer.getVirtualItems() : [];
