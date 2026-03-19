@@ -74,7 +74,7 @@ const SessionItem = memo(function SessionItem({
           />
         ) : (
           <>
-            <p className='text-xs truncate'>{session.title}</p>
+            <p className='text-sm truncate'>{session.title}</p>
             <p className='text-xs text-gray-400 dark:text-gray-300'>
               {(session.messageCount ?? session.messages?.length ?? 0)} 条消息
             </p>
