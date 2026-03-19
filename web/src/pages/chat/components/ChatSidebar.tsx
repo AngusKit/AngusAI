@@ -74,8 +74,8 @@ const SessionItem = memo(function SessionItem({
           />
         ) : (
           <>
-            <p className='text-sm truncate'>{session.title}</p>
-            <p className='text-xs text-gray-500 dark:text-gray-400'>
+            <p className='text-xs truncate'>{session.title}</p>
+            <p className='text-xs text-gray-400 dark:text-gray-300'>
               {(session.messageCount ?? session.messages?.length ?? 0)} 条消息
             </p>
           </>
@@ -140,7 +140,7 @@ const SessionGroup = memo(function SessionGroup({
 }: SessionGroupProps) {
   if (sessions.length === 0) return null;
   return (
-    <div className='mb-2'>
+    <div className='mb-4'>
       <h3 className='text-xs text-gray-500 dark:text-gray-400 px-2 mb-1 flex items-center gap-1.5'>
         <Clock className='w-2.5 h-2.5' />
         {title}
@@ -367,7 +367,7 @@ export function ChatSidebar({
           className='flex-1 overflow-y-auto min-h-0 scrollbar-hide'
           onScroll={handleSessionListScroll}
         >
-          <div className='p-2'>
+          <div className='p-4'>
             <SessionGroup title='今天' sessions={groupedSessions.today} {...sessionListProps} />
             <SessionGroup title='昨天' sessions={groupedSessions.yesterday} {...sessionListProps} />
             <SessionGroup title='最近7天' sessions={groupedSessions.lastWeek} {...sessionListProps} />
