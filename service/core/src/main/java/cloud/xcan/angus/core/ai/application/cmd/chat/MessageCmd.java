@@ -39,4 +39,9 @@ public interface MessageCmd {
    */
   void setStreaming(Message message, Boolean isStreaming);
 
+  /**
+   * 更新消息内容
+   */
+  void updateContent(Message message);
+
 }

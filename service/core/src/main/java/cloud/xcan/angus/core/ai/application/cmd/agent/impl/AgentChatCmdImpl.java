@@ -26,6 +26,7 @@ import cloud.xcan.angus.core.ai.domain.chat.openai.OpenAIChatCompletionChunk;
 import cloud.xcan.angus.core.ai.domain.chat.openai.OpenAIChatCompletionsResponse;
 import cloud.xcan.angus.core.ai.domain.model.Model;
 import cloud.xcan.angus.core.ai.infra.agent.utils.ChatConfigMergeUtils;
+import cloud.xcan.angus.core.ai.infra.agent.ActiveStreamRegistry;
 import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.remote.message.SysException;
 import cloud.xcan.angus.spec.principal.Principal;
@@ -33,6 +34,7 @@ import cloud.xcan.angus.spec.principal.PrincipalContext;
 import dev.langchain4j.service.TokenStream;
 import jakarta.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -80,6 +82,9 @@ public class AgentChatCmdImpl implements AgentChatCmd {
   @Resource
   @Qualifier("sseEmitterChatExecutor")
   private Executor sseEmitterChatExecutor;
+
+  @Resource
+  private ActiveStreamRegistry activeStreamRegistry;
 
   @Override
   public AgentChatResult chat(Session sessionDb, String message, SessionConfig requestConfig) {
@@ -192,10 +197,17 @@ public class AgentChatCmdImpl implements AgentChatCmd {
         final Model modelForAsync = model;
         final Long userMessageIdForLog = userMessage.getId();
         Principal principal = PrincipalContext.get();
+        Long assistantMessageId = assistantMessage.getId();
+        AtomicBoolean cancelled = new AtomicBoolean(false);
+        ActiveStreamRegistry.StreamContext streamCtx = new ActiveStreamRegistry.StreamContext(
+            emitter, cancelled, new StringBuilder(), assistantMessage, messageCmd);
+        activeStreamRegistry.register(assistantMessageId, streamCtx);
+        emitter.onCompletion(() -> activeStreamRegistry.remove(assistantMessageId));
+        emitter.onTimeout(() -> activeStreamRegistry.remove(assistantMessageId));
         sseEmitterChatExecutor.execute(() -> {
           log.info("Chat [{}]-[{}] start sseEmitterChatExecutor, override: {}",
               sessionDb.getSessionId(), userMessage.getId(), override);
-          StringBuilder fullContent = new StringBuilder();
+          StringBuilder fullContent = streamCtx.getFullContent();
           long streamStartMs = System.currentTimeMillis();
           final boolean[] isFirstChunk = {true};
           try {
@@ -204,6 +216,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
                 modelIdStr, override)
                 : agentRegistry.chatStream(agentIdStr, sessionDb.getSessionId(), message);
             stream.onPartialResponse(token -> {
+                  if (cancelled.get()) return;
                   fullContent.append(token);
                   OpenAIChatCompletionChunk chunk;
                   if (isFirstChunk[0]) {
@@ -211,6 +224,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
                     chunk = OpenAIChatCompletionChunk.builder()
                         .id("chatcmpl-stream")
                         .sessionId(sessionDb.getSessionId())
+                        .messageId(assistantMessageId)
                         .object("chat.completion.chunk")
                         .created(System.currentTimeMillis() / 1000)
                         .model(agent.getEncoding())
@@ -231,6 +245,8 @@ public class AgentChatCmdImpl implements AgentChatCmd {
                   } catch (Exception e) {
                     log.error("Chat [{}]-[{}] error sending chunk: {}", sessionDb.getSessionId(),
                         userMessage.getId(), e.getMessage());
+                    assistantMessage.setContent(fullContent.toString());
+                    messageCmd.setStreaming(assistantMessage, false);
                     // org.springframework.web.context.request.async.AsyncRequestTimeoutException: null
                     // org.springframework.web.context.request.async.AsyncRequestNotUsableException: ServletOutputStream failed to write: Broken pipe
                     emitter.completeWithError(e);

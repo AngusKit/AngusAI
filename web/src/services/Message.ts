@@ -44,6 +44,23 @@ export class Message<SecurityDataType = unknown> {
     });
 
   /**
+   * @description 根据消息ID查询单条消息详情，用于 SSE 断开后轮询等待生成完成
+   *
+   * @tags 对话消息
+   * @name GetMessage
+   * @summary 获取消息详情
+   * @request GET:/api/v1/chat/messages/{messageId}
+   * @secure
+   */
+  getMessage = (messageId: string | number, params: RequestParams = {}) =>
+    this.http.request<MessageResult>({
+      path: `${AI}/chat/messages/${messageId}`,
+      method: 'GET',
+      secure: true,
+      ...params,
+    });
+
+  /**
    * @description 清空指定会话的所有消息
    *
    * @tags 对话消息

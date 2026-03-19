@@ -6,6 +6,7 @@ import static cloud.xcan.angus.core.utils.CoreUtils.buildVoPageResult;
 
 import cloud.xcan.angus.core.ai.application.cmd.chat.MessageCmd;
 import cloud.xcan.angus.core.ai.application.cmd.chat.SessionCmd;
+import cloud.xcan.angus.core.ai.infra.agent.ActiveStreamRegistry;
 import cloud.xcan.angus.core.ai.application.query.chat.MessageQuery;
 import cloud.xcan.angus.core.ai.application.query.chat.SessionQuery;
 import cloud.xcan.angus.core.ai.domain.chat.Message;
@@ -39,6 +40,9 @@ public class MessageFacadeImpl implements MessageFacade {
 
   @Resource
   private SessionQuery sessionQuery;
+
+  @Resource
+  private ActiveStreamRegistry activeStreamRegistry;
 
   @Override
   public AttachmentUploadVo uploadAttachment(MultipartFile file, Long messageId) {
@@ -77,9 +81,19 @@ public class MessageFacadeImpl implements MessageFacade {
   @Override
   public MessageVo stopGeneration(Long messageId) {
     Message message = messageQuery.findAndCheck(messageId);
-    if (Boolean.TRUE.equals(message.getIsStreaming())) {
+    ActiveStreamRegistry.StreamContext ctx = activeStreamRegistry.remove(messageId);
+    if (ctx != null) {
+      ctx.getCancelled().set(true);
+      message.setContent(ctx.getFullContent().toString());
+      messageCmd.updateContent(message);
       messageCmd.setStreaming(message, false);
-      return MessageAssembler.toMessageVo(message);
+      try {
+        ctx.getEmitter().complete();
+      } catch (Exception e) {
+        // emitter 可能已关闭，忽略
+      }
+    } else if (Boolean.TRUE.equals(message.getIsStreaming())) {
+      messageCmd.setStreaming(message, false);
     }
     return MessageAssembler.toMessageVo(message);
   }
@@ -104,6 +118,13 @@ public class MessageFacadeImpl implements MessageFacade {
   public void deleteAttachment(Long id) {
     // 删除附件
     // fileStorageService.deleteFile(id);
+  }
+
+  @NameJoin
+  @Override
+  public MessageVo getMessage(Long messageId) {
+    Message message = messageQuery.findAndCheck(messageId);
+    return MessageAssembler.toMessageVo(message);
   }
 
   @NameJoin

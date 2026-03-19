@@ -30,6 +30,10 @@ public class OpenAIChatCompletionChunk {
   @Schema(description = "会话 ID，无会话模式时首块携带，供前端建立关联；有会话模式时通常不传")
   private String sessionId;
 
+  @JsonProperty("message_id")
+  @Schema(description = "助手消息 DB ID，首块携带，供前端停止生成和轮询使用")
+  private Long messageId;
+
   @Schema(description = "对象类型，流式固定为 chat.completion.chunk", example = "chat.completion.chunk")
   private String object;
 

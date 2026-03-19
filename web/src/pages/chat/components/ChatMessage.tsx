@@ -58,9 +58,11 @@ interface ChatMessageProps {
   onRegenerate?: () => void;
   /** 消息反馈回调（点赞/点踩），点踩时需填写 comment */
   onFeedback?: (messageId: string, feedbackType: 'like' | 'dislike', comment?: string) => void;
+  /** 停止生成回调 */
+  onStopGenerate?: (messageId: string) => void;
 }
 
-const ChatMessageInner = ({ message, isLastAssistant, onRegenerate, onFeedback }: ChatMessageProps) => {
+const ChatMessageInner = ({ message, isLastAssistant, onRegenerate, onFeedback, onStopGenerate }: ChatMessageProps) => {
   const [copied, setCopied] = useState(false);
   const [liked, setLiked] = useState<boolean | null>(() => {
     const ft = message.feedbackType;
@@ -359,7 +361,7 @@ const ChatMessageInner = ({ message, isLastAssistant, onRegenerate, onFeedback }
             </div>
           )}
 
-          {/* Streaming Indicator */}
+          {/* Streaming Indicator + 停止按钮 */}
           {message.isStreaming && (
             <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
               <div className="flex gap-1">
@@ -377,6 +379,16 @@ const ChatMessageInner = ({ message, isLastAssistant, onRegenerate, onFeedback }
                 />
               </div>
               正在生成...
+              {onStopGenerate && message.id && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-xs"
+                  onClick={() => onStopGenerate(message.id!)}
+                >
+                  停止
+                </Button>
+              )}
             </div>
           )}
         </div>

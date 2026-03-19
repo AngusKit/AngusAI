@@ -348,7 +348,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
 
   /** 更新指定消息内容（用于流式响应、反馈等）；流式生成期间仅更新 sessionMessages，避免频繁更新 sessions 导致侧边栏闪动 */
   const updateMessage = useCallback(
-    (sessionId: string, messageId: string, patch: Partial<Pick<Message, 'content' | 'isStreaming' | 'feedbackType'>>) => {
+    (sessionId: string, messageId: string, patch: Partial<Pick<Message, 'content' | 'isStreaming' | 'feedbackType' | 'id'>>) => {
       setSessionMessages((prev) => {
         const current = prev[sessionId] ?? [];
         return {

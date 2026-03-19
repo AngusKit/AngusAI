@@ -80,6 +80,8 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
   const lastCompositionEndRef = useRef(0);
   const scrollAfterSendRef = useRef(false);
   const lastDeleteRef = useRef<{ id: string; t: number }>({ id: '', t: 0 });
+  /** 流式生成时后端下发的 messageId，用于 updateMessage 和停止生成 */
+  const streamingMessageIdRef = useRef<number | null>(null);
 
   const handleBack = () => {
     onBack ? onBack() : navigate('/dashboard');
@@ -235,7 +237,12 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
         if (aid) chatPayload.agentId = String(aid);
       }
 
+      const streamMsgIdRef = { current: null as number | null };
       await chatStream(chatPayload, {
+        onMessageId: (msgId) => {
+          streamMsgIdRef.current = msgId;
+          updateMessage(effectiveKeyRef.current, assistantId, { id: String(msgId) });
+        },
         onSessionId: (sessionId) => {
           if (displayKey.startsWith('pending-')) {
             effectiveKeyRef.current = sessionId;
@@ -261,12 +268,14 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
             const now = Date.now();
             if (now - lastFlush >= STREAM_THROTTLE_MS) {
               lastFlush = now;
-              updateMessage(effectiveKeyRef.current, assistantId, { content: accumulated });
+              const idForUpdate = streamMsgIdRef.current != null ? String(streamMsgIdRef.current) : assistantId;
+              updateMessage(effectiveKeyRef.current, idForUpdate, { content: accumulated });
             }
           };
         })(),
       });
-      updateMessage(effectiveKeyRef.current, assistantId, { content: accumulated, isStreaming: false });
+      const idForFinal = streamMsgIdRef.current != null ? String(streamMsgIdRef.current) : assistantId;
+      updateMessage(effectiveKeyRef.current, idForFinal, { content: accumulated, isStreaming: false });
     } catch (err) {
       const msg = err instanceof Error ? err.message : '请求失败';
       updateMessage(effectiveKeyRef.current, assistantId, {
@@ -322,6 +331,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
       let accumulated = '';
       let lastFlush = 0;
       const STREAM_THROTTLE_MS = 60;
+      const regenMsgIdRef = { current: null as number | null };
       await chatStream(
         {
           sessionId: currentSessionId,
@@ -329,17 +339,23 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
           config: configPayload,
         },
         {
+          onMessageId: (msgId) => {
+            regenMsgIdRef.current = msgId;
+            updateMessage(currentSessionId, assistantId, { id: String(msgId) });
+          },
           onToken: (token) => {
             accumulated += token;
             const now = Date.now();
             if (now - lastFlush >= STREAM_THROTTLE_MS) {
               lastFlush = now;
-              updateMessage(currentSessionId, assistantId, { content: accumulated });
+              const idForUpdate = regenMsgIdRef.current != null ? String(regenMsgIdRef.current) : assistantId;
+              updateMessage(currentSessionId, idForUpdate, { content: accumulated });
             }
           },
         }
       );
-      updateMessage(currentSessionId, assistantId, { content: accumulated, isStreaming: false });
+      const idForFinal = regenMsgIdRef.current != null ? String(regenMsgIdRef.current) : assistantId;
+      updateMessage(currentSessionId, idForFinal, { content: accumulated, isStreaming: false });
     } catch (err) {
       const msg = err instanceof Error ? err.message : '请求失败';
       updateMessage(currentSessionId, assistantId, {
@@ -359,6 +375,46 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     settings,
     maxConcurrentChats,
   ]);
+
+  const handleStopGenerate = useCallback(async (messageId: string) => {
+    try {
+      const res = await MessageApi.stopGeneration(messageId);
+      const data = (res as { data?: { content?: string; isStreaming?: boolean } })?.data;
+      if (data && currentSessionId) {
+        updateMessage(currentSessionId, messageId, {
+          content: data.content ?? '',
+          isStreaming: false,
+        });
+      }
+    } catch (e) {
+      console.error('Stop generation failed:', e);
+      toast.error('停止生成失败');
+    }
+  }, [currentSessionId, updateMessage]);
+
+  /** SSE 断开后轮询：若最后一条助手消息在流式生成中，每 3 秒拉取详情直到完成 */
+  const POLL_INTERVAL_MS = 3000;
+  useEffect(() => {
+    if (!currentSessionId || messagesLoading) return;
+    const last = currentMessages[currentMessages.length - 1];
+    if (!last || last.role !== 'assistant' || !last.isStreaming || !last.id) return;
+    const timer = setInterval(async () => {
+      try {
+        const res = await MessageApi.getMessage(last.id!);
+        const data = (res as { data?: { isStreaming?: boolean; content?: string } })?.data;
+        if (data && !data.isStreaming) {
+          updateMessage(currentSessionId, last.id, {
+            content: data.content ?? '',
+            isStreaming: false,
+          });
+          clearInterval(timer);
+        }
+      } catch {
+        /* 忽略轮询错误 */
+      }
+    }, POLL_INTERVAL_MS);
+    return () => clearInterval(timer);
+  }, [currentMessages, currentSessionId, messagesLoading, updateMessage]);
 
   const handleFeedback = useCallback(async (messageId: string, feedbackType: 'like' | 'dislike', comment?: string) => {
     if (!currentSessionId) return;
@@ -600,6 +656,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
         scrollAfterSendRef={scrollAfterSendRef}
         onRegenerate={handleRegenerate}
         onFeedback={handleFeedback}
+        onStopGenerate={handleStopGenerate}
       />
 
       {/* Prompt Library Dialog（enablePromptLibrary 关闭时仍允许通过其他入口打开，此处按配置控制） */}

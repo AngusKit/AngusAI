@@ -29,14 +29,14 @@ public interface MessageFacade {
   void clearFeedback(Long messageId);
 
   /**
-   * 删除消息
-   */
-  void deleteMessage(Long messageId);
-
-  /**
    * 停止生成
    */
   MessageVo stopGeneration(Long messageId);
+
+  /**
+   * 删除消息
+   */
+  void deleteMessage(Long messageId);
 
   /**
    * 清空会话消息
@@ -49,6 +49,11 @@ public interface MessageFacade {
   void deleteAttachment(Long id);
 
   /**
+   * 根据消息 ID 查询单条消息详情（用于 SSE 断开后轮询）
+   */
+  MessageVo getMessage(Long messageId);
+
+  /**
    * 获取消息历史
    */
   PageResult<MessageVo> list(MessageFindDto dto);
@@ -57,4 +62,5 @@ public interface MessageFacade {
    * 获取对话统计
    */
   ChatStatisticsVo getChatStatistics(String period);
+
 }

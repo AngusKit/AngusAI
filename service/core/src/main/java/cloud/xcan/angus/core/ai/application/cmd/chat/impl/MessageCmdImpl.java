@@ -125,6 +125,12 @@ public class MessageCmdImpl extends CommCmd<Message, Long> implements MessageCmd
   }
 
   @Override
+  @Transactional
+  public void updateContent(Message message) {
+    messageRepo.save(message);
+  }
+
+  @Override
   protected BaseRepository<Message, Long> getRepository() {
     return messageRepo;
   }

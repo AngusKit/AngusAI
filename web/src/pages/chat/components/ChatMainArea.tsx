@@ -92,6 +92,8 @@ export interface ChatMainAreaProps {
   onRegenerate?: () => void;
   /** 消息反馈（点赞/点踩），点踩时需填写 comment */
   onFeedback?: (messageId: string, feedbackType: 'like' | 'dislike', comment?: string) => void;
+  /** 停止生成回调 */
+  onStopGenerate?: (messageId: string) => void;
 }
 
 export function ChatMainArea({
@@ -135,6 +137,7 @@ export function ChatMainArea({
                                scrollAfterSendRef,
                                onRegenerate,
                                onFeedback,
+                               onStopGenerate,
                              }: ChatMainAreaProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -373,6 +376,7 @@ export function ChatMainArea({
                         }
                         onRegenerate={onRegenerate}
                         onFeedback={onFeedback}
+                        onStopGenerate={onStopGenerate}
                       />
                     </div>
                   );
@@ -387,8 +391,9 @@ export function ChatMainArea({
                   key={message.id}
                   message={message}
                   isLastAssistant={index === currentMessages.length - 1 && message.role === 'assistant'}
-                  onRegenerate={onRegenerate}
-                  onFeedback={onFeedback}
+                onRegenerate={onRegenerate}
+                onFeedback={onFeedback}
+                onStopGenerate={onStopGenerate}
                 />
               ))}
               <div ref={messagesEndRef} />

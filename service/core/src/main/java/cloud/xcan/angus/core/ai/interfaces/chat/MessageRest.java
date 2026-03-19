@@ -63,19 +63,19 @@ public class MessageRest {
     messageFacade.clearFeedback(messageId);
   }
 
+  @Operation(operationId = "stopGeneration", summary = "停止生成", description = "停止当前正在生成的消息")
+  @PostMapping("/stop")
+  public ApiLocaleResult<MessageVo> stop(
+      @Parameter(description = "消息ID") @RequestParam Long messageId) {
+    return ApiLocaleResult.success(messageFacade.stopGeneration(messageId));
+  }
+
   @Operation(operationId = "deleteMessage", summary = "删除消息", description = "根据消息ID删除单条消息")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @DeleteMapping("/{messageId}")
   public void deleteMessage(
       @Parameter(description = "消息ID") @PathVariable Long messageId) {
     messageFacade.deleteMessage(messageId);
-  }
-
-  @Operation(operationId = "stopGeneration", summary = "停止生成", description = "停止当前正在生成的消息")
-  @PostMapping("/stop")
-  public ApiLocaleResult<MessageVo> stop(
-      @Parameter(description = "消息ID") @RequestParam Long messageId) {
-    return ApiLocaleResult.success(messageFacade.stopGeneration(messageId));
   }
 
   @Operation(operationId = "clearMessages", summary = "清空当前对话", description = "清空指定会话的所有消息")
@@ -90,6 +90,13 @@ public class MessageRest {
   @DeleteMapping("/attachments/{id}")
   public void deleteAttachment(@Parameter(description = "附件ID") @PathVariable Long id) {
     messageFacade.deleteAttachment(id);
+  }
+
+  @Operation(operationId = "getMessage", summary = "获取消息详情", description = "根据消息ID查询单条消息详情，用于 SSE 断开后轮询等待生成完成")
+  @GetMapping("/{messageId}")
+  public ApiLocaleResult<MessageVo> getMessage(
+      @Parameter(description = "消息ID") @PathVariable Long messageId) {
+    return ApiLocaleResult.success(messageFacade.getMessage(messageId));
   }
 
   @Operation(operationId = "getMessageList", summary = "获取消息列表", description = "获取消息列表，支持分页、搜索和筛选（按会话、角色、流式状态、反馈类型等）")

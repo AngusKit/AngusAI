@@ -54,6 +54,7 @@ export async function chatStream(
   callbacks: {
     onToken: (token: string) => void;
     onSessionId?: (sessionId: string) => void;
+    onMessageId?: (messageId: number) => void;
     onError?: (err: Error) => void;
   }
 ): Promise<void> {
@@ -109,6 +110,8 @@ export async function chatStream(
           const obj = JSON.parse(payload) as OpenAIChatCompletionChunk & { sessionId?: string };
           const sid = obj?.session_id ?? obj?.sessionId;
           if (sid) callbacks.onSessionId?.(sid);
+          const mid = obj?.message_id;
+          if (mid != null) callbacks.onMessageId?.(mid);
           const content = obj?.choices?.[0]?.delta?.content;
           if (content) callbacks.onToken(content);
         } catch {
@@ -126,6 +129,8 @@ export async function chatStream(
             const obj = JSON.parse(payload) as OpenAIChatCompletionChunk & { sessionId?: string };
             const sid = obj?.session_id ?? obj?.sessionId;
             if (sid) callbacks.onSessionId?.(sid);
+            const mid = obj?.message_id;
+            if (mid != null) callbacks.onMessageId?.(mid);
             const content = obj?.choices?.[0]?.delta?.content;
             if (content) callbacks.onToken(content);
           } catch {
