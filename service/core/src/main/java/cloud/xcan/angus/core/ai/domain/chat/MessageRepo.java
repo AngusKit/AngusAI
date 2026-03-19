@@ -157,4 +157,27 @@ public interface MessageRepo extends BaseRepository<Message, Long> {
   List<Object[]> countFeedbackByHourForDay(@Param("dayStart") LocalDateTime dayStart,
       @Param("dayEnd") LocalDateTime dayEnd);
 
+  /**
+   * 按模型 ID 统计指定时间范围内的消息数（用于吞吐量：每分钟消息数）。 返回 List<Object[]>: [modelId, count]。
+   */
+  @Query(value = "SELECT m.model_id, COUNT(*) FROM ai_chat_message m "
+      + "WHERE m.model_id IN (:modelIds) AND m.created_date >= :start AND m.created_date <= :end "
+      + "GROUP BY m.model_id", nativeQuery = true)
+  List<Object[]> countByModelIdBetween(@Param("modelIds") List<Long> modelIds,
+      @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+
+  /**
+   * 按模型 ID 统计助理消息的反馈准确率。 准确 = feedback_type 为空、空串或 'like'；不准确 = 'dislike'。 返回
+   * List<Object[]>: [modelId, accurateCount, inaccurateCount]。仅统计 role='ASSISTANT' 的消息。
+   */
+  @Query(value = "SELECT m.model_id, "
+      + "SUM(CASE WHEN (m.feedback_type IS NULL OR m.feedback_type = '' OR m.feedback_type = 'like') THEN 1 ELSE 0 END) AS accurate, "
+      + "SUM(CASE WHEN m.feedback_type = 'dislike' THEN 1 ELSE 0 END) AS inaccurate "
+      + "FROM ai_chat_message m "
+      + "WHERE m.model_id IN (:modelIds) AND m.role = 'ASSISTANT' "
+      + "AND m.created_date >= :start AND m.created_date <= :end "
+      + "GROUP BY m.model_id", nativeQuery = true)
+  List<Object[]> countFeedbackAccuracyByModelId(@Param("modelIds") List<Long> modelIds,
+      @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+
 }

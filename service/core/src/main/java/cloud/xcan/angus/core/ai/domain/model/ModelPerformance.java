@@ -13,10 +13,10 @@ public class ModelPerformance {
   @Schema(description = "延迟（毫秒）")
   private Double latencyMs;
 
-  @Schema(description = "吞吐量（可读格式，如：100 req/s）")
+  @Schema(description = "吞吐量（每分钟消息数，如：12 msg/min）")
   private String throughput;
 
-  @Schema(description = "吞吐量原始值")
+  @Schema(description = "吞吐量原始值（每分钟消息数）")
   private Double throughputRaw;
 
   @Schema(description = "准确率（可读格式，如：98%）")

@@ -67,7 +67,7 @@ export const formatThroughput = (performance?: ModelDetailVo['performance']): st
     return performance.throughput;
   }
   if (performance.throughputRaw !== undefined && performance.throughputRaw !== null) {
-    return `${performance.throughputRaw} req/s`;
+    return `${performance.throughputRaw} msg/min`;
   }
   return '--';
 };

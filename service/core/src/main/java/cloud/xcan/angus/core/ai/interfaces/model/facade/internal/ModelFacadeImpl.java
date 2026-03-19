@@ -31,6 +31,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
@@ -107,7 +108,14 @@ public class ModelFacadeImpl implements ModelFacade {
   @Override
   public ModelDetailVo getDetail(Long id) {
     Model model = modelQuery.findAndCheck(id);
-    return ModelAssembler.toDetailVo(model);
+    // 计算并填充 stats、performance（与列表接口一致，使用今日统计）
+    LocalDate today = LocalDate.now();
+    LocalDateTime todayStart = today.atStartOfDay();
+    LocalDateTime todayEnd = today.plusDays(1).atStartOfDay();
+    Map<Long, ModelQuery.ModelDetailStats> statsMap = modelQuery.getDetailStatsForModelIds(
+        model.getId() != null ? List.of(model.getId()) : List.of(), todayStart, todayEnd);
+    ModelQuery.ModelDetailStats detailStats = model.getId() != null ? statsMap.get(model.getId()) : null;
+    return ModelAssembler.toDetailVo(model, detailStats);
   }
 
   @NameJoin
@@ -123,7 +131,7 @@ public class ModelFacadeImpl implements ModelFacade {
     LocalDateTime todayEnd = today.plusDays(1).atStartOfDay();
     List<Long> modelIds = page.getContent().stream()
         .map(Model::getId)
-        .filter(id -> id != null)
+        .filter(Objects::nonNull)
         .toList();
     Map<Long, ModelQuery.ModelDetailStats> statsMap = modelQuery.getDetailStatsForModelIds(
         modelIds, todayStart, todayEnd);

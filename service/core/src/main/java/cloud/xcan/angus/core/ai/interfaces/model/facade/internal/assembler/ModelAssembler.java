@@ -26,6 +26,39 @@ public class ModelAssembler {
   private static final String API_KEY_MASK = "**************";
 
   /**
+   * 从 ModelDetailStats 构建 ModelPerformance（延迟、吞吐量、准确率）
+   */
+  private static ModelPerformance buildPerformance(ModelDetailStats detailStats) {
+    if (detailStats == null) {
+      return null;
+    }
+    boolean hasLatency = detailStats.avgResponseTimeMs() != null;
+    boolean hasThroughput = detailStats.throughputMsgPerMin() != null;
+    boolean hasAccuracy = detailStats.accuracyPercent() != null;
+    if (!hasLatency && !hasThroughput && !hasAccuracy) {
+      return null;
+    }
+    ModelPerformance perf = new ModelPerformance();
+    if (hasLatency) {
+      perf.setLatencyMs(detailStats.avgResponseTimeMs());
+      double sec = detailStats.avgResponseTimeMs() / 1000.0;
+      perf.setLatency(sec >= 1 ? String.format("%.2fs", sec)
+          : (int) Math.round(detailStats.avgResponseTimeMs()) + "ms");
+    }
+    if (hasThroughput) {
+      double tp = detailStats.throughputMsgPerMin();
+      perf.setThroughputRaw(tp);
+      perf.setThroughput(String.format("%.2f msg/min", tp));
+    }
+    if (hasAccuracy) {
+      double acc = detailStats.accuracyPercent();
+      perf.setAccuracyPercent(acc);
+      perf.setAccuracy(String.format("%.1f%%", acc));
+    }
+    return perf;
+  }
+
+  /**
    * 对 config 中的 apiKey 进行脱敏，返回脱敏后的副本（避免修改原对象）
    */
   public static ModelConfigDefinition maskApiKey(ModelConfigDefinition config) {
@@ -117,6 +150,13 @@ public class ModelAssembler {
   }
 
   public static ModelDetailVo toDetailVo(Model model) {
+    return toDetailVo(model, null);
+  }
+
+  /**
+   * 转换为详情 VO，支持通过 detailStats 填充 stats、performance（与列表接口计算逻辑一致）
+   */
+  public static ModelDetailVo toDetailVo(Model model, ModelDetailStats detailStats) {
     ModelDetailVo vo = new ModelDetailVo();
     vo.setId(model.getId());
     vo.setName(model.getName());
@@ -130,25 +170,38 @@ public class ModelAssembler {
     // 设置访问限制
     vo.setAccessLimit(model.getAccessLimit());
 
-    // 设置性能指标
-    vo.setPerformance(model.getPerformance());
-    // 设置统计数据
-    ModelStats stats = model.getStats();
-    if (stats != null && stats.getTotalCost() != null) {
-      stats.setTotalCostDisplay(formatCostFromDollars(stats.getTotalCost()));
+    // 设置性能指标、统计数据：优先用 detailStats（从 ChatUsageLog 计算），否则用 model 自带的
+    if (detailStats != null) {
+      ModelStats stats = new ModelStats();
+      stats.setTotalCalls(detailStats.totalCalls());
+      stats.setTotalTokens(detailStats.totalTokens());
+      stats.setTotalCost(detailStats.totalCost());
+      stats.setTotalCostDisplay(detailStats.totalCostDisplay());
+      vo.setStats(stats);
+
+      ModelPerformance perf = buildPerformance(detailStats);
+      if (perf != null) {
+        vo.setPerformance(perf);
+      }
+    } else {
+      vo.setPerformance(model.getPerformance());
+      ModelStats stats = model.getStats();
+      if (stats != null && stats.getTotalCost() != null) {
+        stats.setTotalCostDisplay(formatCostFromDollars(stats.getTotalCost()));
+      }
+      if (stats != null && stats.getLastMonthGrowthTrend() != null
+          && stats.getLastMonthGrowthTrend().getAddedCost() != null) {
+        stats.getLastMonthGrowthTrend()
+            .setAddedCostDisplay(
+                formatCostFromDollars(stats.getLastMonthGrowthTrend().getAddedCost()));
+      }
+      if (stats != null && stats.getTodayGrowthTrend() != null
+          && stats.getTodayGrowthTrend().getAddedCost() != null) {
+        stats.getTodayGrowthTrend()
+            .setAddedCostDisplay(formatCostFromDollars(stats.getTodayGrowthTrend().getAddedCost()));
+      }
+      vo.setStats(stats);
     }
-    if (stats != null && stats.getLastMonthGrowthTrend() != null
-        && stats.getLastMonthGrowthTrend().getAddedCost() != null) {
-      stats.getLastMonthGrowthTrend()
-          .setAddedCostDisplay(
-              formatCostFromDollars(stats.getLastMonthGrowthTrend().getAddedCost()));
-    }
-    if (stats != null && stats.getTodayGrowthTrend() != null
-        && stats.getTodayGrowthTrend().getAddedCost() != null) {
-      stats.getTodayGrowthTrend()
-          .setAddedCostDisplay(formatCostFromDollars(stats.getTodayGrowthTrend().getAddedCost()));
-    }
-    vo.setStats(stats);
 
     // 设置审计信息
     vo.setTenantId(model.getTenantId());
@@ -191,12 +244,8 @@ public class ModelAssembler {
       stats.setTotalCostDisplay(detailStats.totalCostDisplay());
       vo.setStats(stats);
 
-      if (detailStats.avgResponseTimeMs() != null) {
-        ModelPerformance perf = new ModelPerformance();
-        perf.setLatencyMs(detailStats.avgResponseTimeMs());
-        double sec = detailStats.avgResponseTimeMs() / 1000.0;
-        perf.setLatency(sec >= 1 ? String.format("%.2fs", sec)
-            : (int) Math.round(detailStats.avgResponseTimeMs()) + "ms");
+      ModelPerformance perf = buildPerformance(detailStats);
+      if (perf != null) {
         vo.setPerformance(perf);
       }
     }

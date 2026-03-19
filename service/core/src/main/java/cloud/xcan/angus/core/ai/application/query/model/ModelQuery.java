@@ -72,10 +72,18 @@ public interface ModelQuery {
 
   /**
    * 模型详情统计（用于列表卡片展示）
+   *
+   * @param throughputMsgPerMin 每分钟消息数（完整近一分钟内的消息数），可为 null
+   * @param accuracyPercent    准确率（0-100），按助理消息反馈：空/like=准确，dislike=不准确，可为 null
    */
   record ModelDetailStats(long totalCalls, long totalTokens, double totalCost,
-                          String totalCostDisplay, Double avgResponseTimeMs) {
+                          String totalCostDisplay, Double avgResponseTimeMs,
+                          Double throughputMsgPerMin, Double accuracyPercent) {
 
+    public ModelDetailStats(long totalCalls, long totalTokens, double totalCost,
+        String totalCostDisplay, Double avgResponseTimeMs) {
+      this(totalCalls, totalTokens, totalCost, totalCostDisplay, avgResponseTimeMs, null, null);
+    }
   }
 
 }

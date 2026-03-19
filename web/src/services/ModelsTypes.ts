@@ -104,10 +104,10 @@ export interface ModelPerformance {
    * @format double
    */
   latencyMs?: number;
-  /** 吞吐量（可读格式，如：100 req/s） */
+  /** 吞吐量（每分钟消息数，可读格式，如：12 msg/min） */
   throughput?: string;
   /**
-   * 吞吐量原始值
+   * 吞吐量原始值（每分钟消息数）
    */
   throughputRaw?: number;
   /** 准确率（可读格式，如：98%） */

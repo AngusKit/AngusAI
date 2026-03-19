@@ -9,6 +9,7 @@ import static cloud.xcan.angus.core.ai.infra.util.TimeRangeUtils.parseStartDate;
 import cloud.xcan.angus.core.ai.application.query.analytics.ChatAnalyticsQuery;
 import cloud.xcan.angus.core.ai.application.query.model.ModelQuery;
 import cloud.xcan.angus.core.ai.domain.chat.ChatUsageLogRepo;
+import cloud.xcan.angus.core.ai.domain.chat.MessageRepo;
 import cloud.xcan.angus.core.ai.domain.model.LastMonthGrowthTrend;
 import cloud.xcan.angus.core.ai.domain.model.Model;
 import cloud.xcan.angus.core.ai.domain.model.ModelRepo;
@@ -49,6 +50,9 @@ public class ModelQueryImpl implements ModelQuery {
 
   @Resource
   private ChatUsageLogRepo chatUsageLogRepo;
+
+  @Resource
+  private MessageRepo messageRepo;
 
   @Override
   public Model findAndCheck(Long id) {
@@ -226,6 +230,33 @@ public class ModelQueryImpl implements ModelQuery {
       return result;
     }
     List<Object[]> rows = chatUsageLogRepo.groupByModelIds(modelIds, start, end);
+    // 吞吐量：完整近一分钟内的消息数（参考 ChatMonitorQuery.getOverview）
+    LocalDateTime now = LocalDateTime.now();
+    LocalDateTime lastMinuteStart = now.minusMinutes(1).withSecond(0).withNano(0);
+    LocalDateTime lastMinuteEnd = lastMinuteStart.plusMinutes(1).minusNanos(1);
+    Map<Long, Long> throughputByModel = new HashMap<>();
+    List<Object[]> throughputRows = messageRepo.countByModelIdBetween(modelIds, lastMinuteStart,
+        lastMinuteEnd);
+    for (Object[] r : throughputRows) {
+      Long mid = r[0] != null ? ((Number) r[0]).longValue() : null;
+      long cnt = r[1] != null ? ((Number) r[1]).longValue() : 0L;
+      if (mid != null) {
+        throughputByModel.put(mid, cnt);
+      }
+    }
+    // 准确率：助理消息反馈，空/like=准确，dislike=不准确
+    Map<Long, Double> accuracyByModel = new HashMap<>();
+    List<Object[]> accuracyRows = messageRepo.countFeedbackAccuracyByModelId(modelIds, start, end);
+    for (Object[] r : accuracyRows) {
+      Long mid = r[0] != null ? ((Number) r[0]).longValue() : null;
+      long accurate = r[1] != null ? ((Number) r[1]).longValue() : 0L;
+      long inaccurate = r[2] != null ? ((Number) r[2]).longValue() : 0L;
+      if (mid != null) {
+        long total = accurate + inaccurate;
+        double pct = total > 0 ? (accurate * 100.0 / total) : 0.0;
+        accuracyByModel.put(mid, pct);
+      }
+    }
     for (Object[] row : rows) {
       Long modelId = row[0] != null ? ((Number) row[0]).longValue() : null;
       if (modelId == null) {
@@ -236,8 +267,12 @@ public class ModelQueryImpl implements ModelQuery {
       Double avgResponseTimeMs = row[3] != null ? ((Number) row[3]).doubleValue() : null;
       double cost = row[4] != null ? ((Number) row[4]).doubleValue() : 0.0;
       String costDisplay = formatCostFromDollars(cost);
+      Double throughputMsgPerMin = throughputByModel.containsKey(modelId)
+          ? throughputByModel.get(modelId).doubleValue() : null;
+      Double accuracyPercent = accuracyByModel.get(modelId);
       result.put(modelId,
-          new ModelDetailStats(calls, tokens, cost, costDisplay, avgResponseTimeMs));
+          new ModelDetailStats(calls, tokens, cost, costDisplay, avgResponseTimeMs,
+              throughputMsgPerMin, accuracyPercent));
     }
     return result;
   }
