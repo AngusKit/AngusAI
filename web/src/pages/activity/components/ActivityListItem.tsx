@@ -1,6 +1,6 @@
-import { Clock, ChevronRight, Info } from 'lucide-react';
+import { Clock, ChevronRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import type { ActivityDetailVo } from '@/services/ActivityTypes';
 import {
   getActionIcon,
@@ -34,10 +34,13 @@ export function ActivityListItem({ activity, language, onClick }: ActivityListIt
       onClick={() => onClick(activity)}
     >
       <div className='flex items-start gap-4'>
-        {/* 用户头像 */}
+        {/* 用户头像：userAvatar 为 URL，userAvatarFallback 为占位符 */}
         <Avatar className='w-10 h-10 flex-shrink-0'>
+          {activity.userAvatar && (
+            <AvatarImage src={activity.userAvatar} alt={activity.userName ?? ''} />
+          )}
           <AvatarFallback className='bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'>
-            {activity.userAvatar ?? activity.userAvatarFallback ?? '--'}
+            {activity.userAvatarFallback ?? (activity.userName ? activity.userName.slice(0, 2) : '--')}
           </AvatarFallback>
         </Avatar>
 

@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Label } from '@/components/ui/label';
 import type { ActivityDetailVo } from '@/services/ActivityTypes';
 import {
@@ -65,8 +65,15 @@ export function ActivityDetailDialog({
           {/* 用户信息 */}
           <div className='flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg'>
             <Avatar className='w-12 h-12'>
+              {selectedActivity.userAvatar && (
+                <AvatarImage
+                  src={selectedActivity.userAvatar}
+                  alt={selectedActivity.userName ?? ''}
+                />
+              )}
               <AvatarFallback className='bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'>
-                {selectedActivity.userAvatar ?? selectedActivity.userAvatarFallback ?? '--'}
+                {selectedActivity.userAvatarFallback ??
+                  (selectedActivity.userName ? selectedActivity.userName.slice(0, 2) : '--')}
               </AvatarFallback>
             </Avatar>
             <div>
