@@ -53,7 +53,7 @@ const SessionItem = memo(function SessionItem({
         'group flex items-center gap-2 px-2 py-1 rounded-lg cursor-pointer transition-colors',
         isSelected
           ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
-          : 'hover:bg-gray-100 dark:hover:bg-gray-750 text-gray-700 dark:text-gray-300'
+          : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
       )}
     >
       {session.isStarred && <Star className='w-4 h-4 flex-shrink-0 fill-yellow-400 text-yellow-400' />}

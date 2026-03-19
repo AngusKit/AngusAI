@@ -30,7 +30,7 @@ export function ActivityListItem({ activity, language, onClick }: ActivityListIt
 
   return (
     <div
-      className='p-6 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors cursor-pointer'
+      className='p-6 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer'
       onClick={() => onClick(activity)}
     >
       <div className='flex items-start gap-4'>

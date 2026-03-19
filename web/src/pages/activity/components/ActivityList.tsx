@@ -52,7 +52,7 @@ export function ActivityList({
       ) : (
         <>
           <ScrollArea className='h-[600px]'>
-            <div className='divide-y divide-gray-200 dark:divide-gray-800'>
+            <div className='divide-y divide-gray-200 dark:divide-gray-700'>
               {activities.map((activity, index) => (
                 <ActivityListItem
                   key={activity.id ?? `activity-${index}`}
