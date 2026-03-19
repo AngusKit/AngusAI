@@ -33,8 +33,8 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 import { cn } from '@/components/ui/utils.ts';
 import { toast } from 'sonner';
-import { copyToClipboard } from '../../../lib/clipboard.ts';
-import { detectContentFormat, type ContentFormat } from '../lib/messageFormat.ts';
+import { copyToClipboard } from '@/lib/clipboard.ts';
+import { detectContentFormat, type ContentFormat } from '../utils.ts';
 import { HtmlPreviewDialog } from './HtmlPreviewDialog.tsx';
 
 interface Message {
