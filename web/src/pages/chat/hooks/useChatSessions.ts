@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { toast } from 'sonner';
 import { useDebounce } from '@/hooks/useDebounce';
 import Session from '@/services/Session';
@@ -86,6 +86,22 @@ function messageVoToMessage(vo: MessageVo): Message {
 }
 
 const SESSION_PAGE_SIZE = 10;
+/** 消息分页大小：每次加载 10 条消息 */
+const MESSAGE_PAGE_SIZE = 10;
+/** 最大缓存消息的会话数量，超出时淘汰最早访问的会话消息，防止内存无限增长导致浏览器崩溃 */
+const MAX_CACHED_MESSAGE_SESSIONS = 20;
+/** 用于 currentMessages 无消息时的稳定引用，避免每次渲染创建新空数组导致子组件重渲染 */
+const EMPTY_MESSAGES: Message[] = [];
+
+/** 每个会话的消息分页信息 */
+interface MessagePagination {
+  /** 已加载的最小页码（向上翻页时递减） */
+  earliestPage: number;
+  /** 总页数 */
+  totalPages: number;
+  /** 是否还有更早的消息可加载 */
+  hasMore: boolean;
+}
 
 export function useChatSessions(initialAppId?: string, initialModelId?: string, initialSessionId?: string) {
   const [sessions, setSessions] = useState<Session[]>([]);
@@ -93,9 +109,23 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
   const [sessionMessages, setSessionMessages] = useState<Record<string, Message[]>>({});
   const [sessionsLoading, setSessionsLoading] = useState(true);
   const [messagesLoading, setMessagesLoading] = useState(false);
+  const [messagesLoadingMore, setMessagesLoadingMore] = useState(false);
   const [sessionKeyword, setSessionKeyword] = useState('');
   const debouncedSessionKeyword = useDebounce(sessionKeyword, 500);
   const loadedMessagesRef = useRef<Set<string>>(new Set());
+  /** 每个会话的消息分页状态（ref 避免触发重渲染） */
+  const messagePaginationRef = useRef<Record<string, MessagePagination>>({});
+  /** 防止并发加载更多消息 */
+  const loadingMoreRef = useRef(false);
+
+  // 使用 ref 持有 sessions 最新值，避免 deleteSession/renameSession/toggleStar 等回调因
+  // sessions 引用变化而重建，从而减少依赖这些回调的子组件的级联重渲染
+  const sessionsRef = useRef(sessions);
+  sessionsRef.current = sessions;
+  const currentSessionIdRef = useRef(currentSessionId);
+  currentSessionIdRef.current = currentSessionId;
+  /** 记录消息缓存的访问顺序（最近访问的在末尾），用于 LRU 淘汰 */
+  const messageCacheOrderRef = useRef<string[]>([]);
 
   const [sessionPage, setSessionPage] = useState(1);
   const [sessionTotal, setSessionTotal] = useState(0);
@@ -161,25 +191,130 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
     loadSessions(sessionPage + 1, true);
   }, [sessions.length, sessionTotal, sessionPage, sessionsLoadMore, sessionsLoading, loadSessions]);
 
-  /** 按 sessionId 内存缓存消息（sessionMessages + loadedMessagesRef），切换会话时优先用缓存，避免重复请求 */
+  /**
+   * 按 sessionId 内存缓存消息（sessionMessages + loadedMessagesRef），切换会话时优先用缓存，避免重复请求。
+   * 首次加载时先请求第 1 页获取 total，然后计算并请求最后一页（最新消息），实现每页 10 条分页。
+   */
   const loadMessages = useCallback(async (sessionId: string) => {
-    if (loadedMessagesRef.current.has(sessionId)) return;
+    if (loadedMessagesRef.current.has(sessionId)) {
+      // 更新 LRU 访问顺序：将当前 sessionId 移到末尾
+      const order = messageCacheOrderRef.current;
+      const idx = order.indexOf(sessionId);
+      if (idx >= 0) order.splice(idx, 1);
+      order.push(sessionId);
+      return;
+    }
     loadedMessagesRef.current.add(sessionId);
+    // 记录 LRU 访问顺序
+    messageCacheOrderRef.current.push(sessionId);
     setMessagesLoading(true);
     try {
-      const res = await Message.getMessageList({ sessionId, pageNo: 1, pageSize: 200 });
-      const data = (res as any)?.data;
-      const list: MessageVo[] = data?.list ?? [];
-      const msgs = list.map(messageVoToMessage);
-      setSessionMessages((prev) => ({ ...prev, [sessionId]: msgs }));
+      // 先请求第 1 页以获取 total
+      const firstRes = await Message.getMessageList({ sessionId, pageNo: 1, pageSize: MESSAGE_PAGE_SIZE });
+      const firstData = (firstRes as any)?.data;
+      const total = Number(firstData?.total ?? 0);
+      const totalPages = Math.max(1, Math.ceil(total / MESSAGE_PAGE_SIZE));
+
+      let msgs: Message[];
+      if (totalPages <= 1) {
+        // 只有 1 页，直接使用第 1 页的数据
+        const list: MessageVo[] = firstData?.list ?? [];
+        msgs = list.map(messageVoToMessage);
+      } else {
+        // 请求最后一页（最新消息）
+        const lastRes = await Message.getMessageList({ sessionId, pageNo: totalPages, pageSize: MESSAGE_PAGE_SIZE });
+        const lastData = (lastRes as any)?.data;
+        const list: MessageVo[] = lastData?.list ?? [];
+        msgs = list.map(messageVoToMessage);
+      }
+
+      // 记录分页信息
+      messagePaginationRef.current[sessionId] = {
+        earliestPage: totalPages,
+        totalPages,
+        hasMore: totalPages > 1,
+      };
+
+      setSessionMessages((prev) => {
+        const next = { ...prev, [sessionId]: msgs };
+        // LRU 淘汰：当缓存会话数超过上限时，移除最早访问且非当前会话的消息
+        const order = messageCacheOrderRef.current;
+        while (order.length > MAX_CACHED_MESSAGE_SESSIONS) {
+          const oldest = order[0];
+          if (!oldest) break;
+          if (oldest === currentSessionIdRef.current) {
+            // 当前会话不淘汰，移到末尾后继续检查下一个
+            order.shift();
+            order.push(oldest);
+            // 若全部都是当前会话（理论上不会），跳出避免无限循环
+            if (order[0] === oldest) break;
+            continue;
+          }
+          order.shift();
+          delete next[oldest];
+          delete messagePaginationRef.current[oldest];
+          loadedMessagesRef.current.delete(oldest);
+        }
+        return next;
+      });
     } catch (e) {
       loadedMessagesRef.current.delete(sessionId);
+      delete messagePaginationRef.current[sessionId];
+      const order = messageCacheOrderRef.current;
+      const idx = order.indexOf(sessionId);
+      if (idx >= 0) order.splice(idx, 1);
       console.error('Load messages failed:', e);
       toast.error('加载消息历史失败');
     } finally {
       setMessagesLoading(false);
     }
   }, []);
+
+  /** 向上滚动时加载更早的消息（上一页） */
+  const loadMoreMessages = useCallback(async (sessionId: string) => {
+    if (loadingMoreRef.current) return;
+    const pagination = messagePaginationRef.current[sessionId];
+    if (!pagination || !pagination.hasMore) return;
+    const prevPage = pagination.earliestPage - 1;
+    if (prevPage < 1) return;
+    loadingMoreRef.current = true;
+    setMessagesLoadingMore(true);
+    try {
+      const res = await Message.getMessageList({ sessionId, pageNo: prevPage, pageSize: MESSAGE_PAGE_SIZE });
+      const data = (res as any)?.data;
+      const list: MessageVo[] = data?.list ?? [];
+      const olderMsgs = list.map(messageVoToMessage);
+      // 将旧消息添加到数组前面
+      setSessionMessages((prev) => {
+        const current = prev[sessionId] ?? [];
+        // 按 id 去重，防止重复
+        const existingIds = new Set(current.map(m => m.id));
+        const uniqueOlder = olderMsgs.filter(m => !existingIds.has(m.id));
+        return { ...prev, [sessionId]: [...uniqueOlder, ...current] };
+      });
+      // 更新分页信息
+      messagePaginationRef.current[sessionId] = {
+        ...pagination,
+        earliestPage: prevPage,
+        hasMore: prevPage > 1,
+      };
+    } catch (e) {
+      console.error('Load more messages failed:', e);
+      toast.error('加载更多消息失败');
+    } finally {
+      loadingMoreRef.current = false;
+      setMessagesLoadingMore(false);
+    }
+  }, []);
+
+  /** 当前会话是否有更早的消息可加载 */
+  // sessionMessages 仅作为重计算触发器：messagePaginationRef 是 ref 不触发渲染，
+  // 依赖 sessionMessages 确保加载消息后 memo 能重新计算
+  const hasMoreMessages = useMemo(() => {
+    if (!currentSessionId) return false;
+    const pagination = messagePaginationRef.current[currentSessionId];
+    return pagination?.hasMore ?? false;
+  }, [currentSessionId, sessionMessages]);
 
   useEffect(() => {
     loadSessions(1, false);
@@ -191,8 +326,14 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
     loadMessages(currentSessionId);
   }, [currentSessionId, loadMessages]);
 
-  const currentSession = sessions.find((s) => s.sessionId === currentSessionId);
-  const currentMessages = currentSessionId ? sessionMessages[currentSessionId] ?? [] : [];
+  const currentSession = useMemo(
+    () => sessions.find((s) => s.sessionId === currentSessionId),
+    [sessions, currentSessionId]
+  );
+  const currentMessages = useMemo(
+    () => (currentSessionId ? sessionMessages[currentSessionId] ?? EMPTY_MESSAGES : EMPTY_MESSAGES),
+    [currentSessionId, sessionMessages]
+  );
 
   const createSession = useCallback(
     async (appId: string, modelId?: string, agentId?: string) => {
@@ -235,7 +376,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
 
   const deleteSession = useCallback(
     async (sessionId: string) => {
-      const session = sessions.find((s) => s.sessionId === sessionId || s.id === sessionId);
+      const session = sessionsRef.current.find((s) => s.sessionId === sessionId || s.id === sessionId);
       const sid = session?.sessionId ?? sessionId;
       if (deletingRef.current.has(sid)) return;
       deletingRef.current.add(sid);
@@ -243,12 +384,13 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
       try {
         await Session.deleteSession(sid);
         setSessions((prev) => prev.filter((s) => s.sessionId !== sid && s.id !== sid));
-        if (currentSessionId === sid) {
-          const remaining = sessions.filter((s) => s.sessionId !== sid);
+        if (currentSessionIdRef.current === sid) {
+          const remaining = sessionsRef.current.filter((s) => s.sessionId !== sid);
           setCurrentSessionId(remaining[0]?.sessionId ?? '');
         }
         setSessionTotal((prev) => Math.max(0, Number(prev) - 1));
         loadedMessagesRef.current.delete(sid);
+        delete messagePaginationRef.current[sid];
         setSessionMessages((prev) => {
           const next = { ...prev };
           delete next[sid];
@@ -262,12 +404,12 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
         deletingRef.current.delete(sid);
       }
     },
-    [sessions, currentSessionId]
+    []
   );
 
   const renameSession = useCallback(
     async (sessionId: string, newTitle: string) => {
-      const session = sessions.find((s) => s.sessionId === sessionId || s.id === sessionId);
+      const session = sessionsRef.current.find((s) => s.sessionId === sessionId || s.id === sessionId);
       const sid = session?.sessionId ?? sessionId;
       const trimmed = newTitle.trim();
       if (!trimmed || trimmed === (session?.title ?? '').trim()) return;
@@ -285,12 +427,12 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
         toast.error('重命名失败');
       }
     },
-    [sessions]
+    []
   );
 
   const toggleStar = useCallback(
     async (sessionId: string) => {
-      const session = sessions.find((s) => s.sessionId === sessionId || s.id === sessionId);
+      const session = sessionsRef.current.find((s) => s.sessionId === sessionId || s.id === sessionId);
       const idToUse = session?.sessionId ?? sessionId;
       const nextStarred = !session?.isStarred;
       try {
@@ -308,7 +450,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
         toast.error('操作失败');
       }
     },
-    [sessions]
+    []
   );
 
   const selectSession = useCallback(
@@ -384,7 +526,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
   /** 更新会话配置（温度、maxTokens 等），持久化到后端 */
   const updateSessionConfig = useCallback(
     async (sessionId: string, config: Partial<SessionConfig>): Promise<boolean> => {
-      const session = sessions.find((s) => s.sessionId === sessionId || s.id === sessionId);
+      const session = sessionsRef.current.find((s) => s.sessionId === sessionId || s.id === sessionId);
       const sid = session?.sessionId ?? sessionId;
       try {
         const mergedConfig: SessionConfig = {
@@ -407,7 +549,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
         return false;
       }
     },
-    [sessions]
+    []
   );
 
   const hasMoreSessions = sessions.length < sessionTotal;
@@ -420,6 +562,8 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
     try {
       await Message.clearMessages(sessionId);
       setSessionMessages((prev) => ({ ...prev, [sessionId]: [] }));
+      // 重置分页信息
+      messagePaginationRef.current[sessionId] = { earliestPage: 1, totalPages: 1, hasMore: false };
       setSessions((prev) =>
         prev.map((s) => (s.sessionId === sessionId ? { ...s, messageCount: 0, updatedAt: new Date() } : s))
       );
@@ -437,7 +581,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
         recentlyDeletedRef.current.delete(sessionId);
         return null;
       }
-      const existing = sessions.find((s) => s.sessionId === sessionId || s.id === sessionId);
+      const existing = sessionsRef.current.find((s) => s.sessionId === sessionId || s.id === sessionId);
       if (existing) return existing;
       try {
         const res = await Session.getSessionDetail(sessionId);
@@ -449,7 +593,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
           if (seen.has(session.sessionId)) return prev;
           return [session, ...prev].sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
         });
-        setSessionTotal((prev) => Math.max(prev, sessions.length + 1));
+        setSessionTotal((prev) => Math.max(prev, sessionsRef.current.length + 1));
         return session;
       } catch (e) {
         console.error('Fetch session detail failed:', e);
@@ -457,7 +601,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
         return null;
       }
     },
-    [sessions]
+    []
   );
 
   /**
@@ -509,6 +653,8 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
     sessionMessages,
     sessionsLoading,
     messagesLoading,
+    messagesLoadingMore,
+    hasMoreMessages,
     sessionsLoadMore,
     hasMoreSessions,
     loadMoreSessions,
@@ -521,6 +667,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
     toggleStar,
     selectSession,
     loadMessages,
+    loadMoreMessages,
     appendMessages,
     removeLastAssistantMessage,
     updateMessage,

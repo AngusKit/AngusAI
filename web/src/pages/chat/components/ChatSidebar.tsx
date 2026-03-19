@@ -167,6 +167,26 @@ const SessionGroup = memo(function SessionGroup({
   );
 });
 
+// 日期分组辅助函数放在组件外部，避免每次渲染重新创建函数
+function isToday(date: Date) {
+  const today = new Date();
+  return date.toDateString() === today.toDateString();
+}
+
+function isYesterday(date: Date) {
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  return date.toDateString() === yesterday.toDateString();
+}
+
+function isLastWeek(date: Date) {
+  const weekAgo = new Date();
+  weekAgo.setDate(weekAgo.getDate() - 7);
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  return date > weekAgo && date < yesterday;
+}
+
 interface ChatSidebarProps {
   sessions: Session[];
   currentSessionId: string;
@@ -231,25 +251,6 @@ export function ChatSidebar({
   };
 
   const filteredSessions = sessions ?? [];
-
-  function isToday(date: Date) {
-    const today = new Date();
-    return date.toDateString() === today.toDateString();
-  }
-
-  function isYesterday(date: Date) {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    return date.toDateString() === yesterday.toDateString();
-  }
-
-  function isLastWeek(date: Date) {
-    const weekAgo = new Date();
-    weekAgo.setDate(weekAgo.getDate() - 7);
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    return date > weekAgo && date < yesterday;
-  }
 
   const groupedSessions = useMemo(
     () => {

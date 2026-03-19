@@ -147,6 +147,12 @@ const ChatMessageInner = ({ message, isLastAssistant, onRegenerate, onFeedback, 
     return detected;
   }, [message.content, message.isStreaming]);
 
+  // 使用 useMemo 缓存 normalizeMarkdownForStreaming 结果，避免每次渲染重复执行正则匹配
+  const normalizedContent = useMemo(
+    () => normalizeMarkdownForStreaming(message.content || ''),
+    [message.content]
+  );
+
   /** 主消息区：按格式渲染 */
   const renderMainContent = () => {
     const content = message.content || '';
@@ -162,7 +168,7 @@ const ChatMessageInner = ({ message, isLastAssistant, onRegenerate, onFeedback, 
         return (
           <div className={wrapClass}>
             <MarkdownRenderer
-              source={normalizeMarkdownForStreaming(content)}
+              source={normalizedContent}
               streaming={!!message.isStreaming}
               showToc={false}
               theme="auto"
