@@ -14,6 +14,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
 import { VectorStoreFormFields } from './VectorStoreFormFields';
+import { VectorStoreTypeEnum } from '@/enums/enums';
 import type { VectorStoreFormData } from '../types';
 
 interface CreateVectorStoreDialogProps {
@@ -44,8 +45,20 @@ export function CreateVectorStoreDialog({
     await onSubmit();
   };
 
+  const hasConnection = !!(formData.endpoint?.trim() || formData.url?.trim());
   const isFormValid =
-    formData.name.trim() && formData.type && formData.endpoint.trim() && formData.dimension.trim();
+    formData.name.trim() &&
+    formData.type &&
+    hasConnection &&
+    formData.dimension.trim() &&
+    (() => {
+      const storeType = formData.type;
+      if (storeType === VectorStoreTypeEnum.PGVECTOR || storeType === VectorStoreTypeEnum.MARIADB) {
+        return !!(formData.database?.trim() && formData.username?.trim() && formData.password?.trim());
+      }
+      if (storeType === VectorStoreTypeEnum.MILVUS) return !!formData.collection?.trim();
+      return true;
+    })();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

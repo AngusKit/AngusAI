@@ -38,8 +38,12 @@ public class QdrantAutoConfiguration {
           .port(port)
           .collectionName(collection);
 
-      if (extra != null && extra.containsKey("apiKey")) {
-        builder.apiKey((String) extra.get("apiKey"));
+      String apiKey = config.getApiKey();
+      if (apiKey == null && extra != null && extra.containsKey("apiKey")) {
+        apiKey = (String) extra.get("apiKey");
+      }
+      if (apiKey != null && !apiKey.isBlank()) {
+        builder.apiKey(apiKey);
       }
       if (extra != null && extra.containsKey("useTls") && (Boolean) extra.get("useTls")) {
         builder.useTls(true);

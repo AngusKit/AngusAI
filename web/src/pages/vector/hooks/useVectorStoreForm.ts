@@ -55,16 +55,29 @@ export const useVectorStoreForm = (): UseVectorStoreFormReturn => {
   }, [formData.dimension, t]);
 
   const createConfigFromFormData = useCallback(
-    (type: VectorStoreTypeEnum, dimension: number): VectorStoreCreateDto['config'] => ({
-      type,
-      endpoint: formData.endpoint.trim() || undefined,
-      apiKey: formData.apiKey.trim() || undefined,
-      database: formData.database.trim() || undefined,
-      collection: formData.collection.trim() || undefined,
-      username: formData.username.trim() || undefined,
-      password: formData.password.trim() || undefined,
-      dimension,
-    }),
+    (type: VectorStoreTypeEnum, dimension: number): VectorStoreCreateDto['config'] => {
+      const extra: Record<string, unknown> = {};
+      if (formData.useTls) extra.useTls = true;
+      if (formData.token?.trim()) extra.token = formData.token.trim();
+      if (formData.databaseName?.trim()) extra.databaseName = formData.databaseName.trim();
+      if (formData.scheme?.trim()) extra.scheme = formData.scheme.trim();
+
+      const base: VectorStoreCreateDto['config'] = {
+        type,
+        dimension,
+        endpoint: formData.endpoint?.trim() || undefined,
+        url: formData.url?.trim() || undefined,
+        apiKey: formData.apiKey?.trim() || undefined,
+        database: formData.database?.trim() || undefined,
+        collection: formData.collection?.trim() || undefined,
+        username: formData.username?.trim() || undefined,
+        password: formData.password?.trim() || undefined,
+      };
+      if (Object.keys(extra).length > 0) {
+        base.extraProperties = extra;
+      }
+      return base;
+    },
     [formData]
   );
 
@@ -180,17 +193,25 @@ export const useVectorStoreForm = (): UseVectorStoreFormReturn => {
   );
 
   const populateFormFromStore = useCallback((store: VectorStoreItem) => {
+    const cfg = store.config;
+    const extra = (cfg as any)?.extraProperties ?? {};
     setFormData({
-      name: store.name,
-      type: store.type,
-      description: store.description === '--' ? '' : store.description,
-      endpoint: store.config?.endpoint ?? '',
-      apiKey: store.config?.apiKey ?? '',
-      dimension: store.config?.dimension ? String(store.config.dimension) : DEFAULT_FORM_DATA.dimension,
-      database: store.config?.database ?? '',
-      collection: store.config?.collection ?? '',
-      username: store.config?.username ?? '',
-      password: store.config?.password ?? '',
+      ...DEFAULT_FORM_DATA,
+      name: store.name ?? '',
+      type: store.type ?? ('' as any),
+      description: store.description === '--' ? '' : (store.description ?? ''),
+      endpoint: cfg?.endpoint ?? cfg?.url ?? '',
+      url: cfg?.url ?? '',
+      apiKey: cfg?.apiKey ?? '',
+      dimension: cfg?.dimension ? String(cfg.dimension) : DEFAULT_FORM_DATA.dimension,
+      database: cfg?.database ?? '',
+      collection: cfg?.collection ?? '',
+      username: cfg?.username ?? '',
+      password: cfg?.password ?? '',
+      useTls: !!extra.useTls,
+      token: (extra.token as string) ?? '',
+      databaseName: (extra.databaseName as string) ?? '',
+      scheme: (extra.scheme as string) ?? 'http',
     });
   }, []);
 

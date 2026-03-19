@@ -83,5 +83,10 @@ export const DEFAULT_FORM_DATA = {
   collection: '',
   username: '',
   password: '',
+  url: '',
+  useTls: false,
+  token: '',
+  databaseName: '',
+  scheme: 'http',
 } as const;
 

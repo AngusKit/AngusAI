@@ -26,6 +26,7 @@ export interface VectorStoreFormData {
   name: string;
   type: '' | VectorStoreTypeEnum;
   description: string;
+  /** 连接地址：HTTP 为完整 URL，DB 为 host:port 或 JDBC URL */
   endpoint: string;
   apiKey: string;
   dimension: string;
@@ -33,6 +34,16 @@ export interface VectorStoreFormData {
   collection: string;
   username: string;
   password: string;
+  /** PGVECTOR/MARIADB: JDBC URL，可选替代 host+port+database */
+  url?: string;
+  /** Qdrant: 是否启用 TLS */
+  useTls?: boolean;
+  /** Milvus: 认证 token（extra.token） */
+  token?: string;
+  /** Milvus: 数据库名（extra.databaseName） */
+  databaseName?: string;
+  /** Weaviate: 协议 http/https（extra.scheme） */
+  scheme?: string;
 }
 
 export interface VectorStoreTypeInfo {

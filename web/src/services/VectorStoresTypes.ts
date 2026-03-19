@@ -68,6 +68,10 @@ export interface VectorStoreConfigDefinition {
    * @example "tenantA"
    */
   namespace?: string;
+  /** 连接 URL（JDBC 或 HTTP），与 endpoint 二选一 */
+  url?: string;
+  /** 扩展参数（如 useTls、token、databaseName、scheme 等） */
+  extraProperties?: Record<string, unknown>;
   /**
    * 向量维度。必须与所用嵌入模型输出维度一致，否则入库/检索会失败。
    * 常见示例：
