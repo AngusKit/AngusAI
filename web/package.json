@@ -59,7 +59,7 @@
     "@radix-ui/react-tooltip": "^1.1.8",
     "@tanstack/react-virtual": "^3.13.22",
     "@xcan-angus/infra": "^2.0.0",
-    "@xcan-cloud/markdown": "^1.0.1",
+    "@xcan-cloud/markdown": "^1.0.2",
     "axios": "^1.13.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "*",
