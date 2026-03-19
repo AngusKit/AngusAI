@@ -62,7 +62,7 @@ public class ActivityQueryImpl implements ActivityQuery {
 
         // Enrich activity data with project names and user information if content exists
         if (page.hasContent()) {
-          userManager.setUserNameAndAvatar(page.getContent(), "userId", "fullName", "avatar");
+          userManager.setUserNameAndAvatar(page.getContent(), "userId", "userName", "userAvatar");
         }
         return page;
       }

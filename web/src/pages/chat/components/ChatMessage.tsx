@@ -24,13 +24,9 @@ import {
 import { Textarea } from '@/components/ui/textarea.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar.tsx';
-import type { ReactNode } from 'react';
 import React from 'react';
 import { useState, useMemo, useEffect } from 'react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
+import { MarkdownRenderer } from '@xcan-cloud/markdown';
 import { cn } from '@/components/ui/utils.ts';
 import { toast } from 'sonner';
 import { copyToClipboard } from '@/lib/clipboard.ts';
@@ -63,161 +59,6 @@ interface ChatMessageProps {
   /** 消息反馈回调（点赞/点踩），点踩时需填写 comment */
   onFeedback?: (messageId: string, feedbackType: 'like' | 'dislike', comment?: string) => void;
 }
-
-/** 代码块：复制、下载、HTML 预览（仅 html 语言） */
-function CodeBlockWithActions({ code, lang }: { code: string; lang: string }) {
-  const [copied, setCopied] = useState(false);
-  const [previewOpen, setPreviewOpen] = useState(false);
-  const isHtml = /^(html?|markup)$/i.test(lang);
-
-  const handleCopy = async () => {
-    const ok = await copyToClipboard(code);
-    if (ok) {
-      setCopied(true);
-      toast.success('已复制');
-      setTimeout(() => setCopied(false), 2000);
-    } else toast.error('复制失败');
-  };
-
-  const handleDownload = () => {
-    const ext = lang ? (lang === 'html' ? 'html' : lang) : 'txt';
-    const blob = new Blob([code], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `code.${ext}`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  return (
-    <div className="my-3 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
-      {/* 工具栏：直接展示，不依赖悬停 */}
-      <div className="flex items-center justify-end gap-1 px-2 py-1.5 bg-gray-100 dark:bg-gray-800/80 border-b border-gray-200 dark:border-gray-700">
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handleCopy}>
-              {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>复制</TooltipContent>
-        </Tooltip>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handleDownload}>
-              <Download className="w-3 h-3" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>下载</TooltipContent>
-        </Tooltip>
-        {isHtml && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setPreviewOpen(true)}>
-                <Eye className="w-3 h-3" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>预览</TooltipContent>
-          </Tooltip>
-        )}
-      </div>
-      <SyntaxHighlighter
-        language={lang}
-        style={oneDark}
-        PreTag="div"
-        customStyle={{ margin: 0, borderRadius: 0 }}
-        className="!my-0 !rounded-none overflow-x-auto text-sm [&>code]:!p-4"
-      >
-        {code}
-      </SyntaxHighlighter>
-      {isHtml && (
-        <HtmlPreviewDialog open={previewOpen} onOpenChange={setPreviewOpen} html={code} title="HTML 预览" />
-      )}
-    </div>
-  );
-}
-
-/** Markdown 渲染时的自定义组件 */
-const markdownComponents: Parameters<typeof ReactMarkdown>[0]['components'] = {
-  p: ({ children }: { children?: ReactNode }) => <p className="mb-2 last:mb-0">{children}</p>,
-  strong: ({ children }: { children?: ReactNode }) => <strong className="font-semibold">{children}</strong>,
-  em: ({ children }: { children?: ReactNode }) => <em className="italic">{children}</em>,
-  code: ({ className, children, ...props }: { className?: string; children?: ReactNode }) => {
-    const isInline = !className;
-    if (isInline) {
-      return (
-        <code
-          className="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded text-sm font-mono"
-          {...props}
-        >
-          {children}
-        </code>
-      );
-    }
-    const match = /language-(\w+)/.exec(className ?? '');
-    const lang = match?.[1] ?? '';
-    const code = String(children ?? '').replace(/\n$/, '');
-    return (
-      <CodeBlockWithActions code={code} lang={lang} />
-    );
-  },
-  pre: ({ children }: { children?: React.ReactNode }) => (
-    <div className="[&>div]:!mt-0 [&>div]:!mb-0">{children}</div>
-  ),
-  a: ({ href, children }: { href?: string; children?: React.ReactNode }) => (
-    <a
-      href={href}
-      className="text-blue-600 dark:text-blue-400 hover:underline"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      {children}
-    </a>
-  ),
-  ul: ({ children }: { children?: React.ReactNode }) => <ul className="my-2 list-disc pl-5 space-y-1">{children}</ul>,
-  ol: ({ children }: { children?: React.ReactNode }) => <ol className="my-2 list-decimal pl-5 space-y-1">{children}</ol>,
-  li: ({ children }: { children?: React.ReactNode }) => <li className="leading-relaxed">{children}</li>,
-  blockquote: ({ children }: { children?: React.ReactNode }) => (
-    <blockquote className="border-l-4 border-gray-300 dark:border-gray-600 pl-4 my-2 text-gray-600 dark:text-gray-400">
-      {children}
-    </blockquote>
-  ),
-  h1: ({ children }: { children?: React.ReactNode }) => <h1 className="text-xl font-bold mt-4 mb-2">{children}</h1>,
-  h2: ({ children }: { children?: React.ReactNode }) => <h2 className="text-lg font-bold mt-3 mb-2">{children}</h2>,
-  h3: ({ children }: { children?: React.ReactNode }) => <h3 className="text-base font-semibold mt-3 mb-1">{children}</h3>,
-  table: ({ children }: { children?: React.ReactNode }) => (
-    <div className="overflow-x-auto my-3">
-      <table className="min-w-full border border-gray-200 dark:border-gray-700 rounded">
-        {children}
-      </table>
-    </div>
-  ),
-  thead: ({ children }: { children?: React.ReactNode }) => (
-    <thead className="bg-gray-100 dark:bg-gray-800">{children}</thead>
-  ),
-  th: ({ children }: { children?: React.ReactNode }) => (
-    <th className="px-4 py-2 text-left text-sm font-medium border-b dark:border-gray-700">
-      {children}
-    </th>
-  ),
-  td: ({ children }: { children?: React.ReactNode }) => (
-    <td className="px-4 py-2 text-sm border-b dark:border-gray-700">{children}</td>
-  ),
-  tr: ({ children }: { children?: React.ReactNode }) => <tr className="border-b dark:border-gray-700">{children}</tr>,
-  /** 拦截外部图片 URL，避免 via.placeholder、unsplash 等第三方请求导致 ERR_CONNECTION_CLOSED 及性能问题 */
-  img: ({ src, alt }: { src?: string; alt?: string }) => {
-    const s = src ?? '';
-    const isExternal = /^https?:\/\//i.test(s) && !s.startsWith(window.location.origin);
-    if (isExternal) {
-      return (
-        <span className="inline-block px-2 py-1 text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 rounded">
-          [图片: {alt || s.slice(0, 40)}]
-        </span>
-      );
-    }
-    return <img src={s} alt={alt ?? ''} className="max-w-full rounded" loading="lazy" />;
-  },
-};
 
 const ChatMessageInner = ({ message, isLastAssistant, onRegenerate, onFeedback }: ChatMessageProps) => {
   const [copied, setCopied] = useState(false);
@@ -312,12 +153,14 @@ const ChatMessageInner = ({ message, isLastAssistant, onRegenerate, onFeedback }
       case 'markdown':
         return (
           <div className={wrapClass}>
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
-              components={markdownComponents}
-            >
-              {normalizeMarkdownForStreaming(content)}
-            </ReactMarkdown>
+            <MarkdownRenderer
+              source={normalizeMarkdownForStreaming(content)}
+              streaming={!!message.isStreaming}
+              showToc={false}
+              theme="auto"
+              debounceMs={message.isStreaming ? 0 : 150}
+              className="markdown-chat-message"
+            />
           </div>
         );
       case 'html':

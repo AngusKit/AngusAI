@@ -31,8 +31,6 @@
     "vite:build:priv": "vite build --mode priv"
   },
   "dependencies": {
-    "@copilotkit/react-core": "^1.54.0",
-    "@copilotkit/react-ui": "^1.54.0",
     "@radix-ui/react-accordion": "^1.2.3",
     "@radix-ui/react-alert-dialog": "^1.1.6",
     "@radix-ui/react-aspect-ratio": "^1.1.2",
@@ -61,6 +59,7 @@
     "@radix-ui/react-tooltip": "^1.1.8",
     "@tanstack/react-virtual": "^3.13.22",
     "@xcan-angus/infra": "^2.0.0",
+    "@xcan-cloud/markdown": "^1.0.1",
     "axios": "^1.13.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "*",
@@ -73,16 +72,16 @@
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.55.0",
-    "react-markdown": "^10.1.0",
     "react-resizable-panels": "^2.1.7",
     "react-router-dom": "^7.13.1",
-    "react-syntax-highlighter": "^15.6.1",
     "reactflow": "*",
     "recharts": "^2.15.2",
-    "remark-gfm": "^4.0.1",
     "sonner": "^2.0.7",
     "tailwind-merge": "*",
     "vaul": "^1.1.2"
+  },
+  "overrides": {
+    "@floating-ui/utils": "0.2.10"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.9.1",
@@ -91,7 +90,6 @@
     "@types/node": "^20.10.0",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
-    "@types/react-syntax-highlighter": "^15.5.13",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
     "@vitejs/plugin-react-swc": "^3.10.2",

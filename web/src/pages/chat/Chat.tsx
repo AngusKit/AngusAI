@@ -20,6 +20,8 @@ import {
 } from './constants';
 import SessionApi from '@/services/Session';
 import MessageApi from '@/services/Message';
+import { MarkdownProvider } from '@xcan-cloud/markdown';
+import '@xcan-cloud/markdown/styles';
 
 interface ChatProps {
   content?: string;
@@ -529,6 +531,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
   };
 
   return (
+    <MarkdownProvider defaultTheme="auto" defaultLocale="zh-CN">
     <div className='flex h-screen bg-gray-50 dark:bg-gray-900'>
       {/* Chat Sidebar（enableSessionList 关闭时不展示） */}
       {enableSessionList && (
@@ -632,5 +635,6 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
         onTemplateChange={setSelectedTemplate}
       />
     </div>
+    </MarkdownProvider>
   );
 }

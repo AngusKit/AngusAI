@@ -18,6 +18,8 @@ import cloud.xcan.angus.core.ai.domain.activity.ActivityStatus;
 import cloud.xcan.angus.core.biz.cmd.CommCmd;
 import cloud.xcan.angus.core.jpa.repository.BaseRepository;
 import cloud.xcan.angus.core.utils.PrincipalContextUtils;
+import cloud.xcan.angus.spec.principal.Principal;
+import cloud.xcan.angus.spec.principal.PrincipalContext;
 import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -84,9 +86,10 @@ public class ActivityCmdImpl extends CommCmd<Activity, Long> implements Activity
     if (!PrincipalContextUtils.isUserAction()) {
       return;
     }
-    Long userId = getUserId();
-    Object[] msgArgs =
-        args != null && args.length > 0 ? args : new Object[]{stringSafe(resourceName, "")};
+    Principal principal = PrincipalContext.get();
+    Long userId = principal.getUserId();
+    Object[] msgArgs = args != null && args.length > 0
+        ? args : new Object[]{stringSafe(resourceName, "")};
     String description = getMessage(userId, actionKey, msgArgs);
     Activity activity = new Activity()
         .setId(getCachedUidGenerator().getUID())
@@ -97,6 +100,8 @@ public class ActivityCmdImpl extends CommCmd<Activity, Long> implements Activity
         .setActionType(resolveActionType(actionKey))
         .setStatus(ActivityStatus.SUCCESS)
         .setActivityDate(LocalDateTime.now())
+        .setIpAddress(principal.getRemoteAddress())
+        .setUserAgent(principal.getUserAgent())
         .setDescription(description)
         .setDetail(description);
     activity.setTenantId(getOptTenantId());
@@ -107,15 +112,19 @@ public class ActivityCmdImpl extends CommCmd<Activity, Long> implements Activity
     if (actionKey == null) {
       return ActionType.UPDATE;
     }
-    if (actionKey.contains("created") || actionKey.contains("duplicated") || actionKey.contains(
-        "cloned")
-        || actionKey.contains("uploaded") || actionKey.contains("imported")) {
+    if (actionKey.contains("created")
+        || actionKey.contains("duplicated")
+        || actionKey.contains("cloned")
+        || actionKey.contains("uploaded")
+        || actionKey.contains("imported")) {
       return ActionType.CREATE;
     }
     if (actionKey.contains("deleted")) {
       return ActionType.DELETE;
     }
-    if (actionKey.contains("star") || actionKey.contains("toggled") || actionKey.contains("started")
+    if (actionKey.contains("star")
+        || actionKey.contains("toggled")
+        || actionKey.contains("started")
         || actionKey.contains("stopped")) {
       return ActionType.CONFIGURE;
     }
