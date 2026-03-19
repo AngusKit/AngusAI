@@ -52,7 +52,7 @@ export class Message<SecurityDataType = unknown> {
    * @request GET:/api/v1/chat/messages/{messageId}
    * @secure
    */
-  getMessage = (messageId: string | number, params: RequestParams = {}) =>
+  getMessage = (messageId: string, params: RequestParams = {}) =>
     this.http.request<MessageResult>({
       path: `${AI}/chat/messages/${messageId}`,
       method: 'GET',
@@ -87,7 +87,7 @@ export class Message<SecurityDataType = unknown> {
    * @request DELETE:/api/v1/chat/messages/{messageId}/feedback
    * @secure
    */
-  deleteFeedback = (messageId: string | number, params: RequestParams = {}) =>
+  deleteFeedback = (messageId: string, params: RequestParams = {}) =>
     this.http.request<void>({
       path: `${AI}/chat/messages/${messageId}/feedback`,
       method: 'DELETE',
@@ -104,7 +104,7 @@ export class Message<SecurityDataType = unknown> {
    * @request DELETE:/api/v1/chat/messages/{messageId}
    * @secure
    */
-  deleteMessage = (messageId: string | number, params: RequestParams = {}) =>
+  deleteMessage = (messageId: string, params: RequestParams = {}) =>
     this.http.request<void>({
       path: `${AI}/chat/messages/${messageId}`,
       method: 'DELETE',
@@ -140,7 +140,7 @@ export class Message<SecurityDataType = unknown> {
    * @request POST:/api/v1/chat/messages/stop?messageId=
    * @secure
    */
-  stopGeneration = (messageId: string | number, params: RequestParams = {}) =>
+  stopGeneration = (messageId: string, params: RequestParams = {}) =>
     this.http.request<MessageResult>({
       path: `${AI}/chat/messages/stop`,
       method: 'POST',
@@ -191,7 +191,7 @@ export class Message<SecurityDataType = unknown> {
    */
   uploadAttachment = (
     file: File,
-    messageId?: string | number,
+    messageId?: string,
     params: RequestParams = {}
   ) => {
     const formData = new FormData();

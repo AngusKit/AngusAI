@@ -80,8 +80,6 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
   const lastCompositionEndRef = useRef(0);
   const scrollAfterSendRef = useRef(false);
   const lastDeleteRef = useRef<{ id: string; t: number }>({ id: '', t: 0 });
-  /** 流式生成时后端下发的 messageId，用于 updateMessage 和停止生成 */
-  const streamingMessageIdRef = useRef<number | null>(null);
 
   const handleBack = () => {
     onBack ? onBack() : navigate('/dashboard');
@@ -237,11 +235,11 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
         if (aid) chatPayload.agentId = String(aid);
       }
 
-      const streamMsgIdRef = { current: null as number | null };
+      const streamMsgIdRef = { current: null as string | null };
       await chatStream(chatPayload, {
         onMessageId: (msgId) => {
           streamMsgIdRef.current = msgId;
-          updateMessage(effectiveKeyRef.current, assistantId, { id: String(msgId) });
+          updateMessage(effectiveKeyRef.current, assistantId, { id: msgId });
         },
         onSessionId: (sessionId) => {
           if (displayKey.startsWith('pending-')) {
@@ -268,13 +266,13 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
             const now = Date.now();
             if (now - lastFlush >= STREAM_THROTTLE_MS) {
               lastFlush = now;
-              const idForUpdate = streamMsgIdRef.current != null ? String(streamMsgIdRef.current) : assistantId;
+              const idForUpdate = streamMsgIdRef.current ?? assistantId;
               updateMessage(effectiveKeyRef.current, idForUpdate, { content: accumulated });
             }
           };
         })(),
       });
-      const idForFinal = streamMsgIdRef.current != null ? String(streamMsgIdRef.current) : assistantId;
+      const idForFinal = streamMsgIdRef.current ?? assistantId;
       updateMessage(effectiveKeyRef.current, idForFinal, { content: accumulated, isStreaming: false });
     } catch (err) {
       const msg = err instanceof Error ? err.message : '请求失败';
@@ -331,7 +329,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
       let accumulated = '';
       let lastFlush = 0;
       const STREAM_THROTTLE_MS = 60;
-      const regenMsgIdRef = { current: null as number | null };
+      const regenMsgIdRef = { current: null as string | null };
       await chatStream(
         {
           sessionId: currentSessionId,
@@ -341,20 +339,20 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
         {
           onMessageId: (msgId) => {
             regenMsgIdRef.current = msgId;
-            updateMessage(currentSessionId, assistantId, { id: String(msgId) });
+            updateMessage(currentSessionId, assistantId, { id: msgId });
           },
           onToken: (token) => {
             accumulated += token;
             const now = Date.now();
             if (now - lastFlush >= STREAM_THROTTLE_MS) {
               lastFlush = now;
-              const idForUpdate = regenMsgIdRef.current != null ? String(regenMsgIdRef.current) : assistantId;
+              const idForUpdate = regenMsgIdRef.current ?? assistantId;
               updateMessage(currentSessionId, idForUpdate, { content: accumulated });
             }
           },
         }
       );
-      const idForFinal = regenMsgIdRef.current != null ? String(regenMsgIdRef.current) : assistantId;
+      const idForFinal = regenMsgIdRef.current ?? assistantId;
       updateMessage(currentSessionId, idForFinal, { content: accumulated, isStreaming: false });
     } catch (err) {
       const msg = err instanceof Error ? err.message : '请求失败';
