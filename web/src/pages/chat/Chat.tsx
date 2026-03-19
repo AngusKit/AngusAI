@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useLanguage } from '@/components/LanguageProvider.tsx';
+import { useTheme } from '@/components/ThemeProvider.tsx';
 import { toast } from 'sonner';
 import { ChatSidebar } from './components/ChatSidebar.tsx';
 import { ChatMainArea } from './components/ChatMainArea.tsx';
@@ -8,6 +9,7 @@ import { PromptLibraryDialog } from './components/PromptLibraryDialog.tsx';
 import { type ChatSwitcherSelection } from './components/ChatSwitcher.tsx';
 import { clearChatSwitcherCacheForSession } from './hooks/useChatSwitcher.ts';
 import { SettingsDialog } from './components/SettingsDialog.tsx';
+import { MarkdownThemeLocaleSync } from './components/MarkdownThemeLocaleSync.tsx';
 import { ThemeDialog, CHAT_TEMPLATES, type TemplateType } from './components/ThemeDialog.tsx';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { SessionConfig } from '@/services/SessionTypes';
@@ -29,7 +31,8 @@ interface ChatProps {
 }
 
 export function Chat({ content = '', onBack }: ChatProps = {}) {
-  useLanguage();
+  const { language } = useLanguage();
+  const { theme: appTheme } = useTheme();
   const navigate = useNavigate();
   const { sessionId: sessionIdFromUrl } = useParams<{ sessionId?: string }>();
   const {
@@ -531,7 +534,8 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
   };
 
   return (
-    <MarkdownProvider defaultTheme="auto" defaultLocale="zh-CN">
+    <MarkdownProvider defaultTheme={appTheme} defaultLocale={language}>
+    <MarkdownThemeLocaleSync />
     <div className='flex h-screen bg-gray-50 dark:bg-gray-900'>
       {/* Chat Sidebar（enableSessionList 关闭时不展示） */}
       {enableSessionList && (
