@@ -42,6 +42,9 @@ public class Activity extends TenantEntity<Activity, Long> {
   @Column(name = "user_id")
   private Long userId;
 
+  @Column(name = "user_name")
+  private String userName;
+
   @Enumerated(EnumType.STRING)
   @Column(name = "action_type")
   private ActionType actionType;
@@ -63,8 +66,6 @@ public class Activity extends TenantEntity<Activity, Long> {
 
   private String detail;
 
-  @Transient
-  private String userName;
   @Transient
   private String userAvatar;
 

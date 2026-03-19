@@ -29,10 +29,9 @@ public class ActivityAssembler {
   }
 
   public static GenericSpecification<Activity> getSpecification(ActivityFindDto dto) {
-    // Build the final filters
     Set<SearchCriteria> filters = new SearchCriteriaBuilder<>(dto)
         .rangeSearchFields("id", "activityDate")
-        .matchSearchFields("resourceName", "detail")
+        .matchSearchFields("resourceName", "userName", "detail")
         .inAndNotFields("resourceId", "resourceType", "actionType", "status")
         .orderByFields("id", "activityDate", "resourceType", "actionType", "status")
         .build();

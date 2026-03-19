@@ -97,6 +97,7 @@ public class ActivityCmdImpl extends CommCmd<Activity, Long> implements Activity
         .setResourceType(resourceType)
         .setResourceName(stringSafe(resourceName, ""))
         .setUserId(nullSafe(userId, -1L))
+        .setUserName(principal.getFullName())
         .setActionType(resolveActionType(actionKey))
         .setStatus(ActivityStatus.SUCCESS)
         .setActivityDate(LocalDateTime.now())
