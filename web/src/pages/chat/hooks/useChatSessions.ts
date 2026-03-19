@@ -198,11 +198,19 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
         // LRU 淘汰：当缓存会话数超过上限时，移除最早访问且非当前会话的消息
         const order = messageCacheOrderRef.current;
         while (order.length > MAX_CACHED_MESSAGE_SESSIONS) {
-          const oldest = order.shift();
-          if (oldest && oldest !== currentSessionIdRef.current) {
-            delete next[oldest];
-            loadedMessagesRef.current.delete(oldest);
+          const oldest = order[0];
+          if (!oldest) break;
+          if (oldest === currentSessionIdRef.current) {
+            // 当前会话不淘汰，移到末尾后继续检查下一个
+            order.shift();
+            order.push(oldest);
+            // 若全部都是当前会话（理论上不会），跳出避免无限循环
+            if (order[0] === oldest) break;
+            continue;
           }
+          order.shift();
+          delete next[oldest];
+          loadedMessagesRef.current.delete(oldest);
         }
         return next;
       });
