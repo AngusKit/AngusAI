@@ -2,7 +2,6 @@ package cloud.xcan.angus.core.ai.application.cmd.agent.impl;
 
 import static cloud.xcan.angus.core.ai.application.converter.AgentConverter.toChatConfigOverride;
 import static cloud.xcan.angus.core.ai.domain.Constants.CHAT_DEFAULT_TIMEOUT_MS;
-import static cloud.xcan.angus.core.utils.GsonUtils.toJson;
 import static cloud.xcan.angus.spec.principal.PrincipalContext.get;
 import static cloud.xcan.angus.spec.utils.ObjectUtils.lengthSafe;
 import static cloud.xcan.angus.spec.utils.ObjectUtils.nullSafe;
@@ -31,6 +30,7 @@ import cloud.xcan.angus.core.biz.BizTemplate;
 import cloud.xcan.angus.remote.message.SysException;
 import cloud.xcan.angus.spec.principal.Principal;
 import cloud.xcan.angus.spec.principal.PrincipalContext;
+import cloud.xcan.angus.spec.utils.JsonUtils;
 import dev.langchain4j.service.TokenStream;
 import jakarta.annotation.Resource;
 import java.math.BigDecimal;
@@ -241,7 +241,7 @@ public class AgentChatCmdImpl implements AgentChatCmd {
                         .build();
                   }
                   try {
-                    emitter.send(SseEmitter.event().data(toJson(chunk)));
+                    emitter.send(SseEmitter.event().data(JsonUtils.toJson(chunk)));
                   } catch (Exception e) {
                     log.error("Chat [{}]-[{}] error sending chunk: {}", sessionDb.getSessionId(),
                         userMessage.getId(), e.getMessage());
