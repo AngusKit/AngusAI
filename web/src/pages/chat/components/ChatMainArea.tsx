@@ -144,8 +144,8 @@ export function ChatMainArea({
   const SCROLL_THROTTLE_MS = 200;
   /** 距底部小于此像素视为「在底部」，才自动滚动；否则用户已向上查看历史，不打断 */
   const BOTTOM_THRESHOLD_PX = 350;
-  /** 消息数超过此阈值时启用虚拟列表，只渲染可见区域以提升性能 */
-  const VIRTUAL_THRESHOLD = 6;
+  /** 消息数超过此阈值时启用虚拟列表；提高阈值以减少滚动时 Markdown 的 mount/unmount 闪烁 */
+  const VIRTUAL_THRESHOLD = 24;
 
   const useVirtual = currentMessages.length > VIRTUAL_THRESHOLD;
   const virtualizer = useVirtualizer({

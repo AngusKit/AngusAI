@@ -25,7 +25,7 @@ import { Textarea } from '@/components/ui/textarea.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar.tsx';
 import React from 'react';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { MarkdownRenderer } from '@xcan-cloud/markdown';
 import { cn } from '@/components/ui/utils.ts';
 import { toast } from 'sonner';
@@ -133,11 +133,17 @@ const ChatMessageInner = ({ message, isLastAssistant, onRegenerate, onFeedback }
 
   const isUser = message.role === 'user';
 
-  // 识别 → 解析 → 渲染管道
-  const contentFormat = useMemo<ContentFormat>(
-    () => detectContentFormat(message.content),
-    [message.content]
-  );
+  // 流式时锁定格式：一旦识别为 markdown 即保持，避免 plain↔markdown 切换导致 remount 闪烁
+  const formatLockRef = useRef<ContentFormat | null>(null);
+  const contentFormat = useMemo<ContentFormat>(() => {
+    const detected = detectContentFormat(message.content);
+    if (message.isStreaming) {
+      if (detected === 'markdown') formatLockRef.current = 'markdown';
+      return formatLockRef.current ?? detected;
+    }
+    formatLockRef.current = null;
+    return detected;
+  }, [message.content, message.isStreaming]);
 
   /** 主消息区：按格式渲染 */
   const renderMainContent = () => {
@@ -158,7 +164,7 @@ const ChatMessageInner = ({ message, isLastAssistant, onRegenerate, onFeedback }
               streaming={!!message.isStreaming}
               showToc={false}
               theme="auto"
-              debounceMs={message.isStreaming ? 0 : 150}
+              debounceMs={message.isStreaming ? 80 : 150}
               className="markdown-chat-message"
             />
           </div>
