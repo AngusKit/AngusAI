@@ -41,6 +41,8 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     currentSession,
     currentMessages,
     messagesLoading,
+    messagesLoadingMore,
+    hasMoreMessages,
     sessionsLoading,
     sessionsLoadMore,
     hasMoreSessions,
@@ -62,6 +64,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     clearSessionMessages,
     setSessionMessages,
     setCurrentSessionId,
+    loadMoreMessages,
     sessionKeyword,
     setSessionKeyword,
   } = useChatSessions(undefined, undefined, sessionIdFromUrl);
@@ -603,6 +606,12 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     }
   };
 
+  const handleLoadMoreMessages = useCallback(() => {
+    if (currentSessionId) {
+      loadMoreMessages(currentSessionId);
+    }
+  }, [currentSessionId, loadMoreMessages]);
+
   return (
     <MarkdownProvider defaultTheme={appTheme} defaultLocale={language}>
     <MarkdownThemeLocaleSync />
@@ -671,6 +680,9 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
         onRegenerate={handleRegenerate}
         onFeedback={handleFeedback}
         onStopGenerate={handleStopGenerate}
+        onLoadMoreMessages={handleLoadMoreMessages}
+        hasMoreMessages={hasMoreMessages}
+        messagesLoadingMore={messagesLoadingMore}
       />
 
       {/* Prompt Library Dialog（enablePromptLibrary 关闭时仍允许通过其他入口打开，此处按配置控制） */}

@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useCallback } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import {
   Loader2,
@@ -94,6 +94,12 @@ export interface ChatMainAreaProps {
   onFeedback?: (messageId: string, feedbackType: 'like' | 'dislike', comment?: string) => void;
   /** 停止生成回调 */
   onStopGenerate?: (messageId: string) => void;
+  /** 向上滚动加载更多消息的回调 */
+  onLoadMoreMessages?: () => void;
+  /** 是否还有更早的消息可加载 */
+  hasMoreMessages?: boolean;
+  /** 是否正在加载更多消息 */
+  messagesLoadingMore?: boolean;
 }
 
 export function ChatMainArea({
@@ -138,15 +144,24 @@ export function ChatMainArea({
                                onRegenerate,
                                onFeedback,
                                onStopGenerate,
+                               onLoadMoreMessages,
+                               hasMoreMessages = false,
+                               messagesLoadingMore = false,
                              }: ChatMainAreaProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const lastScrollTimeRef = useRef(0);
   const prevSessionIdRef = useRef<string | undefined>(undefined);
   const needInitialScrollRef = useRef(true);
+  /** 标记是否正在加载更早消息（prepend），用于在 prepend 后恢复滚动位置而不是滚到底部 */
+  const isPrependingRef = useRef(false);
+  /** 记录 prepend 前的 scrollHeight，用于恢复滚动位置 */
+  const prevScrollHeightRef = useRef(0);
   const SCROLL_THROTTLE_MS = 200;
   /** 距底部小于此像素视为「在底部」，才自动滚动；否则用户已向上查看历史，不打断 */
   const BOTTOM_THRESHOLD_PX = 350;
+  /** 距顶部小于此像素时触发加载更早的消息 */
+  const TOP_THRESHOLD_PX = 100;
   /** 消息数超过此阈值时启用虚拟列表；较低阈值可更早启用虚拟化，减少切换会话时一次性渲染大量 Markdown 的卡顿 */
   const VIRTUAL_THRESHOLD = 10;
 
@@ -171,6 +186,17 @@ export function ChatMainArea({
   useEffect(() => {
     const container = messagesContainerRef.current;
     if (!container) return;
+
+    // 加载更早消息后（prepend），恢复滚动位置使用户看到的内容不跳动
+    if (isPrependingRef.current && currentMessages.length > 0) {
+      isPrependingRef.current = false;
+      const newScrollHeight = container.scrollHeight;
+      const addedHeight = newScrollHeight - prevScrollHeightRef.current;
+      if (addedHeight > 0) {
+        container.scrollTop = container.scrollTop + addedHeight;
+      }
+      return;
+    }
 
     // 进入对话页或切换会话时，有消息则定位到底部
     if (needInitialScrollRef.current && currentMessages.length > 0) {
@@ -200,6 +226,25 @@ export function ChatMainArea({
     lastScrollTimeRef.current = now;
     messagesEndRef.current?.scrollIntoView({ behavior: isStreaming ? 'auto' : 'smooth' });
   }, [currentMessages, currentSessionId]);
+
+  // 监听滚动事件：滚到顶部时触发加载更早的消息
+  const handleScroll = useCallback(() => {
+    const container = messagesContainerRef.current;
+    if (!container || !hasMoreMessages || messagesLoadingMore) return;
+    if (container.scrollTop < TOP_THRESHOLD_PX) {
+      // 记录当前 scrollHeight，以便 prepend 后恢复位置
+      isPrependingRef.current = true;
+      prevScrollHeightRef.current = container.scrollHeight;
+      onLoadMoreMessages?.();
+    }
+  }, [hasMoreMessages, messagesLoadingMore, onLoadMoreMessages]);
+
+  useEffect(() => {
+    const container = messagesContainerRef.current;
+    if (!container) return;
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, [handleScroll]);
 
   const appDisplayName = chatSelection.app?.name ?? '应用';
 
@@ -351,6 +396,12 @@ export function ChatMainArea({
             )
           ) : useVirtual ? (
             <>
+              {messagesLoadingMore && (
+                <div className='flex items-center justify-center py-4'>
+                  <Loader2 className='w-5 h-5 animate-spin text-blue-500 dark:text-blue-400 mr-2' />
+                  <span className='text-sm text-gray-500 dark:text-gray-400'>加载更多消息...</span>
+                </div>
+              )}
               <div
                 className="relative w-full"
                 style={{ height: `${totalSize}px` }}
@@ -386,6 +437,12 @@ export function ChatMainArea({
             </>
           ) : (
             <>
+              {messagesLoadingMore && (
+                <div className='flex items-center justify-center py-4'>
+                  <Loader2 className='w-5 h-5 animate-spin text-blue-500 dark:text-blue-400 mr-2' />
+                  <span className='text-sm text-gray-500 dark:text-gray-400'>加载更多消息...</span>
+                </div>
+              )}
               {currentMessages.map((message, index) => (
                 <ChatMessage
                   key={message.id}

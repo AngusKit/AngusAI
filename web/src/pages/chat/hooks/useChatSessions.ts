@@ -86,10 +86,22 @@ function messageVoToMessage(vo: MessageVo): Message {
 }
 
 const SESSION_PAGE_SIZE = 10;
+/** 消息分页大小：每次加载 10 条消息 */
+const MESSAGE_PAGE_SIZE = 10;
 /** 最大缓存消息的会话数量，超出时淘汰最早访问的会话消息，防止内存无限增长导致浏览器崩溃 */
 const MAX_CACHED_MESSAGE_SESSIONS = 20;
 /** 用于 currentMessages 无消息时的稳定引用，避免每次渲染创建新空数组导致子组件重渲染 */
 const EMPTY_MESSAGES: Message[] = [];
+
+/** 每个会话的消息分页信息 */
+interface MessagePagination {
+  /** 已加载的最小页码（向上翻页时递减） */
+  earliestPage: number;
+  /** 总页数 */
+  totalPages: number;
+  /** 是否还有更早的消息可加载 */
+  hasMore: boolean;
+}
 
 export function useChatSessions(initialAppId?: string, initialModelId?: string, initialSessionId?: string) {
   const [sessions, setSessions] = useState<Session[]>([]);
@@ -97,9 +109,14 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
   const [sessionMessages, setSessionMessages] = useState<Record<string, Message[]>>({});
   const [sessionsLoading, setSessionsLoading] = useState(true);
   const [messagesLoading, setMessagesLoading] = useState(false);
+  const [messagesLoadingMore, setMessagesLoadingMore] = useState(false);
   const [sessionKeyword, setSessionKeyword] = useState('');
   const debouncedSessionKeyword = useDebounce(sessionKeyword, 500);
   const loadedMessagesRef = useRef<Set<string>>(new Set());
+  /** 每个会话的消息分页状态（ref 避免触发重渲染） */
+  const messagePaginationRef = useRef<Record<string, MessagePagination>>({});
+  /** 防止并发加载更多消息 */
+  const loadingMoreRef = useRef(false);
 
   // 使用 ref 持有 sessions 最新值，避免 deleteSession/renameSession/toggleStar 等回调因
   // sessions 引用变化而重建，从而减少依赖这些回调的子组件的级联重渲染
@@ -174,7 +191,10 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
     loadSessions(sessionPage + 1, true);
   }, [sessions.length, sessionTotal, sessionPage, sessionsLoadMore, sessionsLoading, loadSessions]);
 
-  /** 按 sessionId 内存缓存消息（sessionMessages + loadedMessagesRef），切换会话时优先用缓存，避免重复请求 */
+  /**
+   * 按 sessionId 内存缓存消息（sessionMessages + loadedMessagesRef），切换会话时优先用缓存，避免重复请求。
+   * 首次加载时先请求第 1 页获取 total，然后计算并请求最后一页（最新消息），实现每页 10 条分页。
+   */
   const loadMessages = useCallback(async (sessionId: string) => {
     if (loadedMessagesRef.current.has(sessionId)) {
       // 更新 LRU 访问顺序：将当前 sessionId 移到末尾
@@ -189,10 +209,32 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
     messageCacheOrderRef.current.push(sessionId);
     setMessagesLoading(true);
     try {
-      const res = await Message.getMessageList({ sessionId, pageNo: 1, pageSize: 200 });
-      const data = (res as any)?.data;
-      const list: MessageVo[] = data?.list ?? [];
-      const msgs = list.map(messageVoToMessage);
+      // 先请求第 1 页以获取 total
+      const firstRes = await Message.getMessageList({ sessionId, pageNo: 1, pageSize: MESSAGE_PAGE_SIZE });
+      const firstData = (firstRes as any)?.data;
+      const total = Number(firstData?.total ?? 0);
+      const totalPages = Math.max(1, Math.ceil(total / MESSAGE_PAGE_SIZE));
+
+      let msgs: Message[];
+      if (totalPages <= 1) {
+        // 只有 1 页，直接使用第 1 页的数据
+        const list: MessageVo[] = firstData?.list ?? [];
+        msgs = list.map(messageVoToMessage);
+      } else {
+        // 请求最后一页（最新消息）
+        const lastRes = await Message.getMessageList({ sessionId, pageNo: totalPages, pageSize: MESSAGE_PAGE_SIZE });
+        const lastData = (lastRes as any)?.data;
+        const list: MessageVo[] = lastData?.list ?? [];
+        msgs = list.map(messageVoToMessage);
+      }
+
+      // 记录分页信息
+      messagePaginationRef.current[sessionId] = {
+        earliestPage: totalPages,
+        totalPages,
+        hasMore: totalPages > 1,
+      };
+
       setSessionMessages((prev) => {
         const next = { ...prev, [sessionId]: msgs };
         // LRU 淘汰：当缓存会话数超过上限时，移除最早访问且非当前会话的消息
@@ -210,12 +252,14 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
           }
           order.shift();
           delete next[oldest];
+          delete messagePaginationRef.current[oldest];
           loadedMessagesRef.current.delete(oldest);
         }
         return next;
       });
     } catch (e) {
       loadedMessagesRef.current.delete(sessionId);
+      delete messagePaginationRef.current[sessionId];
       const order = messageCacheOrderRef.current;
       const idx = order.indexOf(sessionId);
       if (idx >= 0) order.splice(idx, 1);
@@ -225,6 +269,50 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
       setMessagesLoading(false);
     }
   }, []);
+
+  /** 向上滚动时加载更早的消息（上一页） */
+  const loadMoreMessages = useCallback(async (sessionId: string) => {
+    if (loadingMoreRef.current) return;
+    const pagination = messagePaginationRef.current[sessionId];
+    if (!pagination || !pagination.hasMore) return;
+    const prevPage = pagination.earliestPage - 1;
+    if (prevPage < 1) return;
+    loadingMoreRef.current = true;
+    setMessagesLoadingMore(true);
+    try {
+      const res = await Message.getMessageList({ sessionId, pageNo: prevPage, pageSize: MESSAGE_PAGE_SIZE });
+      const data = (res as any)?.data;
+      const list: MessageVo[] = data?.list ?? [];
+      const olderMsgs = list.map(messageVoToMessage);
+      // 将旧消息添加到数组前面
+      setSessionMessages((prev) => {
+        const current = prev[sessionId] ?? [];
+        // 按 id 去重，防止重复
+        const existingIds = new Set(current.map(m => m.id));
+        const uniqueOlder = olderMsgs.filter(m => !existingIds.has(m.id));
+        return { ...prev, [sessionId]: [...uniqueOlder, ...current] };
+      });
+      // 更新分页信息
+      messagePaginationRef.current[sessionId] = {
+        ...pagination,
+        earliestPage: prevPage,
+        hasMore: prevPage > 1,
+      };
+    } catch (e) {
+      console.error('Load more messages failed:', e);
+      toast.error('加载更多消息失败');
+    } finally {
+      loadingMoreRef.current = false;
+      setMessagesLoadingMore(false);
+    }
+  }, []);
+
+  /** 当前会话是否有更早的消息可加载 */
+  const hasMoreMessages = useMemo(() => {
+    if (!currentSessionId) return false;
+    const pagination = messagePaginationRef.current[currentSessionId];
+    return pagination?.hasMore ?? false;
+  }, [currentSessionId, sessionMessages]);
 
   useEffect(() => {
     loadSessions(1, false);
@@ -300,6 +388,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
         }
         setSessionTotal((prev) => Math.max(0, Number(prev) - 1));
         loadedMessagesRef.current.delete(sid);
+        delete messagePaginationRef.current[sid];
         setSessionMessages((prev) => {
           const next = { ...prev };
           delete next[sid];
@@ -471,6 +560,8 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
     try {
       await Message.clearMessages(sessionId);
       setSessionMessages((prev) => ({ ...prev, [sessionId]: [] }));
+      // 重置分页信息
+      messagePaginationRef.current[sessionId] = { earliestPage: 1, totalPages: 1, hasMore: false };
       setSessions((prev) =>
         prev.map((s) => (s.sessionId === sessionId ? { ...s, messageCount: 0, updatedAt: new Date() } : s))
       );
@@ -560,6 +651,8 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
     sessionMessages,
     sessionsLoading,
     messagesLoading,
+    messagesLoadingMore,
+    hasMoreMessages,
     sessionsLoadMore,
     hasMoreSessions,
     loadMoreSessions,
@@ -572,6 +665,7 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
     toggleStar,
     selectSession,
     loadMessages,
+    loadMoreMessages,
     appendMessages,
     removeLastAssistantMessage,
     updateMessage,
