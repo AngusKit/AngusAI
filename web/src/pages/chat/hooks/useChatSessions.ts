@@ -308,6 +308,8 @@ export function useChatSessions(initialAppId?: string, initialModelId?: string, 
   }, []);
 
   /** 当前会话是否有更早的消息可加载 */
+  // sessionMessages 仅作为重计算触发器：messagePaginationRef 是 ref 不触发渲染，
+  // 依赖 sessionMessages 确保加载消息后 memo 能重新计算
   const hasMoreMessages = useMemo(() => {
     if (!currentSessionId) return false;
     const pagination = messagePaginationRef.current[currentSessionId];
