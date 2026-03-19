@@ -50,7 +50,7 @@ export const DEFAULT_VECTOR_STORE_TYPE_CONFIG = {
  * 分页配置
  */
 export const PAGINATION_CONFIG = {
-  DEFAULT_PAGE_SIZE: 8,
+  DEFAULT_PAGE_SIZE: 6,
   DEFAULT_PAGE: 1,
 } as const;
 
