@@ -2,7 +2,6 @@ import { Search, Star, Copy, Plus, Trash2, Edit, Sparkles, BookOpen, Shield, Fol
 import { Button } from '@/components/ui/button.tsx';
 import { Input } from '@/components/ui/input.tsx';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog.tsx';
-import { ScrollArea } from '@/components/ui/scroll-area.tsx';
 import { Badge } from '@/components/ui/badge.tsx';
 import { Skeleton } from '@/components/ui/skeleton.tsx';
 import { useState, useEffect, useCallback } from 'react';
@@ -28,7 +27,7 @@ import {
   getDefaultCategoryId,
 } from '@/pages/prompt/utils.ts';
 import { useDebounce } from '@/hooks/useDebounce.ts';
-import { XcanPagination } from '@/components/ui/pagination.tsx';
+import { Pagination } from '@/components/gm/Pagination.tsx';
 
 interface PromptLibraryDialogProps {
   onClose: () => void;
@@ -71,7 +70,9 @@ function CategoryItem({
           'group w-full flex items-center gap-2 px-3 rounded-lg transition-colors',
           paddingClass,
           indentClass,
-          isSelected ? 'bg-blue-50 dark:bg-blue-900/20' : 'hover:bg-gray-100 dark:hover:bg-gray-750'
+          isSelected
+            ? 'bg-blue-50 dark:bg-blue-900/30'
+            : 'hover:bg-gray-100 dark:hover:bg-gray-700/60'
         )}
       >
         <button
@@ -105,7 +106,7 @@ function CategoryItem({
               <Button
                 variant='ghost'
                 size='icon'
-                className='h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity'
+                className='h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100 dark:hover:bg-gray-600/50'
                 onClick={e => {
                   e.stopPropagation();
                   onEdit(category);
@@ -116,7 +117,7 @@ function CategoryItem({
               <Button
                 variant='ghost'
                 size='icon'
-                className='h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity'
+                className='h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100 dark:hover:bg-red-950/30'
                 onClick={e => {
                   e.stopPropagation();
                   onDelete(category);
@@ -446,8 +447,8 @@ export function PromptLibraryDialog({ onClose, onSelectPrompt }: PromptLibraryDi
   return (
     <>
       <Dialog open onOpenChange={open => !open && onClose()}>
-        <DialogContent className='sm:max-w-[1124px] max-w-[calc(100%-2rem)] h-[80vh] p-0 dark:bg-gray-800'>
-          <DialogHeader className='px-6 py-4 border-b dark:border-gray-700'>
+        <DialogContent className='flex max-h-[80vh] min-h-0 flex-col gap-0 overflow-hidden p-0 sm:max-w-[1124px] max-w-[calc(100%-2rem)] h-[80vh] dark:bg-gray-800'>
+          <DialogHeader className='shrink-0 px-6 py-4 border-b dark:border-gray-700'>
             <DialogTitle className='flex items-center gap-2 dark:text-white'>
               <Sparkles className='w-5 h-5 text-blue-500' />
               {t('prompts.title')}
@@ -460,7 +461,7 @@ export function PromptLibraryDialog({ onClose, onSelectPrompt }: PromptLibraryDi
                   placeholder={t('prompts.search')}
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
-                  className='pl-10 dark:bg-gray-750 dark:border-gray-600'
+                  className='pl-10 dark:border-gray-600 dark:bg-gray-900/50 dark:text-gray-100 dark:placeholder:text-gray-500 dark:hover:bg-gray-800/80 dark:focus-visible:bg-gray-900'
                 />
               </div>
               <div className='flex-1' />
@@ -470,21 +471,24 @@ export function PromptLibraryDialog({ onClose, onSelectPrompt }: PromptLibraryDi
                   setShowCategoryDialog(true);
                 }}
                 variant='outline'
-                className='gap-2'
+                className='gap-2 dark:border-gray-600 dark:bg-gray-900/40 dark:hover:bg-gray-700/70 dark:hover:text-gray-100'
               >
                 <FolderPlus className='w-4 h-4' />
                 {t('prompts.newCategory')}
               </Button>
-              <Button onClick={openCreateDialog} className='gap-2'>
+              <Button
+                onClick={openCreateDialog}
+                className='gap-2 dark:hover:bg-primary/85 dark:hover:brightness-110'
+              >
                 <Plus className='w-4 h-4' />
                 {t('prompts.newPrompt')}
               </Button>
             </div>
           </DialogHeader>
 
-          <div className='flex flex-1 overflow-hidden'>
-            <div className='w-64 border-r dark:border-gray-700 p-4'>
-              <ScrollArea className='h-full'>
+          <div className='flex min-h-0 flex-1 flex-row overflow-hidden'>
+            <div className='flex min-h-0 w-64 shrink-0 flex-col border-r dark:border-gray-700 p-4'>
+              <div className='scrollbar-hide min-h-0 flex-1 overflow-y-auto [-webkit-overflow-scrolling:touch]'>
                 {isLoadingCategories ? (
                   <div className='space-y-2'>
                     {Array.from({ length: 6 }).map((_, i) => (
@@ -521,12 +525,12 @@ export function PromptLibraryDialog({ onClose, onSelectPrompt }: PromptLibraryDi
                     ))}
                   </div>
                 )}
-              </ScrollArea>
+              </div>
             </div>
 
-            <div className='flex-1 overflow-hidden flex flex-col'>
-              <ScrollArea className='flex-1'>
-                <div className='p-6 space-y-4'>
+            <div className='flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden'>
+              <div className='scrollbar-hide min-h-0 flex-1 overflow-y-auto [-webkit-overflow-scrolling:touch]'>
+                <div className='space-y-4 p-6'>
                   {isLoadingPrompts ? (
                     <>
                       {Array.from({ length: 5 }).map((_, i) => (
@@ -566,7 +570,7 @@ export function PromptLibraryDialog({ onClose, onSelectPrompt }: PromptLibraryDi
                     prompts.map(prompt => (
                       <div
                         key={prompt.id}
-                        className='p-4 bg-white dark:bg-gray-750 border border-gray-200 dark:border-gray-600 rounded-lg hover:shadow-md transition-shadow'
+                        className='rounded-lg border border-gray-200 bg-white p-4 transition-all hover:shadow-md dark:border-gray-600 dark:bg-gray-800/80 dark:hover:bg-gray-700/50'
                       >
                         <div className='flex items-start justify-between mb-3'>
                           <div className='flex-1'>
@@ -590,7 +594,12 @@ export function PromptLibraryDialog({ onClose, onSelectPrompt }: PromptLibraryDi
                               ))}
                             </div>
                           </div>
-                          <Button variant='ghost' size='icon' onClick={() => toggleFavorite(prompt.id)}>
+                          <Button
+                            variant='ghost'
+                            size='icon'
+                            className='dark:hover:bg-gray-600/50'
+                            onClick={() => toggleFavorite(prompt.id)}
+                          >
                             <Star
                               className={cn('w-4 h-4', prompt.isFavorite && 'fill-yellow-400 text-yellow-400')}
                             />
@@ -602,7 +611,11 @@ export function PromptLibraryDialog({ onClose, onSelectPrompt }: PromptLibraryDi
                         </p>
 
                         <div className='flex items-center gap-2'>
-                          <Button size='sm' onClick={() => usePrompt(prompt)} className='min-w-[120px]'>
+                          <Button
+                            size='sm'
+                            onClick={() => usePrompt(prompt)}
+                            className='min-w-[120px] dark:hover:bg-primary/85 dark:hover:brightness-110'
+                          >
                             {t('prompts.use')}
                           </Button>
                           <Button
@@ -619,7 +632,7 @@ export function PromptLibraryDialog({ onClose, onSelectPrompt }: PromptLibraryDi
                               variant='outline'
                               size='sm'
                               onClick={() => duplicatePrompt(prompt)}
-                              className='gap-2'
+                              className='gap-2 dark:border-gray-600 dark:bg-gray-900/30 dark:hover:bg-gray-700/70'
                             >
                               <Copy className='w-3 h-3' />
                               {t('prompts.duplicateAction')}
@@ -628,7 +641,7 @@ export function PromptLibraryDialog({ onClose, onSelectPrompt }: PromptLibraryDi
                           <Button
                             variant='ghost'
                             size='icon'
-                            className='h-8 w-8'
+                            className='h-8 w-8 dark:hover:bg-gray-600/50'
                             onClick={() => {
                               setViewingPrompt(prompt);
                               setShowViewDialog(true);
@@ -641,7 +654,7 @@ export function PromptLibraryDialog({ onClose, onSelectPrompt }: PromptLibraryDi
                               <Button
                                 variant='ghost'
                                 size='icon'
-                                className='h-8 w-8'
+                                className='h-8 w-8 dark:hover:bg-gray-600/50'
                                 onClick={() => openEditDialog(prompt)}
                               >
                                 <Edit className='w-4 h-4' />
@@ -649,7 +662,7 @@ export function PromptLibraryDialog({ onClose, onSelectPrompt }: PromptLibraryDi
                               <Button
                                 variant='ghost'
                                 size='icon'
-                                className='h-8 w-8 text-red-600'
+                                className='h-8 w-8 text-red-600 dark:hover:bg-red-950/40'
                                 onClick={() => {
                                   setDeletingPrompt(prompt);
                                   setShowDeleteDialog(true);
@@ -664,11 +677,19 @@ export function PromptLibraryDialog({ onClose, onSelectPrompt }: PromptLibraryDi
                     ))
                   )}
                 </div>
-              </ScrollArea>
+              </div>
 
               {!isLoadingPrompts && pageParam.total > pageParam.pageSize && (
-                <div className='p-4 border-t dark:border-gray-700'>
-                  <XcanPagination {...pageParam} onChange={handlePageChange} />
+                <div className='shrink-0'>
+                  <Pagination
+                    currentPage={pageParam.pageNo}
+                    totalPages={Math.max(1, Math.ceil(pageParam.total / pageParam.pageSize))}
+                    totalItems={pageParam.total}
+                    pageSize={pageParam.pageSize}
+                    onPageChange={page =>
+                      handlePageChange({ pageNo: page, pageSize: pageParam.pageSize })
+                    }
+                  />
                 </div>
               )}
             </div>

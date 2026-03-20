@@ -1,5 +1,5 @@
 import { Search, Star, Copy, Plus, Trash2, Edit, Sparkles, BookOpen, Shield, FolderPlus, Eye } from 'lucide-react';
-import { XcanPagination } from '@/components/ui/pagination';
+import { Pagination } from '@/components/gm/Pagination.tsx';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -743,7 +743,17 @@ export function PromptLibrary() {
             </div>
           </ScrollArea>
 
-          {!isLoadingPrompts && pageParam.total > pageParam.pageSize && <XcanPagination {...pageParam} onChange={handlePageChange} />}
+          {!isLoadingPrompts && pageParam.total > pageParam.pageSize && (
+            <Pagination
+              currentPage={pageParam.pageNo}
+              totalPages={Math.max(1, Math.ceil(pageParam.total / pageParam.pageSize))}
+              totalItems={pageParam.total}
+              pageSize={pageParam.pageSize}
+              onPageChange={page =>
+                handlePageChange({ pageNo: page, pageSize: pageParam.pageSize })
+              }
+            />
+          )}
         </div>
       </div>
 
