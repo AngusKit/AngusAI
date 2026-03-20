@@ -286,9 +286,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     } catch (err) {
       // SSE 断开但已拿到真实 messageId：后端仍在生成，保持 isStreaming=true 由轮询兜底
       const realMsgId = streamMsgIdRef.current;
-      if (realMsgId && isRealMessageId(realMsgId)) {
-        // 不显示错误，轮询 useEffect 会自动拉取增量内容直到完成
-      } else {
+      if (!realMsgId || !isRealMessageId(realMsgId)) {
         const msg = err instanceof Error ? err.message : '请求失败';
         updateMessage(effectiveKeyRef.current, assistantId, {
           content: `请求出错：${msg}`,
@@ -296,6 +294,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
         });
         toast.error(msg);
       }
+      // 有真实 messageId 时不显示错误，轮询 useEffect 会自动拉取增量内容直到完成
     }
   };
 
@@ -369,9 +368,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     } catch (err) {
       // SSE 断开但已拿到真实 messageId：后端仍在生成，保持 isStreaming=true 由轮询兜底
       const realMsgId = regenMsgIdRef.current;
-      if (realMsgId && isRealMessageId(realMsgId)) {
-        // 不显示错误，轮询 useEffect 会自动拉取增量内容直到完成
-      } else {
+      if (!realMsgId || !isRealMessageId(realMsgId)) {
         const msg = err instanceof Error ? err.message : '请求失败';
         updateMessage(currentSessionId, assistantId, {
           content: `请求出错：${msg}`,
@@ -379,6 +376,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
         });
         toast.error(msg);
       }
+      // 有真实 messageId 时不显示错误，轮询 useEffect 会自动拉取增量内容直到完成
     }
   }, [
     currentSessionId,
