@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button.tsx';
 import { Textarea } from '@/components/ui/textarea.tsx';
 import { AttachmentPreview } from './AttachmentPreview.tsx';
 import { cn } from '@/components/ui/utils.ts';
-import type { ThemeTemplate } from './ThemeDialog.tsx';
+import type { ThemeTemplate } from '../chatTheme.ts';
 
 export interface ChatInputBarHandle {
   insertText: (text: string) => void;

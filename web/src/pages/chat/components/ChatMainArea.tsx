@@ -10,7 +10,6 @@ import {
   ArrowLeft,
   Download,
   Share2,
-  Palette,
   Trash2,
   Plus,
 } from 'lucide-react';
@@ -26,7 +25,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu.tsx';
 import { cn } from '@/components/ui/utils.ts';
-import type { ThemeTemplate } from './ThemeDialog.tsx';
+import type { ThemeTemplate } from '../chatTheme.ts';
 import type { Message } from '../hooks/useChatSessions.ts';
 
 export interface ChatMainAreaProps {
@@ -50,12 +49,9 @@ export interface ChatMainAreaProps {
   enableImageInput?: boolean;
   /** 是否显示会话设置（温度、maxToken等），默认 true */
   enableSessionSettings?: boolean;
-  /** 是否显示外观设置，默认 true */
-  enableAppearanceSettings?: boolean;
   /** 新对话回调（会话列表隐藏时用于下拉菜单中的新对话） */
   onNewSession?: () => void;
   onShowPromptLibrary: () => void;
-  onShowThemeDialog: () => void;
   onShowSettings: () => void;
   onToggleFullscreen: () => void;
   onExportChat: () => void;
@@ -113,10 +109,8 @@ export function ChatMainArea({
                                enableVoiceInput = true,
                                enableImageInput = false,
                                enableSessionSettings = true,
-                               enableAppearanceSettings = true,
                                onNewSession,
                                onShowPromptLibrary,
-                               onShowThemeDialog,
                                onShowSettings,
                                onToggleFullscreen,
                                onExportChat,
@@ -281,11 +275,6 @@ export function ChatMainArea({
             <Button variant='ghost' size='sm' onClick={onShowPromptLibrary} className='gap-2'>
               <BookmarkPlus className='w-4 h-4' />
               提示词库
-            </Button>
-          )}
-          {enableAppearanceSettings && (
-            <Button variant='ghost' size='icon' onClick={onShowThemeDialog} title='外观设置'>
-              <Palette className='w-4 h-4' />
             </Button>
           )}
           {enableSessionSettings && (

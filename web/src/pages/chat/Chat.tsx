@@ -10,7 +10,7 @@ import { type ChatSwitcherSelection } from './components/ChatSwitcher.tsx';
 import { clearChatSwitcherCacheForSession } from './hooks/useChatSwitcher.ts';
 import { SettingsDialog } from './components/SettingsDialog.tsx';
 import { MarkdownThemeLocaleSync } from './components/MarkdownThemeLocaleSync.tsx';
-import { ThemeDialog, CHAT_TEMPLATES, type TemplateType } from './components/ThemeDialog.tsx';
+import { DEFAULT_CHAT_TEMPLATE } from './chatTheme.ts';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { SessionConfig } from '@/services/SessionTypes';
 import {
@@ -79,10 +79,8 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
   const inputBarRef = useRef<{ insertText: (text: string) => void; focus: () => void } | null>(null);
   const [showPromptLibrary, setShowPromptLibrary] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [showThemeDialog, setShowThemeDialog] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState<TemplateType>('modern-blue');
   const isComposingRef = useRef(false);
   const lastCompositionEndRef = useRef(0);
   const scrollAfterSendRef = useRef(false);
@@ -107,8 +105,6 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
       timeoutMs: c?.timeoutMs ?? DEFAULT_CHAT_SETTINGS.timeoutMs,
     });
   }, [currentSessionId, currentSession?.config]);
-
-  const selectedTemplateObj = CHAT_TEMPLATES.find(t => t.id === selectedTemplate) || CHAT_TEMPLATES[0];
 
   // 用 ref 存储最新回调，避免 ensureSessionLoaded/selectSession 变化导致 effect 反复执行
   const ensureSessionLoadedRef = useRef(ensureSessionLoaded);
@@ -480,7 +476,6 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
   const enableVoiceInput = appFeatures?.enableVoiceInput !== false;
   const enableImageInput = appFeatures?.enableImageInput !== false;
   const enableSessionSettings = appFeatures?.enableSessionSettings !== false;
-  const enableAppearanceSettings = appFeatures?.enableAppearanceSettings !== false;
 
   // 当前选中的智能体（优先用 selection.agent，否则从 app 中解析）
   const currentAgent =
@@ -650,9 +645,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
         enableVoiceInput={enableVoiceInput}
         enableImageInput={enableImageInput}
         enableSessionSettings={enableSessionSettings}
-        enableAppearanceSettings={enableAppearanceSettings}
         onShowPromptLibrary={() => setShowPromptLibrary(true)}
-        onShowThemeDialog={() => setShowThemeDialog(true)}
         onNewSession={!enableSessionList ? createNewSession : undefined}
         onShowSettings={() => setShowSettings(true)}
         onToggleFullscreen={toggleFullscreen}
@@ -665,7 +658,7 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
         hasAgentPlaceholder={hasAgentPlaceholder}
         welcomeMessage={welcomeMessage}
         suggestedQuestions={suggestedQuestions}
-        selectedTemplateObj={selectedTemplateObj}
+        selectedTemplateObj={DEFAULT_CHAT_TEMPLATE}
         onInsertPrompt={insertPrompt}
         inputBarRef={inputBarRef}
         initialContent={defaultContent}
@@ -715,13 +708,6 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
         }}
       />
 
-      {/* Theme Dialog */}
-      <ThemeDialog
-        open={showThemeDialog}
-        onOpenChange={setShowThemeDialog}
-        selectedTemplate={selectedTemplate}
-        onTemplateChange={setSelectedTemplate}
-      />
     </div>
     </MarkdownProvider>
   );

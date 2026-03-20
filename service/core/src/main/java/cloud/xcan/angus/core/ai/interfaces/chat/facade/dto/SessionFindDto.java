@@ -33,6 +33,6 @@ public class SessionFindDto extends PageQuery {
 
   @Override
   public String getDefaultOrderBy() {
-    return "createdDate";
+    return "modifiedDate";
   }
 }
