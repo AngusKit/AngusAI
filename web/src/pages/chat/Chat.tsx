@@ -30,6 +30,9 @@ interface ChatProps {
   onBack?: () => void;
 }
 
+/** 判断是否为后端返回的真实消息 ID（非前端占位 id） */
+const isRealMessageId = (id: string) => id && !String(id).startsWith('assistant-');
+
 export function Chat({ content = '', onBack }: ChatProps = {}) {
   const { language } = useLanguage();
   const { theme: appTheme } = useTheme();
@@ -281,12 +284,18 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
       const idForFinal = streamMsgIdRef.current ?? assistantId;
       updateMessage(effectiveKeyRef.current, idForFinal, { content: accumulated, isStreaming: false });
     } catch (err) {
-      const msg = err instanceof Error ? err.message : '请求失败';
-      updateMessage(effectiveKeyRef.current, assistantId, {
-        content: `请求出错：${msg}`,
-        isStreaming: false,
-      });
-      toast.error(msg);
+      // SSE 断开但已拿到真实 messageId：后端仍在生成，保持 isStreaming=true 由轮询兜底
+      const realMsgId = streamMsgIdRef.current;
+      if (realMsgId && isRealMessageId(realMsgId)) {
+        // 不显示错误，轮询 useEffect 会自动拉取增量内容直到完成
+      } else {
+        const msg = err instanceof Error ? err.message : '请求失败';
+        updateMessage(effectiveKeyRef.current, assistantId, {
+          content: `请求出错：${msg}`,
+          isStreaming: false,
+        });
+        toast.error(msg);
+      }
     }
   };
 
@@ -358,12 +367,18 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
       const idForFinal = regenMsgIdRef.current ?? assistantId;
       updateMessage(currentSessionId, idForFinal, { content: accumulated, isStreaming: false });
     } catch (err) {
-      const msg = err instanceof Error ? err.message : '请求失败';
-      updateMessage(currentSessionId, assistantId, {
-        content: `请求出错：${msg}`,
-        isStreaming: false,
-      });
-      toast.error(msg);
+      // SSE 断开但已拿到真实 messageId：后端仍在生成，保持 isStreaming=true 由轮询兜底
+      const realMsgId = regenMsgIdRef.current;
+      if (realMsgId && isRealMessageId(realMsgId)) {
+        // 不显示错误，轮询 useEffect 会自动拉取增量内容直到完成
+      } else {
+        const msg = err instanceof Error ? err.message : '请求失败';
+        updateMessage(currentSessionId, assistantId, {
+          content: `请求出错：${msg}`,
+          isStreaming: false,
+        });
+        toast.error(msg);
+      }
     }
   }, [
     currentSessionId,
@@ -393,9 +408,11 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
     }
   }, [currentSessionId, updateMessage]);
 
-  /** SSE 断开后轮询：若最后一条助手消息在流式生成中，每 3 秒拉取详情直到完成。必须在首个 SSE chunk 返回后（已有真实 message_id）才可轮询，否则会用占位 id 导致 404 */
+  /** SSE 断开后轮询：若最后一条助手消息在流式生成中，每 3 秒拉取详情直到完成。
+   *  后端会在 SSE 断开后周期性持久化内容，轮询时若发现 DB 内容比本地长则增量更新，
+   *  直到 isStreaming=false 时写入最终内容并停止轮询。
+   *  必须在首个 SSE chunk 返回后（已有真实 message_id）才可轮询，否则会用占位 id 导致 404 */
   const POLL_INTERVAL_MS = 3000;
-  const isRealMessageId = (id: string) => id && !String(id).startsWith('assistant-');
   useEffect(() => {
     if (!currentSessionId || messagesLoading) return;
     const last = currentMessages[currentMessages.length - 1];
@@ -404,12 +421,19 @@ export function Chat({ content = '', onBack }: ChatProps = {}) {
       try {
         const res = await MessageApi.getMessage(last.id!);
         const data = (res as { data?: { isStreaming?: boolean; content?: string } })?.data;
-        if (data && !data.isStreaming) {
+        if (!data) return;
+        if (!data.isStreaming) {
+          // 流式完成：写入最终内容并停止轮询
           updateMessage(currentSessionId, last.id, {
             content: data.content ?? '',
             isStreaming: false,
           });
           clearInterval(timer);
+        } else if (data.content && data.content.length > (last.content?.length ?? 0)) {
+          // 仍在生成中但 DB 内容比本地长：增量追加（仅在 DB 内容更长时更新，避免覆盖实时 SSE 数据）
+          updateMessage(currentSessionId, last.id, {
+            content: data.content,
+          });
         }
       } catch {
         /* 忽略轮询错误 */

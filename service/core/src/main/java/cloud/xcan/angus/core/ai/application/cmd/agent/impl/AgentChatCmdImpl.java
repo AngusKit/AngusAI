@@ -35,6 +35,7 @@ import dev.langchain4j.service.TokenStream;
 import jakarta.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -199,11 +200,22 @@ public class AgentChatCmdImpl implements AgentChatCmd {
         Principal principal = PrincipalContext.get();
         Long assistantMessageId = assistantMessage.getId();
         AtomicBoolean cancelled = new AtomicBoolean(false);
+        // SSE 断开标记：客户端刷新/离开时 onCompletion 或 send 异常触发，
+        // 后续 token 不再推送 SSE，改为周期性持久化内容供前端轮询
+        AtomicBoolean sseDisconnected = new AtomicBoolean(false);
+        AtomicInteger tokensSinceLastPersist = new AtomicInteger(0);
+        final int PERSIST_TOKEN_INTERVAL = 200;
         ActiveStreamRegistry.StreamContext streamCtx = new ActiveStreamRegistry.StreamContext(
             emitter, cancelled, new StringBuilder(), assistantMessage, messageCmd);
         activeStreamRegistry.register(assistantMessageId, streamCtx);
-        emitter.onCompletion(() -> activeStreamRegistry.remove(assistantMessageId));
-        emitter.onTimeout(() -> activeStreamRegistry.remove(assistantMessageId));
+        emitter.onCompletion(() -> {
+          sseDisconnected.set(true);
+          activeStreamRegistry.remove(assistantMessageId);
+        });
+        emitter.onTimeout(() -> {
+          sseDisconnected.set(true);
+          activeStreamRegistry.remove(assistantMessageId);
+        });
         sseEmitterChatExecutor.execute(() -> {
           log.info("Chat [{}]-[{}] start sseEmitterChatExecutor, override: {}",
               sessionDb.getSessionId(), userMessage.getId(), override);
@@ -218,6 +230,17 @@ public class AgentChatCmdImpl implements AgentChatCmd {
             stream.onPartialResponse(token -> {
                   if (cancelled.get()) return;
                   fullContent.append(token);
+
+                  // SSE 已断开：跳过推送，周期性持久化内容供前端轮询兜底
+                  if (sseDisconnected.get()) {
+                    if (tokensSinceLastPersist.incrementAndGet() >= PERSIST_TOKEN_INTERVAL) {
+                      tokensSinceLastPersist.set(0);
+                      assistantMessage.setContent(fullContent.toString());
+                      messageCmd.updateContent(assistantMessage);
+                    }
+                    return;
+                  }
+
                   OpenAIChatCompletionChunk chunk;
                   if (isFirstChunk[0]) {
                     isFirstChunk[0] = false;
@@ -243,13 +266,14 @@ public class AgentChatCmdImpl implements AgentChatCmd {
                   try {
                     emitter.send(SseEmitter.event().data(JsonUtils.toJson(chunk)));
                   } catch (Exception e) {
-                    log.error("Chat [{}]-[{}] error sending chunk: {}", sessionDb.getSessionId(),
-                        userMessage.getId(), e.getMessage());
+                    // SSE 推送失败（Broken pipe / AsyncRequestNotUsableException）：
+                    // 标记断开并立即持久化当前内容，后续 token 走周期持久化，不再设 isStreaming=false
+                    log.warn("Chat [{}]-[{}] SSE disconnected, switching to polling fallback: {}",
+                        sessionDb.getSessionId(), userMessage.getId(), e.getMessage());
+                    sseDisconnected.set(true);
+                    tokensSinceLastPersist.set(0);
                     assistantMessage.setContent(fullContent.toString());
-                    messageCmd.setStreaming(assistantMessage, false);
-                    // org.springframework.web.context.request.async.AsyncRequestTimeoutException: null
-                    // org.springframework.web.context.request.async.AsyncRequestNotUsableException: ServletOutputStream failed to write: Broken pipe
-                    emitter.completeWithError(e);
+                    messageCmd.updateContent(assistantMessage);
                   }
                 })
                 // 流结束：用完整内容覆盖占位消息，关闭流式标记，记录 ChatUsageLog（含 token 用量与成本）
@@ -273,7 +297,9 @@ public class AgentChatCmdImpl implements AgentChatCmd {
                   saveApiUsageLog(principal, agent, sessionDb, modelForAsync,
                       "/api/v1/agents/chat/stream", streamStartMs, true, null,
                       inTokens, outTokens, total, userMessageIdForLog);
-                  emitter.complete();
+                  if (!sseDisconnected.get()) {
+                    emitter.complete();
+                  }
                 })
                 .onError(e -> {
                   log.error("Chat [{}]-[{}] error: {}", sessionDb.getSessionId(),
@@ -282,7 +308,9 @@ public class AgentChatCmdImpl implements AgentChatCmd {
                   saveApiUsageLog(principal, agent, sessionDb, modelForAsync,
                       "/api/v1/agents/chat/stream", streamStartMs, false, e.getMessage(),
                       null, null, null, userMessageIdForLog);
-                  emitter.completeWithError(e);
+                  if (!sseDisconnected.get()) {
+                    emitter.completeWithError(e);
+                  }
                 });
             stream.start();
           } catch (Exception e) {
@@ -292,7 +320,9 @@ public class AgentChatCmdImpl implements AgentChatCmd {
             saveApiUsageLog(principal, agent, sessionDb, modelForAsync,
                 "/api/v1/agents/chat/stream", streamStartMs, false, e.getMessage(), null, null,
                 null, userMessageIdForLog);
-            emitter.completeWithError(e);
+            if (!sseDisconnected.get()) {
+              emitter.completeWithError(e);
+            }
           }
         });
         return emitter;
