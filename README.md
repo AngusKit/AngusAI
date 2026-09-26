@@ -40,19 +40,41 @@ AngusAI is enterprise AI agent development on infrastructure you control. It tur
 
 ## Get the Community Edition (free)
 
+About **300 MB**. This zip is **AngusGM + AngusAI** (not the full seven-app suite). At least **2 cores / 4 GB** RAM and **40 GB** disk (model cache extra). Docker Engine + Compose v2.
+
+This first-run path matches the official docs: Docker Compose, the install wizard, **access mode 2** (bundled Caddy), HTTP `:80` (no certificate).
+
+1. Resolve names to this machine (or add to `/etc/hosts` for a local trial). Public DNS name in the wizard is the **suffix** (e.g. `example.com`), not `gm.example.com`.
+
 ```bash
-curl -LO https://repo.anguskit.com/raw/raw-public/AngusKit/ai/AngusAI-Community-1.0.0.zip
-unzip AngusAI-Community-1.0.0.zip
-cd AngusAI-1.0.0/docker
-cp env.example .env
-docker compose --profile mysql up -d
+127.0.0.1 gm.example.com ai.example.com
 ```
 
-- Minimum: **2 cores / 4 GB** (recommended: 4 cores / 8 GB)
-- Ports after install: AngusGM `8801` (sign-in), AngusAI `8802`
-- Only need AngusAI? This zip includes AngusAI + AngusGM — no other product required.
+Open host **80**. App ports stay behind the proxy — do not use `localhost:8801`. Stop Nginx/Caddy/IIS if they already bind 80. On macOS + Docker Desktop, do not run `./install.sh` with `sudo`.
 
-Full installation guide (host ZIP, Kubernetes/Helm, TLS, upgrades): **[docs.anguskit.com/ai](https://www.anguskit.com/en/docs/ai/latest/en/manual/02-install-deploy)**
+2. Download, unzip, and run the wizard from the package root:
+
+```bash
+curl --fail --location --progress-bar -o AngusAI-Community-1.0.0.zip \
+  https://repo.anguskit.com/raw/raw-public/AngusKit/ai/AngusAI-Community-1.0.0.zip
+unzip AngusAI-Community-1.0.0.zip
+cd AngusAI-1.0.0
+./install.sh
+```
+
+Answer: Install mode `1` (Compose) → Access **`2`** (bundled reverse proxy — do not press Enter) → Proxy `1` (Caddy) → TLS **`4`** (HTTP `:80`, no certificate) → Database `1` (MySQL 8 in Compose) → Public DNS name = `example.com` → set admin password (default user `admin`). Wait for `Install finished.`
+
+3. Confirm health, then open the console:
+
+```bash
+./bin/angusctl.sh doctor
+```
+
+Look for `doctor: OK`. Open `http://gm.example.com/`, sign in, then open `http://ai.example.com/`.
+
+Need the full suite? Use `AngusKit-Community-1.0.0.zip` from [AngusKit](https://github.com/AngusKit/AngusKit).
+
+First-run guide: **[ai quickstart](https://www.anguskit.com/en/docs/ai/get-started/quickstart)** · Full install (host ZIP, Helm preview, TLS, offline): **[install docs](https://www.anguskit.com/en/docs/ai/latest/en/manual/02-install-deploy)**
 
 ## Community vs. Team / Enterprise vs. SaaS
 
@@ -64,7 +86,7 @@ Full installation guide (host ZIP, Kubernetes/Helm, TLS, upgrades): **[docs.angu
 | AI tokens | Self-managed (bring your own model budget) | Self-managed or pooled | Per plan |
 | Skills, guardrail policies, MCP, private model onboarding | Not included | Included | Per plan |
 
-Community Edition source is licensed under GPL-3.0 and distributed with each Community installation package. Team and Enterprise editions are proprietary, governed by the **XCan Business License, Version 1.0**, distributed only under a paid subscription.
+Community Edition source is licensed under GPL-3.0 and distributed with each Community installation package. Team and Enterprise editions are proprietary, governed by the **[XCan Business License, Version 1.0](https://www.anguskit.com/licenses/XCBL-1.0)** (XCBL-1.0), distributed only under a paid subscription.
 
 Full pricing and feature comparison: **[anguskit.com/pricing](https://www.anguskit.com/en/pricing)**
 
@@ -89,4 +111,4 @@ Full pricing and feature comparison: **[anguskit.com/pricing](https://www.angusk
 
 - This repository's documentation content: see [LICENSE](LICENSE) (GPL-3.0, matching the Community Edition source it describes).
 - AngusAI Community Edition product source: GPL-3.0, distributed with each Community installation package.
-- AngusAI Team / Enterprise Edition: proprietary, XCan Business License v1.0, distributed under a paid subscription only.
+- AngusAI Team / Enterprise Edition: proprietary, [XCan Business License, Version 1.0](LICENSE-XCBL-1.0) (XCBL-1.0) — see https://www.anguskit.com/licenses/XCBL-1.0. Distributed under a paid subscription only.
