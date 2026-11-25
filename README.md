@@ -86,7 +86,7 @@ First-run guide: **[ai quickstart](https://www.anguskit.com/en/docs/ai/get-start
 | AI tokens | Self-managed (bring your own model budget) | Self-managed or pooled | Per plan |
 | Skills, guardrail policies, MCP, private model onboarding | Not included | Included | Per plan |
 
-Community Edition source is licensed under GPL-3.0 and distributed with each Community installation package. Team and Enterprise editions are proprietary, governed by the **[XCan Business License, Version 1.0](https://www.anguskit.com/licenses/XCBL-1.0)** (XCBL-1.0), distributed only under a paid subscription.
+Community Edition source is licensed under GPL-3.0 and distributed with each Community installation package. Team and Enterprise editions are proprietary, governed by the **[XCan Business License, Version 1.0](https://www.anguskit.com/zh/licenses/XCBL-1.0)** (XCBL-1.0), distributed only under a paid subscription.
 
 Full pricing and feature comparison: **[anguskit.com/pricing](https://www.anguskit.com/en/pricing)**
 
@@ -111,4 +111,4 @@ Full pricing and feature comparison: **[anguskit.com/pricing](https://www.angusk
 
 - This repository's documentation content: see [LICENSE](LICENSE) (GPL-3.0, matching the Community Edition source it describes).
 - AngusAI Community Edition product source: GPL-3.0, distributed with each Community installation package.
-- AngusAI Team / Enterprise Edition: proprietary, [XCan Business License, Version 1.0](LICENSE-XCBL-1.0) (XCBL-1.0) — see https://www.anguskit.com/licenses/XCBL-1.0. Distributed under a paid subscription only.
+- AngusAI Team / Enterprise Edition: proprietary, [XCan Business License, Version 1.0](LICENSE-XCBL-1.0) (XCBL-1.0) — see https://www.anguskit.com/zh/licenses/XCBL-1.0. Distributed under a paid subscription only.
